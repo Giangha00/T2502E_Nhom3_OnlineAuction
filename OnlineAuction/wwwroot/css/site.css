@@ -18,5 +18,9 @@ html {
 }
 
 body {
+  margin: 0;
+}
+
+body:not(.home-page) {
   margin-bottom: 60px;
 }

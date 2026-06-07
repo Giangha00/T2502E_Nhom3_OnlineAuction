@@ -1,8 +1,137 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model OnlineAuction.Models.HomeViewModel
+@{
+    ViewData["Title"] = "Home";
+    Layout = "_HomeLayout";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="intro-section">
+    <div class="container-fluid intro-container">
+        <div class="intro-grid">
+            <div class="intro-image">
+                <img src="https://images.unsplash.com/photo-1578301978693-981a9d7a0040?w=900&h=700&fit=crop"
+                     alt="Featured artwork at auction"/>
+            </div>
+            <div class="intro-content">
+                <h1 class="intro-title">Welcome to Auction House</h1>
+                <p class="intro-description">
+                    Discover unique products through online auction. Browse curated collections,
+                    place your bids, and connect with trusted sellers from around the world.
+                </p>
+                <a href="#featured-auctions" class="btn-cta">Explore Auctions</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="featured-section" id="featured-auctions">
+    <div class="container-fluid section-container">
+        <div class="section-header">
+            <h2 class="section-title">Featured Auctions</h2>
+            <div class="carousel-controls d-none d-md-flex">
+                <button type="button" class="carousel-btn" id="featuredPrev" aria-label="Previous">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m15 18-6-6 6-6"/>
+                    </svg>
+                </button>
+                <button type="button" class="carousel-btn" id="featuredNext" aria-label="Next">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="auction-grid" id="featuredGrid">
+            @foreach (var item in Model.FeaturedAuctions)
+            {
+                <article class="auction-card">
+                    <div class="auction-card-image">
+                        <img src="@item.ImageUrl" alt="@item.Name" loading="lazy"/>
+                        <span class="auction-status">@item.Status</span>
+                    </div>
+                    <div class="auction-card-body">
+                        <span class="auction-category">@item.Category</span>
+                        <h3 class="auction-name">@item.Name</h3>
+                        <div class="auction-prices">
+                            <div class="price-row">
+                                <span class="price-label">Starting</span>
+                                <span class="price-value">$@item.StartingPrice.ToString("N0")</span>
+                            </div>
+                            <div class="price-row">
+                                <span class="price-label">Current</span>
+                                <span class="price-value price-current">$@item.CurrentPrice.ToString("N0")</span>
+                            </div>
+                        </div>
+                        <div class="auction-meta">
+                            <span class="auction-time">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 6v6l4 2"/>
+                                </svg>
+                                @item.TimeRemaining
+                            </span>
+                        </div>
+                        <a href="#" class="btn-view-detail">View Detail</a>
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="sellers-section">
+    <div class="container-fluid section-container">
+        <div class="section-header">
+            <h2 class="section-title">Best Sellers</h2>
+        </div>
+
+        <div class="seller-grid">
+            @foreach (var seller in Model.BestSellers)
+            {
+                <article class="seller-card">
+                    <img src="@seller.AvatarUrl" alt="@seller.Username" class="seller-avatar" loading="lazy"/>
+                    <h3 class="seller-username">@seller.Username</h3>
+                    <div class="seller-stats">
+                        <div class="seller-stat">
+                            <span class="stat-value">@seller.AuctionCount</span>
+                            <span class="stat-label">Auctions</span>
+                        </div>
+                        <div class="seller-stat">
+                            <span class="stat-value">@seller.SuccessfulSales</span>
+                            <span class="stat-label">Sales</span>
+                        </div>
+                        <div class="seller-stat">
+                            <span class="stat-value">@seller.Rating.ToString("0.0")</span>
+                            <span class="stat-label">Rating</span>
+                        </div>
+                    </div>
+                    <div class="seller-rating">
+                        @for (var i = 1; i <= 5; i++)
+                        {
+                            <span class="star @(i <= Math.Floor(seller.Rating) ? "star-filled" : seller.Rating >= i - 0.5 ? "star-half" : "")">&#9733;</span>
+                        }
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            var grid = document.getElementById('featuredGrid');
+            var prev = document.getElementById('featuredPrev');
+            var next = document.getElementById('featuredNext');
+            if (!grid || !prev || !next) return;
+
+            var scrollAmount = 320;
+            prev.addEventListener('click', function () {
+                grid.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            });
+            next.addEventListener('click', function () {
+                grid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            });
+        })();
+    </script>
+}
