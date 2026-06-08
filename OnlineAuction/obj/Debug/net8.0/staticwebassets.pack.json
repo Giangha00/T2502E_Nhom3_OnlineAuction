@@ -5,6 +5,14 @@
       "PackagePath": "staticwebassets\\OnlineAuction.bundle.scp.css"
     },
     {
+      "Id": "C:\\Users\\azhai\\RiderProjects\\T2502E_Nhom3_OnlineAuction\\OnlineAuction\\wwwroot\\css\\app.css",
+      "PackagePath": "staticwebassets\\css\\app.css"
+    },
+    {
+      "Id": "C:\\Users\\azhai\\RiderProjects\\T2502E_Nhom3_OnlineAuction\\OnlineAuction\\wwwroot\\css\\output.css",
+      "PackagePath": "staticwebassets\\css\\output.css"
+    },
+    {
       "Id": "C:\\Users\\azhai\\RiderProjects\\T2502E_Nhom3_OnlineAuction\\OnlineAuction\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },

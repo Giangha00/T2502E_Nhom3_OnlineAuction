@@ -27,3 +27,7 @@ C:\Users\azhai\RiderProjects\T2502E_Nhom3_OnlineAuction\OnlineAuction\obj\Debug\
 C:\Users\azhai\RiderProjects\T2502E_Nhom3_OnlineAuction\OnlineAuction\obj\Debug\net8.0\OnlineAuction.pdb
 C:\Users\azhai\RiderProjects\T2502E_Nhom3_OnlineAuction\OnlineAuction\obj\Debug\net8.0\OnlineAuction.genruntimeconfig.cache
 C:\Users\azhai\RiderProjects\T2502E_Nhom3_OnlineAuction\OnlineAuction\obj\Debug\net8.0\ref\OnlineAuction.dll
+C:\Users\azhai\RiderProjects\T2502E_Nhom3_OnlineAuction\OnlineAuction\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\azhai\RiderProjects\T2502E_Nhom3_OnlineAuction\OnlineAuction\bin\Debug\net8.0\appsettings.json
+C:\Users\azhai\RiderProjects\T2502E_Nhom3_OnlineAuction\OnlineAuction\bin\Debug\net8.0\package-lock.json
+C:\Users\azhai\RiderProjects\T2502E_Nhom3_OnlineAuction\OnlineAuction\bin\Debug\net8.0\package.json
