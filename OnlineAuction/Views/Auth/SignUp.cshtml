@@ -1,0 +1,84 @@
+﻿@{
+    ViewData["Title"] = "Sign Up";
+}
+<div class="min-h-screen bg-gradient-to-br from-stone-100 via-amber-50 to-orange-100 flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-5xl overflow-hidden rounded-3xl bg-white/80 shadow-2xl backdrop-blur">
+        <div class="grid md:grid-cols-2">
+            <div class="hidden md:flex flex-col justify-between bg-gradient-to-br from-stone-900 to-amber-700 p-10 text-white">
+                <div>
+                    <h1 class="text-4xl font-bold">Auction House</h1>
+                    <p class="mt-4 text-sm leading-6 text-amber-100">
+                        Create your account and start bidding on exclusive items from trusted sellers.
+                    </p>
+                </div>
+
+                <div class="rounded-2xl bg-white/10 p-5">
+                    <p class="text-sm text-amber-100">Join the auction community today.</p>
+                </div>
+            </div>
+
+            <div class="p-8 sm:p-12">
+                <h2 class="text-3xl font-bold text-stone-800">Create account</h2>
+                <p class="mt-2 text-sm text-stone-500">Fill in your information to get started.</p>
+
+                <form id="signUpForm" class="mt-8 space-y-4">
+                    <input id="fullName"
+                           type="text"
+                           placeholder="Enter your full name"
+                           class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100" />
+
+                    <input id="email"
+                           type="email"
+                           placeholder="Enter your email"
+                           class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100" />
+
+                    <input id="phoneNumber"
+                           type="tel"
+                           placeholder="Enter your phone number"
+                           class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100" />
+
+                    <input id="password"
+                           type="password"
+                           placeholder="Enter password"
+                           class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100" />
+
+                    <input id="confirmPassword"
+                           type="password"
+                           placeholder="Confirm password"
+                           class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100" />
+
+                    <button type="submit"
+                            class="w-full rounded-xl bg-amber-700 py-3 font-semibold text-white shadow-lg shadow-amber-700/20 transition hover:bg-amber-800">
+                        Create Account
+                    </button>
+                </form>
+
+                <p class="mt-6 text-center text-sm text-stone-500">
+                    Already have an account?
+                    <a asp-controller="Auth" asp-action="Login" class="font-semibold text-amber-700 hover:text-amber-800">
+                        Login
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("signUpForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const fullName = document.getElementById("fullName").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phoneNumber = document.getElementById("phoneNumber").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+        if (!fullName || !email || !phoneNumber || !password || !confirmPassword) {
+            alert("Please fill in all required fields.");
+            return;
+        }
+
+        window.location.href = "/Auth/Login";
+    });
+</script>

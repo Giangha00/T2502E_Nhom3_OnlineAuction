@@ -1,0 +1,14 @@
+{
+  "name": "onlineauction",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./wwwroot/css/app.css -o ./wwwroot/css/output.css --minify",
+    "watch:css": "tailwindcss -i ./wwwroot/css/app.css -o ./wwwroot/css/output.css --watch",
+    "postinstall": "npm run build:css"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "tailwindcss": "^4.3.0"
+  }
+}
