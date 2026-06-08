@@ -137,7 +137,7 @@ public class HomeController : Controller
 
     public IActionResult About()
     {
-        return View();
+        return View("About");
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
