@@ -1,9 +1,149 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model OnlineAuction.Models.HomeViewModel
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    <p class="text-5xl font-bold text-blue-500 border-2">Hello Tailwind.</p>
-</div>
+<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+    <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div class="overflow-hidden rounded-3xl shadow-2xl">
+            <img src="https://images.unsplash.com/photo-1578301978693-981a9d7a0040?w=900&h=700&fit=crop"
+                 alt="Featured artwork at auction"
+                 class="aspect-[4/3] w-full object-cover lg:aspect-[5/4]"/>
+        </div>
+        <div class="px-2">
+            <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Online Auction</p>
+            <h1 class="mt-3 text-4xl font-bold tracking-tight text-stone-900 sm:text-5xl">
+                Welcome to Auction House
+            </h1>
+            <p class="mt-5 max-w-lg text-base leading-7 text-stone-600">
+                Discover unique products through online auction. Browse curated collections,
+                place your bids, and connect with trusted sellers from around the world.
+            </p>
+            <a href="#featured-auctions"
+               class="mt-8 inline-flex items-center rounded-xl bg-amber-700 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-amber-700/20 transition hover:bg-amber-800">
+                Explore Auctions
+            </a>
+        </div>
+    </div>
+</section>
+
+<section id="featured-auctions" class="border-t border-stone-200/80 bg-white/50 py-12 lg:py-16">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-8 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-stone-900 sm:text-3xl">Featured Auctions</h2>
+            <div class="hidden gap-2 md:flex">
+                <button type="button" id="featuredPrev" aria-label="Previous"
+                        class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 transition hover:border-amber-500 hover:text-amber-700">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m15 18-6-6 6-6"/>
+                    </svg>
+                </button>
+                <button type="button" id="featuredNext" aria-label="Next"
+                        class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 transition hover:border-amber-500 hover:text-amber-700">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="featuredGrid"
+             class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:flex lg:snap-x lg:gap-4 lg:overflow-x-auto lg:pb-2">
+            @foreach (var item in Model.FeaturedAuctions)
+            {
+                <article class="group mx-auto w-full max-w-[200px] overflow-hidden rounded-xl border border-stone-200 bg-white/80 shadow-sm transition hover:shadow-lg sm:max-w-[220px] lg:mx-0 lg:w-[200px] lg:max-w-none lg:flex-shrink-0 lg:snap-start xl:w-[220px]">
+                    <div class="relative h-32 overflow-hidden sm:h-36">
+                        <img src="@item.ImageUrl" alt="@item.Name" loading="lazy"
+                             class="h-full w-full object-cover transition duration-500 group-hover:scale-105"/>
+                        <span class="absolute left-2 top-2 rounded-full bg-amber-700 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                            @item.Status
+                        </span>
+                    </div>
+                    <div class="p-3">
+                        <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400">@item.Category</p>
+                        <h3 class="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-stone-900">@item.Name</h3>
+                        <div class="mt-2 flex gap-4">
+                            <div>
+                                <p class="text-[10px] uppercase tracking-wide text-stone-400">Starting</p>
+                                <p class="mt-0.5 text-xs font-semibold text-stone-700">$@item.StartingPrice.ToString("N0")</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] uppercase tracking-wide text-stone-400">Current</p>
+                                <p class="mt-0.5 text-xs font-semibold text-amber-700">$@item.CurrentPrice.ToString("N0")</p>
+                            </div>
+                        </div>
+                        <div class="mt-2 flex items-center gap-1 text-xs text-stone-500">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 6v6l4 2"/>
+                            </svg>
+                            @item.TimeRemaining
+                        </div>
+                        <a href="#"
+                           class="mt-3 block w-full rounded-lg border border-amber-700 py-1.5 text-center text-xs font-semibold text-amber-700 transition hover:bg-amber-700 hover:text-white">
+                            View Detail
+                        </a>
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="py-12 lg:py-16">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <h2 class="mb-8 text-2xl font-bold text-stone-900 sm:text-3xl">Best Sellers</h2>
+
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            @foreach (var seller in Model.BestSellers)
+            {
+                <article class="rounded-2xl border border-stone-200 bg-white/80 p-6 text-center shadow-sm transition hover:shadow-lg">
+                    <img src="@seller.AvatarUrl" alt="@seller.Username" loading="lazy"
+                         class="mx-auto h-20 w-20 rounded-full object-cover ring-4 ring-amber-100"/>
+                    <h3 class="mt-4 text-lg font-semibold text-stone-900">@seller.Username</h3>
+                    <div class="mt-5 flex justify-center gap-6 border-b border-stone-100 pb-5">
+                        <div>
+                            <p class="text-lg font-bold text-stone-900">@seller.AuctionCount</p>
+                            <p class="text-xs uppercase tracking-wide text-stone-400">Auctions</p>
+                        </div>
+                        <div>
+                            <p class="text-lg font-bold text-stone-900">@seller.SuccessfulSales</p>
+                            <p class="text-xs uppercase tracking-wide text-stone-400">Sales</p>
+                        </div>
+                        <div>
+                            <p class="text-lg font-bold text-amber-700">@seller.Rating.ToString("0.0")</p>
+                            <p class="text-xs uppercase tracking-wide text-stone-400">Rating</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-center gap-1">
+                        @for (var i = 1; i <= 5; i++)
+                        {
+                            var filled = i <= Math.Floor(seller.Rating);
+                            var half = !filled && seller.Rating >= i - 0.5;
+                            <span class="text-base @(filled ? "text-amber-500" : half ? "text-amber-300" : "text-stone-200")">&#9733;</span>
+                        }
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            var grid = document.getElementById('featuredGrid');
+            var prev = document.getElementById('featuredPrev');
+            var next = document.getElementById('featuredNext');
+            if (!grid || !prev || !next) return;
+
+            var scrollAmount = 236;
+            prev.addEventListener('click', function () {
+                grid.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            });
+            next.addEventListener('click', function () {
+                grid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            });
+        })();
+    </script>
+}
