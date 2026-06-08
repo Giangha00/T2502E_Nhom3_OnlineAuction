@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var isAuthPage = string.Equals(
+        ViewContext.RouteData.Values["controller"]?.ToString(),
+        "Auth",
+        StringComparison.OrdinalIgnoreCase);
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -24,6 +30,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/OnlineAuction.styles.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/css/output.css" asp-append-version="true"/>
 </head>
 <body>
 <header>
@@ -47,11 +54,13 @@
                     </li>
                 </ul>
             </div>
-        </div>
-    </nav>
-</header>
-<div class="container">
-    <main role="main" class="pb-3">
+        </nav>
+    </header>
+}
+
+@if (isAuthPage)
+{
+    <main role="main">
         @RenderBody()
     </main>
 </div>

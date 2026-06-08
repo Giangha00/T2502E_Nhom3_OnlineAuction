@@ -1,0 +1,74 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+
+<div class="min-h-screen bg-gradient-to-br from-stone-100 via-amber-50 to-orange-100 flex items-center justify-center px-4">
+    <div class="w-full max-w-5xl overflow-hidden rounded-3xl bg-white/80 shadow-2xl backdrop-blur">
+        <div class="grid md:grid-cols-2">
+            <div class="hidden md:flex flex-col justify-between bg-gradient-to-br from-amber-700 to-stone-900 p-10 text-white">
+                <div>
+                    <h1 class="text-4xl font-bold">Auction House</h1>
+                    <p class="mt-4 text-sm leading-6 text-amber-100">
+                        Discover rare items, place your bids, and win unique auctions with confidence.
+                    </p>
+                </div>
+
+                <div class="rounded-2xl bg-white/10 p-5">
+                    <p class="text-sm text-amber-100">“Bid smarter. Win better.”</p>
+                </div>
+            </div>
+
+            <div class="p-8 sm:p-12">
+                <h2 class="text-3xl font-bold text-stone-800">Welcome back</h2>
+                <p class="mt-2 text-sm text-stone-500">Please login to continue to your account.</p>
+
+                <form id="loginForm" class="mt-8 space-y-5">
+                    <div>
+                        <label for="email" class="text-sm font-medium text-stone-700">Email</label>
+                        <input id="email"
+                               type="email"
+                               placeholder="Enter your email"
+                               class="mt-2 w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-stone-700 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100" />
+                    </div>
+
+                    <div>
+                        <label for="password" class="text-sm font-medium text-stone-700">Password</label>
+                        <input id="password"
+                               type="password"
+                               placeholder="Enter your password"
+                               class="mt-2 w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-stone-700 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100" />
+                    </div>
+
+                    <button type="submit"
+                            class="w-full rounded-xl bg-amber-700 py-3 font-semibold text-white shadow-lg shadow-amber-700/20 transition hover:bg-amber-800">
+                        Login
+                    </button>
+                </form>
+
+                <p class="mt-6 text-center text-sm text-stone-500">
+                    Don't have an account?
+                    <a asp-controller="Auth" asp-action="SignUp" class="font-semibold text-amber-700 hover:text-amber-800">
+                        Sign Up
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("loginForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        if (!email || !password) {
+            alert("Please enter email and password.");
+            return;
+        }
+
+        window.location.href = "/";
+    });
+</script>
