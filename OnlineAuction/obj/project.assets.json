@@ -8,19 +8,19 @@
     "net8.0": []
   },
   "packageFolders": {
-    "C:\\Users\\azhai\\.nuget\\packages\\": {}
+    "/Users/macbook/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\azhai\\RiderProjects\\T2502E_Nhom3_OnlineAuction\\OnlineAuction\\OnlineAuction.csproj",
+      "projectUniqueName": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/OnlineAuction.csproj",
       "projectName": "OnlineAuction",
-      "projectPath": "C:\\Users\\azhai\\RiderProjects\\T2502E_Nhom3_OnlineAuction\\OnlineAuction\\OnlineAuction.csproj",
-      "packagesPath": "C:\\Users\\azhai\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\azhai\\RiderProjects\\T2502E_Nhom3_OnlineAuction\\OnlineAuction\\obj\\",
+      "projectPath": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/OnlineAuction.csproj",
+      "packagesPath": "/Users/macbook/.nuget/packages/",
+      "outputPath": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\azhai\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "/Users/macbook/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -38,11 +38,6 @@
         "warnAsError": [
           "NU1605"
         ]
-      },
-      "restoreAuditProperties": {
-        "enableAudit": "true",
-        "auditLevel": "low",
-        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -67,7 +62,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.421/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
