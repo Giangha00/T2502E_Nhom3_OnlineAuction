@@ -6,4 +6,13 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
+    <Target Name="BuildTailwindCss" BeforeTargets="Build">
+        <Exec WorkingDirectory="$(MSBuildProjectDirectory)"
+              Command="npm install"
+              Condition="Exists('$(MSBuildProjectDirectory)/package.json') AND !Exists('$(MSBuildProjectDirectory)/node_modules')" />
+        <Exec WorkingDirectory="$(MSBuildProjectDirectory)"
+              Command="npm run build:css"
+              Condition="Exists('$(MSBuildProjectDirectory)/package.json') AND Exists('$(MSBuildProjectDirectory)/node_modules')" />
+    </Target>
+
 </Project>
