@@ -3,6 +3,9 @@
         ViewContext.RouteData.Values["controller"]?.ToString(),
         "Auth",
         StringComparison.OrdinalIgnoreCase);
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var isHomePage = string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase);
+    var isAuctionPage = string.Equals(currentController, "Auction", StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -75,8 +78,8 @@
         <nav class="hidden border-t border-stone-100 lg:block">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <ul class="flex overflow-x-auto">
-                    <li><a asp-controller="Home" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-amber-700">Home</a></li>
-                    <li><a href="#featured-auctions" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">Auction</a></li>
+                    <li><a asp-controller="Home" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @(isHomePage ? "text-amber-700" : "text-stone-600 transition hover:text-amber-700")">Home</a></li>
+                    <li><a asp-controller="Auction" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @(isAuctionPage ? "text-amber-700" : "text-stone-600 transition hover:text-amber-700")">Auction</a></li>
                     <li><a asp-controller="AboutUs" asp-action="About" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">About Us</a></li>
                     <li><a href="#" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">Contact Us</a></li>
                     <li><a href="#" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">FAQ</a></li>
@@ -88,7 +91,7 @@
         <nav id="mobileNav" class="hidden border-t border-stone-200 bg-white lg:hidden">
             <ul class="px-4 py-3 sm:px-6">
                 <li><a asp-controller="Home" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium text-stone-900">Home</a></li>
-                <li><a href="#featured-auctions" class="block border-b border-stone-100 py-3 text-sm text-stone-700">Auction</a></li>
+                <li><a asp-controller="Auction" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm text-stone-700">Auction</a></li>
                 <li><a asp-controller="AboutUs" asp-action="About" class="block border-b border-stone-100 py-3 text-sm text-stone-700">About Us</a></li>
                 <li><a href="#" class="block border-b border-stone-100 py-3 text-sm text-stone-700">Contact Us</a></li>
                 <li><a href="#" class="block border-b border-stone-100 py-3 text-sm text-stone-700">FAQ</a></li>
