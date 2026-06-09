@@ -1,0 +1,152 @@
+﻿@{
+    ViewData["Title"] = "FAQ";
+}
+
+<div class="w-full bg-[#f5f1e8] text-[#2a1a11]">
+    <section class="relative overflow-hidden px-5 py-20 md:py-24">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,#f3c99b_0%,transparent_32%),linear-gradient(135deg,#2a1a11_0%,#7a431f_48%,#d8a15d_100%)]"></div>
+        <div class="absolute inset-0 bg-black/25"></div>
+
+        <div class="relative z-10 mx-auto max-w-5xl text-center text-[#fff8ee]">
+            <p class="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-[#f3c99b] md:text-sm">Help Center</p>
+            <h1 class="text-4xl font-semibold md:text-6xl">Frequently Asked Questions</h1>
+            <p class="mx-auto mt-5 max-w-2xl text-base leading-8 text-[#fff1dc] md:text-lg">
+                Find answers to common questions about Auction House, bidding, payments, security, and account management.
+            </p>
+
+            <div class="mx-auto mt-9 flex max-w-2xl items-center gap-3 rounded-full border border-white/25 bg-white/15 p-2 shadow-[0_18px_45px_rgba(20,10,4,0.25)] backdrop-blur">
+                <span class="pl-4 text-[#fff1dc]">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                </span>
+                <input type="search"
+                       placeholder="Search frequently asked questions..."
+                       class="w-full bg-transparent py-3 text-sm text-white placeholder:text-[#f8dfbd] outline-none" />
+                <button type="button"
+                        class="hidden rounded-full bg-[#fff8ee] px-5 py-2.5 text-sm font-semibold text-[#7a431f] transition hover:bg-[#f3c99b] sm:inline-block">
+                    Search
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="px-5 py-14 md:py-16">
+        <div class="mx-auto max-w-6xl">
+            <div class="mb-8">
+                <p class="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[#9a5629]">FAQ Categories</p>
+                <h2 class="text-3xl font-semibold md:text-5xl">Browse by topic</h2>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <button type="button" class="faq-category rounded-2xl border border-[#d8c5ae] bg-[#fffaf2] p-5 text-left shadow-[0_10px_24px_rgba(71,41,19,0.06)] transition hover:-translate-y-1 hover:border-[#b87333] hover:shadow-[0_16px_30px_rgba(71,41,19,0.12)]">
+                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-[#9a5629]/10 text-[#9a5629]">A</span>
+                    <h3 class="text-xl font-semibold">Account</h3>
+                    <p class="mt-2 text-sm leading-6 text-[#5a4738]">Registration, login, and profile management.</p>
+                </button>
+
+                <button type="button" class="faq-category rounded-2xl border border-[#d8c5ae] bg-[#fffaf2] p-5 text-left shadow-[0_10px_24px_rgba(71,41,19,0.06)] transition hover:-translate-y-1 hover:border-[#b87333] hover:shadow-[0_16px_30px_rgba(71,41,19,0.12)]">
+                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-[#9a5629]/10 text-[#9a5629]">B</span>
+                    <h3 class="text-xl font-semibold">Auction</h3>
+                    <p class="mt-2 text-sm leading-6 text-[#5a4738]">Create auctions, join bidding, and place bids.</p>
+                </button>
+
+                <button type="button" class="faq-category rounded-2xl border border-[#d8c5ae] bg-[#fffaf2] p-5 text-left shadow-[0_10px_24px_rgba(71,41,19,0.06)] transition hover:-translate-y-1 hover:border-[#b87333] hover:shadow-[0_16px_30px_rgba(71,41,19,0.12)]">
+                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-[#9a5629]/10 text-[#9a5629]">P</span>
+                    <h3 class="text-xl font-semibold">Payment</h3>
+                    <p class="mt-2 text-sm leading-6 text-[#5a4738]">Payments, transactions, and order status.</p>
+                </button>
+
+                <button type="button" class="faq-category rounded-2xl border border-[#d8c5ae] bg-[#fffaf2] p-5 text-left shadow-[0_10px_24px_rgba(71,41,19,0.06)] transition hover:-translate-y-1 hover:border-[#b87333] hover:shadow-[0_16px_30px_rgba(71,41,19,0.12)]">
+                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-[#9a5629]/10 text-[#9a5629]">S</span>
+                    <h3 class="text-xl font-semibold">Security</h3>
+                    <p class="mt-2 text-sm leading-6 text-[#5a4738]">Account protection, privacy, and safe bidding.</p>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="px-5 pb-16 md:pb-20">
+        <div class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.8fr_1.5fr]">
+            <aside class="h-fit rounded-3xl border border-[#d8c5ae] bg-[#fffaf2] p-6 shadow-[0_12px_32px_rgba(71,41,19,0.08)]">
+                <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#9a5629]">Quick Guide</p>
+                <h2 class="mt-3 text-3xl font-semibold">Need help using Auction House?</h2>
+                <p class="mt-4 leading-7 text-[#5a4738]">
+                    These questions cover the most common actions users perform on the platform.
+                </p>
+                <div class="mt-6 space-y-3 text-sm text-[#5a4738]">
+                    <div class="rounded-2xl bg-[#9a5629]/10 p-4">Create an account before joining auctions.</div>
+                    <div class="rounded-2xl bg-[#9a5629]/10 p-4">Bid amount must be higher than the current price.</div>
+                    <div class="rounded-2xl bg-[#9a5629]/10 p-4">Winner is notified when the auction ends.</div>
+                </div>
+            </aside>
+
+            <div class="space-y-4">
+                @{
+                    var faqItems = new[]
+                    {
+                        new { Question = "How do I create an account?", Answer = "Click Register, fill in your personal information, and create your account before joining the auction system." },
+                        new { Question = "How do I place a bid?", Answer = "Select an active auction, enter your bid amount, and submit your bid. Your bid must be higher than the current price." },
+                        new { Question = "How can I create an auction?", Answer = "Create an account, submit product information, upload images or documents, and wait for the product to be approved." },
+                        new { Question = "Can I bid on my own product?", Answer = "No. Sellers are not allowed to place bids on their own auction items." },
+                        new { Question = "How do I know if I win an auction?", Answer = "When the auction ends, the system sends a notification to the winning bidder and the seller." },
+                        new { Question = "What happens after payment?", Answer = "After payment and transaction confirmation, the buyer and seller continue with the delivery process based on the auction result." },
+                        new { Question = "How is my account protected?", Answer = "Users should keep their login information private and use accurate personal information to protect their account." },
+                        new { Question = "Where can I view my auction history?", Answer = "You can open the product detail page and view previous bid history for that auction." }
+                    };
+                }
+
+                @foreach (var item in faqItems)
+                {
+                    <article class="faq-item overflow-hidden rounded-2xl border border-[#d8c5ae] bg-white shadow-[0_10px_25px_rgba(47,23,8,0.06)]">
+                        <button type="button" class="faq-question flex w-full items-center justify-between gap-4 px-5 py-5 text-left">
+                            <span class="text-base font-semibold text-[#2a1a11] md:text-lg">@item.Question</span>
+                            <span class="faq-icon grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#9a5629]/10 text-[#9a5629] transition">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m6 9 6 6 6-6"></path>
+                                </svg>
+                            </span>
+                        </button>
+                        <div class="faq-answer hidden border-t border-[#ead8c2] px-5 pb-5 pt-0">
+                            <p class="pt-4 leading-7 text-[#5a4738]">@item.Answer</p>
+                        </div>
+                    </article>
+                }
+            </div>
+        </div>
+    </section>
+
+    <section class="px-5 pb-20">
+        <div class="mx-auto max-w-6xl overflow-hidden rounded-3xl bg-gradient-to-br from-[#2a1a11] via-[#7a431f] to-[#d8a15d] p-8 text-center text-white shadow-[0_24px_60px_rgba(71,41,19,0.22)] md:p-12">
+            <p class="text-xs font-bold uppercase tracking-[0.24em] text-[#f3c99b]">Support</p>
+            <h2 class="mt-3 text-3xl font-semibold md:text-5xl">Can't find your answer?</h2>
+            <p class="mx-auto mt-4 max-w-2xl leading-8 text-[#fff1dc]">
+                Contact our support team and we will help you understand the auction process clearly.
+            </p>
+            <a href="#"
+               class="mt-8 inline-flex rounded-full bg-[#fff8ee] px-7 py-3 text-sm font-semibold text-[#7a431f] transition hover:bg-[#f3c99b]">
+                Contact Us
+            </a>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var questions = document.querySelectorAll('.faq-question');
+
+            questions.forEach(function (question) {
+                question.addEventListener('click', function () {
+                    var item = question.closest('.faq-item');
+                    var answer = item.querySelector('.faq-answer');
+                    var icon = item.querySelector('.faq-icon');
+
+                    answer.classList.toggle('hidden');
+                    icon.classList.toggle('rotate-180');
+                });
+            });
+        })();
+    </script>
+}

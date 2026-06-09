@@ -79,7 +79,11 @@
                     <li><a href="#featured-auctions" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">Auction</a></li>
                     <li><a asp-controller="AboutUs" asp-action="About" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">About Us</a></li>
                     <li><a href="#" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">Contact Us</a></li>
-                    <li><a href="#" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">FAQ</a></li>
+                    <li><a asp-controller="Faq"
+                           asp-action="Index"
+                           class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">
+                        FAQ
+                    </a></li>
                     <li><a href="#" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">Policy &amp; Term of Use</a></li>
                 </ul>
             </div>
@@ -91,7 +95,7 @@
                 <li><a href="#featured-auctions" class="block border-b border-stone-100 py-3 text-sm text-stone-700">Auction</a></li>
                 <li><a asp-controller="AboutUs" asp-action="About" class="block border-b border-stone-100 py-3 text-sm text-stone-700">About Us</a></li>
                 <li><a href="#" class="block border-b border-stone-100 py-3 text-sm text-stone-700">Contact Us</a></li>
-                <li><a href="#" class="block border-b border-stone-100 py-3 text-sm text-stone-700">FAQ</a></li>
+                <li><a asp-controller="Faq" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">FAQ</a></li>
                 <li><a href="#" class="block border-b border-stone-100 py-3 text-sm text-stone-700">Policy &amp; Term of Use</a></li>
                 <li class="flex gap-2 pt-4">
                     <a asp-controller="Auth" asp-action="Login"
@@ -143,7 +147,11 @@
                     <div>
                         <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900">Help</h4>
                         <ul class="mt-4 space-y-2">
-                            <li><a href="#" class="text-sm text-stone-600 transition hover:text-amber-700">FAQ</a></li>
+                            <li><a asp-controller="Faq"
+                                   asp-action="Index"
+                                   class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">
+                                FAQ
+                            </a></li>
                             <li><a href="#" class="text-sm text-stone-600 transition hover:text-amber-700">How to Bid</a></li>
                             <li><a href="#" class="text-sm text-stone-600 transition hover:text-amber-700">Seller Guide</a></li>
                         </ul>
