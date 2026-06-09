@@ -5,8 +5,376 @@
       "PackagePath": "staticwebassets/OnlineAuction.bundle.scp.css"
     },
     {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/css/style.css",
+      "PackagePath": "staticwebassets/admin/css/style.css"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/favicon.ico",
+      "PackagePath": "staticwebassets/admin/favicon.ico"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-01.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-01.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-02.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-02.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-03.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-03.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-04.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-04.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-05.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-05.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-06.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-06.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-07.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-07.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-08.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-08.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-09.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-09.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-10.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-10.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-11.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-11.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-12.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-12.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-13.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-13.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-14.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-14.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/brand/brand-15.svg",
+      "PackagePath": "staticwebassets/admin/images/brand/brand-15.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/country/country-01.svg",
+      "PackagePath": "staticwebassets/admin/images/country/country-01.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/country/country-02.svg",
+      "PackagePath": "staticwebassets/admin/images/country/country-02.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/country/country-03.svg",
+      "PackagePath": "staticwebassets/admin/images/country/country-03.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/country/country-04.svg",
+      "PackagePath": "staticwebassets/admin/images/country/country-04.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/country/country-05.svg",
+      "PackagePath": "staticwebassets/admin/images/country/country-05.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/country/country-06.svg",
+      "PackagePath": "staticwebassets/admin/images/country/country-06.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/country/country-07.svg",
+      "PackagePath": "staticwebassets/admin/images/country/country-07.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/country/country-08.svg",
+      "PackagePath": "staticwebassets/admin/images/country/country-08.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/error/404-dark.svg",
+      "PackagePath": "staticwebassets/admin/images/error/404-dark.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/error/404.svg",
+      "PackagePath": "staticwebassets/admin/images/error/404.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/favicon.ico",
+      "PackagePath": "staticwebassets/admin/images/favicon.ico"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/grid-image/image-01.png",
+      "PackagePath": "staticwebassets/admin/images/grid-image/image-01.png"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/grid-image/image-02.png",
+      "PackagePath": "staticwebassets/admin/images/grid-image/image-02.png"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/grid-image/image-03.png",
+      "PackagePath": "staticwebassets/admin/images/grid-image/image-03.png"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/grid-image/image-04.png",
+      "PackagePath": "staticwebassets/admin/images/grid-image/image-04.png"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/grid-image/image-05.png",
+      "PackagePath": "staticwebassets/admin/images/grid-image/image-05.png"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/grid-image/image-06.png",
+      "PackagePath": "staticwebassets/admin/images/grid-image/image-06.png"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/icons/file-image-dark.svg",
+      "PackagePath": "staticwebassets/admin/images/icons/file-image-dark.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/icons/file-image.svg",
+      "PackagePath": "staticwebassets/admin/images/icons/file-image.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/icons/file-pdf-dark.svg",
+      "PackagePath": "staticwebassets/admin/images/icons/file-pdf-dark.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/icons/file-pdf.svg",
+      "PackagePath": "staticwebassets/admin/images/icons/file-pdf.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/icons/file-video-dark.svg",
+      "PackagePath": "staticwebassets/admin/images/icons/file-video-dark.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/icons/file-video.svg",
+      "PackagePath": "staticwebassets/admin/images/icons/file-video.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/logo/auth-logo.svg",
+      "PackagePath": "staticwebassets/admin/images/logo/auth-logo.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/logo/logo-dark.svg",
+      "PackagePath": "staticwebassets/admin/images/logo/logo-dark.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/logo/logo-icon.svg",
+      "PackagePath": "staticwebassets/admin/images/logo/logo-icon.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/logo/logo.svg",
+      "PackagePath": "staticwebassets/admin/images/logo/logo.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/product/product-01.jpg",
+      "PackagePath": "staticwebassets/admin/images/product/product-01.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/product/product-02.jpg",
+      "PackagePath": "staticwebassets/admin/images/product/product-02.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/product/product-03.jpg",
+      "PackagePath": "staticwebassets/admin/images/product/product-03.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/product/product-04.jpg",
+      "PackagePath": "staticwebassets/admin/images/product/product-04.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/product/product-05.jpg",
+      "PackagePath": "staticwebassets/admin/images/product/product-05.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/shape/grid-01.svg",
+      "PackagePath": "staticwebassets/admin/images/shape/grid-01.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/owner.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/owner.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-01.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-01.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-02.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-02.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-03.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-03.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-04.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-04.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-05.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-05.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-06.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-06.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-07.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-07.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-08.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-08.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-09.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-09.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-10.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-10.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-11.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-11.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-12.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-12.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-13.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-13.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-14.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-14.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-15.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-15.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-16.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-16.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-17.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-17.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-18.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-18.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-19.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-19.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-20.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-20.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-21.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-21.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-22.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-22.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-23.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-23.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-24.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-24.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-25.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-25.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-26.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-26.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-27.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-27.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-28.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-28.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-29.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-29.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-30.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-30.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-31.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-31.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-32.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-32.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-33.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-33.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-34.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-34.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-35.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-35.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-36.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-36.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/user/user-37.jpg",
+      "PackagePath": "staticwebassets/admin/images/user/user-37.jpg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/video-thumb/thumb-16.png",
+      "PackagePath": "staticwebassets/admin/images/video-thumb/thumb-16.png"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/images/video-thumb/youtube-icon-84.svg",
+      "PackagePath": "staticwebassets/admin/images/video-thumb/youtube-icon-84.svg"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/admin/js/bundle.js",
+      "PackagePath": "staticwebassets/admin/js/bundle.js"
+    },
+    {
       "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/css/app.css",
       "PackagePath": "staticwebassets/css/app.css"
+    },
+    {
+      "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/css/home.css",
+      "PackagePath": "staticwebassets/css/home.css"
     },
     {
       "Id": "/Users/macbook/RiderProjects/Nhom3/OnlineAuction/wwwroot/css/output.css",
