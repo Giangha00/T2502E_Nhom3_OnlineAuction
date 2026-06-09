@@ -1,0 +1,103 @@
+﻿@{
+    ViewData["Title"] = "Contact";
+}
+
+<link rel="stylesheet" href="~/css/contact.css" />
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Contact Auction House</h1>
+        <p>Have questions? We're here to help.</p>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="contact-container">
+
+    <!-- Contact Info -->
+    <div class="contact-info">
+
+        <div class="card">
+            <h3>📍 Address</h3>
+            <p>123 Auction Street, Hanoi</p>
+        </div>
+
+        <div class="card">
+            <h3>📞 Phone</h3>
+            <p>+84 123 456 789</p>
+        </div>
+
+        <div class="card">
+            <h3>✉ Email</h3>
+            <p>support@auctionhouse.com</p>
+        </div>
+
+        <div class="card">
+            <h3>🕒 Working Hours</h3>
+            <p>Mon - Fri | 08:00 - 17:00</p>
+        </div>
+
+    </div>
+
+    <!-- Form -->
+    <div class="contact-form">
+
+        <h2>Send Message</h2>
+
+        <form id="contactForm">
+
+            <label>Full Name *</label>
+            <input
+                type="text"
+                id="fullName"
+                placeholder="Enter your name">
+
+            <span id="nameError" class="error"></span>
+
+            <label>Email *</label>
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter your email">
+
+            <span id="emailError" class="error"></span>
+
+            <label>Subject</label>
+            <input
+                type="text"
+                id="subject"
+                placeholder="Enter subject">
+
+            <label>Message *</label>
+
+            <textarea
+                id="message"
+                placeholder="Write your message..."></textarea>
+
+            <span id="messageError" class="error"></span>
+
+            <button type="submit">
+                Send Message
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+<!-- Map -->
+<section class="map-section">
+
+    <h2>Our Location</h2>
+
+    <div class="map-placeholder">
+        Google Map Placeholder
+    </div>
+
+</section>
+
+<partial name="_Footer" />
+
+<script src="~/js/contact.js"></script>
