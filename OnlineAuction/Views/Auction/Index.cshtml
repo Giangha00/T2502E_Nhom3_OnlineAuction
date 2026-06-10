@@ -30,6 +30,7 @@
             <label for="auctionSort" class="text-sm font-medium text-stone-600">Sort by</label>
             <select id="auctionSort"
                     class="rounded-xl border border-stone-200 bg-white/80 px-3 py-2 text-sm text-stone-700 outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-100">
+                <option value="default" selected>Default</option>
                 <option value="ending">Ending Soon</option>
                 <option value="price-asc">Price: Low to High</option>
                 <option value="price-desc">Price: High to Low</option>
@@ -58,6 +59,7 @@
         @foreach (var item in Model.Auctions)
         {
             <article class="auction-card group overflow-hidden rounded-xl border border-stone-200 bg-white/80 shadow-sm transition hover:shadow-lg"
+                     data-id="@item.Id"
                      data-name="@item.Name.ToLowerInvariant()"
                      data-category="@item.Category"
                      data-price="@item.CurrentPrice"
@@ -102,35 +104,63 @@
         <p class="text-lg font-semibold text-stone-800">No auctions found</p>
         <p class="mt-2 text-sm text-stone-500">Try a different search term or category.</p>
     </div>
+
+    <div id="pagination" class="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
+        <button type="button" id="prevPage"
+                class="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white/80 px-5 py-2 text-sm font-medium text-stone-700 transition hover:border-amber-500 hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-40">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m15 18-6-6 6-6"/>
+            </svg>
+            Previous
+        </button>
+        <p id="pageInfo" class="text-sm text-stone-600">Page 1 of 1</p>
+        <button type="button" id="nextPage"
+                class="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white/80 px-5 py-2 text-sm font-medium text-stone-700 transition hover:border-amber-500 hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-40">
+            Next
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m9 18 6-6-6-6"/>
+            </svg>
+        </button>
+    </div>
 </section>
 
 @section Scripts {
     <script>
         (function () {
+            var PAGE_SIZE = 10;
             var searchInput = document.getElementById('auctionSearch');
             var searchForm = document.getElementById('auctionSearchForm');
             var sortSelect = document.getElementById('auctionSort');
             var grid = document.getElementById('auctionGrid');
             var emptyState = document.getElementById('emptyState');
+            var pagination = document.getElementById('pagination');
             var resultCount = document.getElementById('resultCount');
+            var pageInfo = document.getElementById('pageInfo');
+            var prevPageBtn = document.getElementById('prevPage');
+            var nextPageBtn = document.getElementById('nextPage');
             var categoryButtons = document.querySelectorAll('.category-btn');
             var cards = Array.from(document.querySelectorAll('.auction-card'));
 
             var activeCategory = 'All';
+            var currentPage = 1;
+            var filteredCards = [];
 
             function parseTimeRemaining(value) {
-                var match = value.match(/(\d+)\s*h/i);
-                if (match) return parseInt(match[1], 10);
-                var minuteMatch = value.match(/(\d+)\s*m/i);
-                if (minuteMatch) return parseInt(minuteMatch[1], 10) / 60;
                 var dayMatch = value.match(/(\d+)\s*d/i);
                 if (dayMatch) return parseInt(dayMatch[1], 10) * 24;
+                var hourMatch = value.match(/(\d+)\s*h/i);
+                if (hourMatch) return parseInt(hourMatch[1], 10);
+                var minuteMatch = value.match(/(\d+)\s*m/i);
+                if (minuteMatch) return parseInt(minuteMatch[1], 10) / 60;
                 return 999;
             }
 
             function sortCards(list) {
                 var sort = sortSelect.value;
                 return list.sort(function (a, b) {
+                    if (sort === 'default') {
+                        return Number(a.dataset.id) - Number(b.dataset.id);
+                    }
                     if (sort === 'price-asc') {
                         return Number(a.dataset.price) - Number(b.dataset.price);
                     }
@@ -153,26 +183,55 @@
                 });
             }
 
+            function renderPage() {
+                var totalPages = Math.max(1, Math.ceil(filteredCards.length / PAGE_SIZE));
+                if (currentPage > totalPages) currentPage = totalPages;
+                if (currentPage < 1) currentPage = 1;
+
+                var start = (currentPage - 1) * PAGE_SIZE;
+                var end = start + PAGE_SIZE;
+                var pageCards = filteredCards.slice(start, end);
+
+                filteredCards.forEach(function (card) {
+                    grid.appendChild(card);
+                });
+
+                cards.forEach(function (card) {
+                    var inFilter = filteredCards.includes(card);
+                    var onPage = pageCards.includes(card);
+                    card.classList.toggle('hidden', !inFilter || !onPage);
+                });
+
+                var total = filteredCards.length;
+                if (total === 0) {
+                    resultCount.textContent = 'Showing 0 auctions';
+                } else {
+                    var from = start + 1;
+                    var to = Math.min(end, total);
+                    resultCount.textContent = 'Showing ' + from + '–' + to + ' of ' + total + ' auction' + (total === 1 ? '' : 's');
+                }
+
+                pageInfo.textContent = 'Page ' + currentPage + ' of ' + totalPages;
+                prevPageBtn.disabled = currentPage <= 1;
+                nextPageBtn.disabled = currentPage >= totalPages;
+
+                var hasResults = total > 0;
+                emptyState.classList.toggle('hidden', hasResults);
+                grid.classList.toggle('hidden', !hasResults);
+                pagination.classList.toggle('hidden', !hasResults || totalPages <= 1);
+            }
+
             function applyFilters() {
                 var query = searchInput.value.trim().toLowerCase();
-                var visible = cards.filter(function (card) {
+                filteredCards = cards.filter(function (card) {
                     var matchesCategory = activeCategory === 'All' || card.dataset.category === activeCategory;
                     var matchesSearch = !query || card.dataset.name.includes(query);
                     return matchesCategory && matchesSearch;
                 });
 
-                sortCards(visible).forEach(function (card) {
-                    grid.appendChild(card);
-                });
-
-                cards.forEach(function (card) {
-                    var isVisible = visible.includes(card);
-                    card.classList.toggle('hidden', !isVisible);
-                });
-
-                resultCount.textContent = 'Showing ' + visible.length + ' auction' + (visible.length === 1 ? '' : 's');
-                emptyState.classList.toggle('hidden', visible.length > 0);
-                grid.classList.toggle('hidden', visible.length === 0);
+                sortCards(filteredCards);
+                currentPage = 1;
+                renderPage();
             }
 
             categoryButtons.forEach(function (btn) {
@@ -183,12 +242,32 @@
                 });
             });
 
+            prevPageBtn.addEventListener('click', function () {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderPage();
+                    grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+
+            nextPageBtn.addEventListener('click', function () {
+                var totalPages = Math.ceil(filteredCards.length / PAGE_SIZE);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderPage();
+                    grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+
             searchInput.addEventListener('input', applyFilters);
             searchForm.addEventListener('submit', function (e) {
                 e.preventDefault();
                 applyFilters();
             });
-            sortSelect.addEventListener('change', applyFilters);
+            sortSelect.addEventListener('change', function () {
+                currentPage = 1;
+                applyFilters();
+            });
 
             applyFilters();
         })();
