@@ -124,6 +124,94 @@ public static class MockAuctionData
             CurrentPrice = 9200,
             Status = "Live",
             TimeRemaining = "1d 20h left"
+        },
+        new()
+        {
+            Id = 11,
+            Name = "Chevrolet Camaro SS 1969",
+            Category = "Cars",
+            ImageUrl = "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=600&h=750&fit=crop",
+            StartingPrice = 35000,
+            CurrentPrice = 41200,
+            Status = "Live",
+            TimeRemaining = "2d 5h left"
+        },
+        new()
+        {
+            Id = 12,
+            Name = "BMW M3 E46 Coupe",
+            Category = "Cars",
+            ImageUrl = "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=600&h=750&fit=crop",
+            StartingPrice = 22000,
+            CurrentPrice = 26800,
+            Status = "Ending Soon",
+            TimeRemaining = "3h 20m left"
+        },
+        new()
+        {
+            Id = 13,
+            Name = "Tag Heuer Carrera Chronograph",
+            Category = "Watches",
+            ImageUrl = "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?w=600&h=750&fit=crop",
+            StartingPrice = 2800,
+            CurrentPrice = 3350,
+            Status = "Live",
+            TimeRemaining = "3d 1h left"
+        },
+        new()
+        {
+            Id = 14,
+            Name = "Seiko 6139 Pogue Automatic",
+            Category = "Watches",
+            ImageUrl = "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=600&h=750&fit=crop",
+            StartingPrice = 1900,
+            CurrentPrice = 2450,
+            Status = "Live",
+            TimeRemaining = "6h 50m left"
+        },
+        new()
+        {
+            Id = 15,
+            Name = "Pikachu Illustrator Promo",
+            Category = "Cards",
+            ImageUrl = "https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=600&h=750&fit=crop",
+            StartingPrice = 22000,
+            CurrentPrice = 28500,
+            Status = "Live",
+            TimeRemaining = "6d 4h left"
+        },
+        new()
+        {
+            Id = 16,
+            Name = "LeBron James Topps Chrome RC",
+            Category = "Cards",
+            ImageUrl = "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&h=750&fit=crop",
+            StartingPrice = 9800,
+            CurrentPrice = 11300,
+            Status = "Live",
+            TimeRemaining = "2d 18h left"
+        },
+        new()
+        {
+            Id = 17,
+            Name = "Meucci Elite Series Cue",
+            Category = "Billiard Sticks",
+            ImageUrl = "https://images.unsplash.com/photo-1571019614242-c5c25dee48f8?w=600&h=750&fit=crop",
+            StartingPrice = 620,
+            CurrentPrice = 890,
+            Status = "Live",
+            TimeRemaining = "1d 6h left"
+        },
+        new()
+        {
+            Id = 18,
+            Name = "Pearl Necklace South Sea 14K",
+            Category = "Jewelry",
+            ImageUrl = "https://images.unsplash.com/photo-1599643478518-a784e5dc4c2f?w=600&h=750&fit=crop",
+            StartingPrice = 4300,
+            CurrentPrice = 5100,
+            Status = "Ending Soon",
+            TimeRemaining = "55m left"
         }
     ];
 
