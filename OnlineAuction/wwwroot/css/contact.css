@@ -1,0 +1,13 @@
+﻿/* Contact Page Styles - Tailwind CSS is used for main styling */
+/* This file is kept for any additional custom styles if needed */
+
+/* Smooth transitions for form inputs */
+input, textarea {
+    transition: all 0.2s ease;
+}
+
+/* Scroll behavior for smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
