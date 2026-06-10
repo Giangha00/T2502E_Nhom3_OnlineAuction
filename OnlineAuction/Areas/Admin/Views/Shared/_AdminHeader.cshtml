@@ -1,0 +1,69 @@
+<header
+    class="sticky top-0 z-99999 flex w-full border-gray-200 bg-white lg:border-b dark:border-gray-800 dark:bg-gray-900">
+    <div class="flex grow flex-col items-center justify-between lg:flex-row lg:px-6">
+        <div
+            class="flex w-full items-center justify-between gap-2 border-b border-gray-200 px-3 py-3 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4 dark:border-gray-800">
+            <button
+                :class="sidebarToggle ? 'lg:bg-transparent dark:lg:bg-transparent bg-gray-100 dark:bg-gray-800' : ''"
+                class="z-99999 flex h-10 w-10 items-center justify-center rounded-lg border-gray-200 text-gray-500 lg:h-11 lg:w-11 lg:border dark:border-gray-800 dark:text-gray-400"
+                @@click.stop="sidebarToggle = !sidebarToggle">
+                <svg class="hidden fill-current lg:block" width="16" height="12" viewBox="0 0 16 12" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M0.583252 1C0.583252 0.585788 0.919038 0.25 1.33325 0.25H14.6666C15.0808 0.25 15.4166 0.585786 15.4166 1C15.4166 1.41421 15.0808 1.75 14.6666 1.75L1.33325 1.75C0.919038 1.75 0.583252 1.41422 0.583252 1ZM0.583252 11C0.583252 10.5858 0.919038 10.25 1.33325 10.25L14.6666 10.25C15.0808 10.25 15.4166 10.5858 15.4166 11C15.4166 11.4142 15.0808 11.75 14.6666 11.75L1.33325 11.75C0.919038 11.75 0.583252 11.4142 0.583252 11ZM1.33325 5.25C0.919038 5.25 0.583252 5.58579 0.583252 6C0.583252 6.41421 0.919038 6.75 1.33325 6.75L7.99992 6.75C8.41413 6.75 8.74992 6.41421 8.74992 6C8.74992 5.58579 8.41413 5.25 7.99992 5.25L1.33325 5.25Z"
+                        fill="" />
+                </svg>
+                <svg :class="sidebarToggle ? 'hidden' : 'block lg:hidden'" class="fill-current lg:hidden" width="24"
+                    height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M3.25 6C3.25 5.58579 3.58579 5.25 4 5.25L20 5.25C20.4142 5.25 20.75 5.58579 20.75 6C20.75 6.41421 20.4142 6.75 20 6.75L4 6.75C3.58579 6.75 3.25 6.41422 3.25 6ZM3.25 18C3.25 17.5858 3.58579 17.25 4 17.25L20 17.25C20.4142 17.25 20.75 17.5858 20.75 18C20.75 18.4142 20.4142 18.75 20 18.75L4 18.75C3.58579 18.75 3.25 18.4142 3.25 18ZM4 11.25C3.58579 11.25 3.25 11.5858 3.25 12C3.25 12.4142 3.58579 12.75 4 12.75L12 12.75C12.4142 12.75 12.75 12.4142 12.75 12C12.75 11.5858 12.4142 11.25 12 11.25L4 11.25Z"
+                        fill="" />
+                </svg>
+                <svg :class="sidebarToggle ? 'block lg:hidden' : 'hidden'" class="fill-current" width="24" height="24"
+                    viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M6.21967 7.28131C5.92678 6.98841 5.92678 6.51354 6.21967 6.22065C6.51256 5.92775 6.98744 5.92775 7.28033 6.22065L11.999 10.9393L16.7176 6.22078C17.0105 5.92789 17.4854 5.92788 17.7782 6.22078C18.0711 6.51367 18.0711 6.98855 17.7782 7.28144L13.0597 12L17.7782 16.7186C18.0711 17.0115 18.0711 17.4863 17.7782 17.7792C17.4854 18.0721 17.0105 18.0721 16.7176 17.7792L11.999 13.0607L7.28033 17.7794C6.98744 18.0722 6.51256 18.0722 6.21967 17.7794C5.92678 17.4865 5.92678 17.0116 6.21967 16.7187L10.9384 12L6.21967 7.28131Z"
+                        fill="" />
+                </svg>
+            </button>
+
+            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="lg:hidden">
+                <img class="dark:hidden" src="~/admin/images/logo/logo.svg" alt="Auction House" />
+                <img class="hidden dark:block" src="~/admin/images/logo/logo-dark.svg" alt="Auction House" />
+            </a>
+
+            <div class="hidden lg:block">
+                <h1 class="text-lg font-semibold text-gray-800 dark:text-white/90">Admin Dashboard</h1>
+                <p class="text-theme-sm text-gray-500 dark:text-gray-400">Manage auctions, users, and platform activity
+                </p>
+            </div>
+        </div>
+
+        <div class="flex w-full items-center justify-between gap-4 px-5 py-4 lg:w-auto lg:justify-end lg:px-0">
+            <button
+                class="relative flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                @@click.prevent="darkMode = !darkMode">
+                <svg class="hidden dark:block" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M9.99998 1.5415C10.4142 1.5415 10.75 1.87729 10.75 2.2915V3.5415C10.75 3.95572 10.4142 4.2915 9.99998 4.2915C9.58577 4.2915 9.24998 3.95572 9.24998 3.5415V2.2915C9.24998 1.87729 9.58577 1.5415 9.99998 1.5415ZM10.0009 6.79327C8.22978 6.79327 6.79402 8.22904 6.79402 10.0001C6.79402 11.7712 8.22978 13.207 10.0009 13.207C11.772 13.207 13.2078 11.7712 13.2078 10.0001C13.2078 8.22904 11.772 6.79327 10.0009 6.79327ZM5.29402 10.0001C5.29402 7.40061 7.40135 5.29327 10.0009 5.29327C12.6004 5.29327 14.7078 7.40061 14.7078 10.0001C14.7078 12.5997 12.6004 14.707 10.0009 14.707C7.40135 14.707 5.29402 12.5997 5.29402 10.0001Z"
+                        fill="currentColor" />
+                </svg>
+                <svg class="dark:hidden" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M17.4547 11.97L18.4247 11.2483C18.8285 10.9406 18.9396 10.3955 18.6914 9.98445C18.4432 9.5734 17.9658 9.39894 17.5428 9.5544L16.3856 10.0043C15.9188 9.15027 15.2853 8.39348 14.5285 7.76126L14.9784 6.60407C15.1339 6.18112 14.9594 5.7037 14.5484 5.45551C14.1373 5.20731 13.5922 5.31844 13.2845 5.72227L12.5628 6.6923C11.8957 6.45244 11.1839 6.32019 10.4424 6.30807V5.15088C10.4424 4.68257 10.0627 4.30286 9.5944 4.30286C9.12609 4.30286 8.74638 4.68257 8.74638 5.15088V6.30807C8.00485 6.32019 7.29309 6.45244 6.62595 6.6923L5.90422 5.72227C5.59654 5.31844 5.05138 5.20731 4.64033 5.45551C4.22928 5.7037 4.05482 6.18112 4.21028 6.60407L4.6602 7.76126C3.90341 8.39348 3.26992 9.15027 2.80311 10.0043L1.64592 9.5544C1.22297 9.39894 0.74555 9.5734 0.497354 9.98445C0.249158 10.3955 0.360282 10.9406 0.764115 11.2483L1.73414 11.97C1.49428 12.6371 1.36203 13.3489 1.34991 14.0904H0.192717C-0.275595 14.0904 -0.655304 14.4701 -0.655304 14.9384C-0.655304 15.4067 -0.275595 15.7864 0.192717 15.7864H1.34991C1.36203 16.5279 1.49428 17.2397 1.73414 17.9068L0.764115 18.6285C0.360282 18.9362 0.249158 19.4813 0.497354 19.8924C0.74555 20.3034 1.22297 20.4779 1.64592 20.3224L2.80311 19.8725C3.26992 20.7265 3.90341 21.4833 4.6602 22.1155L4.21028 23.2727C4.05482 23.6957 4.22928 24.1731 4.64033 24.4213C5.05138 24.6695 5.59654 24.5584 5.90422 24.1546L6.62595 23.1845C7.29309 23.4244 8.00485 23.5567 8.74638 23.5688V24.7259C8.74638 25.1943 9.12609 25.574 9.5944 25.574C10.0627 25.574 10.4424 25.1943 10.4424 24.7259V23.5688C11.1839 23.5567 11.8957 23.4244 12.5628 23.1845L13.2845 24.1546C13.5922 24.5584 14.1373 24.6695 14.5484 24.4213C14.9594 24.1731 15.1339 23.6957 14.9784 23.2727L14.5285 22.1155C15.2853 21.4833 15.9188 20.7265 16.3856 19.8725L17.5428 20.3224C17.9658 20.4779 18.4432 20.3034 18.6914 19.8924C18.9396 19.4813 18.8285 18.9362 18.4247 18.6285L17.4547 17.9068C17.6946 17.2397 17.8268 16.5279 17.8389 15.7864H19.9961C20.4644 15.7864 20.8441 15.4067 20.8441 14.9384C20.8441 14.4701 20.4644 14.0904 19.9961 14.0904H17.8389C17.8268 13.3489 17.6946 12.6371 17.4547 11.97Z"
+                        fill="currentColor" />
+                </svg>
+            </button>
+
+            <div class="flex items-center gap-3">
+                <span class="hidden text-right sm:block">
+                    <span class="block text-theme-sm font-medium text-gray-700 dark:text-gray-400">Admin User</span>
+                    <span class="block text-theme-xs text-gray-500 dark:text-gray-400">admin@auctionhouse.com</span>
+                </span>
+                @* <img class="h-11 w-11 overflow-hidden rounded-full" src="~/admin/images/user/user-01.jpg" alt="Admin user" /> *@
+            </div>
+        </div>
+    </div>
+</header>
