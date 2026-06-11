@@ -43,8 +43,8 @@ public static class MockProductDetailData
         var auction = MockAuctionData.GetAuctionById(id);
         if (auction is null) return null;
 
-        var sellers = MockAuctionData.GetBestSellers();
-        var seller = sellers[(id - 1) % sellers.Count];
+        var seller = MockAuctionData.GetSellerForAuction(id);
+        if (seller is null) return null;
         var extras = CategoryExtraImages.GetValueOrDefault(auction.Category, CategoryExtraImages["Watches"]);
         var images = new List<string> { auction.ImageUrl };
         images.AddRange(extras.Take(3));
