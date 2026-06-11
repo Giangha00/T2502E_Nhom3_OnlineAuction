@@ -44,7 +44,8 @@ public class AuthController : Controller
 
         HttpContext.Session.SetString(SessionLoggedInKey, "true");
         HttpContext.Session.SetString("UserName", fullName.Trim());
-        return RedirectToAction("Login");
+        TempData["FromSignUp"] = true;
+        return RedirectToAction("Index", "Payment");
     }
 
     public IActionResult Logout()
