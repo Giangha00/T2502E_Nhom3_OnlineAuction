@@ -124,7 +124,13 @@
 
                     <!-- Card details (shown when card selected) -->
                     <div id="cardDetails" class="mt-6 hidden space-y-4 rounded-xl border border-dashed border-stone-200 bg-stone-50/50 p-5">
-                        <p class="text-sm font-medium text-stone-700">Card Details</p>
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <p class="text-sm font-medium text-stone-700">Card Details</p>
+                            <a asp-controller="Payment" asp-action="Index"
+                               class="text-xs font-semibold text-amber-700 hover:text-amber-800">
+                                Manage saved payment methods →
+                            </a>
+                        </div>
                         <div>
                             <label for="cardNumber" class="block text-sm font-medium text-stone-900">Card Number</label>
                             <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19"

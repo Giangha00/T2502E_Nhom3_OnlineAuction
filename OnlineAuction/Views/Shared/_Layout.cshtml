@@ -7,13 +7,12 @@
     var isHomePage = string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase);
     var isAuctionPage = string.Equals(currentController, "Auction", StringComparison.OrdinalIgnoreCase);
     var isPolicyPage = string.Equals(currentController, "Policy", StringComparison.OrdinalIgnoreCase);
-    var isCartPage = string.Equals(currentController, "Cart", StringComparison.OrdinalIgnoreCase);
+    var isPaymentPage = string.Equals(currentController, "Payment", StringComparison.OrdinalIgnoreCase);
+    var canAccessPaymentInfo = Context.Session.GetString("CanAccessPaymentInfo") == "true";
     var isContactPage = string.Equals(currentController, "Contact", StringComparison.OrdinalIgnoreCase);
     var isAboutPage = string.Equals(currentController, "AboutUs", StringComparison.OrdinalIgnoreCase);
     var isFaqPage = string.Equals(currentController, "Faq", StringComparison.OrdinalIgnoreCase);
     var isRefundPage = string.Equals(currentController, "Refund", StringComparison.OrdinalIgnoreCase);
-    const int cartWonCount = 2;
-
     string NavLinkClass(bool isActive) =>
         isActive
             ? "text-amber-700 visited:text-amber-700"
@@ -58,15 +57,17 @@
             </form>
 
             <div class="hidden shrink-0 items-center gap-2 lg:flex">
-                <a asp-controller="Cart" asp-action="Index"
-                   class="relative flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 text-stone-600 transition hover:border-amber-500 hover:text-amber-700 @(isCartPage ? "border-amber-500 text-amber-700" : "")"
-                   aria-label="My Auction Cart" title="My Auction Cart">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25h9.75M7.5 14.25L5.106 5.272M7.5 14.25l-2.25 7.5h12.33M16.5 14.25l2.25 7.5M9.75 18.75h4.5M16.5 9.75a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zM9 9.75a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/>
-                    </svg>
-                    <span data-cart-badge data-won-count="@cartWonCount"
-                          class="absolute -right-1 -top-1 hidden min-w-[1.125rem] rounded-full bg-amber-700 px-1 text-center text-[10px] font-bold leading-4 text-white">0</span>
-                </a>
+                @if (canAccessPaymentInfo)
+                {
+                    <a asp-controller="Payment" asp-action="Index"
+                       class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 text-stone-600 transition hover:border-amber-500 hover:text-amber-700 @(isPaymentPage ? "border-amber-500 text-amber-700" : "")"
+                       aria-label="Payment Information" title="Payment Information">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <rect x="2" y="5" width="20" height="14" rx="2"/>
+                            <path stroke-linecap="round" d="M2 10h20"/>
+                        </svg>
+                    </a>
+                }
                 <a asp-controller="Auth" asp-action="Login"
                    class="rounded-full border border-amber-700 px-5 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-50">
                     Log In
@@ -104,7 +105,6 @@
                 <ul class="flex overflow-x-auto">
                     <li><a asp-controller="Home" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isHomePage)">Home</a></li>
                     <li><a asp-controller="Auction" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isAuctionPage)">Auction</a></li>
-                    <li><a asp-controller="Cart" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isCartPage)">My Cart</a></li>
                     <li><a asp-controller="AboutUs" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isAboutPage)">About Us</a></li>
                     <li><a asp-controller="Contact" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isContactPage)">Contact Us</a></li>
                     <li><a asp-controller="Faq" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isFaqPage)">FAQ</a></li>
@@ -118,7 +118,10 @@
             <ul class="px-4 py-3 sm:px-6">
                 <li><a asp-controller="Home" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isHomePage)">Home</a></li>
                 <li><a asp-controller="Auction" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isAuctionPage)">Auction</a></li>
-                <li><a asp-controller="Cart" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isCartPage)">My Cart</a></li>
+                @if (canAccessPaymentInfo)
+                {
+                    <li><a asp-controller="Payment" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isPaymentPage)">Payment Information</a></li>
+                }
                 <li><a asp-controller="AboutUs" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isAboutPage)">About Us</a></li>
                 <li><a asp-controller="Contact" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isContactPage)">Contact Us</a></li>
                 <li><a asp-controller="Faq" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isFaqPage)">FAQ</a></li>
@@ -199,7 +202,6 @@
 }
 
 <script src="~/js/site.js" asp-append-version="true"></script>
-<script src="~/js/cart-storage.js" asp-append-version="true"></script>
 @if (!isAuthPage)
 {
     <script>

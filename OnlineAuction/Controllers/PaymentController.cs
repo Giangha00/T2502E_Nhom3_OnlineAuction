@@ -6,6 +6,21 @@ namespace OnlineAuction.Controllers;
 
 public class PaymentController : Controller
 {
+    public IActionResult Index()
+    {
+        if (HttpContext.Session.GetString(PaymentSessionKeys.CanAccessPaymentInfo) != "true")
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        var model = new PaymentInformationViewModel
+        {
+            SavedMethods = MockPaymentData.GetSavedPaymentMethods()
+        };
+
+        return View(model);
+    }
+
     public IActionResult Checkout(int? auctionId)
     {
         var auction = auctionId.HasValue
@@ -16,6 +31,8 @@ public class PaymentController : Controller
         {
             return NotFound();
         }
+
+        HttpContext.Session.SetString(PaymentSessionKeys.CanAccessPaymentInfo, "true");
 
         var platformFee = Math.Round(auction.CurrentPrice * 0.025m, 2);
         var shippingFee = GetShippingFee(auction.Category);
