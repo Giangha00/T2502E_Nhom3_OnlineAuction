@@ -1,0 +1,53 @@
+<div class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-lg lg:sticky lg:top-24">
+  <div class="border-b border-stone-100 bg-gradient-to-r from-amber-700 to-stone-900 px-5 py-4 text-white">
+    <h2 class="text-lg font-semibold">Auction Preview</h2>
+    <p class="mt-0.5 text-xs text-amber-100">Live preview of your listing</p>
+  </div>
+
+  <div class="p-5">
+    <div id="previewImageWrap" class="relative mb-4 aspect-[4/3] overflow-hidden rounded-xl bg-stone-100">
+      <img id="previewImage" src="" alt="Product preview" class="hidden h-full w-full object-cover"/>
+      <div id="previewImagePlaceholder" class="flex h-full flex-col items-center justify-center text-stone-400">
+        <svg class="mb-2 h-12 w-12" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z"/>
+        </svg>
+        <span class="text-xs">No image yet</span>
+      </div>
+      <span id="previewAuctionBadge" class="absolute left-2 top-2 hidden rounded-full bg-amber-700 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">Featured</span>
+    </div>
+
+    <p id="previewCategory" class="text-[10px] font-bold uppercase tracking-widest text-amber-700">—</p>
+    <h3 id="previewName" class="mt-1 text-lg font-bold leading-snug text-stone-900">Product Name</h3>
+    <p id="previewCondition" class="mt-1 text-xs text-stone-500">Condition: —</p>
+
+    <div class="mt-4 space-y-3 rounded-xl bg-stone-50 p-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-stone-500">Starting Price</span>
+        <span id="previewStartingPrice" class="text-base font-bold text-amber-800">$—</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-stone-500">Bid Step</span>
+        <span id="previewBidStep" class="text-sm font-semibold text-stone-700">$—</span>
+      </div>
+      <div id="previewBuyNowRow" class="hidden flex items-center justify-between border-t border-stone-200 pt-3">
+        <span class="text-xs text-stone-500">Buy Now</span>
+        <span id="previewBuyNowPrice" class="text-sm font-semibold text-emerald-700">$—</span>
+      </div>
+    </div>
+
+    <div class="mt-4 space-y-2 text-xs text-stone-600">
+      <div class="flex gap-2">
+        <svg class="mt-0.5 h-4 w-4 shrink-0 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+        </svg>
+        <div>
+          <p class="font-medium text-stone-700">Auction Time</p>
+          <p id="previewStartDate" class="mt-0.5">Start: —</p>
+          <p id="previewEndDate" class="mt-0.5">End: —</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="previewThumbnails" class="mt-4 hidden grid grid-cols-4 gap-1.5"></div>
+  </div>
+</div>

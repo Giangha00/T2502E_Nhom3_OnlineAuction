@@ -1,0 +1,32 @@
+@model OnlineAuction.Models.PaymentInformationViewModel
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@{
+    ViewData["Title"] = "Payment Information";
+    var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+    var initialMethodsJson = JsonSerializer.Serialize(Model.SavedMethods, jsonOptions);
+}
+
+<partial name="_PaymentHeader" />
+
+<section class="py-10 lg:py-14">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div id="paymentNotification" class="mb-6 hidden rounded-xl border px-4 py-3 text-sm font-medium" role="alert"></div>
+
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px] lg:gap-10">
+            <partial name="_PaymentForm" />
+            <partial name="_CardPreview" />
+        </div>
+
+        <partial name="_SavedPaymentList" model="Model" />
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        window.paymentInfoConfig = {
+            initialMethods: @Html.Raw(initialMethodsJson)
+        };
+    </script>
+    <script src="~/js/payment-information.js" asp-append-version="true"></script>
+}

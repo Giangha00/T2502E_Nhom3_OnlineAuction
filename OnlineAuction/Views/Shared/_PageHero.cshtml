@@ -1,0 +1,19 @@
+@model OnlineAuction.Models.PageHeroViewModel
+
+<section class="page-hero relative overflow-hidden py-12 sm:py-16 lg:py-20">
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-amber-400/10 blur-3xl"></div>
+        <div class="absolute -left-40 bottom-0 h-80 w-80 rounded-full bg-orange-400/10 blur-3xl"></div>
+    </div>
+
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 @(Model.Centered ? "text-center" : "")">
+        <p class="page-hero__label text-sm font-semibold uppercase tracking-widest">@Model.Label</p>
+        <h1 class="page-hero__title mt-2 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">@Model.Title</h1>
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <p class="page-hero__desc mt-3 max-w-2xl text-base leading-7 sm:text-lg @(Model.Centered ? "mx-auto" : "")">
+                @Model.Description
+            </p>
+        }
+    </div>
+</section>
