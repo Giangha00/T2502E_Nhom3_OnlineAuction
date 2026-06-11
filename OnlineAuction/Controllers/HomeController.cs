@@ -19,6 +19,7 @@ public class HomeController : Controller
         var model = new HomeViewModel
         {
             FeaturedAuctions = MockAuctionData.GetFeaturedAuctions(),
+            WonAuctions = MockAuctionData.GetWonAuctions(),
             BestSellers = MockAuctionData.GetBestSellers()
         };
 

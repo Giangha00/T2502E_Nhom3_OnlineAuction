@@ -215,8 +215,40 @@ public static class MockAuctionData
         }
     ];
 
+    public static AuctionItemViewModel? GetAuctionById(int id) =>
+        GetAllAuctions().FirstOrDefault(a => a.Id == id);
+
+    public static List<AuctionItemViewModel> GetAuctionsByIds(IEnumerable<int> ids) =>
+        GetAllAuctions().Where(a => ids.Contains(a.Id)).ToList();
+
     public static List<AuctionItemViewModel> GetFeaturedAuctions() =>
         GetAllAuctions().Take(6).ToList();
+
+    public static List<AuctionItemViewModel> GetWonAuctions() =>
+    [
+        new()
+        {
+            Id = 3,
+            Name = "Rolex Submariner Date 1680",
+            Category = "Watches",
+            ImageUrl = "https://images.unsplash.com/photo-1524593362214-995a5aa60ca0?w=600&h=750&fit=crop",
+            StartingPrice = 6800,
+            CurrentPrice = 9450,
+            Status = "Won",
+            TimeRemaining = "Pay within 3 days"
+        },
+        new()
+        {
+            Id = 8,
+            Name = "1952 Topps Mickey Mantle Rookie",
+            Category = "Cards",
+            ImageUrl = "https://images.unsplash.com/photo-1606107557195-0a29b4b9efab?w=600&h=750&fit=crop",
+            StartingPrice = 12000,
+            CurrentPrice = 18750,
+            Status = "Won",
+            TimeRemaining = "Pay within 3 days"
+        }
+    ];
 
     public static List<CategoryViewModel> GetCategories()
     {

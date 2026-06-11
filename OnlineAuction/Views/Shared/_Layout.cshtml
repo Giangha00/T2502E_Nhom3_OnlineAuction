@@ -6,6 +6,18 @@
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var isHomePage = string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase);
     var isAuctionPage = string.Equals(currentController, "Auction", StringComparison.OrdinalIgnoreCase);
+    var isPolicyPage = string.Equals(currentController, "Policy", StringComparison.OrdinalIgnoreCase);
+    var isContactPage = string.Equals(currentController, "Contact", StringComparison.OrdinalIgnoreCase);
+    var isAboutPage = string.Equals(currentController, "AboutUs", StringComparison.OrdinalIgnoreCase);
+    var isFaqPage = string.Equals(currentController, "Faq", StringComparison.OrdinalIgnoreCase);
+    var isRefundPage = string.Equals(currentController, "Refund", StringComparison.OrdinalIgnoreCase);
+    string NavLinkClass(bool isActive) =>
+        isActive
+            ? "text-amber-700 visited:text-amber-700"
+            : "text-stone-600 visited:text-stone-600 transition hover:text-amber-700";
+
+    string FooterLinkClass(bool isActive) =>
+        isActive ? "footer-link footer-link--active" : "footer-link";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -78,16 +90,12 @@
         <nav class="hidden border-t border-stone-100 lg:block">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <ul class="flex overflow-x-auto">
-                    <li><a asp-controller="Home" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @(isHomePage ? "text-amber-700" : "text-stone-600 transition hover:text-amber-700")">Home</a></li>
-                    <li><a asp-controller="Auction" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @(isAuctionPage ? "text-amber-700" : "text-stone-600 transition hover:text-amber-700")">Auction</a></li>
-                    <li><a asp-controller="AboutUs" asp-action="About" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">About Us</a></li>
-                    <li><a href="/Contact" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">Contact Us</a></li>
-                    <li><a asp-controller="Faq"
-                           asp-action="Index"
-                           class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">
-                        FAQ
-                    </a></li>
-                    <li><a href="#" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">Policy &amp; Term of Use</a></li>
+                    <li><a asp-controller="Home" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isHomePage)">Home</a></li>
+                    <li><a asp-controller="Auction" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isAuctionPage)">Auction</a></li>
+                    <li><a asp-controller="AboutUs" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isAboutPage)">About Us</a></li>
+                    <li><a asp-controller="Contact" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isContactPage)">Contact Us</a></li>
+                    <li><a asp-controller="Faq" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isFaqPage)">FAQ</a></li>
+                    <li><a asp-controller="Policy" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isPolicyPage)">Policy &amp; Term of Use</a></li>
                     <li><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">Admin</a></li>
                 </ul>
             </div>
@@ -95,12 +103,12 @@
 
         <nav id="mobileNav" class="hidden border-t border-stone-200 bg-white lg:hidden">
             <ul class="px-4 py-3 sm:px-6">
-                <li><a asp-controller="Home" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium text-stone-900">Home</a></li>
-                <li><a asp-controller="Auction" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm text-stone-700">Auction</a></li>
-                <li><a asp-controller="AboutUs" asp-action="About" class="block border-b border-stone-100 py-3 text-sm text-stone-700">About Us</a></li>
-                <li><a href="/Contact" class="block border-b border-stone-100 py-3 text-sm text-stone-700">Contact Us</a></li>
-                <li><a asp-controller="Faq" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">FAQ</a></li>
-                <li><a href="#" class="block border-b border-stone-100 py-3 text-sm text-stone-700">Policy &amp; Term of Use</a></li>
+                <li><a asp-controller="Home" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isHomePage)">Home</a></li>
+                <li><a asp-controller="Auction" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isAuctionPage)">Auction</a></li>
+                <li><a asp-controller="AboutUs" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isAboutPage)">About Us</a></li>
+                <li><a asp-controller="Contact" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isContactPage)">Contact Us</a></li>
+                <li><a asp-controller="Faq" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isFaqPage)">FAQ</a></li>
+                <li><a asp-controller="Policy" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isPolicyPage)">Policy &amp; Term of Use</a></li>
                 <li><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm text-stone-700">Admin</a></li>
                 <li class="flex gap-2 pt-4">
                     <a asp-controller="Auth" asp-action="Login"
@@ -136,37 +144,34 @@
                     <div>
                         <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900">About</h4>
                         <ul class="mt-4 space-y-2">
-                            <li><a asp-controller="AboutUs" asp-action="About" class="text-sm text-stone-600 transition hover:text-amber-700">About Us</a></li>
-                            <li><a href="#" class="text-sm text-stone-600 transition hover:text-amber-700">Our Story</a></li>
-                            <li><a href="#" class="text-sm text-stone-600 transition hover:text-amber-700">Careers</a></li>
+                            <li><a asp-controller="AboutUs" asp-action="Index" class="@FooterLinkClass(isAboutPage)">About Us</a></li>
+                            <li><a href="#" class="@FooterLinkClass(false)">Our Story</a></li>
+                            <li><a href="#" class="@FooterLinkClass(false)">Careers</a></li>
                         </ul>
                     </div>
                     <div>
                         <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900">Contact</h4>
                         <ul class="mt-4 space-y-2">
-                            <li><a href="/Contact" class="text-sm text-stone-600 transition hover:text-amber-700">Contact Us</a></li>
-                            <li><a href="#" class="text-sm text-stone-600 transition hover:text-amber-700">Support</a></li>
-                            <li><a href="#" class="text-sm text-stone-600 transition hover:text-amber-700">help@auctionhouse.com</a></li>
+                            <li><a asp-controller="Contact" asp-action="Index" class="@FooterLinkClass(isContactPage)">Contact Us</a></li>
+                            <li><a href="#" class="@FooterLinkClass(false)">Support</a></li>
+                            <li><a href="mailto:help@auctionhouse.com" class="@FooterLinkClass(false)">help@auctionhouse.com</a></li>
                         </ul>
                     </div>
                     <div>
                         <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900">Help</h4>
                         <ul class="mt-4 space-y-2">
-                            <li><a asp-controller="Faq"
-                                   asp-action="Index"
-                                   class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">
-                                FAQ
-                            </a></li>
-                            <li><a href="#" class="text-sm text-stone-600 transition hover:text-amber-700">How to Bid</a></li>
-                            <li><a href="#" class="text-sm text-stone-600 transition hover:text-amber-700">Seller Guide</a></li>
+                            <li><a asp-controller="Faq" asp-action="Index" class="@FooterLinkClass(isFaqPage)">FAQ</a></li>
+                            <li><a asp-controller="Refund" asp-action="Index" class="@FooterLinkClass(isRefundPage)">Refund Request</a></li>
+                            <li><a href="#" class="@FooterLinkClass(false)">How to Bid</a></li>
+                            <li><a href="#" class="@FooterLinkClass(false)">Seller Guide</a></li>
                         </ul>
                     </div>
                     <div>
                         <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900">Legal</h4>
                         <ul class="mt-4 space-y-2">
-                            <li><a href="#" class="text-sm text-stone-600 transition hover:text-amber-700">Policy &amp; Term of Use</a></li>
-                            <li><a href="#" class="text-sm text-stone-600 transition hover:text-amber-700">Privacy Policy</a></li>
-                            <li><a href="#" class="text-sm text-stone-600 transition hover:text-amber-700">Cookie Policy</a></li>
+                            <li><a asp-controller="Policy" asp-action="Index" class="@FooterLinkClass(isPolicyPage)">Policy &amp; Term of Use</a></li>
+                            <li><a asp-controller="Policy" asp-action="Index" asp-fragment="privacy-policy" class="@FooterLinkClass(isPolicyPage)">Privacy Policy</a></li>
+                            <li><a href="#" class="@FooterLinkClass(false)">Cookie Policy</a></li>
                         </ul>
                     </div>
                 </div>
