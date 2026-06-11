@@ -104,9 +104,11 @@
             @foreach (var seller in Model.BestSellers)
             {
                 <article class="rounded-2xl border border-stone-200 bg-white/80 p-6 text-center shadow-sm transition hover:shadow-lg">
+                    <a asp-controller="User" asp-action="Detail" asp-route-id="@seller.Id" class="block">
                     <img src="@seller.AvatarUrl" alt="@seller.Username" loading="lazy"
                          class="mx-auto h-20 w-20 rounded-full object-cover ring-4 ring-amber-100"/>
-                    <h3 class="mt-4 text-lg font-semibold text-stone-900">@seller.Username</h3>
+                    <h3 class="mt-4 text-lg font-semibold text-stone-900 transition hover:text-amber-700">@seller.Username</h3>
+                    </a>
                     <div class="mt-5 flex justify-center gap-6 border-b border-stone-100 pb-5">
                         <div>
                             <p class="text-lg font-bold text-stone-900">@seller.AuctionCount</p>
@@ -129,6 +131,10 @@
                             <span class="text-base @(filled ? "text-amber-500" : half ? "text-amber-300" : "text-stone-200")">&#9733;</span>
                         }
                     </div>
+                    <a asp-controller="User" asp-action="Detail" asp-route-id="@seller.Id"
+                       class="mt-5 inline-flex rounded-xl border border-amber-300 bg-white px-5 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-50">
+                        View Profile
+                    </a>
                 </article>
             }
         </div>
