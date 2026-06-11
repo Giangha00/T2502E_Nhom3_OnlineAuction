@@ -16,4 +16,15 @@ public class AuctionController : Controller
 
         return View(model);
     }
+
+    public IActionResult Detail(int id)
+    {
+        var product = MockProductDetailData.GetById(id);
+        if (product is null)
+        {
+            return NotFound();
+        }
+
+        return View(product);
+    }
 }
