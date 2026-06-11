@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="Home" xml:space="preserve">
+  <value>ホーム</value>
+</data>
+
+    <data name="Auction" xml:space="preserve">
+  <value>オークション</value>
+</data>
+
+    <data name="About" xml:space="preserve">
+  <value>概要</value>
+</data>
+
+    <data name="Contact" xml:space="preserve">
+  <value>お問い合わせ</value>
+</data>
+
+    <data name="FAQ" xml:space="preserve">
+  <value>FAQ</value>
+</data>
+
+    <data name="Login" xml:space="preserve">
+  <value>ログイン</value>
+</data>
+
+    <data name="SignUp" xml:space="preserve">
+  <value>サインアップ</value>
+</data>
+
+    <data name="Language" xml:space="preserve">
+  <value>言語</value>
+</data>
+
+    <data name="English" xml:space="preserve">
+  <value>英語</value>
+</data>
+
+    <data name="Vietnamese" xml:space="preserve">
+  <value>ベトナム語</value>
+</data>
+
+    <data name="Japanese" xml:space="preserve">
+  <value>日本語</value>
+</data>
+
+    <data name="Korean" xml:space="preserve">
+  <value>韓国語</value>
+</data>
+
+    <data name="MyCart" xml:space="preserve">
+  <value>マイカート</value>
+</data>
+
+    <data name="AboutUs" xml:space="preserve">
+  <value>私たちについて</value>
+</data>
+
+    <data name="ContactUs" xml:space="preserve">
+  <value>お問い合わせ</value>
+</data>
+
+    <data name="PolicyAndTerms" xml:space="preserve">
+  <value>ポリシー &amp; 利用規約</value>
+</data>
+
+    <data name="SearchPlaceholder" xml:space="preserve">
+  <value>商品、カテゴリー、販売者で検索...</value>
+</data>
+
+    <data name="AuctionHouse" xml:space="preserve">
+  <value>競売</value>
+</data>
+
+    <data name="DiscoverUnique" xml:space="preserve">
+  <value>オンライン競売を通じてユニークな商品を発見してください。</value>
+</data>
+
+    <data name="AllRightsReserved" xml:space="preserve">
+  <value>すべての権利が保護されています。</value>
+</data>
+</root>
