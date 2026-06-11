@@ -1,0 +1,21 @@
+@model OnlineAuction.Models.CreateAuctionViewModel
+
+<div>
+  <label for="category" class="mb-2 block text-sm font-medium text-stone-700">Category <span class="text-red-500">*</span></label>
+  <select id="category" name="Category"
+          class="field-input w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100">
+    <option value="">Select a category</option>
+    @foreach (var category in Model.Categories)
+    {
+      if (Model.Category == category)
+      {
+        <option value="@category" selected="selected">@category</option>
+      }
+      else
+      {
+        <option value="@category">@category</option>
+      }
+    }
+  </select>
+  <p class="field-error mt-1 hidden text-xs text-red-600" data-for="category"></p>
+</div>
