@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/OnlineAuction/Controllers/TestController.cs">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/OnlineAuction/Controllers/TestController.cs" />
+              <option name="updatedContent" value="using Microsoft.AspNetCore.Localization;&#10;using Microsoft.AspNetCore.Mvc;&#10;using Microsoft.Extensions.Localization;&#10;using OnlineAuction.Localization;&#10;&#10;namespace OnlineAuction.Controllers;&#10;&#10;public class TestController : Controller&#10;{&#10;    private readonly IStringLocalizer&lt;SharedResource&gt; _localizer;&#10;&#10;    public TestController(IStringLocalizer&lt;SharedResource&gt; localizer)&#10;    {&#10;        _localizer = localizer;&#10;    }&#10;&#10;    public IActionResult Index()&#10;    {&#10;        var culture = HttpContext.Features.Get&lt;IRequestCultureFeature&gt;()?.RequestCulture.Culture.Name ?? &quot;N/A&quot;;&#10;        var homeText = _localizer[&quot;Home&quot;];&#10;        var auctionText = _localizer[&quot;Auction&quot;];&#10;        &#10;        ViewBag.Culture = culture;&#10;        ViewBag.HomeText = homeText;&#10;        ViewBag.AuctionText = auctionText;&#10;        ViewBag.AllCookies = HttpContext.Request.Headers.Cookie.ToString();&#10;        &#10;        return View();&#10;    }&#10;}&#10;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/OnlineAuction/Views/Test/Index.cshtml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/OnlineAuction/Views/Test/Index.cshtml" />
+              <option name="updatedContent" value="@{&#10;    ViewData[&quot;Title&quot;] = &quot;Test Language&quot;;&#10;}&#10;&#10;&lt;div class=&quot;container mx-auto p-8&quot;&gt;&#10;    &lt;h1 class=&quot;text-2xl font-bold mb-4&quot;&gt; Language Test Page&lt;/h1&gt;&#10;    &#10;    &lt;div class=&quot;bg-blue-100 p-4 rounded mb-4&quot;&gt;&#10;        &lt;h2 class=&quot;font-bold mb-2&quot;&gt;Current Culture:&lt;/h2&gt;&#10;        &lt;p class=&quot;text-lg&quot;&gt;&lt;strong&gt;@ViewBag.Culture&lt;/strong&gt;&lt;/p&gt;&#10;    &lt;/div&gt;&#10;    &#10;    &lt;div class=&quot;bg-green-100 p-4 rounded mb-4&quot;&gt;&#10;        &lt;h2 class=&quot;font-bold mb-2&quot;&gt;Translations:&lt;/h2&gt;&#10;        &lt;p&gt;&lt;strong&gt;Home:&lt;/strong&gt; @ViewBag.HomeText&lt;/p&gt;&#10;        &lt;p&gt;&lt;strong&gt;Auction:&lt;/strong&gt; @ViewBag.AuctionText&lt;/p&gt;&#10;    &lt;/div&gt;&#10;    &#10;    &lt;div class=&quot;bg-yellow-100 p-4 rounded mb-4&quot;&gt;&#10;        &lt;h2 class=&quot;font-bold mb-2&quot;&gt;Cookies:&lt;/h2&gt;&#10;        &lt;p&gt;&lt;code&gt;@ViewBag.AllCookies&lt;/code&gt;&lt;/p&gt;&#10;    &lt;/div&gt;&#10;    &#10;    &lt;a href=&quot;/&quot; class=&quot;bg-blue-500 text-white px-4 py-2 rounded&quot;&gt;Back to Home&lt;/a&gt;&#10;&lt;/div&gt;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
