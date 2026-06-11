@@ -1,0 +1,76 @@
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.Extensions.Localization
+@using OnlineAuction.Resources
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var currentCulture = Context.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name ?? "en-US";
+
+    var languageLabel = currentCulture switch
+    {
+        "vi-VN" => "VI",
+        "ja-JP" => "JA",
+        "ko-KR" => "KO",
+        _ => "EN"
+    };
+}
+
+<div class="relative" id="languageSwitcher">
+    <button type="button"
+            id="languageButton"
+            class="flex items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition hover:border-amber-600 hover:text-amber-700 sm:px-3 sm:py-1.5"
+            aria-haspopup="true"
+            aria-expanded="false">
+        <span>@languageLabel</span>
+        <span class="text-xs">v</span>
+    </button>
+
+    <div id="languageDropdown"
+         class="absolute right-0 z-50 mt-3 hidden w-48 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-xl sm:w-60">
+        <form asp-controller="Language" asp-action="SetLanguage" method="post">
+            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+
+            <button name="culture" value="en-US" type="submit" class="flex w-full items-center justify-between px-4 py-3 text-sm text-stone-700 hover:bg-amber-50">
+                <span>@Localizer["English"]</span>
+                <span class="text-xs text-stone-400">EN</span>
+            </button>
+
+            <button name="culture" value="vi-VN" type="submit" class="flex w-full items-center justify-between px-4 py-3 text-sm text-stone-700 hover:bg-amber-50">
+                <span>@Localizer["Vietnamese"]</span>
+                <span class="text-xs text-stone-400">VI</span>
+            </button>
+
+            <button name="culture" value="ja-JP" type="submit" class="flex w-full items-center justify-between px-4 py-3 text-sm text-stone-700 hover:bg-amber-50">
+                <span>@Localizer["Japanese"]</span>
+                <span class="text-xs text-stone-400">JA</span>
+            </button>
+
+            <button name="culture" value="ko-KR" type="submit" class="flex w-full items-center justify-between px-4 py-3 text-sm text-stone-700 hover:bg-amber-50">
+                <span>@Localizer["Korean"]</span>
+                <span class="text-xs text-stone-400">KO</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const languageSwitcher = document.getElementById('languageSwitcher');
+        const languageButton = document.getElementById('languageButton');
+        const languageDropdown = document.getElementById('languageDropdown');
+
+        if (!languageSwitcher || !languageButton || !languageDropdown) return;
+
+        languageButton.addEventListener('click', function () {
+            const isHidden = languageDropdown.classList.toggle('hidden');
+            languageButton.setAttribute('aria-expanded', String(!isHidden));
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!languageSwitcher.contains(event.target)) {
+                languageDropdown.classList.add('hidden');
+                languageButton.setAttribute('aria-expanded', 'false');
+            }
+        });
+    })();
+</script>
