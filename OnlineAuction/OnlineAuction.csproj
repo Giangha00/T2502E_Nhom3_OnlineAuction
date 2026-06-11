@@ -6,6 +6,10 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Areas\Admin\Views\Auction\" />
+    </ItemGroup>
+
     <Target Name="BuildTailwindCss" BeforeTargets="Build">
         <Exec WorkingDirectory="$(MSBuildProjectDirectory)"
               Command="npm install"
