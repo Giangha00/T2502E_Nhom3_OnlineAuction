@@ -27,39 +27,6 @@
     </div>
 </section>
 
-@if (Model.WonAuctions.Count > 0)
-{
-    <section class="border-t border-green-200/60 bg-green-50/40 py-10 lg:py-12">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="mb-6">
-                <p class="text-sm font-semibold uppercase tracking-widest text-green-700">Congratulations</p>
-                <h2 class="mt-2 text-2xl font-bold text-stone-900 sm:text-3xl">Your Winning Bids</h2>
-                <p class="mt-2 text-sm text-stone-600">Complete payment to secure your items. Payment Information will be available after you start checkout.</p>
-            </div>
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                @foreach (var item in Model.WonAuctions)
-                {
-                    <article class="overflow-hidden rounded-2xl border border-green-200 bg-white p-4 shadow-sm">
-                        <div class="flex gap-4">
-                            <img src="@item.ImageUrl" alt="@item.Name" class="h-20 w-20 shrink-0 rounded-xl object-cover"/>
-                            <div class="min-w-0 flex-1">
-                                <span class="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-green-700">Won</span>
-                                <h3 class="mt-1 line-clamp-2 text-sm font-semibold text-stone-900">@item.Name</h3>
-                                <p class="mt-1 text-xs text-stone-500">@item.TimeRemaining</p>
-                                <p class="mt-1 text-sm font-bold text-amber-700">$@item.CurrentPrice.ToString("N0")</p>
-                            </div>
-                        </div>
-                        <a asp-controller="Payment" asp-action="Checkout" asp-route-auctionId="@item.Id"
-                           class="mt-4 block w-full rounded-xl bg-amber-700 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-amber-800">
-                            Complete Payment
-                        </a>
-                    </article>
-                }
-            </div>
-        </div>
-    </section>
-}
-
 <section id="featured-auctions" class="border-t border-stone-200/80 bg-white/50 py-12 lg:py-16">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mb-8 flex items-center justify-between">

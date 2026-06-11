@@ -4,10 +4,12 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>OnlineAuction</RootNamespace>
+        <RazorLangVersion>8.0</RazorLangVersion>
     </PropertyGroup>
 
-    <ItemGroup>
-      <Folder Include="Areas\Admin\Views\Auction\" />
+    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.11" />
     </ItemGroup>
 
     <ItemGroup>
