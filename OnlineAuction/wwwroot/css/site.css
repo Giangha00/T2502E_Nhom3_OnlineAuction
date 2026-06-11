@@ -101,3 +101,19 @@ footer .footer-link--active:visited {
   background-color: #fef2f2;
   color: #b91c1c;
 }
+
+.ckeditor-wrapper .ck-editor__editable {
+  min-height: 160px;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.ckeditor-wrapper .ck.ck-editor__main > .ck-editor__editable:not(.ck-focused) {
+  border: none !important;
+}
+
+.ckeditor-wrapper .ck.ck-toolbar {
+  border: none !important;
+  border-bottom: 1px solid #e7e5e4 !important;
+  background: #fafaf9 !important;
+}

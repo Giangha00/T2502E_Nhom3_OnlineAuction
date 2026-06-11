@@ -6,6 +6,7 @@
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var isHomePage = string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase);
     var isAuctionPage = string.Equals(currentController, "Auction", StringComparison.OrdinalIgnoreCase);
+    var isSellPage = string.Equals(currentController, "Sell", StringComparison.OrdinalIgnoreCase);
     var isPolicyPage = string.Equals(currentController, "Policy", StringComparison.OrdinalIgnoreCase);
     var isContactPage = string.Equals(currentController, "Contact", StringComparison.OrdinalIgnoreCase);
     var isAboutPage = string.Equals(currentController, "AboutUs", StringComparison.OrdinalIgnoreCase);
@@ -92,6 +93,7 @@
                 <ul class="flex overflow-x-auto">
                     <li><a asp-controller="Home" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isHomePage)">Home</a></li>
                     <li><a asp-controller="Auction" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isAuctionPage)">Auction</a></li>
+                    <li><a asp-controller="Sell" asp-action="Create" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isSellPage)">Sell</a></li>
                     <li><a asp-controller="AboutUs" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isAboutPage)">About Us</a></li>
                     <li><a asp-controller="Contact" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isContactPage)">Contact Us</a></li>
                     <li><a asp-controller="Faq" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isFaqPage)">FAQ</a></li>
@@ -105,6 +107,7 @@
             <ul class="px-4 py-3 sm:px-6">
                 <li><a asp-controller="Home" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isHomePage)">Home</a></li>
                 <li><a asp-controller="Auction" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isAuctionPage)">Auction</a></li>
+                <li><a asp-controller="Sell" asp-action="Create" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isSellPage)">Sell</a></li>
                 <li><a asp-controller="AboutUs" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isAboutPage)">About Us</a></li>
                 <li><a asp-controller="Contact" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isContactPage)">Contact Us</a></li>
                 <li><a asp-controller="Faq" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isFaqPage)">FAQ</a></li>
