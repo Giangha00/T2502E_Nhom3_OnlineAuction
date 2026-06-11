@@ -3,6 +3,7 @@ namespace OnlineAuction.Models;
 public class HomeViewModel
 {
     public List<AuctionItemViewModel> FeaturedAuctions { get; set; } = [];
+    public List<AuctionItemViewModel> WonAuctions { get; set; } = [];
     public List<SellerViewModel> BestSellers { get; set; } = [];
 }
 
