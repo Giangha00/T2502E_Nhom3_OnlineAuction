@@ -4,7 +4,7 @@ namespace OnlineAuction.Controllers;
 
 public class AboutUsController : Controller
 {
-    public IActionResult Index()
+    public IActionResult About()
     {
         return View("About");
     }
