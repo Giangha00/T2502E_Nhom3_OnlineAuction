@@ -6,6 +6,16 @@ namespace OnlineAuction.Controllers;
 
 public class PaymentController : Controller
 {
+    public IActionResult Index()
+    {
+        var model = new PaymentInformationViewModel
+        {
+            SavedMethods = MockPaymentData.GetSavedPaymentMethods()
+        };
+
+        return View(model);
+    }
+
     public IActionResult Checkout(int? auctionId)
     {
         var auction = auctionId.HasValue
