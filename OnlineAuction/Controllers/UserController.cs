@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Data;
+using OnlineAuction.Models;
 
 namespace OnlineAuction.Controllers;
 
@@ -13,6 +14,12 @@ public class UserController : Controller
             return NotFound();
         }
 
-        return View(seller);
+        var model = new UserDetailViewModel
+        {
+            Seller = seller,
+            ActiveListings = MockAuctionData.GetAuctionsBySellerId(id)
+        };
+
+        return View(model);
     }
 }
