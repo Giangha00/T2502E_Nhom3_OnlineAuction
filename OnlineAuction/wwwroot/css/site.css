@@ -22,3 +22,25 @@ header nav a,
 footer a {
   text-decoration: none;
 }
+
+footer .footer-link {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #57534e;
+  transition: color 0.15s ease;
+}
+
+footer .footer-link:link,
+footer .footer-link:visited {
+  color: #57534e;
+}
+
+footer .footer-link:hover {
+  color: #b45309;
+}
+
+footer .footer-link--active,
+footer .footer-link--active:link,
+footer .footer-link--active:visited {
+  color: #b45309;
+}
