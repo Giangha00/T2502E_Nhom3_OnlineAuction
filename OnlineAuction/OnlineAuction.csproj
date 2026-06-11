@@ -6,6 +6,52 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Areas\Admin\Views\Auction\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\SharedResource.en-US.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>SharedResource.en-US.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\SharedResource.vi-VN.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>SharedResource.vi-VN.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\SharedResource.ja-JP.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>SharedResource.ja-JP.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\SharedResource.ko-KR.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>SharedResource.ko-KR.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Resources\SharedResource.en-US.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>SharedResource.en-US.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\SharedResource.vi-VN.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>SharedResource.vi-VN.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\SharedResource.ja-JP.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>SharedResource.ja-JP.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\SharedResource.ko-KR.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>SharedResource.ko-KR.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
     <Target Name="BuildTailwindCss" BeforeTargets="Build">
         <Exec WorkingDirectory="$(MSBuildProjectDirectory)"
               Command="npm install"
