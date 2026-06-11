@@ -21,28 +21,33 @@
                 <h2 class="text-3xl font-bold text-stone-800">Create account</h2>
                 <p class="mt-2 text-sm text-stone-500">Fill in your information to get started.</p>
 
-                <form id="signUpForm" class="mt-8 space-y-4">
-                    <input id="fullName"
+                @if (TempData["AuthError"] is string signUpError)
+                {
+                    <p class="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">@signUpError</p>
+                }
+
+                <form id="signUpForm" method="post" asp-action="SignUp" class="mt-8 space-y-4">
+                    <input name="fullName" id="fullName"
                            type="text"
                            placeholder="Enter your full name"
                            class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100" />
 
-                    <input id="email"
+                    <input name="email" id="email"
                            type="email"
                            placeholder="Enter your email"
                            class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100" />
 
-                    <input id="phoneNumber"
+                    <input name="phoneNumber" id="phoneNumber"
                            type="tel"
                            placeholder="Enter your phone number"
                            class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100" />
 
-                    <input id="password"
+                    <input name="password" id="password"
                            type="password"
                            placeholder="Enter password"
                            class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100" />
 
-                    <input id="confirmPassword"
+                    <input name="confirmPassword" id="confirmPassword"
                            type="password"
                            placeholder="Confirm password"
                            class="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100" />
@@ -63,22 +68,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    document.getElementById("signUpForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const fullName = document.getElementById("fullName").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const phoneNumber = document.getElementById("phoneNumber").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const confirmPassword = document.getElementById("confirmPassword").value.trim();
-
-        if (!fullName || !email || !phoneNumber || !password || !confirmPassword) {
-            alert("Please fill in all required fields.");
-            return;
-        }
-
-        window.location.href = "/Auth/Login";
-    });
-</script>
