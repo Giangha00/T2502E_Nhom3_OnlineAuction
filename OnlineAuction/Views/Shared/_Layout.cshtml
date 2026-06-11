@@ -1,4 +1,9 @@
-﻿@{
+@using Microsoft.Extensions.Localization
+@using OnlineAuction
+@using OnlineAuction.Resources
+@using Microsoft.AspNetCore.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+@{
     var isAuthPage = string.Equals(
         ViewContext.RouteData.Values["controller"]?.ToString(),
         "Auth",
@@ -13,6 +18,8 @@
     var isFaqPage = string.Equals(currentController, "Faq", StringComparison.OrdinalIgnoreCase);
     var isRefundPage = string.Equals(currentController, "Refund", StringComparison.OrdinalIgnoreCase);
     const int cartWonCount = 2;
+    
+    var currentCulture = Context.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name ?? "en-US";
 
     string NavLinkClass(bool isActive) =>
         isActive
@@ -23,7 +30,7 @@
         isActive ? "footer-link footer-link--active" : "footer-link";
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@currentCulture.Replace("_", "-").ToLower()">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -67,13 +74,16 @@
                     <span data-cart-badge data-won-count="@cartWonCount"
                           class="absolute -right-1 -top-1 hidden min-w-[1.125rem] rounded-full bg-amber-700 px-1 text-center text-[10px] font-bold leading-4 text-white">0</span>
                 </a>
+                
+                @await Html.PartialAsync("_LanguageSwitcher")
+                
                 <a asp-controller="Auth" asp-action="Login"
                    class="rounded-full border border-amber-700 px-5 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-50">
-                    Log In
+                    @Localizer["Login"]
                 </a>
                 <a asp-controller="Auth" asp-action="SignUp"
                    class="rounded-full bg-amber-700 px-5 py-2 text-sm font-medium text-white shadow-lg shadow-amber-700/20 transition hover:bg-amber-800">
-                    Register
+                    @Localizer["SignUp"]
                 </a>
             </div>
 
@@ -102,12 +112,12 @@
         <nav class="hidden border-t border-stone-100 lg:block">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <ul class="flex overflow-x-auto">
-                    <li><a asp-controller="Home" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isHomePage)">Home</a></li>
-                    <li><a asp-controller="Auction" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isAuctionPage)">Auction</a></li>
+                    <li><a asp-controller="Home" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isHomePage)">@Localizer["Home"]</a></li>
+                    <li><a asp-controller="Auction" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isAuctionPage)">@Localizer["Auction"]</a></li>
                     <li><a asp-controller="Cart" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isCartPage)">My Cart</a></li>
                     <li><a asp-controller="AboutUs" asp-action="About" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isAboutPage)">About Us</a></li>
-                    <li><a asp-controller="Contact" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isContactPage)">Contact Us</a></li>
-                    <li><a asp-controller="Faq" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isFaqPage)">FAQ</a></li>
+                    <li><a asp-controller="Contact" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isContactPage)">@Localizer["Contact"]</a></li>
+                    <li><a asp-controller="Faq" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isFaqPage)">@Localizer["FAQ"]</a></li>
                     <li><a asp-controller="Policy" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isPolicyPage)">Policy &amp; Term of Use</a></li>
                     <li><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-stone-600 transition hover:text-amber-700">Admin</a></li>
                 </ul>
@@ -116,19 +126,19 @@
 
         <nav id="mobileNav" class="hidden border-t border-stone-200 bg-white lg:hidden">
             <ul class="px-4 py-3 sm:px-6">
-                <li><a asp-controller="Home" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isHomePage)">Home</a></li>
-                <li><a asp-controller="Auction" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isAuctionPage)">Auction</a></li>
+                <li><a asp-controller="Home" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isHomePage)">@Localizer["Home"]</a></li>
+                <li><a asp-controller="Auction" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isAuctionPage)">@Localizer["Auction"]</a></li>
                 <li><a asp-controller="Cart" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isCartPage)">My Cart</a></li>
                 <li><a asp-controller="AboutUs" asp-action="About" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isAboutPage)">About Us</a></li>
-                <li><a asp-controller="Contact" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isContactPage)">Contact Us</a></li>
-                <li><a asp-controller="Faq" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isFaqPage)">FAQ</a></li>
+                <li><a asp-controller="Contact" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isContactPage)">@Localizer["Contact"]</a></li>
+                <li><a asp-controller="Faq" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isFaqPage)">@Localizer["FAQ"]</a></li>
                 <li><a asp-controller="Policy" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isPolicyPage)">Policy &amp; Term of Use</a></li>
                 <li><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm text-stone-700">Admin</a></li>
                 <li class="flex gap-2 pt-4">
                     <a asp-controller="Auth" asp-action="Login"
-                       class="flex-1 rounded-full border border-amber-700 py-2 text-center text-sm font-medium text-amber-700">Log In</a>
+                       class="flex-1 rounded-full border border-amber-700 py-2 text-center text-sm font-medium text-amber-700">@Localizer["Login"]</a>
                     <a asp-controller="Auth" asp-action="SignUp"
-                       class="flex-1 rounded-full bg-amber-700 py-2 text-center text-sm font-medium text-white">Register</a>
+                       class="flex-1 rounded-full bg-amber-700 py-2 text-center text-sm font-medium text-white">@Localizer["SignUp"]</a>
                 </li>
             </ul>
         </nav>
