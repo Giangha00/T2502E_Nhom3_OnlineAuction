@@ -1,0 +1,74 @@
+@model OnlineAuction.Models.UserDetailViewModel
+@{
+    ViewData["Title"] = Model.Seller.Username;
+}
+
+<section class="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+  <nav aria-label="Breadcrumb" class="mb-8">
+    <ol class="flex flex-wrap items-center gap-2 text-sm text-stone-500">
+      <li><a asp-controller="Home" asp-action="Index" class="hover:text-amber-700">Home</a></li>
+      <li class="text-stone-300">/</li>
+      <li><a asp-controller="Auction" asp-action="Index" class="hover:text-amber-700">Auction</a></li>
+      <li class="text-stone-300">/</li>
+      <li class="font-medium text-stone-800">Seller Profile</li>
+    </ol>
+  </nav>
+
+  <div class="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-xl">
+    <div class="bg-gradient-to-r from-amber-700 to-stone-900 px-6 py-10 text-white sm:px-10">
+      <div class="flex flex-col items-center gap-5 sm:flex-row sm:items-end">
+        <img src="@Model.Seller.AvatarUrl" alt="@Model.Seller.Username"
+             class="h-28 w-28 rounded-full object-cover ring-4 ring-white/30"/>
+        <div class="text-center sm:text-left">
+          <p class="text-sm font-semibold uppercase tracking-widest text-amber-100">Verified Seller</p>
+          <h1 class="mt-1 text-3xl font-bold">@Model.Seller.Username</h1>
+          <div class="mt-3 flex flex-wrap justify-center gap-4 text-sm sm:justify-start">
+            <span>@Model.ActiveListings.Count active listing@(Model.ActiveListings.Count == 1 ? "" : "s")</span>
+            <span>@Model.Seller.SuccessfulSales successful sales</span>
+            <span class="font-semibold text-amber-200">@Model.Seller.Rating.ToString("0.0") rating</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-6 sm:p-10">
+      <h2 class="text-xl font-bold text-stone-900">Active Listings</h2>
+      <p class="mt-1 text-sm text-stone-500">Auctions currently listed by @Model.Seller.Username</p>
+
+      @if (Model.ActiveListings.Count > 0)
+      {
+        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+          @foreach (var item in Model.ActiveListings)
+          {
+            <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id"
+               class="flex gap-4 rounded-2xl border border-stone-200 p-4 transition hover:border-amber-300 hover:shadow-md">
+              <img src="@item.ImageUrl" alt="@item.Name" class="h-20 w-20 shrink-0 rounded-xl object-cover"/>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400">@item.Category</p>
+                  <span class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-white @(item.Status == "Ending Soon" ? "bg-orange-600" : "bg-amber-700")">
+                    @item.Status
+                  </span>
+                </div>
+                <p class="mt-1 line-clamp-2 font-semibold text-stone-900">@item.Name</p>
+                <p class="mt-1 text-sm font-bold text-amber-700">$@item.CurrentPrice.ToString("N0")</p>
+              </div>
+            </a>
+          }
+        </div>
+      }
+      else
+      {
+        <div class="mt-6 rounded-2xl border border-dashed border-stone-200 bg-stone-50 px-6 py-12 text-center">
+          <p class="font-medium text-stone-700">No active listings</p>
+          <p class="mt-1 text-sm text-stone-500">This seller has no auctions running at the moment.</p>
+        </div>
+      }
+
+      <a asp-controller="Auction" asp-action="Index"
+         class="mt-8 inline-flex rounded-xl bg-amber-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-amber-800">
+        Back to Auctions
+      </a>
+    </div>
+  </div>
+</section>

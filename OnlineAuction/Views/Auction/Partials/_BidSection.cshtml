@@ -1,0 +1,41 @@
+@model OnlineAuction.Models.ProductDetailViewModel
+@{
+    var minBid = Model.CurrentPrice + Model.BidStep;
+    const int bidOptionCount = 35;
+}
+
+<div id="bidSection" class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+  <div class="border-b border-stone-100 px-5 py-4">
+    <h2 class="text-lg font-semibold text-stone-900">Place Your Bid</h2>
+    <p class="mt-1 text-sm text-stone-500">UI preview only — bidding is not enabled yet</p>
+  </div>
+  <div class="space-y-4 p-5">
+    <div>
+      <label for="bidAmount" class="mb-2 block text-sm font-medium text-stone-700">Bid Amount</label>
+      <div class="relative">
+        <select id="bidAmount" name="bidAmount"
+                class="w-full appearance-none rounded-xl border border-stone-200 bg-stone-50 py-3.5 pl-4 pr-10 text-sm font-medium text-stone-800 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100">
+          @for (var i = 0; i < bidOptionCount; i++)
+          {
+            var amount = minBid + Model.BidStep * i;
+            <option value="@amount.ToString("0.##")">$@amount.ToString("N0")</option>
+          }
+        </select>
+        <svg class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+        </svg>
+      </div>
+      <p class="mt-2 text-xs text-stone-400">
+        Minimum bid: <span class="font-semibold text-stone-600">$@minBid.ToString("N0")</span>
+        · Step: <span class="font-semibold text-stone-600">$@Model.BidStep.ToString("N0")</span>
+      </p>
+    </div>
+    <button type="button"
+            class="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-700 py-3.5 text-sm font-bold text-white shadow-lg shadow-amber-700/25 transition hover:bg-amber-800">
+      <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21.75a8.25 8.25 0 0 1-6.037-13.84M12 21.75V3"/>
+      </svg>
+      Place Bid
+    </button>
+  </div>
+</div>
