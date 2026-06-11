@@ -44,3 +44,20 @@ footer .footer-link--active:link,
 footer .footer-link--active:visited {
   color: #b45309;
 }
+
+/* Unified page hero — orange gradient like Cart banner */
+.page-hero {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 42%, #292524 100%);
+}
+
+.page-hero__label {
+  color: #fef3c7;
+}
+
+.page-hero__title {
+  color: #ffffff;
+}
+
+.page-hero__desc {
+  color: #fffbeb;
+}
