@@ -8,17 +8,11 @@ public class UserController : Controller
 {
     public IActionResult Detail(int id)
     {
-        var seller = MockAuctionData.GetBestSellers().FirstOrDefault(s => s.Id == id);
-        if (seller is null)
+        var model = MockUserDetailData.GetUserDetail(id);
+        if (model is null)
         {
             return NotFound();
         }
-
-        var model = new UserDetailViewModel
-        {
-            Seller = seller,
-            ActiveListings = MockAuctionData.GetAuctionsBySellerId(id)
-        };
 
         return View(model);
     }
