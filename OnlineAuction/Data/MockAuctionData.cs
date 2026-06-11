@@ -218,6 +218,9 @@ public static class MockAuctionData
     public static AuctionItemViewModel? GetAuctionById(int id) =>
         GetAllAuctions().FirstOrDefault(a => a.Id == id);
 
+    public static List<AuctionItemViewModel> GetAuctionsByIds(IEnumerable<int> ids) =>
+        GetAllAuctions().Where(a => ids.Contains(a.Id)).ToList();
+
     public static List<AuctionItemViewModel> GetFeaturedAuctions() =>
         GetAllAuctions().Take(6).ToList();
 
