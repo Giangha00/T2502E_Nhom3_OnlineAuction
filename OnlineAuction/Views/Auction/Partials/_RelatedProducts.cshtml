@@ -1,0 +1,37 @@
+@model OnlineAuction.Models.ProductDetailViewModel
+
+@if (Model.RelatedProducts.Count > 0)
+{
+  <section class="mt-12">
+    <div class="mb-6 flex items-end justify-between">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">You May Also Like</p>
+        <h2 class="mt-1 text-2xl font-bold text-stone-900 sm:text-3xl">Related Products</h2>
+      </div>
+      <a asp-controller="Auction" asp-action="Index"
+         class="hidden text-sm font-semibold text-amber-700 hover:text-amber-800 sm:inline">
+        View all →
+      </a>
+    </div>
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      @foreach (var item in Model.RelatedProducts)
+      {
+        <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id"
+           class="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+          <div class="relative aspect-[4/3] overflow-hidden">
+            <img src="@item.ImageUrl" alt="@item.Name" loading="lazy"
+                 class="h-full w-full object-cover transition duration-500 group-hover:scale-105"/>
+            <span class="absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-white @(item.Status == "Ending Soon" ? "bg-orange-600" : "bg-amber-700")">
+              @item.Status
+            </span>
+          </div>
+          <div class="p-3">
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400">@item.Category</p>
+            <h3 class="mt-1 line-clamp-2 text-sm font-semibold text-stone-900">@item.Name</h3>
+            <p class="mt-2 text-sm font-bold text-amber-700">$@item.CurrentPrice.ToString("N0")</p>
+          </div>
+        </a>
+      }
+    </div>
+  </section>
+}

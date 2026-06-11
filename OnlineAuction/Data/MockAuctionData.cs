@@ -218,6 +218,24 @@ public static class MockAuctionData
     public static AuctionItemViewModel? GetAuctionById(int id) =>
         GetAllAuctions().FirstOrDefault(a => a.Id == id);
 
+    public static SellerViewModel? GetSellerForAuction(int auctionId)
+    {
+        var sellers = GetBestSellers();
+        if (sellers.Count == 0) return null;
+        return sellers[(auctionId - 1) % sellers.Count];
+    }
+
+    public static List<AuctionItemViewModel> GetAuctionsBySellerId(int sellerId)
+    {
+        var sellers = GetBestSellers();
+        var sellerIndex = sellers.FindIndex(s => s.Id == sellerId);
+        if (sellerIndex < 0) return [];
+
+        return GetAllAuctions()
+            .Where(a => (a.Id - 1) % sellers.Count == sellerIndex)
+            .ToList();
+    }
+
     public static List<AuctionItemViewModel> GetAuctionsByIds(IEnumerable<int> ids) =>
         GetAllAuctions().Where(a => ids.Contains(a.Id)).ToList();
 
