@@ -7,8 +7,6 @@
     var isHomePage = string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase);
     var isAuctionPage = string.Equals(currentController, "Auction", StringComparison.OrdinalIgnoreCase);
     var isPolicyPage = string.Equals(currentController, "Policy", StringComparison.OrdinalIgnoreCase);
-    var isPaymentPage = string.Equals(currentController, "Payment", StringComparison.OrdinalIgnoreCase);
-    var canAccessPaymentInfo = Context.Session.GetString("CanAccessPaymentInfo") == "true";
     var isContactPage = string.Equals(currentController, "Contact", StringComparison.OrdinalIgnoreCase);
     var isAboutPage = string.Equals(currentController, "AboutUs", StringComparison.OrdinalIgnoreCase);
     var isFaqPage = string.Equals(currentController, "Faq", StringComparison.OrdinalIgnoreCase);
@@ -57,17 +55,6 @@
             </form>
 
             <div class="hidden shrink-0 items-center gap-2 lg:flex">
-                @if (canAccessPaymentInfo)
-                {
-                    <a asp-controller="Payment" asp-action="Index"
-                       class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 text-stone-600 transition hover:border-amber-500 hover:text-amber-700 @(isPaymentPage ? "border-amber-500 text-amber-700" : "")"
-                       aria-label="Payment Information" title="Payment Information">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                            <rect x="2" y="5" width="20" height="14" rx="2"/>
-                            <path stroke-linecap="round" d="M2 10h20"/>
-                        </svg>
-                    </a>
-                }
                 <a asp-controller="Auth" asp-action="Login"
                    class="rounded-full border border-amber-700 px-5 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-50">
                     Log In
@@ -118,10 +105,6 @@
             <ul class="px-4 py-3 sm:px-6">
                 <li><a asp-controller="Home" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isHomePage)">Home</a></li>
                 <li><a asp-controller="Auction" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isAuctionPage)">Auction</a></li>
-                @if (canAccessPaymentInfo)
-                {
-                    <li><a asp-controller="Payment" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isPaymentPage)">Payment Information</a></li>
-                }
                 <li><a asp-controller="AboutUs" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isAboutPage)">About Us</a></li>
                 <li><a asp-controller="Contact" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isContactPage)">Contact Us</a></li>
                 <li><a asp-controller="Faq" asp-action="Index" class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isFaqPage)">FAQ</a></li>
