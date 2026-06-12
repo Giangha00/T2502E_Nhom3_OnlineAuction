@@ -1,12 +1,25 @@
 @model OnlineAuction.Models.PageHeroViewModel
+@{
+    var hasImage = !string.IsNullOrWhiteSpace(Model.ImageUrl);
+}
 
-<section class="page-hero relative overflow-hidden py-12 sm:py-16 lg:py-20">
-    <div class="absolute inset-0 overflow-hidden">
-        <div class="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-amber-400/10 blur-3xl"></div>
-        <div class="absolute -left-40 bottom-0 h-80 w-80 rounded-full bg-orange-400/10 blur-3xl"></div>
-    </div>
+<section class="page-hero @(hasImage ? "page-hero--image" : "") relative overflow-hidden @(hasImage ? "py-16 sm:py-20 lg:py-24" : "py-12 sm:py-16 lg:py-20")">
+    @if (hasImage)
+    {
+        <div class="page-hero__media absolute inset-0" aria-hidden="true">
+            <img src="@Model.ImageUrl" alt="@Model.ImageAlt" class="h-full w-full object-cover" loading="eager" fetchpriority="high" />
+            <div class="page-hero__overlay absolute inset-0"></div>
+        </div>
+    }
+    else
+    {
+        <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+            <div class="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-amber-400/10 blur-3xl"></div>
+            <div class="absolute -left-40 bottom-0 h-80 w-80 rounded-full bg-orange-400/10 blur-3xl"></div>
+        </div>
+    }
 
-    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 @(Model.Centered ? "text-center" : "")">
+    <div class="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 @(Model.Centered ? "text-center" : "")">
         <p class="page-hero__label text-sm font-semibold uppercase tracking-widest">@Model.Label</p>
         <h1 class="page-hero__title mt-2 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">@Model.Title</h1>
         @if (!string.IsNullOrWhiteSpace(Model.Description))
@@ -14,6 +27,13 @@
             <p class="page-hero__desc mt-3 max-w-2xl text-base leading-7 sm:text-lg @(Model.Centered ? "mx-auto" : "")">
                 @Model.Description
             </p>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.ActionText) && !string.IsNullOrWhiteSpace(Model.ActionController))
+        {
+            <a asp-controller="@Model.ActionController" asp-action="@Model.ActionName"
+               class="mt-8 inline-flex items-center rounded-xl bg-amber-700 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-amber-700/30 transition hover:bg-amber-800">
+                @Model.ActionText
+            </a>
         }
     </div>
 </section>

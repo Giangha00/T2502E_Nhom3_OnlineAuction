@@ -69,7 +69,7 @@ public class SellController : Controller
 
     private static void PopulateOptions(CreateAuctionViewModel model)
     {
-        model.Categories = CreateAuctionMockData.Categories.ToList();
+        model.Categories = MockAuctionData.GetCategoryNames().ToList();
         model.Conditions = CreateAuctionMockData.Conditions.ToList();
     }
 }

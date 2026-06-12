@@ -1,0 +1,8 @@
+@model OnlineAuction.Models.ProductDetailViewModel
+
+<div class="space-y-5">
+  @await Html.PartialAsync("Partials/_SellerInfo", Model.Seller)
+  @await Html.PartialAsync("Partials/_AuctionInfo", Model)
+  @await Html.PartialAsync("Partials/_Countdown", Model)
+  @await Html.PartialAsync("Partials/_BidSection", Model)
+</div>

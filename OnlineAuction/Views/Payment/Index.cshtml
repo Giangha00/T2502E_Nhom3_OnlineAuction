@@ -7,20 +7,40 @@
     var initialMethodsJson = JsonSerializer.Serialize(Model.SavedMethods, jsonOptions);
 }
 
-<partial name="_PaymentHeader" />
-
-<section class="py-10 lg:py-14">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div id="paymentNotification" class="mb-6 hidden rounded-xl border px-4 py-3 text-sm font-medium" role="alert"></div>
-
-        <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px] lg:gap-10">
-            <partial name="_PaymentForm" />
-            <partial name="_CardPreview" />
+<div class="min-h-screen bg-gradient-to-br from-stone-100 via-amber-50 to-orange-100 px-4 py-8 sm:py-12">
+    <div class="mx-auto w-full max-w-6xl">
+        <div class="mb-8 text-center">
+            <a asp-controller="Home" asp-action="Index" class="inline-flex items-center gap-2.5">
+                <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-700 to-stone-900 text-sm font-bold text-white">A</span>
+                <span class="text-sm font-semibold tracking-tight text-stone-900">Auction House</span>
+            </a>
         </div>
 
-        <partial name="_SavedPaymentList" model="Model" />
+        <div class="overflow-hidden rounded-3xl bg-white/80 shadow-2xl backdrop-blur">
+            <partial name="_PaymentHeader" />
+
+            @if (TempData["FromSignUp"] is true)
+            {
+                <div class="border-b border-emerald-200/60 bg-emerald-50/80 px-6 py-4 sm:px-8">
+                    <p class="text-sm text-emerald-800">
+                        Account created successfully. Please add your payment information to complete setup.
+                    </p>
+                </div>
+            }
+
+            <section class="px-4 py-8 sm:px-8 lg:py-10">
+                <div id="paymentNotification" class="mb-6 hidden rounded-xl border px-4 py-3 text-sm font-medium" role="alert"></div>
+
+                <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px] lg:gap-10">
+                    <partial name="_PaymentForm" />
+                    <partial name="_CardPreview" />
+                </div>
+
+                <partial name="_SavedPaymentList" model="Model" />
+            </section>
+        </div>
     </div>
-</section>
+</div>
 
 @section Scripts {
     <script>
