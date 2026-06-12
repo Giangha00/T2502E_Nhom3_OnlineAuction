@@ -6,23 +6,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Bogus" Version="35.6.5" />
-      <PackageReference Include="CloudinaryDotNet" Version="1.29.1" />
-      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.16" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.16" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.16">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="Views\Account\Login.cshtml" />
-      <_ContentIncludedByDefault Remove="Views\Account\Register.cshtml" />
-    </ItemGroup>
-
     <Target Name="BuildTailwindCss" BeforeTargets="Build">
         <Exec WorkingDirectory="$(MSBuildProjectDirectory)"
               Command="npm install"
