@@ -1,0 +1,25 @@
+@model OnlineAuction.Models.ProductDetailViewModel
+
+<div class="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-lg">
+  <div class="relative aspect-square overflow-hidden bg-stone-100 sm:aspect-[4/3] lg:aspect-square">
+    <img id="mainProductImage" src="@Model.Images.FirstOrDefault()" alt="@Model.Name"
+         class="h-full w-full object-cover transition duration-500"/>
+    <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-900/10 to-transparent"></div>
+  </div>
+  @if (Model.Images.Count > 1)
+  {
+    <div class="grid grid-cols-4 gap-2 border-t border-stone-100 bg-stone-50 p-3 sm:grid-cols-5 sm:p-4">
+      @for (var i = 0; i < Model.Images.Count; i++)
+      {
+        var image = Model.Images[i];
+        <button type="button"
+                class="gallery-thumb group overflow-hidden rounded-xl border-2 @(i == 0 ? "border-amber-500 ring-2 ring-amber-100" : "border-transparent") transition hover:border-amber-400"
+                data-image="@image"
+                aria-label="View image @(i + 1)">
+          <img src="@image" alt="@Model.Name thumbnail @(i + 1)"
+               class="aspect-square w-full object-cover transition duration-300 group-hover:scale-105"/>
+        </button>
+      }
+    </div>
+  }
+</div>

@@ -2,11 +2,13 @@
     ViewData["Title"] = "About Us";
 }
 
-<partial name="_PageHero" model='new OnlineAuction.Models.PageHeroViewModel {
+<partial name="_PageHero" model='new PageHeroViewModel {
     Label = "Auction House",
     Title = "About Auction House",
     Description = "A trusted online auction platform where users can discover unique products, place bids confidently, and complete transactions in a transparent environment.",
-    Centered = true
+    Centered = true,
+    ImageUrl = PageBannerImages.About,
+    ImageAlt = "Auction House team and marketplace"
 }' />
 
 <section class="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">

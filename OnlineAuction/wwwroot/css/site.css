@@ -11,6 +11,16 @@ html {
 html {
   position: relative;
   min-height: 100%;
+  --site-header-height: 9.5rem;
+}
+
+@media (min-width: 1024px) {
+  .sticky-below-header {
+    position: sticky;
+    top: calc(var(--site-header-height) + 1rem);
+    z-index: 40;
+    align-self: start;
+  }
 }
 
 body {
@@ -45,9 +55,36 @@ footer .footer-link--active:visited {
   color: #b45309;
 }
 
-/* Unified page hero — orange gradient like Cart banner */
+/* Unified page hero — gradient fallback or image banner overlay */
 .page-hero {
   background: linear-gradient(135deg, #d97706 0%, #b45309 42%, #292524 100%);
+}
+
+.page-hero--image {
+  min-height: 22rem;
+  display: flex;
+  align-items: center;
+}
+
+@media (min-width: 640px) {
+  .page-hero--image {
+    min-height: 26rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-hero--image {
+    min-height: 32rem;
+  }
+}
+
+.page-hero__overlay {
+  background: linear-gradient(
+    135deg,
+    rgba(28, 25, 23, 0.88) 0%,
+    rgba(180, 83, 9, 0.72) 45%,
+    rgba(41, 37, 36, 0.82) 100%
+  );
 }
 
 .page-hero__label {
@@ -116,4 +153,38 @@ footer .footer-link--active:visited {
   border: none !important;
   border-bottom: 1px solid #e7e5e4 !important;
   background: #fafaf9 !important;
+}
+
+.product-description {
+  color: #44403c;
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.product-description p {
+  margin-bottom: 1rem;
+}
+
+.product-description h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1c1917;
+}
+
+.product-description ul {
+  margin-bottom: 1rem;
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
+
+.product-description li {
+  margin-bottom: 0.35rem;
+}
+
+.product-description a {
+  color: #b45309;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }

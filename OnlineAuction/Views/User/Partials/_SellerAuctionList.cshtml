@@ -1,0 +1,20 @@
+@model List<OnlineAuction.Models.AuctionItemViewModel>
+
+<section id="seller-auctions" class="seller-auction-list scroll-mt-24">
+  <h2 class="text-xl font-bold text-stone-900">Seller Auctions</h2>
+  <p class="mt-1 text-sm text-stone-500">Products currently listed for auction</p>
+
+  @if (Model.Count > 0)
+  {
+    <div class="mt-6 grid gap-4 lg:grid-cols-2">
+      @foreach (var auction in Model)
+      {
+        @await Html.PartialAsync("Partials/_AuctionCard", auction)
+      }
+    </div>
+  }
+  else
+  {
+    @await Html.PartialAsync("Partials/_EmptyAuctionState")
+  }
+</section>
