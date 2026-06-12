@@ -1,0 +1,212 @@
+﻿@model List<OnlineAuction.Models.Category>
+
+<div class="p-6">
+
+    <div class="flex items-center justify-between mb-6">
+
+        <h1 class="text-3xl font-bold">
+            Category Management
+        </h1>
+
+        <a asp-action="Create"
+           style="background:#465fff;
+                  color:white;
+                  padding:12px 20px;
+                  border-radius:8px;
+                  text-decoration:none;
+                  font-weight:600;">
+            + Add Category
+        </a>
+
+    </div>
+
+    <form method="get" class="mb-6">
+
+        <div style="display:flex;gap:10px;">
+
+            <input type="text"
+                   name="search"
+                   value="@ViewBag.Search"
+                   placeholder="Search category..."
+                   style="flex:1;
+                          padding:12px;
+                          border:1px solid #d1d5db;
+                          border-radius:8px;" />
+
+            <button type="submit"
+                    style="background:#465fff;
+                           color:white;
+                           border:none;
+                           padding:12px 20px;
+                           border-radius:8px;
+                           cursor:pointer;">
+                Search
+            </button>
+
+        </div>
+
+    </form>
+
+    <div style="
+        background:white;
+        border-radius:12px;
+        overflow:hidden;
+        box-shadow:0 4px 12px rgba(0,0,0,.08);">
+
+        <table style="
+               width:100%;
+               border-collapse:collapse;">
+
+            <thead>
+
+            <tr style="
+                background:#f8fafc;
+                border-bottom:1px solid #e5e7eb;">
+
+                <th style="padding:16px;text-align:left;">
+                    ID
+                </th>
+
+                <th style="padding:16px;text-align:left;">
+                    Image
+                </th>
+
+                <th style="padding:16px;text-align:left;">
+                    Name
+                </th>
+
+                <th style="padding:16px;text-align:left;">
+                    Description
+                </th>
+
+                <th style="padding:16px;text-align:center;">
+                    Actions
+                </th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr style="border-bottom:1px solid #e5e7eb;">
+
+                    <td style="padding:16px;">
+                        @item.Id
+                    </td>
+
+                    <td style="padding:16px;">
+
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl"
+                                 alt="@item.Name"
+                                 style="
+                                 width:80px;
+                                 height:80px;
+                                 object-fit:cover;
+                                 border-radius:10px;
+                                 border:1px solid #ddd;" />
+                        }
+                        else
+                        {
+                            <div style="
+                                width:80px;
+                                height:80px;
+                                background:#f3f4f6;
+                                border-radius:10px;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                                color:#9ca3af;">
+                                No Image
+                            </div>
+                        }
+
+                    </td>
+
+                    <td style="padding:16px;font-weight:600;">
+                        @item.Name
+                    </td>
+
+                    <td style="padding:16px;">
+                        @item.Description
+                    </td>
+
+                    <td style="
+                        padding:16px;
+                        text-align:center;">
+
+                        <a asp-action="Edit"
+                           asp-route-id="@item.Id"
+                           style="
+                           background:#f59e0b;
+                           color:white;
+                           padding:8px 14px;
+                           border-radius:6px;
+                           text-decoration:none;
+                           margin-right:5px;">
+                            Edit
+                        </a>
+
+                        <a asp-action="Delete"
+                           asp-route-id="@item.Id"
+                           style="
+                           background:#ef4444;
+                           color:white;
+                           padding:8px 14px;
+                           border-radius:6px;
+                           text-decoration:none;">
+                            Delete
+                        </a>
+
+                    </td>
+
+                </tr>
+            }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div style="
+         margin-top:20px;
+         display:flex;
+         justify-content:center;
+         gap:10px;">
+
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            if (i == ViewBag.CurrentPage)
+            {
+                <span style="
+                      background:#465fff;
+                      color:white;
+                      padding:10px 15px;
+                      border-radius:8px;">
+                    @i
+                </span>
+            }
+            else
+            {
+                <a asp-action="Index"
+                   asp-route-page="@i"
+                   asp-route-search="@ViewBag.Search"
+                   style="
+                   background:#f3f4f6;
+                   color:#111827;
+                   padding:10px 15px;
+                   border-radius:8px;
+                   text-decoration:none;">
+                    @i
+                </a>
+            }
+        }
+
+    </div>
+
+</div>
