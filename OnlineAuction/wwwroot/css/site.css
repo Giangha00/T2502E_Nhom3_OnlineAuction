@@ -11,6 +11,16 @@ html {
 html {
   position: relative;
   min-height: 100%;
+  --site-header-height: 9.5rem;
+}
+
+@media (min-width: 1024px) {
+  .sticky-below-header {
+    position: sticky;
+    top: calc(var(--site-header-height) + 1rem);
+    z-index: 40;
+    align-self: start;
+  }
 }
 
 body {
@@ -45,9 +55,36 @@ footer .footer-link--active:visited {
   color: #b45309;
 }
 
-/* Unified page hero — orange gradient like Cart banner */
+/* Unified page hero — gradient fallback or image banner overlay */
 .page-hero {
   background: linear-gradient(135deg, #d97706 0%, #b45309 42%, #292524 100%);
+}
+
+.page-hero--image {
+  min-height: 22rem;
+  display: flex;
+  align-items: center;
+}
+
+@media (min-width: 640px) {
+  .page-hero--image {
+    min-height: 26rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-hero--image {
+    min-height: 32rem;
+  }
+}
+
+.page-hero__overlay {
+  background: linear-gradient(
+    135deg,
+    rgba(28, 25, 23, 0.88) 0%,
+    rgba(180, 83, 9, 0.72) 45%,
+    rgba(41, 37, 36, 0.82) 100%
+  );
 }
 
 .page-hero__label {

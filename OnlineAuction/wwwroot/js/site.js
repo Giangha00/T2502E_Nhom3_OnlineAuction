@@ -1,6 +1,18 @@
 ﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
 // for details on configuring this project to bundle and minify static web assets.
 
+(function () {
+	function updateSiteHeaderHeight() {
+		var header = document.getElementById('siteHeader');
+		if (!header) return;
+		document.documentElement.style.setProperty('--site-header-height', header.offsetHeight + 'px');
+	}
+
+	updateSiteHeaderHeight();
+	window.addEventListener('resize', updateSiteHeaderHeight);
+	window.addEventListener('load', updateSiteHeaderHeight);
+})();
+
 // Fix Contact Us anchors that may be rendered with href="#".
 (function () {
 	try {
