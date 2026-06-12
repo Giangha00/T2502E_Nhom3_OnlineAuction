@@ -268,6 +268,8 @@ public static class MockAuctionData
         }
     ];
 
+    public static IReadOnlyList<string> GetCategoryNames() => CategoryOrder;
+
     public static List<CategoryViewModel> GetCategories()
     {
         var counts = GetAllAuctions()
