@@ -8,32 +8,32 @@ public static class MockProductDetailData
     {
         ["Cars"] =
         [
-            "https://images.unsplash.com/photo-1583121274602-3e2820c50fa8?w=800&h=800&fit=crop",
+            "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800&h=800&fit=crop",
             "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=800&fit=crop",
             "https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800&h=800&fit=crop"
         ],
         ["Watches"] =
         [
-            "https://images.unsplash.com/photo-1548171916-e79a860ad597?w=800&h=800&fit=crop",
+            "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=800&h=800&fit=crop",
             "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?w=800&h=800&fit=crop",
             "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=800&h=800&fit=crop"
         ],
         ["Cards"] =
         [
-            "https://images.unsplash.com/photo-1606107557195-0a29cbf1f2b3?w=800&h=800&fit=crop",
+            "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=800&fit=crop",
             "https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=800&h=800&fit=crop",
             "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=800&h=800&fit=crop"
         ],
         ["Billiard Sticks"] =
         [
             "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=800&fit=crop",
-            "https://images.unsplash.com/photo-1571019614242-c5c25dee48f8?w=800&h=800&fit=crop",
+            "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=800&fit=crop",
             "https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?w=800&h=800&fit=crop"
         ],
         ["Jewelry"] =
         [
             "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&h=800&fit=crop",
-            "https://images.unsplash.com/photo-1599643478518-a784e5dc4c2f?w=800&h=800&fit=crop",
+            "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&h=800&fit=crop",
             "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&h=800&fit=crop"
         ]
     };

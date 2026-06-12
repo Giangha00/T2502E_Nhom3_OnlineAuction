@@ -2,13 +2,7 @@ namespace OnlineAuction.Data;
 
 public static class CreateAuctionMockData
 {
-    public static readonly IReadOnlyList<string> Categories =
-    [
-        "Electronics",
-        "Fashion",
-        "Collectibles",
-        "Artwork"
-    ];
+    public static IReadOnlyList<string> Categories => MockAuctionData.GetCategoryNames();
 
     public static readonly IReadOnlyList<string> Conditions =
     [
