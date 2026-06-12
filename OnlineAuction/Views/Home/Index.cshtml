@@ -17,39 +17,24 @@
 
 <section id="featured-auctions" class="border-t border-stone-200/80 bg-white/50 py-12 lg:py-16">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="mb-8 flex items-center justify-between">
+        <div class="mb-8">
             <h2 class="text-2xl font-bold text-stone-900 sm:text-3xl">Featured Auctions</h2>
-            <div class="hidden gap-2 md:flex">
-                <button type="button" id="featuredPrev" aria-label="Previous"
-                        class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 transition hover:border-amber-500 hover:text-amber-700">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="m15 18-6-6 6-6"/>
-                    </svg>
-                </button>
-                <button type="button" id="featuredNext" aria-label="Next"
-                        class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 transition hover:border-amber-500 hover:text-amber-700">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="m9 18 6-6-6-6"/>
-                    </svg>
-                </button>
-            </div>
         </div>
 
-        <div id="featuredGrid"
-             class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:flex lg:snap-x lg:gap-4 lg:overflow-x-auto lg:pb-2">
+        <div id="featuredGrid" class="grid grid-cols-2 items-stretch gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
             @foreach (var item in Model.FeaturedAuctions)
             {
-                <article class="group mx-auto flex h-full w-full max-w-[200px] flex-col overflow-hidden rounded-xl border border-stone-200 bg-white/80 shadow-sm transition hover:shadow-lg sm:max-w-[220px] lg:mx-0 lg:w-[200px] lg:max-w-none lg:flex-shrink-0 lg:snap-start xl:w-[220px]">
+                <article class="group flex h-full flex-col overflow-hidden rounded-xl border border-stone-200 bg-white/80 shadow-sm transition hover:shadow-lg">
                     <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id" class="block shrink-0">
                     <div class="relative aspect-[4/5] overflow-hidden bg-stone-100">
                         <img src="@item.ImageUrl" alt="@item.Name" loading="lazy"
                              class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105"/>
-                        <span class="absolute left-2 top-2 rounded-full bg-amber-700 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                        <span class="absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white @(item.Status == "Ending Soon" ? "bg-orange-600" : "bg-amber-700")">
                             @item.Status
                         </span>
                     </div>
                     </a>
-                    <div class="flex flex-1 flex-col p-3">
+                    <div class="flex flex-1 flex-col p-4">
                         <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400">@item.Category</p>
                         <h3 class="mt-1 min-h-[2.5rem] line-clamp-2 text-sm font-semibold leading-snug text-stone-900">
                             <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id" class="hover:text-amber-700">@item.Name</a>
@@ -129,21 +114,3 @@
     </div>
 </section>
 
-@section Scripts {
-    <script>
-        (function () {
-            var grid = document.getElementById('featuredGrid');
-            var prev = document.getElementById('featuredPrev');
-            var next = document.getElementById('featuredNext');
-            if (!grid || !prev || !next) return;
-
-            var scrollAmount = 236;
-            prev.addEventListener('click', function () {
-                grid.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-            });
-            next.addEventListener('click', function () {
-                grid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-            });
-        })();
-    </script>
-}
