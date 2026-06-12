@@ -1,0 +1,10 @@
+@model double
+
+<div class="inline-flex gap-0.5" aria-hidden="true">
+  @for (var i = 1; i <= 5; i++)
+  {
+    var filled = i <= Math.Floor(Model);
+    var half = !filled && Model >= i - 0.5;
+    <span class="text-base @(filled ? "text-amber-500" : half ? "text-amber-300" : "text-stone-200")">&#9733;</span>
+  }
+</div>
