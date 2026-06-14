@@ -9,7 +9,7 @@ public static class PageBannerImages
         "https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=1920&h=600&fit=crop&q=80";
 
     public const string Sell =
-        "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1600&h=560&fit=crop&q=80";
+        "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=1920&h=720&fit=crop&q=80";
 
     public const string About =
         "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1600&h=560&fit=crop&q=80";

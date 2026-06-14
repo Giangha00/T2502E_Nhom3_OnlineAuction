@@ -2,45 +2,44 @@
     ViewData["Title"] = "About Us";
 }
 
+<div class="rarecard-page bg-white">
 <partial name="_PageHero" model='new PageHeroViewModel {
-    Label = "Auction House",
-    Title = "About Auction House",
-    Description = "A trusted online auction platform where users can discover unique products, place bids confidently, and complete transactions in a transparent environment.",
-    Centered = true,
-    ImageUrl = PageBannerImages.About,
-    ImageAlt = "Auction House team and marketplace"
+    Label = "RareCard",
+    Title = "About RareCard",
+    Description = "A trusted online auction platform for authenticated trading cards — discover premium collectibles, place bids confidently, and complete transactions in a transparent environment.",
+    Centered = true
 }' />
 
-<section class="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-    <div class="mx-auto grid max-w-6xl grid-cols-1 gap-7 lg:grid-cols-[1.3fr_1fr]">
+<section class="px-4 py-12 sm:px-8 lg:px-12 lg:py-16">
+    <div class="grid grid-cols-1 gap-7 lg:grid-cols-[1.3fr_1fr]">
         <div>
-            <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Project Introduction</p>
-            <h2 class="mt-2 text-3xl font-bold text-stone-900 sm:text-4xl">Built for modern online auctions</h2>
-            <p class="mt-4 text-base leading-7 text-stone-600 sm:text-lg">
-                Auction House is designed to connect sellers and buyers in one reliable digital marketplace.
+            <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">Project Introduction</p>
+            <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">Built for modern online auctions</h2>
+            <p class="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
+                RareCard is designed to connect sellers and collectors in one reliable digital marketplace.
                 The platform helps users create auction listings, join live bidding sessions, and finalize deals smoothly.
             </p>
         </div>
-        <div class="rounded-2xl border border-stone-200 bg-white/80 p-6 shadow-sm">
-            <h3 class="text-2xl font-semibold text-stone-900">Who we build for</h3>
-            <ul class="mt-4 list-disc space-y-2 pl-5 text-stone-600 leading-7">
-                <li>Sellers who want to reach more buyers.</li>
-                <li>Buyers searching for valuable and unique products.</li>
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 class="text-2xl font-semibold text-slate-900">Who we build for</h3>
+            <ul class="mt-4 list-disc space-y-2 pl-5 text-slate-600 leading-7">
+                <li>Sellers who want to reach more collectors.</li>
+                <li>Buyers searching for valuable graded cards.</li>
                 <li>Communities that need a secure and transparent bidding process.</li>
             </ul>
         </div>
     </div>
 </section>
 
-<section class="border-t border-stone-200/80 bg-white/50 px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-    <div class="mx-auto grid max-w-6xl grid-cols-1 items-center gap-6 md:grid-cols-[auto_1fr]">
-        <div class="grid h-28 w-28 place-items-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg shadow-amber-200" aria-hidden="true">
-            <div class="text-4xl font-semibold text-white">AH</div>
+<section class="border-t border-slate-200 bg-slate-50 px-4 py-12 sm:px-8 lg:px-12 lg:py-16">
+    <div class="grid grid-cols-1 items-center gap-6 md:grid-cols-[auto_1fr]">
+        <div class="grid h-28 w-28 place-items-center rounded-full bg-gradient-to-br from-blue-600 to-slate-900 shadow-lg shadow-blue-200" aria-hidden="true">
+            <div class="text-3xl font-semibold text-white">RC</div>
         </div>
         <div>
-            <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Our Mission</p>
-            <h2 class="mt-2 text-3xl font-bold text-stone-900 sm:text-4xl">Create a transparent and secure auction environment</h2>
-            <p class="mt-4 text-base leading-7 text-stone-600 sm:text-lg">
+            <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">Our Mission</p>
+            <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">Create a transparent and secure auction environment</h2>
+            <p class="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
                 We focus on building trust in every auction by delivering clear bidding flows,
                 reliable transaction tracking, and a user experience that is simple for everyone.
             </p>
@@ -48,33 +47,33 @@
     </div>
 </section>
 
-<section class="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-    <div class="mx-auto max-w-6xl">
-        <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">How Auction House Works</p>
-        <h2 class="mt-2 text-3xl font-bold text-stone-900 sm:text-4xl">Simple, clear, and reliable process</h2>
+<section class="px-4 py-12 sm:px-8 lg:px-12 lg:py-16">
+    <div>
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">How RareCard Works</p>
+        <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">Simple, clear, and reliable process</h2>
 
         <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             @foreach (var step in new[] {
-                new { Num = "Step 1", Title = "User creates auction", Desc = "Seller posts product details, starting price, and auction timeline." },
+                new { Num = "Step 1", Title = "User creates auction", Desc = "Seller posts card details, starting price, and auction timeline." },
                 new { Num = "Step 2", Title = "Other users place bids", Desc = "Interested buyers join and submit competitive bids in real time." },
                 new { Num = "Step 3", Title = "Highest bidder wins", Desc = "When the auction closes, the highest valid bid is selected automatically." },
                 new { Num = "Step 4", Title = "Complete transaction", Desc = "Buyer and seller complete payment and delivery with status tracking." }
             })
             {
-                <article class="rounded-2xl border border-stone-200 bg-white/80 p-6 shadow-sm transition hover:shadow-md">
-                    <span class="inline-block rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700">@step.Num</span>
-                    <h3 class="mt-3 text-xl font-semibold text-stone-900">@step.Title</h3>
-                    <p class="mt-2 text-sm leading-7 text-stone-600">@step.Desc</p>
+                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+                    <span class="inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">@step.Num</span>
+                    <h3 class="mt-3 text-xl font-semibold text-slate-900">@step.Title</h3>
+                    <p class="mt-2 text-sm leading-7 text-slate-600">@step.Desc</p>
                 </article>
             }
         </div>
     </div>
 </section>
 
-<section class="border-t border-stone-200/80 bg-white/50 px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-    <div class="mx-auto max-w-6xl">
-        <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Core Features</p>
-        <h2 class="mt-2 text-3xl font-bold text-stone-900 sm:text-4xl">Everything needed for online auction operations</h2>
+<section class="border-t border-slate-200 bg-slate-50 px-4 py-12 sm:px-8 lg:px-12 lg:py-16">
+    <div>
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">Core Features</p>
+        <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">Everything needed for online auction operations</h2>
 
         <div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
             @foreach (var feature in new[] {
@@ -84,11 +83,12 @@
                 new { Title = "Transaction Tracking", Desc = "Track each transaction stage from winning bid to completion." }
             })
             {
-                <article class="rounded-2xl border border-stone-200 bg-white/80 p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                    <h3 class="text-xl font-semibold text-stone-900">@feature.Title</h3>
-                    <p class="mt-2 text-sm leading-7 text-stone-600">@feature.Desc</p>
+                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                    <h3 class="text-xl font-semibold text-slate-900">@feature.Title</h3>
+                    <p class="mt-2 text-sm leading-7 text-slate-600">@feature.Desc</p>
                 </article>
             }
         </div>
     </div>
 </section>
+</div>
