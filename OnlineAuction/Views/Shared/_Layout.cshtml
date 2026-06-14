@@ -19,6 +19,7 @@
     var isFaqPage = string.Equals(currentController, "Faq", StringComparison.OrdinalIgnoreCase);
     var isRefundPage = string.Equals(currentController, "Refund", StringComparison.OrdinalIgnoreCase);
     var isAdminArea = string.Equals(ViewContext.RouteData.Values["area"]?.ToString(), "Admin", StringComparison.OrdinalIgnoreCase);
+    var isNotificationPage = string.Equals(currentController, "Notification", StringComparison.OrdinalIgnoreCase);
     var isRareCardTheme = !isStandalonePage && !isAdminArea;
     var isBrowsePage = isHomePage || isAuctionPage;
 
@@ -75,6 +76,7 @@
                 </form>
 
                 <div class="hidden shrink-0 items-center gap-2 lg:flex">
+                    @await Html.PartialAsync("NotificationFeature/_HeaderNotificationIcon", OnlineAuction.Data.MockNotificationData.GetNotifications())
 
                     @await Html.PartialAsync("_LanguageSwitcher")
 
@@ -128,6 +130,9 @@
                         <li><a asp-controller="Faq" asp-action="Index"
                                 class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isFaqPage)">@Localizer["FAQ"]</a>
                         </li>
+                        <li><a href="/notifications"
+                                class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isNotificationPage)">Notifications</a>
+                        </li>
                         <li><a asp-controller="Policy" asp-action="Index"
                                 class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isPolicyPage)">Policy
                                 &amp; Term of Use</a></li>
@@ -156,6 +161,13 @@
                     </li>
                     <li><a asp-controller="Faq" asp-action="Index"
                             class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isFaqPage)">@Localizer["FAQ"]</a>
+                    </li>
+                    <li>
+                        <a href="/notifications"
+                           class="flex items-center justify-between border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isNotificationPage)">
+                            <span>🔔 Notifications</span>
+                            <span class="rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">4</span>
+                        </a>
                     </li>
                     <li><a asp-controller="Policy" asp-action="Index"
                             class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isPolicyPage)">Policy

@@ -1,0 +1,16 @@
+@model OnlineAuction.Models.NotificationItemViewModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<section class="py-10 lg:py-14">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <nav class="mb-5 text-sm text-stone-500" aria-label="Breadcrumb">
+            <a href="/notifications" class="font-medium text-amber-700 visited:text-amber-700 hover:text-amber-800">Notifications</a>
+            <span class="mx-2">/</span>
+            <span>@Model.Title</span>
+        </nav>
+
+        <partial name="_NotificationDetail" model="Model" />
+    </div>
+</section>

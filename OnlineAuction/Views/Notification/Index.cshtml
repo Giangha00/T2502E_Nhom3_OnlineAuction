@@ -1,0 +1,39 @@
+@model OnlineAuction.Models.NotificationPageViewModel
+@{
+    ViewData["Title"] = "Notification Center";
+}
+
+<section class="py-10 lg:py-14">
+    <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-wide text-amber-700">Notification</p>
+                <h1 class="mt-2 text-3xl font-bold tracking-tight text-stone-950 sm:text-4xl">Notification Center</h1>
+                <p class="mt-3 max-w-2xl text-sm leading-6 text-stone-600">
+                    Track bids, auction status, payment updates, refunds, and system messages in one place.
+                </p>
+            </div>
+            <div class="rounded-2xl border border-stone-200 bg-white/90 px-4 py-3 shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">Unread</p>
+                <p class="mt-1 text-2xl font-bold text-stone-950" data-page-unread-count>@Model.UnreadCount</p>
+            </div>
+        </div>
+
+        <div data-notification-page>
+            <partial name="_NotificationFilter" />
+
+            <div class="mt-5 space-y-3" data-notification-list>
+                @foreach (var notification in Model.Notifications)
+                {
+                    <partial name="_NotificationCard" model="notification" />
+                }
+            </div>
+
+            <partial name="_EmptyNotification" />
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/notifications.js" asp-append-version="true"></script>
+}
