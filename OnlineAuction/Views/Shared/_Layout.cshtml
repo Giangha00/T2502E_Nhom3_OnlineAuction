@@ -19,13 +19,22 @@
     var isFaqPage = string.Equals(currentController, "Faq", StringComparison.OrdinalIgnoreCase);
     var isRefundPage = string.Equals(currentController, "Refund", StringComparison.OrdinalIgnoreCase);
     var isNotificationPage = string.Equals(currentController, "Notification", StringComparison.OrdinalIgnoreCase);
+    var isBrowsePage = isHomePage || isAuctionPage;
 
     var currentCulture = Context.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name ?? "en-US";
 
     string NavLinkClass(bool isActive) =>
-    isActive
-    ? "text-amber-700 visited:text-amber-700"
-    : "text-stone-600 visited:text-stone-600 transition hover:text-amber-700";
+    isBrowsePage
+        ? (isActive ? "text-blue-700 visited:text-blue-700 border-b-2 border-blue-700" : "text-slate-600 visited:text-slate-600 transition hover:text-blue-700")
+        : (isActive ? "text-amber-700 visited:text-amber-700" : "text-stone-600 visited:text-stone-600 transition hover:text-amber-700");
+
+    var loginBtnClass = isBrowsePage
+        ? "rounded-full border border-blue-700 px-5 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50"
+        : "rounded-full border border-amber-700 px-5 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-50";
+
+    var signUpBtnClass = isBrowsePage
+        ? "rounded-full bg-blue-700 px-5 py-2 text-sm font-medium text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800"
+        : "rounded-full bg-amber-700 px-5 py-2 text-sm font-medium text-white shadow-lg shadow-amber-700/20 transition hover:bg-amber-800";
 
     string FooterLinkClass(bool isActive) =>
     isActive ? "footer-link footer-link--active" : "footer-link";
@@ -36,29 +45,35 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Auction House</title>
+    <title>@ViewData["Title"] - @(isBrowsePage ? "RareCard" : "Auction House")</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/OnlineAuction.styles.css" asp-append-version="true" />
 </head>
 
 <body
-    class="@(isStandalonePage ? "bg-stone-50" : "min-h-screen bg-gradient-to-br from-stone-100 via-amber-50 to-orange-100 text-stone-800")">
+    class="@(isStandalonePage ? "bg-stone-50" : isBrowsePage ? "min-h-screen bg-white text-stone-900" : "min-h-screen bg-gradient-to-br from-stone-100 via-amber-50 to-orange-100 text-stone-800")">
     @if (!isStandalonePage)
     {
-        <header id="siteHeader" class="sticky top-0 z-50 border-b border-stone-200/80 bg-white/90 backdrop-blur">
-            <div class="mx-auto flex max-w-7xl items-center gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <header id="siteHeader" class="sticky top-0 z-50 w-full border-b border-stone-200/80 bg-white/95 backdrop-blur">
+            <div class="site-shell flex items-center gap-4 py-4">
                 <a asp-controller="Home" asp-action="Index" class="flex shrink-0 items-center gap-2.5">
-                    <span
-                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-700 to-stone-900 text-sm font-bold text-white">A</span>
-                    <span class="text-sm font-semibold tracking-tight text-stone-900">Auction House</span>
+                    @if (isBrowsePage)
+                    {
+                        <span class="text-lg font-extrabold tracking-tight text-slate-900">RareCard</span>
+                    }
+                    else
+                    {
+                        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-700 to-stone-900 text-sm font-bold text-white">A</span>
+                        <span class="text-sm font-semibold tracking-tight text-stone-900">Auction House</span>
+                    }
                 </a>
 
                 <form class="relative mx-auto hidden max-w-xl flex-1 md:block" role="search">
-                    <input type="search" placeholder="Search by product, category, seller..." aria-label="Search products"
+                    <input type="search" placeholder="@(isBrowsePage ? "Search rare items..." : "Search by product, category, seller...")" aria-label="Search products"
                         class="w-full rounded-full border border-stone-200 bg-stone-50 py-2.5 pl-4 pr-12 text-sm text-stone-700 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100" />
                     <button type="submit" aria-label="Search"
                         class="absolute right-1 top-1/2 -translate-y-1/2 rounded-full p-2 text-stone-500 hover:text-amber-700">
@@ -74,14 +89,12 @@
 
                     @await Html.PartialAsync("_LanguageSwitcher")
 
-                    <a asp-controller="Auth" asp-action="Login"
-                        class="rounded-full border border-amber-700 px-5 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-50">
+                    <button type="button" data-auth-tab="login" class="@loginBtnClass">
                         @Localizer["Login"]
-                    </a>
-                    <a asp-controller="Auth" asp-action="SignUp"
-                        class="rounded-full bg-amber-700 px-5 py-2 text-sm font-medium text-white shadow-lg shadow-amber-700/20 transition hover:bg-amber-800">
+                    </button>
+                    <button type="button" data-auth-tab="signup" class="@signUpBtnClass">
                         @Localizer["SignUp"]
-                    </a>
+                    </button>
                 </div>
 
                 <button id="mobileMenuBtn" type="button" aria-label="Toggle navigation" aria-expanded="false"
@@ -92,7 +105,7 @@
                 </button>
             </div>
 
-            <div class="border-t border-stone-100 px-4 pb-3 md:hidden sm:px-6">
+            <div class="site-shell border-t border-stone-100 pb-3 md:hidden">
                 <form class="relative" role="search">
                     <input type="search" placeholder="Search products..." aria-label="Search products"
                         class="w-full rounded-full border border-stone-200 bg-stone-50 py-2.5 pl-4 pr-12 text-sm outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100" />
@@ -106,11 +119,11 @@
                 </form>
             </div>
 
-            <nav class="hidden border-t border-stone-100 lg:block">
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <nav class="hidden w-full border-t border-stone-100 lg:block">
+                <div class="site-shell">
                     <ul class="flex overflow-x-auto">
                         <li><a asp-controller="Home" asp-action="Index"
-                                class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isHomePage)">@Localizer["Home"]</a>
+                                class="block whitespace-nowrap py-3.5 pr-4 text-sm font-medium @NavLinkClass(isHomePage)">@Localizer["Home"]</a>
                         </li>
                         <li><a asp-controller="Auction" asp-action="Index"
                                 class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isAuctionPage)">@Localizer["Auction"]</a>
@@ -139,8 +152,8 @@
                 </div>
             </nav>
 
-            <nav id="mobileNav" class="hidden border-t border-stone-200 bg-white lg:hidden">
-                <ul class="px-4 py-3 sm:px-6">
+            <nav id="mobileNav" class="hidden w-full border-t border-stone-200 bg-white lg:hidden">
+                <ul class="site-shell py-3">
                     <li><a asp-controller="Home" asp-action="Index"
                             class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isHomePage)">@Localizer["Home"]</a>
                     </li>
@@ -171,10 +184,14 @@
                     <li><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
                             class="block border-b border-stone-100 py-3 text-sm text-stone-700">Admin</a></li>
                     <li class="flex gap-2 pt-4">
-                        <a asp-controller="Auth" asp-action="Login"
-                            class="flex-1 rounded-full border border-amber-700 py-2 text-center text-sm font-medium text-amber-700">@Localizer["Login"]</a>
-                        <a asp-controller="Auth" asp-action="SignUp"
-                            class="flex-1 rounded-full bg-amber-700 py-2 text-center text-sm font-medium text-white">@Localizer["SignUp"]</a>
+                        <button type="button" data-auth-tab="login"
+                            class="flex-1 rounded-full border @(isBrowsePage ? "border-blue-700 text-blue-700" : "border-amber-700 text-amber-700") py-2 text-center text-sm font-medium">
+                            @Localizer["Login"]
+                        </button>
+                        <button type="button" data-auth-tab="signup"
+                            class="flex-1 rounded-full @(isBrowsePage ? "bg-blue-700" : "bg-amber-700") py-2 text-center text-sm font-medium text-white">
+                            @Localizer["SignUp"]
+                        </button>
                     </li>
                 </ul>
             </nav>
@@ -187,8 +204,13 @@
 
     @if (!isStandalonePage)
     {
-        <footer class="mt-8 border-t border-stone-200/80 bg-white/70">
-            <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        @await Html.PartialAsync("Partials/_AuthModal")
+    }
+
+    @if (!isStandalonePage)
+    {
+        <footer class="mt-8 w-full border-t border-stone-200 bg-white">
+            <div class="site-shell py-12 lg:py-14">
                 <div class="grid gap-10 md:grid-cols-[1.2fr_2fr] md:gap-16">
                     <div>
                         <a asp-controller="Home" asp-action="Index" class="flex items-center gap-2.5">
@@ -255,6 +277,7 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @if (!isStandalonePage)
     {
+        <script src="~/js/auth-modal.js" asp-append-version="true"></script>
         <script>
             (function () {
                 var btn = document.getElementById('mobileMenuBtn');
