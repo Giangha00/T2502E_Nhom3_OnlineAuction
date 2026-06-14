@@ -6,35 +6,35 @@ public static class MockProductDetailData
 {
     private static readonly Dictionary<string, string[]> CategoryExtraImages = new()
     {
-        ["Cars"] =
-        [
-            "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800&h=800&fit=crop",
-            "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=800&fit=crop",
-            "https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800&h=800&fit=crop"
-        ],
-        ["Watches"] =
-        [
-            "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=800&h=800&fit=crop",
-            "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?w=800&h=800&fit=crop",
-            "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=800&h=800&fit=crop"
-        ],
-        ["Cards"] =
+        ["Pokémon"] =
         [
             "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=800&fit=crop",
             "https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=800&h=800&fit=crop",
             "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=800&h=800&fit=crop"
         ],
-        ["Billiard Sticks"] =
+        ["One Piece"] =
         [
-            "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=800&fit=crop",
-            "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=800&fit=crop",
-            "https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?w=800&h=800&fit=crop"
+            "https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=800&h=800&fit=crop",
+            "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&h=800&fit=crop",
+            "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=800&h=800&fit=crop"
         ],
-        ["Jewelry"] =
+        ["Yu-Gi-Oh!"] =
         [
-            "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&h=800&fit=crop",
-            "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&h=800&fit=crop",
-            "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&h=800&fit=crop"
+            "https://images.unsplash.com/photo-1606107557195-0a29cbf1f2b3?w=800&h=800&fit=crop",
+            "https://images.unsplash.com/photo-1565538810643-b5bdb4dfa845?w=800&h=800&fit=crop",
+            "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=800&h=800&fit=crop"
+        ],
+        ["Sports"] =
+        [
+            "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&h=800&fit=crop",
+            "https://images.unsplash.com/photo-1606107557195-0a29b4b9efab?w=800&h=800&fit=crop",
+            "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=800&fit=crop"
+        ],
+        ["Magic: The Gathering"] =
+        [
+            "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=800&fit=crop",
+            "https://images.unsplash.com/photo-1606169046337-54513793d481?w=800&h=800&fit=crop",
+            "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=800&h=800&fit=crop"
         ]
     };
 
@@ -45,7 +45,7 @@ public static class MockProductDetailData
 
         var seller = MockAuctionData.GetSellerForAuction(id);
         if (seller is null) return null;
-        var extras = CategoryExtraImages.GetValueOrDefault(auction.Category, CategoryExtraImages["Watches"]);
+        var extras = CategoryExtraImages.GetValueOrDefault(auction.Category, CategoryExtraImages["Pokémon"]);
         var images = new List<string> { auction.ImageUrl };
         images.AddRange(extras.Take(3));
 
@@ -60,7 +60,7 @@ public static class MockProductDetailData
             Name = auction.Name,
             ShortDescription = BuildShortDescription(auction),
             Category = auction.Category,
-            Condition = (id % 3) switch { 0 => "Like New", 1 => "Used", _ => "New" },
+            Condition = string.IsNullOrEmpty(auction.Condition) ? "Graded" : auction.Condition,
             DescriptionHtml = BuildDescriptionHtml(auction),
             Images = images,
             StartingPrice = auction.StartingPrice,
@@ -85,26 +85,28 @@ public static class MockProductDetailData
     private static string BuildShortDescription(AuctionItemViewModel auction) =>
         auction.Category switch
         {
-            "Cars" => "Classic automobile in excellent collector condition",
-            "Watches" => "Premium timepiece from a trusted collector",
-            "Cards" => "Authenticated trading card for serious collectors",
-            "Billiard Sticks" => "Professional-grade cue with verified provenance",
-            "Jewelry" => "Fine jewelry piece with documented authenticity",
-            _ => "Curated auction item with verified seller history"
+            "Pokémon" => "Authenticated Pokémon card graded and vault-ready",
+            "One Piece" => "Premium One Piece TCG card from a verified seller",
+            "Yu-Gi-Oh!" => "Graded Yu-Gi-Oh! collectible for serious duelists",
+            "Sports" => "Investment-grade sports card with documented provenance",
+            "Magic: The Gathering" => "Rare MTG card authenticated for collectors",
+            _ => "Curated trading card with verified seller history"
         };
 
     private static string BuildDescriptionHtml(AuctionItemViewModel auction) =>
         $"""
-        <p>This <strong>{auction.Name}</strong> is offered through Auction House with full seller disclosure and documented provenance. Ideal for collectors seeking a premium {auction.Category.ToLowerInvariant()} piece.</p>
+        <p>This <strong>{auction.Name}</strong> is offered through RareCard Vault with full seller disclosure and documented provenance. Ideal for collectors seeking a premium {auction.Category} piece.</p>
         <h3>Highlights</h3>
         <ul>
             <li>Category: {auction.Category}</li>
+            <li>Grade: {auction.Grade}</li>
+            <li>Set: {auction.Subtitle}</li>
             <li>Starting price: ${auction.StartingPrice:N0}</li>
             <li>Current highest bid: ${auction.CurrentPrice:N0}</li>
             <li>Authenticated listing reviewed by our curation team</li>
         </ul>
         <h3>Condition &amp; Notes</h3>
-        <p>The item has been photographed from multiple angles. Minor wear may be visible in close-up images. Please review attached certificates and verification documents before bidding.</p>
+        <p>The card has been photographed from multiple angles inside its grading slab. Please review attached certificates and verification documents before bidding.</p>
         <p><a href="#">View seller return policy</a> · <a href="#">Ask a question</a></p>
         """;
 

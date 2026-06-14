@@ -2,9 +2,16 @@ namespace OnlineAuction.Models;
 
 public class HomeViewModel
 {
+    public List<AuctionItemViewModel> HotAuctions { get; set; } = [];
     public List<AuctionItemViewModel> FeaturedAuctions { get; set; } = [];
+    public List<AuctionItemViewModel> EndingSoonAuctions { get; set; } = [];
+    public AuctionItemViewModel? FeaturedEndingSoon { get; set; }
     public List<AuctionItemViewModel> WonAuctions { get; set; } = [];
     public List<SellerViewModel> BestSellers { get; set; } = [];
+    public List<CategoryViewModel> Categories { get; set; } = [];
+    public List<VaultPostViewModel> VaultPosts { get; set; } = [];
+    public int TotalLiveAuctions { get; set; }
+    public int EndingSoonCount { get; set; }
 }
 
 public class AuctionItemViewModel
@@ -17,6 +24,12 @@ public class AuctionItemViewModel
     public decimal CurrentPrice { get; set; }
     public string Status { get; set; } = string.Empty;
     public string TimeRemaining { get; set; } = string.Empty;
+    public string Grade { get; set; } = string.Empty;
+    public string Subtitle { get; set; } = string.Empty;
+    public string Condition { get; set; } = "Graded";
+    public int Year { get; set; }
+    public bool IsHot { get; set; }
+    public int BidCount => (Id * 3 + 7) % 24 + 3;
 }
 
 public class SellerViewModel
