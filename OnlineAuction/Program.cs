@@ -1,5 +1,12 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
+using OnlineAuction.Data;
+using OnlineAuction.Data.Seeders;
+using OnlineAuction.Configurations;
+using OnlineAuction.Services;
+using OnlineAuction.Services.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -43,8 +50,22 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
         CookieName = CookieRequestCultureProvider.DefaultCookieName
     });
 });
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("CloudinarySettings"));
+
+builder.Services.AddScoped<IAvatarStorageService, CloudinaryAvatarStorageService>();
+builder.Services.AddScoped<IUserService, UserService>();
 var app = builder.Build();
 
+// tạo   dữ liệu   mâu
+/*using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
+    await UserSeeder.SeedAsync(dbContext);
+}*/
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

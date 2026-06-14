@@ -54,13 +54,31 @@
       </Compile>
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Bogus" Version="35.6.5" />
+      <PackageReference Include="CloudinaryDotNet" Version="1.29.2" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.28" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.17" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.17">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.17" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.17">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
+      <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Documents\.DS_Store" />
+    </ItemGroup>
+
     <Target Name="BuildTailwindCss" BeforeTargets="Build">
-        <Exec WorkingDirectory="$(MSBuildProjectDirectory)"
-              Command="npm install"
-              Condition="Exists('$(MSBuildProjectDirectory)/package.json') AND !Exists('$(MSBuildProjectDirectory)/node_modules')" />
-        <Exec WorkingDirectory="$(MSBuildProjectDirectory)"
-              Command="npm run build:css"
-              Condition="Exists('$(MSBuildProjectDirectory)/package.json') AND Exists('$(MSBuildProjectDirectory)/node_modules')" />
+        <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="npm install" Condition="Exists('$(MSBuildProjectDirectory)/package.json') AND !Exists('$(MSBuildProjectDirectory)/node_modules')" />
+        <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="npm run build:css" Condition="Exists('$(MSBuildProjectDirectory)/package.json') AND Exists('$(MSBuildProjectDirectory)/node_modules')" />
     </Target>
 
 </Project>
