@@ -20,7 +20,7 @@ public static class MockAuctionData
             Id = 1,
             Name = "1967 Ford Mustang Fastback",
             Category = "Cars",
-            ImageUrl = "https://images.unsplash.com/photo-1494976388531-d1058498cdd2?w=600&h=750&fit=crop",
+            ImageUrl = "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600&h=750&fit=crop",
             StartingPrice = 28000,
             CurrentPrice = 34500,
             Status = "Live",
@@ -42,7 +42,7 @@ public static class MockAuctionData
             Id = 3,
             Name = "Rolex Submariner Date 1680",
             Category = "Watches",
-            ImageUrl = "https://images.unsplash.com/photo-1524593362214-995a5aa60ca0?w=600&h=750&fit=crop",
+            ImageUrl = "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=600&h=750&fit=crop",
             StartingPrice = 6800,
             CurrentPrice = 9450,
             Status = "Ending Soon",
@@ -75,7 +75,7 @@ public static class MockAuctionData
             Id = 6,
             Name = "Michael Jordan Rookie PSA 10",
             Category = "Cards",
-            ImageUrl = "https://images.unsplash.com/photo-1606107557195-0a29cbf1f2b3?w=600&h=750&fit=crop",
+            ImageUrl = "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=600&h=750&fit=crop",
             StartingPrice = 15000,
             CurrentPrice = 18200,
             Status = "Live",
@@ -196,7 +196,7 @@ public static class MockAuctionData
             Id = 17,
             Name = "Meucci Elite Series Cue",
             Category = "Billiard Sticks",
-            ImageUrl = "https://images.unsplash.com/photo-1571019614242-c5c25dee48f8?w=600&h=750&fit=crop",
+            ImageUrl = "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=750&fit=crop",
             StartingPrice = 620,
             CurrentPrice = 890,
             Status = "Live",
@@ -207,7 +207,7 @@ public static class MockAuctionData
             Id = 18,
             Name = "Pearl Necklace South Sea 14K",
             Category = "Jewelry",
-            ImageUrl = "https://images.unsplash.com/photo-1599643478518-a784e5dc4c2f?w=600&h=750&fit=crop",
+            ImageUrl = "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&h=750&fit=crop",
             StartingPrice = 4300,
             CurrentPrice = 5100,
             Status = "Ending Soon",
@@ -215,8 +215,60 @@ public static class MockAuctionData
         }
     ];
 
+    public static AuctionItemViewModel? GetAuctionById(int id) =>
+        GetAllAuctions().FirstOrDefault(a => a.Id == id);
+
+    public static SellerViewModel? GetSellerForAuction(int auctionId)
+    {
+        var sellers = GetBestSellers();
+        if (sellers.Count == 0) return null;
+        return sellers[(auctionId - 1) % sellers.Count];
+    }
+
+    public static List<AuctionItemViewModel> GetAuctionsBySellerId(int sellerId)
+    {
+        var sellers = GetBestSellers();
+        var sellerIndex = sellers.FindIndex(s => s.Id == sellerId);
+        if (sellerIndex < 0) return [];
+
+        return GetAllAuctions()
+            .Where(a => (a.Id - 1) % sellers.Count == sellerIndex)
+            .ToList();
+    }
+
+    public static List<AuctionItemViewModel> GetAuctionsByIds(IEnumerable<int> ids) =>
+        GetAllAuctions().Where(a => ids.Contains(a.Id)).ToList();
+
     public static List<AuctionItemViewModel> GetFeaturedAuctions() =>
         GetAllAuctions().Take(6).ToList();
+
+    public static List<AuctionItemViewModel> GetWonAuctions() =>
+    [
+        new()
+        {
+            Id = 3,
+            Name = "Rolex Submariner Date 1680",
+            Category = "Watches",
+            ImageUrl = "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=600&h=750&fit=crop",
+            StartingPrice = 6800,
+            CurrentPrice = 9450,
+            Status = "Won",
+            TimeRemaining = "Pay within 3 days"
+        },
+        new()
+        {
+            Id = 8,
+            Name = "1952 Topps Mickey Mantle Rookie",
+            Category = "Cards",
+            ImageUrl = "https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=600&h=750&fit=crop",
+            StartingPrice = 12000,
+            CurrentPrice = 18750,
+            Status = "Won",
+            TimeRemaining = "Pay within 3 days"
+        }
+    ];
+
+    public static IReadOnlyList<string> GetCategoryNames() => CategoryOrder;
 
     public static List<CategoryViewModel> GetCategories()
     {

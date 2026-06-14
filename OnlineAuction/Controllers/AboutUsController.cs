@@ -6,6 +6,6 @@ public class AboutUsController : Controller
 {
     public IActionResult About()
     {
-        return View();
+        return View("About");
     }
 }

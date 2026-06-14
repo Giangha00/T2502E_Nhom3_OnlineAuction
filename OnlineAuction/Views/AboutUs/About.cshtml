@@ -2,109 +2,93 @@
     ViewData["Title"] = "About Us";
 }
 
-<div class="about-page w-full bg-[#f5f1e8] text-[#2a1a11]">
-    <section class="relative min-h-[62vh] md:min-h-[66vh] flex items-center justify-center px-5 py-20 bg-cover bg-center" style="background-image: url('/images/about-hero.svg');">
-        <div class="absolute inset-0 bg-gradient-to-br from-black/75 via-black/45 to-black/20"></div>
-        <div class="relative z-10 text-center text-[#fff8ee] max-w-3xl">
-            <p class="mb-3 text-xs md:text-sm font-bold tracking-[0.22em] uppercase text-[#f3c99b]">Auction House</p>
-            <h1 class="text-4xl md:text-6xl font-semibold mb-4">About Auction House</h1>
-            <p class="mx-auto max-w-2xl leading-8 text-base md:text-lg">
-                A trusted online auction platform where users can discover unique products,
-                place bids confidently, and complete transactions in a transparent environment.
+<partial name="_PageHero" model='new PageHeroViewModel {
+    Label = "Auction House",
+    Title = "About Auction House",
+    Description = "A trusted online auction platform where users can discover unique products, place bids confidently, and complete transactions in a transparent environment.",
+    Centered = true,
+    ImageUrl = PageBannerImages.About,
+    ImageAlt = "Auction House team and marketplace"
+}' />
+
+<section class="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+    <div class="mx-auto grid max-w-6xl grid-cols-1 gap-7 lg:grid-cols-[1.3fr_1fr]">
+        <div>
+            <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Project Introduction</p>
+            <h2 class="mt-2 text-3xl font-bold text-stone-900 sm:text-4xl">Built for modern online auctions</h2>
+            <p class="mt-4 text-base leading-7 text-stone-600 sm:text-lg">
+                Auction House is designed to connect sellers and buyers in one reliable digital marketplace.
+                The platform helps users create auction listings, join live bidding sessions, and finalize deals smoothly.
             </p>
         </div>
-    </section>
-
-    <section class="px-5 py-16 md:py-20">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-7">
-            <div>
-                <p class="mb-3 text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-[#9a5629]">Project Introduction</p>
-                <h2 class="text-3xl md:text-5xl font-semibold mb-4">Built for modern online auctions</h2>
-                <p class="leading-8 text-[#5a4738] text-base md:text-lg">
-                    Auction House is designed to connect sellers and buyers in one reliable digital marketplace.
-                    The platform helps users create auction listings, join live bidding sessions, and finalize deals smoothly.
-                </p>
-            </div>
-            <div class="rounded-2xl border border-[#d8c5ae] bg-[#fffaf2] p-6 shadow-[0_12px_32px_rgba(71,41,19,0.08)]">
-                <h3 class="text-3xl font-semibold mb-3">Who we build for</h3>
-                <ul class="list-disc pl-5 space-y-2 text-[#5a4738] leading-7">
-                    <li>Sellers who want to reach more buyers.</li>
-                    <li>Buyers searching for valuable and unique products.</li>
-                    <li>Communities that need a secure and transparent bidding process.</li>
-                </ul>
-            </div>
+        <div class="rounded-2xl border border-stone-200 bg-white/80 p-6 shadow-sm">
+            <h3 class="text-2xl font-semibold text-stone-900">Who we build for</h3>
+            <ul class="mt-4 list-disc space-y-2 pl-5 text-stone-600 leading-7">
+                <li>Sellers who want to reach more buyers.</li>
+                <li>Buyers searching for valuable and unique products.</li>
+                <li>Communities that need a secure and transparent bidding process.</li>
+            </ul>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section class="px-5 py-16 md:py-20 bg-gradient-to-b from-[#efe3d1] to-[#f6efe4]">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 items-center">
-            <div class="w-28 h-28 rounded-full grid place-items-center bg-[radial-gradient(circle_at_20%_20%,#d8a15d_0%,#9a5629_70%)] shadow-[0_14px_30px_rgba(67,34,14,0.22)]" aria-hidden="true">
-                <div class="text-white text-4xl font-semibold">AH</div>
-            </div>
-            <div>
-                <p class="mb-3 text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-[#9a5629]">Our Mission</p>
-                <h2 class="text-3xl md:text-5xl font-semibold mb-4">Create a transparent and secure auction environment</h2>
-                <p class="leading-8 text-[#5a4738] text-base md:text-lg">
-                    We focus on building trust in every auction by delivering clear bidding flows,
-                    reliable transaction tracking, and a user experience that is simple for everyone.
-                </p>
-            </div>
+<section class="border-t border-stone-200/80 bg-white/50 px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+    <div class="mx-auto grid max-w-6xl grid-cols-1 items-center gap-6 md:grid-cols-[auto_1fr]">
+        <div class="grid h-28 w-28 place-items-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg shadow-amber-200" aria-hidden="true">
+            <div class="text-4xl font-semibold text-white">AH</div>
         </div>
-    </section>
-
-    <section class="px-5 py-16 md:py-20">
-        <div class="max-w-6xl mx-auto">
-            <p class="mb-3 text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-[#9a5629]">How Auction House Works</p>
-            <h2 class="text-3xl md:text-5xl font-semibold mb-7">Simple, clear, and reliable process</h2>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                <article class="relative rounded-2xl border border-[#d8c5ae] bg-white p-6 shadow-[0_10px_25px_rgba(47,23,8,0.06)] after:hidden xl:after:block after:content-[''] after:absolute after:top-1/2 after:-right-2 after:w-3 after:h-3 after:border-t-2 after:border-r-2 after:border-[#d8a15d] after:rotate-45 after:-translate-y-1/2">
-                    <span class="inline-block mb-3 px-3 py-1 rounded-full bg-[#9a5629]/10 text-[#9a5629] text-xs font-bold">Step 1</span>
-                    <h3 class="text-3xl font-semibold mb-2">User creates auction</h3>
-                    <p class="text-[#5a4738] leading-7">Seller posts product details, starting price, and auction timeline.</p>
-                </article>
-                <article class="relative rounded-2xl border border-[#d8c5ae] bg-white p-6 shadow-[0_10px_25px_rgba(47,23,8,0.06)] after:hidden xl:after:block after:content-[''] after:absolute after:top-1/2 after:-right-2 after:w-3 after:h-3 after:border-t-2 after:border-r-2 after:border-[#d8a15d] after:rotate-45 after:-translate-y-1/2">
-                    <span class="inline-block mb-3 px-3 py-1 rounded-full bg-[#9a5629]/10 text-[#9a5629] text-xs font-bold">Step 2</span>
-                    <h3 class="text-3xl font-semibold mb-2">Other users place bids</h3>
-                    <p class="text-[#5a4738] leading-7">Interested buyers join and submit competitive bids in real time.</p>
-                </article>
-                <article class="relative rounded-2xl border border-[#d8c5ae] bg-white p-6 shadow-[0_10px_25px_rgba(47,23,8,0.06)] after:hidden xl:after:block after:content-[''] after:absolute after:top-1/2 after:-right-2 after:w-3 after:h-3 after:border-t-2 after:border-r-2 after:border-[#d8a15d] after:rotate-45 after:-translate-y-1/2">
-                    <span class="inline-block mb-3 px-3 py-1 rounded-full bg-[#9a5629]/10 text-[#9a5629] text-xs font-bold">Step 3</span>
-                    <h3 class="text-3xl font-semibold mb-2">Highest bidder wins</h3>
-                    <p class="text-[#5a4738] leading-7">When the auction closes, the highest valid bid is selected automatically.</p>
-                </article>
-                <article class="relative rounded-2xl border border-[#d8c5ae] bg-white p-6 shadow-[0_10px_25px_rgba(47,23,8,0.06)]">
-                    <span class="inline-block mb-3 px-3 py-1 rounded-full bg-[#9a5629]/10 text-[#9a5629] text-xs font-bold">Step 4</span>
-                    <h3 class="text-3xl font-semibold mb-2">Complete transaction</h3>
-                    <p class="text-[#5a4738] leading-7">Buyer and seller complete payment and delivery with status tracking.</p>
-                </article>
-            </div>
+        <div>
+            <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Our Mission</p>
+            <h2 class="mt-2 text-3xl font-bold text-stone-900 sm:text-4xl">Create a transparent and secure auction environment</h2>
+            <p class="mt-4 text-base leading-7 text-stone-600 sm:text-lg">
+                We focus on building trust in every auction by delivering clear bidding flows,
+                reliable transaction tracking, and a user experience that is simple for everyone.
+            </p>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section class="px-5 py-16 md:py-20 bg-gradient-to-b from-[#f4ece0] to-[#f0e5d7]">
-        <div class="max-w-6xl mx-auto">
-            <p class="mb-3 text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-[#9a5629]">Core Features</p>
-            <h2 class="text-3xl md:text-5xl font-semibold mb-7">Everything needed for online auction operations</h2>
+<section class="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+    <div class="mx-auto max-w-6xl">
+        <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">How Auction House Works</p>
+        <h2 class="mt-2 text-3xl font-bold text-stone-900 sm:text-4xl">Simple, clear, and reliable process</h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <article class="rounded-2xl border border-[#d9c4ab] bg-[#fff7eb] p-6 transition hover:-translate-y-1 hover:shadow-[0_16px_25px_rgba(76,43,20,0.12)]">
-                    <h3 class="text-3xl font-semibold mb-2">Online Auction</h3>
-                    <p class="text-[#5a4738] leading-7">Users can participate in live online auctions from anywhere.</p>
+        <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            @foreach (var step in new[] {
+                new { Num = "Step 1", Title = "User creates auction", Desc = "Seller posts product details, starting price, and auction timeline." },
+                new { Num = "Step 2", Title = "Other users place bids", Desc = "Interested buyers join and submit competitive bids in real time." },
+                new { Num = "Step 3", Title = "Highest bidder wins", Desc = "When the auction closes, the highest valid bid is selected automatically." },
+                new { Num = "Step 4", Title = "Complete transaction", Desc = "Buyer and seller complete payment and delivery with status tracking." }
+            })
+            {
+                <article class="rounded-2xl border border-stone-200 bg-white/80 p-6 shadow-sm transition hover:shadow-md">
+                    <span class="inline-block rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700">@step.Num</span>
+                    <h3 class="mt-3 text-xl font-semibold text-stone-900">@step.Title</h3>
+                    <p class="mt-2 text-sm leading-7 text-stone-600">@step.Desc</p>
                 </article>
-                <article class="rounded-2xl border border-[#d9c4ab] bg-[#fff7eb] p-6 transition hover:-translate-y-1 hover:shadow-[0_16px_25px_rgba(76,43,20,0.12)]">
-                    <h3 class="text-3xl font-semibold mb-2">Secure Bidding</h3>
-                    <p class="text-[#5a4738] leading-7">Bidding activities are visible and consistent to improve transparency.</p>
-                </article>
-                <article class="rounded-2xl border border-[#d9c4ab] bg-[#fff7eb] p-6 transition hover:-translate-y-1 hover:shadow-[0_16px_25px_rgba(76,43,20,0.12)]">
-                    <h3 class="text-3xl font-semibold mb-2">Seller Management</h3>
-                    <p class="text-[#5a4738] leading-7">Manage product listings, auction sessions, and bidder participation.</p>
-                </article>
-                <article class="rounded-2xl border border-[#d9c4ab] bg-[#fff7eb] p-6 transition hover:-translate-y-1 hover:shadow-[0_16px_25px_rgba(76,43,20,0.12)]">
-                    <h3 class="text-3xl font-semibold mb-2">Transaction Tracking</h3>
-                    <p class="text-[#5a4738] leading-7">Track each transaction stage from winning bid to completion.</p>
-                </article>
-            </div>
+            }
         </div>
-    </section>
-</div>
+    </div>
+</section>
+
+<section class="border-t border-stone-200/80 bg-white/50 px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+    <div class="mx-auto max-w-6xl">
+        <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Core Features</p>
+        <h2 class="mt-2 text-3xl font-bold text-stone-900 sm:text-4xl">Everything needed for online auction operations</h2>
+
+        <div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+            @foreach (var feature in new[] {
+                new { Title = "Online Auction", Desc = "Users can participate in live online auctions from anywhere." },
+                new { Title = "Secure Bidding", Desc = "Bidding activities are visible and consistent to improve transparency." },
+                new { Title = "Seller Management", Desc = "Manage product listings, auction sessions, and bidder participation." },
+                new { Title = "Transaction Tracking", Desc = "Track each transaction stage from winning bid to completion." }
+            })
+            {
+                <article class="rounded-2xl border border-stone-200 bg-white/80 p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                    <h3 class="text-xl font-semibold text-stone-900">@feature.Title</h3>
+                    <p class="mt-2 text-sm leading-7 text-stone-600">@feature.Desc</p>
+                </article>
+            }
+        </div>
+    </div>
+</section>

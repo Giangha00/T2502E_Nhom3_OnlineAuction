@@ -1,0 +1,28 @@
+<aside class="sticky-below-header">
+    <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <h2 class="text-lg font-semibold text-stone-900">Card Preview</h2>
+        <p class="mt-1 text-sm text-stone-500">Updates in real time as you type.</p>
+
+        <div class="mt-6 perspective-[1000px]">
+            <div id="cardPreview" class="card-preview card-preview--visa relative mx-auto aspect-[1.586/1] w-full max-w-sm rounded-2xl p-6 text-white shadow-xl transition-all duration-500">
+                <div class="flex items-start justify-between">
+                    <span id="previewChip" class="h-9 w-12 rounded-md bg-amber-200/80"></span>
+                    <span id="previewType" class="text-sm font-bold tracking-widest">VISA</span>
+                </div>
+                <p id="previewNumber" class="mt-8 font-mono text-lg tracking-[0.2em] sm:text-xl">**** **** **** 4567</p>
+                <div class="mt-6 flex items-end justify-between gap-4">
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[10px] uppercase tracking-widest text-white/70">Card Holder</p>
+                        <p id="previewHolder" class="truncate text-sm font-semibold uppercase">YOUR NAME</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-widest text-white/70">Expires</p>
+                        <p id="previewExpiry" class="text-sm font-semibold">MM/YY</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="mt-4 text-center text-xs text-stone-400">Preview only — no real payment processing</p>
+    </div>
+</aside>

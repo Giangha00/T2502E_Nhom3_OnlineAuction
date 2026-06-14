@@ -4,15 +4,81 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>OnlineAuction</RootNamespace>
+        <RazorLangVersion>8.0</RazorLangVersion>
     </PropertyGroup>
 
+    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.11" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\SharedResource.en-US.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>SharedResource.en-US.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\SharedResource.vi-VN.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>SharedResource.vi-VN.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\SharedResource.ja-JP.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>SharedResource.ja-JP.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\SharedResource.ko-KR.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>SharedResource.ko-KR.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Resources\SharedResource.en-US.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>SharedResource.en-US.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\SharedResource.vi-VN.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>SharedResource.vi-VN.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\SharedResource.ja-JP.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>SharedResource.ja-JP.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\SharedResource.ko-KR.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>SharedResource.ko-KR.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Bogus" Version="35.6.5" />
+      <PackageReference Include="CloudinaryDotNet" Version="1.29.2" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.28" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.17" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.17">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.17" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.17">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
+      <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Documents\.DS_Store" />
+    </ItemGroup>
+
     <Target Name="BuildTailwindCss" BeforeTargets="Build">
-        <Exec WorkingDirectory="$(MSBuildProjectDirectory)"
-              Command="npm install"
-              Condition="Exists('$(MSBuildProjectDirectory)/package.json') AND !Exists('$(MSBuildProjectDirectory)/node_modules')" />
-        <Exec WorkingDirectory="$(MSBuildProjectDirectory)"
-              Command="npm run build:css"
-              Condition="Exists('$(MSBuildProjectDirectory)/package.json') AND Exists('$(MSBuildProjectDirectory)/node_modules')" />
+        <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="npm install" Condition="Exists('$(MSBuildProjectDirectory)/package.json') AND !Exists('$(MSBuildProjectDirectory)/node_modules')" />
+        <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="npm run build:css" Condition="Exists('$(MSBuildProjectDirectory)/package.json') AND Exists('$(MSBuildProjectDirectory)/node_modules')" />
     </Target>
 
 </Project>

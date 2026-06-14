@@ -1,0 +1,32 @@
+@model OnlineAuction.Models.ProductDetailViewModel
+
+<div class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+  <div class="border-b border-stone-100 bg-gradient-to-r from-amber-50 to-stone-50 px-5 py-4">
+    <h2 class="text-lg font-semibold text-stone-900">Auction Information</h2>
+  </div>
+  <div class="grid gap-4 p-5 sm:grid-cols-2">
+    <div class="rounded-xl bg-stone-50 p-4">
+      <p class="text-xs font-semibold uppercase tracking-widest text-stone-400">Starting Price</p>
+      <p class="mt-1 text-2xl font-bold text-stone-800">$@Model.StartingPrice.ToString("N0")</p>
+    </div>
+    <div class="rounded-xl bg-amber-50 p-4">
+      <p class="text-xs font-semibold uppercase tracking-widest text-amber-700">Current Price</p>
+      <p class="mt-1 text-2xl font-bold text-amber-800">$@Model.CurrentPrice.ToString("N0")</p>
+    </div>
+    <div class="rounded-xl bg-stone-50 p-4">
+      <p class="text-xs font-semibold uppercase tracking-widest text-stone-400">Minimum Bid Step</p>
+      <p class="mt-1 text-xl font-bold text-stone-800">$@Model.BidStep.ToString("N0")</p>
+    </div>
+    <div class="rounded-xl bg-stone-50 p-4">
+      <p class="text-xs font-semibold uppercase tracking-widest text-stone-400">Condition</p>
+      <p class="mt-1 text-xl font-bold text-stone-800">@Model.Condition</p>
+    </div>
+  </div>
+  <div class="border-t border-stone-100 px-5 py-4">
+    <p class="text-xs font-semibold uppercase tracking-widest text-stone-400">Auction Time</p>
+    <div class="mt-2 grid gap-2 text-sm text-stone-700 sm:grid-cols-2">
+      <p><span class="font-medium text-stone-900">Start:</span> @Model.StartDate.ToString("dd/MM/yyyy HH:mm")</p>
+      <p><span class="font-medium text-stone-900">End:</span> @Model.EndDate.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+  </div>
+</div>
