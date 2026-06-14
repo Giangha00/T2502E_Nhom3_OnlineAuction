@@ -49,10 +49,11 @@ public static class MockProductDetailData
         var images = new List<string> { auction.ImageUrl };
         images.AddRange(extras.Take(3));
 
-        var (days, hours, minutes) = ParseCountdown(auction.TimeRemaining);
+        var (days, hours, minutes, seconds) = ParseCountdown(auction.TimeRemaining);
         var (status, badgeClass) = MapStatus(auction.Status);
         var bidStep = CalculateBidStep(auction.StartingPrice);
         var (start, end) = BuildAuctionDates(id, days, hours, minutes);
+        var (setName, cardNumber) = ParseSetInfo(auction.Subtitle, auction.Name);
 
         return new ProductDetailViewModel
         {
@@ -61,25 +62,103 @@ public static class MockProductDetailData
             ShortDescription = BuildShortDescription(auction),
             Category = auction.Category,
             Condition = string.IsNullOrEmpty(auction.Condition) ? "Graded" : auction.Condition,
+            Grade = auction.Grade,
+            Subtitle = auction.Subtitle,
+            Year = auction.Year,
+            SetName = setName,
+            Language = auction.Category == "Pokémon" && auction.Year < 2000 ? "Japanese" : "English",
+            CardNumber = cardNumber,
+            CertificateNumber = $"PSA-{48000000 + auction.Id * 137}",
             DescriptionHtml = BuildDescriptionHtml(auction),
             Images = images,
             StartingPrice = auction.StartingPrice,
             CurrentPrice = auction.CurrentPrice,
             BidStep = bidStep,
+            BidCount = (id * 3 + 7) % 24 + 3,
+            LotNumber = (id % 12) + 1,
+            WatcherCount = (id * 5 + 11) % 50 + 5,
+            EstimatedValue = Math.Round(auction.CurrentPrice * 1.85m, 0),
+            ReserveMet = auction.CurrentPrice >= auction.StartingPrice,
+            AuctionEventName = "RareCard Vault: Premium Trading Card Auction 2026",
+            QuickBidAmounts = BuildQuickBids(auction.CurrentPrice, bidStep),
             StartDate = start,
             EndDate = end,
             CountdownDays = days,
             CountdownHours = hours,
             CountdownMinutes = minutes,
+            CountdownSeconds = seconds,
             AuctionStatus = status,
             StatusBadgeClass = badgeClass,
             Seller = seller,
+            Grading = BuildGrading(auction.Grade),
+            BidHistory = BuildBidHistory(auction),
             Documents = BuildDocuments(auction),
             RelatedProducts = MockAuctionData.GetAllAuctions()
-                .Where(a => a.Category == auction.Category && a.Id != auction.Id)
+                .Where(a => a.Status == "Ending Soon" && a.Id != auction.Id)
                 .Take(4)
                 .ToList()
         };
+    }
+
+    private static List<decimal> BuildQuickBids(decimal currentPrice, decimal bidStep) =>
+    [
+        currentPrice + bidStep,
+        currentPrice + bidStep * 2,
+        currentPrice + bidStep * 5
+    ];
+
+    private static (string SetName, string CardNumber) ParseSetInfo(string subtitle, string name)
+    {
+        if (string.IsNullOrWhiteSpace(subtitle))
+            return ("Collector Edition", "—");
+
+        var parts = subtitle.Split('·', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        var setName = parts.Length > 0 ? parts[0] : subtitle;
+        var cardNumber = name.Contains('#') ? name.Split('#').Last().Trim() : "4/102";
+        return (setName, cardNumber);
+    }
+
+    private static GradingScoreViewModel BuildGrading(string grade)
+    {
+        var numeric = grade switch
+        {
+            var g when g.Contains("10") => "10",
+            var g when g.Contains("9.5") => "9.5",
+            var g when g.Contains("9") => "9",
+            var g when g.Contains("8.5") => "8.5",
+            var g when g.Contains("8") => "8",
+            _ => "9"
+        };
+
+        return new GradingScoreViewModel
+        {
+            Centering = numeric,
+            Corners = numeric,
+            Edges = numeric,
+            Surface = numeric
+        };
+    }
+
+    private static List<BidHistoryItemViewModel> BuildBidHistory(AuctionItemViewModel auction)
+    {
+        var bidders = new[] { "Player_Collector_02", "Vault_Direct_88", "EliteBidder_19", "CardHaven_07" };
+        var history = new List<BidHistoryItemViewModel>();
+        var price = auction.CurrentPrice;
+
+        for (var i = 0; i < 4; i++)
+        {
+            history.Add(new BidHistoryItemViewModel
+            {
+                BidderName = bidders[i],
+                Amount = price,
+                BidTime = DateTime.Now.AddHours(-(i * 3 + 1)),
+                Status = i == 0 ? "WINNING" : "OUTBID"
+            });
+            price -= auction.StartingPrice > 10000 ? 500 : 50;
+            if (price < auction.StartingPrice) price = auction.StartingPrice;
+        }
+
+        return history;
     }
 
     private static string BuildShortDescription(AuctionItemViewModel auction) =>
@@ -133,11 +212,12 @@ public static class MockProductDetailData
         return (start, end);
     }
 
-    private static (int Days, int Hours, int Minutes) ParseCountdown(string timeRemaining)
+    private static (int Days, int Hours, int Minutes, int Seconds) ParseCountdown(string timeRemaining)
     {
         var days = 0;
         var hours = 0;
         var minutes = 0;
+        var seconds = 12;
 
         var dayMatch = System.Text.RegularExpressions.Regex.Match(timeRemaining, @"(\d+)\s*d");
         if (dayMatch.Success) days = int.Parse(dayMatch.Groups[1].Value);
@@ -149,14 +229,14 @@ public static class MockProductDetailData
         if (minuteMatch.Success) minutes = int.Parse(minuteMatch.Groups[1].Value);
 
         if (days == 0 && hours == 0 && minutes == 0) minutes = 30;
-        return (days, hours, minutes);
+        return (days, hours, minutes, seconds);
     }
 
     private static (string Status, string BadgeClass) MapStatus(string status) => status switch
     {
-        "Ending Soon" => ("Ending Soon", "bg-orange-600"),
-        "Won" or "Completed" => ("Completed", "bg-stone-600"),
-        _ => ("Active Auction", "bg-emerald-600")
+        "Ending Soon" => ("Live Auction", "bg-blue-100 text-blue-800"),
+        "Won" or "Completed" => ("Completed", "bg-stone-600 text-white"),
+        _ => ("Live Auction", "bg-blue-100 text-blue-800")
     };
 
     private static string Slugify(string value) =>

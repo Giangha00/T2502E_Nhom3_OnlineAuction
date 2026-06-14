@@ -2,21 +2,18 @@
     ViewData["Title"] = "FAQ";
 }
 
-<section class="page-hero page-hero--image relative overflow-hidden px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-    <div class="page-hero__media absolute inset-0" aria-hidden="true">
-        <img src="@PageBannerImages.Faq" alt="Auction House help center" class="h-full w-full object-cover" loading="eager" />
-        <div class="page-hero__overlay absolute inset-0"></div>
-    </div>
+<div class="rarecard-page bg-white">
+<partial name="_PageHero" model='new PageHeroViewModel {
+    Label = "Help Center",
+    Title = "Frequently Asked Questions",
+    Description = "Find answers to common questions about RareCard, bidding, payments, security, and account management.",
+    Centered = true
+}' />
 
-    <div class="relative z-10 mx-auto max-w-5xl text-center">
-        <p class="page-hero__label text-sm font-semibold uppercase tracking-widest">Help Center</p>
-        <h1 class="page-hero__title mt-2 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">Frequently Asked Questions</h1>
-        <p class="page-hero__desc mx-auto mt-4 max-w-2xl text-base leading-7 sm:text-lg">
-            Find answers to common questions about Auction House, bidding, payments, security, and account management.
-        </p>
-
-        <div class="mx-auto mt-8 flex max-w-2xl items-center gap-3 rounded-full border border-white/25 bg-white/15 p-2 shadow-[0_18px_45px_rgba(20,10,4,0.25)] backdrop-blur">
-            <span class="pl-4 text-amber-100">
+<div class="w-full text-slate-800">
+    <section class="border-b border-slate-200 px-4 py-8 sm:px-8 lg:px-12">
+        <div class="mx-auto flex max-w-2xl items-center gap-3 rounded-full border border-slate-200 bg-slate-50 p-2">
+            <span class="pl-4 text-slate-400">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="11" cy="11" r="8"></circle>
                     <path d="m21 21-4.3-4.3"></path>
@@ -24,64 +21,61 @@
             </span>
             <input type="search"
                    placeholder="Search frequently asked questions..."
-                   class="w-full bg-transparent py-3 text-sm text-white placeholder:text-amber-200/80 outline-none" />
+                   class="w-full bg-transparent py-3 text-sm text-slate-700 placeholder:text-slate-400 outline-none" />
             <button type="button"
-                    class="hidden rounded-full bg-amber-50 px-5 py-2.5 text-sm font-semibold text-amber-800 transition hover:bg-white sm:inline-block">
+                    class="hidden rounded-full bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 sm:inline-block">
                 Search
             </button>
         </div>
-    </div>
-</section>
+    </section>
 
-<div class="w-full text-stone-800">
-
-    <section class="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-        <div class="mx-auto max-w-6xl">
+    <section class="px-4 py-12 sm:px-8 lg:px-12 lg:py-16">
+        <div>
             <div class="mb-8">
-                <p class="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-amber-700">FAQ Categories</p>
+                <p class="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-blue-700">FAQ Categories</p>
                 <h2 class="text-3xl font-semibold md:text-5xl">Browse by topic</h2>
             </div>
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <button type="button" class="faq-category rounded-2xl border border-stone-200 bg-white/80 p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-amber-400 hover:shadow-md">
-                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-amber-50 text-amber-700">A</span>
+                <button type="button" class="faq-category rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-blue-400 hover:shadow-md">
+                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-blue-50 text-blue-700">A</span>
                     <h3 class="text-xl font-semibold">Account</h3>
-                    <p class="mt-2 text-sm leading-6 text-stone-600">Registration, login, and profile management.</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">Registration, login, and profile management.</p>
                 </button>
 
-                <button type="button" class="faq-category rounded-2xl border border-stone-200 bg-white/80 p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-amber-400 hover:shadow-md">
-                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-amber-50 text-amber-700">B</span>
+                <button type="button" class="faq-category rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-blue-400 hover:shadow-md">
+                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-blue-50 text-blue-700">B</span>
                     <h3 class="text-xl font-semibold">Auction</h3>
-                    <p class="mt-2 text-sm leading-6 text-stone-600">Create auctions, join bidding, and place bids.</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">Create auctions, join bidding, and place bids.</p>
                 </button>
 
-                <button type="button" class="faq-category rounded-2xl border border-stone-200 bg-white/80 p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-amber-400 hover:shadow-md">
-                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-amber-50 text-amber-700">P</span>
+                <button type="button" class="faq-category rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-blue-400 hover:shadow-md">
+                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-blue-50 text-blue-700">P</span>
                     <h3 class="text-xl font-semibold">Payment</h3>
-                    <p class="mt-2 text-sm leading-6 text-stone-600">Payments, transactions, and order status.</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">Payments, transactions, and order status.</p>
                 </button>
 
-                <button type="button" class="faq-category rounded-2xl border border-stone-200 bg-white/80 p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-amber-400 hover:shadow-md">
-                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-amber-50 text-amber-700">S</span>
+                <button type="button" class="faq-category rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-blue-400 hover:shadow-md">
+                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-blue-50 text-blue-700">S</span>
                     <h3 class="text-xl font-semibold">Security</h3>
-                    <p class="mt-2 text-sm leading-6 text-stone-600">Account protection, privacy, and safe bidding.</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">Account protection, privacy, and safe bidding.</p>
                 </button>
             </div>
         </div>
     </section>
 
-    <section class="px-5 pb-16 md:pb-20">
-        <div class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.8fr_1.5fr]">
-            <aside class="h-fit rounded-3xl border border-stone-200 bg-white/80 p-6 shadow-sm">
-                <p class="text-xs font-bold uppercase tracking-[0.2em] text-amber-700">Quick Guide</p>
-                <h2 class="mt-3 text-3xl font-semibold">Need help using Auction House?</h2>
-                <p class="mt-4 leading-7 text-stone-600">
+    <section class="px-4 pb-16 sm:px-8 md:pb-20 lg:px-12">
+        <div class="grid gap-8 lg:grid-cols-[0.8fr_1.5fr]">
+            <aside class="h-fit rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">Quick Guide</p>
+                <h2 class="mt-3 text-3xl font-semibold">Need help using RareCard?</h2>
+                <p class="mt-4 leading-7 text-slate-600">
                     These questions cover the most common actions users perform on the platform.
                 </p>
-                <div class="mt-6 space-y-3 text-sm text-stone-600">
-                    <div class="rounded-2xl bg-amber-50 p-4">Create an account before joining auctions.</div>
-                    <div class="rounded-2xl bg-amber-50 p-4">Bid amount must be higher than the current price.</div>
-                    <div class="rounded-2xl bg-amber-50 p-4">Winner is notified when the auction ends.</div>
+                <div class="mt-6 space-y-3 text-sm text-slate-600">
+                    <div class="rounded-2xl bg-blue-50 p-4">Create an account before joining auctions.</div>
+                    <div class="rounded-2xl bg-blue-50 p-4">Bid amount must be higher than the current price.</div>
+                    <div class="rounded-2xl bg-blue-50 p-4">Winner is notified when the auction ends.</div>
                 </div>
             </aside>
 
@@ -102,17 +96,17 @@
 
                 @foreach (var item in faqItems)
                 {
-                    <article class="faq-item overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+                    <article class="faq-item overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                         <button type="button" class="faq-question flex w-full items-center justify-between gap-4 px-5 py-5 text-left">
-                            <span class="text-base font-semibold text-stone-900 md:text-lg">@item.Question</span>
-                            <span class="faq-icon grid h-8 w-8 shrink-0 place-items-center rounded-full bg-amber-50 text-amber-700 transition">
+                            <span class="text-base font-semibold text-slate-900 md:text-lg">@item.Question</span>
+                            <span class="faq-icon grid h-8 w-8 shrink-0 place-items-center rounded-full bg-blue-50 text-blue-700 transition">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="m6 9 6 6 6-6"></path>
                                 </svg>
                             </span>
                         </button>
-                        <div class="faq-answer hidden border-t border-stone-100 px-5 pb-5 pt-0">
-                            <p class="pt-4 leading-7 text-stone-600">@item.Answer</p>
+                        <div class="faq-answer hidden border-t border-slate-100 px-5 pb-5 pt-0">
+                            <p class="pt-4 leading-7 text-slate-600">@item.Answer</p>
                         </div>
                     </article>
                 }
@@ -120,19 +114,20 @@
         </div>
     </section>
 
-    <section class="px-5 pb-20">
-        <div class="page-hero mx-auto max-w-6xl overflow-hidden rounded-3xl p-8 text-center md:p-12">
-            <p class="page-hero__label text-sm font-semibold uppercase tracking-widest">Support</p>
-            <h2 class="page-hero__title mt-3 text-3xl font-bold md:text-4xl">Can't find your answer?</h2>
-            <p class="page-hero__desc mx-auto mt-4 max-w-2xl leading-7">
+    <section class="px-4 pb-20 sm:px-8 lg:px-12">
+        <div class="mx-auto max-w-6xl overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 p-8 text-center md:p-12">
+            <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">Support</p>
+            <h2 class="mt-3 text-3xl font-bold md:text-4xl">Can't find your answer?</h2>
+            <p class="mx-auto mt-4 max-w-2xl leading-7 text-slate-600">
                 Contact our support team and we will help you understand the auction process clearly.
             </p>
             <a asp-controller="Contact" asp-action="Index"
-               class="mt-8 inline-flex rounded-xl bg-amber-50 px-7 py-3 text-sm font-semibold text-amber-800 shadow-md transition hover:bg-white">
+               class="mt-8 inline-flex rounded-lg bg-blue-700 px-7 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-800">
                 Contact Us
             </a>
         </div>
     </section>
+</div>
 </div>
 
 @section Scripts {

@@ -1,41 +1,106 @@
 @model OnlineAuction.Models.CreateAuctionViewModel
 
-<div class="overflow-hidden rounded-2xl border border-stone-200 bg-white/90 shadow-sm">
-  <div class="border-b border-stone-100 bg-gradient-to-r from-stone-50 to-amber-50/50 px-6 py-4">
-    <h2 class="flex items-center gap-2 text-lg font-semibold text-stone-900">
-      <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-700 text-sm font-bold text-white">1</span>
-      Product Information
+<div class="overflow-hidden rounded-2xl border border-slate-200 bg-white/90 shadow-sm">
+  <div class="border-b border-slate-100 bg-gradient-to-r from-slate-50 to-blue-50/50 px-6 py-4">
+    <h2 class="flex items-center gap-2 text-lg font-semibold text-slate-900">
+      <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-700 text-sm font-bold text-white">1</span>
+      Card Information
     </h2>
-    <p class="mt-1 pl-10 text-sm text-stone-500">Basic details about the item you want to auction</p>
+    <p class="mt-1 pl-10 text-sm text-slate-500">Same fields shown on the product detail page</p>
   </div>
 
   <div class="space-y-5 p-6">
+    @await Html.PartialAsync("Partials/_CategorySelect", Model)
+
     <div>
-      <label for="productName" class="mb-2 block text-sm font-medium text-stone-700">Product Name <span class="text-red-500">*</span></label>
-      <input type="text" id="productName" name="ProductName" value="@Model.ProductName" placeholder="Vintage Watch"
-             class="field-input w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100"/>
+      <label for="productName" class="mb-2 block text-sm font-medium text-slate-700">Card Name <span class="text-red-500">*</span></label>
+      <input type="text" id="productName" name="ProductName" value="@Model.ProductName" placeholder="Charizard 1st Edition Holo"
+             class="field-input w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"/>
       <p class="field-error mt-1 hidden text-xs text-red-600" data-for="productName"></p>
     </div>
 
-  @await Html.PartialAsync("Partials/_CategorySelect", Model)
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="year" class="mb-2 block text-sm font-medium text-slate-700">Year</label>
+        <input type="number" id="year" name="Year" value="@(Model.Year > 0 ? Model.Year : "")" min="1800" max="2100" placeholder="1999"
+               class="field-input w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"/>
+        <p class="field-error mt-1 hidden text-xs text-red-600" data-for="year"></p>
+      </div>
+      <div>
+        <label for="setName" class="mb-2 block text-sm font-medium text-slate-700">Set Name <span class="text-red-500">*</span></label>
+        <input type="text" id="setName" name="SetName" value="@Model.SetName" placeholder="Base Set"
+               class="field-input w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"/>
+        <p class="field-error mt-1 hidden text-xs text-red-600" data-for="setName"></p>
+      </div>
+    </div>
 
-    <div>
-      <label for="productDescription" class="mb-2 block text-sm font-medium text-stone-700">Product Description</label>
-      <textarea id="productDescription" name="ProductDescription" class="hidden">@Model.ProductDescription</textarea>
-      <div id="descriptionEditor" class="ckeditor-wrapper overflow-hidden rounded-xl border border-stone-200 bg-white"></div>
-      <p class="mt-1 text-xs text-stone-400">Rich text supported — bullets, links, and formatting</p>
-      <p class="field-error mt-1 hidden text-xs text-red-600" data-for="productDescription"></p>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="cardNumber" class="mb-2 block text-sm font-medium text-slate-700">Card Number</label>
+        <input type="text" id="cardNumber" name="CardNumber" value="@Model.CardNumber" placeholder="4/102"
+               class="field-input w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"/>
+      </div>
+      <div>
+        <label for="language" class="mb-2 block text-sm font-medium text-slate-700">Language</label>
+        <select id="language" name="Language"
+                class="field-input w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100">
+          @foreach (var language in Model.Languages)
+          {
+            if (Model.Language == language)
+            {
+              <option value="@language" selected="selected">@language</option>
+            }
+            else
+            {
+              <option value="@language">@language</option>
+            }
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="grade" class="mb-2 block text-sm font-medium text-slate-700">Grade <span class="text-red-500">*</span></label>
+        <select id="grade" name="Grade"
+                class="field-input w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100">
+          @foreach (var grade in Model.Grades)
+          {
+            if (Model.Grade == grade)
+            {
+              <option value="@grade" selected="selected">@grade</option>
+            }
+            else
+            {
+              <option value="@grade">@grade</option>
+            }
+          }
+        </select>
+        <p class="field-error mt-1 hidden text-xs text-red-600" data-for="grade"></p>
+      </div>
+      <div>
+        <label for="certificateNumber" class="mb-2 block text-sm font-medium text-slate-700">Certificate Number</label>
+        <input type="text" id="certificateNumber" name="CertificateNumber" value="@Model.CertificateNumber" placeholder="PSA-48000137"
+               class="field-input w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"/>
+      </div>
     </div>
 
     <div>
-      <span class="mb-3 block text-sm font-medium text-stone-700">Condition <span class="text-red-500">*</span></span>
-      <div class="flex flex-wrap gap-4">
+      <label for="subtitle" class="mb-2 block text-sm font-medium text-slate-700">Subtitle</label>
+      <input type="text" id="subtitle" name="Subtitle" value="@Model.Subtitle" placeholder="Base Set · 1999 · Wizards of the Coast"
+             class="field-input w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"/>
+      <p class="mt-1 text-xs text-slate-400">Optional — shown under the card title on the detail page</p>
+    </div>
+
+    <div>
+      <span class="mb-3 block text-sm font-medium text-slate-700">Condition <span class="text-red-500">*</span></span>
+      <div class="flex flex-wrap gap-3">
         @foreach (var condition in Model.Conditions)
         {
           var id = $"condition_{condition.Replace(" ", "")}";
-          <label class="flex cursor-pointer items-center gap-2.5 rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:ring-2 has-[:checked]:ring-amber-100">
-            <input type="radio" name="Condition" value="@condition" id="@id" class="h-4 w-4 border-stone-300 text-amber-700 focus:ring-amber-500" @(Model.Condition == condition ? "checked=\"checked\"" : null)/>
-            <span class="font-medium text-stone-700">@condition</span>
+          <label class="flex cursor-pointer items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:ring-2 has-[:checked]:ring-blue-100">
+            <input type="radio" name="Condition" value="@condition" id="@id" class="h-4 w-4 border-slate-300 text-blue-700 focus:ring-blue-500" @(Model.Condition == condition ? "checked=\"checked\"" : null)/>
+            <span class="font-medium text-slate-700">@condition</span>
           </label>
         }
       </div>
@@ -43,9 +108,11 @@
     </div>
 
     <div>
-      <label for="productOrigin" class="mb-2 block text-sm font-medium text-stone-700">Product Origin</label>
-      <input type="text" id="productOrigin" name="ProductOrigin" value="@Model.ProductOrigin" placeholder="Japan"
-             class="field-input w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100"/>
+      <label for="productDescription" class="mb-2 block text-sm font-medium text-slate-700">About the work</label>
+      <textarea id="productDescription" name="ProductDescription" class="hidden">@Model.ProductDescription</textarea>
+      <div id="descriptionEditor" class="ckeditor-wrapper overflow-hidden rounded-xl border border-slate-200 bg-white"></div>
+      <p class="mt-1 text-xs text-slate-400">Description shown in the “About the work” tab on the detail page</p>
+      <p class="field-error mt-1 hidden text-xs text-red-600" data-for="productDescription"></p>
     </div>
   </div>
 </div>

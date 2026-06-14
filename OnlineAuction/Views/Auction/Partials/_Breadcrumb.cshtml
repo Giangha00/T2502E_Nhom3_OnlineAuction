@@ -1,15 +1,11 @@
 @model OnlineAuction.Models.ProductDetailViewModel
 
-<nav aria-label="Breadcrumb" class="mb-6">
-  <ol class="flex flex-wrap items-center gap-2 text-sm text-stone-500">
-    <li>
-      <a asp-controller="Home" asp-action="Index" class="transition hover:text-amber-700">Home</a>
-    </li>
-    <li aria-hidden="true" class="text-stone-300">/</li>
-    <li>
-      <a asp-controller="Auction" asp-action="Index" class="transition hover:text-amber-700">Auction</a>
-    </li>
-    <li aria-hidden="true" class="text-stone-300">/</li>
-    <li class="font-medium text-stone-800" aria-current="page">Product Detail</li>
+<nav aria-label="Breadcrumb" class="mb-8">
+  <ol class="flex flex-wrap items-center gap-2 text-sm text-slate-500">
+    <li><a asp-controller="Auction" asp-action="Index" class="transition hover:text-blue-700">Auction</a></li>
+    <li aria-hidden="true" class="text-slate-300">›</li>
+    <li><a asp-controller="Auction" asp-action="Index" asp-fragment="category-@Model.Category.Replace(" ", "-").ToLowerInvariant()" class="transition hover:text-blue-700">@Model.Category</a></li>
+    <li aria-hidden="true" class="text-slate-300">›</li>
+    <li class="font-medium text-slate-900" aria-current="page">@Model.Name</li>
   </ol>
 </nav>
