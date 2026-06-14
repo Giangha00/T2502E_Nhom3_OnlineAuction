@@ -1,0 +1,111 @@
+@model OnlineAuction.Models.AuctionCardViewModel
+@{
+    var item = Model.Item;
+    var variant = Model.Variant ?? "grid";
+    var isEndingSoon = item.Status == "Ending Soon";
+    var isWon = item.Status == "Won";
+    var filterAttrs = Model.EnableFiltering
+        ? $"data-id=\"{item.Id}\" data-name=\"{item.Name.ToLowerInvariant()}\" data-category=\"{item.Category}\" data-price=\"{item.CurrentPrice}\" data-time=\"{item.TimeRemaining}\" data-year=\"{item.Year}\" data-condition=\"{item.Condition}\" data-ending-soon=\"{isEndingSoon.ToString().ToLowerInvariant()}\""
+        : "";
+}
+
+@if (variant == "hot")
+{
+    <article class="rarecard-card rarecard-card--hot group @((Model.EnableFiltering ? "auction-card" : ""))" @Html.Raw(filterAttrs)>
+        <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id" class="block">
+            <div class="relative overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+                <div class="relative aspect-[3/4] bg-stone-100">
+                    <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"/>
+                    @if (item.IsHot)
+                    {
+                        <span class="absolute left-3 top-3 rounded-md bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">Hot</span>
+                    }
+                    @if (!string.IsNullOrEmpty(item.Grade))
+                    {
+                        <span class="absolute right-3 top-3 rounded-md bg-white/95 px-2 py-0.5 text-[10px] font-bold text-slate-800 shadow">@item.Grade</span>
+                    }
+                </div>
+                <div class="p-4">
+                    <h3 class="line-clamp-2 text-sm font-semibold text-stone-900">@item.Name</h3>
+                    <div class="mt-3 flex items-end justify-between gap-2">
+                        <div>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-stone-400">Current Bid</p>
+                            <p class="text-lg font-bold tabular-nums text-blue-700">$@item.CurrentPrice.ToString("N0")</p>
+                        </div>
+                        <p class="text-right text-xs font-semibold tabular-nums @(isEndingSoon ? "text-red-600" : "text-stone-600")">@item.TimeRemaining</p>
+                    </div>
+                    @if (Model.ShowBidLink)
+                    {
+                        <span class="mt-4 block w-full rounded-full bg-slate-900 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-white transition group-hover:bg-blue-800">
+                            Place Bid
+                        </span>
+                    }
+                </div>
+            </div>
+        </a>
+    </article>
+}
+else if (variant == "compact")
+{
+    <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id"
+       class="rarecard-ending-item group flex gap-3 rounded-xl border border-stone-200 bg-white p-3 transition hover:border-blue-200 hover:shadow-md">
+        <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" class="h-20 w-16 shrink-0 rounded-lg object-cover"/>
+        <div class="min-w-0 flex-1">
+            <p class="line-clamp-2 text-sm font-semibold text-stone-900 group-hover:text-blue-800">@item.Name</p>
+            <p class="mt-1 text-sm font-bold tabular-nums text-blue-700">$@item.CurrentPrice.ToString("N0")</p>
+            <p class="mt-0.5 text-xs font-medium text-red-600">@item.TimeRemaining</p>
+        </div>
+    </a>
+}
+else
+{
+    <article class="rarecard-card rarecard-card--grid group @(Model.EnableFiltering ? "auction-card" : "")" @Html.Raw(filterAttrs)>
+        <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id" class="block">
+            <div class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:shadow-lg">
+                <div class="relative aspect-[4/5] bg-stone-50">
+                    <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"/>
+                    @if (!string.IsNullOrEmpty(item.Grade))
+                    {
+                        <span class="absolute left-3 top-3 rounded-md bg-slate-900 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">@item.Grade</span>
+                    }
+                    <button type="button" aria-label="Add to watchlist" onclick="event.preventDefault();"
+                            class="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-stone-400 shadow transition hover:text-red-500">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-4">
+                    <h3 class="line-clamp-2 text-sm font-semibold leading-snug text-stone-900">@item.Name</h3>
+                    @if (!string.IsNullOrEmpty(item.Subtitle))
+                    {
+                        <p class="mt-1 line-clamp-1 text-xs text-stone-500">@item.Subtitle</p>
+                    }
+                    <div class="mt-4 flex items-end justify-between gap-2 border-t border-stone-100 pt-3">
+                        <div>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-stone-400">@(isWon ? "Winning Bid" : "Current Bid")</p>
+                            <p class="text-xl font-bold tabular-nums text-blue-700">$@item.CurrentPrice.ToString("N0")</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-stone-400">Time Left</p>
+                            <p class="text-xs font-semibold tabular-nums @(isEndingSoon ? "text-red-600" : "text-stone-700")">@item.TimeRemaining</p>
+                        </div>
+                    </div>
+                    @if (Model.ShowBidLink)
+                    {
+                        @if (isWon)
+                        {
+                            <span class="mt-4 block w-full rounded-full bg-emerald-600 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-white">Complete Payment</span>
+                        }
+                        else
+                        {
+                            <span class="mt-4 block w-full rounded-full bg-blue-700 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-white transition group-hover:bg-blue-800">
+                                Bid Now
+                            </span>
+                        }
+                    }
+                </div>
+            </div>
+        </a>
+    </article>
+}

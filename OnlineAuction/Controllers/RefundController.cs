@@ -71,9 +71,8 @@ public class RefundController : Controller
                 var platformFee = Math.Round(a!.CurrentPrice * 0.025m, 2);
                 var shipping = a.Category switch
                 {
-                    "Cars" => 850m,
-                    "Watches" => 35m,
-                    _ => 40m
+                    "Sports" => 22m,
+                    _ => 18m
                 };
 
                 return new RefundEligibleOrderViewModel

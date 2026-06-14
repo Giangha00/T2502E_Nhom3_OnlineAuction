@@ -1,292 +1,309 @@
 @model OnlineAuction.Models.AuctionViewModel
 @{
-    ViewData["Title"] = "Auctions";
+    ViewData["Title"] = "Live Auctions";
     var totalCount = Model.Auctions.Count;
+    var endingCount = Model.Auctions.Count(a => a.Status == "Ending Soon");
 }
 
-<partial name="_PageHero" model='new PageHeroViewModel {
-    Label = "Browse & Bid",
-    Title = "Live Auctions",
-    Description = "Browse cars, watches, cards, billiard sticks, and jewelry. Filter by category or search by product name.",
-    ImageUrl = PageBannerImages.Auction,
-    ImageAlt = "Live auction bidding room"
-}' />
+<div class="rarecard-page bg-white">
+  <section class="border-b border-stone-200 px-4 py-10 sm:px-8 lg:px-12 lg:py-12">
+    <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl">Live Auctions</h1>
+        <p class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base">
+          Discover authenticated, high-grade collectibles curated for the world's most discerning collectors.
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-xs font-semibold text-blue-800">
+          <span class="h-2 w-2 rounded-full bg-blue-600"></span>
+          Live now
+        </span>
+        <button type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-slate-700">Active Bids (2)</button>
+        <button type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-slate-700">Watchlist (0)</button>
+      </div>
+    </div>
+  </section>
 
-<section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
-    <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <form id="auctionSearchForm" class="relative w-full lg:max-w-md" role="search">
-            <input id="auctionSearch" type="search" placeholder="Search auctions..." aria-label="Search auctions"
-                   class="w-full rounded-full border border-stone-200 bg-white/80 py-2.5 pl-4 pr-12 text-sm text-stone-700 outline-none transition focus:border-amber-500 focus:ring-4 focus:ring-amber-100"/>
-            <button type="submit" aria-label="Search"
-                    class="absolute right-1 top-1/2 -translate-y-1/2 rounded-full p-2 text-stone-500 hover:text-amber-700">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="m21 21-4.3-4.3"/>
-                </svg>
-            </button>
-        </form>
-
-        <div class="flex items-center gap-3">
-            <label for="auctionSort" class="text-sm font-medium text-stone-600">Sort by</label>
-            <select id="auctionSort"
-                    class="rounded-xl border border-stone-200 bg-white/80 px-3 py-2 text-sm text-stone-700 outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-100">
-                <option value="default" selected>Default</option>
-                <option value="ending">Ending Soon</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="name">Name A–Z</option>
-            </select>
+  <div class="flex w-full flex-col lg:flex-row">
+    <aside class="rarecard-sidebar shrink-0 border-b border-stone-200 bg-slate-50 px-4 py-6 sm:px-8 lg:w-72 lg:border-b-0 lg:border-r lg:px-6 xl:w-80">
+      <form id="auctionFilterForm" class="space-y-6">
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">Category</h3>
+          <div class="mt-3 space-y-2">
+            @foreach (var category in Model.Categories)
+            {
+              <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+                <input type="checkbox" name="category" value="@category.Name" class="filter-category rounded border-stone-300 text-blue-700 focus:ring-blue-600"/>
+                @category.Name
+              </label>
+            }
+          </div>
         </div>
-    </div>
 
-    <div class="mb-8 flex flex-wrap gap-2" id="categoryFilters">
-        <button type="button" data-category="All"
-                class="category-btn rounded-full bg-amber-700 px-4 py-1.5 text-sm font-medium text-white">
-            All (@totalCount)
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">Condition</h3>
+          <div class="mt-3 space-y-2">
+            @foreach (var cond in new[] { "Graded", "New", "Used", "Not Specified" })
+            {
+              <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+                <input type="checkbox" name="condition" value="@cond" class="filter-condition rounded border-stone-300 text-blue-700 focus:ring-blue-600"/>
+                @cond
+              </label>
+            }
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">Year Manufactured</h3>
+          <div class="mt-3 space-y-2">
+            @foreach (var (label, min, max) in new (string, int, int)[] {
+              ("Pre-1990", 0, 1989),
+              ("1990–1999", 1990, 1999),
+              ("2000–2009", 2000, 2009),
+              ("2010–2019", 2010, 2019),
+              ("2020+", 2020, 9999)
+            })
+            {
+              <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+                <input type="checkbox" name="year" value="@min-@max" data-min="@min" data-max="@max" class="filter-year rounded border-stone-300 text-blue-700 focus:ring-blue-600"/>
+                @label
+              </label>
+            }
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">Price Range</h3>
+          <div class="mt-3 space-y-2">
+            @foreach (var (label, min, max) in new (string, int, int)[] {
+              ("Under $1,000", 0, 999),
+              ("$1,000 – $5,000", 1000, 5000),
+              ("$5,000 – $25,000", 5000, 25000),
+              ("$25,000 – $50,000", 25000, 50000),
+              ("$50,000+", 50000, 99999999)
+            })
+            {
+              <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+                <input type="checkbox" name="price" value="@min-@max" data-min="@min" data-max="@max" class="filter-price rounded border-stone-300 text-blue-700 focus:ring-blue-600"/>
+                @label
+              </label>
+            }
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between rounded-xl border border-stone-200 bg-white px-4 py-3">
+          <span class="text-sm font-medium text-slate-800">Ending Soon Only</span>
+          <label class="relative inline-flex cursor-pointer items-center">
+            <input type="checkbox" id="filterEndingSoon" class="peer sr-only"/>
+            <span class="h-6 w-11 rounded-full bg-stone-300 transition peer-checked:bg-blue-700 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition peer-checked:after:translate-x-full"></span>
+          </label>
+        </div>
+
+        <button type="button" id="clearFilters" class="w-full rounded-full border border-stone-300 py-2 text-xs font-semibold uppercase tracking-wider text-slate-600 hover:bg-white">
+          Clear filters
         </button>
-        @foreach (var category in Model.Categories)
-        {
-            <button type="button" data-category="@category.Name"
-                    class="category-btn rounded-full border border-stone-200 bg-white/80 px-4 py-1.5 text-sm font-medium text-stone-700 transition hover:border-amber-500 hover:text-amber-700">
-                @category.Name (@category.ItemCount)
-            </button>
-        }
-    </div>
+      </form>
+    </aside>
 
-    <p id="resultCount" class="mb-4 text-sm text-stone-500">Showing @totalCount auctions</p>
+    <section class="min-w-0 flex-1 px-4 py-6 sm:px-8 lg:px-10 lg:py-8">
+      <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <p id="resultCount" class="text-sm text-slate-500">Showing @totalCount items</p>
+        <div class="flex items-center gap-3">
+          <label for="auctionSearch" class="sr-only">Search</label>
+          <input id="auctionSearch" type="search" placeholder="Search rare items..."
+                 class="w-full rounded-full border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm outline-none focus:border-blue-600 sm:max-w-xs"/>
+          <select id="auctionSort" class="rounded-full border border-stone-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-600">
+            <option value="default">Featured</option>
+            <option value="ending">Ending soon</option>
+            <option value="price-asc">Price: low to high</option>
+            <option value="price-desc">Price: high to low</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </div>
+      </div>
 
-    <div id="auctionGrid" class="grid grid-cols-2 items-stretch gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+      <div id="auctionGrid" class="rarecard-auction-grid">
         @foreach (var item in Model.Auctions)
         {
-            <article class="auction-card group flex h-full flex-col overflow-hidden rounded-xl border border-stone-200 bg-white/80 shadow-sm transition hover:shadow-lg"
-                     data-id="@item.Id"
-                     data-name="@item.Name.ToLowerInvariant()"
-                     data-category="@item.Category"
-                     data-price="@item.CurrentPrice"
-                     data-time="@item.TimeRemaining">
-                <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id" class="block shrink-0">
-                    <div class="relative aspect-[4/5] overflow-hidden bg-stone-100">
-                        <img src="@item.ImageUrl" alt="@item.Name" loading="lazy"
-                             class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105"/>
-                        <span class="absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white @(item.Status == "Ending Soon" ? "bg-orange-600" : "bg-amber-700")">
-                            @item.Status
-                        </span>
-                    </div>
-                </a>
-                <div class="flex flex-1 flex-col p-4">
-                    <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400">@item.Category</p>
-                    <h2 class="mt-1 min-h-[2.5rem] line-clamp-2 text-sm font-semibold leading-snug text-stone-900">
-                        <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id"
-                           class="transition hover:text-amber-700">@item.Name</a>
-                    </h2>
-                    <div class="mt-2 flex gap-4">
-                        <div>
-                            <p class="text-[10px] uppercase tracking-wide text-stone-400">Starting</p>
-                            <p class="mt-0.5 text-xs font-semibold text-stone-700">$@item.StartingPrice.ToString("N0")</p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] uppercase tracking-wide text-stone-400">Current</p>
-                            <p class="mt-0.5 text-xs font-semibold text-amber-700">$@item.CurrentPrice.ToString("N0")</p>
-                        </div>
-                    </div>
-                    <div class="mt-2 flex min-h-[1.25rem] items-center gap-1 text-xs text-stone-500">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 6v6l4 2"/>
-                        </svg>
-                        <span class="line-clamp-1">@item.TimeRemaining</span>
-                    </div>
-                    <div class="mt-auto pt-3">
-                        @if (item.Status == "Won")
-                        {
-                            <a asp-controller="Payment" asp-action="Checkout" asp-route-auctionId="@item.Id"
-                               class="block w-full rounded-lg bg-green-700 py-2 text-center text-xs font-semibold text-white transition hover:bg-green-800">
-                                Complete Payment
-                            </a>
-                        }
-                        else
-                        {
-                            <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id"
-                               class="block w-full rounded-lg bg-amber-700 py-2 text-center text-xs font-semibold text-white transition hover:bg-amber-800">
-                                View Details
-                            </a>
-                        }
-                    </div>
-                </div>
-            </article>
+          <partial name="Partials/_TradingCardAuctionCard"
+                   model="@(new AuctionCardViewModel { Item = item, EnableFiltering = true, Variant = "grid" })"/>
         }
-    </div>
+      </div>
 
-    <div id="emptyState" class="hidden rounded-2xl border border-dashed border-stone-300 bg-white/60 py-16 text-center">
-        <p class="text-lg font-semibold text-stone-800">No auctions found</p>
-        <p class="mt-2 text-sm text-stone-500">Try a different search term or category.</p>
-    </div>
+      <div id="emptyState" class="hidden rounded-2xl border border-dashed border-stone-300 py-20 text-center">
+        <p class="text-xl font-bold text-slate-800">No cards found</p>
+        <p class="mt-2 text-sm text-slate-500">Try adjusting your filters or search.</p>
+      </div>
 
-    <div id="pagination" class="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
-        <button type="button" id="prevPage"
-                class="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white/80 px-5 py-2 text-sm font-medium text-stone-700 transition hover:border-amber-500 hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-40">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="m15 18-6-6 6-6"/>
-            </svg>
-            Previous
-        </button>
-        <p id="pageInfo" class="text-sm text-stone-600">Page 1 of 1</p>
-        <button type="button" id="nextPage"
-                class="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white/80 px-5 py-2 text-sm font-medium text-stone-700 transition hover:border-amber-500 hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-40">
-            Next
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="m9 18 6-6-6-6"/>
-            </svg>
-        </button>
-    </div>
-</section>
+      <div id="pagination" class="mt-12 flex flex-col items-center gap-4 border-t border-stone-200 pt-10 sm:flex-row sm:justify-center sm:gap-8">
+        <button type="button" id="prevPage" class="text-sm font-semibold text-slate-600 hover:text-slate-900 disabled:opacity-30" disabled>← Previous</button>
+        <div id="pageNumbers" class="flex flex-wrap items-center justify-center gap-1"></div>
+        <button type="button" id="nextPage" class="text-sm font-semibold text-slate-600 hover:text-slate-900 disabled:opacity-30">Next →</button>
+      </div>
+    </section>
+  </div>
+</div>
 
 @section Scripts {
-    <script>
-        (function () {
-            var PAGE_SIZE = 10;
-            var searchInput = document.getElementById('auctionSearch');
-            var searchForm = document.getElementById('auctionSearchForm');
-            var sortSelect = document.getElementById('auctionSort');
-            var grid = document.getElementById('auctionGrid');
-            var emptyState = document.getElementById('emptyState');
-            var pagination = document.getElementById('pagination');
-            var resultCount = document.getElementById('resultCount');
-            var pageInfo = document.getElementById('pageInfo');
-            var prevPageBtn = document.getElementById('prevPage');
-            var nextPageBtn = document.getElementById('nextPage');
-            var categoryButtons = document.querySelectorAll('.category-btn');
-            var cards = Array.from(document.querySelectorAll('.auction-card'));
+  <script>
+    (function () {
+      var PAGE_SIZE = 12;
+      var grid = document.getElementById('auctionGrid');
+      var emptyState = document.getElementById('emptyState');
+      var pagination = document.getElementById('pagination');
+      var resultCount = document.getElementById('resultCount');
+      var pageNumbers = document.getElementById('pageNumbers');
+      var prevPageBtn = document.getElementById('prevPage');
+      var nextPageBtn = document.getElementById('nextPage');
+      var searchInput = document.getElementById('auctionSearch');
+      var sortSelect = document.getElementById('auctionSort');
+      var endingSoonToggle = document.getElementById('filterEndingSoon');
+      var clearBtn = document.getElementById('clearFilters');
+      var cards = Array.from(document.querySelectorAll('.auction-card'));
 
-            var activeCategory = 'All';
-            var currentPage = 1;
-            var filteredCards = [];
+      var currentPage = 1;
+      var filteredCards = [];
 
-            function parseTimeRemaining(value) {
-                var dayMatch = value.match(/(\d+)\s*d/i);
-                if (dayMatch) return parseInt(dayMatch[1], 10) * 24;
-                var hourMatch = value.match(/(\d+)\s*h/i);
-                if (hourMatch) return parseInt(hourMatch[1], 10);
-                var minuteMatch = value.match(/(\d+)\s*m/i);
-                if (minuteMatch) return parseInt(minuteMatch[1], 10) / 60;
-                return 999;
-            }
+      function parseTimeRemaining(value) {
+        var dayMatch = value.match(/(\d+)\s*d/i);
+        if (dayMatch) return parseInt(dayMatch[1], 10) * 24;
+        var hourMatch = value.match(/(\d+)\s*h/i);
+        if (hourMatch) return parseInt(hourMatch[1], 10);
+        var minuteMatch = value.match(/(\d+)\s*m/i);
+        if (minuteMatch) return parseInt(minuteMatch[1], 10) / 60;
+        return 999;
+      }
 
-            function sortCards(list) {
-                var sort = sortSelect.value;
-                return list.sort(function (a, b) {
-                    if (sort === 'default') {
-                        return Number(a.dataset.id) - Number(b.dataset.id);
-                    }
-                    if (sort === 'price-asc') {
-                        return Number(a.dataset.price) - Number(b.dataset.price);
-                    }
-                    if (sort === 'price-desc') {
-                        return Number(b.dataset.price) - Number(a.dataset.price);
-                    }
-                    if (sort === 'name') {
-                        return a.dataset.name.localeCompare(b.dataset.name);
-                    }
-                    return parseTimeRemaining(a.dataset.time) - parseTimeRemaining(b.dataset.time);
-                });
-            }
+      function getCheckedValues(selector) {
+        return Array.from(document.querySelectorAll(selector + ':checked')).map(function (el) { return el; });
+      }
 
-            function updateCategoryStyles() {
-                categoryButtons.forEach(function (btn) {
-                    var isActive = btn.dataset.category === activeCategory;
-                    btn.className = isActive
-                        ? 'category-btn rounded-full bg-amber-700 px-4 py-1.5 text-sm font-medium text-white'
-                        : 'category-btn rounded-full border border-stone-200 bg-white/80 px-4 py-1.5 text-sm font-medium text-stone-700 transition hover:border-amber-500 hover:text-amber-700';
-                });
-            }
+      function matchesRange(value, checks, attrMin, attrMax) {
+        if (checks.length === 0) return true;
+        return checks.some(function (el) {
+          var min = Number(el.getAttribute(attrMin));
+          var max = Number(el.getAttribute(attrMax));
+          return value >= min && value <= max;
+        });
+      }
 
-            function renderPage() {
-                var totalPages = Math.max(1, Math.ceil(filteredCards.length / PAGE_SIZE));
-                if (currentPage > totalPages) currentPage = totalPages;
-                if (currentPage < 1) currentPage = 1;
+      function sortCards(list) {
+        var sort = sortSelect.value;
+        return list.sort(function (a, b) {
+          if (sort === 'default') return Number(a.dataset.id) - Number(b.dataset.id);
+          if (sort === 'price-asc') return Number(a.dataset.price) - Number(b.dataset.price);
+          if (sort === 'price-desc') return Number(b.dataset.price) - Number(a.dataset.price);
+          if (sort === 'name') return a.dataset.name.localeCompare(b.dataset.name);
+          return parseTimeRemaining(a.dataset.time) - parseTimeRemaining(b.dataset.time);
+        });
+      }
 
-                var start = (currentPage - 1) * PAGE_SIZE;
-                var end = start + PAGE_SIZE;
-                var pageCards = filteredCards.slice(start, end);
+      function renderPageNumbers(totalPages) {
+        pageNumbers.innerHTML = '';
+        var maxVisible = 5;
+        var start = Math.max(1, currentPage - 2);
+        var end = Math.min(totalPages, start + maxVisible - 1);
+        if (end - start < maxVisible - 1) start = Math.max(1, end - maxVisible + 1);
 
-                filteredCards.forEach(function (card) {
-                    grid.appendChild(card);
-                });
+        for (var i = start; i <= end; i++) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = String(i);
+          btn.className = 'mx-0.5 flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold ' +
+            (i === currentPage ? 'bg-blue-700 text-white' : 'text-slate-600 hover:bg-stone-100');
+          btn.addEventListener('click', (function (page) {
+            return function () { currentPage = page; renderPage(); grid.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+          })(i));
+          pageNumbers.appendChild(btn);
+        }
+      }
 
-                cards.forEach(function (card) {
-                    var inFilter = filteredCards.includes(card);
-                    var onPage = pageCards.includes(card);
-                    card.classList.toggle('hidden', !inFilter || !onPage);
-                });
+      function renderPage() {
+        var totalPages = Math.max(1, Math.ceil(filteredCards.length / PAGE_SIZE));
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
 
-                var total = filteredCards.length;
-                if (total === 0) {
-                    resultCount.textContent = 'Showing 0 auctions';
-                } else {
-                    var from = start + 1;
-                    var to = Math.min(end, total);
-                    resultCount.textContent = 'Showing ' + from + '–' + to + ' of ' + total + ' auction' + (total === 1 ? '' : 's');
-                }
+        var start = (currentPage - 1) * PAGE_SIZE;
+        var end = start + PAGE_SIZE;
+        var pageCards = filteredCards.slice(start, end);
 
-                pageInfo.textContent = 'Page ' + currentPage + ' of ' + totalPages;
-                prevPageBtn.disabled = currentPage <= 1;
-                nextPageBtn.disabled = currentPage >= totalPages;
+        filteredCards.forEach(function (card) { grid.appendChild(card); });
 
-                var hasResults = total > 0;
-                emptyState.classList.toggle('hidden', hasResults);
-                grid.classList.toggle('hidden', !hasResults);
-                pagination.classList.toggle('hidden', !hasResults || totalPages <= 1);
-            }
+        cards.forEach(function (card) {
+          var inFilter = filteredCards.includes(card);
+          var onPage = pageCards.includes(card);
+          card.classList.toggle('hidden', !inFilter || !onPage);
+        });
 
-            function applyFilters() {
-                var query = searchInput.value.trim().toLowerCase();
-                filteredCards = cards.filter(function (card) {
-                    var matchesCategory = activeCategory === 'All' || card.dataset.category === activeCategory;
-                    var matchesSearch = !query || card.dataset.name.includes(query);
-                    return matchesCategory && matchesSearch;
-                });
+        var total = filteredCards.length;
+        resultCount.textContent = total === 0 ? 'Showing 0 items' : 'Showing ' + (start + 1) + '–' + Math.min(end, total) + ' of ' + total + ' items';
 
-                sortCards(filteredCards);
-                currentPage = 1;
-                renderPage();
-            }
+        prevPageBtn.disabled = currentPage <= 1;
+        nextPageBtn.disabled = currentPage >= totalPages;
+        renderPageNumbers(totalPages);
 
-            categoryButtons.forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    activeCategory = btn.dataset.category;
-                    updateCategoryStyles();
-                    applyFilters();
-                });
-            });
+        var hasResults = total > 0;
+        emptyState.classList.toggle('hidden', hasResults);
+        grid.classList.toggle('hidden', !hasResults);
+        pagination.classList.toggle('hidden', !hasResults || totalPages <= 1);
+      }
 
-            prevPageBtn.addEventListener('click', function () {
-                if (currentPage > 1) {
-                    currentPage--;
-                    renderPage();
-                    grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
+      function applyFilters() {
+        var query = searchInput.value.trim().toLowerCase();
+        var categories = getCheckedValues('.filter-category').map(function (el) { return el.value; });
+        var conditions = getCheckedValues('.filter-condition').map(function (el) { return el.value; });
+        var yearChecks = getCheckedValues('.filter-year');
+        var priceChecks = getCheckedValues('.filter-price');
+        var endingOnly = endingSoonToggle.checked;
 
-            nextPageBtn.addEventListener('click', function () {
-                var totalPages = Math.ceil(filteredCards.length / PAGE_SIZE);
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    renderPage();
-                    grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
+        filteredCards = cards.filter(function (card) {
+          if (query && !card.dataset.name.includes(query)) return false;
+          if (categories.length && categories.indexOf(card.dataset.category) === -1) return false;
+          if (conditions.length && conditions.indexOf(card.dataset.condition) === -1) return false;
+          if (!matchesRange(Number(card.dataset.year), yearChecks, 'data-min', 'data-max')) return false;
+          if (!matchesRange(Number(card.dataset.price), priceChecks, 'data-min', 'data-max')) return false;
+          if (endingOnly && card.dataset.endingSoon !== 'true') return false;
+          return true;
+        });
 
-            searchInput.addEventListener('input', applyFilters);
-            searchForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-                applyFilters();
-            });
-            sortSelect.addEventListener('change', function () {
-                currentPage = 1;
-                applyFilters();
-            });
+        sortCards(filteredCards);
+        currentPage = 1;
+        renderPage();
+      }
 
-            applyFilters();
-        })();
-    </script>
+      document.querySelectorAll('.filter-category, .filter-condition, .filter-year, .filter-price').forEach(function (el) {
+        el.addEventListener('change', applyFilters);
+      });
+      endingSoonToggle.addEventListener('change', applyFilters);
+      searchInput.addEventListener('input', applyFilters);
+      sortSelect.addEventListener('change', applyFilters);
+
+      clearBtn.addEventListener('click', function () {
+        document.querySelectorAll('.filter-category, .filter-condition, .filter-year, .filter-price').forEach(function (el) { el.checked = false; });
+        endingSoonToggle.checked = false;
+        searchInput.value = '';
+        applyFilters();
+      });
+
+      prevPageBtn.addEventListener('click', function () {
+        if (currentPage > 1) { currentPage--; renderPage(); grid.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      });
+      nextPageBtn.addEventListener('click', function () {
+        var totalPages = Math.ceil(filteredCards.length / PAGE_SIZE);
+        if (currentPage < totalPages) { currentPage++; renderPage(); grid.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      });
+
+      if (window.location.hash) {
+        var hash = window.location.hash.replace('#category-', '').replace(/-/g, ' ');
+        document.querySelectorAll('.filter-category').forEach(function (el) {
+          if (el.value.toLowerCase() === hash || el.value.toLowerCase().replace('!', '') === hash.replace('!', '')) {
+            el.checked = true;
+          }
+        });
+      }
+
+      applyFilters();
+    })();
+  </script>
 }

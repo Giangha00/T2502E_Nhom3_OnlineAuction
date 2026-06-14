@@ -82,11 +82,8 @@ public class PaymentController : Controller
     private static decimal GetShippingFee(string category) =>
         category switch
         {
-            "Cars" => 850m,
-            "Jewelry" => 45m,
-            "Watches" => 35m,
-            "Cards" => 25m,
-            "Billiard Sticks" => 30m,
-            _ => 40m
+            "Pokémon" or "One Piece" or "Yu-Gi-Oh!" or "Magic: The Gathering" => 18m,
+            "Sports" => 22m,
+            _ => 20m
         };
 }

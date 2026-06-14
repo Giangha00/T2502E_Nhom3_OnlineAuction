@@ -3,10 +3,10 @@ namespace OnlineAuction.Data;
 public static class PageBannerImages
 {
     public const string Home =
-        "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1600&h=560&fit=crop&q=80";
+        "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=1920&h=900&fit=crop&q=80";
 
     public const string Auction =
-        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1600&h=560&fit=crop&q=80";
+        "https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=1920&h=600&fit=crop&q=80";
 
     public const string Sell =
         "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1600&h=560&fit=crop&q=80";
