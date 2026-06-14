@@ -1,0 +1,92 @@
+<div id="authModalOverlay" class="home-auth-overlay home-auth-overlay--hidden" aria-hidden="true">
+  <div class="home-auth-backdrop" id="authModalBackdrop"></div>
+  <div class="home-auth-modal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+    <div class="home-auth-modal__grid">
+      <aside class="home-auth-visual" aria-hidden="true">
+        <div class="home-auth-visual__slides">
+          <div class="home-auth-visual__slide auth-visual-slide is-active" data-slide="0"
+               style="background-image: url('https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=900&h=1100&fit=crop&q=80');"></div>
+          <div class="home-auth-visual__slide auth-visual-slide" data-slide="1"
+               style="background-image: url('https://images.unsplash.com/photo-1546519638-68e109498ffc?w=900&h=1100&fit=crop&q=80');"></div>
+          <div class="home-auth-visual__slide auth-visual-slide" data-slide="2"
+               style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=900&h=1100&fit=crop&q=80');"></div>
+        </div>
+        <div class="home-auth-visual__overlay"></div>
+        <div class="home-auth-visual__content">
+          <p class="home-auth-visual__eyebrow" id="authVisualEyebrow">RareCard Vault</p>
+          <h3 class="home-auth-visual__title" id="authVisualTitle">Welcome to RareCard</h3>
+          <p class="home-auth-visual__desc" id="authVisualDesc">Bid on authenticated graded cards from PSA, BGS &amp; CGC vaults.</p>
+        </div>
+        <div class="home-auth-visual__dots" role="tablist" aria-label="Gallery">
+          <button type="button" class="auth-visual-dot is-active" data-slide="0" aria-label="Slide 1"></button>
+          <button type="button" class="auth-visual-dot" data-slide="1" aria-label="Slide 2"></button>
+          <button type="button" class="auth-visual-dot" data-slide="2" aria-label="Slide 3"></button>
+        </div>
+      </aside>
+
+      <div class="home-auth-form-col">
+        <button type="button" id="authModalClose" class="home-auth-close" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+
+        <div class="home-auth-brand">
+          <span class="home-auth-logo">RareCard</span>
+        </div>
+
+        <h2 id="authModalTitle" class="home-auth-heading">Sign up or log in</h2>
+        <p class="home-auth-subheading">Join the world's premier trading card auction vault</p>
+
+        <div class="home-auth-tabs" role="tablist">
+          <button type="button" class="home-auth-tab home-auth-tab--active" data-tab="login" role="tab" aria-selected="true">Log in</button>
+          <button type="button" class="home-auth-tab" data-tab="signup" role="tab" aria-selected="false">Sign up</button>
+        </div>
+
+        <div id="authPanelLogin" class="home-auth-panel" role="tabpanel">
+          <form method="post" asp-controller="Auth" asp-action="Login" class="home-auth-form">
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalEmail">Email</label>
+              <input name="email" id="modalEmail" type="email" placeholder="Enter your email address" required class="home-auth-input"/>
+            </div>
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalPassword">Password</label>
+              <input name="password" id="modalPassword" type="password" placeholder="Enter your password" required class="home-auth-input"/>
+            </div>
+            <button type="submit" class="home-auth-submit">Continue</button>
+          </form>
+        </div>
+
+        <div id="authPanelSignup" class="home-auth-panel hidden" role="tabpanel" hidden>
+          <form method="post" asp-controller="Auth" asp-action="SignUp" class="home-auth-form">
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalFullName">Full name</label>
+              <input name="fullName" id="modalFullName" type="text" placeholder="Enter your full name" required class="home-auth-input"/>
+            </div>
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalSignupEmail">Email</label>
+              <input name="email" id="modalSignupEmail" type="email" placeholder="Enter your email address" required class="home-auth-input"/>
+            </div>
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalPhone">Phone</label>
+              <input name="phoneNumber" id="modalPhone" type="tel" placeholder="Enter your phone number" class="home-auth-input"/>
+            </div>
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalSignupPassword">Password</label>
+              <input name="password" id="modalSignupPassword" type="password" placeholder="Create a password" required class="home-auth-input"/>
+            </div>
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalConfirmPassword">Confirm password</label>
+              <input name="confirmPassword" id="modalConfirmPassword" type="password" placeholder="Confirm your password" required class="home-auth-input"/>
+            </div>
+            <button type="submit" class="home-auth-submit">Create Account</button>
+          </form>
+        </div>
+
+        <p class="home-auth-legal">
+          By continuing, you agree to RareCard's Terms of Service and Privacy Policy.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
