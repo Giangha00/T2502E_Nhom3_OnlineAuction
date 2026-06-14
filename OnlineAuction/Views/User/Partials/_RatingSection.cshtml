@@ -1,14 +1,14 @@
 @model OnlineAuction.Models.SellerRatingViewModel
 
-<section class="rating-section rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
-  <h2 class="text-xl font-bold text-stone-900">Seller Reviews</h2>
+<section class="rating-section rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+  <h2 class="text-xl font-bold text-slate-900">Seller Reviews</h2>
 
   <div class="rating-summary mt-6 flex flex-wrap items-center gap-4 rounded-2xl bg-stone-50 p-5">
     <div class="flex items-center gap-3">
       @await Html.PartialAsync("Partials/_StarRating", Model.AverageRating)
-      <span class="text-2xl font-bold text-stone-900">@Model.AverageRating.ToString("0.0") / 5</span>
+      <span class="text-2xl font-bold text-slate-900">@Model.AverageRating.ToString("0.0") / 5</span>
     </div>
-    <p class="text-sm font-medium text-stone-500">@Model.ReviewCount Reviews</p>
+    <p class="text-sm font-medium text-slate-500">@Model.ReviewCount Reviews</p>
   </div>
 
   @if (Model.Reviews.Count > 0)

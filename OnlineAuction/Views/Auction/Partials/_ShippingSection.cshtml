@@ -1,0 +1,25 @@
+@model OnlineAuction.Models.ProductDetailViewModel
+
+<div class="space-y-6">
+  <div class="rounded-xl border border-slate-200 bg-white p-6">
+    <p class="text-sm leading-relaxed text-slate-600">
+      All graded cards ship in climate-controlled, fully insured vault packaging. White glove handling from our authentication center to your door.
+    </p>
+    <ul class="mt-5 space-y-3 text-sm text-slate-700">
+      <li class="flex items-start gap-2">
+        <svg class="mt-0.5 h-4 w-4 shrink-0 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+        Full appraisal value insurance included
+      </li>
+      <li class="flex items-start gap-2">
+        <svg class="mt-0.5 h-4 w-4 shrink-0 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+        Climate controlled transportation
+      </li>
+      <li class="flex items-start gap-2">
+        <svg class="mt-0.5 h-4 w-4 shrink-0 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+        International priority shipping available
+      </li>
+    </ul>
+  </div>
+
+  @await Html.PartialAsync("Partials/_DocumentSection", Model)
+</div>

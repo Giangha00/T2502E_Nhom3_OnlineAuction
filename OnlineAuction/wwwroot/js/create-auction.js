@@ -23,14 +23,37 @@
     return '$' + Number(value).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   }
 
-  function formatDateTime(value) {
-    if (!value) return '—';
+  function formatEndDate(value) {
+    if (!value) return 'Ends —';
     var d = new Date(value);
-    if (isNaN(d.getTime())) return '—';
-    return d.toLocaleString('en-GB', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      hour: '2-digit', minute: '2-digit', hour12: false
+    if (isNaN(d.getTime())) return 'Ends —';
+    return 'Ends ' + d.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit'
     });
+  }
+
+  function formatCountdown(startValue, endValue) {
+    if (!endValue) return '—';
+    var end = new Date(endValue);
+    if (isNaN(end.getTime())) return '—';
+    var now = startValue ? new Date(startValue) : new Date();
+    if (isNaN(now.getTime())) now = new Date();
+    var diff = Math.max(0, end.getTime() - now.getTime());
+    var days = Math.floor(diff / 86400000);
+    var hours = Math.floor((diff % 86400000) / 3600000);
+    return 'in ' + days + 'd ' + hours + 'h';
+  }
+
+  function buildSpecs(data) {
+    var parts = [];
+    if (data.grade) parts.push(data.grade);
+    if (data.setName) parts.push(data.setName);
+    if (data.condition) parts.push(data.condition);
+    if (data.certificateNumber) parts.push('Cert. ' + data.certificateNumber);
+    return parts.length ? parts.join(' · ') : '—';
   }
 
   function showError(field, message) {
@@ -72,11 +95,21 @@
       category: $('category')?.value || '',
       productDescription: state.editor ? state.editor.getData() : ($('productDescription')?.value || ''),
       condition: getSelectedRadio('Condition'),
-      productOrigin: $('productOrigin')?.value.trim() || '',
+      grade: $('grade')?.value || '',
+      subtitle: $('subtitle')?.value.trim() || '',
+      year: $('year')?.value || '',
+      setName: $('setName')?.value.trim() || '',
+      language: $('language')?.value || '',
+      cardNumber: $('cardNumber')?.value.trim() || '',
+      certificateNumber: $('certificateNumber')?.value.trim() || '',
+      gradingCentering: $('gradingCentering')?.value.trim() || '',
+      gradingCorners: $('gradingCorners')?.value.trim() || '',
+      gradingEdges: $('gradingEdges')?.value.trim() || '',
+      gradingSurface: $('gradingSurface')?.value.trim() || '',
       startingPrice: $('startingPrice')?.value || '',
       bidStep: $('bidStep')?.value || '',
-      buyNowPrice: $('buyNowPrice')?.value || '',
-      auctionType: getSelectedRadio('AuctionType'),
+      estimatedValue: $('estimatedValue')?.value || '',
+      auctionEventName: $('auctionEventName')?.value.trim() || '',
       startDate: $('startDate')?.value || '',
       endDate: $('endDate')?.value || '',
       imageCount: state.images.length,
@@ -87,29 +120,21 @@
   function updatePreview() {
     var data = getFormData();
 
-    $('previewName').textContent = data.productName || 'Product Name';
-    $('previewCategory').textContent = data.category || '—';
-    $('previewCondition').textContent = 'Condition: ' + (data.condition || '—');
+    $('previewCategory').textContent = data.category || 'Category';
+    $('previewName').innerHTML = data.productName
+      ? '<em>' + data.productName + '</em>' + (data.year ? ', ' + data.year : '')
+      : '<em>Card Name</em>';
+    $('previewSpecs').textContent = buildSpecs(data);
+    $('previewEstimatedValue').textContent = formatMoney(data.estimatedValue);
     $('previewStartingPrice').textContent = formatMoney(data.startingPrice);
     $('previewBidStep').textContent = formatMoney(data.bidStep);
-
-    var buyNowRow = $('previewBuyNowRow');
-    if (data.buyNowPrice && Number(data.buyNowPrice) > 0) {
-      buyNowRow.classList.remove('hidden');
-      $('previewBuyNowPrice').textContent = formatMoney(data.buyNowPrice);
-    } else {
-      buyNowRow.classList.add('hidden');
-    }
-
-    $('previewStartDate').textContent = 'Start: ' + formatDateTime(data.startDate);
-    $('previewEndDate').textContent = 'End: ' + formatDateTime(data.endDate);
-
-    var badge = $('previewAuctionBadge');
-    if (data.auctionType === 'Featured') {
-      badge.classList.remove('hidden');
-    } else {
-      badge.classList.add('hidden');
-    }
+    $('previewCountdown').textContent = formatCountdown(data.startDate, data.endDate);
+    $('previewEndDate').textContent = formatEndDate(data.endDate);
+    $('previewEventName').textContent = data.auctionEventName || '—';
+    $('previewYear').textContent = data.year || '—';
+    $('previewSetName').textContent = data.setName || '—';
+    $('previewLanguage').textContent = data.language || '—';
+    $('previewCardNumber').textContent = data.cardNumber || '—';
 
     var previewImg = $('previewImage');
     var placeholder = $('previewImagePlaceholder');
@@ -127,11 +152,11 @@
     thumbs.innerHTML = '';
     if (state.images.length > 1) {
       thumbs.classList.remove('hidden');
-      state.images.slice(0, 4).forEach(function (img, i) {
+      state.images.slice(0, 5).forEach(function (img, i) {
         var el = document.createElement('img');
         el.src = img.url;
         el.alt = 'Thumbnail ' + (i + 1);
-        el.className = 'aspect-square rounded-lg object-cover';
+        el.className = 'h-14 w-14 rounded border border-slate-200 object-cover';
         thumbs.appendChild(el);
       });
     } else {
@@ -227,7 +252,7 @@
       li.className = 'flex items-center justify-between rounded-xl border border-stone-200 bg-stone-50 px-4 py-3';
       li.innerHTML =
         '<div class="flex min-w-0 items-center gap-3">' +
-        '<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-xs font-bold text-amber-800">' +
+        '<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-xs font-bold text-blue-800">' +
         doc.name.split('.').pop().toUpperCase().slice(0, 3) + '</span>' +
         '<div class="min-w-0"><p class="truncate text-sm font-medium text-stone-800">' + doc.name + '</p>' +
         '<p class="text-xs text-stone-400">' + (doc.size / 1024).toFixed(1) + ' KB</p></div></div>' +
@@ -280,14 +305,14 @@
     zone.addEventListener('click', function () { input.click(); });
     zone.addEventListener('dragover', function (e) {
       e.preventDefault();
-      zone.classList.add('border-amber-500', 'bg-amber-50/60');
+      zone.classList.add('border-blue-500', 'bg-blue-50/60');
     });
     zone.addEventListener('dragleave', function () {
-      zone.classList.remove('border-amber-500', 'bg-amber-50/60');
+      zone.classList.remove('border-blue-500', 'bg-blue-50/60');
     });
     zone.addEventListener('drop', function (e) {
       e.preventDefault();
-      zone.classList.remove('border-amber-500', 'bg-amber-50/60');
+      zone.classList.remove('border-blue-500', 'bg-blue-50/60');
       if (e.dataTransfer.files.length) onFiles(e.dataTransfer.files);
     });
     input.addEventListener('change', function () {
@@ -303,7 +328,7 @@
     var now = new Date();
 
     if (!data.productName) {
-      showError('productName', 'Product name is required');
+      showError('productName', 'Card name is required');
       markInvalid($('productName'));
       valid = false;
     }
@@ -311,6 +336,18 @@
     if (!data.category) {
       showError('category', 'Please select a category');
       markInvalid($('category'));
+      valid = false;
+    }
+
+    if (!data.setName) {
+      showError('setName', 'Set name is required');
+      markInvalid($('setName'));
+      valid = false;
+    }
+
+    if (!data.grade) {
+      showError('grade', 'Please select a grade');
+      markInvalid($('grade'));
       valid = false;
     }
 
@@ -328,13 +365,21 @@
       valid = false;
     }
 
-    if (data.buyNowPrice) {
-      var buyNow = Number(data.buyNowPrice);
-      if (!isNaN(buyNow) && buyNow <= price) {
-        showError('buyNowPrice', 'Buy now price must be greater than starting price');
-        markInvalid($('buyNowPrice'));
-        valid = false;
-      }
+    var estimated = Number(data.estimatedValue);
+    if (!data.estimatedValue || isNaN(estimated) || estimated <= 0) {
+      showError('estimatedValue', 'Estimated value must be greater than 0');
+      markInvalid($('estimatedValue'));
+      valid = false;
+    } else if (!isNaN(price) && estimated < price) {
+      showError('estimatedValue', 'Estimated value should be at least the starting price');
+      markInvalid($('estimatedValue'));
+      valid = false;
+    }
+
+    if (!data.auctionEventName) {
+      showError('auctionEventName', 'Auction event name is required');
+      markInvalid($('auctionEventName'));
+      valid = false;
     }
 
     if (!data.startDate) {
@@ -389,20 +434,27 @@
 
       if ($('productName') && data.productName) $('productName').value = data.productName;
       if ($('category') && data.category) $('category').value = data.category;
-      if ($('productOrigin') && data.productOrigin) $('productOrigin').value = data.productOrigin;
+      if ($('subtitle') && data.subtitle) $('subtitle').value = data.subtitle;
+      if ($('year') && data.year) $('year').value = data.year;
+      if ($('setName') && data.setName) $('setName').value = data.setName;
+      if ($('language') && data.language) $('language').value = data.language;
+      if ($('cardNumber') && data.cardNumber) $('cardNumber').value = data.cardNumber;
+      if ($('grade') && data.grade) $('grade').value = data.grade;
+      if ($('certificateNumber') && data.certificateNumber) $('certificateNumber').value = data.certificateNumber;
+      if ($('gradingCentering') && data.gradingCentering) $('gradingCentering').value = data.gradingCentering;
+      if ($('gradingCorners') && data.gradingCorners) $('gradingCorners').value = data.gradingCorners;
+      if ($('gradingEdges') && data.gradingEdges) $('gradingEdges').value = data.gradingEdges;
+      if ($('gradingSurface') && data.gradingSurface) $('gradingSurface').value = data.gradingSurface;
       if ($('startingPrice') && data.startingPrice) $('startingPrice').value = data.startingPrice;
       if ($('bidStep') && data.bidStep) $('bidStep').value = data.bidStep;
-      if ($('buyNowPrice') && data.buyNowPrice) $('buyNowPrice').value = data.buyNowPrice;
+      if ($('estimatedValue') && data.estimatedValue) $('estimatedValue').value = data.estimatedValue;
+      if ($('auctionEventName') && data.auctionEventName) $('auctionEventName').value = data.auctionEventName;
       if ($('startDate') && data.startDate) $('startDate').value = data.startDate;
       if ($('endDate') && data.endDate) $('endDate').value = data.endDate;
 
       if (data.condition) {
         var radio = form.querySelector('input[name="Condition"][value="' + data.condition + '"]');
         if (radio) radio.checked = true;
-      }
-      if (data.auctionType) {
-        var typeRadio = form.querySelector('input[name="AuctionType"][value="' + data.auctionType + '"]');
-        if (typeRadio) typeRadio.checked = true;
       }
 
       if (state.editor && data.productDescription) {
@@ -433,7 +485,7 @@
     if (!el || typeof ClassicEditor === 'undefined') return;
 
     ClassicEditor.create(el, {
-      placeholder: 'Describe your product...',
+      placeholder: 'Describe your card — highlights, provenance, condition notes...',
       toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'undo', 'redo']
     }).then(function (editor) {
       state.editor = editor;
@@ -448,8 +500,11 @@
   }
 
   function bindEvents() {
-    var fields = ['productName', 'category', 'productOrigin', 'startingPrice', 'bidStep', 'buyNowPrice',
-      'startDate', 'endDate'];
+    var fields = [
+      'productName', 'category', 'subtitle', 'year', 'setName', 'language', 'cardNumber',
+      'grade', 'certificateNumber', 'gradingCentering', 'gradingCorners', 'gradingEdges', 'gradingSurface',
+      'startingPrice', 'bidStep', 'estimatedValue', 'auctionEventName', 'startDate', 'endDate'
+    ];
 
     fields.forEach(function (id) {
       var el = $(id);
@@ -458,7 +513,7 @@
       el.addEventListener('change', updatePreview);
     });
 
-    form.querySelectorAll('input[name="Condition"], input[name="AuctionType"]').forEach(function (el) {
+    form.querySelectorAll('input[name="Condition"]').forEach(function (el) {
       el.addEventListener('change', updatePreview);
     });
 
