@@ -1,0 +1,162 @@
+@model OnlineAuction.Models.RefundPageViewModel
+@{
+    ViewData["Title"] = "Refund Request";
+}
+
+<partial name="_PageHero" model='new PageHeroViewModel {
+    Label = "Buyer Protection",
+    Title = "Refund Request",
+    Description = "Submit a refund request for a completed auction transaction. Our team will review your case and respond within 3–5 business days."
+}' />
+
+<!-- Steps -->
+<section class="border-b border-amber-200/40 bg-amber-50/30">
+    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <ol class="flex flex-wrap items-center justify-center gap-4 sm:gap-8">
+            <li class="flex items-center gap-2 text-sm font-medium text-amber-700">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-700 text-xs font-bold text-white">1</span>
+                Review Policy
+            </li>
+            <li class="hidden h-px w-8 bg-stone-300 sm:block"></li>
+            <li class="flex items-center gap-2 text-sm font-medium text-amber-700">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-700 text-xs font-bold text-white">2</span>
+                Submit Request
+            </li>
+            <li class="hidden h-px w-8 bg-stone-300 sm:block"></li>
+            <li class="flex items-center gap-2 text-sm font-medium text-stone-400">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-stone-300 text-xs font-bold">3</span>
+                Confirmation
+            </li>
+        </ol>
+    </div>
+</section>
+
+<section class="py-10 lg:py-14">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
+            <!-- Policy -->
+            <div class="space-y-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-stone-900">Refund Policy</h2>
+                    <p class="mt-2 text-sm text-stone-600">
+                        Auction House protects buyers when transactions do not meet listing standards or delivery commitments.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    @foreach (var item in Model.PolicyItems)
+                    {
+                        <article class="rounded-2xl border border-stone-200 bg-white/80 p-5 shadow-sm">
+                            <h3 class="font-semibold text-stone-900">@item.Title</h3>
+                            <p class="mt-2 text-sm leading-6 text-stone-600">@item.Description</p>
+                        </article>
+                    }
+                </div>
+
+                <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                    <p class="text-sm font-semibold text-amber-900">Before you submit</p>
+                    <ul class="mt-2 list-inside list-disc space-y-1 text-sm text-amber-800">
+                        <li>Contact the seller first through the platform messaging system.</li>
+                        <li>Keep photos, tracking numbers, and payment receipts as evidence.</li>
+                        <li>Refund requests must be filed within <strong>14 days</strong> of delivery or expected delivery date.</li>
+                    </ul>
+                </div>
+
+                <p class="text-sm text-stone-500">
+                    Read full terms in our
+                    <a asp-controller="Policy" asp-action="Index" asp-fragment="payment-policy" class="font-medium text-amber-700 visited:text-amber-700 hover:text-amber-800">Payment Policy</a>.
+                </p>
+            </div>
+
+            <!-- Form -->
+            <div class="rounded-2xl border border-stone-200 bg-white/80 p-6 shadow-sm sm:p-8">
+                <h2 class="text-xl font-semibold text-stone-900">Submit Refund Request</h2>
+                <p class="mt-1 text-sm text-stone-500">Fill in the details below. Required fields are marked with <span class="text-red-500">*</span>.</p>
+
+                <form id="refundForm" class="mt-6 space-y-5">
+                    <div>
+                        <label for="orderReference" class="block text-sm font-medium text-stone-900">Order Reference <span class="text-red-500">*</span></label>
+                        <select id="orderReference"
+                                class="mt-2 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
+                            <option value="">Select your order</option>
+                            @foreach (var order in Model.RecentOrders)
+                            {
+                                <option value="@order.OrderReference" data-amount="@order.AmountPaid" data-name="@order.AuctionName">
+                                    @order.OrderReference — @order.AuctionName ($@order.AmountPaid.ToString("N2"))
+                                </option>
+                            }
+                            <option value="other">Other order (enter manually below)</option>
+                        </select>
+                        <span id="orderReferenceError" class="mt-1 block text-sm text-red-600"></span>
+                    </div>
+
+                    <div id="manualOrderField" class="hidden">
+                        <label for="manualOrderRef" class="block text-sm font-medium text-stone-900">Manual Order Reference</label>
+                        <input type="text" id="manualOrderRef" placeholder="AH-YYYYMMDD-0000"
+                               class="mt-2 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500"/>
+                    </div>
+
+                    <div>
+                        <label for="fullName" class="block text-sm font-medium text-stone-900">Full Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="fullName" placeholder="John Doe"
+                               class="mt-2 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500"/>
+                        <span id="fullNameError" class="mt-1 block text-sm text-red-600"></span>
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-stone-900">Email Address <span class="text-red-500">*</span></label>
+                        <input type="email" id="email" placeholder="john@example.com"
+                               class="mt-2 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500"/>
+                        <span id="emailError" class="mt-1 block text-sm text-red-600"></span>
+                    </div>
+
+                    <div>
+                        <label for="refundReason" class="block text-sm font-medium text-stone-900">Reason for Refund <span class="text-red-500">*</span></label>
+                        <select id="refundReason"
+                                class="mt-2 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
+                            <option value="">Select a reason</option>
+                            @foreach (var reason in Model.RefundReasons)
+                            {
+                                <option value="@reason.Label">@reason.Label</option>
+                            }
+                        </select>
+                        <span id="refundReasonError" class="mt-1 block text-sm text-red-600"></span>
+                    </div>
+
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-stone-900">Description <span class="text-red-500">*</span></label>
+                        <textarea id="description" rows="4" placeholder="Describe the issue in detail. Include delivery date, condition of item, and any communication with the seller..."
+                                  class="w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500 resize-none"></textarea>
+                        <span id="descriptionError" class="mt-1 block text-sm text-red-600"></span>
+                    </div>
+
+                    <div>
+                        <label for="refundAmount" class="block text-sm font-medium text-stone-900">Refund Amount Requested (USD)</label>
+                        <input type="number" id="refundAmount" min="0" step="0.01" placeholder="0.00"
+                               class="mt-2 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500"/>
+                        <p class="mt-1 text-xs text-stone-400">Leave blank to request a full refund of the order total.</p>
+                    </div>
+
+                    <label class="flex cursor-pointer items-start gap-3">
+                        <input type="checkbox" id="agreePolicy"
+                               class="mt-1 h-4 w-4 rounded border-stone-300 text-amber-700 focus:ring-amber-500"/>
+                        <span class="text-sm text-stone-600">
+                            I confirm the information provided is accurate and I agree to the
+                            <a asp-controller="Policy" asp-action="Index" class="font-medium text-amber-700 visited:text-amber-700 hover:text-amber-800">refund policy</a>.
+                        </span>
+                    </label>
+                    <span id="agreePolicyError" class="block text-sm text-red-600"></span>
+
+                    <button type="submit"
+                            class="w-full rounded-xl bg-amber-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-amber-700/20 transition hover:bg-amber-800 focus:ring-2 focus:ring-amber-700 focus:ring-offset-2">
+                        Submit Refund Request
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/refund.js" asp-append-version="true"></script>
+}
