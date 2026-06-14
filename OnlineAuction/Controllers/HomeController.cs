@@ -16,11 +16,21 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
+        var allAuctions = MockAuctionData.GetAllAuctions();
+        var endingSoon = allAuctions.Where(a => a.Status == "Ending Soon").ToList();
+
         var model = new HomeViewModel
         {
+            HotAuctions = MockAuctionData.GetHotAuctions(),
             FeaturedAuctions = MockAuctionData.GetFeaturedAuctions(),
+            EndingSoonAuctions = endingSoon.Skip(1).Take(3).ToList(),
+            FeaturedEndingSoon = endingSoon.FirstOrDefault(),
             WonAuctions = MockAuctionData.GetWonAuctions(),
-            BestSellers = MockAuctionData.GetBestSellers()
+            BestSellers = MockAuctionData.GetBestSellers(),
+            Categories = MockAuctionData.GetCategories(),
+            VaultPosts = MockAuctionData.GetVaultPosts(),
+            TotalLiveAuctions = allAuctions.Count,
+            EndingSoonCount = endingSoon.Count
         };
 
         return View(model);
