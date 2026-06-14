@@ -7,19 +7,36 @@ public class ProductDetailViewModel
     public string ShortDescription { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
     public string Condition { get; set; } = string.Empty;
+    public string Grade { get; set; } = string.Empty;
+    public string Subtitle { get; set; } = string.Empty;
+    public int Year { get; set; }
+    public string SetName { get; set; } = string.Empty;
+    public string Language { get; set; } = "English";
+    public string CardNumber { get; set; } = string.Empty;
+    public string CertificateNumber { get; set; } = string.Empty;
     public string DescriptionHtml { get; set; } = string.Empty;
     public List<string> Images { get; set; } = [];
     public decimal StartingPrice { get; set; }
     public decimal CurrentPrice { get; set; }
     public decimal BidStep { get; set; }
+    public int BidCount { get; set; }
+    public int LotNumber { get; set; }
+    public int WatcherCount { get; set; }
+    public decimal EstimatedValue { get; set; }
+    public bool ReserveMet { get; set; } = true;
+    public string AuctionEventName { get; set; } = string.Empty;
+    public List<decimal> QuickBidAmounts { get; set; } = [];
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public int CountdownDays { get; set; }
     public int CountdownHours { get; set; }
     public int CountdownMinutes { get; set; }
+    public int CountdownSeconds { get; set; }
     public string AuctionStatus { get; set; } = "Active Auction";
     public string StatusBadgeClass { get; set; } = "bg-emerald-600";
     public SellerViewModel Seller { get; set; } = new();
+    public GradingScoreViewModel Grading { get; set; } = new();
+    public List<BidHistoryItemViewModel> BidHistory { get; set; } = [];
     public List<ProductDocumentViewModel> Documents { get; set; } = [];
     public List<AuctionItemViewModel> RelatedProducts { get; set; } = [];
 }

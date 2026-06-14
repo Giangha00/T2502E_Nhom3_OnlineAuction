@@ -28,9 +28,9 @@ public class SellController : Controller
             ModelState.AddModelError(nameof(model.EndDate), "End date must be greater than start date.");
         }
 
-        if (model.BuyNowPrice.HasValue && model.BuyNowPrice.Value <= model.StartingPrice)
+        if (model.EstimatedValue < model.StartingPrice)
         {
-            ModelState.AddModelError(nameof(model.BuyNowPrice), "Buy now price must be greater than starting price.");
+            ModelState.AddModelError(nameof(model.EstimatedValue), "Estimated value should be at least the starting price.");
         }
 
         if (!ModelState.IsValid)
@@ -60,8 +60,10 @@ public class SellController : Controller
             StartDate = DateTime.Now.AddHours(1),
             EndDate = DateTime.Now.AddDays(7),
             BidStep = 50,
-            AuctionType = "Normal",
-            Condition = "New"
+            Condition = "Graded",
+            Grade = "PSA 10",
+            Language = "English",
+            AuctionEventName = "RareCard Vault: Premium Trading Card Auction 2026"
         };
         PopulateOptions(model);
         return model;
@@ -71,5 +73,7 @@ public class SellController : Controller
     {
         model.Categories = MockAuctionData.GetCategoryNames().ToList();
         model.Conditions = CreateAuctionMockData.Conditions.ToList();
+        model.Grades = CreateAuctionMockData.Grades.ToList();
+        model.Languages = CreateAuctionMockData.Languages.ToList();
     }
 }
