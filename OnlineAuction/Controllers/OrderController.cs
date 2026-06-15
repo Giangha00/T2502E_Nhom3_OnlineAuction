@@ -1,11 +1,13 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
 
+[Authorize]
 public class OrderController : Controller
 {
-    private const string SessionLoggedInKey = "IsLoggedIn";
     private readonly IOrderService _orderService;
 
     public OrderController(IOrderService orderService)
@@ -15,23 +17,14 @@ public class OrderController : Controller
 
     public IActionResult Index()
     {
-        if (!IsLoggedIn())
-        {
-            return RedirectToAction("Index", "Home");
-        }
-
         var model = _orderService.BuildOrderPage(HttpContext.Session);
         return View(model);
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public IActionResult PlaceBid(int auctionId, decimal amount)
     {
-        if (!IsLoggedIn())
-        {
-            return Unauthorized(new { success = false, message = "Please sign in to place a bid." });
-        }
-
         var result = _orderService.PlaceBid(HttpContext.Session, auctionId, amount);
 
         if (!result.Success)
@@ -50,13 +43,9 @@ public class OrderController : Controller
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public IActionResult Complete(string paymentMethod)
     {
-        if (!IsLoggedIn())
-        {
-            return RedirectToAction("Index", "Home");
-        }
-
         var result = _orderService.CompleteOrder(HttpContext.Session, paymentMethod);
         if (!result.Success)
         {
@@ -72,6 +61,9 @@ public class OrderController : Controller
         });
     }
 
-    private bool IsLoggedIn() =>
-        string.Equals(HttpContext.Session.GetString(SessionLoggedInKey), "true", StringComparison.Ordinal);
+    protected int? GetCurrentUserId()
+    {
+        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return int.TryParse(value, out var userId) ? userId : null;
+    }
 }
