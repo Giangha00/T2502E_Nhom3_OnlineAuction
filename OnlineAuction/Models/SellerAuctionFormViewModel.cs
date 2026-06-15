@@ -37,6 +37,10 @@ public class SellerAuctionFormViewModel
     [Required]
     public string PrimaryImage { get; set; } = string.Empty;
 
+    // File anh moi khi seller muon thay cover trong man hinh Edit.
+    // Neu khong upload file moi thi Service giu nguyen PrimaryImage hien tai.
+    public IFormFile? PrimaryImageFile { get; set; }
+
     [Required]
     [Range(0.01, double.MaxValue)]
     public decimal StartingPrice { get; set; }

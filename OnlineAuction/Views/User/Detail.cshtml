@@ -17,6 +17,20 @@
 
     @await Html.PartialAsync("Partials/_UserProfileHeader", Model)
 
+    @if (TempData["SuccessMessage"] is string successMessage)
+    {
+      <div class="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-sm text-emerald-800">
+        @successMessage
+      </div>
+    }
+
+    @if (TempData["ErrorMessage"] is string errorMessage)
+    {
+      <div class="mt-6 rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm text-red-700">
+        @errorMessage
+      </div>
+    }
+
     <div class="user-detail-actions-mobile mt-6 lg:hidden">
       @await Html.PartialAsync("Partials/_ActionButtons", Model.Profile)
     </div>
@@ -24,7 +38,7 @@
     <div class="mt-8 grid gap-8 lg:grid-cols-[1fr_300px] xl:grid-cols-[1fr_320px]">
       <div class="space-y-8">
         @await Html.PartialAsync("Partials/_UserInformation", Model.BasicInfo)
-        @await Html.PartialAsync("Partials/_SellerAuctionList", Model.Auctions)
+        @await Html.PartialAsync("Partials/_SellerAuctionList", Model)
         @await Html.PartialAsync("Partials/_RatingSection", Model.Rating)
       </div>
 

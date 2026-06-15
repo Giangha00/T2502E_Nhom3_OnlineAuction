@@ -1,28 +1,25 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
 
+[Authorize]
 [Route("User/Auction")]
 public class UserAuctionController : Controller
 {
     private readonly ISellerAuctionService _sellerAuctionService;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly AuctionHouseDbContext _dbContext;
 
     public UserAuctionController(
         ISellerAuctionService sellerAuctionService,
-        UserManager<ApplicationUser> userManager,
-        AuctionHouseDbContext dbContext)
+        UserManager<ApplicationUser> userManager)
     {
         _sellerAuctionService = sellerAuctionService;
         _userManager = userManager;
-        _dbContext = dbContext;
     }
 
     [HttpGet("Edit/{auctionId:int}")]
@@ -43,6 +40,8 @@ public class UserAuctionController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int auctionId, SellerAuctionFormViewModel model)
     {
+        model.PrimaryImageFile ??= Request.Form.Files.FirstOrDefault();
+
         var sellerId = await GetCurrentSellerIdAsync();
         if (!sellerId.HasValue)
         {
@@ -86,17 +85,7 @@ public class UserAuctionController : Controller
 
     private async Task<int?> GetCurrentSellerIdAsync()
     {
-        var identityUserId = _userManager.GetUserId(User);
-        if (int.TryParse(identityUserId, out var currentUserId))
-        {
-            return currentUserId;
-        }
-
-        // Tam thoi fallback vi AuthController hien tai cua nhom chua sign-in bang Identity.
-        // Rule owner van nam trong Service: chi sua/xoa auction co Product.SellerId == sellerId.
-        return await _dbContext.Users
-            .OrderBy(user => user.Id)
-            .Select(user => (int?)user.Id)
-            .FirstOrDefaultAsync();
+        var user = await _userManager.GetUserAsync(User);
+        return user?.Id;
     }
 }
