@@ -76,9 +76,18 @@
       body.append('auctionId', auctionId);
       body.append('amount', amount);
 
+      var csrfMeta = document.querySelector('meta[name="request-verification-token"]');
+      var csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+      if (csrfToken) {
+        body.append('__RequestVerificationToken', csrfToken);
+      }
+
       fetch('/Order/PlaceBid', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
         body: body.toString()
       })
         .then(function (response) {
