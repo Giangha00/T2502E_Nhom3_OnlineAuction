@@ -1,3 +1,8 @@
+@{
+    var modalReturnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+    var authError = TempData["AuthError"] as string;
+}
+
 <div id="authModalOverlay" class="home-auth-overlay home-auth-overlay--hidden" aria-hidden="true">
   <div class="home-auth-backdrop" id="authModalBackdrop"></div>
   <div class="home-auth-modal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
@@ -38,6 +43,11 @@
         <h2 id="authModalTitle" class="home-auth-heading">Sign up or log in</h2>
         <p class="home-auth-subheading">Join the world's premier trading card auction vault</p>
 
+        @if (!string.IsNullOrWhiteSpace(authError))
+        {
+          <p id="authModalError" class="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">@authError</p>
+        }
+
         <div class="home-auth-tabs" role="tablist">
           <button type="button" class="home-auth-tab home-auth-tab--active" data-tab="login" role="tab" aria-selected="true">Log in</button>
           <button type="button" class="home-auth-tab" data-tab="signup" role="tab" aria-selected="false">Sign up</button>
@@ -45,6 +55,9 @@
 
         <div id="authPanelLogin" class="home-auth-panel" role="tabpanel">
           <form method="post" asp-controller="Auth" asp-action="Login" class="home-auth-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@modalReturnUrl" />
+            <input type="hidden" name="fromModal" value="true" />
             <div class="home-auth-field">
               <label class="home-auth-field__label" for="modalEmail">Email</label>
               <input name="email" id="modalEmail" type="email" placeholder="Enter your email address" required class="home-auth-input"/>
@@ -53,12 +66,19 @@
               <label class="home-auth-field__label" for="modalPassword">Password</label>
               <input name="password" id="modalPassword" type="password" placeholder="Enter your password" required class="home-auth-input"/>
             </div>
+            <label class="mb-4 flex items-center gap-2 text-sm text-slate-600">
+              <input name="rememberMe" type="checkbox" value="true" class="rounded border-slate-300 text-blue-700 focus:ring-blue-500" />
+              Remember me
+            </label>
             <button type="submit" class="home-auth-submit">Continue</button>
           </form>
         </div>
 
         <div id="authPanelSignup" class="home-auth-panel hidden" role="tabpanel" hidden>
           <form method="post" asp-controller="Auth" asp-action="SignUp" class="home-auth-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@modalReturnUrl" />
+            <input type="hidden" name="fromModal" value="true" />
             <div class="home-auth-field">
               <label class="home-auth-field__label" for="modalFullName">Full name</label>
               <input name="fullName" id="modalFullName" type="text" placeholder="Enter your full name" required class="home-auth-input"/>
@@ -69,7 +89,7 @@
             </div>
             <div class="home-auth-field">
               <label class="home-auth-field__label" for="modalPhone">Phone</label>
-              <input name="phoneNumber" id="modalPhone" type="tel" placeholder="Enter your phone number" class="home-auth-input"/>
+              <input name="phoneNumber" id="modalPhone" type="tel" placeholder="Enter your phone number" required class="home-auth-input"/>
             </div>
             <div class="home-auth-field">
               <label class="home-auth-field__label" for="modalSignupPassword">Password</label>
