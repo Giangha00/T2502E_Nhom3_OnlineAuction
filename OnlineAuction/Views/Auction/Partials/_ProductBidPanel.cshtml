@@ -7,7 +7,7 @@
     if (!string.IsNullOrEmpty(Model.SetName)) specs.Add(Model.SetName);
     if (!string.IsNullOrEmpty(Model.Condition)) specs.Add(Model.Condition);
     if (!string.IsNullOrEmpty(Model.CertificateNumber)) specs.Add($"Cert. {Model.CertificateNumber}");
-    var isLoggedIn = string.Equals(Context.Session.GetString("IsLoggedIn"), "true", StringComparison.Ordinal);
+    var isLoggedIn = User.Identity?.IsAuthenticated == true;
 }
 
 <div class="product-bid-panel" data-is-logged-in="@(isLoggedIn ? "true" : "false")" data-auction-id="@Model.Id">
