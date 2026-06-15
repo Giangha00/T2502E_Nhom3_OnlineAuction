@@ -97,4 +97,20 @@
     <data name="AllRightsReserved" xml:space="preserve">
   <value>All rights reserved.</value>
 </data>
+
+    <data name="Sell" xml:space="preserve">
+  <value>Sell</value>
+</data>
+
+    <data name="Notifications" xml:space="preserve">
+  <value>Notifications</value>
+</data>
+
+    <data name="ReadAll" xml:space="preserve">
+  <value>Read all</value>
+</data>
+
+    <data name="NoNotifications" xml:space="preserve">
+  <value>No notifications yet</value>
+</data>
 </root>

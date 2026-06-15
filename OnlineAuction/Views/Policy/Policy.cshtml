@@ -1,186 +1,235 @@
 @{
     ViewData["Title"] = "Policy & Term of Use";
+
+    var sections = new[]
+    {
+        new { Id = "terms-of-service", Label = "Terms of Service", Icon = "document" },
+        new { Id = "privacy-policy", Label = "Privacy Policy", Icon = "shield" },
+        new { Id = "shipping-policy", Label = "Shipping Policy", Icon = "truck" },
+        new { Id = "bidding-rules", Label = "Bidding Rules", Icon = "gavel" }
+    };
 }
 
-<partial name="_PageHero" model='new PageHeroViewModel {
-    Label = "Auction House Governance",
-    Title = "Policy & Term of Use",
-    Description = "Understand our rules and guidelines for using Auction House, including privacy, auction operations, payments, and responsibilities of every member.",
-    ImageUrl = PageBannerImages.Policy,
-    ImageAlt = "Auction House policies and terms"
-}' />
+<div class="policy-page bg-slate-50">
+  @* Hero *@
+  <section class="site-shell px-4 pt-10 pb-8 text-center sm:px-6 sm:pt-12">
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Legal Information</h1>
+    <p class="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
+      Transparency and security are at the core of RareCard. Please review our terms and policies carefully.
+    </p>
+    <p class="mt-4 inline-flex items-center gap-2 text-xs text-slate-400">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+      </svg>
+      Last Updated: October 24, 2024
+    </p>
+  </section>
 
-<div class="policy-page text-stone-800">
+  @* Main *@
+  <section class="site-shell px-4 pb-16 sm:px-6 lg:pb-20">
+    <div class="grid gap-8 lg:grid-cols-[240px_1fr]">
+      @* Sidebar *@
+      <aside class="lg:sticky lg:top-28 lg:self-start">
+        <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">Sections</p>
+        <nav class="space-y-1" aria-label="Policy sections">
+          @foreach (var nav in sections)
+          {
+            var isFirst = nav.Id == "terms-of-service";
+            <a href="#@nav.Id" data-policy-nav="@nav.Id"
+               class="policy-nav-link flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition @(isFirst ? "bg-blue-700 text-white" : "text-slate-700 hover:bg-white")">
+              @if (nav.Icon == "document")
+              {
+                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
+                </svg>
+              }
+              else if (nav.Icon == "shield")
+              {
+                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/>
+                </svg>
+              }
+              else if (nav.Icon == "truck")
+              {
+                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177V18.75m0-11.177c0-.977.278-1.945.806-2.769M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18.75"/>
+                </svg>
+              }
+              else
+              {
+                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
+                </svg>
+              }
+              @nav.Label
+            </a>
+          }
+        </nav>
 
-    <section class="px-4 py-10 md:px-5 md:py-14">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 md:gap-8">
-            <aside class="sticky-below-header">
-                <div class="rounded-2xl border border-stone-200 bg-white/80 p-4 md:p-5 shadow-sm">
-                    <h2 class="text-2xl font-semibold mb-4">Policy Menu</h2>
-
-                    <div class="lg:hidden -mx-1 mb-2 overflow-x-auto">
-                        <nav class="flex gap-2 px-1 min-w-max" aria-label="Policy section navigation mobile">
-                            <a href="#terms-of-use" class="px-3 py-2 text-sm rounded-full bg-amber-50 text-amber-800 font-semibold whitespace-nowrap">Terms of Use</a>
-                            <a href="#privacy-policy" class="px-3 py-2 text-sm rounded-full bg-amber-50 text-amber-800 font-semibold whitespace-nowrap">Privacy Policy</a>
-                            <a href="#auction-rules" class="px-3 py-2 text-sm rounded-full bg-amber-50 text-amber-800 font-semibold whitespace-nowrap">Auction Rules</a>
-                            <a href="#payment-policy" class="px-3 py-2 text-sm rounded-full bg-amber-50 text-amber-800 font-semibold whitespace-nowrap">Payment Policy</a>
-                            <a href="#user-responsibilities" class="px-3 py-2 text-sm rounded-full bg-amber-50 text-amber-800 font-semibold whitespace-nowrap">User Responsibilities</a>
-                        </nav>
-                    </div>
-
-                    <nav class="hidden lg:block" aria-label="Policy section navigation desktop">
-                        <a href="#terms-of-use" class="block px-4 py-3 rounded-xl hover:bg-amber-50 transition text-stone-700 font-medium">Terms of Use</a>
-                        <a href="#privacy-policy" class="block px-4 py-3 rounded-xl hover:bg-amber-50 transition text-stone-700 font-medium">Privacy Policy</a>
-                        <a href="#auction-rules" class="block px-4 py-3 rounded-xl hover:bg-amber-50 transition text-stone-700 font-medium">Auction Rules</a>
-                        <a href="#payment-policy" class="block px-4 py-3 rounded-xl hover:bg-amber-50 transition text-stone-700 font-medium">Payment Policy</a>
-                        <a href="#user-responsibilities" class="block px-4 py-3 rounded-xl hover:bg-amber-50 transition text-stone-700 font-medium">User Responsibilities</a>
-                    </nav>
-                    <p class="mt-4 mb-0 text-sm text-stone-500 leading-6">
-                        Tip: Choose any section to jump directly to detailed policy content.
-                    </p>
-                </div>
-            </aside>
-
-            <div class="space-y-6 md:space-y-8">
-                <section id="terms-of-use" class="rounded-2xl border border-stone-200 bg-white p-5 md:p-7 shadow-sm scroll-mt-24">
-                    <p class="mb-2 text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-amber-700">Section 01</p>
-                    <h2 class="text-3xl md:text-4xl font-semibold mb-4">Terms of Use</h2>
-                    <p class="text-stone-600 leading-7 mb-5">
-                        These terms define how users should access and use Auction House services in a lawful,
-                        fair, and transparent way.
-                    </p>
-
-                    <div class="space-y-5">
-                        <article class="rounded-xl bg-white/80 border border-stone-200 p-4 md:p-5">
-                            <h3 class="text-2xl font-semibold mb-2">Account Usage</h3>
-                            <ul class="list-disc pl-5 space-y-2 text-stone-600 leading-7">
-                                <li>Users must provide accurate and up-to-date account information.</li>
-                                <li>Account credentials must not be shared with others.</li>
-                            </ul>
-                        </article>
-
-                        <article class="rounded-xl bg-white/80 border border-stone-200 p-4 md:p-5">
-                            <h3 class="text-2xl font-semibold mb-2">Auction Participation</h3>
-                            <ul class="list-disc pl-5 space-y-2 text-stone-600 leading-7">
-                                <li>Users must comply with all platform auction rules.</li>
-                                <li>Creating fake bids is strictly prohibited.</li>
-                                <li>Any form of price manipulation is forbidden.</li>
-                            </ul>
-                        </article>
-
-                        <article class="rounded-xl bg-white/80 border border-stone-200 p-4 md:p-5">
-                            <h3 class="text-2xl font-semibold mb-2">Prohibited Activities</h3>
-                            <ul class="list-disc pl-5 space-y-2 text-stone-600 leading-7">
-                                <li>Fraudulent behavior in listings, bids, or transactions.</li>
-                                <li>Spam or abusive communication within the platform.</li>
-                                <li>Submitting false or misleading information.</li>
-                            </ul>
-                        </article>
-                    </div>
-                </section>
-
-                <section id="privacy-policy" class="rounded-2xl border border-stone-200 bg-white p-5 md:p-7 shadow-sm scroll-mt-24">
-                    <p class="mb-2 text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-amber-700">Section 02</p>
-                    <h2 class="text-3xl md:text-4xl font-semibold mb-4">Privacy Policy</h2>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <article class="rounded-xl bg-amber-50/50 border border-stone-200 p-4 md:p-5">
-                            <h3 class="text-2xl font-semibold mb-2">Information Collection</h3>
-                            <ul class="list-disc pl-5 space-y-2 text-stone-600 leading-7">
-                                <li>Account profile and contact details.</li>
-                                <li>Auction activity and transaction records.</li>
-                            </ul>
-                        </article>
-
-                        <article class="rounded-xl bg-amber-50/50 border border-stone-200 p-4 md:p-5">
-                            <h3 class="text-2xl font-semibold mb-2">Data Usage</h3>
-                            <ul class="list-disc pl-5 space-y-2 text-stone-600 leading-7">
-                                <li>Operate auction workflows and payment coordination.</li>
-                                <li>Improve service quality, security, and user support.</li>
-                            </ul>
-                        </article>
-
-                        <article class="rounded-xl bg-amber-50/50 border border-stone-200 p-4 md:p-5">
-                            <h3 class="text-2xl font-semibold mb-2">Data Protection</h3>
-                            <ul class="list-disc pl-5 space-y-2 text-stone-600 leading-7">
-                                <li>User data is protected with controlled access standards.</li>
-                                <li>Only authorized personnel can access sensitive information.</li>
-                            </ul>
-                        </article>
-                    </div>
-                </section>
-
-                <section id="auction-rules" class="rounded-2xl border border-stone-200 bg-white p-5 md:p-7 shadow-sm scroll-mt-24">
-                    <p class="mb-2 text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-amber-700">Section 03</p>
-                    <h2 class="text-3xl md:text-4xl font-semibold mb-4">Auction Rules</h2>
-
-                    <div class="space-y-4">
-                        <article class="rounded-xl bg-white/80 border border-stone-200 p-4 md:p-5">
-                            <h3 class="text-2xl font-semibold mb-2">Seller Rules</h3>
-                            <ul class="list-disc pl-5 space-y-2 text-stone-600 leading-7">
-                                <li>Provide complete and accurate product information.</li>
-                                <li>Do not list restricted or policy-violating items.</li>
-                            </ul>
-                        </article>
-
-                        <article class="rounded-xl bg-white/80 border border-stone-200 p-4 md:p-5">
-                            <h3 class="text-2xl font-semibold mb-2">Bidder Rules</h3>
-                            <ul class="list-disc pl-5 space-y-2 text-stone-600 leading-7">
-                                <li>Place bids responsibly and with payment intent.</li>
-                                <li>Do not cancel bids in violation of auction rules.</li>
-                            </ul>
-                        </article>
-
-                        <article class="rounded-xl bg-white/80 border border-stone-200 p-4 md:p-5">
-                            <h3 class="text-2xl font-semibold mb-2">Auction Result</h3>
-                            <p class="text-stone-600 leading-7 mb-0">
-                                The winning bidder is responsible for completing the transaction within the specified timeframe.
-                            </p>
-                        </article>
-                    </div>
-                </section>
-
-                <section id="payment-policy" class="rounded-2xl border border-stone-200 bg-white p-5 md:p-7 shadow-sm scroll-mt-24">
-                    <p class="mb-2 text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-amber-700">Section 04</p>
-                    <h2 class="text-3xl md:text-4xl font-semibold mb-4">Payment Policy</h2>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <article class="rounded-xl bg-amber-50/50 border border-stone-200 p-4 md:p-5">
-                            <h3 class="text-2xl font-semibold mb-2">Payment Methods</h3>
-                            <p class="text-stone-600 leading-7 mb-0">Bank transfer, card payments, and supported e-wallet gateways.</p>
-                        </article>
-
-                        <article class="rounded-xl bg-amber-50/50 border border-stone-200 p-4 md:p-5">
-                            <h3 class="text-2xl font-semibold mb-2">Payment Timeline</h3>
-                            <p class="text-stone-600 leading-7 mb-0">Winning users must complete payment within the required deadline.</p>
-                        </article>
-
-                        <article class="rounded-xl bg-amber-50/50 border border-stone-200 p-4 md:p-5">
-                            <h3 class="text-2xl font-semibold mb-2">Failed Transactions</h3>
-                            <p class="text-stone-600 leading-7 mb-0">The system records failed attempts and may request re-verification or retry.</p>
-                        </article>
-
-                        <article class="rounded-xl bg-amber-50/50 border border-stone-200 p-4 md:p-5">
-                            <h3 class="text-2xl font-semibold mb-2">Refund Policy</h3>
-                            <p class="text-stone-600 leading-7 mb-3">Refund eligibility is reviewed based on transaction evidence and platform policy.</p>
-                            <a asp-controller="Refund" asp-action="Index" class="inline-flex text-sm font-semibold text-amber-700 hover:text-amber-800 transition">Submit a refund request →</a>
-                        </article>
-                    </div>
-                </section>
-
-                <section id="user-responsibilities" class="rounded-2xl border border-stone-200 bg-white p-5 md:p-7 shadow-sm scroll-mt-24">
-                    <p class="mb-2 text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-amber-700">Section 05</p>
-                    <h2 class="text-3xl md:text-4xl font-semibold mb-4">User Responsibilities</h2>
-
-                    <div class="rounded-xl bg-white/80 border border-stone-200 p-4 md:p-6">
-                        <ul class="list-disc pl-5 space-y-3 text-stone-600 leading-7 mb-0">
-                            <li>Protect your account credentials and login activity.</li>
-                            <li>Provide truthful and complete information at all times.</li>
-                            <li>Comply with all Auction House rules during listing, bidding, and payment.</li>
-                        </ul>
-                    </div>
-                </section>
-            </div>
+        <div class="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-sm font-bold text-blue-700">Need help?</p>
+          <p class="mt-1 text-xs leading-relaxed text-slate-500">Have questions about our legal documentation?</p>
+          <a asp-controller="Contact" asp-action="Index"
+             class="mt-4 inline-flex w-full items-center justify-center rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50">
+            Contact Support
+          </a>
         </div>
-    </section>
+      </aside>
+
+      @* Content card *@
+      <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div class="space-y-10 p-6 sm:p-8 lg:p-10">
+
+          @* Terms of Service *@
+          <div id="terms-of-service" class="policy-content-section scroll-mt-28" data-policy-section="terms-of-service">
+            <div class="mb-6 flex items-center gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-slate-900">Terms of Service</h2>
+            </div>
+
+            <div class="space-y-6 text-sm leading-relaxed text-slate-600">
+              <div>
+                <h3 class="mb-2 font-semibold text-slate-900">1. User Agreement</h3>
+                <p>By accessing RareCard, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site.</p>
+                <p class="mt-3">The materials on RareCard's website are provided on an 'as is' basis. RareCard makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
+                <blockquote class="mt-4 rounded-lg bg-slate-50 px-5 py-4 text-sm italic text-slate-600">
+                  "Users must be at least 18 years of age and possess the legal capacity to enter into binding contracts to participate in auctions or use our grading services."
+                </blockquote>
+              </div>
+              <div>
+                <h3 class="mb-2 font-semibold text-slate-900">2. Intellectual Property</h3>
+                <p>All content included on this site, such as text, graphics, logos, button icons, images, audio clips, digital downloads, data compilations, and software, is the property of RareCard or its content suppliers and protected by international copyright laws.</p>
+              </div>
+              <div>
+                <h3 class="mb-2 font-semibold text-slate-900">3. Limitation of Liability</h3>
+                <p>In no event shall RareCard or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on RareCard's website.</p>
+              </div>
+            </div>
+          </div>
+
+          <hr class="border-slate-100"/>
+
+          @* Privacy Commitment *@
+          <div id="privacy-policy" class="policy-content-section scroll-mt-28" data-policy-section="privacy-policy">
+            <div class="mb-6 flex items-center gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/>
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-slate-900">Privacy Commitment</h2>
+            </div>
+
+            <p class="mb-6 text-sm leading-relaxed text-slate-600">
+              Your privacy is important to us. It is RareCard's policy to respect your privacy regarding any information we may collect from you across our website and auction platform.
+            </p>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="rounded-lg bg-slate-50 p-5">
+                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-blue-700 shadow-sm">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/>
+                  </svg>
+                </div>
+                <h3 class="mt-3 text-sm font-semibold text-slate-900">Data Encryption</h3>
+                <p class="mt-1.5 text-xs leading-relaxed text-slate-500">All personal data is encrypted using AES-256 standards both in transit and at rest within our secure vaults.</p>
+              </div>
+              <div class="rounded-lg bg-slate-50 p-5">
+                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-blue-700 shadow-sm">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636"/>
+                  </svg>
+                </div>
+                <h3 class="mt-3 text-sm font-semibold text-slate-900">Third-Party Policy</h3>
+                <p class="mt-1.5 text-xs leading-relaxed text-slate-500">We never sell your personal information to third parties. Data is only shared with essential service providers like payment processors.</p>
+              </div>
+            </div>
+          </div>
+
+          <hr class="border-slate-100"/>
+
+          @* Shipping Policy *@
+          <div id="shipping-policy" class="policy-content-section scroll-mt-28" data-policy-section="shipping-policy">
+            <div class="mb-6 flex items-center gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177V18.75m0-11.177c0-.977.278-1.945.806-2.769M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18.75"/>
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-slate-900">Shipping Policy</h2>
+            </div>
+
+            <div class="space-y-5 text-sm leading-relaxed text-slate-600">
+              <div>
+                <h3 class="mb-2 font-semibold text-slate-900">Domestic Shipping</h3>
+                <p>All domestic shipments are fully insured and require signature confirmation. Items valued over $500 ship via overnight courier with tracking and tamper-evident packaging.</p>
+              </div>
+              <div>
+                <h3 class="mb-2 font-semibold text-slate-900">International Shipping</h3>
+                <p>International orders are subject to customs duties and import taxes, which are the buyer's responsibility. RareCard uses bonded carriers for high-value cross-border deliveries.</p>
+              </div>
+              <div>
+                <h3 class="mb-2 font-semibold text-slate-900">Vault-to-Vault Transfers</h3>
+                <p>Cards held in our climate-controlled vault may be transferred directly to buyer vault accounts without physical shipment, reducing transit risk for premium collectibles.</p>
+              </div>
+            </div>
+          </div>
+
+          <hr class="border-slate-100"/>
+
+          @* Bidding & Disputes *@
+          <div id="bidding-rules" class="policy-content-section scroll-mt-28" data-policy-section="bidding-rules">
+            <div class="mb-6 flex items-center gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/>
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-slate-900">Bidding &amp; Disputes</h2>
+            </div>
+
+            <div class="space-y-5 text-sm leading-relaxed text-slate-600">
+              <div>
+                <h3 class="mb-2 font-semibold text-slate-900">Auction Conduct</h3>
+                <p>All bids placed on RareCard are legally binding. Users are prohibited from shill bidding, retracting valid bids, or colluding to manipulate auction outcomes. Violations may result in account suspension and forfeiture of deposits.</p>
+              </div>
+              <div>
+                <h3 class="mb-2 font-semibold text-slate-900">Dispute Resolution</h3>
+                <p>In the event of a dispute regarding item condition or authenticity, buyers must notify RareCard within 48 hours of delivery. Our specialist panel will review evidence and mediate a resolution within 5 business days.</p>
+              </div>
+            </div>
+          </div>
+
+          @* Legacy anchor for refund page links *@
+          <span id="payment-policy" class="sr-only" aria-hidden="true"></span>
+          <span id="auction-rules" class="sr-only" aria-hidden="true"></span>
+          <span id="user-responsibilities" class="sr-only" aria-hidden="true"></span>
+          <span id="terms-of-use" class="sr-only" aria-hidden="true"></span>
+        </div>
+
+        @* Download CTA *@
+        <div class="flex flex-col items-start justify-between gap-4 border-t border-slate-100 bg-slate-50 px-6 py-6 sm:flex-row sm:items-center sm:px-8 lg:px-10">
+          <div>
+            <p class="text-sm font-semibold text-slate-900">Want a physical copy?</p>
+            <p class="mt-0.5 text-xs text-slate-500">Download the complete legal documentation as a PDF.</p>
+          </div>
+          <button type="button"
+                  class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-xs font-semibold text-white transition hover:bg-slate-800">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+            </svg>
+            Download PDF Version
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
+
+@section Scripts {
+  <script src="~/js/policy.js" asp-append-version="true"></script>
+}

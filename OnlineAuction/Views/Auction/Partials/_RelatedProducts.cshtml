@@ -2,35 +2,18 @@
 
 @if (Model.RelatedProducts.Count > 0)
 {
-  <section class="mt-12">
-    <div class="mb-6 flex items-end justify-between">
+  <section class="product-detail-section mt-14 border-t border-slate-200 pt-12">
+    <div class="mb-8 flex items-end justify-between gap-4">
       <div>
-        <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">You May Also Like</p>
-        <h2 class="mt-1 text-2xl font-bold text-stone-900 sm:text-3xl">Related Products</h2>
+        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Ending Soon</h2>
+        <p class="mt-1 text-sm text-slate-500">Other rare collectibles you might be interested in</p>
       </div>
-      <a asp-controller="Auction" asp-action="Index"
-         class="hidden text-sm font-semibold text-amber-700 hover:text-amber-800 sm:inline">
-        View all →
-      </a>
+      <a asp-controller="Auction" asp-action="Index" class="hidden text-sm font-semibold text-blue-700 hover:text-blue-900 sm:inline">View all →</a>
     </div>
-    <div class="grid grid-cols-2 items-stretch gap-4 sm:grid-cols-3 lg:grid-cols-4">
+    <div class="rarecard-auction-grid">
       @foreach (var item in Model.RelatedProducts)
       {
-        <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id"
-           class="group flex h-full flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
-          <div class="relative aspect-[4/5] shrink-0 overflow-hidden bg-stone-100">
-            <img src="@item.ImageUrl" alt="@item.Name" loading="lazy"
-                 class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105"/>
-            <span class="absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-white @(item.Status == "Ending Soon" ? "bg-orange-600" : "bg-amber-700")">
-              @item.Status
-            </span>
-          </div>
-          <div class="flex flex-1 flex-col p-3">
-            <p class="text-[10px] font-semibold uppercase tracking-widest text-stone-400">@item.Category</p>
-            <h3 class="mt-1 min-h-[2.5rem] line-clamp-2 text-sm font-semibold text-stone-900">@item.Name</h3>
-            <p class="mt-auto pt-2 text-sm font-bold text-amber-700">$@item.CurrentPrice.ToString("N0")</p>
-          </div>
-        </a>
+        <partial name="Partials/_TradingCardAuctionCard" model="@(new AuctionCardViewModel { Item = item, Variant = "grid" })"/>
       }
     </div>
   </section>

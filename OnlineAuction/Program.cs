@@ -1,5 +1,14 @@
 using System.Globalization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
+using OnlineAuction.Data;
+using OnlineAuction.Data.Seeders;
+using OnlineAuction.Configurations;
+using OnlineAuction.Entities;
+using OnlineAuction.Services;
+using OnlineAuction.Services.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -43,8 +52,54 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
         CookieName = CookieRequestCultureProvider.DefaultCookieName
     });
 });
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var serverVersion = ServerVersion.Parse("8.0.36-mysql");
+
+builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
+    options.UseMySql(connectionString, serverVersion, mySqlOptions =>
+        mySqlOptions.MigrationsHistoryTable("__ef_migrations_history")));
+
+builder.Services
+    .AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
+    {
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 6;
+        options.User.RequireUniqueEmail = true;
+    })
+    .AddEntityFrameworkStores<AuctionHouseDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Auth/Login";
+    options.AccessDeniedPath = "/Auth/Login";
+});
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("CloudinarySettings"));
+
+builder.Services.AddScoped<IAvatarStorageService, CloudinaryAvatarStorageService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuctionService, AuctionService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<ISellService, SellService>();
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
+
+// tạo   dữ liệu   mâu
+/*using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
+    await UserSeeder.SeedAsync(dbContext);
+}*/
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -65,6 +120,7 @@ app.UseRequestLocalization(localizationOptions);
 app.UseRouting();
 
 app.UseSession();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
