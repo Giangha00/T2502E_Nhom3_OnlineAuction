@@ -22,6 +22,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
+    public DbSet<Payment> Payments => Set<Payment>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -33,6 +35,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureBids(builder);
         ConfigureOrders(builder);
         ConfigureOrderItems(builder);
+        ConfigurePayments(builder);
     }
 
     private static void ConfigureIdentityTables(ModelBuilder builder)
@@ -203,8 +206,6 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(o => o.TotalAmount).HasColumnName("total_amount").HasPrecision(18, 2);
             entity.Property(o => o.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(OrderStatuses.PendingPayment);
             entity.Property(o => o.PaymentDeadline).HasColumnName("payment_deadline");
-            entity.Property(o => o.TransactionId).HasColumnName("transaction_id").HasMaxLength(100);
-            entity.Property(o => o.PaidAt).HasColumnName("paid_at");
             entity.Property(o => o.CreatedAt).HasColumnName("created_at");
 
             entity.HasIndex(o => o.OrderReference).IsUnique().HasDatabaseName("uk_orders_reference");
@@ -254,6 +255,36 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_order_items_winning_bid",
                 "`winning_bid` > 0"));
+        });
+    }
+
+    private static void ConfigurePayments(ModelBuilder builder)
+    {
+        builder.Entity<Payment>(entity =>
+        {
+            entity.ToTable("payments");
+
+            entity.Property(p => p.Id).HasColumnName("id");
+            entity.Property(p => p.OrderId).HasColumnName("order_id");
+            entity.Property(p => p.Amount).HasColumnName("amount").HasPrecision(18, 2);
+            entity.Property(p => p.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(PaymentStatuses.Pending);
+            entity.Property(p => p.TransactionId).HasColumnName("transaction_id").HasMaxLength(100);
+            entity.Property(p => p.PaidAt).HasColumnName("paid_at");
+            entity.Property(p => p.CreatedAt).HasColumnName("created_at");
+
+            entity.HasIndex(p => p.OrderId).HasDatabaseName("ix_payments_order_id");
+            entity.HasIndex(p => p.Status).HasDatabaseName("ix_payments_status");
+            entity.HasIndex(p => p.TransactionId).HasDatabaseName("ix_payments_transaction_id");
+
+            entity.HasOne(p => p.Order)
+                .WithMany(o => o.Payments)
+                .HasForeignKey(p => p.OrderId)
+                .HasConstraintName("fk_payments_order")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_payments_amount",
+                "`amount` > 0"));
         });
     }
 }

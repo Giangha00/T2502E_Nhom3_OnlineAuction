@@ -1,7 +1,8 @@
 -- ============================================================
--- RareCard Online Auction — MySQL Schema (XAMPP)
--- 6 core business tables | utf8mb4
--- Run via EF migration: dotnet ef database update
+-- RareCard Online Auction — MySQL (XAMPP)
+-- 7 business tables | No INSERT | utf8mb4
+-- Apply via: dotnet ef database update
+-- Identity tables (roles, user_claims, ...) created by EF migrations
 -- ============================================================
 
 CREATE DATABASE IF NOT EXISTS online_auction
@@ -10,18 +11,15 @@ CREATE DATABASE IF NOT EXISTS online_auction
 
 USE online_auction;
 
--- Identity support tables (roles, user_claims, user_logins, user_roles, user_tokens, role_claims)
--- are created automatically by ASP.NET Core Identity migrations.
-
--- Core tables created by migration RareCardSchema:
---   users, products, auctions, bids, orders, order_items
+-- Business tables: users, products, auctions, bids, orders, order_items, payments
 --
--- Foreign keys preserved:
---   products.seller_id        -> users.id          (RESTRICT)
---   auctions.product_id       -> products.id       (RESTRICT)
---   auctions.winner_id        -> users.id          (SET NULL)
---   bids.auction_id           -> auctions.id       (RESTRICT)
---   bids.bidder_id            -> users.id          (RESTRICT)
---   orders.buyer_id           -> users.id          (RESTRICT)
---   order_items.order_id      -> orders.id         (CASCADE)
---   order_items.auction_id    -> auctions.id       (RESTRICT)
+-- FK relationships:
+--   products.seller_id     -> users.id       (RESTRICT)
+--   auctions.product_id    -> products.id    (RESTRICT)
+--   auctions.winner_id     -> users.id       (SET NULL)
+--   bids.auction_id        -> auctions.id    (RESTRICT)
+--   bids.bidder_id         -> users.id       (RESTRICT)
+--   orders.buyer_id        -> users.id       (RESTRICT)
+--   order_items.order_id   -> orders.id      (CASCADE)
+--   order_items.auction_id -> auctions.id    (RESTRICT)
+--   payments.order_id      -> orders.id      (RESTRICT)
