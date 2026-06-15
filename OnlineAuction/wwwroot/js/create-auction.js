@@ -162,21 +162,27 @@
 
   function addImages(files) {
     var errors = [];
-    Array.from(files).forEach(function (file) {
-      if (!IMAGE_TYPES.includes(file.type)) {
-        errors.push(file.name + ': invalid format (JPG, PNG, WEBP only)');
-        return;
-      }
-      if (file.size > MAX_IMAGE_SIZE) {
-        errors.push(file.name + ': exceeds 5MB limit');
-        return;
-      }
+    var file = Array.from(files)[0];
+
+    state.images.forEach(function (img) { URL.revokeObjectURL(img.url); });
+    state.images = [];
+
+    if (!file) {
+      renderImagePreviews();
+      return;
+    }
+
+    if (!IMAGE_TYPES.includes(file.type)) {
+      errors.push(file.name + ': invalid format (JPG, PNG, WEBP only)');
+    } else if (file.size > MAX_IMAGE_SIZE) {
+      errors.push(file.name + ': exceeds 5MB limit');
+    } else {
       state.images.push({
         id: 'img_' + Date.now() + '_' + Math.random().toString(36).slice(2),
         file: file,
         url: URL.createObjectURL(file)
       });
-    });
+    }
 
     if (errors.length) {
       showError('images', errors[0]);
@@ -193,12 +199,16 @@
       URL.revokeObjectURL(state.images[idx].url);
       state.images.splice(idx, 1);
     }
+    var input = $('imageInput');
+    if (input && state.images.length === 0) input.value = '';
     renderImagePreviews();
   }
 
   function clearAllImages() {
     state.images.forEach(function (img) { URL.revokeObjectURL(img.url); });
     state.images = [];
+    var input = $('imageInput');
+    if (input) input.value = '';
     renderImagePreviews();
     showError('images', '');
   }
@@ -258,7 +268,7 @@
     renderDocuments();
   }
 
-  function setupDropZone(zoneId, inputId, onFiles) {
+  function setupDropZone(zoneId, inputId, onFiles, resetAfterChange) {
     var zone = $(zoneId);
     var input = $(inputId);
     if (!zone || !input) return;
@@ -278,7 +288,7 @@
     });
     input.addEventListener('change', function () {
       if (input.files.length) onFiles(input.files);
-      input.value = '';
+      if (resetAfterChange) input.value = '';
     });
   }
 
@@ -465,8 +475,8 @@
       el.addEventListener('change', updatePreview);
     });
 
-    setupDropZone('imageDropZone', 'imageInput', addImages);
-    setupDropZone('documentDropZone', 'documentInput', addDocuments);
+    setupDropZone('imageDropZone', 'imageInput', addImages, false);
+    setupDropZone('documentDropZone', 'documentInput', addDocuments, true);
 
     var clearBtn = $('clearAllImages');
     if (clearBtn) clearBtn.addEventListener('click', clearAllImages);
@@ -493,13 +503,35 @@
       }
 
       var data = getFormData();
-      showSuccess(data.productName);
+      var formData = new FormData(form);
+
+      formData.delete('PrimaryImageFile');
+      if (state.images.length > 0) {
+        formData.append('PrimaryImageFile', state.images[0].file);
+      }
 
       fetch(form.action, {
         method: 'POST',
-        body: new FormData(form),
+        body: formData,
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      }).catch(function () { /* UI-only fallback */ });
+      })
+        .then(function (response) {
+          return response.json().then(function (payload) {
+            if (!response.ok || payload.success === false) {
+              throw new Error(payload.message || 'Could not create auction.');
+            }
+            return payload;
+          });
+        })
+        .then(function (payload) {
+          showSuccess(data.productName);
+          if (payload.redirectUrl) {
+            window.location.href = payload.redirectUrl;
+          }
+        })
+        .catch(function (error) {
+          showError('images', error.message);
+        });
     });
   }
 
