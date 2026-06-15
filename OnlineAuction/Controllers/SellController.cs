@@ -1,30 +1,27 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
 
+[Authorize]
 public class SellController : Controller
 {
     private readonly ISellService _sellService;
     private readonly ISellerAuctionService _sellerAuctionService;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly AuctionHouseDbContext _dbContext;
 
     public SellController(
         ISellService sellService,
         ISellerAuctionService sellerAuctionService,
-        UserManager<ApplicationUser> userManager,
-        AuctionHouseDbContext dbContext)
+        UserManager<ApplicationUser> userManager)
     {
         _sellService = sellService;
         _sellerAuctionService = sellerAuctionService;
         _userManager = userManager;
-        _dbContext = dbContext;
     }
 
     [HttpGet]
@@ -100,17 +97,7 @@ public class SellController : Controller
 
     private async Task<int?> GetCurrentSellerIdAsync()
     {
-        var identityUserId = _userManager.GetUserId(User);
-        if (int.TryParse(identityUserId, out var currentUserId))
-        {
-            return currentUserId;
-        }
-
-        // Tam thoi fallback vi AuthController hien tai cua nhom chua sign-in bang Identity.
-        // Khi phan login Identity xong, co the xoa fallback nay va bat buoc dung currentUserId.
-        return await _dbContext.Users
-            .OrderBy(user => user.Id)
-            .Select(user => (int?)user.Id)
-            .FirstOrDefaultAsync();
+        var user = await _userManager.GetUserAsync(User);
+        return user?.Id;
     }
 }

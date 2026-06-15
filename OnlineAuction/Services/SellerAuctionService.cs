@@ -188,6 +188,17 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "End date can only be extended, not shortened.");
         }
 
+        string? newImageUrl;
+        try
+        {
+            // Edit cung dung Cloudinary: neu co file moi thi thay cover, khong co thi giu anh cu.
+            newImageUrl = await _photoService.AddPhotoAsync(model.PrimaryImageFile, ProductImageFolder);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return (false, ex.Message);
+        }
+
         auction.Product.Name = model.ProductName.Trim();
         auction.Product.Category = model.Category.Trim();
         auction.Product.ShortDescription = model.ShortDescription;
@@ -197,7 +208,9 @@ public class SellerAuctionService : ISellerAuctionService
         auction.Product.SetName = model.SetName;
         auction.Product.GradeLabel = model.GradeLabel;
         auction.Product.CertNumber = model.CertNumber;
-        auction.Product.PrimaryImage = model.PrimaryImage;
+        auction.Product.PrimaryImage = string.IsNullOrWhiteSpace(newImageUrl)
+            ? model.PrimaryImage
+            : newImageUrl;
 
         auction.StartingPrice = model.StartingPrice;
         auction.CurrentPrice = model.StartingPrice;
