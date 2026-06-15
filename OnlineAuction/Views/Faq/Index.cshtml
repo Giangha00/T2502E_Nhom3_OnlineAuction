@@ -1,155 +1,143 @@
 ﻿@{
     ViewData["Title"] = "FAQ";
+
+    var categories = new[]
+    {
+        new { Id = "buying", Label = "Buying", Icon = "cart" },
+        new { Id = "selling", Label = "Selling", Icon = "tag" },
+        new { Id = "security", Label = "Security", Icon = "shield" }
+    };
+
+    var faqSections = new Dictionary<string, (string Title, string Icon, (string Question, string Answer)[] Items)>
+    {
+        ["buying"] = ("Buying", "cart", new[]
+        {
+            ("How to bid?", "Create your RareCard account, browse active auctions, and enter a bid amount higher than the current price. You'll receive instant confirmation and notifications if you're outbid."),
+            ("What are the shipping fees?", "Shipping fees are calculated at checkout based on item value, destination, and insurance level. Domestic orders typically range from $15–$45 for standard insured delivery."),
+            ("International bidding?", "Yes — international bidding is available in select regions. Import duties and customs fees may apply and are the buyer's responsibility. Contact support for country-specific details.")
+        }),
+        ["selling"] = ("Selling", "tag", new[]
+        {
+            ("What is the consignment fee?", "Standard auctions carry a 10% commission on the final sale price. Featured listings include an additional placement fee. There are no upfront listing charges for verified sellers."),
+            ("How do I ship my cards to RareCard?", "After your listing is approved, generate a prepaid insured shipping label from your seller dashboard. Cards must be sent in a rigid mailer or slab case with tracking enabled.")
+        }),
+        ["security"] = ("Security", "shield", new[]
+        {
+            ("Is my card insured?", "Every card held in our vault and in transit is fully insured up to its listed value. Coverage begins the moment we receive your item and continues through delivery to the buyer."),
+            ("How do you verify authenticity?", "We use direct PSA and BGS API integration for real-time slab verification, plus a secondary 10-point physical inspection by our specialist curators before any listing goes live.")
+        })
+    };
 }
 
-<section class="page-hero page-hero--image relative overflow-hidden px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-    <div class="page-hero__media absolute inset-0" aria-hidden="true">
-        <img src="@PageBannerImages.Faq" alt="Auction House help center" class="h-full w-full object-cover" loading="eager" />
-        <div class="page-hero__overlay absolute inset-0"></div>
+<div class="faq-page bg-white">
+  @* Hero *@
+  <section class="site-shell px-4 pt-10 pb-8 text-center sm:px-6 sm:pt-12 lg:pt-14">
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Help Center</h1>
+    <p class="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
+      Find answers to common questions about bidding, grading, and security at RareCard Auctions.
+    </p>
+
+    <div class="mx-auto mt-8 grid max-w-4xl gap-4 sm:grid-cols-[1fr_auto]">
+      <div class="rounded-xl border border-slate-200 bg-white p-2 shadow-sm">
+        <div class="flex items-center gap-3 rounded-lg bg-slate-50 px-4 py-3">
+          <svg class="h-5 w-5 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+          </svg>
+          <input id="faqSearch" type="search" placeholder="Search for questions..."
+                 class="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"/>
+        </div>
+      </div>
+
+      <div class="relative overflow-hidden rounded-xl bg-blue-700 px-6 py-5 text-left shadow-sm sm:min-w-[280px]">
+        <p class="text-sm font-bold text-white">Need direct support?</p>
+        <p class="mt-1 text-xs text-blue-100">Our specialists are available 24/7.</p>
+        <a asp-controller="Contact" asp-action="Index"
+           class="mt-4 inline-flex rounded-lg bg-white px-4 py-2 text-xs font-semibold text-blue-700 transition hover:bg-blue-50">
+          Contact Us
+        </a>
+        <svg class="pointer-events-none absolute -bottom-2 right-2 h-24 w-24 text-white/10" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.375c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375V8.51m11.25 0V9.375c0 .621-.504 1.125-1.125 1.125h-4.125c-.621 0-1.125-.504-1.125-1.125V8.51"/>
+        </svg>
+      </div>
     </div>
+  </section>
 
-    <div class="relative z-10 mx-auto max-w-5xl text-center">
-        <p class="page-hero__label text-sm font-semibold uppercase tracking-widest">Help Center</p>
-        <h1 class="page-hero__title mt-2 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">Frequently Asked Questions</h1>
-        <p class="page-hero__desc mx-auto mt-4 max-w-2xl text-base leading-7 sm:text-lg">
-            Find answers to common questions about Auction House, bidding, payments, security, and account management.
-        </p>
-
-        <div class="mx-auto mt-8 flex max-w-2xl items-center gap-3 rounded-full border border-white/25 bg-white/15 p-2 shadow-[0_18px_45px_rgba(20,10,4,0.25)] backdrop-blur">
-            <span class="pl-4 text-amber-100">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.3-4.3"></path>
-                </svg>
-            </span>
-            <input type="search"
-                   placeholder="Search frequently asked questions..."
-                   class="w-full bg-transparent py-3 text-sm text-white placeholder:text-amber-200/80 outline-none" />
-            <button type="button"
-                    class="hidden rounded-full bg-amber-50 px-5 py-2.5 text-sm font-semibold text-amber-800 transition hover:bg-white sm:inline-block">
-                Search
+  @* Main content *@
+  <section class="site-shell px-4 pb-16 sm:px-6 lg:pb-20">
+    <div class="grid gap-8 lg:grid-cols-[220px_1fr] xl:grid-cols-[240px_1fr]">
+      @* Sidebar *@
+      <aside class="sticky-below-header lg:self-start">
+        <nav class="space-y-1 rounded-xl border border-slate-200 bg-white p-2 shadow-sm" aria-label="FAQ categories">
+          @foreach (var cat in categories)
+          {
+            var isFirst = cat.Id == "buying";
+            <button type="button" data-faq-nav="@cat.Id"
+                    class="faq-nav-btn flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition @(isFirst ? "bg-blue-700 text-white" : "text-slate-700 hover:bg-slate-50")">
+              @cat.Label
+              <svg class="h-4 w-4 @(isFirst ? "text-white" : "text-slate-400")" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
+              </svg>
             </button>
-        </div>
-    </div>
-</section>
+          }
+        </nav>
+      </aside>
 
-<div class="w-full text-stone-800">
-
-    <section class="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-        <div class="mx-auto max-w-6xl">
-            <div class="mb-8">
-                <p class="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-amber-700">FAQ Categories</p>
-                <h2 class="text-3xl font-semibold md:text-5xl">Browse by topic</h2>
-            </div>
-
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <button type="button" class="faq-category rounded-2xl border border-stone-200 bg-white/80 p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-amber-400 hover:shadow-md">
-                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-amber-50 text-amber-700">A</span>
-                    <h3 class="text-xl font-semibold">Account</h3>
-                    <p class="mt-2 text-sm leading-6 text-stone-600">Registration, login, and profile management.</p>
-                </button>
-
-                <button type="button" class="faq-category rounded-2xl border border-stone-200 bg-white/80 p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-amber-400 hover:shadow-md">
-                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-amber-50 text-amber-700">B</span>
-                    <h3 class="text-xl font-semibold">Auction</h3>
-                    <p class="mt-2 text-sm leading-6 text-stone-600">Create auctions, join bidding, and place bids.</p>
-                </button>
-
-                <button type="button" class="faq-category rounded-2xl border border-stone-200 bg-white/80 p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-amber-400 hover:shadow-md">
-                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-amber-50 text-amber-700">P</span>
-                    <h3 class="text-xl font-semibold">Payment</h3>
-                    <p class="mt-2 text-sm leading-6 text-stone-600">Payments, transactions, and order status.</p>
-                </button>
-
-                <button type="button" class="faq-category rounded-2xl border border-stone-200 bg-white/80 p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-amber-400 hover:shadow-md">
-                    <span class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-amber-50 text-amber-700">S</span>
-                    <h3 class="text-xl font-semibold">Security</h3>
-                    <p class="mt-2 text-sm leading-6 text-stone-600">Account protection, privacy, and safe bidding.</p>
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <section class="px-5 pb-16 md:pb-20">
-        <div class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.8fr_1.5fr]">
-            <aside class="h-fit rounded-3xl border border-stone-200 bg-white/80 p-6 shadow-sm">
-                <p class="text-xs font-bold uppercase tracking-[0.2em] text-amber-700">Quick Guide</p>
-                <h2 class="mt-3 text-3xl font-semibold">Need help using Auction House?</h2>
-                <p class="mt-4 leading-7 text-stone-600">
-                    These questions cover the most common actions users perform on the platform.
-                </p>
-                <div class="mt-6 space-y-3 text-sm text-stone-600">
-                    <div class="rounded-2xl bg-amber-50 p-4">Create an account before joining auctions.</div>
-                    <div class="rounded-2xl bg-amber-50 p-4">Bid amount must be higher than the current price.</div>
-                    <div class="rounded-2xl bg-amber-50 p-4">Winner is notified when the auction ends.</div>
-                </div>
-            </aside>
-
-            <div class="space-y-4">
-                @{
-                    var faqItems = new[]
-                    {
-                        new { Question = "How do I create an account?", Answer = "Click Register, fill in your personal information, and create your account before joining the auction system." },
-                        new { Question = "How do I place a bid?", Answer = "Select an active auction, enter your bid amount, and submit your bid. Your bid must be higher than the current price." },
-                        new { Question = "How can I create an auction?", Answer = "Create an account, submit product information, upload images or documents, and wait for the product to be approved." },
-                        new { Question = "Can I bid on my own product?", Answer = "No. Sellers are not allowed to place bids on their own auction items." },
-                        new { Question = "How do I know if I win an auction?", Answer = "When the auction ends, the system sends a notification to the winning bidder and the seller." },
-                        new { Question = "What happens after payment?", Answer = "After payment and transaction confirmation, the buyer and seller continue with the delivery process based on the auction result." },
-                        new { Question = "How is my account protected?", Answer = "Users should keep their login information private and use accurate personal information to protect their account." },
-                        new { Question = "Where can I view my auction history?", Answer = "You can open the product detail page and view previous bid history for that auction." }
-                    };
-                }
-
-                @foreach (var item in faqItems)
+      @* FAQ sections *@
+      <div class="space-y-10">
+        @foreach (var faqGroup in faqSections)
+        {
+          var meta = faqGroup.Value;
+          <div id="faq-@faqGroup.Key" class="faq-section scroll-mt-header" data-faq-section="@faqGroup.Key">
+            <div class="mb-4 flex items-center gap-3">
+              <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+                @if (meta.Icon == "cart")
                 {
-                    <article class="faq-item overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-                        <button type="button" class="faq-question flex w-full items-center justify-between gap-4 px-5 py-5 text-left">
-                            <span class="text-base font-semibold text-stone-900 md:text-lg">@item.Question</span>
-                            <span class="faq-icon grid h-8 w-8 shrink-0 place-items-center rounded-full bg-amber-50 text-amber-700 transition">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="m6 9 6 6 6-6"></path>
-                                </svg>
-                            </span>
-                        </button>
-                        <div class="faq-answer hidden border-t border-stone-100 px-5 pb-5 pt-0">
-                            <p class="pt-4 leading-7 text-stone-600">@item.Answer</p>
-                        </div>
-                    </article>
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                  </svg>
                 }
+                else if (meta.Icon == "tag")
+                {
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z"/>
+                  </svg>
+                }
+                else
+                {
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/>
+                  </svg>
+                }
+              </div>
+              <h2 class="text-lg font-bold text-slate-900">@meta.Title</h2>
             </div>
-        </div>
-    </section>
 
-    <section class="px-5 pb-20">
-        <div class="page-hero mx-auto max-w-6xl overflow-hidden rounded-3xl p-8 text-center md:p-12">
-            <p class="page-hero__label text-sm font-semibold uppercase tracking-widest">Support</p>
-            <h2 class="page-hero__title mt-3 text-3xl font-bold md:text-4xl">Can't find your answer?</h2>
-            <p class="page-hero__desc mx-auto mt-4 max-w-2xl leading-7">
-                Contact our support team and we will help you understand the auction process clearly.
-            </p>
-            <a asp-controller="Contact" asp-action="Index"
-               class="mt-8 inline-flex rounded-xl bg-amber-50 px-7 py-3 text-sm font-semibold text-amber-800 shadow-md transition hover:bg-white">
-                Contact Us
-            </a>
-        </div>
-    </section>
+            <div class="space-y-2">
+              @foreach (var item in meta.Items)
+              {
+                <article class="faq-item overflow-hidden rounded-lg border border-slate-200 bg-white" data-faq-question="@item.Question.ToLowerInvariant()">
+                  <button type="button" class="faq-question flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+                    <span class="text-sm font-medium text-slate-900">@item.Question</span>
+                    <svg class="faq-chevron h-4 w-4 shrink-0 text-slate-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+                    </svg>
+                  </button>
+                  <div class="faq-answer hidden border-t border-slate-100 px-5 pb-4">
+                    <p class="pt-3 text-sm leading-relaxed text-slate-500">@item.Answer</p>
+                  </div>
+                </article>
+              }
+            </div>
+          </div>
+        }
+
+        <p id="faqNoResults" class="hidden py-8 text-center text-sm text-slate-500">No questions match your search.</p>
+      </div>
+    </div>
+  </section>
 </div>
 
 @section Scripts {
-    <script>
-        (function () {
-            var questions = document.querySelectorAll('.faq-question');
-
-            questions.forEach(function (question) {
-                question.addEventListener('click', function () {
-                    var item = question.closest('.faq-item');
-                    var answer = item.querySelector('.faq-answer');
-                    var icon = item.querySelector('.faq-icon');
-
-                    answer.classList.toggle('hidden');
-                    icon.classList.toggle('rotate-180');
-                });
-            });
-        })();
-    </script>
+  <script src="~/js/faq.js" asp-append-version="true"></script>
 }
