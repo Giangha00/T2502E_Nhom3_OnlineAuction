@@ -20,15 +20,13 @@ public class AuctionOrder
 
     public DateTime PaymentDeadline { get; set; }
 
-    public string? TransactionId { get; set; }
-
-    public DateTime? PaidAt { get; set; }
-
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public ApplicationUser Buyer { get; set; } = null!;
 
     public ICollection<OrderItem> Items { get; set; } = [];
+
+    public ICollection<Payment> Payments { get; set; } = [];
 }
 
 public static class OrderStatuses
