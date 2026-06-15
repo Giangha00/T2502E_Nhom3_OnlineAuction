@@ -81,11 +81,13 @@ builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));
 
 builder.Services.AddScoped<IAvatarStorageService, CloudinaryAvatarStorageService>();
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuctionService, AuctionService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
+builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

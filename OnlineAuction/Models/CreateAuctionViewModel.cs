@@ -4,6 +4,9 @@ namespace OnlineAuction.Models;
 
 public class CreateAuctionViewModel
 {
+    // Dung cho man hinh Edit. Khi tao moi thi gia tri nay de trong.
+    public int? AuctionId { get; set; }
+
     [Required(ErrorMessage = "Card name is required.")]
     [StringLength(120, ErrorMessage = "Card name cannot exceed 120 characters.")]
     [Display(Name = "Card Name")]
@@ -45,6 +48,14 @@ public class CreateAuctionViewModel
 
     [Display(Name = "Certificate Number")]
     public string? CertificateNumber { get; set; }
+
+    // File anh chinh lay tu form va upload len Cloudinary trong Service.
+    // Database khong luu file, chi luu URL Cloudinary vao cot products.primary_image.
+    [Display(Name = "Primary Image")]
+    public IFormFile? PrimaryImageFile { get; set; }
+
+    // Dung khi sua auction: neu seller khong chon anh moi thi giu URL anh cu.
+    public string? ExistingPrimaryImage { get; set; }
 
     [Display(Name = "Grading — Centering")]
     public string GradingCentering { get; set; } = "10";
