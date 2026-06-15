@@ -2,7 +2,11 @@
 @using OnlineAuction
 @using OnlineAuction.Resources
 @using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Identity
+@using OnlineAuction.Entities
 @inject IStringLocalizer<SharedResource> Localizer
+@inject UserManager<ApplicationUser> UserManager
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
@@ -22,7 +26,9 @@
     var isRareCardTheme = !isStandalonePage && !isAdminArea;
 
     var currentCulture = Context.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name ?? "en-US";
-    var isLoggedIn = string.Equals(Context.Session.GetString("IsLoggedIn"), "true", StringComparison.Ordinal);
+    var isLoggedIn = User.Identity?.IsAuthenticated == true;
+    ApplicationUser? currentUser = isLoggedIn ? await UserManager.GetUserAsync(User) : null;
+    var displayName = currentUser?.FullName ?? User.Identity?.Name ?? "User";
     var orderCount = isLoggedIn ? OnlineAuction.Data.WonOrderStore.GetCount(Context.Session) : 0;
     var isOrderPage = string.Equals(currentController, "Order", StringComparison.OrdinalIgnoreCase);
 
@@ -40,6 +46,8 @@
 
     string FooterLinkClass(bool isActive) =>
         isActive ? "footer-link footer-link--active" : "footer-link";
+
+    var antiforgeryTokens = Antiforgery.GetAndStoreTokens(Context);
 }
 <!DOCTYPE html>
 <html lang="@currentCulture.Replace("_", "-").ToLower()">
@@ -47,6 +55,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="request-verification-token" content="@antiforgeryTokens.RequestToken" />
     <title>@ViewData["Title"] - @(isRareCardTheme ? "RareCard" : "Auction House")</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -103,14 +112,29 @@
                     }
                     @await Html.PartialAsync("_LanguageSwitcher")
 
-                    <div class="hidden items-center gap-2 lg:flex">
-                        <button type="button" data-auth-tab="login" class="@loginBtnClass">
-                            @Localizer["Login"]
-                        </button>
-                        <button type="button" data-auth-tab="signup" class="@signUpBtnClass">
-                            @Localizer["SignUp"]
-                        </button>
-                    </div>
+                    @if (isLoggedIn)
+                    {
+                        <div class="hidden items-center gap-3 lg:flex">
+                            <span class="max-w-[140px] truncate text-sm font-medium text-slate-700" title="@displayName">@displayName</span>
+                            <form asp-controller="Auth" asp-action="Logout" method="post" class="inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="hidden items-center gap-2 lg:flex">
+                            <button type="button" data-auth-tab="login" class="@loginBtnClass">
+                                @Localizer["Login"]
+                            </button>
+                            <button type="button" data-auth-tab="signup" class="@signUpBtnClass">
+                                @Localizer["SignUp"]
+                            </button>
+                        </div>
+                    }
 
                     <button id="mobileMenuBtn" type="button" aria-label="Toggle navigation" aria-expanded="false"
                         class="flex flex-col gap-1.5 p-2 lg:hidden">
@@ -135,15 +159,30 @@
                             class="block border-b border-stone-100 py-3 text-sm font-medium @MobileNavLinkClass(isContactPage)">@Localizer["Contact"]</a></li>
                     <li><a asp-controller="Faq" asp-action="Index"
                             class="block border-b border-stone-100 py-3 text-sm font-medium @MobileNavLinkClass(isFaqPage)">@Localizer["FAQ"]</a></li>
-                    <li class="flex gap-2 pt-4">
-                        <button type="button" data-auth-tab="login"
-                            class="flex-1 rounded-full border border-blue-700 py-2 text-center text-sm font-medium text-blue-700">
-                            @Localizer["Login"]
-                        </button>
-                        <button type="button" data-auth-tab="signup"
-                            class="flex-1 rounded-full bg-blue-700 py-2 text-center text-sm font-medium text-white">
-                            @Localizer["SignUp"]
-                        </button>
+                    <li class="flex flex-col gap-2 pt-4">
+                        @if (isLoggedIn)
+                        {
+                            <p class="text-sm font-medium text-slate-700">@displayName</p>
+                            <form asp-controller="Auth" asp-action="Logout" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="w-full rounded-full border border-slate-300 py-2 text-center text-sm font-medium text-slate-700">
+                                    Logout
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="flex gap-2">
+                                <button type="button" data-auth-tab="login"
+                                    class="flex-1 rounded-full border border-blue-700 py-2 text-center text-sm font-medium text-blue-700">
+                                    @Localizer["Login"]
+                                </button>
+                                <button type="button" data-auth-tab="signup"
+                                    class="flex-1 rounded-full bg-blue-700 py-2 text-center text-sm font-medium text-white">
+                                    @Localizer["SignUp"]
+                                </button>
+                            </div>
+                        }
                     </li>
                 </ul>
             </nav>
@@ -232,6 +271,16 @@
         @if (isLoggedIn)
         {
             <script src="~/js/header-notifications.js" asp-append-version="true"></script>
+        }
+        @if (TempData["OpenAuthModal"] is string openAuthTab)
+        {
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    if (typeof window.openAuthModal === 'function') {
+                        window.openAuthModal(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(openAuthTab)));
+                    }
+                });
+            </script>
         }
         <script>
             (function () {
