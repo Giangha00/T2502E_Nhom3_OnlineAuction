@@ -97,4 +97,20 @@
     <data name="AllRightsReserved" xml:space="preserve">
   <value>모든 권리 보유.</value>
 </data>
+
+    <data name="Sell" xml:space="preserve">
+  <value>판매</value>
+</data>
+
+    <data name="Notifications" xml:space="preserve">
+  <value>알림</value>
+</data>
+
+    <data name="ReadAll" xml:space="preserve">
+  <value>모두 읽음</value>
+</data>
+
+    <data name="NoNotifications" xml:space="preserve">
+  <value>알림이 없습니다</value>
+</data>
 </root>

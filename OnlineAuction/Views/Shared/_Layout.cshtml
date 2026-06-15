@@ -19,24 +19,27 @@
     var isFaqPage = string.Equals(currentController, "Faq", StringComparison.OrdinalIgnoreCase);
     var isRefundPage = string.Equals(currentController, "Refund", StringComparison.OrdinalIgnoreCase);
     var isAdminArea = string.Equals(ViewContext.RouteData.Values["area"]?.ToString(), "Admin", StringComparison.OrdinalIgnoreCase);
-    var isNotificationPage = string.Equals(currentController, "Notification", StringComparison.OrdinalIgnoreCase);
     var isRareCardTheme = !isStandalonePage && !isAdminArea;
-    var isBrowsePage = isHomePage || isAuctionPage;
 
     var currentCulture = Context.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name ?? "en-US";
-
-    var searchFocusClass = "focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100";
-    var searchHoverClass = "hover:text-blue-700";
+    var isLoggedIn = string.Equals(Context.Session.GetString("IsLoggedIn"), "true", StringComparison.Ordinal);
+    var orderCount = isLoggedIn ? OnlineAuction.Data.WonOrderStore.GetCount(Context.Session) : 0;
+    var isOrderPage = string.Equals(currentController, "Order", StringComparison.OrdinalIgnoreCase);
 
     string NavLinkClass(bool isActive) =>
-    isActive ? "text-blue-700 visited:text-blue-700 border-b-2 border-blue-700" : "text-slate-600 visited:text-slate-600 transition hover:text-blue-700";
+        isActive
+            ? "site-nav-link is-active text-blue-700 visited:text-blue-700"
+            : "site-nav-link text-slate-600 visited:text-slate-600 transition hover:text-blue-700";
+
+    string MobileNavLinkClass(bool isActive) =>
+        isActive ? "text-blue-700 visited:text-blue-700" : "text-slate-600 visited:text-slate-600";
 
     var loginBtnClass = "rounded-full border border-blue-700 px-5 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50";
 
     var signUpBtnClass = "rounded-full bg-blue-700 px-5 py-2 text-sm font-medium text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800";
 
     string FooterLinkClass(bool isActive) =>
-    isActive ? "footer-link footer-link--active" : "footer-link";
+        isActive ? "footer-link footer-link--active" : "footer-link";
 }
 <!DOCTYPE html>
 <html lang="@currentCulture.Replace("_", "-").ToLower()">
@@ -58,122 +61,80 @@
     @if (!isStandalonePage)
     {
         <header id="siteHeader" class="sticky top-0 z-50 w-full border-b border-stone-200/80 bg-white/95 backdrop-blur">
-            <div class="site-shell flex items-center gap-4 py-4">
+            <div class="site-shell flex items-center gap-6 py-4">
                 <a asp-controller="Home" asp-action="Index" class="flex shrink-0 items-center gap-2.5">
                     <span class="text-lg font-extrabold tracking-tight text-slate-900">RareCard</span>
                 </a>
 
-                <form class="relative mx-auto hidden max-w-xl flex-1 md:block" role="search">
-                    <input type="search" placeholder="@(isRareCardTheme ? "Search rare items..." : "Search by product, category, seller...")" aria-label="Search products"
-                        class="w-full rounded-full border border-stone-200 bg-stone-50 py-2.5 pl-4 pr-12 text-sm text-stone-700 outline-none transition @searchFocusClass" />
-                    <button type="submit" aria-label="Search"
-                        class="absolute right-1 top-1/2 -translate-y-1/2 rounded-full p-2 text-stone-500 @searchHoverClass">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8" />
-                            <path d="m21 21-4.3-4.3" />
-                        </svg>
-                    </button>
-                </form>
+                <nav class="hidden flex-1 justify-center lg:block" aria-label="Main navigation">
+                    <ul class="flex items-center justify-center">
+                        <li><a asp-controller="Home" asp-action="Index"
+                                class="@NavLinkClass(isHomePage)">@Localizer["Home"]</a></li>
+                        <li><a asp-controller="Auction" asp-action="Index"
+                                class="@NavLinkClass(isAuctionPage)">@Localizer["Auction"]</a></li>
+                        <li><a asp-controller="Sell" asp-action="Create"
+                                class="@NavLinkClass(isSellPage)">@Localizer["Sell"]</a></li>
+                        <li><a asp-controller="AboutUs" asp-action="About"
+                                class="@NavLinkClass(isAboutPage)">@Localizer["AboutUs"]</a></li>
+                        <li><a asp-controller="Contact" asp-action="Index"
+                                class="@NavLinkClass(isContactPage)">@Localizer["Contact"]</a></li>
+                        <li><a asp-controller="Faq" asp-action="Index"
+                                class="@NavLinkClass(isFaqPage)">@Localizer["FAQ"]</a></li>
+                    </ul>
+                </nav>
 
-                <div class="hidden shrink-0 items-center gap-2 lg:flex">
-                    @await Html.PartialAsync("NotificationFeature/_HeaderNotificationIcon", OnlineAuction.Data.MockNotificationData.GetNotifications())
-
+                <div class="ml-auto flex items-center gap-2">
+                    @if (isLoggedIn)
+                    {
+                        @await Html.PartialAsync("Partials/_HeaderNotifications", OnlineAuction.Data.MockNotificationData.GetNotifications())
+                        <a asp-controller="Order" asp-action="Index"
+                           class="relative flex h-10 w-10 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-blue-700 @(isOrderPage ? "bg-blue-50 text-blue-700" : "")"
+                           aria-label="Won auctions">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
+                            </svg>
+                            @if (orderCount > 0)
+                            {
+                                <span class="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-700 px-1 text-[10px] font-bold text-white">
+                                    @(orderCount > 9 ? "9+" : orderCount.ToString())
+                                </span>
+                            }
+                        </a>
+                    }
                     @await Html.PartialAsync("_LanguageSwitcher")
 
-                    <button type="button" data-auth-tab="login" class="@loginBtnClass">
-                        @Localizer["Login"]
-                    </button>
-                    <button type="button" data-auth-tab="signup" class="@signUpBtnClass">
-                        @Localizer["SignUp"]
+                    <div class="hidden items-center gap-2 lg:flex">
+                        <button type="button" data-auth-tab="login" class="@loginBtnClass">
+                            @Localizer["Login"]
+                        </button>
+                        <button type="button" data-auth-tab="signup" class="@signUpBtnClass">
+                            @Localizer["SignUp"]
+                        </button>
+                    </div>
+
+                    <button id="mobileMenuBtn" type="button" aria-label="Toggle navigation" aria-expanded="false"
+                        class="flex flex-col gap-1.5 p-2 lg:hidden">
+                        <span class="block h-0.5 w-5 bg-stone-800"></span>
+                        <span class="block h-0.5 w-5 bg-stone-800"></span>
+                        <span class="block h-0.5 w-5 bg-stone-800"></span>
                     </button>
                 </div>
-
-                <button id="mobileMenuBtn" type="button" aria-label="Toggle navigation" aria-expanded="false"
-                    class="ml-auto flex flex-col gap-1.5 p-2 lg:hidden">
-                    <span class="block h-0.5 w-5 bg-stone-800"></span>
-                    <span class="block h-0.5 w-5 bg-stone-800"></span>
-                    <span class="block h-0.5 w-5 bg-stone-800"></span>
-                </button>
             </div>
-
-            <div class="site-shell border-t border-stone-100 pb-3 md:hidden">
-                <form class="relative" role="search">
-                    <input type="search" placeholder="Search products..." aria-label="Search products"
-                        class="w-full rounded-full border border-stone-200 bg-stone-50 py-2.5 pl-4 pr-12 text-sm outline-none transition @searchFocusClass" />
-                    <button type="submit" aria-label="Search"
-                        class="absolute right-1 top-1/2 -translate-y-1/2 rounded-full p-2 text-stone-500">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8" />
-                            <path d="m21 21-4.3-4.3" />
-                        </svg>
-                    </button>
-                </form>
-            </div>
-
-            <nav class="hidden w-full border-t border-stone-100 lg:block">
-                <div class="site-shell">
-                    <ul class="flex overflow-x-auto">
-                        <li><a asp-controller="Home" asp-action="Index"
-                                class="block whitespace-nowrap py-3.5 pr-4 text-sm font-medium @NavLinkClass(isHomePage)">@Localizer["Home"]</a>
-                        </li>
-                        <li><a asp-controller="Auction" asp-action="Index"
-                                class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isAuctionPage)">@Localizer["Auction"]</a>
-                        </li>
-                        <li><a asp-controller="Sell" asp-action="Create"
-                                class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isSellPage)">Sell</a></li>
-                        <li><a asp-controller="AboutUs" asp-action="About"
-                                class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isAboutPage)">About
-                                Us</a></li>
-                        <li><a asp-controller="Contact" asp-action="Index"
-                                class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isContactPage)">@Localizer["Contact"]</a>
-                        </li>
-                        <li><a asp-controller="Faq" asp-action="Index"
-                                class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isFaqPage)">@Localizer["FAQ"]</a>
-                        </li>
-                        <li><a href="/notifications"
-                                class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isNotificationPage)">Notifications</a>
-                        </li>
-                        <li><a asp-controller="Policy" asp-action="Index"
-                                class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium @NavLinkClass(isPolicyPage)">Policy
-                                &amp; Term of Use</a></li>
-                        <li><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
-                                class="block whitespace-nowrap px-4 py-3.5 text-sm font-medium text-slate-600 transition hover:text-blue-700">Admin</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
 
             <nav id="mobileNav" class="hidden w-full border-t border-stone-200 bg-white lg:hidden">
                 <ul class="site-shell py-3">
                     <li><a asp-controller="Home" asp-action="Index"
-                            class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isHomePage)">@Localizer["Home"]</a>
-                    </li>
+                            class="block border-b border-stone-100 py-3 text-sm font-medium @MobileNavLinkClass(isHomePage)">@Localizer["Home"]</a></li>
                     <li><a asp-controller="Auction" asp-action="Index"
-                            class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isAuctionPage)">@Localizer["Auction"]</a>
-                    </li>
+                            class="block border-b border-stone-100 py-3 text-sm font-medium @MobileNavLinkClass(isAuctionPage)">@Localizer["Auction"]</a></li>
                     <li><a asp-controller="Sell" asp-action="Create"
-                            class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isSellPage)">Sell</a></li>
+                            class="block border-b border-stone-100 py-3 text-sm font-medium @MobileNavLinkClass(isSellPage)">@Localizer["Sell"]</a></li>
                     <li><a asp-controller="AboutUs" asp-action="About"
-                            class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isAboutPage)">About
-                            Us</a></li>
+                            class="block border-b border-stone-100 py-3 text-sm font-medium @MobileNavLinkClass(isAboutPage)">@Localizer["AboutUs"]</a></li>
                     <li><a asp-controller="Contact" asp-action="Index"
-                            class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isContactPage)">@Localizer["Contact"]</a>
-                    </li>
+                            class="block border-b border-stone-100 py-3 text-sm font-medium @MobileNavLinkClass(isContactPage)">@Localizer["Contact"]</a></li>
                     <li><a asp-controller="Faq" asp-action="Index"
-                            class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isFaqPage)">@Localizer["FAQ"]</a>
-                    </li>
-                    <li>
-                        <a href="/notifications"
-                           class="flex items-center justify-between border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isNotificationPage)">
-                            <span>🔔 Notifications</span>
-                            <span class="rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">4</span>
-                        </a>
-                    </li>
-                    <li><a asp-controller="Policy" asp-action="Index"
-                            class="block border-b border-stone-100 py-3 text-sm font-medium @NavLinkClass(isPolicyPage)">Policy
-                            &amp; Term of Use</a></li>
-                    <li><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
-                            class="block border-b border-stone-100 py-3 text-sm text-stone-700">Admin</a></li>
+                            class="block border-b border-stone-100 py-3 text-sm font-medium @MobileNavLinkClass(isFaqPage)">@Localizer["FAQ"]</a></li>
                     <li class="flex gap-2 pt-4">
                         <button type="button" data-auth-tab="login"
                             class="flex-1 rounded-full border border-blue-700 py-2 text-center text-sm font-medium text-blue-700">
@@ -267,6 +228,11 @@
     @if (!isStandalonePage)
     {
         <script src="~/js/auth-modal.js" asp-append-version="true"></script>
+        <script src="~/js/language-switcher.js" asp-append-version="true"></script>
+        @if (isLoggedIn)
+        {
+            <script src="~/js/header-notifications.js" asp-append-version="true"></script>
+        }
         <script>
             (function () {
                 var btn = document.getElementById('mobileMenuBtn');

@@ -30,6 +30,13 @@
         <p class="mt-1 text-sm font-medium text-slate-900">@Model.CardNumber</p>
       </div>
     </div>
+
+    @if (Model.Documents.Count > 0)
+    {
+      <div class="mt-8">
+        @await Html.PartialAsync("Partials/_DocumentSection", Model)
+      </div>
+    }
   </div>
 
   <div class="product-detail-tabs__panel" role="tabpanel" data-panel="grading" hidden>

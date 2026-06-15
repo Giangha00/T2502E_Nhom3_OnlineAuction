@@ -14,6 +14,11 @@ public class UserFormViewModel
     [Display(Name = "Full Name")]
     public string FullName { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "Username is required.")]
+    [StringLength(50, ErrorMessage = "Username cannot exceed 50 characters.")]
+    [RegularExpression(@"^[a-zA-Z0-9._-]+$", ErrorMessage = "Username contains invalid characters.")]
+    public string Username { get; set; } = string.Empty;
+
     [Required(ErrorMessage = "Email is required.")]
     [EmailAddress(ErrorMessage = "Invalid email format.")]
     [StringLength(160, ErrorMessage = "Email cannot exceed 160 characters.")]
@@ -30,9 +35,6 @@ public class UserFormViewModel
     [Required(ErrorMessage = "Status is required.")]
     public UserStatus Status { get; set; } = UserStatus.Active;
 
-    [Required(ErrorMessage = "Gender is required.")]
-    public Gender Gender { get; set; } = Gender.Male;
-
     [StringLength(120, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 120 characters.")]
     [DataType(DataType.Password)]
     [Display(Name = "Password")]
@@ -46,6 +48,4 @@ public class UserFormViewModel
     public List<SelectListItem> RoleOptions { get; set; } = [];
 
     public List<SelectListItem> StatusOptions { get; set; } = [];
-
-    public List<SelectListItem> GenderOptions { get; set; } = [];
 }

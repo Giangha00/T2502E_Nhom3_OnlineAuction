@@ -97,4 +97,20 @@
     <data name="AllRightsReserved" xml:space="preserve">
   <value>すべての権利が保護されています。</value>
 </data>
+
+    <data name="Sell" xml:space="preserve">
+  <value>出品</value>
+</data>
+
+    <data name="Notifications" xml:space="preserve">
+  <value>通知</value>
+</data>
+
+    <data name="ReadAll" xml:space="preserve">
+  <value>すべて既読</value>
+</data>
+
+    <data name="NoNotifications" xml:space="preserve">
+  <value>通知はありません</value>
+</data>
 </root>

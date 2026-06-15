@@ -3,39 +3,38 @@
     ViewData["Title"] = Model.Profile.Username;
 }
 
-<div class="rarecard-page bg-white">
-<section class="user-detail-page w-full px-4 py-8 sm:px-8 lg:px-12 lg:py-12">
-  <nav aria-label="Breadcrumb" class="mb-8">
-    <ol class="flex flex-wrap items-center gap-2 text-sm text-slate-500">
-      <li><a asp-controller="Home" asp-action="Index" class="transition hover:text-blue-700">Home</a></li>
-      <li aria-hidden="true" class="text-slate-300">/</li>
-      <li><a asp-controller="Auction" asp-action="Index" class="transition hover:text-blue-700">Auction</a></li>
-      <li aria-hidden="true" class="text-slate-300">/</li>
-      <li class="font-medium text-slate-800" aria-current="page">Seller Profile</li>
-    </ol>
-  </nav>
+<div class="user-detail-page min-h-screen bg-slate-50">
+  <section class="site-shell px-4 py-8 sm:px-6 lg:py-10">
+    <nav aria-label="Breadcrumb" class="mb-6">
+      <ol class="flex flex-wrap items-center gap-2 text-xs text-slate-400 sm:text-sm">
+        <li><a asp-controller="Home" asp-action="Index" class="transition hover:text-blue-700">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a asp-controller="Auction" asp-action="Index" class="transition hover:text-blue-700">Auction</a></li>
+        <li aria-hidden="true">/</li>
+        <li class="font-medium text-slate-700" aria-current="page">Seller Profile</li>
+      </ol>
+    </nav>
 
-  @await Html.PartialAsync("Partials/_UserProfileHeader", Model.Profile)
+    @await Html.PartialAsync("Partials/_UserProfileHeader", Model)
 
-  <div class="user-detail-actions-mobile mt-6 lg:hidden">
-    @await Html.PartialAsync("Partials/_ActionButtons", Model.Profile)
-  </div>
-
-  <div class="mt-8 grid gap-8 lg:grid-cols-3 lg:gap-10">
-    <div class="user-detail-main space-y-8 lg:col-span-2">
-      @await Html.PartialAsync("Partials/_UserInformation", Model.BasicInfo)
-      @await Html.PartialAsync("Partials/_SellerStatistics", Model.Statistics)
-      @await Html.PartialAsync("Partials/_SellerAuctionList", Model.Auctions)
-      @await Html.PartialAsync("Partials/_RatingSection", Model.Rating)
+    <div class="user-detail-actions-mobile mt-6 lg:hidden">
+      @await Html.PartialAsync("Partials/_ActionButtons", Model.Profile)
     </div>
 
-    <aside class="user-detail-sidebar hidden lg:block">
-      <div class="sticky-below-header">
-        @await Html.PartialAsync("Partials/_ActionButtons", Model.Profile)
+    <div class="mt-8 grid gap-8 lg:grid-cols-[1fr_300px] xl:grid-cols-[1fr_320px]">
+      <div class="space-y-8">
+        @await Html.PartialAsync("Partials/_UserInformation", Model.BasicInfo)
+        @await Html.PartialAsync("Partials/_SellerAuctionList", Model.Auctions)
+        @await Html.PartialAsync("Partials/_RatingSection", Model.Rating)
       </div>
-    </aside>
-  </div>
 
-  @await Html.PartialAsync("Partials/_RelatedAuctions", Model.RelatedAuctions)
-</section>
+      <aside class="hidden lg:block">
+        <div class="sticky-below-header">
+          @await Html.PartialAsync("Partials/_ActionButtons", Model.Profile)
+        </div>
+      </aside>
+    </div>
+
+    @await Html.PartialAsync("Partials/_RelatedAuctions", Model.RelatedAuctions)
+  </section>
 </div>

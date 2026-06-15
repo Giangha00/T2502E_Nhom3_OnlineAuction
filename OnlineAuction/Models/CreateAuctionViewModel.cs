@@ -18,9 +18,11 @@ public class CreateAuctionViewModel
 
     [Required(ErrorMessage = "Please select a condition.")]
     [Display(Name = "Condition")]
-    public string Condition { get; set; } = "Graded";
+    public string Condition { get; set; } = "New";
 
-    [Required(ErrorMessage = "Please select a grade.")]
+    [Display(Name = "Product Origin")]
+    public string? ProductOrigin { get; set; }
+
     [Display(Name = "Grade")]
     public string Grade { get; set; } = "PSA 10";
 
@@ -31,7 +33,6 @@ public class CreateAuctionViewModel
     [Display(Name = "Year")]
     public int? Year { get; set; }
 
-    [Required(ErrorMessage = "Set name is required.")]
     [StringLength(120)]
     [Display(Name = "Set Name")]
     public string SetName { get; set; } = string.Empty;
@@ -67,12 +68,14 @@ public class CreateAuctionViewModel
     [Display(Name = "Bid Step ($)")]
     public decimal BidStep { get; set; }
 
-    [Required(ErrorMessage = "Estimated value is required.")]
-    [Range(0.01, double.MaxValue, ErrorMessage = "Estimated value must be greater than 0.")]
-    [Display(Name = "Estimated Value ($)")]
-    public decimal EstimatedValue { get; set; }
+    [Range(0.01, double.MaxValue, ErrorMessage = "Buy now price must be greater than 0.")]
+    [Display(Name = "Buy Now Price ($)")]
+    public decimal? BuyNowPrice { get; set; }
 
-    [Required(ErrorMessage = "Auction event name is required.")]
+    [Required(ErrorMessage = "Please select an auction type.")]
+    [Display(Name = "Auction Type")]
+    public string AuctionType { get; set; } = "Normal";
+
     [StringLength(160)]
     [Display(Name = "Auction Event")]
     public string AuctionEventName { get; set; } = "RareCard Vault: Premium Trading Card Auction 2026";

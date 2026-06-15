@@ -42,6 +42,12 @@
             </div>
 
             <div>
+                <label asp-for="Username" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="Username" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="Username" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div>
                 <label asp-for="Email" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
                 <input asp-for="Email" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
                 <span asp-validation-for="Email" class="text-theme-xs text-error-600"></span>
@@ -70,12 +76,6 @@
                 <label asp-for="Status" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
                 <select asp-for="Status" asp-items="Model.StatusOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></select>
                 <span asp-validation-for="Status" class="text-theme-xs text-error-600"></span>
-            </div>
-
-            <div>
-                <label asp-for="Gender" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <select asp-for="Gender" asp-items="Model.GenderOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></select>
-                <span asp-validation-for="Gender" class="text-theme-xs text-error-600"></span>
             </div>
 
             <div>

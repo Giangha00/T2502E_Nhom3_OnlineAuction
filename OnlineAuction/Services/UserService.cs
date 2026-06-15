@@ -1,11 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using OnlineAuction.Areas.Admin.ViewModels.Users;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
+using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
+using AdminUserDetailViewModel = OnlineAuction.Areas.Admin.ViewModels.Users.UserDetailViewModel;
+using PublicUserDetailViewModel = OnlineAuction.Models.UserDetailViewModel;
 
 namespace OnlineAuction.Services;
 
@@ -13,14 +17,20 @@ public class UserService : IUserService
 {
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IAvatarStorageService _avatarStorageService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
     public UserService(
         AuctionHouseDbContext dbContext,
-        IAvatarStorageService avatarStorageService)
+        IAvatarStorageService avatarStorageService,
+        UserManager<ApplicationUser> userManager)
     {
         _dbContext = dbContext;
         _avatarStorageService = avatarStorageService;
+        _userManager = userManager;
     }
+
+    public Task<PublicUserDetailViewModel?> GetPublicProfileAsync(int id) =>
+        Task.FromResult(BuildPublicProfile(id));
 
     public async Task<UserListViewModel> GetUsersAsync(UserFilterViewModel filter)
     {
@@ -34,8 +44,9 @@ public class UserService : IUserService
 
             query = query.Where(user =>
                 user.FullName.Contains(keyword) ||
-                user.Email.Contains(keyword) ||
-                user.PhoneNumber.Contains(keyword));
+                (user.Email != null && user.Email.Contains(keyword)) ||
+                (user.PhoneNumber != null && user.PhoneNumber.Contains(keyword)) ||
+                (user.UserName != null && user.UserName.Contains(keyword)));
         }
 
         if (filter.Role.HasValue)
@@ -48,30 +59,25 @@ public class UserService : IUserService
             query = query.Where(user => user.Status == filter.Status.Value);
         }
 
-        if (filter.Gender.HasValue)
-        {
-            query = query.Where(user => user.Gender == filter.Gender.Value);
-        }
-
         var dateRange = ParseDateRange(filter.DateRange);
 
         if (dateRange.StartDate.HasValue && dateRange.EndDate.HasValue)
         {
             query = query.Where(user =>
-                user.CreatedDate >= dateRange.StartDate.Value &&
-                user.CreatedDate < dateRange.EndDate.Value);
+                user.CreatedAt >= dateRange.StartDate.Value &&
+                user.CreatedAt < dateRange.EndDate.Value);
         }
         else
         {
             if (filter.FromDate.HasValue)
             {
-                query = query.Where(user => user.CreatedDate >= filter.FromDate.Value);
+                query = query.Where(user => user.CreatedAt >= filter.FromDate.Value);
             }
 
             if (filter.ToDate.HasValue)
             {
                 var toDate = filter.ToDate.Value.Date.AddDays(1);
-                query = query.Where(user => user.CreatedDate < toDate);
+                query = query.Where(user => user.CreatedAt < toDate);
             }
         }
 
@@ -81,8 +87,8 @@ public class UserService : IUserService
         query = filter.SortOrder switch
         {
             "name_desc" => query.OrderByDescending(user => user.FullName),
-            "date_asc" => query.OrderBy(user => user.CreatedDate),
-            "date_desc" => query.OrderByDescending(user => user.CreatedDate),
+            "date_asc" => query.OrderBy(user => user.CreatedAt),
+            "date_desc" => query.OrderByDescending(user => user.CreatedAt),
             _ => query.OrderBy(user => user.FullName)
         };
 
@@ -93,13 +99,13 @@ public class UserService : IUserService
             {
                 Id = user.Id,
                 FullName = user.FullName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
+                Email = user.Email ?? string.Empty,
+                PhoneNumber = user.PhoneNumber ?? string.Empty,
+                Username = user.UserName ?? string.Empty,
                 AvatarUrl = user.AvatarUrl,
                 Role = user.Role,
                 Status = user.Status,
-                Gender = user.Gender,
-                CreatedDate = user.CreatedDate
+                CreatedAt = user.CreatedAt
             })
             .ToListAsync();
 
@@ -117,8 +123,7 @@ public class UserService : IUserService
         var model = new UserFormViewModel
         {
             Role = UserRole.User,
-            Status = UserStatus.Active,
-            Gender = Gender.Male
+            Status = UserStatus.Active
         };
 
         PopulateOptions(model);
@@ -140,11 +145,11 @@ public class UserService : IUserService
         {
             Id = user.Id,
             FullName = user.FullName,
-            Email = user.Email,
-            PhoneNumber = user.PhoneNumber,
+            Username = user.UserName ?? string.Empty,
+            Email = user.Email ?? string.Empty,
+            PhoneNumber = user.PhoneNumber ?? string.Empty,
             Role = user.Role,
             Status = user.Status,
-            Gender = user.Gender,
             CurrentAvatarUrl = user.AvatarUrl
         };
 
@@ -153,38 +158,48 @@ public class UserService : IUserService
         return model;
     }
 
-    public async Task<UserDetailViewModel?> GetDetailsAsync(int id)
+    public async Task<AdminUserDetailViewModel?> GetDetailsAsync(int id)
     {
-        return await _dbContext.Users.AsNoTracking()
+        var user = await _dbContext.Users.AsNoTracking()
             .Where(user => user.Id == id)
-            .Select(user => new UserDetailViewModel
+            .Select(user => new AdminUserDetailViewModel
             {
                 Id = user.Id,
                 FullName = user.FullName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
+                Username = user.UserName ?? string.Empty,
+                Email = user.Email ?? string.Empty,
+                PhoneNumber = user.PhoneNumber ?? string.Empty,
                 AvatarUrl = user.AvatarUrl,
                 Role = user.Role,
                 Status = user.Status,
-                Gender = user.Gender,
-                AuctionCount = user.AuctionCount,
-                HasActiveAuctionOrTransaction = user.HasActiveAuctionOrTransaction,
-                CreatedDate = user.CreatedDate,
-                UpdatedDate = user.UpdatedDate
+                AuctionCount = user.Products.Count,
+                HasActiveAuctionOrTransaction =
+                    user.Products.Any(p => p.Auctions.Any(a =>
+                        a.Status == AuctionStatuses.Live ||
+                        a.Status == AuctionStatuses.EndingSoon ||
+                        a.Status == AuctionStatuses.AwaitingPayment)) ||
+                    user.Orders.Any(o => o.Status == OrderStatuses.PendingPayment),
+                CreatedAt = user.CreatedAt,
+                UpdatedAt = user.UpdatedAt
             })
             .FirstOrDefaultAsync();
+
+        return user;
     }
 
     public async Task<(bool Success, string Message)> CreateAsync(UserFormViewModel model)
     {
         var normalizedEmail = model.Email.Trim();
+        var normalizedUsername = model.Username.Trim();
 
-        var isEmailExists = await _dbContext.Users
-            .AnyAsync(user => user.Email == normalizedEmail);
-
-        if (isEmailExists)
+        if (await _userManager.FindByEmailAsync(normalizedEmail) is not null)
         {
             return (false, "Email already exists.");
+        }
+
+        if (await _userManager.FindByNameAsync(normalizedUsername) is not null)
+        {
+            return (false, "Username already exists.");
         }
 
         if (string.IsNullOrWhiteSpace(model.InitialPassword))
@@ -194,23 +209,23 @@ public class UserService : IUserService
 
         var avatarUrl = await _avatarStorageService.SaveAvatarAsync(model.AvatarFile);
 
-        var user = new User
+        var user = new ApplicationUser
         {
-            FullName = model.FullName.Trim(),
+            UserName = normalizedUsername,
             Email = normalizedEmail,
+            FullName = model.FullName.Trim(),
             PhoneNumber = model.PhoneNumber.Trim(),
             Role = model.Role,
             Status = model.Status,
-            Gender = model.Gender,
             AvatarUrl = avatarUrl,
-            InitialPassword = model.InitialPassword,
-            CreatedDate = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow
         };
 
-        await _dbContext.Users.AddAsync(user);
-        await _dbContext.SaveChangesAsync();
+        var result = await _userManager.CreateAsync(user, model.InitialPassword);
 
-        return (true, "User created successfully.");
+        return result.Succeeded
+            ? (true, "User created successfully.")
+            : (false, string.Join(" ", result.Errors.Select(error => error.Description)));
     }
 
     public async Task<(bool Success, string Message)> UpdateAsync(UserFormViewModel model)
@@ -229,38 +244,51 @@ public class UserService : IUserService
         }
 
         var normalizedEmail = model.Email.Trim();
+        var normalizedUsername = model.Username.Trim();
 
-        var isEmailExists = await _dbContext.Users
-            .AnyAsync(otherUser =>
-                otherUser.Email == normalizedEmail &&
-                otherUser.Id != model.Id.Value);
-
-        if (isEmailExists)
+        var existingEmailUser = await _userManager.FindByEmailAsync(normalizedEmail);
+        if (existingEmailUser is not null && existingEmailUser.Id != model.Id.Value)
         {
             return (false, "Email already exists.");
+        }
+
+        var existingUsernameUser = await _userManager.FindByNameAsync(normalizedUsername);
+        if (existingUsernameUser is not null && existingUsernameUser.Id != model.Id.Value)
+        {
+            return (false, "Username already exists.");
         }
 
         var avatarUrl = await _avatarStorageService.SaveAvatarAsync(model.AvatarFile);
 
         user.FullName = model.FullName.Trim();
+        user.UserName = normalizedUsername;
         user.Email = normalizedEmail;
         user.PhoneNumber = model.PhoneNumber.Trim();
         user.Role = model.Role;
         user.Status = model.Status;
-        user.Gender = model.Gender;
-        user.UpdatedDate = DateTime.UtcNow;
-
-        if (!string.IsNullOrWhiteSpace(model.InitialPassword))
-        {
-            user.InitialPassword = model.InitialPassword;
-        }
+        user.UpdatedAt = DateTime.UtcNow;
 
         if (!string.IsNullOrWhiteSpace(avatarUrl))
         {
             user.AvatarUrl = avatarUrl;
         }
 
-        await _dbContext.SaveChangesAsync();
+        var updateResult = await _userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+        {
+            return (false, string.Join(" ", updateResult.Errors.Select(error => error.Description)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(model.InitialPassword))
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var passwordResult = await _userManager.ResetPasswordAsync(user, token, model.InitialPassword);
+
+            if (!passwordResult.Succeeded)
+            {
+                return (false, string.Join(" ", passwordResult.Errors.Select(error => error.Description)));
+            }
+        }
 
         return (true, "User updated successfully.");
     }
@@ -274,10 +302,11 @@ public class UserService : IUserService
             return (false, "User not found.");
         }
 
-        _dbContext.Users.Remove(user);
-        await _dbContext.SaveChangesAsync();
+        var result = await _userManager.DeleteAsync(user);
 
-        return (true, "User deleted successfully.");
+        return result.Succeeded
+            ? (true, "User deleted successfully.")
+            : (false, string.Join(" ", result.Errors.Select(error => error.Description)));
     }
 
     public async Task<(bool Success, string Message)> ExecuteBulkActionAsync(UserBulkActionViewModel model)
@@ -298,8 +327,14 @@ public class UserService : IUserService
 
         if (model.Action == UserBulkActions.Delete)
         {
-            _dbContext.Users.RemoveRange(users);
-            await _dbContext.SaveChangesAsync();
+            foreach (var user in users)
+            {
+                var result = await _userManager.DeleteAsync(user);
+                if (!result.Succeeded)
+                {
+                    return (false, string.Join(" ", result.Errors.Select(error => error.Description)));
+                }
+            }
 
             return (true, $"Deleted {users.Count} users.");
         }
@@ -314,7 +349,7 @@ public class UserService : IUserService
             foreach (var user in users)
             {
                 user.Status = model.Status.Value;
-                user.UpdatedDate = DateTime.UtcNow;
+                user.UpdatedAt = DateTime.UtcNow;
             }
 
             await _dbContext.SaveChangesAsync();
@@ -332,7 +367,7 @@ public class UserService : IUserService
             foreach (var user in users)
             {
                 user.Role = model.Role.Value;
-                user.UpdatedDate = DateTime.UtcNow;
+                user.UpdatedAt = DateTime.UtcNow;
             }
 
             await _dbContext.SaveChangesAsync();
@@ -342,6 +377,98 @@ public class UserService : IUserService
 
         return (false, "Invalid bulk action.");
     }
+
+    private static PublicUserDetailViewModel? BuildPublicProfile(int id)
+    {
+        var seller = MockAuctionData.GetBestSellers().FirstOrDefault(s => s.Id == id);
+        if (seller is null)
+        {
+            return null;
+        }
+
+        var profileExtras = GetProfileExtras(id);
+        var auctions = MockAuctionData.GetAuctionsBySellerId(id);
+        var related = MockAuctionData.GetAllAuctions()
+            .Where(a => !auctions.Any(x => x.Id == a.Id))
+            .Take(3)
+            .ToList();
+
+        return new PublicUserDetailViewModel
+        {
+            Profile = new UserProfileViewModel
+            {
+                Id = seller.Id,
+                Username = seller.Username,
+                FullName = profileExtras.FullName,
+                AvatarUrl = seller.AvatarUrl,
+                Role = "Seller",
+                MemberSince = profileExtras.MemberSince
+            },
+            BasicInfo = new UserBasicInfoViewModel
+            {
+                FullName = profileExtras.FullName,
+                Email = profileExtras.Email,
+                PhoneNumber = profileExtras.Phone,
+                Address = profileExtras.Address
+            },
+            Statistics = new SellerStatisticsViewModel
+            {
+                TotalAuctions = seller.AuctionCount,
+                CompletedAuctions = seller.SuccessfulSales,
+                TotalSales = profileExtras.TotalSales,
+                Rating = seller.Rating
+            },
+            Auctions = auctions,
+            Rating = new SellerRatingViewModel
+            {
+                AverageRating = seller.Rating,
+                ReviewCount = profileExtras.ReviewCount,
+                Reviews = GetReviewsForSeller(id)
+            },
+            RelatedAuctions = related
+        };
+    }
+
+    private static (string FullName, string Email, string Phone, string Address, int MemberSince, int TotalSales, int ReviewCount) GetProfileExtras(int id) =>
+        id switch
+        {
+            1 => ("Elena Voss", "elena.voss@gmail.com", "+84 912 345 678", "Ha Noi, Viet Nam", 2022, 120, 98),
+            2 => ("Marcus Chen", "marcus.chen@gmail.com", "+84 987 654 321", "Ho Chi Minh, Viet Nam", 2023, 95, 76),
+            3 => ("Sofia Nguyen", "sofia.gallery@gmail.com", "+84 901 234 567", "Da Nang, Viet Nam", 2021, 156, 142),
+            4 => ("James Retro", "james.retro@gmail.com", "+84 933 221 100", "Ha Noi, Viet Nam", 2024, 88, 54),
+            _ => ("John Smith", "john@gmail.com", "+84 xxx xxx xxx", "Ha Noi, Viet Nam", 2026, 120, 120)
+        };
+
+    private static List<SellerReviewViewModel> GetReviewsForSeller(int id) =>
+        id switch
+        {
+            1 =>
+            [
+                new() { ReviewerName = "Michael", Rating = 5, Comment = "Great seller! Fast shipping and item exactly as described.", ReviewDate = new DateTime(2026, 6, 10) },
+                new() { ReviewerName = "Anna", Rating = 5, Comment = "Professional communication throughout the auction.", ReviewDate = new DateTime(2026, 5, 28) },
+                new() { ReviewerName = "David", Rating = 4.5, Comment = "Smooth transaction. Would buy again.", ReviewDate = new DateTime(2026, 5, 12) }
+            ],
+            2 =>
+            [
+                new() { ReviewerName = "Michael", Rating = 5, Comment = "Great seller!", ReviewDate = new DateTime(2026, 6, 10) },
+                new() { ReviewerName = "Lisa", Rating = 4.5, Comment = "Reliable seller with quality items.", ReviewDate = new DateTime(2026, 4, 20) }
+            ],
+            3 =>
+            [
+                new() { ReviewerName = "Tom", Rating = 5, Comment = "Outstanding gallery pieces and packaging.", ReviewDate = new DateTime(2026, 6, 8) },
+                new() { ReviewerName = "Sarah", Rating = 5, Comment = "Best seller on the platform!", ReviewDate = new DateTime(2026, 5, 30) },
+                new() { ReviewerName = "Kevin", Rating = 5, Comment = "Highly recommend for art collectors.", ReviewDate = new DateTime(2026, 5, 15) }
+            ],
+            4 =>
+            [
+                new() { ReviewerName = "Michael", Rating = 4, Comment = "Good vintage finds. Delivery took a bit longer.", ReviewDate = new DateTime(2026, 6, 2) },
+                new() { ReviewerName = "Emma", Rating = 4.5, Comment = "Authentic retro items as advertised.", ReviewDate = new DateTime(2026, 4, 8) }
+            ],
+            _ =>
+            [
+                new() { ReviewerName = "Michael", Rating = 5, Comment = "Great seller!", ReviewDate = new DateTime(2026, 6, 10) }
+            ]
+        };
 
     private static void NormalizeFilter(UserFilterViewModel filter)
     {
@@ -364,14 +491,7 @@ public class UserService : IUserService
         model.StatusOptions =
         [
             new SelectListItem("Active", UserStatus.Active.ToString()),
-            new SelectListItem("Inactive", UserStatus.Inactive.ToString()),
-            new SelectListItem("Blocked", UserStatus.Blocked.ToString())
-        ];
-
-        model.GenderOptions =
-        [
-            new SelectListItem("Male", Gender.Male.ToString()),
-            new SelectListItem("Female", Gender.Female.ToString())
+            new SelectListItem("Inactive", UserStatus.Inactive.ToString())
         ];
     }
 

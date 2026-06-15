@@ -11,18 +11,18 @@ namespace OnlineAuction.Controllers
             {
                 ContactInfo = new ContactInfoModel
                 {
-                    Address = "123 Auction Street, Hanoi, Vietnam 10000",
-                    Phone = "+84 123 456 789",
-                    Email = "support@auctionhouse.com",
-                    WorkingHours = "Mon - Fri: 08:00 - 18:00"
+                    Address = "900 Collector's Plaza, 14th Floor, Manhattan, New York 10001",
+                    Phone = "+1 (888) RARE-CRD",
+                    Email = "support@rarecard.com",
+                    Discord = "RareCard Discord"
                 },
                 Location = new LocationModel
                 {
-                    Name = "Main Office",
-                    Address = "123 Auction Street, Hanoi 10000, Vietnam",
-                    Phone = "+84 123 456 789",
-                    Latitude = 21.0285,
-                    Longitude = 105.8542
+                    Name = "HQ Location",
+                    Address = "900 Collector's Plaza, 14th Floor, Manhattan, New York 10001",
+                    Phone = "+1 (888) RARE-CRD",
+                    Latitude = 40.7484,
+                    Longitude = -73.9857
                 },
                 FAQItems = new List<FAQItemModel>
                 {

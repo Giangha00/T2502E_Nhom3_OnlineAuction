@@ -8,6 +8,8 @@ public class UserDetailViewModel
 
     public string FullName { get; set; } = string.Empty;
 
+    public string Username { get; set; } = string.Empty;
+
     public string Email { get; set; } = string.Empty;
 
     public string PhoneNumber { get; set; } = string.Empty;
@@ -18,13 +20,11 @@ public class UserDetailViewModel
 
     public UserStatus Status { get; set; }
 
-    public Gender Gender { get; set; }
-
     public int AuctionCount { get; set; }
 
     public bool HasActiveAuctionOrTransaction { get; set; }
 
-    public DateTime CreatedDate { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public DateTime? UpdatedDate { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 }

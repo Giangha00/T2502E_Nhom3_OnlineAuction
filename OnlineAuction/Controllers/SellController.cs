@@ -1,36 +1,31 @@
 using Microsoft.AspNetCore.Mvc;
-using OnlineAuction.Data;
 using OnlineAuction.Models;
+using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
 
 public class SellController : Controller
 {
+    private readonly ISellService _sellService;
+
+    public SellController(ISellService sellService)
+    {
+        _sellService = sellService;
+    }
+
     [HttpGet]
     public IActionResult Create()
     {
-        return View(BuildForm());
+        return View(_sellService.BuildCreateForm());
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Create(CreateAuctionViewModel model)
     {
-        PopulateOptions(model);
-
-        if (model.StartDate < DateTime.Now.AddMinutes(-1))
+        foreach (var (key, message) in _sellService.ValidateCreateAuction(model))
         {
-            ModelState.AddModelError(nameof(model.StartDate), "Start date cannot be in the past.");
-        }
-
-        if (model.EndDate <= model.StartDate)
-        {
-            ModelState.AddModelError(nameof(model.EndDate), "End date must be greater than start date.");
-        }
-
-        if (model.EstimatedValue < model.StartingPrice)
-        {
-            ModelState.AddModelError(nameof(model.EstimatedValue), "Estimated value should be at least the starting price.");
+            ModelState.AddModelError(key, message);
         }
 
         if (!ModelState.IsValid)
@@ -51,29 +46,5 @@ public class SellController : Controller
         }
 
         return RedirectToAction(nameof(Create));
-    }
-
-    private static CreateAuctionViewModel BuildForm()
-    {
-        var model = new CreateAuctionViewModel
-        {
-            StartDate = DateTime.Now.AddHours(1),
-            EndDate = DateTime.Now.AddDays(7),
-            BidStep = 50,
-            Condition = "Graded",
-            Grade = "PSA 10",
-            Language = "English",
-            AuctionEventName = "RareCard Vault: Premium Trading Card Auction 2026"
-        };
-        PopulateOptions(model);
-        return model;
-    }
-
-    private static void PopulateOptions(CreateAuctionViewModel model)
-    {
-        model.Categories = MockAuctionData.GetCategoryNames().ToList();
-        model.Conditions = CreateAuctionMockData.Conditions.ToList();
-        model.Grades = CreateAuctionMockData.Grades.ToList();
-        model.Languages = CreateAuctionMockData.Languages.ToList();
     }
 }

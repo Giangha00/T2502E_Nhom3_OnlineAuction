@@ -1,25 +1,26 @@
 using Microsoft.AspNetCore.Mvc;
-using OnlineAuction.Data;
-using OnlineAuction.Models;
+using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
 
 public class AuctionController : Controller
 {
+    private readonly IAuctionService _auctionService;
+
+    public AuctionController(IAuctionService auctionService)
+    {
+        _auctionService = auctionService;
+    }
+
     public IActionResult Index()
     {
-        var model = new AuctionViewModel
-        {
-            Categories = MockAuctionData.GetCategories(),
-            Auctions = MockAuctionData.GetAllAuctions()
-        };
-
+        var model = _auctionService.GetAuctionIndex();
         return View(model);
     }
 
     public IActionResult Detail(int id)
     {
-        var product = MockProductDetailData.GetById(id);
+        var product = _auctionService.GetProductDetail(id);
         if (product is null)
         {
             return NotFound();
