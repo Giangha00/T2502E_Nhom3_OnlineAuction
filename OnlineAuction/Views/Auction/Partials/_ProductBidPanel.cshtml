@@ -7,9 +7,10 @@
     if (!string.IsNullOrEmpty(Model.SetName)) specs.Add(Model.SetName);
     if (!string.IsNullOrEmpty(Model.Condition)) specs.Add(Model.Condition);
     if (!string.IsNullOrEmpty(Model.CertificateNumber)) specs.Add($"Cert. {Model.CertificateNumber}");
+    var isLoggedIn = string.Equals(Context.Session.GetString("IsLoggedIn"), "true", StringComparison.Ordinal);
 }
 
-<div class="product-bid-panel">
+<div class="product-bid-panel" data-is-logged-in="@(isLoggedIn ? "true" : "false")" data-auction-id="@Model.Id">
   <p class="text-sm text-slate-500">Lot @Model.LotNumber</p>
 
   <h1 class="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">@Model.Category</h1>
@@ -74,7 +75,8 @@
     </div>
   </div>
 
-  <button type="button" class="mt-4 flex w-full items-center justify-center rounded-md bg-slate-900 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800">
+  <button type="button" id="placeBidBtn"
+          class="mt-4 flex w-full items-center justify-center rounded-md bg-slate-900 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800">
     Bid
   </button>
 
@@ -89,4 +91,8 @@
   <div class="product-bid-panel__divider"></div>
 
   <p class="text-sm leading-relaxed text-slate-600">@Model.AuctionEventName</p>
+
+  <div class="mt-6">
+    @await Html.PartialAsync("Partials/_SellerInfo", Model.Seller)
+  </div>
 </div>

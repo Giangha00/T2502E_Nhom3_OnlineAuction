@@ -1,122 +1,56 @@
-<!-- Contact Form Section -->
-<section class="border-t border-slate-200/80 bg-white/50 py-12 lg:py-16">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
-            <!-- Left Column - Additional Info -->
-            <div class="flex flex-col justify-center space-y-8">
-                <div>
-                    <h2 class="text-3xl font-bold text-slate-900 sm:text-4xl">
-                        Have a Question?
-                    </h2>
-                    <p class="mt-4 text-base text-slate-600 leading-7">
-                        Our dedicated support team is ready to assist you with any inquiries about our auction platform, bidding process, or services. We typically respond within 2-4 business hours.
-                    </p>
-                </div>
+<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+  <h2 class="text-xl font-bold text-slate-900">Send an Inquiry</h2>
+  <p class="mt-1 text-sm text-slate-500">Average response time: 2 hours (business days)</p>
 
-                <!-- Support Channels -->
-                <div class="space-y-4">
-                    <h3 class="font-semibold text-slate-900">Other Ways to Connect</h3>
-                    <ul class="space-y-3">
-                        <li class="flex items-start gap-3">
-                            <svg class="h-5 w-5 text-blue-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 10 10.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                            </svg>
-                            <div>
-                                <p class="font-medium text-slate-900">Live Chat Support</p>
-                                <p class="text-sm text-slate-600">Available Mon-Fri 8AM-6PM Vietnam Time</p>
-                            </div>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="h-5 w-5 text-blue-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 10 10.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                            </svg>
-                            <div>
-                                <p class="font-medium text-slate-900">FAQ Section</p>
-                                <p class="text-sm text-slate-600">Browse our comprehensive knowledge base</p>
-                            </div>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="h-5 w-5 text-blue-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 10 10.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                            </svg>
-                            <div>
-                                <p class="font-medium text-slate-900">Community Forum</p>
-                                <p class="text-sm text-slate-600">Connect with other auction house members</p>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Right Column - Contact Form -->
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-                <h3 class="text-xl font-semibold text-slate-900 mb-6">Send us a Message</h3>
-                
-                <form id="contactForm" class="space-y-5">
-                    <!-- Full Name -->
-                    <div>
-                        <label for="fullName" class="block text-sm font-medium text-slate-900 mb-2">
-                            Full Name <span class="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="fullName"
-                            placeholder="John Doe"
-                            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                        <span id="nameError" class="mt-1 block text-sm text-red-600"></span>
-                    </div>
-
-                    <!-- Email -->
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-slate-900 mb-2">
-                            Email Address <span class="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            placeholder="john@example.com"
-                            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                        <span id="emailError" class="mt-1 block text-sm text-red-600"></span>
-                    </div>
-
-                    <!-- Subject -->
-                    <div>
-                        <label for="subject" class="block text-sm font-medium text-slate-900 mb-2">
-                            Subject
-                        </label>
-                        <input
-                            type="text"
-                            id="subject"
-                            placeholder="How can we help you?"
-                            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                    </div>
-
-                    <!-- Message -->
-                    <div>
-                        <label for="message" class="block text-sm font-medium text-slate-900 mb-2">
-                            Message <span class="text-red-500">*</span>
-                        </label>
-                        <textarea
-                            id="message"
-                            placeholder="Please describe your inquiry in detail..."
-                            rows="5"
-                            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"></textarea>
-                        <span id="messageError" class="mt-1 block text-sm text-red-600"></span>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <button
-                        type="submit"
-                        class="w-full rounded-lg bg-blue-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800 focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 active:scale-95">
-                        Send Message
-                    </button>
-
-                    <p class="text-xs text-slate-500 text-center">
-                        We'll get back to you as soon as possible. Required fields are marked with <span class="text-red-500">*</span>
-                    </p>
-                </form>
-            </div>
-        </div>
+  <form id="contactForm" class="mt-6 space-y-5">
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="fullName" class="mb-1.5 block text-sm font-medium text-slate-700">Full Name</label>
+        <input type="text" id="fullName" placeholder="e.g. John Doe"
+               class="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
+        <span id="nameError" class="mt-1 hidden text-xs text-red-600"></span>
+      </div>
+      <div>
+        <label for="email" class="mb-1.5 block text-sm font-medium text-slate-700">Email Address</label>
+        <input type="email" id="email" placeholder="john@example.com"
+               class="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
+        <span id="emailError" class="mt-1 hidden text-xs text-red-600"></span>
+      </div>
     </div>
-</section>
 
+    <div>
+      <label for="reason" class="mb-1.5 block text-sm font-medium text-slate-700">Reason for contact</label>
+      <select id="reason"
+              class="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+        <option value="Auction Inquiry">Auction Inquiry</option>
+        <option value="Private Sale">Private Sale</option>
+        <option value="Account Support">Account Support</option>
+        <option value="Shipping & Insurance">Shipping &amp; Insurance</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="message" class="mb-1.5 block text-sm font-medium text-slate-700">Your Message</label>
+      <textarea id="message" rows="6" placeholder="How can our collectors' team assist you today?"
+                class="w-full resize-none rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></textarea>
+      <span id="messageError" class="mt-1 hidden text-xs text-red-600"></span>
+    </div>
+
+    <div class="flex flex-col gap-4 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+      <p class="flex items-center gap-2 text-xs text-slate-400">
+        <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/>
+        </svg>
+        Your data is secured by 256-bit encryption.
+      </p>
+      <button type="submit"
+              class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-700 px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-blue-800">
+        Submit Request
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+        </svg>
+      </button>
+    </div>
+  </form>
+</div>

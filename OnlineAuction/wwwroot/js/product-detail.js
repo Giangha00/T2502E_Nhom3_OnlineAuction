@@ -50,4 +50,55 @@
       });
     });
   });
+
+  var bidPanel = document.querySelector('.product-bid-panel');
+  var placeBidBtn = document.getElementById('placeBidBtn');
+
+  if (placeBidBtn && bidPanel) {
+    placeBidBtn.addEventListener('click', function () {
+      var isLoggedIn = bidPanel.getAttribute('data-is-logged-in') === 'true';
+
+      if (!isLoggedIn) {
+        if (typeof window.openAuthModal === 'function') {
+          window.openAuthModal('signup');
+        }
+        return;
+      }
+
+      var auctionId = bidPanel.getAttribute('data-auction-id');
+      var amount = bidSelect ? bidSelect.value : null;
+      if (!auctionId || !amount) return;
+
+      placeBidBtn.disabled = true;
+      placeBidBtn.textContent = 'Placing bid…';
+
+      var body = new URLSearchParams();
+      body.append('auctionId', auctionId);
+      body.append('amount', amount);
+
+      fetch('/Order/PlaceBid', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString()
+      })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error('Bid failed');
+          }
+          return response.json();
+        })
+        .then(function (data) {
+          if (data.success && data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+            return;
+          }
+          throw new Error(data.message || 'Bid failed');
+        })
+        .catch(function () {
+          placeBidBtn.disabled = false;
+          placeBidBtn.textContent = 'Bid';
+          window.alert('Unable to place bid. Please try again.');
+        });
+    });
+  }
 })();

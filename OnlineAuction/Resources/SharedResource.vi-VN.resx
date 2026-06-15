@@ -97,4 +97,20 @@
     <data name="AllRightsReserved" xml:space="preserve">
   <value>Tất cả các quyền được bảo lưu.</value>
 </data>
+
+    <data name="Sell" xml:space="preserve">
+  <value>Bán</value>
+</data>
+
+    <data name="Notifications" xml:space="preserve">
+  <value>Thông báo</value>
+</data>
+
+    <data name="ReadAll" xml:space="preserve">
+  <value>Đánh dấu đã đọc</value>
+</data>
+
+    <data name="NoNotifications" xml:space="preserve">
+  <value>Chưa có thông báo</value>
+</data>
 </root>

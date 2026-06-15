@@ -16,7 +16,11 @@
             <div class="relative overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
                 <div class="relative aspect-[3/4] bg-stone-100">
                     <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"/>
-                    @if (item.IsHot)
+                    @if (isEndingSoon)
+                    {
+                        <span class="absolute left-3 top-3 rounded-md bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">Ending Soon</span>
+                    }
+                    else if (item.IsHot)
                     {
                         <span class="absolute left-3 top-3 rounded-md bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">Hot</span>
                     }
@@ -60,7 +64,10 @@ else if (variant == "compact")
 else
 {
     <article class="rarecard-card rarecard-card--grid group @(Model.EnableFiltering ? "auction-card" : "")" @Html.Raw(filterAttrs)>
-        <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id" class="block">
+        <a asp-controller="@(isWon ? "Order" : "Auction")"
+           asp-action="@(isWon ? "Index" : "Detail")"
+           asp-route-id="@(isWon ? null : item.Id)"
+           class="block">
             <div class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:shadow-lg">
                 <div class="relative aspect-[4/5] bg-stone-50">
                     <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"/>

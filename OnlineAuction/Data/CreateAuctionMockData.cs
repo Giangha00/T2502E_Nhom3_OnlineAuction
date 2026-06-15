@@ -6,10 +6,15 @@ public static class CreateAuctionMockData
 
     public static readonly IReadOnlyList<string> Conditions =
     [
-        "Graded",
-        "Raw Near Mint",
-        "Raw Excellent",
-        "Raw Good"
+        "New",
+        "Like New",
+        "Used"
+    ];
+
+    public static readonly IReadOnlyList<string> AuctionTypes =
+    [
+        "Normal",
+        "Featured"
     ];
 
     public static readonly IReadOnlyList<string> Grades =
@@ -35,8 +40,9 @@ public static class CreateAuctionMockData
 
     public static readonly IReadOnlyList<string> DocumentTypes =
     [
-        "Product Certificate",
+        "Certificate",
         "Warranty",
-        "Product Verification"
+        "Invoice",
+        "Verification"
     ];
 }

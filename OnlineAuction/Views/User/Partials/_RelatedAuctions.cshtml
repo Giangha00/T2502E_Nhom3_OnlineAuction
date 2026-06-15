@@ -2,18 +2,18 @@
 
 @if (Model.Count > 0)
 {
-  <section class="related-auctions mt-12 border-t border-slate-200 pt-12">
+  <section class="mt-12 border-t border-slate-200 pt-10">
     <div class="mb-6">
-      <p class="text-sm font-semibold uppercase tracking-widest text-blue-700">Discover More</p>
-      <h2 class="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">Related Auctions</h2>
+      <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Discover More</p>
+      <h2 class="mt-1 text-xl font-bold text-slate-900 sm:text-2xl">Related Auctions</h2>
     </div>
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       @foreach (var item in Model)
       {
         <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id"
-           class="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
-          <div class="relative aspect-[4/3] overflow-hidden">
+           class="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-blue-200 hover:shadow-md">
+          <div class="relative aspect-[4/3] overflow-hidden bg-slate-100">
             <img src="@item.ImageUrl" alt="@item.Name" loading="lazy"
                  class="h-full w-full object-cover transition duration-500 group-hover:scale-105"/>
             <div class="absolute left-2 top-2">
@@ -21,7 +21,8 @@
             </div>
           </div>
           <div class="p-4">
-            <h3 class="line-clamp-2 text-sm font-semibold text-slate-900">@item.Name</h3>
+            <p class="text-[10px] font-semibold uppercase tracking-wide text-blue-700">@item.Category</p>
+            <h3 class="mt-1 line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-blue-800">@item.Name</h3>
             <p class="mt-2 text-sm font-bold text-blue-700">$@item.CurrentPrice.ToString("N0")</p>
           </div>
         </a>

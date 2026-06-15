@@ -1,14 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
-using OnlineAuction.Data;
-using OnlineAuction.Models;
+using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
 
 public class UserController : Controller
 {
-    public IActionResult Detail(int id)
+    private readonly IUserService _userService;
+
+    public UserController(IUserService userService)
     {
-        var model = MockUserDetailData.GetUserDetail(id);
+        _userService = userService;
+    }
+
+    public async Task<IActionResult> Detail(int id)
+    {
+        var model = await _userService.GetPublicProfileAsync(id);
         if (model is null)
         {
             return NotFound();

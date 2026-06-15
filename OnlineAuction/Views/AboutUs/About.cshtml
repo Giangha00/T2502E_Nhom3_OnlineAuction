@@ -1,94 +1,182 @@
+@using OnlineAuction.Data
 @{
     ViewData["Title"] = "About Us";
+
+    var curators = new[]
+    {
+        new { Name = "Julian Thorne", Title = "Founder & CEO", Bio = "Former auction house director with 20 years in high-value collectibles. Julian founded RareCard to bridge the gap between traditional heritage and digital precision.", Photo = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=800&fit=crop&q=80" },
+        new { Name = "Elena Vasquez", Title = "Head of Curation", Bio = "Expert in 19th-century ephemera and modern TCG history. Elena leads our team of specialists in vetting every listing for historical significance.", Photo = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=800&fit=crop&q=80" },
+        new { Name = "Marcus Chen", Title = "Technical Director", Bio = "Architect of our proprietary authentication engine. Marcus ensures that every digital transaction is backed by immutable physical verification.", Photo = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&h=800&fit=crop&q=80" }
+    };
 }
 
-<div class="rarecard-page bg-white">
-<partial name="_PageHero" model='new PageHeroViewModel {
-    Label = "RareCard",
-    Title = "About RareCard",
-    Description = "A trusted online auction platform for authenticated trading cards — discover premium collectibles, place bids confidently, and complete transactions in a transparent environment.",
-    Centered = true
-}' />
+<div class="about-page bg-white">
+  @* Hero *@
+  <section class="site-shell px-4 py-16 text-center sm:px-6 sm:py-20 lg:py-24">
+    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">Our Story</p>
+    <h1 class="mx-auto mt-4 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+      Elevating the legacy of collectible history.
+    </h1>
+    <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-500 sm:text-lg">
+      RareCard is more than a marketplace. It is a sanctuary for the world's most significant artifacts of modern culture.
+    </p>
+  </section>
 
-<section class="px-4 py-12 sm:px-8 lg:px-12 lg:py-16">
-    <div class="grid grid-cols-1 gap-7 lg:grid-cols-[1.3fr_1fr]">
-        <div>
-            <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">Project Introduction</p>
-            <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">Built for modern online auctions</h2>
-            <p class="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
-                RareCard is designed to connect sellers and collectors in one reliable digital marketplace.
-                The platform helps users create auction listings, join live bidding sessions, and finalize deals smoothly.
+  @* Our Mission *@
+  <section class="site-shell px-4 pb-16 sm:px-6 sm:pb-20 lg:pb-24">
+    <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+      <div class="overflow-hidden rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200">
+        <img src="@PageBannerImages.AboutMissionCard" alt="Graded collectible card in protective slab"
+             class="h-full w-full object-cover" loading="lazy"/>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Our Mission</h2>
+        <p class="mt-4 text-base leading-relaxed text-slate-600">
+          We believe that every card tells a story. Our mission is to preserve these stories through a platform built on
+          absolute transparency, expert curation, and technological precision.
+        </p>
+        <div class="mt-8 grid gap-6 sm:grid-cols-2">
+          <div>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/>
+              </svg>
+            </div>
+            <h3 class="mt-3 text-sm font-semibold text-slate-900">Uncompromising Integrity</h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-slate-500">
+              Every listing is vetted against the highest global standards for authenticity.
             </p>
-        </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 class="text-2xl font-semibold text-slate-900">Who we build for</h3>
-            <ul class="mt-4 list-disc space-y-2 pl-5 text-slate-600 leading-7">
-                <li>Sellers who want to reach more collectors.</li>
-                <li>Buyers searching for valuable graded cards.</li>
-                <li>Communities that need a secure and transparent bidding process.</li>
-            </ul>
-        </div>
-    </div>
-</section>
-
-<section class="border-t border-slate-200 bg-slate-50 px-4 py-12 sm:px-8 lg:px-12 lg:py-16">
-    <div class="grid grid-cols-1 items-center gap-6 md:grid-cols-[auto_1fr]">
-        <div class="grid h-28 w-28 place-items-center rounded-full bg-gradient-to-br from-blue-600 to-slate-900 shadow-lg shadow-blue-200" aria-hidden="true">
-            <div class="text-3xl font-semibold text-white">RC</div>
-        </div>
-        <div>
-            <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">Our Mission</p>
-            <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">Create a transparent and secure auction environment</h2>
-            <p class="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
-                We focus on building trust in every auction by delivering clear bidding flows,
-                reliable transaction tracking, and a user experience that is simple for everyone.
+          </div>
+          <div>
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.696 13.653 17.002 15.5 12.75 15.5s-8.25-1.847-8.25-4.125v-3.75"/>
+              </svg>
+            </div>
+            <h3 class="mt-3 text-sm font-semibold text-slate-900">Historical Custodians</h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-slate-500">
+              We track the provenance of every high-value asset in our ecosystem.
             </p>
+          </div>
         </div>
+      </div>
     </div>
-</section>
+  </section>
 
-<section class="px-4 py-12 sm:px-8 lg:px-12 lg:py-16">
-    <div>
-        <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">How RareCard Works</p>
-        <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">Simple, clear, and reliable process</h2>
+  @* Precision Authentication *@
+  <section class="site-shell px-4 pb-16 sm:px-6 sm:pb-20 lg:pb-24">
+    <div class="text-center">
+      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Precision Authentication</h2>
+      <p class="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
+        Our strategic partnerships with PSA and BGS ensure that every card on RareCard is exactly what it claims to be.
+      </p>
+    </div>
 
-        <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            @foreach (var step in new[] {
-                new { Num = "Step 1", Title = "User creates auction", Desc = "Seller posts card details, starting price, and auction timeline." },
-                new { Num = "Step 2", Title = "Other users place bids", Desc = "Interested buyers join and submit competitive bids in real time." },
-                new { Num = "Step 3", Title = "Highest bidder wins", Desc = "When the auction closes, the highest valid bid is selected automatically." },
-                new { Num = "Step 4", Title = "Complete transaction", Desc = "Buyer and seller complete payment and delivery with status tracking." }
-            })
-            {
-                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
-                    <span class="inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">@step.Num</span>
-                    <h3 class="mt-3 text-xl font-semibold text-slate-900">@step.Title</h3>
-                    <p class="mt-2 text-sm leading-7 text-slate-600">@step.Desc</p>
-                </article>
-            }
+    <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2">
+      @* PSA — large top-left *@
+      <article class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2 lg:row-span-1">
+        <div>
+          <span class="inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">Primary Partner: PSA Grading</span>
+          <h3 class="mt-4 text-xl font-bold text-slate-900">The Gold Standard</h3>
+          <p class="mt-2 max-w-lg text-sm leading-relaxed text-slate-500">
+            Direct API integration allows for real-time verification of every PSA slab in our inventory. No manual entry, no human error.
+          </p>
         </div>
-    </div>
-</section>
-
-<section class="border-t border-slate-200 bg-slate-50 px-4 py-12 sm:px-8 lg:px-12 lg:py-16">
-    <div>
-        <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">Core Features</p>
-        <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">Everything needed for online auction operations</h2>
-
-        <div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
-            @foreach (var feature in new[] {
-                new { Title = "Online Auction", Desc = "Users can participate in live online auctions from anywhere." },
-                new { Title = "Secure Bidding", Desc = "Bidding activities are visible and consistent to improve transparency." },
-                new { Title = "Seller Management", Desc = "Manage product listings, auction sessions, and bidder participation." },
-                new { Title = "Transaction Tracking", Desc = "Track each transaction stage from winning bid to completion." }
-            })
-            {
-                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                    <h3 class="text-xl font-semibold text-slate-900">@feature.Title</h3>
-                    <p class="mt-2 text-sm leading-7 text-slate-600">@feature.Desc</p>
-                </article>
-            }
+        <div class="mt-6 flex gap-3">
+          <img src="@PageBannerImages.AboutCardDetail1" alt="Card detail" class="h-16 w-16 rounded-lg object-cover" loading="lazy"/>
+          <img src="@PageBannerImages.AboutCardDetail2" alt="Card detail" class="h-16 w-16 rounded-lg object-cover" loading="lazy"/>
         </div>
+      </article>
+
+      @* Multi-Point Grading — blue top-right *@
+      <article class="flex flex-col justify-between rounded-2xl bg-blue-700 p-6 text-white lg:col-span-1">
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/15">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/>
+          </svg>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-lg font-bold">Multi-Point Grading</h3>
+          <p class="mt-2 text-sm leading-relaxed text-blue-100">
+            Our internal team performs a secondary 10-point physical inspection on every high-tier asset before listing.
+          </p>
+        </div>
+      </article>
+
+      @* BECKETT — bottom-left *@
+      <article class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-1">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">BECKETT (BGS)</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-500">
+            Specialized partnership focusing on the technical nuances of card centering and surface preservation.
+          </p>
+        </div>
+        <a href="#" class="mt-4 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-blue-700 hover:text-blue-800">
+          Verification lookup here
+          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+          </svg>
+        </a>
+      </article>
+
+      @* Vaulting & Security — bottom-right with image *@
+      <article class="relative overflow-hidden rounded-2xl lg:col-span-2">
+        <img src="@PageBannerImages.AboutVault" alt="Secure card vault" class="absolute inset-0 h-full w-full object-cover" loading="lazy"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent"></div>
+        <div class="relative flex min-h-[220px] flex-col justify-end p-6 sm:min-h-[260px]">
+          <h3 class="text-xl font-bold text-white">Vaulting &amp; Security</h3>
+          <p class="mt-2 max-w-md text-sm leading-relaxed text-slate-200">
+            Climate-controlled facilities ensure your assets are preserved in museum-grade conditions until the moment of sale.
+          </p>
+        </div>
+      </article>
     </div>
-</section>
+  </section>
+
+  @* The Curators *@
+  <section class="site-shell px-4 pb-16 sm:px-6 sm:pb-20 lg:pb-24">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div class="max-w-xl">
+        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">The Curators</h2>
+        <p class="mt-3 text-sm leading-relaxed text-slate-500 sm:text-base">
+          Our team brings over 30 years of combined experience in the global collectibles market.
+        </p>
+      </div>
+      <a href="#" class="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+        Join Our Team
+      </a>
+    </div>
+
+    <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      @foreach (var member in curators)
+      {
+        <article>
+          <div class="aspect-[3/4] overflow-hidden rounded-xl bg-slate-100">
+            <img src="@member.Photo" alt="@member.Name" class="h-full w-full object-cover grayscale" loading="lazy"/>
+          </div>
+          <h3 class="mt-4 text-base font-bold text-slate-900">@member.Name</h3>
+          <p class="mt-0.5 text-sm font-medium text-blue-700">@member.Title</p>
+          <p class="mt-2 text-sm leading-relaxed text-slate-500">@member.Bio</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  @* Newsletter *@
+  <section class="border-t border-slate-100 bg-white px-4 py-16 sm:px-6 sm:py-20">
+    <div class="site-shell mx-auto max-w-xl text-center">
+      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Stay informed on the next big drop.</h2>
+      <p class="mt-3 text-sm leading-relaxed text-slate-500 sm:text-base">
+        Join our private newsletter for early access to curated collections and market insights.
+      </p>
+      <form class="mt-8 flex flex-col gap-3 sm:flex-row" onsubmit="return false;">
+        <input type="email" placeholder="Your professional email" aria-label="Email address"
+               class="flex-1 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
+        <button type="submit"
+                class="shrink-0 rounded-lg bg-blue-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-800">
+          Subscribe
+        </button>
+      </form>
+    </div>
+  </section>
 </div>

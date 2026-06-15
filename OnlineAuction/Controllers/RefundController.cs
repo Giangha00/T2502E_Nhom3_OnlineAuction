@@ -1,16 +1,23 @@
 using Microsoft.AspNetCore.Mvc;
-using OnlineAuction.Data;
 using OnlineAuction.Models;
+using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
 
 public class RefundController : Controller
 {
+    private readonly IPaymentService _paymentService;
+
+    public RefundController(IPaymentService paymentService)
+    {
+        _paymentService = paymentService;
+    }
+
     public IActionResult Index()
     {
         var model = new RefundPageViewModel
         {
-            RecentOrders = BuildRecentOrders(),
+            RecentOrders = _paymentService.GetRefundEligibleOrders(),
             RefundReasons =
             [
                 new RefundReasonOption { Id = "not-as-described", Label = "Item not as described in listing" },
@@ -58,31 +65,5 @@ public class RefundController : Controller
         };
 
         return View(model);
-    }
-
-    private static List<RefundEligibleOrderViewModel> BuildRecentOrders()
-    {
-        var orderIds = new[] { 3, 12 };
-        return orderIds
-            .Select(id => MockAuctionData.GetAuctionById(id))
-            .Where(a => a is not null)
-            .Select(a =>
-            {
-                var platformFee = Math.Round(a!.CurrentPrice * 0.025m, 2);
-                var shipping = a.Category switch
-                {
-                    "Sports" => 22m,
-                    _ => 18m
-                };
-
-                return new RefundEligibleOrderViewModel
-                {
-                    OrderReference = $"AH-20260310-{a.Id:D4}",
-                    AuctionName = a.Name,
-                    AmountPaid = a.CurrentPrice + platformFee + shipping,
-                    PaidOn = DateTime.UtcNow.AddDays(-a.Id % 5)
-                };
-            })
-            .ToList();
     }
 }
