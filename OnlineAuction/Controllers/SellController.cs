@@ -47,7 +47,14 @@ public class SellController : Controller
         {
             if (Request.Headers.ContainsKey("X-Requested-With"))
             {
-                return BadRequest(ModelState);
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ModelState.Values
+                        .SelectMany(entry => entry.Errors)
+                        .Select(error => error.ErrorMessage)
+                        .FirstOrDefault() ?? "Please check the auction form."
+                });
             }
 
             return View(model);

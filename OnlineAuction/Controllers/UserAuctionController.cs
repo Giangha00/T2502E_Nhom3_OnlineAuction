@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
@@ -11,13 +13,16 @@ namespace OnlineAuction.Controllers;
 [Route("User/Auction")]
 public class UserAuctionController : Controller
 {
+    private readonly AuctionHouseDbContext _db;
     private readonly ISellerAuctionService _sellerAuctionService;
     private readonly UserManager<ApplicationUser> _userManager;
 
     public UserAuctionController(
+        AuctionHouseDbContext db,
         ISellerAuctionService sellerAuctionService,
         UserManager<ApplicationUser> userManager)
     {
+        _db = db;
         _sellerAuctionService = sellerAuctionService;
         _userManager = userManager;
     }
@@ -50,6 +55,16 @@ public class UserAuctionController : Controller
 
         model.AuctionId = auctionId;
 
+        if (!await IsAuctionOwnerAsync(auctionId, sellerId.Value))
+        {
+            return Forbid();
+        }
+
+        if (model.EndDate <= model.StartDate)
+        {
+            ModelState.AddModelError(nameof(model.EndDate), "End date must be greater than start date.");
+        }
+
         if (!ModelState.IsValid)
         {
             return View(model);
@@ -76,6 +91,11 @@ public class UserAuctionController : Controller
             return RedirectToAction("Login", "Auth");
         }
 
+        if (!await IsAuctionOwnerAsync(auctionId, sellerId.Value))
+        {
+            return Forbid();
+        }
+
         var result = await _sellerAuctionService.CancelAsync(auctionId, sellerId.Value);
 
         TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
@@ -87,5 +107,12 @@ public class UserAuctionController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
         return user?.Id;
+    }
+
+    private Task<bool> IsAuctionOwnerAsync(int auctionId, int sellerId)
+    {
+        return _db.Auctions.AnyAsync(auction =>
+            auction.Id == auctionId &&
+            auction.Product.SellerId == sellerId);
     }
 }

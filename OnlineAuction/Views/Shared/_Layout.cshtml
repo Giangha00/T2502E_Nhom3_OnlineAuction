@@ -29,6 +29,7 @@
     var isLoggedIn = User.Identity?.IsAuthenticated == true;
     ApplicationUser? currentUser = isLoggedIn ? await UserManager.GetUserAsync(User) : null;
     var displayName = currentUser?.FullName ?? User.Identity?.Name ?? "User";
+    var currentUserId = currentUser?.Id ?? 0;
     var orderCount = isLoggedIn ? OnlineAuction.Data.WonOrderStore.GetCount(Context.Session) : 0;
     var isOrderPage = string.Equals(currentController, "Order", StringComparison.OrdinalIgnoreCase);
 
@@ -114,14 +115,32 @@
 
                     @if (isLoggedIn)
                     {
-                        <div class="hidden items-center gap-3 lg:flex">
-                            <span class="max-w-[140px] truncate text-sm font-medium text-slate-700" title="@displayName">@displayName</span>
-                            <form asp-controller="Auth" asp-action="Logout" method="post" class="inline">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
-                                    Logout
-                                </button>
-                            </form>
+                        <div class="group relative hidden lg:block">
+                            <button type="button"
+                                    class="flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white py-1.5 pl-2 pr-3 text-sm font-medium text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                    aria-haspopup="true">
+                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-700 text-xs font-bold uppercase text-white">
+                                    @(string.IsNullOrWhiteSpace(displayName) ? "U" : displayName.Trim()[0].ToString())
+                                </span>
+                                <span class="max-w-[140px] truncate" title="@displayName">@displayName</span>
+                                <svg class="h-4 w-4 text-slate-400 transition group-hover:text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                                </svg>
+                            </button>
+
+                            <div class="invisible absolute right-0 top-full z-50 mt-2 w-44 rounded-xl border border-slate-200 bg-white py-2 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                                <a asp-controller="User" asp-action="Detail" asp-route-id="@currentUserId"
+                                   class="block px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700">
+                                    Profile
+                                </a>
+                                <form asp-controller="Auth" asp-action="Logout" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="block w-full cursor-pointer px-4 py-2 text-left text-sm font-medium text-red-600 transition hover:bg-red-50">
+                                        Log out
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     }
                     else
@@ -163,10 +182,14 @@
                         @if (isLoggedIn)
                         {
                             <p class="text-sm font-medium text-slate-700">@displayName</p>
+                            <a asp-controller="User" asp-action="Detail" asp-route-id="@currentUserId"
+                               class="w-full rounded-full border border-blue-200 py-2 text-center text-sm font-medium text-blue-700 transition hover:bg-blue-50">
+                                Profile
+                            </a>
                             <form asp-controller="Auth" asp-action="Logout" method="post">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="w-full rounded-full border border-slate-300 py-2 text-center text-sm font-medium text-slate-700">
-                                    Logout
+                                <button type="submit" class="w-full cursor-pointer rounded-full border border-slate-300 py-2 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                                    Log out
                                 </button>
                             </form>
                         }
@@ -292,6 +315,13 @@
                     var isOpen = !nav.classList.contains('hidden');
                     nav.classList.toggle('hidden', isOpen);
                     btn.setAttribute('aria-expanded', String(!isOpen));
+                });
+
+                document.querySelectorAll('[data-auto-dismiss]').forEach(function (el) {
+                    var delay = Number(el.getAttribute('data-auto-dismiss')) || 5000;
+                    window.setTimeout(function () {
+                        el.classList.add('hidden');
+                    }, delay);
                 });
             })();
         </script>
