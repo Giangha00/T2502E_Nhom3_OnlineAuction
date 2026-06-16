@@ -10,7 +10,6 @@ public class UserDetailViewModel
     public List<AuctionItemViewModel> Auctions { get; set; } = [];
     public SellerRatingViewModel Rating { get; set; } = new();
     public List<AuctionItemViewModel> RelatedAuctions { get; set; } = [];
-    public bool IsOwner { get; set; }
 }
 
 public class UserProfileViewModel
@@ -22,7 +21,6 @@ public class UserProfileViewModel
     public string AvatarUrl { get; set; } = string.Empty;
     public string Role { get; set; } = "Seller";
     public int MemberSince { get; set; }
-    public bool IsOwner { get; set; }
 }
 
 public class SellerAuctionCardViewModel
