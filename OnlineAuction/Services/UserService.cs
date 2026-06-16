@@ -68,7 +68,7 @@ public class UserService : IUserService
                 auction.Status,
                 auction.EndDate,
                 ProductName = auction.Product.Name,
-                auction.Product.Category,
+                CategoryName = auction.Product.Category.Name,
                 auction.Product.PrimaryImage,
                 auction.Product.GradeLabel,
                 auction.Product.Condition,
@@ -81,7 +81,7 @@ public class UserService : IUserService
             {
                 Id = auction.Id,
                 Name = auction.ProductName,
-                Category = auction.Category,
+                Category = auction.CategoryName,
                 ImageUrl = auction.PrimaryImage,
                 StartingPrice = auction.StartingPrice,
                 CurrentPrice = auction.CurrentPrice,
@@ -114,7 +114,7 @@ public class UserService : IUserService
                 auction.Status,
                 auction.EndDate,
                 ProductName = auction.Product.Name,
-                auction.Product.Category,
+                CategoryName = auction.Product.Category.Name,
                 auction.Product.PrimaryImage,
                 auction.Product.GradeLabel,
                 auction.Product.Condition,
@@ -127,7 +127,7 @@ public class UserService : IUserService
             {
                 Id = auction.Id,
                 Name = auction.ProductName,
-                Category = auction.Category,
+                Category = auction.CategoryName,
                 ImageUrl = auction.PrimaryImage,
                 StartingPrice = auction.StartingPrice,
                 CurrentPrice = auction.CurrentPrice,
@@ -315,7 +315,7 @@ public class UserService : IUserService
                 AvatarUrl = user.AvatarUrl,
                 Role = user.Role,
                 Status = user.Status,
-                AuctionCount = user.Products.Count,
+                AuctionCount = user.Products.Count(),
                 HasActiveAuctionOrTransaction =
                     user.Products.Any(p => p.Auctions.Any(a =>
                         a.Status == AuctionStatuses.Live ||

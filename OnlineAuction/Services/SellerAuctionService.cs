@@ -40,7 +40,7 @@ public class SellerAuctionService : ISellerAuctionService
             {
                 Id = auction.Id,
                 Name = auction.Product.Name,
-                Category = auction.Product.Category,
+                Category = auction.Product.Category.Name,
                 ImageUrl = auction.Product.PrimaryImage,
                 StartingPrice = auction.StartingPrice,
                 CurrentPrice = auction.CurrentPrice,
@@ -85,12 +85,15 @@ public class SellerAuctionService : ISellerAuctionService
             ? DefaultProductImageUrl
             : imageUrl;
 
+        var category = await GetOrCreateCategoryAsync(model.Category);
+
         // Insert Product truoc. Product chua thong tin mat hang/card va gan voi seller_id.
+        // DB moi dung categories rieng, vi vay service nhan chuoi tu form va map thanh category_id.
         var product = new Product
         {
             SellerId = sellerId,
             Name = model.ProductName.Trim(),
-            Category = model.Category.Trim(),
+            CategoryId = category.Id,
             ShortDescription = string.IsNullOrWhiteSpace(model.Subtitle) ? null : model.Subtitle.Trim(),
             DescriptionHtml = model.ProductDescription,
             Condition = model.Condition,
@@ -99,6 +102,7 @@ public class SellerAuctionService : ISellerAuctionService
             GradeLabel = string.IsNullOrWhiteSpace(model.Grade) ? null : model.Grade.Trim(),
             CertNumber = string.IsNullOrWhiteSpace(model.CertificateNumber) ? null : model.CertificateNumber.Trim(),
             PrimaryImage = imageUrl,
+            Category = category,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -127,6 +131,7 @@ public class SellerAuctionService : ISellerAuctionService
         var auction = await _db.Auctions
             .AsNoTracking()
             .Include(a => a.Product)
+            .ThenInclude(product => product.Category)
             .FirstOrDefaultAsync(a => a.Id == auctionId && a.Product.SellerId == sellerId);
 
         if (auction is null)
@@ -138,7 +143,7 @@ public class SellerAuctionService : ISellerAuctionService
         {
             AuctionId = auction.Id,
             ProductName = auction.Product.Name,
-            Category = auction.Product.Category,
+            Category = auction.Product.Category.Name,
             ShortDescription = auction.Product.ShortDescription,
             DescriptionHtml = auction.Product.DescriptionHtml,
             Condition = auction.Product.Condition,
@@ -199,8 +204,11 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, ex.Message);
         }
 
+        var category = await GetOrCreateCategoryAsync(model.Category);
+
         auction.Product.Name = model.ProductName.Trim();
-        auction.Product.Category = model.Category.Trim();
+        auction.Product.CategoryId = category.Id;
+        auction.Product.Category = category;
         auction.Product.ShortDescription = model.ShortDescription;
         auction.Product.DescriptionHtml = model.DescriptionHtml;
         auction.Product.Condition = model.Condition;
@@ -259,5 +267,51 @@ public class SellerAuctionService : ISellerAuctionService
         await _db.SaveChangesAsync();
 
         return (true, "Auction cancelled successfully.");
+    }
+
+    private async Task<Category> GetOrCreateCategoryAsync(string categoryName)
+    {
+        var normalizedName = string.IsNullOrWhiteSpace(categoryName)
+            ? "Uncategorized"
+            : categoryName.Trim();
+        var normalizedSlug = BuildSlug(normalizedName);
+
+        var category = await _db.Categories
+            .FirstOrDefaultAsync(item => item.Name == normalizedName || item.Slug == normalizedSlug);
+
+        if (category is not null)
+        {
+            return category;
+        }
+
+        // Tao category moi khi form gui len gia tri chua co trong bang categories.
+        // Viec nay giup CRUD seller khong bi loi foreign key category_id sau khi team merge schema moi.
+        category = new Category
+        {
+            Name = normalizedName,
+            Slug = normalizedSlug,
+            IsActive = true,
+            SortOrder = 0,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _db.Categories.Add(category);
+        await _db.SaveChangesAsync();
+
+        return category;
+    }
+
+    private static string BuildSlug(string value)
+    {
+        var chars = value
+            .Trim()
+            .ToLowerInvariant()
+            .Select(ch => char.IsLetterOrDigit(ch) ? ch : '-')
+            .ToArray();
+
+        var slug = string.Join("-", new string(chars)
+            .Split('-', StringSplitOptions.RemoveEmptyEntries));
+
+        return string.IsNullOrWhiteSpace(slug) ? "uncategorized" : slug;
     }
 }
