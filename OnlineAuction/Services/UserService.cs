@@ -29,8 +29,151 @@ public class UserService : IUserService
         _userManager = userManager;
     }
 
-    public Task<PublicUserDetailViewModel?> GetPublicProfileAsync(int id) =>
-        Task.FromResult(BuildPublicProfile(id));
+    public async Task<PublicUserDetailViewModel?> GetPublicProfileAsync(int id)
+    {
+        // User Detail bay gio doc seller tu bang users trong MySQL thay vi mock data.
+        var seller = await _dbContext.Users
+            .AsNoTracking()
+            .Where(user => user.Id == id)
+            .Select(user => new
+            {
+                user.Id,
+                user.UserName,
+                user.FullName,
+                user.Email,
+                user.PhoneNumber,
+                user.AvatarUrl,
+                user.Role,
+                user.CreatedAt
+            })
+            .FirstOrDefaultAsync();
+
+        if (seller is null)
+        {
+            return null;
+        }
+
+        // Lay danh sach auction cua seller theo quan he: products.seller_id -> auctions.product_id.
+        var sellerAuctions = await _dbContext.Auctions
+            .AsNoTracking()
+            .Where(auction =>
+                auction.Product.SellerId == id &&
+                auction.Status != AuctionStatuses.Cancelled)
+            .OrderByDescending(auction => auction.CreatedAt)
+            .Select(auction => new
+            {
+                auction.Id,
+                auction.StartingPrice,
+                auction.CurrentPrice,
+                auction.Status,
+                auction.EndDate,
+                ProductName = auction.Product.Name,
+                Category = auction.Product.Category.Name,
+                auction.Product.PrimaryImage,
+                auction.Product.GradeLabel,
+                auction.Product.Condition,
+                auction.Product.Year
+            })
+            .ToListAsync();
+
+        var auctions = sellerAuctions
+            .Select(auction => new AuctionItemViewModel
+            {
+                Id = auction.Id,
+                Name = auction.ProductName,
+                Category = auction.Category,
+                ImageUrl = auction.PrimaryImage,
+                StartingPrice = auction.StartingPrice,
+                CurrentPrice = auction.CurrentPrice,
+                Status = auction.Status,
+                TimeRemaining = FormatAuctionTimeRemaining(auction.EndDate),
+                Grade = auction.GradeLabel ?? string.Empty,
+                Condition = auction.Condition,
+                Year = auction.Year ?? 0
+            })
+            .ToList();
+
+        var completedAuctions = await _dbContext.Auctions
+            .AsNoTracking()
+            .CountAsync(auction =>
+                auction.Product.SellerId == id &&
+                auction.Status == AuctionStatuses.Completed);
+
+        var relatedRows = await _dbContext.Auctions
+            .AsNoTracking()
+            .Where(auction =>
+                auction.Product.SellerId != id &&
+                auction.Status == AuctionStatuses.Live)
+            .OrderByDescending(auction => auction.CreatedAt)
+            .Take(3)
+            .Select(auction => new
+            {
+                auction.Id,
+                auction.StartingPrice,
+                auction.CurrentPrice,
+                auction.Status,
+                auction.EndDate,
+                ProductName = auction.Product.Name,
+                Category = auction.Product.Category.Name,
+                auction.Product.PrimaryImage,
+                auction.Product.GradeLabel,
+                auction.Product.Condition,
+                auction.Product.Year
+            })
+            .ToListAsync();
+
+        var related = relatedRows
+            .Select(auction => new AuctionItemViewModel
+            {
+                Id = auction.Id,
+                Name = auction.ProductName,
+                Category = auction.Category,
+                ImageUrl = auction.PrimaryImage,
+                StartingPrice = auction.StartingPrice,
+                CurrentPrice = auction.CurrentPrice,
+                Status = auction.Status,
+                TimeRemaining = FormatAuctionTimeRemaining(auction.EndDate),
+                Grade = auction.GradeLabel ?? string.Empty,
+                Condition = auction.Condition,
+                Year = auction.Year ?? 0
+            })
+            .ToList();
+
+        return new PublicUserDetailViewModel
+        {
+            Profile = new UserProfileViewModel
+            {
+                Id = seller.Id,
+                Username = seller.UserName ?? string.Empty,
+                FullName = seller.FullName,
+                AvatarUrl = seller.AvatarUrl ?? "/admin/images/user/user-01.jpg",
+                Role = seller.Role.ToString(),
+                MemberSince = seller.CreatedAt.Year
+            },
+            BasicInfo = new UserBasicInfoViewModel
+            {
+                FullName = seller.FullName,
+                Email = seller.Email ?? string.Empty,
+                PhoneNumber = seller.PhoneNumber ?? string.Empty,
+                Address = string.Empty
+            },
+            Statistics = new SellerStatisticsViewModel
+            {
+                TotalAuctions = auctions.Count,
+                CompletedAuctions = completedAuctions,
+                TotalSales = completedAuctions,
+                Rating = 0
+            },
+            Auctions = auctions,
+            Rating = new SellerRatingViewModel
+            {
+                AverageRating = 0,
+                ReviewCount = 0,
+                Reviews = []
+            },
+            RelatedAuctions = related
+        };
+    }
 
     public async Task<UserListViewModel> GetUsersAsync(UserFilterViewModel filter)
     {
@@ -376,6 +519,27 @@ public class UserService : IUserService
         }
 
         return (false, "Invalid bulk action.");
+    }
+
+    private static string FormatAuctionTimeRemaining(DateTime endDate)
+    {
+        var remaining = endDate - DateTime.UtcNow;
+        if (remaining <= TimeSpan.Zero)
+        {
+            return "Ended";
+        }
+
+        if (remaining.TotalDays >= 1)
+        {
+            return $"{(int)remaining.TotalDays} days left";
+        }
+
+        if (remaining.TotalHours >= 1)
+        {
+            return $"{(int)remaining.TotalHours} hours left";
+        }
+
+        return $"{Math.Max(1, (int)remaining.TotalMinutes)} minutes left";
     }
 
     private static PublicUserDetailViewModel? BuildPublicProfile(int id)

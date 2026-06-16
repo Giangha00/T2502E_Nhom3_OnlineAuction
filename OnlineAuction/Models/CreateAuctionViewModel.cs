@@ -90,6 +90,8 @@ public class CreateAuctionViewModel
     [DataType(DataType.DateTime)]
     public DateTime EndDate { get; set; } = DateTime.Now.AddDays(7);
 
+    public IFormFile? PrimaryImageFile { get; set; }
+
     public List<string> Categories { get; set; } = [];
     public List<string> Conditions { get; set; } = [];
     public List<string> Grades { get; set; } = [];
