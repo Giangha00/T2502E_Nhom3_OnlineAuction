@@ -3,3 +3,45 @@
 @source "../../Views/**/*.cshtml";
 @source "../../Pages/**/*.cshtml";
 @source "../**/*.html";
+
+@layer base {
+    /*
+      Font stack chung cho website:
+      - Inter: font UI chinh, hop voi giao dien hien dai/sang.
+      - Noto Sans: ho tro tieng Viet day du dau.
+      - Noto Sans JP/KR: fallback dep cho tieng Nhat va tieng Han.
+      Dat o app.css de sau khi build thanh output.css no se ghi de font mac dinh trong site.css.
+    */
+    body {
+        font-family: "Inter", "Noto Sans", "Noto Sans JP", "Noto Sans KR", "Segoe UI", Arial, sans-serif;
+    }
+
+    /*
+      Khi trang dang o ngon ngu Nhat/Han, dua font ban dia len truoc de ky tu hien thi mem va deu hon.
+      _Layout.cshtml da set <html lang="ja|ko|vi|en"> nen cac selector nay tu dong doi theo language switcher.
+    */
+    html[lang="ja"] body {
+        font-family: "Noto Sans JP", "Inter", "Noto Sans", sans-serif;
+    }
+
+    html[lang="ko"] body {
+        font-family: "Noto Sans KR", "Inter", "Noto Sans", sans-serif;
+    }
+
+    html[lang="vi"] body,
+    html[lang="en"] body {
+        font-family: "Inter", "Noto Sans", "Noto Sans JP", "Noto Sans KR", "Segoe UI", Arial, sans-serif;
+    }
+
+    /*
+      Mot so heading dang dung class font-editorial trong site.css.
+      Them Noto Serif JP/KR de title tieng Nhat/Han van giu cam giac sang thay vi fallback lung tung.
+    */
+    html[lang="ja"] .font-editorial {
+        font-family: "Noto Serif JP", "Libre Baskerville", Georgia, serif;
+    }
+
+    html[lang="ko"] .font-editorial {
+        font-family: "Noto Serif KR", "Libre Baskerville", Georgia, serif;
+    }
+}
