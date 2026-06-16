@@ -6,7 +6,12 @@
 
 <div class="sell-page min-h-screen bg-slate-50">
   <section class="site-shell px-4 py-8 sm:px-6 lg:py-10">
-    <div id="successBanner" class="@(string.IsNullOrEmpty(successMessage) ? "hidden" : "") mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
+    <style>
+      #successBanner a {
+        display: none;
+      }
+    </style>
+    <div id="successBanner" data-auto-dismiss="5000" class="@(string.IsNullOrEmpty(successMessage) ? "hidden" : "") fixed left-1/2 top-24 z-9999 w-[min(92vw,520px)] -translate-x-1/2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800 shadow-lg">
       <div class="flex items-start gap-3">
         <svg class="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
@@ -43,7 +48,7 @@
           </div>
         </div>
 
-        <div class="hidden lg:block">
+        <div class="hidden lg:sticky lg:top-28 lg:block lg:self-start">
           @await Html.PartialAsync("Partials/_PreviewCard")
         </div>
       </div>

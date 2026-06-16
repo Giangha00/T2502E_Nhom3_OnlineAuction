@@ -1,22 +1,23 @@
 <div class="sell-footer-bar mt-8 rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm sm:px-6">
+  <div id="createAuctionStatus" class="mb-4 hidden rounded-lg border px-4 py-3 text-sm font-medium"></div>
   <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
     <p class="text-sm text-slate-500">
       <span class="font-medium text-slate-700">Ready to publish?</span> Review the preview panel, then create your auction.
     </p>
     <div class="flex flex-col gap-3 sm:flex-row sm:shrink-0">
       <a asp-controller="Account" asp-action="Selling"
-         class="inline-flex items-center justify-center rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+         class="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
         Cancel
       </a>
       <button type="button" id="saveDraftBtn"
-              class="inline-flex items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-5 py-2.5 text-sm font-semibold text-blue-800 transition hover:bg-blue-100">
+              class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-5 py-2.5 text-sm font-semibold text-blue-800 transition hover:bg-blue-100">
         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"/>
         </svg>
         Save Draft
       </button>
       <button type="submit" id="createAuctionBtn"
-              class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-700 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800">
+              class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-blue-700 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800">
         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
         </svg>

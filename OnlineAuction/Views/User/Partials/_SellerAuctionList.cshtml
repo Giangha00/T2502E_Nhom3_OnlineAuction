@@ -1,4 +1,4 @@
-@model List<OnlineAuction.Models.AuctionItemViewModel>
+@model OnlineAuction.Models.UserDetailViewModel
 
 <section id="seller-auctions" class="scroll-mt-header">
   <div class="mb-5 flex items-center justify-between gap-4">
@@ -10,17 +10,29 @@
       </div>
       <div>
         <h2 class="text-base font-bold text-slate-900">Seller Auctions</h2>
-        <p class="text-xs text-slate-500">@Model.Count listing@(Model.Count == 1 ? "" : "s") currently active</p>
+        <p class="text-xs text-slate-500">@Model.Auctions.Count listing@(Model.Auctions.Count == 1 ? "" : "s") currently active</p>
       </div>
     </div>
+
+    @if (Model.IsOwner)
+    {
+      <a asp-controller="Sell" asp-action="Create"
+         class="inline-flex cursor-pointer items-center justify-center rounded-lg bg-blue-700 px-4 py-2 text-xs font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-blue-800 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300">
+        Create Listing
+      </a>
+    }
   </div>
 
-  @if (Model.Count > 0)
+  @if (Model.Auctions.Count > 0)
   {
     <div class="space-y-4">
-      @foreach (var auction in Model)
+      @foreach (var auction in Model.Auctions)
       {
-        @await Html.PartialAsync("Partials/_AuctionCard", auction)
+        @await Html.PartialAsync("Partials/_AuctionCard", new SellerAuctionCardViewModel
+        {
+          Auction = auction,
+          IsOwner = Model.IsOwner
+        })
       }
     </div>
   }
