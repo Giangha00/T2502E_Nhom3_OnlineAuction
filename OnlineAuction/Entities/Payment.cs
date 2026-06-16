@@ -1,6 +1,6 @@
 namespace OnlineAuction.Entities;
 
-public class Payment
+public class Payment : AuditableEntity
 {
     public int Id { get; set; }
 
@@ -13,8 +13,6 @@ public class Payment
     public string? TransactionId { get; set; }
 
     public DateTime? PaidAt { get; set; }
-
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public AuctionOrder Order { get; set; } = null!;
 }

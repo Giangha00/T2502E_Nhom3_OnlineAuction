@@ -92,6 +92,7 @@ builder.Services.AddScoped<IAuctionService, AuctionService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
+builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

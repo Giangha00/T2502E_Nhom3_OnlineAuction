@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OnlineAuction.Entities;
 
 namespace OnlineAuction.Data;
@@ -11,6 +12,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         : base(options)
     {
     }
+
+    public DbSet<Category> Categories => Set<Category>();
 
     public DbSet<Product> Products => Set<Product>();
 
@@ -30,6 +33,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
         ConfigureIdentityTables(builder);
         ConfigureUsers(builder);
+        ConfigureCategories(builder);
         ConfigureProducts(builder);
         ConfigureAuctions(builder);
         ConfigureBids(builder);
@@ -75,10 +79,36 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(u => u.AvatarUrl).HasColumnName("avatar_url").HasMaxLength(260);
             entity.Property(u => u.CreatedAt).HasColumnName("created_at");
             entity.Property(u => u.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(u => u.CreatedBy).HasColumnName("created_by");
+            entity.Property(u => u.UpdatedBy).HasColumnName("updated_by");
+            entity.Property(u => u.DeletedAt).HasColumnName("deleted_at");
+            entity.Property(u => u.DeletedBy).HasColumnName("deleted_by");
 
             entity.HasIndex(u => u.Email).IsUnique().HasDatabaseName("uk_users_email");
             entity.HasIndex(u => u.UserName).IsUnique().HasDatabaseName("uk_users_username");
             entity.HasIndex(u => u.Role).HasDatabaseName("ix_users_role");
+            entity.HasIndex(u => u.DeletedAt).HasDatabaseName("ix_users_deleted_at");
+
+            ConfigureUserAuditForeignKeys(entity, "users");
+        });
+    }
+
+    private static void ConfigureCategories(ModelBuilder builder)
+    {
+        builder.Entity<Category>(entity =>
+        {
+            entity.ToTable("categories");
+
+            entity.Property(t => t.Id).HasColumnName("id");
+            entity.Property(t => t.Name).HasColumnName("name").HasMaxLength(50).IsRequired();
+            entity.Property(t => t.Slug).HasColumnName("slug").HasMaxLength(60).IsRequired();
+            entity.Property(t => t.SortOrder).HasColumnName("sort_order");
+            entity.Property(t => t.IsActive).HasColumnName("is_active");
+
+            entity.HasIndex(t => t.Name).IsUnique().HasDatabaseName("uk_categories_name");
+            entity.HasIndex(t => t.Slug).IsUnique().HasDatabaseName("uk_categories_slug");
+
+            ConfigureAuditableEntity(entity, "categories");
         });
     }
 
@@ -90,8 +120,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
             entity.Property(p => p.Id).HasColumnName("id");
             entity.Property(p => p.SellerId).HasColumnName("seller_id");
+            entity.Property(p => p.CategoryId).HasColumnName("category_id");
             entity.Property(p => p.Name).HasColumnName("name").HasMaxLength(120).IsRequired();
-            entity.Property(p => p.Category).HasColumnName("category").HasMaxLength(50).IsRequired();
             entity.Property(p => p.ShortDescription).HasColumnName("short_description").HasMaxLength(300);
             entity.Property(p => p.DescriptionHtml).HasColumnName("description_html");
             entity.Property(p => p.Condition).HasColumnName("condition").HasMaxLength(20).IsRequired().HasDefaultValue("graded");
@@ -100,16 +130,28 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(p => p.GradeLabel).HasColumnName("grade_label").HasMaxLength(20);
             entity.Property(p => p.CertNumber).HasColumnName("cert_number").HasMaxLength(50);
             entity.Property(p => p.PrimaryImage).HasColumnName("primary_image").HasMaxLength(500).IsRequired();
-            entity.Property(p => p.CreatedAt).HasColumnName("created_at");
+            entity.Property(p => p.ImportPrice).HasColumnName("import_price").HasPrecision(18, 2);
 
             entity.HasIndex(p => p.SellerId).HasDatabaseName("ix_products_seller_id");
-            entity.HasIndex(p => p.Category).HasDatabaseName("ix_products_category");
+            entity.HasIndex(p => p.CategoryId).HasDatabaseName("ix_products_category_id");
 
             entity.HasOne(p => p.Seller)
                 .WithMany(u => u.Products)
                 .HasForeignKey(p => p.SellerId)
                 .HasConstraintName("fk_products_seller")
                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(p => p.Category)
+                .WithMany(t => t.Products)
+                .HasForeignKey(p => p.CategoryId)
+                .HasConstraintName("fk_products_category")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_products_import_price",
+                "`import_price` IS NULL OR `import_price` >= 0"));
+
+            ConfigureAuditableEntity(entity, "products");
         });
     }
 
@@ -124,15 +166,14 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(a => a.StartingPrice).HasColumnName("starting_price").HasPrecision(18, 2);
             entity.Property(a => a.BidStep).HasColumnName("bid_step").HasPrecision(18, 2);
             entity.Property(a => a.CurrentPrice).HasColumnName("current_price").HasPrecision(18, 2);
+            entity.Property(a => a.BuyNowPrice).HasColumnName("buy_now_price").HasPrecision(18, 2);
             entity.Property(a => a.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(AuctionStatuses.Live);
             entity.Property(a => a.StartDate).HasColumnName("start_date");
             entity.Property(a => a.EndDate).HasColumnName("end_date");
             entity.Property(a => a.WinnerId).HasColumnName("winner_id");
-            entity.Property(a => a.CreatedAt).HasColumnName("created_at");
 
             entity.HasIndex(a => a.ProductId).HasDatabaseName("ix_auctions_product_id");
             entity.HasIndex(a => new { a.Status, a.EndDate }).HasDatabaseName("ix_auctions_status_end_date");
-            entity.HasIndex(a => a.WinnerId).HasDatabaseName("ix_auctions_winner_id");
 
             entity.HasOne(a => a.Product)
                 .WithMany(p => p.Auctions)
@@ -148,11 +189,13 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_auctions_prices",
-                "`starting_price` > 0 AND `bid_step` > 0 AND `current_price` >= 0"));
+                "`starting_price` > 0 AND `bid_step` > 0 AND `current_price` >= 0 AND (`buy_now_price` IS NULL OR `buy_now_price` > `starting_price`)"));
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_auctions_dates",
                 "`end_date` > `start_date`"));
+
+            ConfigureAuditableEntity(entity, "auctions");
         });
     }
 
@@ -166,11 +209,11 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(b => b.AuctionId).HasColumnName("auction_id");
             entity.Property(b => b.BidderId).HasColumnName("bidder_id");
             entity.Property(b => b.Amount).HasColumnName("amount").HasPrecision(18, 2);
+            entity.Property(b => b.BidType).HasColumnName("bid_type").HasMaxLength(20).IsRequired().HasDefaultValue(BidTypes.Manual);
             entity.Property(b => b.IsWinning).HasColumnName("is_winning");
             entity.Property(b => b.PlacedAt).HasColumnName("placed_at");
 
             entity.HasIndex(b => new { b.AuctionId, b.PlacedAt }).HasDatabaseName("ix_bids_auction_placed_at");
-            entity.HasIndex(b => new { b.AuctionId, b.Amount }).HasDatabaseName("ix_bids_auction_amount");
             entity.HasIndex(b => b.BidderId).HasDatabaseName("ix_bids_bidder_id");
 
             entity.HasOne(b => b.Auction)
@@ -188,6 +231,12 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_bids_amount",
                 "`amount` > 0"));
+
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_bids_bid_type",
+                "`bid_type` IN ('manual', 'buy_now')"));
+
+            ConfigureAuditableEntity(entity, "bids");
         });
     }
 
@@ -206,7 +255,6 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(o => o.TotalAmount).HasColumnName("total_amount").HasPrecision(18, 2);
             entity.Property(o => o.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(OrderStatuses.PendingPayment);
             entity.Property(o => o.PaymentDeadline).HasColumnName("payment_deadline");
-            entity.Property(o => o.CreatedAt).HasColumnName("created_at");
 
             entity.HasIndex(o => o.OrderReference).IsUnique().HasDatabaseName("uk_orders_reference");
             entity.HasIndex(o => new { o.BuyerId, o.Status }).HasDatabaseName("ix_orders_buyer_status");
@@ -220,6 +268,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_orders_amounts",
                 "`subtotal` > 0 AND `total_amount` > 0"));
+
+            ConfigureAuditableEntity(entity, "orders");
         });
     }
 
@@ -238,7 +288,6 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(i => i.WinningBid).HasColumnName("winning_bid").HasPrecision(18, 2);
 
             entity.HasIndex(i => new { i.OrderId, i.AuctionId }).IsUnique().HasDatabaseName("uk_order_items_order_auction");
-            entity.HasIndex(i => i.AuctionId).HasDatabaseName("ix_order_items_auction_id");
 
             entity.HasOne(i => i.Order)
                 .WithMany(o => o.Items)
@@ -255,6 +304,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_order_items_winning_bid",
                 "`winning_bid` > 0"));
+
+            ConfigureAuditableEntity(entity, "order_items");
         });
     }
 
@@ -270,7 +321,6 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(p => p.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(PaymentStatuses.Pending);
             entity.Property(p => p.TransactionId).HasColumnName("transaction_id").HasMaxLength(100);
             entity.Property(p => p.PaidAt).HasColumnName("paid_at");
-            entity.Property(p => p.CreatedAt).HasColumnName("created_at");
 
             entity.HasIndex(p => p.OrderId).HasDatabaseName("ix_payments_order_id");
             entity.HasIndex(p => p.Status).HasDatabaseName("ix_payments_status");
@@ -285,6 +335,47 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_payments_amount",
                 "`amount` > 0"));
+
+            ConfigureAuditableEntity(entity, "payments");
         });
+    }
+
+    private static void ConfigureAuditableEntity<TEntity>(
+        EntityTypeBuilder<TEntity> entity,
+        string tableName) where TEntity : AuditableEntity
+    {
+        entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+        entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+        entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+        entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
+        entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+        entity.Property(e => e.DeletedBy).HasColumnName("deleted_by");
+
+        entity.HasIndex(e => e.DeletedAt).HasDatabaseName($"ix_{tableName}_deleted_at");
+
+        ConfigureUserAuditForeignKeys(entity, tableName);
+    }
+
+    private static void ConfigureUserAuditForeignKeys<TEntity>(
+        EntityTypeBuilder<TEntity> entity,
+        string tableName) where TEntity : class
+    {
+        entity.HasOne<ApplicationUser>()
+            .WithMany()
+            .HasForeignKey(nameof(AuditableEntity.CreatedBy))
+            .HasConstraintName($"fk_{tableName}_created_by")
+            .OnDelete(DeleteBehavior.SetNull);
+
+        entity.HasOne<ApplicationUser>()
+            .WithMany()
+            .HasForeignKey(nameof(AuditableEntity.UpdatedBy))
+            .HasConstraintName($"fk_{tableName}_updated_by")
+            .OnDelete(DeleteBehavior.SetNull);
+
+        entity.HasOne<ApplicationUser>()
+            .WithMany()
+            .HasForeignKey(nameof(AuditableEntity.DeletedBy))
+            .HasConstraintName($"fk_{tableName}_deleted_by")
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
