@@ -21,6 +21,9 @@
   <data name="Auction" xml:space="preserve">
   <value>Đấu giá</value>
 </data>
+  <data name="BuyNow" xml:space="preserve">
+  <value>Mua ngay</value>
+</data>
   <data name="About" xml:space="preserve">
   <value>Về chúng tôi</value>
 </data>

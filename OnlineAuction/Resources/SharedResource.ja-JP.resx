@@ -21,6 +21,9 @@
   <data name="Auction" xml:space="preserve">
   <value>オークション</value>
 </data>
+  <data name="BuyNow" xml:space="preserve">
+  <value>今すぐ購入</value>
+</data>
   <data name="About" xml:space="preserve">
   <value>概要</value>
 </data>
