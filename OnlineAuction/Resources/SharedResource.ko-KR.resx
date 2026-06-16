@@ -1,116 +1,213 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-        <xsd:element name="root" msdata:IsDataSet="true">
-            
-        </xsd:element>
-    </xsd:schema>
-    <resheader name="resmimetype">
-        <value>text/microsoft-resx</value>
-    </resheader>
-    <resheader name="version">
-        <value>1.3</value>
-    </resheader>
-    <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <data name="Home" xml:space="preserve">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true"></xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Home" xml:space="preserve">
   <value>홈</value>
 </data>
-
-    <data name="Auction" xml:space="preserve">
+  <data name="Auction" xml:space="preserve">
   <value>경매</value>
 </data>
-
-    <data name="About" xml:space="preserve">
+  <data name="About" xml:space="preserve">
   <value>소개</value>
 </data>
-
-    <data name="Contact" xml:space="preserve">
+  <data name="Contact" xml:space="preserve">
   <value>연락처</value>
 </data>
-
-    <data name="FAQ" xml:space="preserve">
+  <data name="FAQ" xml:space="preserve">
   <value>자주 묻는 질문</value>
 </data>
-
-    <data name="Login" xml:space="preserve">
+  <data name="Login" xml:space="preserve">
   <value>로그인</value>
 </data>
-
-    <data name="SignUp" xml:space="preserve">
+  <data name="SignUp" xml:space="preserve">
   <value>가입</value>
 </data>
-
-    <data name="Language" xml:space="preserve">
+  <data name="Language" xml:space="preserve">
   <value>언어</value>
 </data>
-
-    <data name="English" xml:space="preserve">
+  <data name="English" xml:space="preserve">
   <value>영어</value>
 </data>
-
-    <data name="Vietnamese" xml:space="preserve">
+  <data name="Vietnamese" xml:space="preserve">
   <value>베트남어</value>
 </data>
-
-    <data name="Japanese" xml:space="preserve">
+  <data name="Japanese" xml:space="preserve">
   <value>일본어</value>
 </data>
-
-    <data name="Korean" xml:space="preserve">
+  <data name="Korean" xml:space="preserve">
   <value>한국어</value>
 </data>
-
-    <data name="MyCart" xml:space="preserve">
+  <data name="MyCart" xml:space="preserve">
   <value>내 장바구니</value>
 </data>
-
-    <data name="AboutUs" xml:space="preserve">
+  <data name="AboutUs" xml:space="preserve">
   <value>우리에 대해</value>
 </data>
-
-    <data name="ContactUs" xml:space="preserve">
+  <data name="ContactUs" xml:space="preserve">
   <value>연락처</value>
 </data>
-
-    <data name="PolicyAndTerms" xml:space="preserve">
+  <data name="PolicyAndTerms" xml:space="preserve">
   <value>정책 &amp; 이용 약관</value>
 </data>
-
-    <data name="SearchPlaceholder" xml:space="preserve">
+  <data name="SearchPlaceholder" xml:space="preserve">
   <value>상품, 카테고리, 판매자로 검색...</value>
 </data>
-
-    <data name="AuctionHouse" xml:space="preserve">
+  <data name="AuctionHouse" xml:space="preserve">
   <value>경매장</value>
 </data>
-
-    <data name="DiscoverUnique" xml:space="preserve">
+  <data name="DiscoverUnique" xml:space="preserve">
   <value>온라인 경매를 통해 독특한 상품을 발견하세요.</value>
 </data>
-
-    <data name="AllRightsReserved" xml:space="preserve">
+  <data name="AllRightsReserved" xml:space="preserve">
   <value>모든 권리 보유.</value>
 </data>
-
-    <data name="Sell" xml:space="preserve">
+  <data name="Sell" xml:space="preserve">
   <value>판매</value>
 </data>
-
-    <data name="Notifications" xml:space="preserve">
+  <data name="Notifications" xml:space="preserve">
   <value>알림</value>
 </data>
-
-    <data name="ReadAll" xml:space="preserve">
+  <data name="ReadAll" xml:space="preserve">
   <value>모두 읽음</value>
 </data>
-
-    <data name="NoNotifications" xml:space="preserve">
+  <data name="NoNotifications" xml:space="preserve">
   <value>알림이 없습니다</value>
 </data>
+  <data name="Home_ViewOrders" xml:space="preserve">
+    <value>주문 보기</value>
+  </data>
+  <data name="Home_PageTitle" xml:space="preserve">
+    <value>홈</value>
+  </data>
+  <data name="Common_RequiredField" xml:space="preserve">
+    <value>필수 입력 항목</value>
+  </data>
+  <data name="Layout_Footer_CookiePolicy" xml:space="preserve">
+    <value>쿠키 정책</value>
+  </data>
+  <data name="Home_EndingSoon_Title" xml:space="preserve">
+    <value>곧 종료되는 경매</value>
+  </data>
+  <data name="Layout_Footer_Contact" xml:space="preserve">
+    <value>연락처</value>
+  </data>
+  <data name="Common_Save" xml:space="preserve">
+    <value>저장</value>
+  </data>
+  <data name="Common_Submit" xml:space="preserve">
+    <value>제출</value>
+  </data>
+  <data name="Layout_Footer_HowToBid" xml:space="preserve">
+    <value>입찰 방법</value>
+  </data>
+  <data name="Layout_Footer_PrivacyPolicy" xml:space="preserve">
+    <value>개인정보 처리방침</value>
+  </data>
+  <data name="Layout_WonAuctions" xml:space="preserve">
+    <value>낙찰된 경매</value>
+  </data>
+  <data name="Home_Vault_Title" xml:space="preserve">
+    <value>Vault 최신 소식</value>
+  </data>
+  <data name="Common_Success" xml:space="preserve">
+    <value>성공</value>
+  </data>
+  <data name="Home_Hero_TitleLine1" xml:space="preserve">
+    <value>세계에서 가장</value>
+  </data>
+  <data name="Common_Loading" xml:space="preserve">
+    <value>로딩 중...</value>
+  </data>
+  <data name="Layout_ToggleNavigation" xml:space="preserve">
+    <value>내비게이션 전환</value>
+  </data>
+  <data name="Home_BrowseByCategory_Title" xml:space="preserve">
+    <value>카테고리별 탐색</value>
+  </data>
+  <data name="Layout_Profile" xml:space="preserve">
+    <value>프로필</value>
+  </data>
+  <data name="Home_CompletePayment_Title" xml:space="preserve">
+    <value>낙찰 상품 결제를 완료하세요</value>
+  </data>
+  <data name="Layout_Footer_Legal" xml:space="preserve">
+    <value>법적 고지</value>
+  </data>
+  <data name="Common_Error" xml:space="preserve">
+    <value>오류</value>
+  </data>
+  <data name="Layout_Logout" xml:space="preserve">
+    <value>로그아웃</value>
+  </data>
+  <data name="Home_Hero_Subtitle" xml:space="preserve">
+    <value>인증된 포켓몬, 스포츠, TCG 카드를 엄선해 제공하는 까다로운 컬렉터를 위한 프리미엄 목적지입니다.</value>
+  </data>
+  <data name="Home_Hero_ExploreAuctions" xml:space="preserve">
+    <value>경매 둘러보기</value>
+  </data>
+  <data name="Layout_Footer_Support" xml:space="preserve">
+    <value>지원</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>취소</value>
+  </data>
+  <data name="Home_BestSellers_Title" xml:space="preserve">
+    <value>인기 판매자</value>
+  </data>
+  <data name="Layout_Footer_About" xml:space="preserve">
+    <value>소개</value>
+  </data>
+  <data name="Home_HotAuctions_Title" xml:space="preserve">
+    <value>인기 경매</value>
+  </data>
+  <data name="Layout_Footer_Help" xml:space="preserve">
+    <value>도움말</value>
+  </data>
+  <data name="Layout_Brand_Tagline" xml:space="preserve">
+    <value>인증된 트레이딩 카드를 프리미엄 온라인 경매로 만나보세요.</value>
+  </data>
+  <data name="Home_Hero_TitleAccent" xml:space="preserve">
+    <value>희귀한 수집품에 투자하세요</value>
+  </data>
+  <data name="Home_Hero_Eyebrow" xml:space="preserve">
+    <value>RareCard Vault</value>
+  </data>
+  <data name="Layout_Footer_Careers" xml:space="preserve">
+    <value>채용</value>
+  </data>
+  <data name="Common_ViewAll" xml:space="preserve">
+    <value>전체 보기</value>
+  </data>
+  <data name="Common_ViewAllPosts" xml:space="preserve">
+    <value>모든 게시글 보기</value>
+  </data>
+  <data name="Layout_Footer_SellerGuide" xml:space="preserve">
+    <value>판매자 가이드</value>
+  </data>
+  <data name="Layout_Footer_OurStory" xml:space="preserve">
+    <value>우리 이야기</value>
+  </data>
+  <data name="Home_Hero_SellYourCard" xml:space="preserve">
+    <value>카드 판매하기</value>
+  </data>
+  <data name="Common_ItemsSuffix" xml:space="preserve">
+    <value>{0}+개</value>
+  </data>
+  <data name="Layout_Footer_RefundRequest" xml:space="preserve">
+    <value>환불 요청</value>
+  </data>
 </root>

@@ -1,4 +1,4 @@
-﻿using OnlineAuction.Models;
+using OnlineAuction.Models;
 
 namespace OnlineAuction.Services.Interfaces;
 

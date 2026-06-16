@@ -2,6 +2,8 @@ namespace OnlineAuction.Models;
 
 public class UserDetailViewModel
 {
+    public bool IsOwner { get; set; }
+
     public UserProfileViewModel Profile { get; set; } = new();
     public UserBasicInfoViewModel BasicInfo { get; set; } = new();
     public SellerStatisticsViewModel Statistics { get; set; } = new();
@@ -14,6 +16,7 @@ public class UserDetailViewModel
 public class UserProfileViewModel
 {
     public int Id { get; set; }
+    public bool IsOwner { get; set; }
     public string Username { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public string AvatarUrl { get; set; } = string.Empty;
