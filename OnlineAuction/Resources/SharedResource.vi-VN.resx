@@ -1,116 +1,213 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-        <xsd:element name="root" msdata:IsDataSet="true">
-            
-        </xsd:element>
-    </xsd:schema>
-    <resheader name="resmimetype">
-        <value>text/microsoft-resx</value>
-    </resheader>
-    <resheader name="version">
-        <value>1.3</value>
-    </resheader>
-    <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <data name="Home" xml:space="preserve">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true"></xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Home" xml:space="preserve">
   <value>Trang chủ</value>
 </data>
-
-    <data name="Auction" xml:space="preserve">
+  <data name="Auction" xml:space="preserve">
   <value>Đấu giá</value>
 </data>
-
-    <data name="About" xml:space="preserve">
+  <data name="About" xml:space="preserve">
   <value>Về chúng tôi</value>
 </data>
-
-    <data name="Contact" xml:space="preserve">
+  <data name="Contact" xml:space="preserve">
   <value>Liên hệ</value>
 </data>
-
-    <data name="FAQ" xml:space="preserve">
+  <data name="FAQ" xml:space="preserve">
   <value>Câu hỏi thường gặp</value>
 </data>
-
-    <data name="Login" xml:space="preserve">
+  <data name="Login" xml:space="preserve">
   <value>Đăng nhập</value>
 </data>
-
-    <data name="SignUp" xml:space="preserve">
+  <data name="SignUp" xml:space="preserve">
   <value>Đăng ký</value>
 </data>
-
-    <data name="Language" xml:space="preserve">
+  <data name="Language" xml:space="preserve">
   <value>Ngôn ngữ</value>
 </data>
-
-    <data name="English" xml:space="preserve">
+  <data name="English" xml:space="preserve">
   <value>Tiếng Anh</value>
 </data>
-
-    <data name="Vietnamese" xml:space="preserve">
+  <data name="Vietnamese" xml:space="preserve">
   <value>Tiếng Việt</value>
 </data>
-
-    <data name="Japanese" xml:space="preserve">
+  <data name="Japanese" xml:space="preserve">
   <value>Tiếng Nhật</value>
 </data>
-
-    <data name="Korean" xml:space="preserve">
+  <data name="Korean" xml:space="preserve">
   <value>Tiếng Hàn</value>
 </data>
-
-    <data name="MyCart" xml:space="preserve">
+  <data name="MyCart" xml:space="preserve">
   <value>Giỏ hàng</value>
 </data>
-
-    <data name="AboutUs" xml:space="preserve">
+  <data name="AboutUs" xml:space="preserve">
   <value>Về chúng tôi</value>
 </data>
-
-    <data name="ContactUs" xml:space="preserve">
+  <data name="ContactUs" xml:space="preserve">
   <value>Liên hệ</value>
 </data>
-
-    <data name="PolicyAndTerms" xml:space="preserve">
+  <data name="PolicyAndTerms" xml:space="preserve">
   <value>Chính sách &amp; Điều khoản sử dụng</value>
 </data>
-
-    <data name="SearchPlaceholder" xml:space="preserve">
+  <data name="SearchPlaceholder" xml:space="preserve">
   <value>Tìm kiếm theo sản phẩm, danh mục, người bán...</value>
 </data>
-
-    <data name="AuctionHouse" xml:space="preserve">
+  <data name="AuctionHouse" xml:space="preserve">
   <value>Phòng đấu giá</value>
 </data>
-
-    <data name="DiscoverUnique" xml:space="preserve">
+  <data name="DiscoverUnique" xml:space="preserve">
   <value>Khám phá những sản phẩm độc đáo thông qua đấu giá trực tuyến.</value>
 </data>
-
-    <data name="AllRightsReserved" xml:space="preserve">
+  <data name="AllRightsReserved" xml:space="preserve">
   <value>Tất cả các quyền được bảo lưu.</value>
 </data>
-
-    <data name="Sell" xml:space="preserve">
+  <data name="Sell" xml:space="preserve">
   <value>Bán</value>
 </data>
-
-    <data name="Notifications" xml:space="preserve">
+  <data name="Notifications" xml:space="preserve">
   <value>Thông báo</value>
 </data>
-
-    <data name="ReadAll" xml:space="preserve">
+  <data name="ReadAll" xml:space="preserve">
   <value>Đánh dấu đã đọc</value>
 </data>
-
-    <data name="NoNotifications" xml:space="preserve">
+  <data name="NoNotifications" xml:space="preserve">
   <value>Chưa có thông báo</value>
 </data>
+  <data name="Home_ViewOrders" xml:space="preserve">
+    <value>Xem đơn hàng</value>
+  </data>
+  <data name="Home_PageTitle" xml:space="preserve">
+    <value>Trang chủ</value>
+  </data>
+  <data name="Common_RequiredField" xml:space="preserve">
+    <value>Trường bắt buộc</value>
+  </data>
+  <data name="Layout_Footer_CookiePolicy" xml:space="preserve">
+    <value>Chính sách cookie</value>
+  </data>
+  <data name="Home_EndingSoon_Title" xml:space="preserve">
+    <value>Sắp kết thúc</value>
+  </data>
+  <data name="Layout_Footer_Contact" xml:space="preserve">
+    <value>Liên hệ</value>
+  </data>
+  <data name="Common_Save" xml:space="preserve">
+    <value>Lưu</value>
+  </data>
+  <data name="Common_Submit" xml:space="preserve">
+    <value>Gửi</value>
+  </data>
+  <data name="Layout_Footer_HowToBid" xml:space="preserve">
+    <value>Cách đặt giá</value>
+  </data>
+  <data name="Layout_Footer_PrivacyPolicy" xml:space="preserve">
+    <value>Chính sách bảo mật</value>
+  </data>
+  <data name="Layout_WonAuctions" xml:space="preserve">
+    <value>Đấu giá đã thắng</value>
+  </data>
+  <data name="Home_Vault_Title" xml:space="preserve">
+    <value>Tin mới từ Vault</value>
+  </data>
+  <data name="Common_Success" xml:space="preserve">
+    <value>Thành công</value>
+  </data>
+  <data name="Home_Hero_TitleLine1" xml:space="preserve">
+    <value>Đầu tư vào những</value>
+  </data>
+  <data name="Common_Loading" xml:space="preserve">
+    <value>Đang tải...</value>
+  </data>
+  <data name="Layout_ToggleNavigation" xml:space="preserve">
+    <value>Mở/đóng điều hướng</value>
+  </data>
+  <data name="Home_BrowseByCategory_Title" xml:space="preserve">
+    <value>Duyệt theo danh mục</value>
+  </data>
+  <data name="Layout_Profile" xml:space="preserve">
+    <value>Hồ sơ</value>
+  </data>
+  <data name="Home_CompletePayment_Title" xml:space="preserve">
+    <value>Hoàn tất thanh toán cho phiên đã thắng</value>
+  </data>
+  <data name="Layout_Footer_Legal" xml:space="preserve">
+    <value>Pháp lý</value>
+  </data>
+  <data name="Common_Error" xml:space="preserve">
+    <value>Lỗi</value>
+  </data>
+  <data name="Layout_Logout" xml:space="preserve">
+    <value>Đăng xuất</value>
+  </data>
+  <data name="Home_Hero_Subtitle" xml:space="preserve">
+    <value>Điểm đến cao cấp cho thẻ Pokémon, thể thao và TCG đã xác thực, được tuyển chọn cho những nhà sưu tầm khó tính nhất.</value>
+  </data>
+  <data name="Home_Hero_ExploreAuctions" xml:space="preserve">
+    <value>Khám phá đấu giá</value>
+  </data>
+  <data name="Layout_Footer_Support" xml:space="preserve">
+    <value>Hỗ trợ</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Hủy</value>
+  </data>
+  <data name="Home_BestSellers_Title" xml:space="preserve">
+    <value>Người bán hàng đầu</value>
+  </data>
+  <data name="Layout_Footer_About" xml:space="preserve">
+    <value>Giới thiệu</value>
+  </data>
+  <data name="Home_HotAuctions_Title" xml:space="preserve">
+    <value>Đấu giá nổi bật</value>
+  </data>
+  <data name="Layout_Footer_Help" xml:space="preserve">
+    <value>Trợ giúp</value>
+  </data>
+  <data name="Layout_Brand_Tagline" xml:space="preserve">
+    <value>Khám phá thẻ sưu tầm đã xác thực qua các phiên đấu giá trực tuyến cao cấp.</value>
+  </data>
+  <data name="Home_Hero_TitleAccent" xml:space="preserve">
+    <value>vật phẩm sưu tầm hiếm nhất</value>
+  </data>
+  <data name="Home_Hero_Eyebrow" xml:space="preserve">
+    <value>Kho RareCard</value>
+  </data>
+  <data name="Layout_Footer_Careers" xml:space="preserve">
+    <value>Tuyển dụng</value>
+  </data>
+  <data name="Common_ViewAll" xml:space="preserve">
+    <value>Xem tất cả</value>
+  </data>
+  <data name="Common_ViewAllPosts" xml:space="preserve">
+    <value>Xem tất cả bài viết</value>
+  </data>
+  <data name="Layout_Footer_SellerGuide" xml:space="preserve">
+    <value>Hướng dẫn người bán</value>
+  </data>
+  <data name="Layout_Footer_OurStory" xml:space="preserve">
+    <value>Câu chuyện của chúng tôi</value>
+  </data>
+  <data name="Home_Hero_SellYourCard" xml:space="preserve">
+    <value>Bán thẻ của bạn</value>
+  </data>
+  <data name="Common_ItemsSuffix" xml:space="preserve">
+    <value>{0}+ mục</value>
+  </data>
+  <data name="Layout_Footer_RefundRequest" xml:space="preserve">
+    <value>Yêu cầu hoàn tiền</value>
+  </data>
 </root>
