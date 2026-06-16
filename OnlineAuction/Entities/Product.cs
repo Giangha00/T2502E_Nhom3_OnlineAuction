@@ -1,14 +1,14 @@
 namespace OnlineAuction.Entities;
 
-public class Product
+public class Product : AuditableEntity
 {
     public int Id { get; set; }
 
     public int SellerId { get; set; }
 
-    public string Name { get; set; } = string.Empty;
+    public int CategoryId { get; set; }
 
-    public string Category { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
     public string? ShortDescription { get; set; }
 
@@ -26,9 +26,11 @@ public class Product
 
     public string PrimaryImage { get; set; } = string.Empty;
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public decimal? ImportPrice { get; set; }
 
     public ApplicationUser Seller { get; set; } = null!;
+
+    public Category Category { get; set; } = null!;
 
     public ICollection<Auction> Auctions { get; set; } = [];
 }
