@@ -29,8 +29,133 @@ public class UserService : IUserService
         _userManager = userManager;
     }
 
-    public Task<PublicUserDetailViewModel?> GetPublicProfileAsync(int id) =>
-        Task.FromResult(BuildPublicProfile(id));
+    public async Task<PublicUserDetailViewModel?> GetPublicProfileAsync(int id)
+    {
+        var user = await _dbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(user => user.Id == id);
+
+        if (user is null || user.Status == UserStatus.Active)
+        {
+            return null;
+        }
+
+        var sellerAuctions = await _dbContext.Auctions
+            .AsNoTracking()
+            .Where(auction => auction.Product.SellerId == id)
+            .OrderByDescending(auction => auction.Status == AuctionStatuses.Live)
+            .ThenBy(auction => auction.EndDate)
+            .Select(auction => new
+            {
+                auction.Id,
+                auction.StartingPrice,
+                auction.CurrentPrice,
+                auction.Status,
+                auction.EndDate,
+                ProductName = auction.Product.Name,
+                auction.Product.Category,
+                auction.Product.PrimaryImage,
+                auction.Product.GradeLabel,
+                auction.Product.Year,
+                auction.Product.SetName,
+                auction.Product.Condition,
+                BidCount = auction.Bids.Count
+            })
+            .ToListAsync();
+
+        var relatedAuctions = await _dbContext.Auctions
+            .AsNoTracking()
+            .Where(auction => auction.Product.SellerId != id)
+            .Where(auction =>
+                auction.Status == AuctionStatuses.Live ||
+                auction.Status == AuctionStatuses.EndingSoon)
+            .OrderBy(auction => auction.EndDate)
+            .Take(3)
+            .Select(auction => new
+            {
+                auction.Id,
+                auction.StartingPrice,
+                auction.CurrentPrice,
+                auction.Status,
+                auction.EndDate,
+                ProductName = auction.Product.Name,
+                auction.Product.Category,
+                auction.Product.PrimaryImage,
+                auction.Product.GradeLabel,
+                auction.Product.Year,
+                auction.Product.SetName,
+                auction.Product.Condition,
+                BidCount = auction.Bids.Count
+            })
+            .ToListAsync();
+
+        var completedAuctions = sellerAuctions.Count(auction =>
+            auction.Status == AuctionStatuses.Completed ||
+            auction.Status == AuctionStatuses.Ended);
+
+        return new PublicUserDetailViewModel
+        {
+            Profile = new UserProfileViewModel
+            {
+                Id = user.Id,
+                Username = user.UserName ?? user.FullName,
+                FullName = user.FullName,
+                AvatarUrl = string.IsNullOrWhiteSpace(user.AvatarUrl)
+                    ? "/admin/images/user/user-01.jpg"
+                    : user.AvatarUrl,
+                Role = "Seller",
+                MemberSince = user.CreatedAt.Year
+            },
+            BasicInfo = new UserBasicInfoViewModel
+            {
+                FullName = user.FullName,
+                Email = user.Email ?? string.Empty,
+                PhoneNumber = user.PhoneNumber ?? string.Empty,
+                Address = string.Empty
+            },
+            Statistics = new SellerStatisticsViewModel
+            {
+                TotalAuctions = sellerAuctions.Count,
+                CompletedAuctions = completedAuctions,
+                TotalSales = completedAuctions,
+                Rating = 0
+            },
+            Auctions = sellerAuctions.Select(auction => MapAuctionItem(
+                auction.Id,
+                auction.ProductName,
+                auction.Category,
+                auction.PrimaryImage,
+                auction.StartingPrice,
+                auction.CurrentPrice,
+                auction.Status,
+                auction.EndDate,
+                auction.GradeLabel,
+                auction.Year,
+                auction.SetName,
+                auction.Condition,
+                auction.BidCount)).ToList(),
+            Rating = new SellerRatingViewModel
+            {
+                AverageRating = 0,
+                ReviewCount = 0,
+                Reviews = []
+            },
+            RelatedAuctions = relatedAuctions.Select(auction => MapAuctionItem(
+                auction.Id,
+                auction.ProductName,
+                auction.Category,
+                auction.PrimaryImage,
+                auction.StartingPrice,
+                auction.CurrentPrice,
+                auction.Status,
+                auction.EndDate,
+                auction.GradeLabel,
+                auction.Year,
+                auction.SetName,
+                auction.Condition,
+                auction.BidCount)).ToList()
+        };
+    }
 
     public async Task<UserListViewModel> GetUsersAsync(UserFilterViewModel filter)
     {
@@ -133,6 +258,8 @@ public class UserService : IUserService
 
     public async Task<UserFormViewModel?> GetEditFormAsync(int id)
     {
+        Console.WriteLine("PUBLIC PROFILE RUNNING");
+        
         var user = await _dbContext.Users.AsNoTracking()
             .FirstOrDefaultAsync(user => user.Id == id);
 
@@ -378,97 +505,82 @@ public class UserService : IUserService
         return (false, "Invalid bulk action.");
     }
 
-    private static PublicUserDetailViewModel? BuildPublicProfile(int id)
-    {
-        var seller = MockAuctionData.GetBestSellers().FirstOrDefault(s => s.Id == id);
-        if (seller is null)
+    private static AuctionItemViewModel MapAuctionItem(
+        int id,
+        string name,
+        string category,
+        string imageUrl,
+        decimal startingPrice,
+        decimal currentPrice,
+        string status,
+        DateTime endDate,
+        string? grade,
+        int? year,
+        string? setName,
+        string condition,
+        int bidCount) =>
+        new()
         {
-            return null;
+            Id = id,
+            Name = name,
+            Category = category,
+            ImageUrl = imageUrl,
+            StartingPrice = startingPrice,
+            CurrentPrice = currentPrice,
+            Status = FormatAuctionStatus(status),
+            TimeRemaining = FormatTimeRemaining(endDate),
+            Grade = grade ?? string.Empty,
+            Year = year ?? 0,
+            Subtitle = BuildAuctionSubtitle(setName, year),
+            Condition = condition,
+            IsHot = bidCount >= 10
+        };
+
+    private static string FormatAuctionStatus(string status) =>
+        status switch
+        {
+            AuctionStatuses.Live => "Live",
+            AuctionStatuses.EndingSoon => "Ending Soon",
+            AuctionStatuses.Completed or AuctionStatuses.Ended => "Completed",
+            AuctionStatuses.AwaitingPayment => "Active",
+            _ => status
+        };
+
+    private static string FormatTimeRemaining(DateTime endDate)
+    {
+        var remaining = endDate - DateTime.UtcNow;
+        if (remaining <= TimeSpan.Zero)
+        {
+            return "Ended";
         }
 
-        var profileExtras = GetProfileExtras(id);
-        var auctions = MockAuctionData.GetAuctionsBySellerId(id);
-        var related = MockAuctionData.GetAllAuctions()
-            .Where(a => !auctions.Any(x => x.Id == a.Id))
-            .Take(3)
-            .ToList();
-
-        return new PublicUserDetailViewModel
+        if (remaining.TotalDays >= 1)
         {
-            Profile = new UserProfileViewModel
-            {
-                Id = seller.Id,
-                Username = seller.Username,
-                FullName = profileExtras.FullName,
-                AvatarUrl = seller.AvatarUrl,
-                Role = "Seller",
-                MemberSince = profileExtras.MemberSince
-            },
-            BasicInfo = new UserBasicInfoViewModel
-            {
-                FullName = profileExtras.FullName,
-                Email = profileExtras.Email,
-                PhoneNumber = profileExtras.Phone,
-                Address = profileExtras.Address
-            },
-            Statistics = new SellerStatisticsViewModel
-            {
-                TotalAuctions = seller.AuctionCount,
-                CompletedAuctions = seller.SuccessfulSales,
-                TotalSales = profileExtras.TotalSales,
-                Rating = seller.Rating
-            },
-            Auctions = auctions,
-            Rating = new SellerRatingViewModel
-            {
-                AverageRating = seller.Rating,
-                ReviewCount = profileExtras.ReviewCount,
-                Reviews = GetReviewsForSeller(id)
-            },
-            RelatedAuctions = related
-        };
+            return $"{(int)remaining.TotalDays}d {remaining.Hours}h left";
+        }
+
+        if (remaining.TotalHours >= 1)
+        {
+            return $"{(int)remaining.TotalHours}h {remaining.Minutes}m left";
+        }
+
+        return $"{Math.Max(1, remaining.Minutes)}m left";
     }
 
-    private static (string FullName, string Email, string Phone, string Address, int MemberSince, int TotalSales, int ReviewCount) GetProfileExtras(int id) =>
-        id switch
+    private static string BuildAuctionSubtitle(string? setName, int? year)
+    {
+        if (!string.IsNullOrWhiteSpace(setName) && year.HasValue)
         {
-            1 => ("Elena Voss", "elena.voss@gmail.com", "+84 912 345 678", "Ha Noi, Viet Nam", 2022, 120, 98),
-            2 => ("Marcus Chen", "marcus.chen@gmail.com", "+84 987 654 321", "Ho Chi Minh, Viet Nam", 2023, 95, 76),
-            3 => ("Sofia Nguyen", "sofia.gallery@gmail.com", "+84 901 234 567", "Da Nang, Viet Nam", 2021, 156, 142),
-            4 => ("James Retro", "james.retro@gmail.com", "+84 933 221 100", "Ha Noi, Viet Nam", 2024, 88, 54),
-            _ => ("John Smith", "john@gmail.com", "+84 xxx xxx xxx", "Ha Noi, Viet Nam", 2026, 120, 120)
-        };
+            return $"{setName} - {year.Value}";
+        }
 
-    private static List<SellerReviewViewModel> GetReviewsForSeller(int id) =>
-        id switch
+        if (!string.IsNullOrWhiteSpace(setName))
         {
-            1 =>
-            [
-                new() { ReviewerName = "Michael", Rating = 5, Comment = "Great seller! Fast shipping and item exactly as described.", ReviewDate = new DateTime(2026, 6, 10) },
-                new() { ReviewerName = "Anna", Rating = 5, Comment = "Professional communication throughout the auction.", ReviewDate = new DateTime(2026, 5, 28) },
-                new() { ReviewerName = "David", Rating = 4.5, Comment = "Smooth transaction. Would buy again.", ReviewDate = new DateTime(2026, 5, 12) }
-            ],
-            2 =>
-            [
-                new() { ReviewerName = "Michael", Rating = 5, Comment = "Great seller!", ReviewDate = new DateTime(2026, 6, 10) },
-                new() { ReviewerName = "Lisa", Rating = 4.5, Comment = "Reliable seller with quality items.", ReviewDate = new DateTime(2026, 4, 20) }
-            ],
-            3 =>
-            [
-                new() { ReviewerName = "Tom", Rating = 5, Comment = "Outstanding gallery pieces and packaging.", ReviewDate = new DateTime(2026, 6, 8) },
-                new() { ReviewerName = "Sarah", Rating = 5, Comment = "Best seller on the platform!", ReviewDate = new DateTime(2026, 5, 30) },
-                new() { ReviewerName = "Kevin", Rating = 5, Comment = "Highly recommend for art collectors.", ReviewDate = new DateTime(2026, 5, 15) }
-            ],
-            4 =>
-            [
-                new() { ReviewerName = "Michael", Rating = 4, Comment = "Good vintage finds. Delivery took a bit longer.", ReviewDate = new DateTime(2026, 6, 2) },
-                new() { ReviewerName = "Emma", Rating = 4.5, Comment = "Authentic retro items as advertised.", ReviewDate = new DateTime(2026, 4, 8) }
-            ],
-            _ =>
-            [
-                new() { ReviewerName = "Michael", Rating = 5, Comment = "Great seller!", ReviewDate = new DateTime(2026, 6, 10) }
-            ]
-        };
+            return setName;
+        }
+
+        return year?.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
+    }
 
     private static void NormalizeFilter(UserFilterViewModel filter)
     {
