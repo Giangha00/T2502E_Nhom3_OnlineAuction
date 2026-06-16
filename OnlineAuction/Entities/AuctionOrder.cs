@@ -1,6 +1,6 @@
 namespace OnlineAuction.Entities;
 
-public class AuctionOrder
+public class AuctionOrder : AuditableEntity
 {
     public int Id { get; set; }
 
@@ -19,8 +19,6 @@ public class AuctionOrder
     public string Status { get; set; } = OrderStatuses.PendingPayment;
 
     public DateTime PaymentDeadline { get; set; }
-
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public ApplicationUser Buyer { get; set; } = null!;
 

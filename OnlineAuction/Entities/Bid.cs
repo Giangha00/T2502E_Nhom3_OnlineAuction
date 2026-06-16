@@ -1,6 +1,6 @@
 namespace OnlineAuction.Entities;
 
-public class Bid
+public class Bid : AuditableEntity
 {
     public long Id { get; set; }
 
@@ -10,6 +10,8 @@ public class Bid
 
     public decimal Amount { get; set; }
 
+    public string BidType { get; set; } = BidTypes.Manual;
+
     public bool IsWinning { get; set; }
 
     public DateTime PlacedAt { get; set; } = DateTime.UtcNow;
@@ -17,4 +19,10 @@ public class Bid
     public Auction Auction { get; set; } = null!;
 
     public ApplicationUser Bidder { get; set; } = null!;
+}
+
+public static class BidTypes
+{
+    public const string Manual = "manual";
+    public const string BuyNow = "buy_now";
 }
