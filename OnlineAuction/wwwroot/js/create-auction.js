@@ -18,15 +18,33 @@
 
   function $(id) { return document.getElementById(id); }
 
+  // Create.cshtml renders Auction Preview twice: one for mobile and one for desktop.
+  // Update every matching preview element so the visible preview is always in sync.
+  function $all(id) {
+    return Array.from(document.querySelectorAll('[id="' + id + '"]'));
+  }
+
+  function setPreviewText(id, value) {
+    $all(id).forEach(function (el) {
+      el.textContent = value;
+    });
+  }
+
+  function stripHtml(value) {
+    var temp = document.createElement('div');
+    temp.innerHTML = value || '';
+    return (temp.textContent || temp.innerText || '').trim();
+  }
+
   function formatMoney(value) {
-    if (value === '' || value === null || isNaN(value)) return '$ —';
+    if (value === '' || value === null || isNaN(value)) return '$ --';
     return '$' + Number(value).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   }
 
   function formatDateTime(value) {
-    if (!value) return '—';
+    if (!value) return '--';
     var d = new Date(value);
-    if (isNaN(d.getTime())) return '—';
+    if (isNaN(d.getTime())) return '--';
     return d.toLocaleString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -90,28 +108,43 @@
   function updatePreview() {
     var data = getFormData();
 
-    $('previewName').textContent = data.productName || 'Product Name';
-    $('previewCondition').textContent = 'Condition: ' + (data.condition || '—');
-    $('previewStartingPrice').textContent = formatMoney(data.startingPrice);
-    $('previewCurrentBid').textContent = data.startingPrice ? formatMoney(data.startingPrice) : '—';
-    $('previewStartDate').textContent = formatDateTime(data.startDate);
-    $('previewEndDate').textContent = formatDateTime(data.endDate);
+    setPreviewText('previewName', data.productName || 'Product Name');
+    setPreviewText('previewCondition', 'Condition: ' + (data.condition || '--'));
+    setPreviewText('previewDescription', stripHtml(data.productDescription) || 'No description yet.');
+    setPreviewText('previewCategory', data.category || '--');
+    setPreviewText('previewOrigin', data.productOrigin || '--');
+    setPreviewText('previewAuctionType', data.auctionType || '--');
+    setPreviewText('previewStartingPrice', formatMoney(data.startingPrice));
+    setPreviewText('previewCurrentBid', data.startingPrice ? formatMoney(data.startingPrice) : '--');
+    setPreviewText('previewBidStep', formatMoney(data.bidStep));
+    setPreviewText('previewBuyNowPrice', data.buyNowPrice ? formatMoney(data.buyNowPrice) : '--');
+    setPreviewText('previewStartDate', formatDateTime(data.startDate));
+    setPreviewText('previewEndDate', formatDateTime(data.endDate));
+    setPreviewText('previewImageCount', String(data.imageCount));
+    setPreviewText('previewDocumentCount', String(data.documentCount));
 
-    var previewImg = $('previewImage');
-    var placeholder = $('previewImagePlaceholder');
-    if (state.images.length > 0) {
-      previewImg.src = state.images[0].url;
-      previewImg.classList.remove('hidden');
-      placeholder.classList.add('hidden');
-    } else {
-      previewImg.src = '';
-      previewImg.classList.add('hidden');
-      placeholder.classList.remove('hidden');
-    }
+    $all('previewImage').forEach(function (previewImg) {
+      if (state.images.length > 0) {
+        previewImg.src = state.images[0].url;
+        previewImg.classList.remove('hidden');
+      } else {
+        previewImg.src = '';
+        previewImg.classList.add('hidden');
+      }
+    });
 
-    var thumbs = $('previewThumbnails');
-    thumbs.innerHTML = '';
-    if (state.images.length > 1) {
+    $all('previewImagePlaceholder').forEach(function (placeholder) {
+      placeholder.classList.toggle('hidden', state.images.length > 0);
+    });
+
+    $all('previewThumbnails').forEach(function (thumbs) {
+      thumbs.innerHTML = '';
+
+      if (state.images.length <= 1) {
+        thumbs.classList.add('hidden');
+        return;
+      }
+
       thumbs.classList.remove('hidden');
       state.images.slice(0, 5).forEach(function (img, i) {
         var el = document.createElement('img');
@@ -120,9 +153,7 @@
         el.className = 'h-14 w-14 rounded border border-slate-200 object-cover';
         thumbs.appendChild(el);
       });
-    } else {
-      thumbs.classList.add('hidden');
-    }
+    });
   }
 
   function renderImagePreviews() {
@@ -146,7 +177,7 @@
       card.className = 'group relative aspect-square overflow-hidden rounded-lg border border-slate-200 bg-slate-100';
       card.innerHTML =
         '<img src="' + img.url + '" alt="Preview" class="h-full w-full object-cover"/>' +
-        '<button type="button" data-remove-image="' + img.id + '" class="absolute right-1.5 top-1.5 rounded-lg bg-red-600/90 px-2 py-1 text-[10px] font-bold uppercase text-white opacity-0 transition group-hover:opacity-100">Remove</button>';
+        '<button type="button" data-remove-image="' + img.id + '" class="absolute right-1.5 top-1.5 cursor-pointer rounded-lg bg-red-600/90 px-2 py-1 text-[10px] font-bold uppercase text-white opacity-0 transition group-hover:opacity-100">Remove</button>';
       list.appendChild(card);
     });
 
@@ -227,7 +258,7 @@
         doc.name.split('.').pop().toUpperCase().slice(0, 3) + '</span>' +
         '<div class="min-w-0"><p class="truncate text-sm font-medium text-slate-800">' + doc.name + '</p>' +
         '<p class="text-xs text-slate-400">' + (doc.size / 1024).toFixed(1) + ' KB</p></div></div>' +
-        '<button type="button" data-remove-doc="' + doc.id + '" class="shrink-0 text-xs font-semibold text-red-600 hover:text-red-700">Remove</button>';
+        '<button type="button" data-remove-doc="' + doc.id + '" class="shrink-0 cursor-pointer text-xs font-semibold text-red-600 hover:text-red-700">Remove</button>';
       list.appendChild(li);
     });
 
@@ -238,6 +269,8 @@
         renderDocuments();
       });
     });
+
+    updatePreview();
   }
 
   function addDocuments(files) {
@@ -429,14 +462,43 @@
   }
 
   function showSuccess(name) {
+    showTopToast('success', 'Your auction "' + name + '" has been created successfully!');
+    try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
+  }
+
+  function showTopToast(type, message) {
     var banner = $('successBanner');
     var text = $('successMessageText');
-    if (text) text.textContent = 'Your auction "' + name + '" has been created successfully!';
+    var icon = banner ? banner.querySelector('svg') : null;
+    if (text) text.textContent = message;
     if (banner) {
+      banner.className = 'fixed left-1/2 top-24 z-9999 w-[min(92vw,520px)] -translate-x-1/2 rounded-xl border px-5 py-4 text-sm font-semibold shadow-lg';
+      if (type === 'success') {
+        banner.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-800');
+        if (icon) icon.setAttribute('class', 'mt-0.5 h-5 w-5 shrink-0 text-emerald-600');
+      } else {
+        banner.classList.add('border-red-200', 'bg-red-50', 'text-red-700');
+        if (icon) icon.setAttribute('class', 'mt-0.5 h-5 w-5 shrink-0 text-red-600');
+      }
       banner.classList.remove('hidden');
-      banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.setTimeout(function () {
+        banner.classList.add('hidden');
+      }, 5000);
     }
-    try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
+  }
+
+  function showSubmitStatus(type, message) {
+    var status = $('createAuctionStatus');
+    if (!status) return;
+
+    status.textContent = message;
+    status.className = 'mb-4 rounded-lg border px-4 py-3 text-sm font-medium';
+
+    if (type === 'success') {
+      status.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-800');
+    } else {
+      status.classList.add('border-red-200', 'bg-red-50', 'text-red-700');
+    }
   }
 
   function initEditor() {
@@ -531,6 +593,8 @@
         })
         .catch(function (error) {
           showError('images', error.message);
+          showTopToast('error', error.message);
+          showSubmitStatus('error', error.message);
         });
     });
   }
