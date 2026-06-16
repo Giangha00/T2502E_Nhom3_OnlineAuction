@@ -8,7 +8,7 @@ public interface IAuctionService
 
     AuctionViewModel GetAuctionIndex();
 
-    ProductDetailViewModel? GetProductDetail(int id);
+    Task<ProductDetailViewModel?> GetProductDetailAsync(int id);
 
     AuctionItemViewModel? GetAuctionById(int id);
 
