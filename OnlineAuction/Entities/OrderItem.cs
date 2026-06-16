@@ -1,6 +1,6 @@
 namespace OnlineAuction.Entities;
 
-public class OrderItem
+public class OrderItem : AuditableEntity
 {
     public int Id { get; set; }
 

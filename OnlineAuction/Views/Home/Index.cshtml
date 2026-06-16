@@ -1,6 +1,9 @@
 ﻿@model OnlineAuction.Models.HomeViewModel
+@inject IStringLocalizer<SharedResource> Localizer
 @{
-    ViewData["Title"] = "Home";
+    // Localizer lay chuoi tu SharedResource theo culture hien tai.
+    // Vi du: vi-VN se doc key Home_PageTitle trong SharedResource.vi-VN.resx.
+    ViewData["Title"] = Localizer["Home_PageTitle"];
     var heroImage = PageBannerImages.Home;
 }
 
@@ -11,22 +14,22 @@
     </div>
     <div class="relative w-full px-4 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
       <div class="mx-auto max-w-4xl text-center lg:mx-0 lg:text-left">
-        <p class="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">RareCard Vault</p>
+        <p class="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">@Localizer["Home_Hero_Eyebrow"]</p>
         <h1 class="mt-4 text-4xl font-bold leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-          Invest in the World's<br/>
-          <span class="text-blue-600">Rarest Collectibles</span>
+          @Localizer["Home_Hero_TitleLine1"]<br/>
+          <span class="text-blue-600">@Localizer["Home_Hero_TitleAccent"]</span>
         </h1>
         <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-600 lg:mx-0 lg:text-lg">
-          The premier destination for authenticated Pokémon, sports, and TCG cards — curated for the world's most discerning collectors.
+          @Localizer["Home_Hero_Subtitle"]
         </p>
         <div class="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
           <a asp-controller="Auction" asp-action="Index"
              class="inline-flex items-center rounded-full bg-slate-900 px-7 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-blue-800">
-            Explore Auctions
+            @Localizer["Home_Hero_ExploreAuctions"]
           </a>
           <a asp-controller="Sell" asp-action="Create"
              class="inline-flex items-center rounded-full border-2 border-slate-900 bg-white px-7 py-3.5 text-xs font-bold uppercase tracking-widest text-slate-900 transition hover:bg-slate-50">
-            Sell Your Card
+            @Localizer["Home_Hero_SellYourCard"]
           </a>
         </div>
       </div>
@@ -37,8 +40,8 @@
   {
     <section class="border-b border-stone-200 py-10 sm:py-12">
       <div class="mb-6 flex w-full items-end justify-between gap-4 px-4 sm:px-8 lg:px-12">
-        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Hot Auctions</h2>
-        <a asp-controller="Auction" asp-action="Index" class="text-sm font-semibold text-blue-700 hover:text-blue-900">View All →</a>
+        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">@Localizer["Home_HotAuctions_Title"]</h2>
+        <a asp-controller="Auction" asp-action="Index" class="text-sm font-semibold text-blue-700 hover:text-blue-900">@Localizer["Common_ViewAll"] <span aria-hidden="true">→</span></a>
       </div>
       <div class="rarecard-hot-row px-4 sm:px-8 lg:px-12">
         @foreach (var item in Model.HotAuctions)
@@ -53,7 +56,7 @@
 
   <section class="border-b border-stone-200 bg-slate-50 py-10 sm:py-12">
     <div class="mb-8 px-4 sm:px-8 lg:px-12">
-      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Browse by Category</h2>
+      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">@Localizer["Home_BrowseByCategory_Title"]</h2>
     </div>
     <div class="grid w-full grid-cols-1 gap-4 px-4 sm:grid-cols-2 sm:px-8 lg:grid-cols-4 lg:px-12">
       @foreach (var category in Model.Categories.Take(4))
@@ -64,7 +67,7 @@
           <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent"></div>
           <div class="relative flex min-h-[10rem] flex-col justify-end p-5 sm:min-h-[12rem]">
             <h3 class="text-lg font-bold text-white">@category.Name</h3>
-            <p class="text-sm text-white/80">@(string.IsNullOrEmpty(category.DisplayCount) ? $"{category.ItemCount}+ Items" : category.DisplayCount)</p>
+            <p class="text-sm text-white/80">@(string.IsNullOrEmpty(category.DisplayCount) ? Localizer["Common_ItemsSuffix", category.ItemCount] : category.DisplayCount)</p>
           </div>
         </a>
       }
@@ -73,7 +76,7 @@
 
   <section class="border-b border-stone-200 py-10 sm:py-12">
     <div class="mb-8 px-4 sm:px-8 lg:px-12">
-      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Best Sellers</h2>
+      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">@Localizer["Home_BestSellers_Title"]</h2>
     </div>
     <div class="flex flex-wrap justify-center gap-8 px-4 sm:px-8 lg:px-12">
       @foreach (var seller in Model.BestSellers)
@@ -93,8 +96,8 @@
   {
     <section class="border-b border-stone-200 py-10 sm:py-12">
       <div class="mb-6 flex w-full items-end justify-between gap-4 px-4 sm:px-8 lg:px-12">
-        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Auction Ending Soon</h2>
-        <a asp-controller="Auction" asp-action="Index" class="text-sm font-semibold text-blue-700 hover:text-blue-900">View All →</a>
+        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">@Localizer["Home_EndingSoon_Title"]</h2>
+        <a asp-controller="Auction" asp-action="Index" class="text-sm font-semibold text-blue-700 hover:text-blue-900">@Localizer["Common_ViewAll"] <span aria-hidden="true">→</span></a>
       </div>
       <div class="rarecard-hot-row px-4 sm:px-8 lg:px-12">
         @foreach (var item in Model.EndingSoonAuctions)
@@ -111,8 +114,8 @@
   {
     <section class="py-10 sm:py-14">
       <div class="mb-8 flex w-full items-end justify-between gap-4 px-4 sm:px-8 lg:px-12">
-        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Latest from the Vault</h2>
-        <a href="#" class="text-sm font-semibold text-blue-700 hover:text-blue-900">View All Posts →</a>
+        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">@Localizer["Home_Vault_Title"]</h2>
+        <a href="#" class="text-sm font-semibold text-blue-700 hover:text-blue-900">@Localizer["Common_ViewAllPosts"] <span aria-hidden="true">→</span></a>
       </div>
       <div class="grid w-full grid-cols-1 gap-6 px-4 sm:grid-cols-2 sm:px-8 lg:grid-cols-3 lg:px-12">
         @foreach (var post in Model.VaultPosts)
@@ -136,9 +139,9 @@
   {
     <section class="border-t border-emerald-100 bg-emerald-50/60 py-10">
       <div class="mb-6 flex flex-wrap items-center justify-between gap-4 px-4 sm:px-8 lg:px-12">
-        <h2 class="text-xl font-bold text-emerald-800">Complete payment on your wins</h2>
+        <h2 class="text-xl font-bold text-emerald-800">@Localizer["Home_CompletePayment_Title"]</h2>
         <a asp-controller="Order" asp-action="Index"
-           class="text-sm font-semibold text-emerald-700 hover:text-emerald-900">View Orders →</a>
+           class="text-sm font-semibold text-emerald-700 hover:text-emerald-900">@Localizer["Home_ViewOrders"] <span aria-hidden="true">→</span></a>
       </div>
       <div class="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 sm:px-8 lg:grid-cols-4 lg:px-12">
         @foreach (var item in Model.WonAuctions)
@@ -149,3 +152,4 @@
     </section>
   }
 </div>
+
