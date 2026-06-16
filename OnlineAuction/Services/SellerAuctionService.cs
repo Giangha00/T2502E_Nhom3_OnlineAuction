@@ -1,6 +1,3 @@
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
@@ -11,117 +8,310 @@ namespace OnlineAuction.Services;
 
 public class SellerAuctionService : ISellerAuctionService
 {
-    private readonly AuctionHouseDbContext _dbContext;
-    private readonly IAvatarStorageService _imageStorageService;
+    private const string ProductImageFolder = "auction-house/products";
+
+    // Anh fallback giup products.primary_image khong bi null khi view hien tai chua gui file len server.
+    // Khi view upload anh co name="PrimaryImageFile", Cloudinary URL se thay the gia tri nay.
+    private const string DefaultProductImageUrl =
+        "https://res.cloudinary.com/demo/image/upload/c_fill,w_900,h_900,q_auto,f_auto/sample.jpg";
+
+    private readonly AuctionHouseDbContext _db;
+    private readonly IPhotoService _photoService;
 
     public SellerAuctionService(
-        AuctionHouseDbContext dbContext,
-        IAvatarStorageService imageStorageService)
+        AuctionHouseDbContext db,
+        IPhotoService photoService)
     {
-        _dbContext = dbContext;
-        _imageStorageService = imageStorageService;
+        _db = db;
+        _photoService = photoService;
     }
 
-    public async Task<(bool Success, string Message)> CreateAsync(CreateAuctionViewModel model, int sellerId)
+    public async Task<List<AuctionItemViewModel>> GetSellerAuctionsAsync(int sellerId)
     {
-        var category = await ResolveCategoryAsync(model.Category, sellerId);
-        if (category is null)
+        // Read dung Database that: products.seller_id -> auctions.
+        // AsNoTracking dung cho man hinh chi doc de EF khong theo doi thay doi entity.
+        return await _db.Auctions
+            .AsNoTracking()
+            .Where(auction =>
+                auction.Product.SellerId == sellerId &&
+                auction.Status != AuctionStatuses.Cancelled)
+            .OrderByDescending(auction => auction.CreatedAt)
+            .Select(auction => new AuctionItemViewModel
+            {
+                Id = auction.Id,
+                Name = auction.Product.Name,
+                Category = auction.Product.Category.Name,
+                ImageUrl = auction.Product.PrimaryImage,
+                StartingPrice = auction.StartingPrice,
+                CurrentPrice = auction.CurrentPrice,
+                Status = auction.Status,
+                Grade = auction.Product.GradeLabel ?? string.Empty,
+                Condition = auction.Product.Condition,
+                Year = auction.Product.Year ?? 0,
+                TimeRemaining = auction.EndDate > DateTime.UtcNow
+                    ? $"{(auction.EndDate - DateTime.UtcNow).Days} days left"
+                    : "Ended"
+            })
+            .ToListAsync();
+    }
+
+    public async Task<(bool Success, string Message, int? AuctionId)> CreateAsync(
+        CreateAuctionViewModel model,
+        int sellerId)
+    {
+        // Validate lai trong Service vi client/JS co the bi tat hoac bi bypass.
+        if (model.EndDate <= model.StartDate)
         {
-            return (false, "Invalid category.");
+            return (false, "End date must be greater than start date.", null);
         }
 
-        var imageUrl = await _imageStorageService.SaveAvatarAsync(model.PrimaryImageFile);
-        if (string.IsNullOrWhiteSpace(imageUrl))
+        if (model.StartingPrice <= 0 || model.BidStep <= 0)
         {
-            return (false, "Product image is required.");
+            return (false, "Starting price and bid step must be greater than 0.", null);
         }
 
+        string? imageUrl;
+        try
+        {
+            // Neu form gui file len, upload len Cloudinary va luu URL vao MySQL.
+            imageUrl = await _photoService.AddPhotoAsync(model.PrimaryImageFile, ProductImageFolder);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return (false, ex.Message, null);
+        }
+
+        imageUrl = string.IsNullOrWhiteSpace(imageUrl)
+            ? DefaultProductImageUrl
+            : imageUrl;
+
+        var category = await GetOrCreateCategoryAsync(model.Category);
+
+        // Insert Product truoc. Product chua thong tin mat hang/card va gan voi seller_id.
+        // DB moi dung categories rieng, vi vay service nhan chuoi tu form va map thanh category_id.
         var product = new Product
         {
             SellerId = sellerId,
-            CategoryId = category.Id,
             Name = model.ProductName.Trim(),
-            ShortDescription = model.Subtitle?.Trim(),
+            CategoryId = category.Id,
+            ShortDescription = string.IsNullOrWhiteSpace(model.Subtitle) ? null : model.Subtitle.Trim(),
             DescriptionHtml = model.ProductDescription,
             Condition = model.Condition,
             Year = model.Year,
-            SetName = model.SetName,
-            GradeLabel = model.Grade,
-            CertNumber = model.CertificateNumber,
+            SetName = string.IsNullOrWhiteSpace(model.SetName) ? null : model.SetName.Trim(),
+            GradeLabel = string.IsNullOrWhiteSpace(model.Grade) ? null : model.Grade.Trim(),
+            CertNumber = string.IsNullOrWhiteSpace(model.CertificateNumber) ? null : model.CertificateNumber.Trim(),
             PrimaryImage = imageUrl,
-            CreatedBy = sellerId
+            Category = category,
+            CreatedAt = DateTime.UtcNow
         };
 
+        // Insert Auction sau. Auction chua gia, buoc gia, thoi gian va trang thai dau gia.
         var auction = new Auction
         {
             Product = product,
             StartingPrice = model.StartingPrice,
             BidStep = model.BidStep,
             CurrentPrice = model.StartingPrice,
-            BuyNowPrice = model.BuyNowPrice,
-            Status = AuctionStatuses.Live,
             StartDate = model.StartDate,
             EndDate = model.EndDate,
-            CreatedBy = sellerId
+            Status = AuctionStatuses.Live,
+            CreatedAt = DateTime.UtcNow
         };
 
-        await _dbContext.Auctions.AddAsync(auction);
-        await _dbContext.SaveChangesAsync();
+        _db.Auctions.Add(auction);
+        await _db.SaveChangesAsync();
 
-        return (true, $"Your auction \"{model.ProductName}\" has been created successfully!");
+        return (true, "Auction created successfully.", auction.Id);
     }
 
-    private async Task<Category?> ResolveCategoryAsync(string categoryName, int sellerId)
+    public async Task<SellerAuctionFormViewModel?> GetEditFormAsync(int auctionId, int sellerId)
     {
-        if (string.IsNullOrWhiteSpace(categoryName))
+        // Chi lay auction neu seller dang thao tac dung la chu so huu product.
+        var auction = await _db.Auctions
+            .AsNoTracking()
+            .Include(a => a.Product)
+            .ThenInclude(product => product.Category)
+            .FirstOrDefaultAsync(a => a.Id == auctionId && a.Product.SellerId == sellerId);
+
+        if (auction is null)
         {
             return null;
         }
 
-        var normalizedName = categoryName.Trim();
-        var slug = ToSlug(normalizedName);
+        return new SellerAuctionFormViewModel
+        {
+            AuctionId = auction.Id,
+            ProductName = auction.Product.Name,
+            Category = auction.Product.Category.Name,
+            ShortDescription = auction.Product.ShortDescription,
+            DescriptionHtml = auction.Product.DescriptionHtml,
+            Condition = auction.Product.Condition,
+            Year = auction.Product.Year,
+            SetName = auction.Product.SetName,
+            GradeLabel = auction.Product.GradeLabel,
+            CertNumber = auction.Product.CertNumber,
+            PrimaryImage = auction.Product.PrimaryImage,
+            StartingPrice = auction.StartingPrice,
+            BidStep = auction.BidStep,
+            StartDate = auction.StartDate,
+            EndDate = auction.EndDate
+        };
+    }
 
-        var category = await _dbContext.Categories
-            .FirstOrDefaultAsync(item =>
-                item.Name == normalizedName ||
-                item.Slug == slug);
+    public async Task<(bool Success, string Message)> UpdateAsync(
+        SellerAuctionFormViewModel model,
+        int sellerId)
+    {
+        if (!model.AuctionId.HasValue)
+        {
+            return (false, "Invalid auction.");
+        }
+
+        var auction = await _db.Auctions
+            .Include(a => a.Product)
+            .FirstOrDefaultAsync(a => a.Id == model.AuctionId && a.Product.SellerId == sellerId);
+
+        if (auction is null)
+        {
+            return (false, "Auction not found.");
+        }
+
+        var hasBids = await _db.Bids.AnyAsync(b => b.AuctionId == auction.Id);
+        if (hasBids)
+        {
+            return (false, "Cannot edit auction that already has bids.");
+        }
+
+        if (auction.Status != AuctionStatuses.Live || auction.EndDate <= DateTime.UtcNow)
+        {
+            return (false, "Only live auctions can be edited.");
+        }
+
+        if (model.EndDate < auction.EndDate)
+        {
+            return (false, "End date can only be extended, not shortened.");
+        }
+
+        string? newImageUrl;
+        try
+        {
+            // Edit cung dung Cloudinary: neu co file moi thi thay cover, khong co thi giu anh cu.
+            newImageUrl = await _photoService.AddPhotoAsync(model.PrimaryImageFile, ProductImageFolder);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return (false, ex.Message);
+        }
+
+        var category = await GetOrCreateCategoryAsync(model.Category);
+
+        auction.Product.Name = model.ProductName.Trim();
+        auction.Product.CategoryId = category.Id;
+        auction.Product.Category = category;
+        auction.Product.ShortDescription = model.ShortDescription;
+        auction.Product.DescriptionHtml = model.DescriptionHtml;
+        auction.Product.Condition = model.Condition;
+        auction.Product.Year = model.Year;
+        auction.Product.SetName = model.SetName;
+        auction.Product.GradeLabel = model.GradeLabel;
+        auction.Product.CertNumber = model.CertNumber;
+        auction.Product.PrimaryImage = string.IsNullOrWhiteSpace(newImageUrl)
+            ? model.PrimaryImage
+            : newImageUrl;
+
+        auction.StartingPrice = model.StartingPrice;
+        auction.CurrentPrice = model.StartingPrice;
+        auction.BidStep = model.BidStep;
+        auction.EndDate = model.EndDate;
+
+        await _db.SaveChangesAsync();
+
+        return (true, "Auction updated successfully.");
+    }
+
+    public async Task<(bool Success, string Message)> CancelAsync(int auctionId, int sellerId)
+    {
+        var auction = await _db.Auctions
+            .Include(a => a.Product)
+            .FirstOrDefaultAsync(a => a.Id == auctionId && a.Product.SellerId == sellerId);
+
+        if (auction is null)
+        {
+            return (false, "Auction not found.");
+        }
+
+        var hasBids = await _db.Bids.AnyAsync(b => b.AuctionId == auction.Id);
+        if (hasBids)
+        {
+            return (false, "Cannot cancel auction that already has bids.");
+        }
+
+        var hasLockedOrder = await _db.OrderItems.AnyAsync(item =>
+            item.AuctionId == auction.Id &&
+            (item.Order.Status == OrderStatuses.PendingPayment ||
+             item.Order.Status == OrderStatuses.Paid));
+
+        if (hasLockedOrder)
+        {
+            return (false, "Cannot cancel auction that already has a pending or paid order.");
+        }
+
+        if (auction.Status != AuctionStatuses.Live || auction.EndDate <= DateTime.UtcNow)
+        {
+            return (false, "Only live auctions can be cancelled.");
+        }
+
+        // Soft delete: khong xoa row khoi database, chi doi status de con lich su.
+        auction.Status = AuctionStatuses.Cancelled;
+        await _db.SaveChangesAsync();
+
+        return (true, "Auction cancelled successfully.");
+    }
+
+    private async Task<Category> GetOrCreateCategoryAsync(string categoryName)
+    {
+        var normalizedName = string.IsNullOrWhiteSpace(categoryName)
+            ? "Uncategorized"
+            : categoryName.Trim();
+        var normalizedSlug = BuildSlug(normalizedName);
+
+        var category = await _db.Categories
+            .FirstOrDefaultAsync(item => item.Name == normalizedName || item.Slug == normalizedSlug);
 
         if (category is not null)
         {
             return category;
         }
 
+        // Tao category moi khi form gui len gia tri chua co trong bang categories.
+        // Viec nay giup CRUD seller khong bi loi foreign key category_id sau khi team merge schema moi.
         category = new Category
         {
             Name = normalizedName,
-            Slug = slug,
-            SortOrder = await _dbContext.Categories.CountAsync() + 1,
+            Slug = normalizedSlug,
             IsActive = true,
-            CreatedBy = sellerId
+            SortOrder = 0,
+            CreatedAt = DateTime.UtcNow
         };
 
-        await _dbContext.Categories.AddAsync(category);
-        await _dbContext.SaveChangesAsync();
+        _db.Categories.Add(category);
+        await _db.SaveChangesAsync();
 
         return category;
     }
 
-    private static string ToSlug(string value)
+    private static string BuildSlug(string value)
     {
-        var normalized = value.Normalize(NormalizationForm.FormD);
-        var builder = new StringBuilder();
+        var chars = value
+            .Trim()
+            .ToLowerInvariant()
+            .Select(ch => char.IsLetterOrDigit(ch) ? ch : '-')
+            .ToArray();
 
-        foreach (var character in normalized)
-        {
-            if (CharUnicodeInfo.GetUnicodeCategory(character) != UnicodeCategory.NonSpacingMark)
-            {
-                builder.Append(character);
-            }
-        }
+        var slug = string.Join("-", new string(chars)
+            .Split('-', StringSplitOptions.RemoveEmptyEntries));
 
-        var slug = builder.ToString().Normalize(NormalizationForm.FormC).ToLowerInvariant();
-        slug = Regex.Replace(slug, @"[^a-z0-9]+", "-").Trim('-');
-
-        return string.IsNullOrWhiteSpace(slug) ? "category" : slug;
+        return string.IsNullOrWhiteSpace(slug) ? "uncategorized" : slug;
     }
 }

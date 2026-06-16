@@ -87,6 +87,7 @@ builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));
 
 builder.Services.AddScoped<IAvatarStorageService, CloudinaryAvatarStorageService>();
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuctionService, AuctionService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
