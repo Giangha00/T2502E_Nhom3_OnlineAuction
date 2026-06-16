@@ -1,5 +1,5 @@
 <div class="space-y-4">
-  <div class="sticky-below-header overflow-hidden rounded-xl border border-slate-200 bg-white shadow-md">
+  <div class="max-h-[calc(100vh-8rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-md">
     <div class="bg-blue-700 px-5 py-4 text-white">
       <h2 class="text-base font-semibold">Auction Preview</h2>
       <p class="mt-0.5 text-xs text-blue-100">Live preview of your listing</p>
@@ -19,6 +19,23 @@
       <p id="previewName" class="text-base font-semibold text-slate-900">Product Name</p>
       <p id="previewCondition" class="mt-1 text-sm text-slate-500">Condition: —</p>
 
+      <p id="previewDescription" class="mt-3 line-clamp-3 text-sm leading-relaxed text-slate-600">No description yet.</p>
+
+      <div class="mt-4 grid gap-2 rounded-lg bg-slate-50 px-4 py-3 text-xs text-slate-600">
+        <div class="flex items-center justify-between gap-3">
+          <span>Category</span>
+          <span id="previewCategory" class="text-right font-medium text-slate-800">--</span>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <span>Origin</span>
+          <span id="previewOrigin" class="text-right font-medium text-slate-800">--</span>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <span>Auction Type</span>
+          <span id="previewAuctionType" class="text-right font-medium text-slate-800">--</span>
+        </div>
+      </div>
+
       <div class="mt-4 space-y-2 border-t border-slate-100 pt-4 text-sm">
         <div class="flex items-center justify-between">
           <span class="text-slate-500">Starting Price</span>
@@ -27,6 +44,14 @@
         <div class="flex items-center justify-between">
           <span class="text-slate-500">Current Bid</span>
           <span id="previewCurrentBid" class="font-semibold text-slate-900">—</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-slate-500">Bid Step</span>
+          <span id="previewBidStep" class="font-semibold text-slate-900">$ --</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-slate-500">Buy Now</span>
+          <span id="previewBuyNowPrice" class="font-semibold text-slate-900">--</span>
         </div>
       </div>
 
@@ -44,6 +69,17 @@
       </div>
 
       <div id="previewThumbnails" class="mt-4 hidden flex flex-wrap gap-2"></div>
+
+      <div class="mt-4 rounded-lg border border-slate-100 px-4 py-3 text-xs text-slate-600">
+        <div class="flex items-center justify-between">
+          <span>Images</span>
+          <span id="previewImageCount" class="font-medium text-slate-800">0</span>
+        </div>
+        <div class="mt-1 flex items-center justify-between">
+          <span>Documents</span>
+          <span id="previewDocumentCount" class="font-medium text-slate-800">0</span>
+        </div>
+      </div>
     </div>
   </div>
 

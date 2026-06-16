@@ -23,6 +23,12 @@ public class UserProfileViewModel
     public int MemberSince { get; set; }
 }
 
+public class SellerAuctionCardViewModel
+{
+    public AuctionItemViewModel Auction { get; set; } = new();
+    public bool IsOwner { get; set; }
+}
+
 public class UserBasicInfoViewModel
 {
     public string FullName { get; set; } = string.Empty;

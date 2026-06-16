@@ -26,8 +26,6 @@
     var isRareCardTheme = !isStandalonePage && !isAdminArea;
 
     var currentCulture = Context.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name ?? "en-US";
-    // HTML lang chi can ma ngon ngu ngan gon (en, vi, ja, ko) de browser/screen reader doc dung ngon ngu hien tai.
-    var htmlLang = currentCulture.Split('-')[0].ToLowerInvariant();
     var isLoggedIn = User.Identity?.IsAuthenticated == true;
     ApplicationUser? currentUser = isLoggedIn ? await UserManager.GetUserAsync(User) : null;
     var displayName = currentUser?.FullName ?? User.Identity?.Name ?? "User";
@@ -53,16 +51,16 @@
     var antiforgeryTokens = Antiforgery.GetAndStoreTokens(Context);
 }
 <!DOCTYPE html>
-<html lang="@htmlLang">
+<html lang="@currentCulture.Replace("_", "-").ToLower()">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="request-verification-token" content="@antiforgeryTokens.RequestToken" />
-    <title>@ViewData["Title"] - @(isRareCardTheme ? "RareCard" : Localizer["AuctionHouse"])</title>
+    <title>@ViewData["Title"] - @(isRareCardTheme ? "RareCard" : "Auction House")</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Noto+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&family=Noto+Serif+JP:wght@400;600;700&family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/OnlineAuction.styles.css" asp-append-version="true" />
@@ -101,7 +99,7 @@
                         @await Html.PartialAsync("Partials/_HeaderNotifications", OnlineAuction.Data.MockNotificationData.GetNotifications())
                         <a asp-controller="Order" asp-action="Index"
                            class="relative flex h-10 w-10 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-blue-700 @(isOrderPage ? "bg-blue-50 text-blue-700" : "")"
-                           aria-label="@Localizer["Layout_WonAuctions"]">
+                           aria-label="Won auctions">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
                             </svg>
@@ -133,13 +131,13 @@
                             <div class="invisible absolute right-0 top-full z-50 mt-2 w-44 rounded-xl border border-slate-200 bg-white py-2 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
                                 <a asp-controller="User" asp-action="Detail" asp-route-id="@currentUserId"
                                    class="block px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700">
-                                    @Localizer["Layout_Profile"]
+                                    Profile
                                 </a>
                                 <form asp-controller="Auth" asp-action="Logout" method="post">
                                     @Html.AntiForgeryToken()
                                     <button type="submit"
                                             class="block w-full cursor-pointer px-4 py-2 text-left text-sm font-medium text-red-600 transition hover:bg-red-50">
-                                        @Localizer["Layout_Logout"]
+                                        Log out
                                     </button>
                                 </form>
                             </div>
@@ -157,7 +155,7 @@
                         </div>
                     }
 
-                    <button id="mobileMenuBtn" type="button" aria-label="@Localizer["Layout_ToggleNavigation"]" aria-expanded="false"
+                    <button id="mobileMenuBtn" type="button" aria-label="Toggle navigation" aria-expanded="false"
                         class="flex flex-col gap-1.5 p-2 lg:hidden">
                         <span class="block h-0.5 w-5 bg-stone-800"></span>
                         <span class="block h-0.5 w-5 bg-stone-800"></span>
@@ -186,12 +184,12 @@
                             <p class="text-sm font-medium text-slate-700">@displayName</p>
                             <a asp-controller="User" asp-action="Detail" asp-route-id="@currentUserId"
                                class="w-full rounded-full border border-blue-200 py-2 text-center text-sm font-medium text-blue-700 transition hover:bg-blue-50">
-                                @Localizer["Layout_Profile"]
+                                Profile
                             </a>
                             <form asp-controller="Auth" asp-action="Logout" method="post">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="w-full cursor-pointer rounded-full border border-slate-300 py-2 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-50">
-                                    @Localizer["Layout_Logout"]
+                                    Log out
                                 </button>
                             </form>
                         }
@@ -233,56 +231,56 @@
                             <span class="text-lg font-extrabold tracking-tight text-slate-900">RareCard</span>
                         </a>
                         <p class="mt-3 max-w-xs text-sm leading-6 text-slate-600">
-                            @Localizer["Layout_Brand_Tagline"]
+                            Discover authenticated trading cards through premium online auctions.
                         </p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-8 sm:grid-cols-4">
                         <div>
-                            <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900">@Localizer["Layout_Footer_About"]</h4>
+                            <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900">About</h4>
                             <ul class="mt-4 space-y-2">
                                 <li><a asp-controller="AboutUs" asp-action="About"
-                                        class="@FooterLinkClass(isAboutPage)">@Localizer["AboutUs"]</a></li>
-                                <li><a href="#" class="@FooterLinkClass(false)">@Localizer["Layout_Footer_OurStory"]</a></li>
-                                <li><a href="#" class="@FooterLinkClass(false)">@Localizer["Layout_Footer_Careers"]</a></li>
+                                        class="@FooterLinkClass(isAboutPage)">About Us</a></li>
+                                <li><a href="#" class="@FooterLinkClass(false)">Our Story</a></li>
+                                <li><a href="#" class="@FooterLinkClass(false)">Careers</a></li>
                             </ul>
                         </div>
                         <div>
-                            <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900">@Localizer["Layout_Footer_Contact"]</h4>
+                            <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900">Contact</h4>
                             <ul class="mt-4 space-y-2">
                                 <li><a asp-controller="Contact" asp-action="Index"
-                                        class="@FooterLinkClass(isContactPage)">@Localizer["ContactUs"]</a></li>
-                                <li><a href="#" class="@FooterLinkClass(false)">@Localizer["Layout_Footer_Support"]</a></li>
+                                        class="@FooterLinkClass(isContactPage)">Contact Us</a></li>
+                                <li><a href="#" class="@FooterLinkClass(false)">Support</a></li>
                                 <li><a href="mailto:help@auctionhouse.com"
                                         class="@FooterLinkClass(false)">help@auctionhouse.com</a></li>
                             </ul>
                         </div>
                         <div>
-                            <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900">@Localizer["Layout_Footer_Help"]</h4>
+                            <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900">Help</h4>
                             <ul class="mt-4 space-y-2">
                                 <li><a asp-controller="Faq" asp-action="Index" class="@FooterLinkClass(isFaqPage)">FAQ</a>
                                 </li>
                                 <li><a asp-controller="Refund" asp-action="Index"
-                                        class="@FooterLinkClass(isRefundPage)">@Localizer["Layout_Footer_RefundRequest"]</a></li>
-                                <li><a href="#" class="@FooterLinkClass(false)">@Localizer["Layout_Footer_HowToBid"]</a></li>
-                                <li><a href="#" class="@FooterLinkClass(false)">@Localizer["Layout_Footer_SellerGuide"]</a></li>
+                                        class="@FooterLinkClass(isRefundPage)">Refund Request</a></li>
+                                <li><a href="#" class="@FooterLinkClass(false)">How to Bid</a></li>
+                                <li><a href="#" class="@FooterLinkClass(false)">Seller Guide</a></li>
                             </ul>
                         </div>
                         <div>
-                            <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900">@Localizer["Layout_Footer_Legal"]</h4>
+                            <h4 class="text-xs font-semibold uppercase tracking-widest text-stone-900">Legal</h4>
                             <ul class="mt-4 space-y-2">
                                 <li><a asp-controller="Policy" asp-action="Index"
-                                        class="@FooterLinkClass(isPolicyPage)">@Localizer["PolicyAndTerms"]</a></li>
+                                        class="@FooterLinkClass(isPolicyPage)">Policy &amp; Term of Use</a></li>
                                 <li><a asp-controller="Policy" asp-action="Index" asp-fragment="privacy-policy"
-                                        class="@FooterLinkClass(isPolicyPage)">@Localizer["Layout_Footer_PrivacyPolicy"]</a></li>
-                                <li><a href="#" class="@FooterLinkClass(false)">@Localizer["Layout_Footer_CookiePolicy"]</a></li>
+                                        class="@FooterLinkClass(isPolicyPage)">Privacy Policy</a></li>
+                                <li><a href="#" class="@FooterLinkClass(false)">Cookie Policy</a></li>
                             </ul>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-10 border-t border-stone-200 pt-6">
-                    <p class="text-xs text-slate-500">&copy; @DateTime.Now.Year RareCard. @Localizer["AllRightsReserved"]</p>
+                    <p class="text-xs text-slate-500">&copy; @DateTime.Now.Year RareCard. All rights reserved.</p>
                 </div>
             </div>
         </footer>
