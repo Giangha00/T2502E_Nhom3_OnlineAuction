@@ -1,0 +1,26 @@
+@model OnlineAuction.Models.AccountPageViewModel
+@{
+    ViewData["Title"] = Model.PageTitle;
+}
+
+<div class="account-dashboard min-h-screen bg-slate-50">
+  <div class="site-shell account-dashboard__layout px-4 py-8 sm:px-6 lg:py-10">
+    <partial name="Partials/_AccountSidebar" model="Model.Shell"/>
+
+    <div class="account-dashboard__main">
+      <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">@Model.PageTitle</h1>
+      <p class="mt-2 text-sm text-slate-500">@Model.PageDescription</p>
+
+      <div class="account-empty mt-16">
+        <div class="account-empty__art" aria-hidden="true">
+          <svg viewBox="0 0 80 80" fill="none" class="h-16 w-16 text-slate-300">
+            <circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+            <path d="M28 40h24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h2 class="mt-6 text-xl font-bold text-slate-900">Nothing here yet.</h2>
+        <p class="mt-2 max-w-md text-sm text-slate-500">This section will show your @Model.PageTitle.ToLowerInvariant() activity once you start using RareCard.</p>
+      </div>
+    </div>
+  </div>
+</div>

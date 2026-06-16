@@ -21,6 +21,9 @@
   <data name="Auction" xml:space="preserve">
   <value>경매</value>
 </data>
+  <data name="BuyNow" xml:space="preserve">
+  <value>바로 구매</value>
+</data>
   <data name="About" xml:space="preserve">
   <value>소개</value>
 </data>

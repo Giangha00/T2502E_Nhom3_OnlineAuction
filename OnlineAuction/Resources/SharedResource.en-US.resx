@@ -21,6 +21,9 @@
   <data name="Auction" xml:space="preserve">
   <value>Auction</value>
 </data>
+  <data name="BuyNow" xml:space="preserve">
+  <value>Buy Now</value>
+</data>
   <data name="About" xml:space="preserve">
   <value>About</value>
 </data>

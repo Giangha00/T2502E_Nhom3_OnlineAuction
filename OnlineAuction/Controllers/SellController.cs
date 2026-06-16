@@ -92,7 +92,7 @@ public class SellController : Controller
             });
         }
 
-        return RedirectToAction("Detail", "User", new { id = sellerId.Value });
+        return RedirectToAction("Selling", "Account", new { tab = "active", channel = "buynow" });
     }
 
     private async Task<int?> GetCurrentSellerIdAsync()

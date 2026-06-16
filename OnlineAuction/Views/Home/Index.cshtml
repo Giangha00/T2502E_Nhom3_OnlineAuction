@@ -5,6 +5,7 @@
     // Vi du: vi-VN se doc key Home_PageTitle trong SharedResource.vi-VN.resx.
     ViewData["Title"] = Localizer["Home_PageTitle"];
     var heroImage = PageBannerImages.Home;
+    var isLoggedIn = User.Identity?.IsAuthenticated == true;
 }
 
 <div id="homePageContent" class="rarecard-page">
@@ -27,10 +28,21 @@
              class="inline-flex items-center rounded-full bg-slate-900 px-7 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-blue-800">
             @Localizer["Home_Hero_ExploreAuctions"]
           </a>
-          <a asp-controller="Sell" asp-action="Create"
-             class="inline-flex items-center rounded-full border-2 border-slate-900 bg-white px-7 py-3.5 text-xs font-bold uppercase tracking-widest text-slate-900 transition hover:bg-slate-50">
-            @Localizer["Home_Hero_SellYourCard"]
-          </a>
+          @if (isLoggedIn)
+          {
+            <a asp-controller="Account" asp-action="Selling"
+               class="inline-flex items-center rounded-full border-2 border-slate-900 bg-white px-7 py-3.5 text-xs font-bold uppercase tracking-widest text-slate-900 transition hover:bg-slate-50">
+              @Localizer["Home_Hero_SellYourCard"]
+            </a>
+          }
+          else
+          {
+            var sellReturnUrl = Url.Action("Selling", "Account", new { tab = "active", channel = "buynow" }) ?? "/Account/Selling";
+            <button type="button" data-auth-tab="login" data-auth-return-url="@sellReturnUrl"
+                    class="inline-flex cursor-pointer items-center rounded-full border-2 border-slate-900 bg-white px-7 py-3.5 text-xs font-bold uppercase tracking-widest text-slate-900 transition hover:bg-slate-50">
+              @Localizer["Home_Hero_SellYourCard"]
+            </button>
+          }
         </div>
       </div>
     </div>
