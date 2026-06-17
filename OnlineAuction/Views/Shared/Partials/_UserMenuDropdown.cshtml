@@ -1,6 +1,6 @@
 @model OnlineAuction.Models.AccountShellViewModel
 
-<div id="userMenuPanel" class="user-menu-panel hidden" role="menu" aria-label="Account menu">
+<div id="userMenuPanel" class="user-menu-panel hidden" role="menu" aria-label="@Localizer["UserMenu_AccountMenu"]">
   <div class="user-menu-panel__header">
     <span class="user-menu-panel__avatar">@Model.Initials</span>
     <div class="min-w-0">
@@ -8,30 +8,27 @@
     </div>
   </div>
 
-  <a asp-controller="Account" asp-action="Wallet" class="account-wallet-card user-menu-panel__wallet" role="menuitem">
-    <div class="flex items-start justify-between gap-4">
-      <div>
-        <p class="text-base font-semibold text-white">Wallet</p>
-        <p class="mt-1 text-xs text-white/70">Manage your payment methods and balances</p>
-      </div>
-      <svg class="h-4 w-4 shrink-0 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-    </div>
-    <p class="account-wallet-card__balance mt-6">$@Model.WalletBalance.ToString("N2")</p>
-    <p class="mt-1 text-[11px] text-white/60">Available balance</p>
-  </a>
-
   <nav class="user-menu-panel__nav">
+    <a asp-controller="User" asp-action="Detail" asp-route-id="@Model.UserId" class="user-menu-panel__link" role="menuitem">
+      <span class="user-menu-panel__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </span>
+      <span class="min-w-0">
+        <span class="block text-sm font-semibold text-slate-900">@Localizer["UserMenu_UserInformation"]</span>
+        <span class="block text-xs text-slate-500">@Localizer["UserMenu_UserInformation_Desc"]</span>
+      </span>
+    </a>
     @{
-      var items = new (string Action, string Title, string Desc)[]
+      var items = new (string Action, string TitleKey, string DescKey)[]
       {
-        ("Orders", "Orders", "Track and view your purchases"),
-        ("Bids", "Bids", "View your active and past auctions bids"),
-        ("Watchlist", "Watchlist", "Keep tabs on saved items"),
-        ("Offers", "Offers", "Track offers you've made or received"),
-        ("Selling", "Selling", "Monitor your active listings and sales"),
-        ("Summary", "Summary", "An overall view of your account"),
-        ("Accounting", "Accounting", "View balance, summaries, and transactions"),
-        ("Submissions", "Submissions", "Review submitted items and progress")
+        ("Orders", "UserMenu_Orders", "UserMenu_Orders_Desc"),
+        ("Bids", "UserMenu_Bids", "UserMenu_Bids_Desc"),
+        ("Watchlist", "UserMenu_Watchlist", "UserMenu_Watchlist_Desc"),
+        ("Offers", "UserMenu_Offers", "UserMenu_Offers_Desc"),
+        ("Selling", "UserMenu_Selling", "UserMenu_Selling_Desc"),
+        ("Summary", "UserMenu_Summary", "UserMenu_Summary_Desc"),
+        ("Accounting", "UserMenu_Accounting", "UserMenu_Accounting_Desc"),
+        ("Submissions", "UserMenu_Submissions", "UserMenu_Submissions_Desc")
       };
     }
     @foreach (var item in items)
@@ -67,8 +64,8 @@
           }
         </span>
         <span class="min-w-0">
-          <span class="block text-sm font-semibold text-slate-900">@item.Title</span>
-          <span class="block text-xs text-slate-500">@item.Desc</span>
+          <span class="block text-sm font-semibold text-slate-900">@Localizer[item.TitleKey]</span>
+          <span class="block text-xs text-slate-500">@Localizer[item.DescKey]</span>
         </span>
       </a>
     }
@@ -76,8 +73,8 @@
 
   <div class="user-menu-panel__vault">
     <div class="flex items-center justify-between gap-2">
-      <p class="text-sm font-semibold text-slate-900">My Vault address</p>
-      <button type="button" class="user-menu-panel__copy" data-copy-vault aria-label="Copy vault address">
+      <p class="text-sm font-semibold text-slate-900">@Localizer["UserMenu_VaultAddress"]</p>
+      <button type="button" class="user-menu-panel__copy" data-copy-vault aria-label="@Localizer["UserMenu_CopyVault"]">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="h-4 w-4"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
       </button>
     </div>
@@ -88,14 +85,14 @@
     </p>
     <a asp-controller="Account" asp-action="Submissions"
        class="mt-4 flex w-full items-center justify-center rounded-full bg-slate-900 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
-      Submit items to Vault
+      @Localizer["UserMenu_SubmitToVault"]
     </a>
   </div>
 
   <form asp-controller="Auth" asp-action="Logout" method="post" class="user-menu-panel__logout">
     @Html.AntiForgeryToken()
     <button type="submit" class="w-full cursor-pointer py-2 text-center text-sm font-medium text-red-600 transition hover:text-red-700">
-      Log out
+      @Localizer["Layout_Logout"]
     </button>
   </form>
 </div>

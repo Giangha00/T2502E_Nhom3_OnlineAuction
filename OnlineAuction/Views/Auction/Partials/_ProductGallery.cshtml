@@ -15,8 +15,8 @@
         <button type="button"
                 class="gallery-thumb group h-14 w-14 shrink-0 overflow-hidden rounded border-2 @(i == 0 ? "border-slate-900" : "border-transparent") bg-white transition hover:border-slate-400"
                 data-image="@image"
-                aria-label="View image @(i + 1)">
-          <img src="@image" alt="@Model.Name thumbnail @(i + 1)"
+                aria-label="@Localizer["Product_ViewImage", i + 1]">
+          <img src="@image" alt="@Localizer["Product_Thumbnail", Model.Name, i + 1]"
                class="h-full w-full object-cover"/>
         </button>
       }

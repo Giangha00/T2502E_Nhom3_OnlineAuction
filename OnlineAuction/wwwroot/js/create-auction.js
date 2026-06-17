@@ -16,6 +16,19 @@
   var form = document.getElementById('createAuctionForm');
   if (!form) return;
 
+  var i18n = (window.sellPageConfig && window.sellPageConfig.i18n) || {};
+
+  function t(key, fallback) {
+    return i18n[key] || fallback || '';
+  }
+
+  function tf(template) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    return String(template).replace(/\{(\d+)\}/g, function (_, index) {
+      return args[Number(index)] !== undefined ? args[Number(index)] : '';
+    });
+  }
+
   function $(id) { return document.getElementById(id); }
 
   // Create.cshtml renders Auction Preview twice: one for mobile and one for desktop.
@@ -105,27 +118,58 @@
     };
   }
 
-  function updatePreview() {
-    var data = getFormData();
+  function formatCardMoney(value) {
+    if (value === '' || value === null || isNaN(value)) return '$ —';
+    return '$' + Number(value).toLocaleString('en-US', { maximumFractionDigits: 0 });
+  }
 
-    setPreviewText('previewName', data.productName || 'Product Name');
-    setPreviewText('previewCondition', 'Condition: ' + (data.condition || '--'));
-    setPreviewText('previewDescription', stripHtml(data.productDescription) || 'No description yet.');
-    setPreviewText('previewCategory', data.category || '--');
-    setPreviewText('previewOrigin', data.productOrigin || '--');
-    setPreviewText('previewAuctionType', data.auctionType || '--');
-    setPreviewText('previewStartingPrice', formatMoney(data.startingPrice));
-    setPreviewText('previewCurrentBid', data.startingPrice ? formatMoney(data.startingPrice) : '--');
-    setPreviewText('previewBidStep', formatMoney(data.bidStep));
-    setPreviewText('previewBuyNowPrice', data.buyNowPrice ? formatMoney(data.buyNowPrice) : '--');
-    setPreviewText('previewStartDate', formatDateTime(data.startDate));
-    setPreviewText('previewEndDate', formatDateTime(data.endDate));
-    setPreviewText('previewImageCount', String(data.imageCount));
-    setPreviewText('previewDocumentCount', String(data.documentCount));
+  function formatTimeRemaining(endDate) {
+    if (!endDate) return '—';
+    var end = new Date(endDate);
+    if (isNaN(end.getTime())) return '—';
+    var diff = end.getTime() - Date.now();
+    if (diff <= 0) return t('timeEnded', 'Ended');
+    var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    if (days > 0) return tf(t('timeLeftDays', '{0}d {1}h left'), days, hours);
+    var mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return tf(t('timeLeftHours', '{0}h {1}m left'), hours, mins);
+  }
 
+  function localizeCondition(value) {
+    switch (value) {
+      case 'New': return t('conditionNew', value);
+      case 'Like New': return t('conditionLikeNew', value);
+      case 'Used': return t('conditionUsed', value);
+      default: return value;
+    }
+  }
+
+  function buildPreviewSubtitle(data) {
+    var parts = [];
+    if (data.category) parts.push(data.category);
+    if (data.productOrigin) parts.push(data.productOrigin);
+    if (data.condition) parts.push(localizeCondition(data.condition));
+    return parts.length ? parts.join(' · ') : '—';
+  }
+
+  function setPreviewGradeBadge(condition) {
+    $all('previewGrade').forEach(function (badge) {
+      var showGrade = condition && /^(PSA|BGS|CGC)\s/i.test(condition);
+      if (showGrade) {
+        badge.textContent = condition;
+        badge.classList.remove('hidden');
+      } else {
+        badge.textContent = '';
+        badge.classList.add('hidden');
+      }
+    });
+  }
+
+  function setPreviewMainImage(url) {
     $all('previewImage').forEach(function (previewImg) {
-      if (state.images.length > 0) {
-        previewImg.src = state.images[0].url;
+      if (url) {
+        previewImg.src = url;
         previewImg.classList.remove('hidden');
       } else {
         previewImg.src = '';
@@ -134,26 +178,19 @@
     });
 
     $all('previewImagePlaceholder').forEach(function (placeholder) {
-      placeholder.classList.toggle('hidden', state.images.length > 0);
+      placeholder.classList.toggle('hidden', Boolean(url));
     });
+  }
 
-    $all('previewThumbnails').forEach(function (thumbs) {
-      thumbs.innerHTML = '';
+  function updatePreview() {
+    var data = getFormData();
 
-      if (state.images.length <= 1) {
-        thumbs.classList.add('hidden');
-        return;
-      }
-
-      thumbs.classList.remove('hidden');
-      state.images.slice(0, 5).forEach(function (img, i) {
-        var el = document.createElement('img');
-        el.src = img.url;
-        el.alt = 'Thumbnail ' + (i + 1);
-        el.className = 'h-14 w-14 rounded border border-slate-200 object-cover';
-        thumbs.appendChild(el);
-      });
-    });
+    setPreviewText('previewName', data.productName || t('productNameDefault', 'Product Name'));
+    setPreviewText('previewSubtitle', buildPreviewSubtitle(data));
+    setPreviewText('previewCurrentBid', formatCardMoney(data.startingPrice));
+    setPreviewText('previewTimeRemaining', formatTimeRemaining(data.endDate));
+    setPreviewGradeBadge(data.condition);
+    setPreviewMainImage(state.images.length > 0 ? state.images[0].url : '');
   }
 
   function renderImagePreviews() {
@@ -177,7 +214,7 @@
       card.className = 'group relative aspect-square overflow-hidden rounded-lg border border-slate-200 bg-slate-100';
       card.innerHTML =
         '<img src="' + img.url + '" alt="Preview" class="h-full w-full object-cover"/>' +
-        '<button type="button" data-remove-image="' + img.id + '" class="absolute right-1.5 top-1.5 cursor-pointer rounded-lg bg-red-600/90 px-2 py-1 text-[10px] font-bold uppercase text-white opacity-0 transition group-hover:opacity-100">Remove</button>';
+        '<button type="button" data-remove-image="' + img.id + '" class="absolute right-1.5 top-1.5 cursor-pointer rounded-lg bg-red-600/90 px-2 py-1 text-[10px] font-bold uppercase text-white opacity-0 transition group-hover:opacity-100">' + t('remove', 'Remove') + '</button>';
       list.appendChild(card);
     });
 
@@ -204,9 +241,9 @@
     }
 
     if (!IMAGE_TYPES.includes(file.type)) {
-      errors.push(file.name + ': invalid format (JPG, PNG, WEBP only)');
+      errors.push(tf(t('errorImageInvalidFormat', '{0}: invalid format (JPG, PNG, WEBP only)'), file.name));
     } else if (file.size > MAX_IMAGE_SIZE) {
-      errors.push(file.name + ': exceeds 5MB limit');
+      errors.push(tf(t('errorImageSizeLimit', '{0}: exceeds 5MB limit'), file.name));
     } else {
       state.images.push({
         id: 'img_' + Date.now() + '_' + Math.random().toString(36).slice(2),
@@ -258,7 +295,7 @@
         doc.name.split('.').pop().toUpperCase().slice(0, 3) + '</span>' +
         '<div class="min-w-0"><p class="truncate text-sm font-medium text-slate-800">' + doc.name + '</p>' +
         '<p class="text-xs text-slate-400">' + (doc.size / 1024).toFixed(1) + ' KB</p></div></div>' +
-        '<button type="button" data-remove-doc="' + doc.id + '" class="shrink-0 cursor-pointer text-xs font-semibold text-red-600 hover:text-red-700">Remove</button>';
+        '<button type="button" data-remove-doc="' + doc.id + '" class="shrink-0 cursor-pointer text-xs font-semibold text-red-600 hover:text-red-700">' + t('remove', 'Remove') + '</button>';
       list.appendChild(li);
     });
 
@@ -277,11 +314,11 @@
     var errors = [];
     Array.from(files).forEach(function (file) {
       if (!DOC_TYPES.includes(file.type)) {
-        errors.push(file.name + ': invalid format (PDF, JPG, PNG only)');
+        errors.push(tf(t('errorDocInvalidFormat', '{0}: invalid format (PDF, JPG, PNG only)'), file.name));
         return;
       }
       if (file.size > MAX_DOC_SIZE) {
-        errors.push(file.name + ': exceeds 10MB limit');
+        errors.push(tf(t('errorDocSizeLimit', '{0}: exceeds 10MB limit'), file.name));
         return;
       }
       state.documents.push({
@@ -332,32 +369,32 @@
     var now = new Date();
 
     if (!data.productName) {
-      showError('productName', 'Product name is required');
+      showError('productName', t('errorProductNameRequired', 'Product name is required'));
       markInvalid($('productName'));
       valid = false;
     }
 
     if (!data.category) {
-      showError('category', 'Please select a category');
+      showError('category', t('errorCategoryRequired', 'Please select a category'));
       markInvalid($('category'));
       valid = false;
     }
 
     if (!data.condition) {
-      showError('Condition', 'Please select a condition');
+      showError('Condition', t('errorConditionRequired', 'Please select a condition'));
       valid = false;
     }
 
     var price = Number(data.startingPrice);
     if (!data.startingPrice || isNaN(price) || price <= 0) {
-      showError('startingPrice', 'Starting price must be greater than 0');
+      showError('startingPrice', t('errorStartingPriceRequired', 'Starting price must be greater than 0'));
       markInvalid($('startingPrice'));
       valid = false;
     }
 
     var step = Number(data.bidStep);
     if (!data.bidStep || isNaN(step) || step <= 0) {
-      showError('bidStep', 'Bid step must be greater than 0');
+      showError('bidStep', t('errorBidStepRequired', 'Bid step must be greater than 0'));
       markInvalid($('bidStep'));
       valid = false;
     }
@@ -365,43 +402,43 @@
     if (data.buyNowPrice) {
       var buyNow = Number(data.buyNowPrice);
       if (isNaN(buyNow) || buyNow <= 0) {
-        showError('buyNowPrice', 'Buy now price must be greater than 0');
+        showError('buyNowPrice', t('errorBuyNowPriceInvalid', 'Buy now price must be greater than 0'));
         markInvalid($('buyNowPrice'));
         valid = false;
       } else if (!isNaN(price) && buyNow <= price) {
-        showError('buyNowPrice', 'Buy now price must be greater than the starting price');
+        showError('buyNowPrice', t('errorBuyNowPriceGreater', 'Buy now price must be greater than the starting price'));
         markInvalid($('buyNowPrice'));
         valid = false;
       }
     }
 
     if (!data.auctionType) {
-      showError('AuctionType', 'Please select an auction type');
+      showError('AuctionType', t('errorAuctionTypeRequired', 'Please select an auction type'));
       valid = false;
     }
 
     if (!data.startDate) {
-      showError('startDate', 'Start date is required');
+      showError('startDate', t('errorStartDateRequired', 'Start date is required'));
       markInvalid($('startDate'));
       valid = false;
     } else {
       var start = new Date(data.startDate);
       if (start < now) {
-        showError('startDate', 'Start date cannot be in the past');
+        showError('startDate', t('errorStartDatePast', 'Start date cannot be in the past'));
         markInvalid($('startDate'));
         valid = false;
       }
     }
 
     if (!data.endDate) {
-      showError('endDate', 'End date is required');
+      showError('endDate', t('errorEndDateRequired', 'End date is required'));
       markInvalid($('endDate'));
       valid = false;
     } else if (data.startDate) {
       var startD = new Date(data.startDate);
       var endD = new Date(data.endDate);
       if (endD <= startD) {
-        showError('endDate', 'End date must be greater than start date');
+        showError('endDate', t('errorEndDateAfterStart', 'End date must be greater than start date'));
         markInvalid($('endDate'));
         valid = false;
       }
@@ -462,7 +499,7 @@
   }
 
   function showSuccess(name) {
-    showTopToast('success', 'Your auction "' + name + '" has been created successfully!');
+    showTopToast('success', tf(t('successCreated', 'Your auction "{0}" has been created successfully!'), name));
     try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
   }
 
@@ -506,7 +543,7 @@
     if (!el || typeof ClassicEditor === 'undefined') return;
 
     ClassicEditor.create(el, {
-      placeholder: "Describe your product's unique features, grade, and history...",
+      placeholder: t('editorPlaceholder', "Describe your product's unique features, grade, and history..."),
       toolbar: ['bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'undo', 'redo']
     }).then(function (editor) {
       state.editor = editor;
@@ -580,7 +617,7 @@
         .then(function (response) {
           return response.json().then(function (payload) {
             if (!response.ok || payload.success === false) {
-              throw new Error(payload.message || 'Could not create auction.');
+              throw new Error(payload.message || t('errorCreateFailed', 'Could not create auction.'));
             }
             return payload;
           });
