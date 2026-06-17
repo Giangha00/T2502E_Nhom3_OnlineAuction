@@ -5,10 +5,10 @@
   <section class="product-detail-section mt-14 border-t border-slate-200 pt-12">
     <div class="mb-8 flex items-end justify-between gap-4">
       <div>
-        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Ending Soon</h2>
-        <p class="mt-1 text-sm text-slate-500">Other rare collectibles you might be interested in</p>
+        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">@Localizer["Product_EndingSoonTitle"]</h2>
+        <p class="mt-1 text-sm text-slate-500">@Localizer["Product_RelatedSubtitle"]</p>
       </div>
-      <a asp-controller="Auction" asp-action="Index" class="hidden text-sm font-semibold text-blue-700 hover:text-blue-900 sm:inline">View all →</a>
+      <a asp-controller="Auction" asp-action="Index" class="hidden text-sm font-semibold text-blue-700 hover:text-blue-900 sm:inline">@Localizer["Product_ViewAllArrow"]</a>
     </div>
     <div class="rarecard-auction-grid">
       @foreach (var item in Model.RelatedProducts)

@@ -144,6 +144,12 @@
   <data name="Layout_Profile" xml:space="preserve">
     <value>Profile</value>
   </data>
+  <data name="UserMenu_UserInformation" xml:space="preserve">
+    <value>User Information</value>
+  </data>
+  <data name="UserMenu_UserInformation_Desc" xml:space="preserve">
+    <value>View profile details and contact information</value>
+  </data>
   <data name="Home_CompletePayment_Title" xml:space="preserve">
     <value>Complete payment on your wins</value>
   </data>
@@ -213,4 +219,582 @@
   <data name="Layout_Footer_RefundRequest" xml:space="preserve">
     <value>Refund Request</value>
   </data>
+  <data name="Sell_PageTitle" xml:space="preserve"><value>Sell Your Card</value></data>
+  <data name="Sell_SuccessMessage" xml:space="preserve"><value>Your auction has been created successfully!</value></data>
+  <data name="Sell_ViewAuctions" xml:space="preserve"><value>View auctions →</value></data>
+  <data name="Sell_DraftSaved" xml:space="preserve"><value>Draft saved locally. You can continue editing anytime.</value></data>
+  <data name="Sell_Heading" xml:space="preserve"><value>List Your Rare Collectible</value></data>
+  <data name="Sell_Subheading" xml:space="preserve"><value>Provide precise details to maximize your card's auction potential.</value></data>
+  <data name="Sell_Section1_Title" xml:space="preserve"><value>Product Information</value></data>
+  <data name="Sell_Section1_Desc" xml:space="preserve"><value>Basic details about your collectible item</value></data>
+  <data name="Sell_ProductName" xml:space="preserve"><value>Product Name</value></data>
+  <data name="Sell_ProductName_Placeholder" xml:space="preserve"><value>e.g. 1999 Pokémon Base Set Charizard Holo</value></data>
+  <data name="Sell_Category" xml:space="preserve"><value>Category</value></data>
+  <data name="Sell_Category_Placeholder" xml:space="preserve"><value>Select a category</value></data>
+  <data name="Sell_ProductDescription" xml:space="preserve"><value>Product Description</value></data>
+  <data name="Sell_Condition" xml:space="preserve"><value>Condition</value></data>
+  <data name="Sell_Condition_New" xml:space="preserve"><value>New</value></data>
+  <data name="Sell_Condition_LikeNew" xml:space="preserve"><value>Like New</value></data>
+  <data name="Sell_Condition_Used" xml:space="preserve"><value>Used</value></data>
+  <data name="Sell_ProductOrigin" xml:space="preserve"><value>Product Origin</value></data>
+  <data name="Sell_ProductOrigin_Placeholder" xml:space="preserve"><value>e.g. Japan / USA</value></data>
+  <data name="Sell_Section2_Title" xml:space="preserve"><value>Product Images</value></data>
+  <data name="Sell_Section2_Desc" xml:space="preserve"><value>Upload multiple images — JPG, PNG, WEBP (max 5MB each)</value></data>
+  <data name="Sell_UploadImages_Title" xml:space="preserve"><value>Upload Product Images</value></data>
+  <data name="Sell_UploadImages_DragDrop" xml:space="preserve"><value>Drag &amp; Drop files here or click to browse</value></data>
+  <data name="Sell_UploadImages_CloudinaryNote" xml:space="preserve"><value>This image will be uploaded to Cloudinary and saved as the listing cover.</value></data>
+  <data name="Sell_UploadedImages" xml:space="preserve"><value>Uploaded Images</value></data>
+  <data name="Sell_RemoveAll" xml:space="preserve"><value>Remove all</value></data>
+  <data name="Sell_Section3_Title" xml:space="preserve"><value>Auction Settings</value></data>
+  <data name="Sell_Section3_Desc" xml:space="preserve"><value>Set your pricing and auction type</value></data>
+  <data name="Sell_StartingPrice" xml:space="preserve"><value>Starting Price</value></data>
+  <data name="Sell_BidStep" xml:space="preserve"><value>Bid Step</value></data>
+  <data name="Sell_BuyNowPrice" xml:space="preserve"><value>Buy Now Price</value></data>
+  <data name="Sell_AuctionType" xml:space="preserve"><value>Auction Type</value></data>
+  <data name="Sell_AuctionType_Normal" xml:space="preserve"><value>Normal Auction</value></data>
+  <data name="Sell_AuctionType_Normal_Desc" xml:space="preserve"><value>Standard auction listing with regular visibility across the marketplace.</value></data>
+  <data name="Sell_AuctionType_Featured" xml:space="preserve"><value>Featured Auction</value></data>
+  <data name="Sell_AuctionType_Featured_Desc" xml:space="preserve"><value>High-priority placement on homepage and category pages. Additional fee applies.</value></data>
+  <data name="Sell_Section4_Title" xml:space="preserve"><value>Auction Duration</value></data>
+  <data name="Sell_Section4_Desc" xml:space="preserve"><value>When your auction starts and ends</value></data>
+  <data name="Sell_StartDate" xml:space="preserve"><value>Start Date</value></data>
+  <data name="Sell_EndDate" xml:space="preserve"><value>End Date</value></data>
+  <data name="Sell_Section5_Title" xml:space="preserve"><value>Product Documents</value></data>
+  <data name="Sell_Section5_Desc" xml:space="preserve"><value>Certificate, warranty, invoice, or verification files</value></data>
+  <data name="Sell_DocType_Certificate" xml:space="preserve"><value>Certificate</value></data>
+  <data name="Sell_DocType_Warranty" xml:space="preserve"><value>Warranty</value></data>
+  <data name="Sell_DocType_Invoice" xml:space="preserve"><value>Invoice</value></data>
+  <data name="Sell_DocType_Verification" xml:space="preserve"><value>Verification</value></data>
+  <data name="Sell_UploadDocuments" xml:space="preserve"><value>Upload Documents</value></data>
+  <data name="Sell_UploadDocuments_Hint" xml:space="preserve"><value>PDF, JPG, PNG — max 10MB per file</value></data>
+  <data name="Sell_ReadyToPublish_Highlight" xml:space="preserve"><value>Ready to publish?</value></data>
+  <data name="Sell_ReadyToPublish" xml:space="preserve"><value>Review the preview panel, then create your auction.</value></data>
+  <data name="Sell_SaveDraft" xml:space="preserve"><value>Save Draft</value></data>
+  <data name="Sell_CreateAuction" xml:space="preserve"><value>Create Auction</value></data>
+  <data name="Sell_Preview_Title" xml:space="preserve"><value>Auction Preview</value></data>
+  <data name="Sell_Preview_Desc" xml:space="preserve"><value>How your listing appears in auction</value></data>
+  <data name="Sell_Preview_NoImage" xml:space="preserve"><value>No image yet</value></data>
+  <data name="Sell_Preview_ProductNameDefault" xml:space="preserve"><value>Product Name</value></data>
+  <data name="Sell_Preview_CurrentBid" xml:space="preserve"><value>Current Bid</value></data>
+  <data name="Sell_Preview_TimeLeft" xml:space="preserve"><value>Time Left</value></data>
+  <data name="Sell_Preview_ReviewNote" xml:space="preserve"><value>Your card will be reviewed by our specialists before the auction goes live to ensure authenticity.</value></data>
+  <data name="Sell_Preview_TimeEnded" xml:space="preserve"><value>Ended</value></data>
+  <data name="Sell_Preview_TimeLeftDays" xml:space="preserve"><value>{0}d {1}h left</value></data>
+  <data name="Sell_Preview_TimeLeftHours" xml:space="preserve"><value>{0}h {1}m left</value></data>
+  <data name="Sell_Editor_Placeholder" xml:space="preserve"><value>Describe your product's unique features, grade, and history...</value></data>
+  <data name="Sell_Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="Sell_Success_Created" xml:space="preserve"><value>Your auction "{0}" has been created successfully!</value></data>
+  <data name="Sell_Error_CreateFailed" xml:space="preserve"><value>Could not create auction.</value></data>
+  <data name="Sell_Error_ProductNameRequired" xml:space="preserve"><value>Product name is required</value></data>
+  <data name="Sell_Error_CategoryRequired" xml:space="preserve"><value>Please select a category</value></data>
+  <data name="Sell_Error_ConditionRequired" xml:space="preserve"><value>Please select a condition</value></data>
+  <data name="Sell_Error_StartingPriceRequired" xml:space="preserve"><value>Starting price must be greater than 0</value></data>
+  <data name="Sell_Error_BidStepRequired" xml:space="preserve"><value>Bid step must be greater than 0</value></data>
+  <data name="Sell_Error_BuyNowPriceInvalid" xml:space="preserve"><value>Buy now price must be greater than 0</value></data>
+  <data name="Sell_Error_BuyNowPriceGreater" xml:space="preserve"><value>Buy now price must be greater than the starting price</value></data>
+  <data name="Sell_Error_AuctionTypeRequired" xml:space="preserve"><value>Please select an auction type</value></data>
+  <data name="Sell_Error_StartDateRequired" xml:space="preserve"><value>Start date is required</value></data>
+  <data name="Sell_Error_StartDatePast" xml:space="preserve"><value>Start date cannot be in the past</value></data>
+  <data name="Sell_Error_EndDateRequired" xml:space="preserve"><value>End date is required</value></data>
+  <data name="Sell_Error_EndDateAfterStart" xml:space="preserve"><value>End date must be greater than start date</value></data>
+  <data name="Sell_Error_ImageInvalidFormat" xml:space="preserve"><value>{0}: invalid format (JPG, PNG, WEBP only)</value></data>
+  <data name="Sell_Error_ImageSizeLimit" xml:space="preserve"><value>{0}: exceeds 5MB limit</value></data>
+  <data name="Sell_Error_DocInvalidFormat" xml:space="preserve"><value>{0}: invalid format (PDF, JPG, PNG only)</value></data>
+  <data name="Sell_Error_DocSizeLimit" xml:space="preserve"><value>{0}: exceeds 10MB limit</value></data>
+  <data name="UserMenu_Orders" xml:space="preserve"><value>Orders</value></data>
+  <data name="UserMenu_Orders_Desc" xml:space="preserve"><value>Track and view your purchases</value></data>
+  <data name="UserMenu_Bids" xml:space="preserve"><value>Bids</value></data>
+  <data name="UserMenu_Bids_Desc" xml:space="preserve"><value>View your active and past auctions bids</value></data>
+  <data name="UserMenu_Watchlist" xml:space="preserve"><value>Watchlist</value></data>
+  <data name="UserMenu_Watchlist_Desc" xml:space="preserve"><value>Keep tabs on saved items</value></data>
+  <data name="UserMenu_Offers" xml:space="preserve"><value>Offers</value></data>
+  <data name="UserMenu_Offers_Desc" xml:space="preserve"><value>Track offers you've made or received</value></data>
+  <data name="UserMenu_Selling" xml:space="preserve"><value>Selling</value></data>
+  <data name="UserMenu_Selling_Desc" xml:space="preserve"><value>Monitor your active listings and sales</value></data>
+  <data name="UserMenu_Summary" xml:space="preserve"><value>Summary</value></data>
+  <data name="UserMenu_Summary_Desc" xml:space="preserve"><value>An overall view of your account</value></data>
+  <data name="UserMenu_Accounting" xml:space="preserve"><value>Accounting</value></data>
+  <data name="UserMenu_Accounting_Desc" xml:space="preserve"><value>View balance, summaries, and transactions</value></data>
+  <data name="UserMenu_Submissions" xml:space="preserve"><value>Submissions</value></data>
+  <data name="UserMenu_Submissions_Desc" xml:space="preserve"><value>Review submitted items and progress</value></data>
+  <data name="UserMenu_VaultAddress" xml:space="preserve"><value>My Vault address</value></data>
+  <data name="UserMenu_CopyVault" xml:space="preserve"><value>Copy vault address</value></data>
+  <data name="UserMenu_SubmitToVault" xml:space="preserve"><value>Submit items to Vault</value></data>
+  <data name="UserMenu_AccountMenu" xml:space="preserve"><value>Account menu</value></data>
+  <data name="Account_Wallet" xml:space="preserve"><value>Wallet</value></data>
+  <data name="Account_Orders" xml:space="preserve"><value>Orders</value></data>
+  <data name="Account_Bids" xml:space="preserve"><value>Bids</value></data>
+  <data name="Account_Watchlist" xml:space="preserve"><value>Watchlist</value></data>
+  <data name="Account_Offers" xml:space="preserve"><value>Offers</value></data>
+  <data name="Account_Selling" xml:space="preserve"><value>Selling</value></data>
+  <data name="Account_Summary" xml:space="preserve"><value>Summary</value></data>
+  <data name="Account_Accounting" xml:space="preserve"><value>Accounting</value></data>
+  <data name="Account_Submissions" xml:space="preserve"><value>Submissions</value></data>
+  <data name="Account_Preferences" xml:space="preserve"><value>Preferences</value></data>
+  <data name="Account_Orders_Desc" xml:space="preserve"><value>Track and view your purchases</value></data>
+  <data name="Account_Bids_Desc" xml:space="preserve"><value>View your active and past auction bids</value></data>
+  <data name="Account_Watchlist_Desc" xml:space="preserve"><value>Keep tabs on saved items</value></data>
+  <data name="Account_Offers_Desc" xml:space="preserve"><value>Track offers you've made or received</value></data>
+  <data name="Account_Summary_Desc" xml:space="preserve"><value>An overall view of your account</value></data>
+  <data name="Account_Accounting_Desc" xml:space="preserve"><value>View balance, summaries, and transactions</value></data>
+  <data name="Account_Submissions_Desc" xml:space="preserve"><value>Review submitted items and progress</value></data>
+  <data name="Account_Preferences_Desc" xml:space="preserve"><value>Manage your account settings and notifications</value></data>
+  <data name="Account_Empty_Title" xml:space="preserve"><value>Nothing here yet.</value></data>
+  <data name="Account_Empty_Desc" xml:space="preserve"><value>This section will show your {0} activity once you start using RareCard.</value></data>
+  <data name="Auth_Modal_Title" xml:space="preserve"><value>Sign up or log in</value></data>
+  <data name="Auth_Modal_Subtitle" xml:space="preserve"><value>Join the world's premier trading card auction vault</value></data>
+  <data name="Auth_LogIn" xml:space="preserve"><value>Log in</value></data>
+  <data name="Auth_SignUp" xml:space="preserve"><value>Sign up</value></data>
+  <data name="Auth_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Auth_Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Auth_RememberMe" xml:space="preserve"><value>Remember me</value></data>
+  <data name="Auth_Continue" xml:space="preserve"><value>Continue</value></data>
+  <data name="Auth_FullName" xml:space="preserve"><value>Full name</value></data>
+  <data name="Auth_Phone" xml:space="preserve"><value>Phone</value></data>
+  <data name="Auth_ConfirmPassword" xml:space="preserve"><value>Confirm password</value></data>
+  <data name="Auth_CreateAccount" xml:space="preserve"><value>Create Account</value></data>
+  <data name="Auth_Legal" xml:space="preserve"><value>By continuing, you agree to RareCard's Terms of Service and Privacy Policy.</value></data>
+  <data name="Auth_Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Auth_Placeholder_Email" xml:space="preserve"><value>Enter your email address</value></data>
+  <data name="Auth_Placeholder_Password" xml:space="preserve"><value>Enter your password</value></data>
+  <data name="Auth_Placeholder_FullName" xml:space="preserve"><value>Enter your full name</value></data>
+  <data name="Auth_Placeholder_Phone" xml:space="preserve"><value>Enter your phone number</value></data>
+  <data name="Auth_Placeholder_SignupPassword" xml:space="preserve"><value>Create a password</value></data>
+  <data name="Auth_Placeholder_ConfirmPassword" xml:space="preserve"><value>Confirm your password</value></data>
+  <data name="Auth_Slide1_Eyebrow" xml:space="preserve"><value>RareCard Vault</value></data>
+  <data name="Auth_Slide1_Title" xml:space="preserve"><value>Welcome to RareCard</value></data>
+  <data name="Auth_Slide1_Desc" xml:space="preserve"><value>Bid on authenticated graded cards from PSA, BGS &amp; CGC vaults.</value></data>
+  <data name="Auth_Slide2_Eyebrow" xml:space="preserve"><value>Pokémon &amp; TCG</value></data>
+  <data name="Auth_Slide2_Title" xml:space="preserve"><value>Discover Rare Holos</value></data>
+  <data name="Auth_Slide2_Desc" xml:space="preserve"><value>Base Set Charizards, Illustrator promos &amp; manga rare parallels.</value></data>
+  <data name="Auth_Slide3_Eyebrow" xml:space="preserve"><value>Sports &amp; MTG</value></data>
+  <data name="Auth_Slide3_Title" xml:space="preserve"><value>Legends on Auction</value></data>
+  <data name="Auth_Slide3_Desc" xml:space="preserve"><value>From Mickey Mantle rookies to Alpha Black Lotus — curated daily.</value></data>
+  <data name="Layout_Footer_AboutUs" xml:space="preserve"><value>About Us</value></data>
+  <data name="Layout_Footer_ContactUs" xml:space="preserve"><value>Contact Us</value></data>
+  <data name="Layout_Footer_PolicyTerms" xml:space="preserve"><value>Policy &amp; Term of Use</value></data>
+  <data name="Layout_Copyright" xml:space="preserve"><value>© {0} RareCard. All rights reserved.</value></data>
+  <data name="Auction_PageTitle" xml:space="preserve"><value>Live Auctions</value></data>
+  <data name="Auction_Subtitle" xml:space="preserve"><value>Discover authenticated, high-grade collectibles curated for the world's most discerning collectors.</value></data>
+  <data name="Auction_LiveNow" xml:space="preserve"><value>Live now</value></data>
+  <data name="Auction_ActiveBids" xml:space="preserve"><value>Active Bids ({0})</value></data>
+  <data name="Auction_WatchlistCount" xml:space="preserve"><value>Watchlist ({0})</value></data>
+  <data name="Auction_Filter_Category" xml:space="preserve"><value>Category</value></data>
+  <data name="Auction_Filter_Condition" xml:space="preserve"><value>Condition</value></data>
+  <data name="Auction_Filter_Year" xml:space="preserve"><value>Year Manufactured</value></data>
+  <data name="Auction_Filter_PriceRange" xml:space="preserve"><value>Price Range</value></data>
+  <data name="Auction_Filter_EndingSoonOnly" xml:space="preserve"><value>Ending Soon Only</value></data>
+  <data name="Auction_ClearFilters" xml:space="preserve"><value>Clear filters</value></data>
+  <data name="Auction_ShowingItems" xml:space="preserve"><value>Showing {0} items</value></data>
+  <data name="Auction_Sort_Featured" xml:space="preserve"><value>Featured</value></data>
+  <data name="Auction_Sort_EndingSoon" xml:space="preserve"><value>Ending soon</value></data>
+  <data name="Auction_Sort_PriceAsc" xml:space="preserve"><value>Price: low to high</value></data>
+  <data name="Auction_Sort_PriceDesc" xml:space="preserve"><value>Price: high to low</value></data>
+  <data name="Auction_Sort_Name" xml:space="preserve"><value>Name A–Z</value></data>
+  <data name="Auction_Condition_Graded" xml:space="preserve"><value>Graded</value></data>
+  <data name="Auction_Condition_NotSpecified" xml:space="preserve"><value>Not Specified</value></data>
+  <data name="Card_CurrentBid" xml:space="preserve"><value>Current Bid</value></data>
+  <data name="Card_TimeLeft" xml:space="preserve"><value>Time Left</value></data>
+  <data name="Card_BidNow" xml:space="preserve"><value>Bid Now</value></data>
+  <data name="Card_AddToCart" xml:space="preserve"><value>Add to Cart</value></data>
+  <data name="Card_WinningBid" xml:space="preserve"><value>Winning Bid</value></data>
+  <data name="Card_CompletePayment" xml:space="preserve"><value>Complete Payment</value></data>
+  <data name="Card_PlaceBid" xml:space="preserve"><value>Place Bid</value></data>
+  <data name="Card_EndingSoon" xml:space="preserve"><value>Ending Soon</value></data>
+  <data name="Card_Hot" xml:space="preserve"><value>Hot</value></data>
+  <data name="Order_PageTitle" xml:space="preserve"><value>Won Auctions</value></data>
+  <data name="Order_ItemsWon" xml:space="preserve"><value>{0} Item(s) Won</value></data>
+  <data name="Order_Empty_Title" xml:space="preserve"><value>No won auctions yet</value></data>
+  <data name="Order_Empty_Desc" xml:space="preserve"><value>Place a winning bid on any live auction and your item will appear here for checkout.</value></data>
+  <data name="Order_BrowseAuctions" xml:space="preserve"><value>Browse Auctions</value></data>
+  <data name="Order_PaymentDeadline" xml:space="preserve"><value>Payment Deadline:</value></data>
+  <data name="BuyNow_PageTitle" xml:space="preserve"><value>Buy Now</value></data>
+  <data name="BuyNow_Subtitle" xml:space="preserve"><value>Instantly purchase authenticated collectibles at fixed prices.</value></data>
+  <data name="BuyNow_AvailableNow" xml:space="preserve"><value>Available now</value></data>
+  <data name="User_SellerProfile" xml:space="preserve"><value>Seller Profile</value></data>
+  <data name="User_BasicInformation" xml:space="preserve"><value>Basic Information</value></data>
+  <data name="User_BasicInformation_Desc" xml:space="preserve"><value>Contact and profile details</value></data>
+  <data name="User_FullName" xml:space="preserve"><value>Full Name</value></data>
+  <data name="User_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="User_PhoneNumber" xml:space="preserve"><value>Phone Number</value></data>
+  <data name="User_Address" xml:space="preserve"><value>Address</value></data>
+  <data name="User_MemberSince" xml:space="preserve"><value>Member since {0}</value></data>
+  <data name="Contact_PageTitle" xml:space="preserve"><value>Contact Us</value></data>
+  <data name="Payment_PageTitle" xml:space="preserve"><value>Payment Information</value></data>
+  <data name="Payment_AddMethod" xml:space="preserve"><value>Add New Payment Method</value></data>
+  <data name="Common_Search" xml:space="preserve"><value>Search</value></data>
+  <data name="Common_Breadcrumb_Home" xml:space="preserve"><value>Home</value></data>
+  <data name="Product_AuthenticatedListing" xml:space="preserve"><value>Authenticated listing</value></data>
+  <data name="Product_CurrentBid" xml:space="preserve"><value>Current bid</value></data>
+  <data name="Product_PlaceMaxBid" xml:space="preserve"><value>Place max bid</value></data>
+  <data name="Product_Bid" xml:space="preserve"><value>Bid</value></data>
+  <data name="Product_AboutTheWork" xml:space="preserve"><value>About the work</value></data>
+  <data name="Product_Grading" xml:space="preserve"><value>Grading</value></data>
+  <data name="Product_BidHistory" xml:space="preserve"><value>Bid history</value></data>
+  <data name="Product_Shipping" xml:space="preserve"><value>Shipping</value></data>
+  <data name="Product_EstimatedValue" xml:space="preserve"><value>Estimated value:</value></data>
+  <data name="Product_BuyersPremium" xml:space="preserve"><value>Price includes buyer's premium. Shipping and taxes may apply.</value></data>
+  <data name="Product_Lot" xml:space="preserve"><value>Lot {0}</value></data>
+  <data name="Product_EndsAt" xml:space="preserve"><value>Ends {0}</value></data>
+  <data name="Product_ClosureNote" xml:space="preserve"><value>*Closure times may be extended to accommodate last-minute bids</value></data>
+  <data name="Product_BidsCount" xml:space="preserve"><value>{0} bid(s)</value></data>
+  <data name="Product_ReserveMet" xml:space="preserve"><value>reserve met</value></data>
+  <data name="Product_WatchersCount" xml:space="preserve"><value>{0} watchers</value></data>
+  <data name="Product_CountdownIn" xml:space="preserve"><value>in {0}d {1}h</value></data>
+  <data name="RelatedProducts_Title" xml:space="preserve"><value>Related Products</value></data>
+  <data name="Faq_PageTitle" xml:space="preserve"><value>FAQ</value></data>
+  <data name="AboutUs_PageTitle" xml:space="preserve"><value>About Us</value></data>
+  <data name="Policy_PageTitle" xml:space="preserve"><value>Policy &amp; Terms</value></data>
+  <data name="Refund_PageTitle" xml:space="preserve"><value>Refund Request</value></data>
+  <data name="Error_PageTitle" xml:space="preserve"><value>Error</value></data>
+  <data name="Error_Description" xml:space="preserve"><value>An error occurred while processing your request.</value></data>
+  <data name="Account_Selling_Tab_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="Account_Selling_Tab_Sold" xml:space="preserve"><value>Sold</value></data>
+  <data name="Account_Selling_Tab_Unsold" xml:space="preserve"><value>Unsold</value></data>
+  <data name="Account_Selling_Tab_Scheduled" xml:space="preserve"><value>Scheduled</value></data>
+  <data name="Account_Selling_EmptyHint_Auction" xml:space="preserve"><value>Add cards to Auction and start selling.</value></data>
+  <data name="Account_Selling_EmptyHint_BuyNow" xml:space="preserve"><value>Add cards to Buy Now and start selling.</value></data>
+  <data name="Account_Selling_SellOnAuction" xml:space="preserve"><value>Sell on Auction</value></data>
+  <data name="Account_Selling_SellOnBuyNow" xml:space="preserve"><value>Sell on Buy Now</value></data>
+  <data name="Account_Selling_EmptyTitle" xml:space="preserve"><value>No listings yet.</value></data>
+  <data name="Account_Wallet_Desc" xml:space="preserve"><value>Manage your payment methods and balances.</value></data>
+  <data name="Account_Wallet_AvailableBalance" xml:space="preserve"><value>Available balance</value></data>
+  <data name="Account_Wallet_NoMethods" xml:space="preserve"><value>No payment methods yet.</value></data>
+  <data name="Account_Wallet_NoMethodsDesc" xml:space="preserve"><value>Add a card or bank account to receive payouts from your sales.</value></data>
+  <data name="Account_Wallet_AddMethod" xml:space="preserve"><value>Add payment method</value></data>
+  <data name="Account_Orders_WonTitle" xml:space="preserve"><value>View your won auctions</value></data>
+  <data name="Account_Orders_WonDesc" xml:space="preserve"><value>Complete payment for auctions you've won and track order status.</value></data>
+  <data name="Account_Orders_GoToWon" xml:space="preserve"><value>Go to Won Auctions</value></data>
+  <data name="Product_ViewImage" xml:space="preserve"><value>View image {0}</value></data>
+  <data name="Product_Thumbnail" xml:space="preserve"><value>{0} thumbnail {1}</value></data>
+  <data name="Product_Description" xml:space="preserve"><value>Description</value></data>
+  <data name="Product_ItemOverview" xml:space="preserve"><value>Item Overview</value></data>
+  <data name="Product_Year" xml:space="preserve"><value>Year</value></data>
+  <data name="Product_Set" xml:space="preserve"><value>Set</value></data>
+  <data name="Product_Language" xml:space="preserve"><value>Language</value></data>
+  <data name="Product_CardNumber" xml:space="preserve"><value>Card Number</value></data>
+  <data name="Product_GradingReport" xml:space="preserve"><value>{0} Grading Report</value></data>
+  <data name="Product_Certificate" xml:space="preserve"><value>Certificate #{0}</value></data>
+  <data name="Product_ViewCertificate" xml:space="preserve"><value>View certificate →</value></data>
+  <data name="Product_Centering" xml:space="preserve"><value>Centering</value></data>
+  <data name="Product_Corners" xml:space="preserve"><value>Corners</value></data>
+  <data name="Product_Edges" xml:space="preserve"><value>Edges</value></data>
+  <data name="Product_Surface" xml:space="preserve"><value>Surface</value></data>
+  <data name="Product_VerifiedAuthentic" xml:space="preserve"><value>Verified authentic slab — inspected by RareCard curation team before listing.</value></data>
+  <data name="Product_Bidder" xml:space="preserve"><value>Bidder</value></data>
+  <data name="Product_BidAmount" xml:space="preserve"><value>Bid Amount</value></data>
+  <data name="Product_DateTime" xml:space="preserve"><value>Date &amp;amp; Time</value></data>
+  <data name="Product_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Product_Winning" xml:space="preserve"><value>Winning</value></data>
+  <data name="Product_Outbid" xml:space="preserve"><value>Outbid</value></data>
+  <data name="Product_ViewAllBids" xml:space="preserve"><value>View All {0} Bids →</value></data>
+  <data name="Product_Shipping_Desc" xml:space="preserve"><value>All graded cards ship in climate-controlled, fully insured vault packaging. White glove handling from our authentication center to your door.</value></data>
+  <data name="Product_Shipping_Insurance" xml:space="preserve"><value>Full appraisal value insurance included</value></data>
+  <data name="Product_Shipping_Climate" xml:space="preserve"><value>Climate controlled transportation</value></data>
+  <data name="Product_Shipping_International" xml:space="preserve"><value>International priority shipping available</value></data>
+  <data name="Product_Documents_Title" xml:space="preserve"><value>Product Documents</value></data>
+  <data name="Product_Documents_Desc" xml:space="preserve"><value>Certificates, warranty, and verification files</value></data>
+  <data name="Common_View" xml:space="preserve"><value>View</value></data>
+  <data name="Common_Download" xml:space="preserve"><value>Download</value></data>
+  <data name="Product_Seller" xml:space="preserve"><value>Seller</value></data>
+  <data name="Product_SalesCount" xml:space="preserve"><value>{0} sales</value></data>
+  <data name="Product_EndingSoonTitle" xml:space="preserve"><value>Ending Soon</value></data>
+  <data name="Product_RelatedSubtitle" xml:space="preserve"><value>Other rare collectibles you might be interested in</value></data>
+  <data name="Product_ViewAllArrow" xml:space="preserve"><value>View all →</value></data>
+  <data name="Product_CountdownTitle" xml:space="preserve"><value>Auction Ends In</value></data>
+  <data name="Product_Days" xml:space="preserve"><value>Days</value></data>
+  <data name="Product_Hours" xml:space="preserve"><value>Hours</value></data>
+  <data name="Product_Minutes" xml:space="preserve"><value>Minutes</value></data>
+  <data name="Product_CountdownPreview" xml:space="preserve"><value>Static preview — countdown is not live</value></data>
+  <data name="Product_AuctionInfo" xml:space="preserve"><value>Auction Information</value></data>
+  <data name="Product_StartingPrice" xml:space="preserve"><value>Starting Price</value></data>
+  <data name="Product_CurrentPrice" xml:space="preserve"><value>Current Price</value></data>
+  <data name="Product_MinBidStep" xml:space="preserve"><value>Minimum Bid Step</value></data>
+  <data name="Product_Condition" xml:space="preserve"><value>Condition</value></data>
+  <data name="Product_AuctionTime" xml:space="preserve"><value>Auction Time</value></data>
+  <data name="Product_StartLabel" xml:space="preserve"><value>Start:</value></data>
+  <data name="Product_EndLabel" xml:space="preserve"><value>End:</value></data>
+  <data name="Product_PlaceBidTitle" xml:space="preserve"><value>Place Your Bid</value></data>
+  <data name="Product_BidPreviewNote" xml:space="preserve"><value>UI preview only — bidding is not enabled yet</value></data>
+  <data name="Product_BidAmountLabel" xml:space="preserve"><value>Bid Amount</value></data>
+  <data name="Product_MinBid" xml:space="preserve"><value>Minimum bid:</value></data>
+  <data name="Product_Step" xml:space="preserve"><value>Step:</value></data>
+  <data name="Product_CertPrefix" xml:space="preserve"><value>Cert. {0}</value></data>
+  <data name="BuyNow_Price" xml:space="preserve"><value>Price</value></data>
+  <data name="BuyNow_FixedPrice" xml:space="preserve"><value>Fixed buy now price</value></data>
+  <data name="BuyNow_InStock" xml:space="preserve"><value>In stock</value></data>
+  <data name="BuyNow_MoreTitle" xml:space="preserve"><value>More Buy Now</value></data>
+  <data name="BuyNow_MoreSubtitle" xml:space="preserve"><value>Other authenticated collectibles available now</value></data>
+  <data name="BuyNow_ViewAll" xml:space="preserve"><value>View all →</value></data>
+  <data name="Payment_SignUpSuccess" xml:space="preserve"><value>Account created successfully. Please add your payment information to complete setup.</value></data>
+  <data name="Payment_Form_DemoNote" xml:space="preserve"><value>Enter your card details below. Information is stored locally for UI demo only.</value></data>
+  <data name="Payment_CardType" xml:space="preserve"><value>Card Type</value></data>
+  <data name="Payment_Visa" xml:space="preserve"><value>Visa</value></data>
+  <data name="Payment_Mastercard" xml:space="preserve"><value>Mastercard</value></data>
+  <data name="Payment_Other" xml:space="preserve"><value>Other</value></data>
+  <data name="Payment_CardNumber" xml:space="preserve"><value>Card Number</value></data>
+  <data name="Payment_CardHolder" xml:space="preserve"><value>Card Holder Name</value></data>
+  <data name="Payment_ExpiryMonth" xml:space="preserve"><value>Expiry Month</value></data>
+  <data name="Payment_ExpiryYear" xml:space="preserve"><value>Expiry Year</value></data>
+  <data name="Payment_CVV" xml:space="preserve"><value>CVV</value></data>
+  <data name="Payment_BillingAddress" xml:space="preserve"><value>Billing Address</value></data>
+  <data name="Payment_SetDefault" xml:space="preserve"><value>Set as default payment method</value></data>
+  <data name="Payment_SaveInfo" xml:space="preserve"><value>Save Payment Information</value></data>
+  <data name="Payment_EmptyTitle" xml:space="preserve"><value>No payment method found</value></data>
+  <data name="Payment_EmptyDesc" xml:space="preserve"><value>Add your first payment method using the form above.</value></data>
+  <data name="Payment_EmptyAction" xml:space="preserve"><value>Add your first payment method</value></data>
+  <data name="Payment_SavedMethods" xml:space="preserve"><value>Saved Payment Methods</value></data>
+  <data name="Payment_SavedMethodsDesc" xml:space="preserve"><value>Manage your stored cards for faster checkout.</value></data>
+  <data name="Payment_MethodCount" xml:space="preserve"><value>{0} method(s)</value></data>
+  <data name="Payment_CardPreview" xml:space="preserve"><value>Card Preview</value></data>
+  <data name="Payment_CardPreviewDesc" xml:space="preserve"><value>Updates in real time as you type.</value></data>
+  <data name="Payment_CardPreviewNote" xml:space="preserve"><value>Preview only — no real payment processing</value></data>
+  <data name="Payment_PreviewHolder" xml:space="preserve"><value>Card Holder</value></data>
+  <data name="Payment_PreviewExpires" xml:space="preserve"><value>Expires</value></data>
+  <data name="Payment_Default" xml:space="preserve"><value>Default</value></data>
+  <data name="Payment_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Payment_Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="Payment_SetDefaultBtn" xml:space="preserve"><value>Set Default</value></data>
+  <data name="Payment_Expires" xml:space="preserve"><value>Expires:</value></data>
+  <data name="Checkout_PageTitle" xml:space="preserve"><value>Checkout</value></data>
+  <data name="Checkout_Label" xml:space="preserve"><value>Secure Checkout</value></data>
+  <data name="Checkout_Title" xml:space="preserve"><value>Complete Your Payment</value></data>
+  <data name="Checkout_Description" xml:space="preserve"><value>Congratulations on winning the auction. Please complete payment before {0} to secure your item. Order reference: {1}.</value></data>
+  <data name="Checkout_Step_Review" xml:space="preserve"><value>Review Order</value></data>
+  <data name="Checkout_Step_Payment" xml:space="preserve"><value>Payment Details</value></data>
+  <data name="Checkout_Step_Confirmation" xml:space="preserve"><value>Confirmation</value></data>
+  <data name="Checkout_ShippingInfo" xml:space="preserve"><value>Shipping Information</value></data>
+  <data name="Checkout_ShippingDesc" xml:space="preserve"><value>Where should we deliver your winning item?</value></data>
+  <data name="Checkout_FullName" xml:space="preserve"><value>Full Name</value></data>
+  <data name="Checkout_Phone" xml:space="preserve"><value>Phone Number</value></data>
+  <data name="Checkout_Email" xml:space="preserve"><value>Email Address</value></data>
+  <data name="Checkout_StreetAddress" xml:space="preserve"><value>Street Address</value></data>
+  <data name="Checkout_City" xml:space="preserve"><value>City</value></data>
+  <data name="Checkout_PostalCode" xml:space="preserve"><value>Postal Code</value></data>
+  <data name="Checkout_PaymentMethod" xml:space="preserve"><value>Payment Method</value></data>
+  <data name="Checkout_PaymentMethodDesc" xml:space="preserve"><value>Choose how you would like to pay for your winning bid.</value></data>
+  <data name="Checkout_CardDetails" xml:space="preserve"><value>Card Details</value></data>
+  <data name="Checkout_ManageSaved" xml:space="preserve"><value>Manage saved payment methods →</value></data>
+  <data name="Checkout_ExpiryDate" xml:space="preserve"><value>Expiry Date</value></data>
+  <data name="Checkout_BankTransfer" xml:space="preserve"><value>Bank Transfer Details</value></data>
+  <data name="Checkout_Bank" xml:space="preserve"><value>Bank</value></data>
+  <data name="Checkout_AccountName" xml:space="preserve"><value>Account Name</value></data>
+  <data name="Checkout_AccountNumber" xml:space="preserve"><value>Account Number</value></data>
+  <data name="Checkout_TransferContent" xml:space="preserve"><value>Transfer Content</value></data>
+  <data name="Checkout_AgreeTerms" xml:space="preserve"><value>I agree to the</value></data>
+  <data name="Checkout_PaymentPolicy" xml:space="preserve"><value>Payment Policy</value></data>
+  <data name="Checkout_WinningBidderConfirm" xml:space="preserve"><value>and confirm that I am the winning bidder for this auction item.</value></data>
+  <data name="Checkout_OrderSummary" xml:space="preserve"><value>Order Summary</value></data>
+  <data name="Checkout_Won" xml:space="preserve"><value>Won</value></data>
+  <data name="Checkout_WinningBid" xml:space="preserve"><value>Winning Bid</value></data>
+  <data name="Checkout_PlatformFee" xml:space="preserve"><value>Platform Fee (2.5%)</value></data>
+  <data name="Checkout_Shipping" xml:space="preserve"><value>Shipping</value></data>
+  <data name="Checkout_Total" xml:space="preserve"><value>Total</value></data>
+  <data name="Checkout_PayNow" xml:space="preserve"><value>Pay {0} Now</value></data>
+  <data name="Checkout_SecurePayment" xml:space="preserve"><value>Secure SSL encrypted payment</value></data>
+  <data name="Checkout_NeedHelp" xml:space="preserve"><value>Need help?</value></data>
+  <data name="Checkout_ContactSupport" xml:space="preserve"><value>Contact support</value></data>
+  <data name="PaymentConfirm_PageTitle" xml:space="preserve"><value>Payment Confirmed</value></data>
+  <data name="PaymentConfirm_Success" xml:space="preserve"><value>Payment Successful</value></data>
+  <data name="PaymentConfirm_ThankYou" xml:space="preserve"><value>Thank you! Your payment has been received and your order is being processed.</value></data>
+  <data name="PaymentConfirm_OrderReference" xml:space="preserve"><value>Order Reference</value></data>
+  <data name="PaymentConfirm_Item" xml:space="preserve"><value>Item</value></data>
+  <data name="PaymentConfirm_PaymentMethod" xml:space="preserve"><value>Payment Method</value></data>
+  <data name="PaymentConfirm_AmountPaid" xml:space="preserve"><value>Amount Paid</value></data>
+  <data name="PaymentConfirm_WhatNext" xml:space="preserve"><value>What happens next?</value></data>
+  <data name="PaymentConfirm_Step1" xml:space="preserve"><value>You will receive a confirmation email shortly.</value></data>
+  <data name="PaymentConfirm_Step2" xml:space="preserve"><value>The seller will prepare your item for shipment.</value></data>
+  <data name="PaymentConfirm_Step3" xml:space="preserve"><value>Tracking details will be sent once the package is dispatched.</value></data>
+  <data name="PaymentConfirm_BrowseMore" xml:space="preserve"><value>Browse More Auctions</value></data>
+  <data name="PaymentConfirm_BackHome" xml:space="preserve"><value>Back to Home</value></data>
+  <data name="Contact_Hero_Label" xml:space="preserve"><value>Customer Support</value></data>
+  <data name="Contact_Hero_TitleLine1" xml:space="preserve"><value>Elevated Care for</value></data>
+  <data name="Contact_Hero_TitleAccent" xml:space="preserve"><value>Serious Collectors</value></data>
+  <data name="Contact_Hero_Desc" xml:space="preserve"><value>Whether you're inquiring about a private sale or need assistance with your high-grade portfolio, our specialists are standing by to ensure a seamless experience.</value></data>
+  <data name="Contact_Hero_Alt" xml:space="preserve"><value>RareCard support office</value></data>
+  <data name="Contact_Form_Title" xml:space="preserve"><value>Send an Inquiry</value></data>
+  <data name="Contact_Form_ResponseTime" xml:space="preserve"><value>Average response time: 2 hours (business days)</value></data>
+  <data name="Contact_Reason" xml:space="preserve"><value>Reason for contact</value></data>
+  <data name="Contact_Reason_Auction" xml:space="preserve"><value>Auction Inquiry</value></data>
+  <data name="Contact_Reason_PrivateSale" xml:space="preserve"><value>Private Sale</value></data>
+  <data name="Contact_Reason_Account" xml:space="preserve"><value>Account Support</value></data>
+  <data name="Contact_Reason_Shipping" xml:space="preserve"><value>Shipping &amp;amp; Insurance</value></data>
+  <data name="Contact_Reason_Other" xml:space="preserve"><value>Other</value></data>
+  <data name="Contact_Message" xml:space="preserve"><value>Your Message</value></data>
+  <data name="Contact_Message_Placeholder" xml:space="preserve"><value>How can our collectors' team assist you today?</value></data>
+  <data name="Contact_SecurityNote" xml:space="preserve"><value>Your data is secured by 256-bit encryption.</value></data>
+  <data name="Contact_Submit" xml:space="preserve"><value>Submit Request</value></data>
+  <data name="Contact_GetInTouch" xml:space="preserve"><value>Get in Touch</value></data>
+  <data name="Contact_EmailUs" xml:space="preserve"><value>Email Us</value></data>
+  <data name="Contact_CallDirectly" xml:space="preserve"><value>Call Directly</value></data>
+  <data name="Contact_JoinCommunity" xml:space="preserve"><value>Join Community</value></data>
+  <data name="Contact_HQLocation" xml:space="preserve"><value>HQ Location</value></data>
+  <data name="Contact_FaqTitle" xml:space="preserve"><value>Looking for quick answers?</value></data>
+  <data name="Contact_FaqDesc" xml:space="preserve"><value>Our knowledge base contains detailed information about grading standards, insurance, and international shipping.</value></data>
+  <data name="Contact_ExploreFaqs" xml:space="preserve"><value>Explore FAQs</value></data>
+  <data name="Contact_Map_Title" xml:space="preserve"><value>Our Location</value></data>
+  <data name="Contact_Map_Desc" xml:space="preserve"><value>Visit us at our Hanoi headquarters or connect with us online</value></data>
+  <data name="Contact_MainOffice" xml:space="preserve"><value>Main Office</value></data>
+  <data name="Contact_BusinessHours" xml:space="preserve"><value>Business Hours</value></data>
+  <data name="Contact_MonFri" xml:space="preserve"><value>Monday - Friday</value></data>
+  <data name="Contact_Saturday" xml:space="preserve"><value>Saturday</value></data>
+  <data name="Contact_Sunday" xml:space="preserve"><value>Sunday</value></data>
+  <data name="Contact_Closed" xml:space="preserve"><value>Closed</value></data>
+  <data name="Contact_MapEmbedded" xml:space="preserve"><value>Map embedded on this page</value></data>
+  <data name="Refund_Label" xml:space="preserve"><value>Buyer Protection</value></data>
+  <data name="Refund_Description" xml:space="preserve"><value>Submit a refund request for a completed auction transaction. Our team will review your case and respond within 3–5 business days.</value></data>
+  <data name="Refund_Step_Policy" xml:space="preserve"><value>Review Policy</value></data>
+  <data name="Refund_Step_Submit" xml:space="preserve"><value>Submit Request</value></data>
+  <data name="Refund_Step_Confirmation" xml:space="preserve"><value>Confirmation</value></data>
+  <data name="Refund_PolicyTitle" xml:space="preserve"><value>Refund Policy</value></data>
+  <data name="Refund_PolicyDesc" xml:space="preserve"><value>Auction House protects buyers when transactions do not meet listing standards or delivery commitments.</value></data>
+  <data name="Refund_BeforeSubmit" xml:space="preserve"><value>Before you submit</value></data>
+  <data name="Refund_BeforeTip1" xml:space="preserve"><value>Contact the seller first through the platform messaging system.</value></data>
+  <data name="Refund_BeforeTip2" xml:space="preserve"><value>Keep photos, tracking numbers, and payment receipts as evidence.</value></data>
+  <data name="Refund_BeforeTip3" xml:space="preserve"><value>Refund requests must be filed within &lt;strong&gt;14 days&lt;/strong&gt; of delivery or expected delivery date.</value></data>
+  <data name="Refund_ReadFullTerms" xml:space="preserve"><value>Read full terms in our</value></data>
+  <data name="Refund_FormTitle" xml:space="preserve"><value>Submit Refund Request</value></data>
+  <data name="Refund_FormDesc" xml:space="preserve"><value>Fill in the details below. Required fields are marked with</value></data>
+  <data name="Refund_OrderReference" xml:space="preserve"><value>Order Reference</value></data>
+  <data name="Refund_SelectOrder" xml:space="preserve"><value>Select your order</value></data>
+  <data name="Refund_OtherOrder" xml:space="preserve"><value>Other order (enter manually below)</value></data>
+  <data name="Refund_ManualOrderRef" xml:space="preserve"><value>Manual Order Reference</value></data>
+  <data name="Refund_Reason" xml:space="preserve"><value>Reason for Refund</value></data>
+  <data name="Refund_SelectReason" xml:space="preserve"><value>Select a reason</value></data>
+  <data name="Refund_DescriptionLabel" xml:space="preserve"><value>Description</value></data>
+  <data name="Refund_DescriptionPlaceholder" xml:space="preserve"><value>Describe the issue in detail. Include delivery date, condition of item, and any communication with the seller...</value></data>
+  <data name="Refund_AmountLabel" xml:space="preserve"><value>Refund Amount Requested (USD)</value></data>
+  <data name="Refund_AmountHint" xml:space="preserve"><value>Leave blank to request a full refund of the order total.</value></data>
+  <data name="Refund_AgreePolicy" xml:space="preserve"><value>I confirm the information provided is accurate and I agree to the</value></data>
+  <data name="Refund_PolicyLink" xml:space="preserve"><value>refund policy</value></data>
+  <data name="Refund_Submit" xml:space="preserve"><value>Submit Refund Request</value></data>
+  <data name="RefundConfirm_PageTitle" xml:space="preserve"><value>Refund Request Submitted</value></data>
+  <data name="RefundConfirm_Title" xml:space="preserve"><value>Refund Request Received</value></data>
+  <data name="RefundConfirm_ThankYou" xml:space="preserve"><value>Thank you. Your request has been submitted and is now under review by our support team.</value></data>
+  <data name="RefundConfirm_RequestId" xml:space="preserve"><value>Request ID</value></data>
+  <data name="RefundConfirm_EstimatedReview" xml:space="preserve"><value>Estimated Review</value></data>
+  <data name="RefundConfirm_Step1" xml:space="preserve"><value>Our team will verify your order and review submitted evidence.</value></data>
+  <data name="RefundConfirm_Step2" xml:space="preserve"><value>You will receive an email update once a decision is made.</value></data>
+  <data name="RefundConfirm_Step3" xml:space="preserve"><value>Approved refunds are processed within 7–14 business days.</value></data>
+  <data name="RefundConfirm_ContactSupport" xml:space="preserve"><value>Contact Support</value></data>
+  <data name="User_ReviewsTitle" xml:space="preserve"><value>Seller Reviews</value></data>
+  <data name="User_ReviewsDesc" xml:space="preserve"><value>Feedback from verified buyers</value></data>
+  <data name="User_ReviewCount" xml:space="preserve"><value>{0} review(s)</value></data>
+  <data name="User_NoReviews" xml:space="preserve"><value>No reviews yet.</value></data>
+  <data name="User_SellerAuctions" xml:space="preserve"><value>Seller Auctions</value></data>
+  <data name="User_ListingCount" xml:space="preserve"><value>{0} listing(s) currently active</value></data>
+  <data name="User_CreateListing" xml:space="preserve"><value>Create Listing</value></data>
+  <data name="User_DiscoverMore" xml:space="preserve"><value>Discover More</value></data>
+  <data name="User_RelatedAuctions" xml:space="preserve"><value>Related Auctions</value></data>
+  <data name="User_SellerActions" xml:space="preserve"><value>Seller Actions</value></data>
+  <data name="User_ConnectSeller" xml:space="preserve"><value>Connect with this seller</value></data>
+  <data name="User_ContactSeller" xml:space="preserve"><value>Contact Seller</value></data>
+  <data name="User_ViewAuctions" xml:space="preserve"><value>View Auctions</value></data>
+  <data name="User_NoAuctions" xml:space="preserve"><value>No auctions yet</value></data>
+  <data name="User_NoAuctionsDesc" xml:space="preserve"><value>This seller hasn't listed any products.</value></data>
+  <data name="User_CurrentBid" xml:space="preserve"><value>Current Bid</value></data>
+  <data name="User_Ends" xml:space="preserve"><value>Ends</value></data>
+  <data name="User_ViewDetail" xml:space="preserve"><value>View Detail</value></data>
+  <data name="User_CancelListing" xml:space="preserve"><value>Cancel</value></data>
+  <data name="User_CancelConfirm" xml:space="preserve"><value>Cancel this auction listing?</value></data>
+  <data name="User_Status_Active" xml:space="preserve"><value>Active Auction</value></data>
+  <data name="User_Status_EndingSoon" xml:space="preserve"><value>Ending Soon</value></data>
+  <data name="User_Status_Completed" xml:space="preserve"><value>Completed</value></data>
+  <data name="UserAuction_EditTitle" xml:space="preserve"><value>Edit Auction</value></data>
+  <data name="UserAuction_EditDesc" xml:space="preserve"><value>Only live auctions without bids can be edited.</value></data>
+  <data name="UserAuction_ProductName" xml:space="preserve"><value>Product Name</value></data>
+  <data name="UserAuction_ShortDescription" xml:space="preserve"><value>Short Description</value></data>
+  <data name="UserAuction_SetName" xml:space="preserve"><value>Set Name</value></data>
+  <data name="UserAuction_Grade" xml:space="preserve"><value>Grade</value></data>
+  <data name="UserAuction_CertNumber" xml:space="preserve"><value>Certificate Number</value></data>
+  <data name="UserAuction_CurrentCover" xml:space="preserve"><value>Current Cover</value></data>
+  <data name="UserAuction_ReplaceCover" xml:space="preserve"><value>Replace Cover Image</value></data>
+  <data name="UserAuction_StartDate" xml:space="preserve"><value>Start Date</value></data>
+  <data name="UserAuction_EndDate" xml:space="preserve"><value>End Date</value></data>
+  <data name="UserAuction_SaveChanges" xml:space="preserve"><value>Save Changes</value></data>
+  <data name="Sell_AuctionHeader_Label" xml:space="preserve"><value>Seller Dashboard</value></data>
+  <data name="Sell_AuctionHeader_Title" xml:space="preserve"><value>Create New Auction</value></data>
+  <data name="Sell_AuctionHeader_Desc" xml:space="preserve"><value>Sell your product through auction. Complete the form below and review your listing before publishing.</value></data>
+  <data name="Sell_Grading_Title" xml:space="preserve"><value>Grading Details</value></data>
+  <data name="Sell_Grading_Desc" xml:space="preserve"><value>Sub-scores shown in the Grading tab on the detail page</value></data>
+  <data name="Card_Live" xml:space="preserve"><value>Live</value></data>
+  <data name="Card_ViewLot" xml:space="preserve"><value>View lot →</value></data>
+  <data name="Card_BidsCount" xml:space="preserve"><value>{0} bids</value></data>
+  <data name="Card_WinningBidLabel" xml:space="preserve"><value>Winning bid</value></data>
+  <data name="Card_CompletePaymentArrow" xml:space="preserve"><value>Complete payment →</value></data>
+  <data name="Order_ShippingInfo" xml:space="preserve"><value>Shipping Information</value></data>
+  <data name="Order_ShippingAddress" xml:space="preserve"><value>Shipping Address</value></data>
+  <data name="Order_PaymentMethod" xml:space="preserve"><value>Payment Method</value></data>
+  <data name="Order_Summary" xml:space="preserve"><value>Order Summary</value></data>
+  <data name="Order_Subtotal" xml:space="preserve"><value>Subtotal ({0} item(s))</value></data>
+  <data name="Order_SecuredShipping" xml:space="preserve"><value>Secured Shipping</value></data>
+  <data name="Order_VaultInsurance" xml:space="preserve"><value>Vault Insurance</value></data>
+  <data name="Order_CompleteOrder" xml:space="preserve"><value>Complete Order</value></data>
+  <data name="Order_SslSecure" xml:space="preserve"><value>SSL Encrypted Secure Transaction</value></data>
+  <data name="Order_AuthenticityTitle" xml:space="preserve"><value>RareCard Authenticity Guarantee</value></data>
+  <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Your items are protected by our vault security. All won auctions are double-verified before shipment to ensure grading integrity.</value></data>
+  <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Placing bid…</value></data>
+  <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Unable to place bid. Please try again.</value></data>
+  <data name="Js_BuyNow_Adding" xml:space="preserve"><value>Adding…</value></data>
+  <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>Added to cart.</value></data>
+  <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>Unable to add to cart. Please try again.</value></data>
+  <data name="Js_Order_RemainingHours" xml:space="preserve"><value>{0}H {1}M REMAINING</value></data>
+  <data name="Js_Order_RemainingMinutes" xml:space="preserve"><value>{0}M REMAINING</value></data>
+  <data name="Js_PaymentInfo_SaveFailed" xml:space="preserve"><value>Unable to save payment information</value></data>
+  <data name="Js_PaymentInfo_SaveSuccess" xml:space="preserve"><value>Payment information saved successfully! Redirecting to home...</value></data>
+  <data name="Js_PaymentInfo_Removed" xml:space="preserve"><value>Payment method removed</value></data>
+  <data name="Js_PaymentInfo_DefaultUpdated" xml:space="preserve"><value>Default payment method updated</value></data>
+  <data name="Js_PaymentInfo_SaveChanges" xml:space="preserve"><value>Save Changes</value></data>
+  <data name="Js_PaymentInfo_CardRequired" xml:space="preserve"><value>Card number is required</value></data>
+  <data name="Js_PaymentInfo_CardLength" xml:space="preserve"><value>Card number must be 13–19 digits</value></data>
+  <data name="Js_PaymentInfo_HolderRequired" xml:space="preserve"><value>Card holder name is required</value></data>
+  <data name="Js_PaymentInfo_HolderInvalid" xml:space="preserve"><value>No special characters allowed</value></data>
+  <data name="Js_PaymentInfo_ExpiryRequired" xml:space="preserve"><value>Expiry date is required</value></data>
+  <data name="Js_PaymentInfo_Expired" xml:space="preserve"><value>Card has expired</value></data>
+  <data name="Js_PaymentInfo_CvvInvalid" xml:space="preserve"><value>Invalid CVV</value></data>
+  <data name="Js_PaymentInfo_BillingRequired" xml:space="preserve"><value>Billing address is required</value></data>
+  <data name="Js_Payment_FullNameRequired" xml:space="preserve"><value>Full name is required.</value></data>
+  <data name="Js_Payment_PhoneRequired" xml:space="preserve"><value>Phone number is required.</value></data>
+  <data name="Js_Payment_EmailInvalid" xml:space="preserve"><value>Please enter a valid email address.</value></data>
+  <data name="Js_Payment_AddressRequired" xml:space="preserve"><value>Street address is required.</value></data>
+  <data name="Js_Payment_CityRequired" xml:space="preserve"><value>City is required.</value></data>
+  <data name="Js_Payment_MethodRequired" xml:space="preserve"><value>Please select a payment method.</value></data>
+  <data name="Js_Payment_TermsRequired" xml:space="preserve"><value>You must agree to the payment policy.</value></data>
+  <data name="Js_Contact_Required" xml:space="preserve"><value>This field is required</value></data>
+  <data name="Js_Contact_EmailInvalid" xml:space="preserve"><value>Invalid email format</value></data>
+  <data name="Js_Contact_Submitted" xml:space="preserve"><value>✓ Request Submitted</value></data>
+  <data name="Js_Refund_OrderRequired" xml:space="preserve"><value>Please select an order.</value></data>
+  <data name="Js_Refund_ManualRequired" xml:space="preserve"><value>Please enter your order reference.</value></data>
+  <data name="Js_Refund_FullNameRequired" xml:space="preserve"><value>Full name is required.</value></data>
+  <data name="Js_Refund_EmailInvalid" xml:space="preserve"><value>Please enter a valid email address.</value></data>
+  <data name="Js_Refund_ReasonRequired" xml:space="preserve"><value>Please select a refund reason.</value></data>
+  <data name="Js_Refund_DescriptionRequired" xml:space="preserve"><value>Please provide a detailed description (at least 20 characters).</value></data>
+  <data name="Js_Refund_PolicyRequired" xml:space="preserve"><value>You must agree to the refund policy.</value></data>
+  <data name="User_Verified" xml:space="preserve"><value>Verified</value></data>
+  <data name="User_YourAuctionList" xml:space="preserve"><value>Your Auction List</value></data>
+  <data name="User_Stat_TotalAuctions" xml:space="preserve"><value>Total Auctions</value></data>
+  <data name="User_Stat_Completed" xml:space="preserve"><value>Completed</value></data>
+  <data name="User_Stat_TotalSales" xml:space="preserve"><value>Total Sales</value></data>
+  <data name="User_Stat_SuccessRate" xml:space="preserve"><value>Success Rate</value></data>
+  <data name="User_NotUpdated" xml:space="preserve"><value>Not updated</value></data>
+  <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
+  <data name="SellBuyNow_PageTitle" xml:space="preserve"><value>Sell Buy Now</value></data>
+  <data name="SellBuyNow_Heading" xml:space="preserve"><value>List a Buy Now Product</value></data>
+  <data name="SellBuyNow_Subheading" xml:space="preserve"><value>Sell your product at a fixed price. Buyers can purchase instantly without bidding.</value></data>
+  <data name="SellBuyNow_Section3_Title" xml:space="preserve"><value>Pricing</value></data>
+  <data name="SellBuyNow_Section3_Desc" xml:space="preserve"><value>Set the fixed price for your product</value></data>
+  <data name="SellBuyNow_Price" xml:space="preserve"><value>Price</value></data>
+  <data name="SellBuyNow_PriceHint" xml:space="preserve"><value>This is the price buyers will pay to purchase instantly.</value></data>
+  <data name="SellBuyNow_Preview_Desc" xml:space="preserve"><value>Preview how your listing will appear on Buy Now</value></data>
+  <data name="SellBuyNow_Preview_ReviewNote" xml:space="preserve"><value>Review your listing details before publishing. Fixed-price listings appear on the Buy Now marketplace.</value></data>
+  <data name="SellBuyNow_ReadyToPublish_Highlight" xml:space="preserve"><value>Ready to publish?</value></data>
+  <data name="SellBuyNow_ReadyToPublish" xml:space="preserve"><value>Your listing will appear on Buy Now immediately.</value></data>
+  <data name="SellBuyNow_CreateListing" xml:space="preserve"><value>Publish Listing</value></data>
+  <data name="SellBuyNow_SuccessMessage" xml:space="preserve"><value>Buy now listing created successfully.</value></data>
+  <data name="SellBuyNow_Success_Created" xml:space="preserve"><value>Your listing "{0}" has been created successfully!</value></data>
+  <data name="SellBuyNow_Error_CreateFailed" xml:space="preserve"><value>Could not create listing.</value></data>
+  <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>Price must be greater than 0</value></data>
+  <data name="User_YourBuyNowList" xml:space="preserve"><value>Your Buy Now Listings</value></data>
+  <data name="User_SellerBuyNowList" xml:space="preserve"><value>Buy Now Listings</value></data>
+  <data name="Account_Selling_CreateListing" xml:space="preserve"><value>Post for sale</value></data>
 </root>

@@ -2,7 +2,7 @@
 
 <nav aria-label="Breadcrumb" class="mb-8">
   <ol class="flex flex-wrap items-center gap-2 text-sm text-slate-500">
-    <li><a asp-controller="BuyNow" asp-action="Index" class="transition hover:text-blue-700">Buy Now</a></li>
+    <li><a asp-controller="BuyNow" asp-action="Index" class="transition hover:text-blue-700">@Localizer["BuyNow"]</a></li>
     <li aria-hidden="true" class="text-slate-300">›</li>
     <li><a asp-controller="BuyNow" asp-action="Index" asp-fragment="category-@Model.Category.Replace(" ", "-").ToLowerInvariant()" class="transition hover:text-blue-700">@Model.Category</a></li>
     <li aria-hidden="true" class="text-slate-300">›</li>

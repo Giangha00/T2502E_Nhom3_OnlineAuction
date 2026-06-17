@@ -1049,9 +1049,122 @@ body.home-auth-open {
 }
 
 .account-pill.is-active {
-  border-color: #0f172a;
-  background: #0f172a;
+  border-color: #1d4ed8;
+  background: #1d4ed8;
   color: #fff;
+}
+
+.account-selling-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.account-selling-toolbar--filters-only {
+  justify-content: flex-start;
+}
+
+.account-selling-toolbar__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.account-sell-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.account-sell-actions--empty {
+  justify-content: center;
+  width: 100%;
+  max-width: 36rem;
+}
+
+.account-sell-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 12.5rem;
+  border-radius: 0.875rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  padding: 0.65rem 0.9rem;
+  color: #0f172a;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, background 0.15s ease;
+}
+
+.account-sell-action:hover {
+  border-color: #bfdbfe;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.08);
+  transform: translateY(-1px);
+}
+
+.account-sell-action.is-active {
+  border-color: #1d4ed8;
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+}
+
+.account-sell-action__icon {
+  display: flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.625rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.account-sell-action.is-active .account-sell-action__icon {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.account-sell-action__icon svg {
+  height: 1.125rem;
+  width: 1.125rem;
+}
+
+.account-sell-action__content {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.account-sell-action__label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.account-sell-action__type {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.account-sell-action__arrow {
+  height: 1rem;
+  width: 1rem;
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.account-sell-action.is-active .account-sell-action__arrow {
+  opacity: 0.9;
 }
 
 .account-empty {
@@ -1060,31 +1173,6 @@ body.home-auth-open {
   align-items: center;
   text-align: center;
   padding: 2rem 1rem 4rem;
-}
-
-.account-wallet-card {
-  display: block;
-  border-radius: 1rem;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.04) 25%, transparent 25%) 0 0 / 12px 12px,
-    linear-gradient(225deg, rgba(255, 255, 255, 0.04) 25%, transparent 25%) 0 0 / 12px 12px,
-    #1c1917;
-  padding: 1.25rem 1.5rem;
-  color: #fff;
-  text-decoration: none;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.account-wallet-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
-}
-
-.account-wallet-card__balance {
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
 }
 
 .user-menu-panel {
@@ -1107,10 +1195,6 @@ body.home-auth-open {
   align-items: center;
   gap: 0.75rem;
   padding: 0.25rem 0.25rem 1rem;
-}
-
-.user-menu-panel__wallet {
-  margin-bottom: 0.5rem;
 }
 
 .user-menu-panel__nav {
@@ -1179,3 +1263,95 @@ body.home-auth-open {
   border-top: 1px solid #f5f5f4;
   padding-top: 0.5rem;
 }
+
+.user-detail-stat-card {
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.user-detail-stat-card__label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.user-detail-stat-card__value {
+  margin-top: 0.35rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #0f172a;
+}
+
+.user-detail-stat-card__value--accent {
+  color: #1d4ed8;
+}
+
+.user-detail-field__label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.user-detail-field__input {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.625rem;
+  background: #f8fafc;
+  padding: 0.75rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.user-detail-field__input--placeholder {
+  color: #94a3b8;
+}
+
+.user-detail-auction-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.875rem;
+  background: #fff;
+}
+
+@media (min-width: 640px) {
+  .user-detail-auction-card {
+    flex-direction: row;
+  }
+}
+
+.user-detail-auction-card__media {
+  aspect-ratio: 4 / 3;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #f1f5f9;
+}
+
+@media (min-width: 640px) {
+  .user-detail-auction-card__media {
+    aspect-ratio: auto;
+    width: 9rem;
+    height: 8rem;
+  }
+}
+
+.user-detail-auction-card__body {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  padding: 1rem 1.25rem;
+}
+
