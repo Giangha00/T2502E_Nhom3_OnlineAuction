@@ -238,6 +238,19 @@
   <data name="Sell_Condition_Used" xml:space="preserve"><value>Đã qua sử dụng</value></data>
   <data name="Sell_ProductOrigin" xml:space="preserve"><value>Xuất xứ sản phẩm</value></data>
   <data name="Sell_ProductOrigin_Placeholder" xml:space="preserve"><value>vd. Nhật Bản / Mỹ</value></data>
+  <data name="Sell_ShortDescription" xml:space="preserve"><value>Mô tả ngắn</value></data>
+  <data name="Sell_ShortDescription_Placeholder" xml:space="preserve"><value>Tóm tắt hiển thị ở header (tối đa 300 ký tự)</value></data>
+  <data name="Sell_Subtitle" xml:space="preserve"><value>Phụ đề</value></data>
+  <data name="Sell_Subtitle_Placeholder" xml:space="preserve"><value>Dòng tagline dưới tên sản phẩm</value></data>
+  <data name="Sell_Section4_CardSpecs_Title" xml:space="preserve"><value>Thông số thẻ</value></data>
+  <data name="Sell_Section4_CardSpecs_Desc" xml:space="preserve"><value>Năm, bộ, ngôn ngữ, grade và số chứng nhận</value></data>
+  <data name="Sell_SetName_Placeholder" xml:space="preserve"><value>vd. Base Set</value></data>
+  <data name="Sell_Grade" xml:space="preserve"><value>Grade</value></data>
+  <data name="Sell_CertificateNumber" xml:space="preserve"><value>Số chứng nhận</value></data>
+  <data name="Sell_EstimatedValue" xml:space="preserve"><value>Giá trị ước tính</value></data>
+  <data name="Sell_AuctionEventName" xml:space="preserve"><value>Tên sự kiện đấu giá</value></data>
+  <data name="Sell_AuctionEventName_Placeholder" xml:space="preserve"><value>vd. RareCard Vault: Premium Trading Card Auction</value></data>
+  <data name="Sell_Error_YearInvalid" xml:space="preserve"><value>Vui lòng nhập năm hợp lệ từ 1800 đến 2100.</value></data>
   <data name="Sell_Section2_Title" xml:space="preserve"><value>Hình ảnh sản phẩm</value></data>
   <data name="Sell_Section2_Desc" xml:space="preserve"><value>Tải lên nhiều hình — JPG, PNG, WEBP (tối đa 5MB mỗi ảnh)</value></data>
   <data name="Sell_UploadImages_Title" xml:space="preserve"><value>Tải lên hình ảnh sản phẩm</value></data>

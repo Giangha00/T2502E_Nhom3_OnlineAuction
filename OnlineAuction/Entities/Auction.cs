@@ -24,6 +24,8 @@ public class Auction : AuditableEntity
 
     public DateTime EndDate { get; set; }
 
+    public string? AuctionEventName { get; set; }
+
     public int? WinnerId { get; set; }
 
     public Product Product { get; set; } = null!;

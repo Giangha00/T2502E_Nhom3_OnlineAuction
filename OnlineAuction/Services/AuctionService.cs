@@ -55,6 +55,10 @@ public class AuctionService : IAuctionService
                 .ThenInclude(p => p.Seller)
             .Include(a => a.Product)
                 .ThenInclude(p => p.Category)
+            .Include(a => a.Product)
+                .ThenInclude(p => p.Images)
+            .Include(a => a.Product)
+                .ThenInclude(p => p.Documents)
             .Include(a => a.Bids)
                 .ThenInclude(b => b.Bidder)
             .FirstOrDefaultAsync(a => a.Id == id);
