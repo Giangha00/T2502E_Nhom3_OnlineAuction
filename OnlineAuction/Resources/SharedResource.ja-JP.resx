@@ -505,6 +505,9 @@
   <data name="Product_Days" xml:space="preserve"><value>日</value></data>
   <data name="Product_Hours" xml:space="preserve"><value>時間</value></data>
   <data name="Product_Minutes" xml:space="preserve"><value>分</value></data>
+  <data name="Product_Seconds" xml:space="preserve"><value>秒</value></data>
+  <data name="Product_NoBidsYet" xml:space="preserve"><value>入札はまだありません</value></data>
+  <data name="Product_AuctionEnded" xml:space="preserve"><value>オークション終了</value></data>
   <data name="Product_CountdownPreview" xml:space="preserve"><value>静的プレビュー — カウントダウンはライブではありません</value></data>
   <data name="Product_AuctionInfo" xml:space="preserve"><value>オークション情報</value></data>
   <data name="Product_StartingPrice" xml:space="preserve"><value>開始価格</value></data>
@@ -735,6 +738,8 @@
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Vaultセキュリティで保護。発送前にすべての落札品を二重検証します。</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>入札中…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>入札できませんでした。もう一度お試しください。</value></data>
+  <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>入札が完了しました！</value></data>
+  <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>オークション終了</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>追加中…</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>カートに追加しました。</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>カートに追加できませんでした。もう一度お試しください。</value></data>
