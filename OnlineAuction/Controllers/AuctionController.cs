@@ -15,9 +15,9 @@ public class AuctionController : Controller
         _bidService = bidService;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var model = _auctionService.GetAuctionIndex();
+        var model = await _auctionService.GetAuctionIndexAsync();
         return View(model);
     }
 
