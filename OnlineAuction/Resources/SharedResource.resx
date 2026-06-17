@@ -521,6 +521,14 @@
   <data name="Product_Seconds" xml:space="preserve"><value>Seconds</value></data>
   <data name="Product_NoBidsYet" xml:space="preserve"><value>No bids yet</value></data>
   <data name="Product_AuctionEnded" xml:space="preserve"><value>Auction ended</value></data>
+  <data name="Product_RegisterForAuction" xml:space="preserve"><value>Register for auction</value></data>
+  <data name="Product_RegistrationPending" xml:space="preserve"><value>Your registration is pending approval.</value></data>
+  <data name="Product_RegistrationApproved" xml:space="preserve"><value>You are registered for this auction.</value></data>
+  <data name="Product_RegistrationRejected" xml:space="preserve"><value>Your registration was rejected.</value></data>
+  <data name="Product_MustRegisterToBid" xml:space="preserve"><value>You must register for this auction before placing a bid.</value></data>
+  <data name="Product_RegisteredCount" xml:space="preserve"><value>{0} registered</value></data>
+  <data name="Product_YouAreTheSeller" xml:space="preserve"><value>You are the seller of this listing.</value></data>
+  <data name="Product_CancelRegistration" xml:space="preserve"><value>Cancel registration</value></data>
   <data name="Product_CountdownPreview" xml:space="preserve"><value>Static preview — countdown is not live</value></data>
   <data name="Product_AuctionInfo" xml:space="preserve"><value>Auction Information</value></data>
   <data name="Product_StartingPrice" xml:space="preserve"><value>Starting Price</value></data>
@@ -753,6 +761,11 @@
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Unable to place bid. Please try again.</value></data>
   <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Bid placed successfully!</value></data>
   <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>Auction ended</value></data>
+  <data name="Js_ProductDetail_Registering" xml:space="preserve"><value>Registering…</value></data>
+  <data name="Js_ProductDetail_RegistrationSuccess" xml:space="preserve"><value>Registration successful!</value></data>
+  <data name="Js_ProductDetail_RegistrationFailed" xml:space="preserve"><value>Unable to register. Please try again.</value></data>
+  <data name="Js_ProductDetail_RegistrationCancelled" xml:space="preserve"><value>Registration cancelled.</value></data>
+  <data name="Js_ProductDetail_CancelRegistrationFailed" xml:space="preserve"><value>Unable to cancel registration.</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>Adding…</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>Added to cart.</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>Unable to add to cart. Please try again.</value></data>

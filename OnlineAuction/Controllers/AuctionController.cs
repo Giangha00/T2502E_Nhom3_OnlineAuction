@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Services.Interfaces;
 
@@ -8,11 +9,16 @@ public class AuctionController : Controller
 {
     private readonly IAuctionService _auctionService;
     private readonly IBidService _bidService;
+    private readonly IAuctionRegistrationService _registrationService;
 
-    public AuctionController(IAuctionService auctionService, IBidService bidService)
+    public AuctionController(
+        IAuctionService auctionService,
+        IBidService bidService,
+        IAuctionRegistrationService registrationService)
     {
         _auctionService = auctionService;
         _bidService = bidService;
+        _registrationService = registrationService;
     }
 
     public async Task<IActionResult> Index()
@@ -23,13 +29,70 @@ public class AuctionController : Controller
 
     public async Task<IActionResult> Detail(int id)
     {
-        var product = await _auctionService.GetProductDetailAsync(id);
+        var product = await _auctionService.GetProductDetailAsync(id, GetCurrentUserId());
         if (product is null)
         {
             return NotFound();
         }
 
         return View(product);
+    }
+
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Register(int auctionId)
+    {
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return Unauthorized(new { success = false, message = "Please sign in to register." });
+        }
+
+        var result = await _registrationService.RegisterAsync(auctionId, userId.Value);
+        if (!result.Success)
+        {
+            return result.StatusCode switch
+            {
+                404 => NotFound(new { success = false, message = result.Message }),
+                401 => Unauthorized(new { success = false, message = result.Message }),
+                _ => BadRequest(new { success = false, message = result.Message })
+            };
+        }
+
+        return Json(new
+        {
+            success = true,
+            message = result.Message,
+            status = result.Status,
+            registrationCount = result.RegistrationCount
+        });
+    }
+
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CancelRegistration(int auctionId)
+    {
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return Unauthorized(new { success = false, message = "Please sign in." });
+        }
+
+        var result = await _registrationService.CancelRegistrationAsync(auctionId, userId.Value);
+        if (!result.Success)
+        {
+            return BadRequest(new { success = false, message = result.Message });
+        }
+
+        return Json(new
+        {
+            success = true,
+            message = result.Message,
+            status = result.Status,
+            registrationCount = result.RegistrationCount
+        });
     }
 
     [HttpPost]
@@ -74,5 +137,11 @@ public class AuctionController : Controller
                 isWinning = bid.IsWinning
             })
         });
+    }
+
+    private int? GetCurrentUserId()
+    {
+        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return int.TryParse(value, out var userId) ? userId : null;
     }
 }
