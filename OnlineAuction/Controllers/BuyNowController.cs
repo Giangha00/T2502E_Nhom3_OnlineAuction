@@ -21,9 +21,9 @@ public class BuyNowController : Controller
         return View(model);
     }
 
-    public IActionResult Detail(int id)
+    public async Task<IActionResult> Detail(int id)
     {
-        var product = _auctionService.GetProductDetail(id);
+        var product = await _auctionService.GetProductDetailAsync(id);
         if (product is null)
         {
             return NotFound();
@@ -35,9 +35,9 @@ public class BuyNowController : Controller
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
-    public IActionResult AddToCart(int productId)
+    public async Task<IActionResult> AddToCart(int productId)
     {
-        var product = _auctionService.GetProductDetail(productId);
+        var product = await _auctionService.GetProductDetailAsync(productId);
         if (product is null)
         {
             return NotFound(new { success = false, message = "Product not found." });

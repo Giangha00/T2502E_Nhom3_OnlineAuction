@@ -27,14 +27,15 @@ public static class AuctionCatalogSeeder
         }
 
         var now = DateTime.UtcNow;
-        var catalog = new (Product Product, decimal StartingPrice, decimal BidStep, decimal CurrentPrice, string Status, int EndDays, int EndHours)[]
+        var categoryCache = new Dictionary<string, Category>(StringComparer.OrdinalIgnoreCase);
+        var catalog = new (string CategoryName, Product Product, decimal StartingPrice, decimal BidStep, decimal CurrentPrice, string Status, int EndDays, int EndHours)[]
         {
             (
+                "Pokémon",
                 new Product
                 {
                     SellerId = seller.Id,
                     Name = "Charizard 1st Edition Holo",
-                    Category = "Pokémon",
                     ShortDescription = "Authenticated Pokémon holo graded and vault-ready.",
                     DescriptionHtml = "<p>1999 Base Set Charizard holo offered through RareCard Vault with documented provenance.</p>",
                     Condition = "graded",
@@ -48,11 +49,11 @@ public static class AuctionCatalogSeeder
                 85000, 500, 124500, AuctionStatuses.Live, 2, 14
             ),
             (
+                "One Piece",
                 new Product
                 {
                     SellerId = seller.Id,
                     Name = "Gear 5 Luffy Manga Rare",
-                    Category = "One Piece",
                     ShortDescription = "Premium One Piece TCG manga rare parallel.",
                     Condition = "graded",
                     Year = 2023,
@@ -65,11 +66,11 @@ public static class AuctionCatalogSeeder
                 4200, 50, 6800, AuctionStatuses.EndingSoon, 0, 5
             ),
             (
+                "Yu-Gi-Oh!",
                 new Product
                 {
                     SellerId = seller.Id,
                     Name = "Blue-Eyes White Dragon LOB",
-                    Category = "Yu-Gi-Oh!",
                     ShortDescription = "Legend of Blue Eyes White Dragon graded collectible.",
                     Condition = "graded",
                     Year = 2002,
@@ -82,11 +83,11 @@ public static class AuctionCatalogSeeder
                 12000, 100, 18500, AuctionStatuses.Live, 1, 8
             ),
             (
+                "Sports",
                 new Product
                 {
                     SellerId = seller.Id,
                     Name = "LeBron James Topps Chrome RC",
-                    Category = "Sports",
                     ShortDescription = "Investment-grade sports card with verified provenance.",
                     Condition = "graded",
                     Year = 2003,
@@ -99,11 +100,11 @@ public static class AuctionCatalogSeeder
                 98000, 500, 142000, AuctionStatuses.Live, 3, 2
             ),
             (
+                "Magic: The Gathering",
                 new Product
                 {
                     SellerId = seller.Id,
                     Name = "Black Lotus Alpha",
-                    Category = "Magic: The Gathering",
                     ShortDescription = "Alpha Black Lotus authenticated for collectors.",
                     Condition = "graded",
                     Year = 1993,
@@ -119,6 +120,9 @@ public static class AuctionCatalogSeeder
 
         foreach (var entry in catalog)
         {
+            var category = await GetOrCreateCategoryAsync(dbContext, entry.CategoryName, categoryCache);
+            entry.Product.CategoryId = category.Id;
+
             dbContext.Products.Add(entry.Product);
             await dbContext.SaveChangesAsync();
 
@@ -160,5 +164,52 @@ public static class AuctionCatalogSeeder
                 await dbContext.SaveChangesAsync();
             }
         }
+    }
+
+    private static async Task<Category> GetOrCreateCategoryAsync(
+        AuctionHouseDbContext dbContext,
+        string categoryName,
+        Dictionary<string, Category> cache)
+    {
+        if (cache.TryGetValue(categoryName, out var cached))
+        {
+            return cached;
+        }
+
+        var slug = BuildSlug(categoryName);
+        var category = await dbContext.Categories
+            .FirstOrDefaultAsync(item => item.Name == categoryName || item.Slug == slug);
+
+        if (category is null)
+        {
+            category = new Category
+            {
+                Name = categoryName,
+                Slug = slug,
+                IsActive = true,
+                SortOrder = 0,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            dbContext.Categories.Add(category);
+            await dbContext.SaveChangesAsync();
+        }
+
+        cache[categoryName] = category;
+        return category;
+    }
+
+    private static string BuildSlug(string value)
+    {
+        var chars = value
+            .Trim()
+            .ToLowerInvariant()
+            .Select(ch => char.IsLetterOrDigit(ch) ? ch : '-')
+            .ToArray();
+
+        var slug = string.Join("-", new string(chars)
+            .Split('-', StringSplitOptions.RemoveEmptyEntries));
+
+        return string.IsNullOrWhiteSpace(slug) ? "uncategorized" : slug;
     }
 }
