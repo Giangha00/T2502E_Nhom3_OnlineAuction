@@ -12,12 +12,26 @@ internal static class ProductDetailMapper
     public static ProductDetailViewModel MapToViewModel(
         Auction auction,
         SellerViewModel seller,
-        IReadOnlyList<AuctionItemViewModel> relatedProducts)
+        IReadOnlyList<AuctionItemViewModel> relatedProducts,
+        int? currentUserId = null,
+        string? userRegistrationStatus = null,
+        string? registrationRejectReason = null,
+        int registrationCount = 0)
     {
         var product = auction.Product;
         var bids = auction.Bids.OrderByDescending(b => b.PlacedAt).ToList();
         var (days, hours, minutes, seconds) = CalculateCountdown(auction.EndDate);
         var (auctionStatus, badgeClass) = MapAuctionStatus(auction.Status, auction.EndDate);
+        var isSeller = currentUserId.HasValue && product.SellerId == currentUserId.Value;
+        var auctionAcceptsBids = CanAcceptBids(auction);
+        var canBid = ComputeCanBid(
+            auction,
+            currentUserId,
+            userRegistrationStatus,
+            isSeller,
+            auctionAcceptsBids);
+        var isRegistered = userRegistrationStatus is not null &&
+                           userRegistrationStatus != AuctionRegistrationStatuses.Cancelled;
 
         return new ProductDetailViewModel
         {
@@ -40,7 +54,7 @@ internal static class ProductDetailMapper
             BidStep = auction.BidStep,
             BidCount = bids.Count,
             LotNumber = 0,
-            WatcherCount = 0,
+            WatcherCount = registrationCount,
             EstimatedValue = product.EstimatedValue ?? 0,
             ReserveMet = auction.CurrentPrice >= auction.StartingPrice,
             AuctionEventName = string.IsNullOrWhiteSpace(auction.AuctionEventName)
@@ -55,13 +69,40 @@ internal static class ProductDetailMapper
             CountdownSeconds = seconds,
             AuctionStatus = auctionStatus,
             StatusBadgeClass = badgeClass,
-            CanPlaceBid = CanAcceptBids(auction),
+            CanPlaceBid = auctionAcceptsBids,
+            RequiresRegistration = auction.RequiresRegistration,
+            IsRegistered = isRegistered,
+            RegistrationStatus = userRegistrationStatus,
+            RegistrationRejectReason = registrationRejectReason,
+            CanBid = canBid,
+            IsSeller = isSeller,
+            RegistrationCount = registrationCount,
             Seller = seller,
             Grading = BuildGrading(product),
             BidHistory = MapBidHistory(bids),
             Documents = MapDocuments(product),
             RelatedProducts = relatedProducts.ToList()
         };
+    }
+
+    public static bool ComputeCanBid(
+        Auction auction,
+        int? currentUserId,
+        string? registrationStatus,
+        bool isSeller,
+        bool auctionAcceptsBids)
+    {
+        if (!auctionAcceptsBids || !currentUserId.HasValue || isSeller)
+        {
+            return false;
+        }
+
+        if (!auction.RequiresRegistration)
+        {
+            return true;
+        }
+
+        return registrationStatus == AuctionRegistrationStatuses.Approved;
     }
 
     public static SellerViewModel MapSeller(ApplicationUser seller, int auctionCount, int successfulSales) =>

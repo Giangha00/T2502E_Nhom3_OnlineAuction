@@ -521,6 +521,14 @@
   <data name="Product_Seconds" xml:space="preserve"><value>秒</value></data>
   <data name="Product_NoBidsYet" xml:space="preserve"><value>入札はまだありません</value></data>
   <data name="Product_AuctionEnded" xml:space="preserve"><value>オークション終了</value></data>
+  <data name="Product_RegisterForAuction" xml:space="preserve"><value>オークションに登録</value></data>
+  <data name="Product_RegistrationPending" xml:space="preserve"><value>登録は承認待ちです。</value></data>
+  <data name="Product_RegistrationApproved" xml:space="preserve"><value>このオークションに登録済みです。</value></data>
+  <data name="Product_RegistrationRejected" xml:space="preserve"><value>登録が拒否されました。</value></data>
+  <data name="Product_MustRegisterToBid" xml:space="preserve"><value>入札する前にこのオークションに登録してください。</value></data>
+  <data name="Product_RegisteredCount" xml:space="preserve"><value>{0} 人が登録</value></data>
+  <data name="Product_YouAreTheSeller" xml:space="preserve"><value>あなたはこの出品の売り手です。</value></data>
+  <data name="Product_CancelRegistration" xml:space="preserve"><value>登録をキャンセル</value></data>
   <data name="Product_CountdownPreview" xml:space="preserve"><value>静的プレビュー — カウントダウンはライブではありません</value></data>
   <data name="Product_AuctionInfo" xml:space="preserve"><value>オークション情報</value></data>
   <data name="Product_StartingPrice" xml:space="preserve"><value>開始価格</value></data>
@@ -753,6 +761,11 @@
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>入札できませんでした。もう一度お試しください。</value></data>
   <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>入札が完了しました！</value></data>
   <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>オークション終了</value></data>
+  <data name="Js_ProductDetail_Registering" xml:space="preserve"><value>登録中…</value></data>
+  <data name="Js_ProductDetail_RegistrationSuccess" xml:space="preserve"><value>登録が完了しました！</value></data>
+  <data name="Js_ProductDetail_RegistrationFailed" xml:space="preserve"><value>登録できませんでした。もう一度お試しください。</value></data>
+  <data name="Js_ProductDetail_RegistrationCancelled" xml:space="preserve"><value>登録をキャンセルしました。</value></data>
+  <data name="Js_ProductDetail_CancelRegistrationFailed" xml:space="preserve"><value>登録をキャンセルできませんでした。</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>追加中…</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>カートに追加しました。</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>カートに追加できませんでした。もう一度お試しください。</value></data>
