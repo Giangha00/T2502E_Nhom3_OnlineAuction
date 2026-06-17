@@ -3,11 +3,11 @@
 <section class="mt-10 lg:mt-12">
     <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-            <h2 class="text-xl font-semibold text-stone-900">Saved Payment Methods</h2>
-            <p class="mt-1 text-sm text-stone-500">Manage your stored cards for faster checkout.</p>
+            <h2 class="text-xl font-semibold text-stone-900">@Localizer["Payment_SavedMethods"]</h2>
+            <p class="mt-1 text-sm text-stone-500">@Localizer["Payment_SavedMethodsDesc"]</p>
         </div>
         <span id="savedCountBadge" class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
-            @Model.SavedMethods.Count method@(Model.SavedMethods.Count == 1 ? "" : "s")
+            @Localizer["Payment_MethodCount", Model.SavedMethods.Count]
         </span>
     </div>
 

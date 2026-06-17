@@ -1,0 +1,220 @@
+@model CategoryListViewModel
+
+@{
+    ViewData["Title"] = "Category Management";
+    ViewData["AdminPage"] = "categories";
+
+    var currentPage = Model.Filter.Page <= 0 ? 1 : Model.Filter.Page;
+    var totalPages = Model.TotalPages <= 0 ? 1 : Model.TotalPages;
+    var startPage = Math.Max(1, currentPage - 2);
+    var endPage = Math.Min(totalPages, currentPage + 2);
+}
+
+<div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Category Management</h2>
+            <p class="text-theme-sm text-gray-500 dark:text-gray-400">Manage product categories used across listings.</p>
+        </div>
+
+        <a asp-area="Admin"
+           asp-controller="Category"
+           asp-action="Create"
+           class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
+            Create Category
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] is not null)
+    {
+        <div class="mb-4 rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-theme-sm text-success-700">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] is not null)
+    {
+        <div class="mb-4 rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-theme-sm text-error-700">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+        <form method="get" class="flex flex-wrap items-end gap-3">
+            <input type="hidden" name="Page" value="1" />
+
+            <div class="min-w-[220px] flex-1">
+                <label class="mb-1 block text-theme-xs font-medium text-gray-500">Search</label>
+                <input name="Search"
+                       value="@Model.Filter.Search"
+                       placeholder="Name or slug"
+                       class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            </div>
+
+            <div class="w-[140px]">
+                <label class="mb-1 block text-theme-xs font-medium text-gray-500">Status</label>
+                <select name="IsActive" class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                    <option value="">All</option>
+                    <option value="true" selected="@(Model.Filter.IsActive == true)">Active</option>
+                    <option value="false" selected="@(Model.Filter.IsActive == false)">Inactive</option>
+                </select>
+            </div>
+
+            <div class="w-[170px]">
+                <label class="mb-1 block text-theme-xs font-medium text-gray-500">Sort</label>
+                <select name="SortOrder" class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                    <option value="" selected="@(string.IsNullOrWhiteSpace(Model.Filter.SortOrder))">Sort order</option>
+                    <option value="name_desc" selected="@(Model.Filter.SortOrder == "name_desc")">Name Z-A</option>
+                    <option value="sort_asc" selected="@(Model.Filter.SortOrder == "sort_asc")">Sort low-high</option>
+                    <option value="sort_desc" selected="@(Model.Filter.SortOrder == "sort_desc")">Sort high-low</option>
+                    <option value="date_desc" selected="@(Model.Filter.SortOrder == "date_desc")">Newest</option>
+                    <option value="date_asc" selected="@(Model.Filter.SortOrder == "date_asc")">Oldest</option>
+                </select>
+            </div>
+
+            <div class="flex gap-2">
+                <button type="submit" class="h-10 rounded-lg bg-brand-500 px-4 text-theme-sm font-medium text-white hover:bg-brand-600">
+                    Filter
+                </button>
+
+                <a asp-area="Admin"
+                   asp-controller="Category"
+                   asp-action="Index"
+                   class="inline-flex h-10 items-center rounded-lg border border-gray-300 bg-white px-4 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="max-w-full overflow-x-auto">
+            <table class="w-full min-w-[900px]">
+                <thead>
+                <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Name</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Slug</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Sort</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Products</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Status</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Created</th>
+                    <th class="px-5 py-3 text-right text-theme-xs font-medium uppercase text-gray-500">Actions</th>
+                </tr>
+                </thead>
+
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                @if (Model.Categories.Count == 0)
+                {
+                    <tr>
+                        <td colspan="7" class="px-5 py-10 text-center text-theme-sm text-gray-500">No categories found.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var category in Model.Categories)
+                    {
+                        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                            <td class="px-5 py-4">
+                                <p class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@category.Name</p>
+                                <p class="text-theme-xs text-gray-500">ID: @category.Id</p>
+                            </td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@category.Slug</td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@category.SortOrder</td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@category.ProductCount</td>
+                            <td class="px-5 py-4">
+                                @if (category.IsActive)
+                                {
+                                    <span class="rounded-full bg-success-50 px-2.5 py-0.5 text-theme-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-500">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="rounded-full bg-gray-100 px-2.5 py-0.5 text-theme-xs font-medium text-gray-700 dark:bg-white/5 dark:text-gray-400">Inactive</span>
+                                }
+                            </td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@category.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            <td class="px-5 py-4">
+                                <div class="flex justify-end gap-3">
+                                    <a asp-area="Admin"
+                                       asp-controller="Category"
+                                       asp-action="Details"
+                                       asp-route-id="@category.Id"
+                                       class="text-theme-sm font-medium text-brand-500 hover:underline">
+                                        Details
+                                    </a>
+
+                                    <a asp-area="Admin"
+                                       asp-controller="Category"
+                                       asp-action="Edit"
+                                       asp-route-id="@category.Id"
+                                       class="text-theme-sm font-medium text-warning-600 hover:underline">
+                                        Edit
+                                    </a>
+
+                                    <form asp-area="Admin"
+                                          asp-controller="Category"
+                                          asp-action="Delete"
+                                          asp-route-id="@category.Id"
+                                          method="post"
+                                          class="inline"
+                                          onsubmit="return confirm('Are you sure you want to delete this category?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="text-theme-sm font-medium text-error-600 hover:underline">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-theme-sm text-gray-500">
+            Total: <span class="font-medium text-gray-800 dark:text-white/90">@Model.TotalItems</span>
+            · Page <span class="font-medium text-gray-800 dark:text-white/90">@currentPage</span>
+            of <span class="font-medium text-gray-800 dark:text-white/90">@totalPages</span>
+        </p>
+
+        <nav class="flex flex-wrap items-center gap-2">
+            <a asp-area="Admin"
+               asp-controller="Category"
+               asp-action="Index"
+               asp-route-Search="@Model.Filter.Search"
+               asp-route-SortOrder="@Model.Filter.SortOrder"
+               asp-route-IsActive="@Model.Filter.IsActive"
+               asp-route-Page="@(currentPage - 1)"
+               class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage <= 1 ? "pointer-events-none opacity-50" : "")">
+                Previous
+            </a>
+
+            @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
+            {
+                <a asp-area="Admin"
+                   asp-controller="Category"
+                   asp-action="Index"
+                   asp-route-Search="@Model.Filter.Search"
+                   asp-route-SortOrder="@Model.Filter.SortOrder"
+                   asp-route-IsActive="@Model.Filter.IsActive"
+                   asp-route-Page="@pageNumber"
+                   class="rounded-lg border px-3 py-2 text-theme-sm font-medium @(pageNumber == currentPage ? "border-brand-500 bg-brand-500 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50")">
+                    @pageNumber
+                </a>
+            }
+
+            <a asp-area="Admin"
+               asp-controller="Category"
+               asp-action="Index"
+               asp-route-Search="@Model.Filter.Search"
+               asp-route-SortOrder="@Model.Filter.SortOrder"
+               asp-route-IsActive="@Model.Filter.IsActive"
+               asp-route-Page="@(currentPage + 1)"
+               class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage >= totalPages ? "pointer-events-none opacity-50" : "")">
+                Next
+            </a>
+        </nav>
+    </div>
+</div>

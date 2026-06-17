@@ -1,0 +1,98 @@
+@model OnlineAuction.Models.AccountShellViewModel
+
+<div id="userMenuPanel" class="user-menu-panel hidden" role="menu" aria-label="@Localizer["UserMenu_AccountMenu"]">
+  <div class="user-menu-panel__header">
+    <span class="user-menu-panel__avatar">@Model.Initials</span>
+    <div class="min-w-0">
+      <p class="truncate text-sm font-semibold text-slate-900">@Model.DisplayName</p>
+    </div>
+  </div>
+
+  <nav class="user-menu-panel__nav">
+    <a asp-controller="User" asp-action="Detail" asp-route-id="@Model.UserId" class="user-menu-panel__link" role="menuitem">
+      <span class="user-menu-panel__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </span>
+      <span class="min-w-0">
+        <span class="block text-sm font-semibold text-slate-900">@Localizer["UserMenu_UserInformation"]</span>
+        <span class="block text-xs text-slate-500">@Localizer["UserMenu_UserInformation_Desc"]</span>
+      </span>
+    </a>
+    @{
+      var items = new (string Action, string TitleKey, string DescKey)[]
+      {
+        ("Orders", "UserMenu_Orders", "UserMenu_Orders_Desc"),
+        ("Bids", "UserMenu_Bids", "UserMenu_Bids_Desc"),
+        ("Watchlist", "UserMenu_Watchlist", "UserMenu_Watchlist_Desc"),
+        ("Offers", "UserMenu_Offers", "UserMenu_Offers_Desc"),
+        ("Selling", "UserMenu_Selling", "UserMenu_Selling_Desc"),
+        ("Summary", "UserMenu_Summary", "UserMenu_Summary_Desc"),
+        ("Accounting", "UserMenu_Accounting", "UserMenu_Accounting_Desc"),
+        ("Submissions", "UserMenu_Submissions", "UserMenu_Submissions_Desc")
+      };
+    }
+    @foreach (var item in items)
+    {
+      <a asp-controller="Account" asp-action="@item.Action" class="user-menu-panel__link" role="menuitem">
+        <span class="user-menu-panel__icon" aria-hidden="true">
+          @switch (item.Action)
+          {
+            case "Orders":
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M6 6h15l-1.5 9H7.5L6 6Z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+              break;
+            case "Bids":
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="m14 13 6-6-2-2-6 6"/><path d="M16 5l3 3"/><path d="M8 21l-5-2 10-10 5 5-10 10Z"/></svg>
+              break;
+            case "Watchlist":
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              break;
+            case "Offers":
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20 12V8H6a2 2 0 0 1-2-2"/><path d="M4 6v12a2 2 0 0 0 2 2h14"/></svg>
+              break;
+            case "Selling":
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+              break;
+            case "Summary":
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+              break;
+            case "Accounting":
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              break;
+            default:
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
+              break;
+          }
+        </span>
+        <span class="min-w-0">
+          <span class="block text-sm font-semibold text-slate-900">@Localizer[item.TitleKey]</span>
+          <span class="block text-xs text-slate-500">@Localizer[item.DescKey]</span>
+        </span>
+      </a>
+    }
+  </nav>
+
+  <div class="user-menu-panel__vault">
+    <div class="flex items-center justify-between gap-2">
+      <p class="text-sm font-semibold text-slate-900">@Localizer["UserMenu_VaultAddress"]</p>
+      <button type="button" class="user-menu-panel__copy" data-copy-vault aria-label="@Localizer["UserMenu_CopyVault"]">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="h-4 w-4"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
+    </div>
+    <p class="mt-3 text-xs leading-relaxed text-slate-500" id="vaultAddressText">
+      @Model.VaultAddressName<br/>
+      @Model.VaultAddressLine1<br/>
+      @Model.VaultAddressLine2
+    </p>
+    <a asp-controller="Account" asp-action="Submissions"
+       class="mt-4 flex w-full items-center justify-center rounded-full bg-slate-900 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
+      @Localizer["UserMenu_SubmitToVault"]
+    </a>
+  </div>
+
+  <form asp-controller="Auth" asp-action="Logout" method="post" class="user-menu-panel__logout">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="w-full cursor-pointer py-2 text-center text-sm font-medium text-red-600 transition hover:text-red-700">
+      @Localizer["Layout_Logout"]
+    </button>
+  </form>
+</div>

@@ -1,15 +1,15 @@
 @model string
 
 @{
-    var normalized = Model switch
+    var normalized = Model?.ToLowerInvariant() switch
     {
-        "Live" or "Active" => ("Active", "Active Auction", "bg-emerald-600"),
-        "Ending Soon" => ("Ending Soon", "Ending Soon", "bg-orange-600"),
-        "Completed" or "Won" => ("Completed", "Completed", "bg-stone-500"),
-        _ => (Model, Model, "bg-amber-700")
+        "live" or "active" => (Localizer["User_Status_Live"].Value, "bg-blue-700"),
+        "ending_soon" or "ending soon" => (Localizer["User_Status_EndingSoon"].Value, "bg-orange-600"),
+        "completed" or "won" or "ended" => (Localizer["User_Status_Completed"].Value, "bg-stone-500"),
+        _ => (Model ?? string.Empty, "bg-slate-500")
     };
 }
 
-<span class="inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white @normalized.Item3">
-  @normalized.Item2
+<span class="inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white @normalized.Item2">
+  @normalized.Item1
 </span>

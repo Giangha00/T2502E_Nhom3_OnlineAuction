@@ -1,31 +1,43 @@
+@using System.Text.Json
 @model OnlineAuction.Models.RefundPageViewModel
 @{
-    ViewData["Title"] = "Refund Request";
+    ViewData["Title"] = Localizer["Refund_PageTitle"];
+    var refundI18n = new Dictionary<string, string>
+    {
+        ["orderRequired"] = Localizer["Js_Refund_OrderRequired"].Value,
+        ["manualRequired"] = Localizer["Js_Refund_ManualRequired"].Value,
+        ["fullNameRequired"] = Localizer["Js_Refund_FullNameRequired"].Value,
+        ["emailInvalid"] = Localizer["Js_Refund_EmailInvalid"].Value,
+        ["reasonRequired"] = Localizer["Js_Refund_ReasonRequired"].Value,
+        ["descriptionRequired"] = Localizer["Js_Refund_DescriptionRequired"].Value,
+        ["policyRequired"] = Localizer["Js_Refund_PolicyRequired"].Value
+    };
 }
 
+<div class="rarecard-page bg-white">
 <partial name="_PageHero" model='new PageHeroViewModel {
-    Label = "Buyer Protection",
-    Title = "Refund Request",
-    Description = "Submit a refund request for a completed auction transaction. Our team will review your case and respond within 3–5 business days."
+    Label = Localizer["Refund_Label"].Value,
+    Title = Localizer["Refund_PageTitle"].Value,
+    Description = Localizer["Refund_Description"].Value
 }' />
 
 <!-- Steps -->
-<section class="border-b border-amber-200/40 bg-amber-50/30">
+<section class="border-b border-blue-200/40 bg-blue-50/30">
     <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <ol class="flex flex-wrap items-center justify-center gap-4 sm:gap-8">
-            <li class="flex items-center gap-2 text-sm font-medium text-amber-700">
-                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-700 text-xs font-bold text-white">1</span>
-                Review Policy
+            <li class="flex items-center gap-2 text-sm font-medium text-blue-700">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">1</span>
+                @Localizer["Refund_Step_Policy"]
             </li>
             <li class="hidden h-px w-8 bg-stone-300 sm:block"></li>
-            <li class="flex items-center gap-2 text-sm font-medium text-amber-700">
-                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-700 text-xs font-bold text-white">2</span>
-                Submit Request
+            <li class="flex items-center gap-2 text-sm font-medium text-blue-700">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">2</span>
+                @Localizer["Refund_Step_Submit"]
             </li>
             <li class="hidden h-px w-8 bg-stone-300 sm:block"></li>
-            <li class="flex items-center gap-2 text-sm font-medium text-stone-400">
-                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-stone-300 text-xs font-bold">3</span>
-                Confirmation
+            <li class="flex items-center gap-2 text-sm font-medium text-slate-400">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-slate-300 text-xs font-bold">3</span>
+                @Localizer["Refund_Step_Confirmation"]
             </li>
         </ol>
     </div>
@@ -37,84 +49,84 @@
             <!-- Policy -->
             <div class="space-y-6">
                 <div>
-                    <h2 class="text-2xl font-bold text-stone-900">Refund Policy</h2>
-                    <p class="mt-2 text-sm text-stone-600">
-                        Auction House protects buyers when transactions do not meet listing standards or delivery commitments.
+                    <h2 class="text-2xl font-bold text-slate-900">@Localizer["Refund_PolicyTitle"]</h2>
+                    <p class="mt-2 text-sm text-slate-600">
+                        @Localizer["Refund_PolicyDesc"]
                     </p>
                 </div>
 
                 <div class="space-y-4">
                     @foreach (var item in Model.PolicyItems)
                     {
-                        <article class="rounded-2xl border border-stone-200 bg-white/80 p-5 shadow-sm">
-                            <h3 class="font-semibold text-stone-900">@item.Title</h3>
-                            <p class="mt-2 text-sm leading-6 text-stone-600">@item.Description</p>
+                        <article class="rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-sm">
+                            <h3 class="font-semibold text-slate-900">@item.Title</h3>
+                            <p class="mt-2 text-sm leading-6 text-slate-600">@item.Description</p>
                         </article>
                     }
                 </div>
 
-                <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
-                    <p class="text-sm font-semibold text-amber-900">Before you submit</p>
-                    <ul class="mt-2 list-inside list-disc space-y-1 text-sm text-amber-800">
-                        <li>Contact the seller first through the platform messaging system.</li>
-                        <li>Keep photos, tracking numbers, and payment receipts as evidence.</li>
-                        <li>Refund requests must be filed within <strong>14 days</strong> of delivery or expected delivery date.</li>
+                <div class="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+                    <p class="text-sm font-semibold text-blue-900">@Localizer["Refund_BeforeSubmit"]</p>
+                    <ul class="mt-2 list-inside list-disc space-y-1 text-sm text-blue-800">
+                        <li>@Localizer["Refund_BeforeTip1"]</li>
+                        <li>@Localizer["Refund_BeforeTip2"]</li>
+                        <li>@Html.Raw(Localizer["Refund_BeforeTip3"].Value)</li>
                     </ul>
                 </div>
 
-                <p class="text-sm text-stone-500">
-                    Read full terms in our
-                    <a asp-controller="Policy" asp-action="Index" asp-fragment="payment-policy" class="font-medium text-amber-700 visited:text-amber-700 hover:text-amber-800">Payment Policy</a>.
+                <p class="text-sm text-slate-500">
+                    @Localizer["Refund_ReadFullTerms"]
+                    <a asp-controller="Policy" asp-action="Index" asp-fragment="payment-policy" class="font-medium text-blue-700 visited:text-blue-700 hover:text-blue-800">@Localizer["Checkout_PaymentPolicy"]</a>.
                 </p>
             </div>
 
             <!-- Form -->
-            <div class="rounded-2xl border border-stone-200 bg-white/80 p-6 shadow-sm sm:p-8">
-                <h2 class="text-xl font-semibold text-stone-900">Submit Refund Request</h2>
-                <p class="mt-1 text-sm text-stone-500">Fill in the details below. Required fields are marked with <span class="text-red-500">*</span>.</p>
+            <div class="rounded-2xl border border-slate-200 bg-white/80 p-6 shadow-sm sm:p-8">
+                <h2 class="text-xl font-semibold text-slate-900">@Localizer["Refund_FormTitle"]</h2>
+                <p class="mt-1 text-sm text-slate-500">@Localizer["Refund_FormDesc"] <span class="text-red-500">*</span>.</p>
 
                 <form id="refundForm" class="mt-6 space-y-5">
                     <div>
-                        <label for="orderReference" class="block text-sm font-medium text-stone-900">Order Reference <span class="text-red-500">*</span></label>
+                        <label for="orderReference" class="block text-sm font-medium text-slate-900">@Localizer["Refund_OrderReference"] <span class="text-red-500">*</span></label>
                         <select id="orderReference"
-                                class="mt-2 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
-                            <option value="">Select your order</option>
+                                class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            <option value="">@Localizer["Refund_SelectOrder"]</option>
                             @foreach (var order in Model.RecentOrders)
                             {
                                 <option value="@order.OrderReference" data-amount="@order.AmountPaid" data-name="@order.AuctionName">
                                     @order.OrderReference — @order.AuctionName ($@order.AmountPaid.ToString("N2"))
                                 </option>
                             }
-                            <option value="other">Other order (enter manually below)</option>
+                            <option value="other">@Localizer["Refund_OtherOrder"]</option>
                         </select>
                         <span id="orderReferenceError" class="mt-1 block text-sm text-red-600"></span>
                     </div>
 
                     <div id="manualOrderField" class="hidden">
-                        <label for="manualOrderRef" class="block text-sm font-medium text-stone-900">Manual Order Reference</label>
+                        <label for="manualOrderRef" class="block text-sm font-medium text-slate-900">@Localizer["Refund_ManualOrderRef"]</label>
                         <input type="text" id="manualOrderRef" placeholder="AH-YYYYMMDD-0000"
-                               class="mt-2 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500"/>
+                               class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"/>
                     </div>
 
                     <div>
-                        <label for="fullName" class="block text-sm font-medium text-stone-900">Full Name <span class="text-red-500">*</span></label>
+                        <label for="fullName" class="block text-sm font-medium text-slate-900">@Localizer["User_FullName"] <span class="text-red-500">*</span></label>
                         <input type="text" id="fullName" placeholder="John Doe"
-                               class="mt-2 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500"/>
+                               class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"/>
                         <span id="fullNameError" class="mt-1 block text-sm text-red-600"></span>
                     </div>
 
                     <div>
-                        <label for="email" class="block text-sm font-medium text-stone-900">Email Address <span class="text-red-500">*</span></label>
+                        <label for="email" class="block text-sm font-medium text-slate-900">@Localizer["User_Email"] <span class="text-red-500">*</span></label>
                         <input type="email" id="email" placeholder="john@example.com"
-                               class="mt-2 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500"/>
+                               class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"/>
                         <span id="emailError" class="mt-1 block text-sm text-red-600"></span>
                     </div>
 
                     <div>
-                        <label for="refundReason" class="block text-sm font-medium text-stone-900">Reason for Refund <span class="text-red-500">*</span></label>
+                        <label for="refundReason" class="block text-sm font-medium text-slate-900">@Localizer["Refund_Reason"] <span class="text-red-500">*</span></label>
                         <select id="refundReason"
-                                class="mt-2 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
-                            <option value="">Select a reason</option>
+                                class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            <option value="">@Localizer["Refund_SelectReason"]</option>
                             @foreach (var reason in Model.RefundReasons)
                             {
                                 <option value="@reason.Label">@reason.Label</option>
@@ -124,32 +136,32 @@
                     </div>
 
                     <div>
-                        <label for="description" class="block text-sm font-medium text-stone-900">Description <span class="text-red-500">*</span></label>
-                        <textarea id="description" rows="4" placeholder="Describe the issue in detail. Include delivery date, condition of item, and any communication with the seller..."
-                                  class="w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500 resize-none"></textarea>
+                        <label for="description" class="block text-sm font-medium text-slate-900">@Localizer["Refund_DescriptionLabel"] <span class="text-red-500">*</span></label>
+                        <textarea id="description" rows="4" placeholder="@Localizer["Refund_DescriptionPlaceholder"]"
+                                  class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"></textarea>
                         <span id="descriptionError" class="mt-1 block text-sm text-red-600"></span>
                     </div>
 
                     <div>
-                        <label for="refundAmount" class="block text-sm font-medium text-stone-900">Refund Amount Requested (USD)</label>
+                        <label for="refundAmount" class="block text-sm font-medium text-slate-900">@Localizer["Refund_AmountLabel"]</label>
                         <input type="number" id="refundAmount" min="0" step="0.01" placeholder="0.00"
-                               class="mt-2 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500"/>
-                        <p class="mt-1 text-xs text-stone-400">Leave blank to request a full refund of the order total.</p>
+                               class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"/>
+                        <p class="mt-1 text-xs text-slate-400">@Localizer["Refund_AmountHint"]</p>
                     </div>
 
                     <label class="flex cursor-pointer items-start gap-3">
                         <input type="checkbox" id="agreePolicy"
-                               class="mt-1 h-4 w-4 rounded border-stone-300 text-amber-700 focus:ring-amber-500"/>
-                        <span class="text-sm text-stone-600">
-                            I confirm the information provided is accurate and I agree to the
-                            <a asp-controller="Policy" asp-action="Index" class="font-medium text-amber-700 visited:text-amber-700 hover:text-amber-800">refund policy</a>.
+                               class="mt-1 h-4 w-4 rounded border-slate-300 text-blue-700 focus:ring-blue-500"/>
+                        <span class="text-sm text-slate-600">
+                            @Localizer["Refund_AgreePolicy"]
+                            <a asp-controller="Policy" asp-action="Index" class="font-medium text-blue-700 visited:text-blue-700 hover:text-blue-800">@Localizer["Refund_PolicyLink"]</a>.
                         </span>
                     </label>
                     <span id="agreePolicyError" class="block text-sm text-red-600"></span>
 
                     <button type="submit"
-                            class="w-full rounded-xl bg-amber-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-amber-700/20 transition hover:bg-amber-800 focus:ring-2 focus:ring-amber-700 focus:ring-offset-2">
-                        Submit Refund Request
+                            class="w-full rounded-xl bg-blue-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800 focus:ring-2 focus:ring-blue-700 focus:ring-offset-2">
+                        @Localizer["Refund_Submit"]
                     </button>
                 </form>
             </div>
@@ -158,5 +170,11 @@
 </section>
 
 @section Scripts {
+    <script>
+        window.refundConfig = {
+            i18n: @Html.Raw(JsonSerializer.Serialize(refundI18n))
+        };
+    </script>
     <script src="~/js/refund.js" asp-append-version="true"></script>
 }
+</div>

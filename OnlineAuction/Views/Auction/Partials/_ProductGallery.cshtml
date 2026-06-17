@@ -1,23 +1,23 @@
 @model OnlineAuction.Models.ProductDetailViewModel
 
-<div class="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-lg">
-  <div class="relative aspect-square overflow-hidden bg-stone-100 sm:aspect-[4/3] lg:aspect-square">
+<div class="product-gallery">
+  <div class="product-gallery__main overflow-hidden bg-slate-50">
     <img id="mainProductImage" src="@Model.Images.FirstOrDefault()" alt="@Model.Name"
-         class="h-full w-full object-cover transition duration-500"/>
-    <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-900/10 to-transparent"></div>
+         class="h-full w-full object-contain object-center transition duration-500"/>
   </div>
+
   @if (Model.Images.Count > 1)
   {
-    <div class="grid grid-cols-4 gap-2 border-t border-stone-100 bg-stone-50 p-3 sm:grid-cols-5 sm:p-4">
-      @for (var i = 0; i < Model.Images.Count; i++)
+    <div class="mt-3 flex flex-wrap gap-2">
+      @for (var i = 0; i < Math.Min(Model.Images.Count, 5); i++)
       {
         var image = Model.Images[i];
         <button type="button"
-                class="gallery-thumb group overflow-hidden rounded-xl border-2 @(i == 0 ? "border-amber-500 ring-2 ring-amber-100" : "border-transparent") transition hover:border-amber-400"
+                class="gallery-thumb group h-14 w-14 shrink-0 overflow-hidden rounded border-2 @(i == 0 ? "border-slate-900" : "border-transparent") bg-white transition hover:border-slate-400"
                 data-image="@image"
-                aria-label="View image @(i + 1)">
-          <img src="@image" alt="@Model.Name thumbnail @(i + 1)"
-               class="aspect-square w-full object-cover transition duration-300 group-hover:scale-105"/>
+                aria-label="@Localizer["Product_ViewImage", i + 1]">
+          <img src="@image" alt="@Localizer["Product_Thumbnail", Model.Name, i + 1]"
+               class="h-full w-full object-cover"/>
         </button>
       }
     </div>

@@ -1,0 +1,65 @@
+@model CategoryFormViewModel
+
+@{
+    ViewData["Title"] = "Create Category";
+    ViewData["AdminPage"] = "categories";
+}
+
+<div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+    <div class="mb-6">
+        <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Create Category</h2>
+        <p class="text-theme-sm text-gray-500 dark:text-gray-400">Add a new product category.</p>
+    </div>
+
+    <form asp-area="Admin"
+          asp-controller="Category"
+          asp-action="Create"
+          method="post"
+          class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly" class="mb-4 text-theme-sm text-error-600"></div>
+
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div>
+                <label asp-for="Name" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="Name" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="Name" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div>
+                <label asp-for="Slug" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="Slug" placeholder="auto-generated from name if empty" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="Slug" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div>
+                <label asp-for="SortOrder" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="SortOrder" type="number" min="0" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="SortOrder" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div class="flex items-center gap-3 pt-8">
+                <input asp-for="IsActive" class="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500" />
+                <label asp-for="IsActive" class="text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+            </div>
+        </div>
+
+        <div class="mt-6 flex justify-end gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
+            <a asp-area="Admin"
+               asp-controller="Category"
+               asp-action="Index"
+               class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                Cancel
+            </a>
+
+            <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
+                Create Category
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

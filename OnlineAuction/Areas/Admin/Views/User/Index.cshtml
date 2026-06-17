@@ -15,7 +15,6 @@
         {
             UserStatus.Active => "bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-500",
             UserStatus.Inactive => "bg-warning-50 text-warning-700 dark:bg-warning-500/15 dark:text-warning-400",
-            UserStatus.Blocked => "bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-500",
             _ => "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-gray-400"
         };
     }
@@ -86,16 +85,6 @@
                     <option value="">All</option>
                     <option value="Active" selected="@(Model.Filter.Status == UserStatus.Active)">Active</option>
                     <option value="Inactive" selected="@(Model.Filter.Status == UserStatus.Inactive)">Inactive</option>
-                    <option value="Blocked" selected="@(Model.Filter.Status == UserStatus.Blocked)">Blocked</option>
-                </select>
-            </div>
-
-            <div class="w-[130px]">
-                <label class="mb-1 block text-theme-xs font-medium text-gray-500">Gender</label>
-                <select name="Gender" class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                    <option value="">All</option>
-                    <option value="Male" selected="@(Model.Filter.Gender == Gender.Male)">Male</option>
-                    <option value="Female" selected="@(Model.Filter.Gender == Gender.Female)">Female</option>
                 </select>
             </div>
 
@@ -154,7 +143,6 @@
                     <option value="">Status</option>
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
-                    <option value="Blocked">Blocked</option>
                 </select>
 
                 <select name="Role" class="h-10 rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
@@ -187,7 +175,7 @@
                         <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Contact</th>
                         <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Role</th>
                         <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Status</th>
-                        <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Gender</th>
+                        <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Username</th>
                         <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Created</th>
                         <th class="px-5 py-3 text-right text-theme-xs font-medium uppercase text-gray-500">Actions</th>
                     </tr>
@@ -238,8 +226,8 @@
                                     </span>
                                 </td>
 
-                                <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@user.Gender</td>
-                                <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@user.CreatedDate.ToString("dd/MM/yyyy")</td>
+                                <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@user.Username</td>
+                                <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@user.CreatedAt.ToString("dd/MM/yyyy")</td>
 
                                 <td class="px-5 py-4">
                                     <div class="flex justify-end gap-3">
@@ -291,7 +279,6 @@
                asp-route-SortOrder="@Model.Filter.SortOrder"
                asp-route-Role="@Model.Filter.Role"
                asp-route-Status="@Model.Filter.Status"
-               asp-route-Gender="@Model.Filter.Gender"
                asp-route-Page="@(currentPage - 1)"
                class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage <= 1 ? "pointer-events-none opacity-50" : "")">
                 Previous
@@ -307,7 +294,6 @@
                    asp-route-SortOrder="@Model.Filter.SortOrder"
                    asp-route-Role="@Model.Filter.Role"
                    asp-route-Status="@Model.Filter.Status"
-                   asp-route-Gender="@Model.Filter.Gender"
                    asp-route-Page="@pageNumber"
                    class="rounded-lg border px-3 py-2 text-theme-sm font-medium @(pageNumber == currentPage ? "border-brand-500 bg-brand-500 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50")">
                     @pageNumber
@@ -322,7 +308,6 @@
                asp-route-SortOrder="@Model.Filter.SortOrder"
                asp-route-Role="@Model.Filter.Role"
                asp-route-Status="@Model.Filter.Status"
-               asp-route-Gender="@Model.Filter.Gender"
                asp-route-Page="@(currentPage + 1)"
                class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage >= totalPages ? "pointer-events-none opacity-50" : "")">
                 Next

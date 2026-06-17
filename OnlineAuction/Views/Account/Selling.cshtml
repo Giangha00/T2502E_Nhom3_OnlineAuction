@@ -1,0 +1,86 @@
+@model OnlineAuction.Models.SellingViewModel
+@{
+    ViewData["Title"] = Localizer["Account_Selling"];
+    var tabs = new[] {
+        ("active", Localizer["Account_Selling_Tab_Active"].Value),
+        ("sold", Localizer["Account_Selling_Tab_Sold"].Value),
+        ("unsold", Localizer["Account_Selling_Tab_Unsold"].Value),
+        ("scheduled", Localizer["Account_Selling_Tab_Scheduled"].Value)
+    };
+    var channels = new[] {
+        ("buynow", Localizer["BuyNow"].Value),
+        ("auction", Localizer["Auction"].Value)
+    };
+    var isAuctionChannel = string.Equals(Model.Channel, "auction", StringComparison.OrdinalIgnoreCase);
+    var emptyHint = isAuctionChannel
+        ? Localizer["Account_Selling_EmptyHint_Auction"].Value
+        : Localizer["Account_Selling_EmptyHint_BuyNow"].Value;
+    var createButton = new AccountSellingCreateButtonViewModel { IsAuctionChannel = isAuctionChannel };
+    var hasListings = Model.Listings.Count > 0;
+}
+
+<div class="account-dashboard min-h-screen bg-slate-50">
+  <div class="site-shell account-dashboard__layout px-4 py-8 sm:px-6 lg:py-10">
+    <partial name="Partials/_AccountSidebar" model="Model.Shell"/>
+
+    <div class="account-dashboard__main">
+      <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">@Localizer["Account_Selling"]</h1>
+
+      <div class="mt-8 border-b border-stone-200">
+        <div class="flex flex-wrap gap-6">
+          @foreach (var (key, label) in tabs)
+          {
+            var isActive = string.Equals(Model.Tab, key, StringComparison.OrdinalIgnoreCase);
+            <a asp-controller="Account" asp-action="Selling" asp-route-tab="@key" asp-route-channel="@Model.Channel"
+               class="account-tab @(isActive ? "is-active" : "")">@label</a>
+          }
+        </div>
+      </div>
+
+      <div class="account-selling-toolbar mt-6 @(hasListings ? "" : "account-selling-toolbar--filters-only")">
+        <div class="account-selling-toolbar__filters">
+          @foreach (var (key, label) in channels)
+          {
+            var isActive = string.Equals(Model.Channel, key, StringComparison.OrdinalIgnoreCase);
+            <a asp-controller="Account" asp-action="Selling" asp-route-tab="@Model.Tab" asp-route-channel="@key"
+               class="account-pill @(isActive ? "is-active" : "")">@label</a>
+          }
+        </div>
+
+        @if (hasListings)
+        {
+          <div class="account-sell-actions">
+            <partial name="Partials/_SellingCreateButton" model="createButton" />
+          </div>
+        }
+      </div>
+
+      @if (!hasListings)
+      {
+        <div class="account-empty mt-16">
+          <div class="account-empty__art" aria-hidden="true">
+            <svg viewBox="0 0 120 96" fill="none" class="h-24 w-32 text-slate-300">
+              <rect x="8" y="12" width="44" height="60" rx="6" fill="currentColor" opacity="0.35" transform="rotate(-8 30 42)"/>
+              <rect x="52" y="8" width="44" height="60" rx="6" fill="currentColor" opacity="0.55" transform="rotate(8 74 38)"/>
+            </svg>
+          </div>
+          <h2 class="mt-6 text-xl font-bold text-slate-900">@Localizer["Account_Selling_EmptyTitle"]</h2>
+          <p class="mt-2 text-sm text-slate-500">@emptyHint</p>
+          <div class="account-sell-actions account-sell-actions--empty mt-8">
+            <partial name="Partials/_SellingCreateButton" model="@(new AccountSellingCreateButtonViewModel { IsAuctionChannel = isAuctionChannel, ShowArrow = false })" />
+          </div>
+        </div>
+      }
+      else
+      {
+        <div class="rarecard-auction-grid mt-10">
+          @foreach (var item in Model.Listings)
+          {
+            <partial name="~/Views/Shared/Partials/_TradingCardAuctionCard.cshtml"
+                     model="@(new AuctionCardViewModel { Item = item, Variant = "grid", CardMode = Model.Channel == "buynow" ? "buynow" : "auction" })"/>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,112 @@
+@{
+    var modalReturnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+    var authError = TempData["AuthError"] as string;
+}
+
+<div id="authModalOverlay" class="home-auth-overlay home-auth-overlay--hidden" aria-hidden="true">
+  <div class="home-auth-backdrop" id="authModalBackdrop"></div>
+  <div class="home-auth-modal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+    <div class="home-auth-modal__grid">
+      <aside class="home-auth-visual" aria-hidden="true">
+        <div class="home-auth-visual__slides">
+          <div class="home-auth-visual__slide auth-visual-slide is-active" data-slide="0"
+               style="background-image: url('https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=900&h=1100&fit=crop&q=80');"></div>
+          <div class="home-auth-visual__slide auth-visual-slide" data-slide="1"
+               style="background-image: url('https://images.unsplash.com/photo-1546519638-68e109498ffc?w=900&h=1100&fit=crop&q=80');"></div>
+          <div class="home-auth-visual__slide auth-visual-slide" data-slide="2"
+               style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=900&h=1100&fit=crop&q=80');"></div>
+        </div>
+        <div class="home-auth-visual__overlay"></div>
+        <div class="home-auth-visual__content">
+          <p class="home-auth-visual__eyebrow" id="authVisualEyebrow">@Localizer["Auth_Slide1_Eyebrow"]</p>
+          <h3 class="home-auth-visual__title" id="authVisualTitle">@Localizer["Auth_Slide1_Title"]</h3>
+          <p class="home-auth-visual__desc" id="authVisualDesc">@Localizer["Auth_Slide1_Desc"]</p>
+        </div>
+        <div class="home-auth-visual__dots" role="tablist" aria-label="Gallery">
+          <button type="button" class="auth-visual-dot is-active" data-slide="0" aria-label="Slide 1"></button>
+          <button type="button" class="auth-visual-dot" data-slide="1" aria-label="Slide 2"></button>
+          <button type="button" class="auth-visual-dot" data-slide="2" aria-label="Slide 3"></button>
+        </div>
+      </aside>
+
+      <div class="home-auth-form-col">
+        <button type="button" id="authModalClose" class="home-auth-close" aria-label="@Localizer["Auth_Close"]">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+
+        <div class="home-auth-brand">
+          <span class="home-auth-logo">RareCard</span>
+        </div>
+
+        <h2 id="authModalTitle" class="home-auth-heading">@Localizer["Auth_Modal_Title"]</h2>
+        <p class="home-auth-subheading">@Localizer["Auth_Modal_Subtitle"]</p>
+
+        @if (!string.IsNullOrWhiteSpace(authError))
+        {
+          <p id="authModalError" class="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">@authError</p>
+        }
+
+        <div class="home-auth-tabs" role="tablist">
+          <button type="button" class="home-auth-tab home-auth-tab--active" data-tab="login" role="tab" aria-selected="true">@Localizer["Auth_LogIn"]</button>
+          <button type="button" class="home-auth-tab" data-tab="signup" role="tab" aria-selected="false">@Localizer["Auth_SignUp"]</button>
+        </div>
+
+        <div id="authPanelLogin" class="home-auth-panel" role="tabpanel">
+          <form method="post" asp-controller="Auth" asp-action="Login" class="home-auth-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@modalReturnUrl" />
+            <input type="hidden" name="fromModal" value="true" />
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalEmail">@Localizer["Auth_Email"]</label>
+              <input name="email" id="modalEmail" type="email" placeholder="@Localizer["Auth_Placeholder_Email"]" required class="home-auth-input"/>
+            </div>
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalPassword">@Localizer["Auth_Password"]</label>
+              <input name="password" id="modalPassword" type="password" placeholder="@Localizer["Auth_Placeholder_Password"]" required class="home-auth-input"/>
+            </div>
+            <label class="mb-4 flex items-center gap-2 text-sm text-slate-600">
+              <input name="rememberMe" type="checkbox" value="true" class="rounded border-slate-300 text-blue-700 focus:ring-blue-500" />
+              @Localizer["Auth_RememberMe"]
+            </label>
+            <button type="submit" class="home-auth-submit">@Localizer["Auth_Continue"]</button>
+          </form>
+        </div>
+
+        <div id="authPanelSignup" class="home-auth-panel hidden" role="tabpanel" hidden>
+          <form method="post" asp-controller="Auth" asp-action="SignUp" class="home-auth-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@modalReturnUrl" />
+            <input type="hidden" name="fromModal" value="true" />
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalFullName">@Localizer["Auth_FullName"]</label>
+              <input name="fullName" id="modalFullName" type="text" placeholder="@Localizer["Auth_Placeholder_FullName"]" required class="home-auth-input"/>
+            </div>
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalSignupEmail">@Localizer["Auth_Email"]</label>
+              <input name="email" id="modalSignupEmail" type="email" placeholder="@Localizer["Auth_Placeholder_Email"]" required class="home-auth-input"/>
+            </div>
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalPhone">@Localizer["Auth_Phone"]</label>
+              <input name="phoneNumber" id="modalPhone" type="tel" placeholder="@Localizer["Auth_Placeholder_Phone"]" required class="home-auth-input"/>
+            </div>
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalSignupPassword">@Localizer["Auth_Password"]</label>
+              <input name="password" id="modalSignupPassword" type="password" placeholder="@Localizer["Auth_Placeholder_SignupPassword"]" required class="home-auth-input"/>
+            </div>
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalConfirmPassword">@Localizer["Auth_ConfirmPassword"]</label>
+              <input name="confirmPassword" id="modalConfirmPassword" type="password" placeholder="@Localizer["Auth_Placeholder_ConfirmPassword"]" required class="home-auth-input"/>
+            </div>
+            <button type="submit" class="home-auth-submit">@Localizer["Auth_CreateAccount"]</button>
+          </form>
+        </div>
+
+        <p class="home-auth-legal">
+          @Localizer["Auth_Legal"]
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

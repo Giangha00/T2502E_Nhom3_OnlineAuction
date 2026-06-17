@@ -1,26 +1,29 @@
 ﻿(function () {
-    const form = document.getElementById("contactForm");
+    'use strict';
+
+    var form = document.getElementById('contactForm');
     if (!form) return;
 
-    const fullNameInput = document.getElementById("fullName");
-    const emailInput = document.getElementById("email");
-    const messageInput = document.getElementById("message");
+    var i18n = (window.contactConfig && window.contactConfig.i18n) || {};
 
-    const nameErrorSpan = document.getElementById("nameError");
-    const emailErrorSpan = document.getElementById("emailError");
-    const messageErrorSpan = document.getElementById("messageError");
+    var fullNameInput = document.getElementById('fullName');
+    var emailInput = document.getElementById('email');
+    var messageInput = document.getElementById('message');
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    var nameErrorSpan = document.getElementById('nameError');
+    var emailErrorSpan = document.getElementById('emailError');
+    var messageErrorSpan = document.getElementById('messageError');
 
-    // Real-time validation
-    fullNameInput?.addEventListener("blur", validateName);
-    emailInput?.addEventListener("blur", validateEmail);
-    messageInput?.addEventListener("blur", validateMessage);
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    fullNameInput?.addEventListener('blur', validateName);
+    emailInput?.addEventListener('blur', validateEmail);
+    messageInput?.addEventListener('blur', validateMessage);
 
     function validateName() {
         clearError(nameErrorSpan, fullNameInput);
-        if (fullNameInput.value.trim() === "") {
-            showError(nameErrorSpan, fullNameInput, "This field is required");
+        if (fullNameInput.value.trim() === '') {
+            showError(nameErrorSpan, fullNameInput, i18n.required || 'This field is required');
             return false;
         }
         return true;
@@ -28,11 +31,12 @@
 
     function validateEmail() {
         clearError(emailErrorSpan, emailInput);
-        if (emailInput.value.trim() === "") {
-            showError(emailErrorSpan, emailInput, "This field is required");
+        if (emailInput.value.trim() === '') {
+            showError(emailErrorSpan, emailInput, 'This field is required');
             return false;
-        } else if (!emailRegex.test(emailInput.value)) {
-            showError(emailErrorSpan, emailInput, "Invalid email format");
+        }
+        if (!emailRegex.test(emailInput.value)) {
+            showError(emailErrorSpan, emailInput, i18n.emailInvalid || 'Invalid email format');
             return false;
         }
         return true;
@@ -40,62 +44,47 @@
 
     function validateMessage() {
         clearError(messageErrorSpan, messageInput);
-        if (messageInput.value.trim() === "") {
-            showError(messageErrorSpan, messageInput, "This field is required");
+        if (messageInput.value.trim() === '') {
+            showError(messageErrorSpan, messageInput, i18n.required || 'This field is required');
             return false;
         }
         return true;
     }
 
     function showError(errorSpan, input, message) {
-        errorSpan.innerText = message;
-        errorSpan.style.display = "block";
-        input.classList.add("border-red-500", "focus:border-red-500", "focus:ring-red-500");
-        input.classList.remove("border-stone-300", "focus:border-amber-500", "focus:ring-amber-500");
+        errorSpan.textContent = message;
+        errorSpan.classList.remove('hidden');
+        input.classList.add('border-red-400', 'ring-2', 'ring-red-100');
     }
 
     function clearError(errorSpan, input) {
-        errorSpan.innerText = "";
-        errorSpan.style.display = "none";
-        input.classList.remove("border-red-500", "focus:border-red-500", "focus:ring-red-500");
-        input.classList.add("border-stone-300", "focus:border-amber-500", "focus:ring-amber-500");
+        errorSpan.textContent = '';
+        errorSpan.classList.add('hidden');
+        input.classList.remove('border-red-400', 'ring-2', 'ring-red-100');
     }
 
-    form.addEventListener("submit", function (e) {
+    form.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        // Clear all errors first
-        nameErrorSpan.innerText = "";
-        emailErrorSpan.innerText = "";
-        messageErrorSpan.innerText = "";
+        var isValid = validateName() & validateEmail() & validateMessage();
 
-        let isValid = true;
+        if (!isValid) return;
 
-        // Validate all fields
-        if (!validateName()) isValid = false;
-        if (!validateEmail()) isValid = false;
-        if (!validateMessage()) isValid = false;
+        var submitBtn = form.querySelector('button[type="submit"]');
+        var originalHtml = submitBtn.innerHTML;
 
-        if (isValid) {
-            // Show success feedback
-            const submitBtn = form.querySelector("button[type='submit']");
-            const originalText = submitBtn.innerText;
+        submitBtn.textContent = i18n.submitted || '✓ Request Submitted';
+        submitBtn.disabled = true;
+        submitBtn.classList.add('bg-emerald-700', 'hover:bg-emerald-700');
+        submitBtn.classList.remove('bg-blue-700', 'hover:bg-blue-800');
 
-            submitBtn.innerText = "✓ Message Sent Successfully!";
-            submitBtn.disabled = true;
-            submitBtn.classList.add("bg-green-700", "hover:bg-green-700");
-            submitBtn.classList.remove("bg-amber-700", "hover:bg-amber-800");
+        form.reset();
 
-            // Reset form
-            form.reset();
-
-            // Reset button after 3 seconds
-            setTimeout(() => {
-                submitBtn.innerText = originalText;
-                submitBtn.disabled = false;
-                submitBtn.classList.remove("bg-green-700", "hover:bg-green-700");
-                submitBtn.classList.add("bg-amber-700", "hover:bg-amber-800");
-            }, 3000);
-        }
+        setTimeout(function () {
+            submitBtn.innerHTML = originalHtml;
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('bg-emerald-700', 'hover:bg-emerald-700');
+            submitBtn.classList.add('bg-blue-700', 'hover:bg-blue-800');
+        }, 3000);
     });
 })();

@@ -2,6 +2,8 @@
     const form = document.getElementById('refundForm');
     if (!form) return;
 
+    const i18n = (window.refundConfig && window.refundConfig.i18n) || {};
+
     const orderSelect = document.getElementById('orderReference');
     const manualOrderField = document.getElementById('manualOrderField');
     const refundAmount = document.getElementById('refundAmount');
@@ -49,33 +51,33 @@
 
         let orderRef = orderValue;
         if (!orderValue) {
-            setError('orderReferenceError', 'Please select an order.');
+            setError('orderReferenceError', i18n.orderRequired || 'Please select an order.');
             valid = false;
         } else if (orderValue === 'other' && !manualRef) {
-            setError('orderReferenceError', 'Please enter your order reference.');
+            setError('orderReferenceError', i18n.manualRequired || 'Please enter your order reference.');
             valid = false;
         } else if (orderValue === 'other') {
             orderRef = manualRef;
         }
 
         if (!fullName) {
-            setError('fullNameError', 'Full name is required.');
+            setError('fullNameError', i18n.fullNameRequired || 'Full name is required.');
             valid = false;
         }
         if (!email || !isValidEmail(email)) {
-            setError('emailError', 'Please enter a valid email address.');
+            setError('emailError', i18n.emailInvalid || 'Please enter a valid email address.');
             valid = false;
         }
         if (!reason) {
-            setError('refundReasonError', 'Please select a refund reason.');
+            setError('refundReasonError', i18n.reasonRequired || 'Please select a refund reason.');
             valid = false;
         }
         if (!description || description.length < 20) {
-            setError('descriptionError', 'Please provide a detailed description (at least 20 characters).');
+            setError('descriptionError', i18n.descriptionRequired || 'Please provide a detailed description (at least 20 characters).');
             valid = false;
         }
         if (!agreePolicy) {
-            setError('agreePolicyError', 'You must agree to the refund policy.');
+            setError('agreePolicyError', i18n.policyRequired || 'You must agree to the refund policy.');
             valid = false;
         }
 

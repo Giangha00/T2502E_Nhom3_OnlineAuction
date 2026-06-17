@@ -14,8 +14,6 @@ public class UserFilterViewModel
 
     public UserStatus? Status { get; set; }
 
-    public Gender? Gender { get; set; }
-
     public DateTime? FromDate { get; set; }
 
     public DateTime? ToDate { get; set; }
@@ -24,5 +22,3 @@ public class UserFilterViewModel
 
     public int PageSize { get; set; } = 10;
 }
-
-

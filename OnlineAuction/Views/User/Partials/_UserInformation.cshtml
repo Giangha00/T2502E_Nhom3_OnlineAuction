@@ -1,25 +1,38 @@
 @model OnlineAuction.Models.UserBasicInfoViewModel
 
-<section class="user-information rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
-  <h2 class="text-xl font-bold text-stone-900">Basic Information</h2>
-  <p class="mt-1 text-sm text-stone-500">Contact and profile details</p>
+<section class="p-6 sm:p-8">
+  <div class="mb-6 flex items-center gap-3">
+    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+      </svg>
+    </div>
+    <div>
+      <h2 class="text-base font-bold text-slate-900">@Localizer["User_BasicInformation"]</h2>
+      <p class="text-xs text-slate-500">@Localizer["User_BasicInformation_Desc"]</p>
+    </div>
+  </div>
 
-  <dl class="mt-6 grid gap-5 sm:grid-cols-2">
+  <div class="grid gap-5 sm:grid-cols-2">
     <div>
-      <dt class="text-xs font-semibold uppercase tracking-widest text-stone-400">Full Name</dt>
-      <dd class="mt-1 text-base font-medium text-stone-900">@Model.FullName</dd>
+      <label class="user-detail-field__label">@Localizer["User_FullName"]</label>
+      <input type="text" readonly value="@Model.FullName"
+             class="user-detail-field__input"/>
     </div>
     <div>
-      <dt class="text-xs font-semibold uppercase tracking-widest text-stone-400">Email</dt>
-      <dd class="mt-1 text-base font-medium text-stone-900 break-all">@Model.Email</dd>
+      <label class="user-detail-field__label">@Localizer["User_Email"]</label>
+      <input type="text" readonly value="@Model.Email"
+             class="user-detail-field__input"/>
     </div>
     <div>
-      <dt class="text-xs font-semibold uppercase tracking-widest text-stone-400">Phone Number</dt>
-      <dd class="mt-1 text-base font-medium text-stone-900">@Model.PhoneNumber</dd>
+      <label class="user-detail-field__label">@Localizer["User_PhoneNumber"]</label>
+      <input type="text" readonly value="@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? Localizer["User_NotUpdated"].Value : Model.PhoneNumber)"
+             class="user-detail-field__input @(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "user-detail-field__input--placeholder" : "")"/>
     </div>
     <div>
-      <dt class="text-xs font-semibold uppercase tracking-widest text-stone-400">Address</dt>
-      <dd class="mt-1 text-base font-medium text-stone-900">@Model.Address</dd>
+      <label class="user-detail-field__label">@Localizer["User_Address"]</label>
+      <input type="text" readonly value="@(string.IsNullOrWhiteSpace(Model.Address) ? Localizer["User_NotUpdated"].Value : Model.Address)"
+             class="user-detail-field__input user-detail-field__input--placeholder"/>
     </div>
-  </dl>
+  </div>
 </section>
