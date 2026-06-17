@@ -505,6 +505,9 @@
   <data name="Product_Days" xml:space="preserve"><value>Days</value></data>
   <data name="Product_Hours" xml:space="preserve"><value>Hours</value></data>
   <data name="Product_Minutes" xml:space="preserve"><value>Minutes</value></data>
+  <data name="Product_Seconds" xml:space="preserve"><value>Seconds</value></data>
+  <data name="Product_NoBidsYet" xml:space="preserve"><value>No bids yet</value></data>
+  <data name="Product_AuctionEnded" xml:space="preserve"><value>Auction ended</value></data>
   <data name="Product_CountdownPreview" xml:space="preserve"><value>Static preview — countdown is not live</value></data>
   <data name="Product_AuctionInfo" xml:space="preserve"><value>Auction Information</value></data>
   <data name="Product_StartingPrice" xml:space="preserve"><value>Starting Price</value></data>
@@ -735,6 +738,8 @@
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Your items are protected by our vault security. All won auctions are double-verified before shipment to ensure grading integrity.</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Placing bid…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Unable to place bid. Please try again.</value></data>
+  <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Bid placed successfully!</value></data>
+  <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>Auction ended</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>Adding…</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>Added to cart.</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>Unable to add to cart. Please try again.</value></data>
