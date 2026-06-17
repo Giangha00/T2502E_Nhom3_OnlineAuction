@@ -1,0 +1,69 @@
+@model OnlineAuction.Models.SellingViewModel
+@{
+    ViewData["Title"] = "Selling";
+    var tabs = new[] { ("active", "Active"), ("sold", "Sold"), ("unsold", "Unsold"), ("scheduled", "Scheduled") };
+    var channels = new[] { ("buynow", "Buy Now"), ("auction", "Auction") };
+    var isAuctionChannel = string.Equals(Model.Channel, "auction", StringComparison.OrdinalIgnoreCase);
+    var emptyHint = isAuctionChannel
+        ? "Add cards to Auction and start selling."
+        : "Add cards to Buy Now and start selling.";
+    var sellButtonLabel = isAuctionChannel ? "Sell on Auction" : "Sell on Buy Now";
+}
+
+<div class="account-dashboard min-h-screen bg-slate-50">
+  <div class="site-shell account-dashboard__layout px-4 py-8 sm:px-6 lg:py-10">
+    <partial name="Partials/_AccountSidebar" model="Model.Shell"/>
+
+    <div class="account-dashboard__main">
+      <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Selling</h1>
+
+      <div class="mt-8 border-b border-stone-200">
+        <div class="flex flex-wrap gap-6">
+          @foreach (var (key, label) in tabs)
+          {
+            var isActive = string.Equals(Model.Tab, key, StringComparison.OrdinalIgnoreCase);
+            <a asp-controller="Account" asp-action="Selling" asp-route-tab="@key" asp-route-channel="@Model.Channel"
+               class="account-tab @(isActive ? "is-active" : "")">@label</a>
+          }
+        </div>
+      </div>
+
+      <div class="mt-5 flex flex-wrap gap-2">
+        @foreach (var (key, label) in channels)
+        {
+          var isActive = string.Equals(Model.Channel, key, StringComparison.OrdinalIgnoreCase);
+          <a asp-controller="Account" asp-action="Selling" asp-route-tab="@Model.Tab" asp-route-channel="@key"
+             class="account-pill @(isActive ? "is-active" : "")">@label</a>
+        }
+      </div>
+
+      @if (Model.Listings.Count == 0)
+      {
+        <div class="account-empty mt-16">
+          <div class="account-empty__art" aria-hidden="true">
+            <svg viewBox="0 0 120 96" fill="none" class="h-24 w-32 text-slate-300">
+              <rect x="8" y="12" width="44" height="60" rx="6" fill="currentColor" opacity="0.35" transform="rotate(-8 30 42)"/>
+              <rect x="52" y="8" width="44" height="60" rx="6" fill="currentColor" opacity="0.55" transform="rotate(8 74 38)"/>
+            </svg>
+          </div>
+          <h2 class="mt-6 text-xl font-bold text-slate-900">No listings yet.</h2>
+          <p class="mt-2 text-sm text-slate-500">@emptyHint</p>
+          <a asp-controller="Sell" asp-action="Create"
+             class="mt-8 inline-flex rounded-full bg-slate-900 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
+            @sellButtonLabel
+          </a>
+        </div>
+      }
+      else
+      {
+        <div class="rarecard-auction-grid mt-10">
+          @foreach (var item in Model.Listings)
+          {
+            <partial name="~/Views/Shared/Partials/_TradingCardAuctionCard.cshtml"
+                     model="@(new AuctionCardViewModel { Item = item, Variant = "grid", CardMode = Model.Channel == "buynow" ? "buynow" : "auction" })"/>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

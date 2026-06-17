@@ -36,6 +36,18 @@
 
   if (!overlay) return;
 
+  var returnUrlInputs = overlay.querySelectorAll('input[name="returnUrl"]');
+  var defaultReturnUrl = returnUrlInputs.length
+    ? returnUrlInputs[0].value
+    : window.location.pathname + window.location.search;
+
+  function setReturnUrl(url) {
+    var nextUrl = url || defaultReturnUrl;
+    returnUrlInputs.forEach(function (input) {
+      input.value = nextUrl;
+    });
+  }
+
   function switchTab(tabName) {
     tabs.forEach(function (tab) {
       var isActive = tab.dataset.tab === tabName;
@@ -86,7 +98,8 @@
     }
   }
 
-  function openModal(tabName) {
+  function openModal(tabName, returnUrl) {
+    setReturnUrl(returnUrl);
     switchTab(tabName || 'login');
     overlay.classList.remove('home-auth-overlay--hidden');
     overlay.setAttribute('aria-hidden', 'false');
@@ -112,12 +125,16 @@
     overlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('home-auth-open');
     stopCarousel();
+    setReturnUrl(null);
   }
 
   triggers.forEach(function (trigger) {
     trigger.addEventListener('click', function (e) {
       e.preventDefault();
-      openModal(trigger.getAttribute('data-auth-tab') || 'login');
+      openModal(
+        trigger.getAttribute('data-auth-tab') || 'login',
+        trigger.getAttribute('data-auth-return-url')
+      );
     });
   });
 

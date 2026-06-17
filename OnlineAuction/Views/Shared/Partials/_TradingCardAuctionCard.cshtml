@@ -2,8 +2,10 @@
 @{
     var item = Model.Item;
     var variant = Model.Variant ?? "grid";
+    var isBuyNow = string.Equals(Model.CardMode, "buynow", StringComparison.OrdinalIgnoreCase);
     var isEndingSoon = item.Status == "Ending Soon";
     var isWon = item.Status == "Won";
+    var actionLabel = isBuyNow ? "Add to Cart" : (isWon ? "Complete Payment" : "Bid Now");
     var filterAttrs = Model.EnableFiltering
         ? $"data-id=\"{item.Id}\" data-name=\"{item.Name.ToLowerInvariant()}\" data-category=\"{item.Category}\" data-price=\"{item.CurrentPrice}\" data-time=\"{item.TimeRemaining}\" data-year=\"{item.Year}\" data-condition=\"{item.Condition}\" data-ending-soon=\"{isEndingSoon.ToString().ToLowerInvariant()}\""
         : "";
@@ -64,7 +66,7 @@ else if (variant == "compact")
 else
 {
     <article class="rarecard-card rarecard-card--grid group @(Model.EnableFiltering ? "auction-card" : "")" @Html.Raw(filterAttrs)>
-        <a asp-controller="@(isWon ? "Order" : "Auction")"
+        <a asp-controller="@(isWon ? "Order" : isBuyNow ? "BuyNow" : "Auction")"
            asp-action="@(isWon ? "Index" : "Detail")"
            asp-route-id="@(isWon ? null : item.Id)"
            class="block">
@@ -107,7 +109,7 @@ else
                         else
                         {
                             <span class="mt-4 block w-full rounded-full bg-blue-700 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-white transition group-hover:bg-blue-800">
-                                Bid Now
+                                @actionLabel
                             </span>
                         }
                     }

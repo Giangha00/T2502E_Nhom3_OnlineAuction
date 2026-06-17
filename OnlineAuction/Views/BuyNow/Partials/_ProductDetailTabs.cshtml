@@ -1,0 +1,48 @@
+@model OnlineAuction.Models.ProductDetailViewModel
+
+<section class="product-detail-tabs mt-10">
+  <div class="product-detail-tabs__nav" role="tablist">
+    <button type="button" class="product-detail-tabs__tab is-active" role="tab" aria-selected="true" data-tab="about">About the work</button>
+    <button type="button" class="product-detail-tabs__tab" role="tab" aria-selected="false" data-tab="grading">Grading</button>
+    <button type="button" class="product-detail-tabs__tab" role="tab" aria-selected="false" data-tab="shipping">Shipping</button>
+  </div>
+
+  <div class="product-detail-tabs__panel is-active" role="tabpanel" data-panel="about">
+    <div class="product-description text-sm leading-relaxed text-slate-600">
+      @Html.Raw(Model.DescriptionHtml)
+    </div>
+    <div class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div>
+        <p class="text-xs text-slate-400">Year</p>
+        <p class="mt-1 text-sm font-medium text-slate-900">@(Model.Year > 0 ? Model.Year.ToString() : "—")</p>
+      </div>
+      <div>
+        <p class="text-xs text-slate-400">Set</p>
+        <p class="mt-1 text-sm font-medium text-slate-900">@Model.SetName</p>
+      </div>
+      <div>
+        <p class="text-xs text-slate-400">Language</p>
+        <p class="mt-1 text-sm font-medium text-slate-900">@Model.Language</p>
+      </div>
+      <div>
+        <p class="text-xs text-slate-400">Card Number</p>
+        <p class="mt-1 text-sm font-medium text-slate-900">@Model.CardNumber</p>
+      </div>
+    </div>
+
+    @if (Model.Documents.Count > 0)
+    {
+      <div class="mt-8">
+        @await Html.PartialAsync("~/Views/Auction/Partials/_DocumentSection.cshtml", Model)
+      </div>
+    }
+  </div>
+
+  <div class="product-detail-tabs__panel" role="tabpanel" data-panel="grading" hidden>
+    @await Html.PartialAsync("~/Views/Auction/Partials/_GradingSection.cshtml", Model)
+  </div>
+
+  <div class="product-detail-tabs__panel" role="tabpanel" data-panel="shipping" hidden>
+    @await Html.PartialAsync("~/Views/Auction/Partials/_ShippingSection.cshtml", Model)
+  </div>
+</section>
