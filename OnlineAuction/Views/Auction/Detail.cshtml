@@ -5,7 +5,13 @@
     {
         ["placingBid"] = Localizer["Js_ProductDetail_PlacingBid"].Value,
         ["bid"] = Localizer["Product_Bid"].Value,
-        ["bidFailed"] = Localizer["Js_ProductDetail_BidFailed"].Value
+        ["bidFailed"] = Localizer["Js_ProductDetail_BidFailed"].Value,
+        ["bidSuccess"] = Localizer["Js_ProductDetail_BidSuccess"].Value,
+        ["auctionEnded"] = Localizer["Js_ProductDetail_AuctionEnded"].Value,
+        ["winning"] = Localizer["Product_Winning"].Value,
+        ["outbid"] = Localizer["Product_Outbid"].Value,
+        ["noBidsYet"] = Localizer["Product_NoBidsYet"].Value,
+        ["bidsCount"] = Localizer["Product_BidsCount", 0].Value.Replace("0", "{0}")
     };
 }
 
@@ -30,6 +36,11 @@
 @section Scripts {
   <script>
     window.productDetailConfig = {
+      auctionId: @Model.Id,
+      bidStep: @Model.BidStep.ToString(System.Globalization.CultureInfo.InvariantCulture),
+      endDate: @Html.Raw(JsonSerializer.Serialize(Model.EndDate.ToUniversalTime().ToString("o"))),
+      canBid: @(Model.CanPlaceBid ? "true" : "false"),
+      bidOptionCount: 35,
       i18n: @Html.Raw(JsonSerializer.Serialize(productDetailI18n))
     };
   </script>

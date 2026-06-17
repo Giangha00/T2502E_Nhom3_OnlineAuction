@@ -8,9 +8,16 @@
     if (!string.IsNullOrEmpty(Model.Condition)) specs.Add(Model.Condition);
     if (!string.IsNullOrEmpty(Model.CertificateNumber)) specs.Add(Localizer["Product_CertPrefix", Model.CertificateNumber].Value);
     var isLoggedIn = User.Identity?.IsAuthenticated == true;
+    var endDateIso = Model.EndDate.ToUniversalTime().ToString("o");
 }
 
-<div class="product-bid-panel" data-is-logged-in="@(isLoggedIn ? "true" : "false")" data-auction-id="@Model.Id">
+<div class="product-bid-panel"
+     data-is-logged-in="@(isLoggedIn ? "true" : "false")"
+     data-auction-id="@Model.Id"
+     data-end-date="@endDateIso"
+     data-bid-step="@Model.BidStep.ToString("0.##")"
+     data-current-price="@Model.CurrentPrice.ToString("0.##")"
+     data-can-bid="@(Model.CanPlaceBid ? "true" : "false")">
   <p class="text-sm text-slate-500">@Localizer["Product_Lot", Model.LotNumber]</p>
 
   <h1 class="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">@Model.Category</h1>
@@ -39,12 +46,12 @@
   <div class="mt-5 flex items-start justify-between gap-6">
     <div>
       <p class="text-sm text-slate-700">@Localizer["Product_CurrentBid"]</p>
-      <p class="mt-1 text-xs text-slate-500">
+      <p id="bidCountLabel" class="mt-1 text-xs text-slate-500">
         @Localizer["Product_BidsCount", Model.BidCount]@(Model.ReserveMet ? $", {Localizer["Product_ReserveMet"]}" : "")
       </p>
       <p class="mt-0.5 text-xs text-slate-500">@Localizer["Product_WatchersCount", Model.WatcherCount]</p>
     </div>
-    <p class="text-3xl font-bold tabular-nums text-slate-900 sm:text-4xl">$@Model.CurrentPrice.ToString("N0")</p>
+    <p id="currentPriceDisplay" class="text-3xl font-bold tabular-nums text-slate-900 sm:text-4xl">$@Model.CurrentPrice.ToString("N0")</p>
   </div>
 
   <p class="mt-4 text-xs leading-relaxed text-slate-500">
@@ -62,7 +69,8 @@
     </label>
     <div class="relative mt-2">
       <select id="bidAmount" name="bidAmount"
-              class="w-full appearance-none rounded-md border border-slate-300 bg-white py-3 pl-4 pr-10 text-sm font-medium text-slate-800 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900">
+              class="w-full appearance-none rounded-md border border-slate-300 bg-white py-3 pl-4 pr-10 text-sm font-medium text-slate-800 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+              @(Model.CanPlaceBid ? null : "disabled")>
         @for (var i = 0; i < bidOptionCount; i++)
         {
           var amount = minBid + Model.BidStep * i;
@@ -73,18 +81,43 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
       </svg>
     </div>
+    <p class="mt-2 text-xs text-slate-400">
+      @Localizer["Product_MinBid"] <span id="minBidDisplay" class="font-semibold text-slate-600">$@minBid.ToString("N0")</span>
+      · @Localizer["Product_Step"] <span class="font-semibold text-slate-600">$@Model.BidStep.ToString("N0")</span>
+    </p>
   </div>
 
+  <div id="bidFeedback" class="mt-3 hidden rounded-md px-3 py-2 text-sm font-medium" role="status" aria-live="polite"></div>
+
   <button type="button" id="placeBidBtn"
-          class="mt-4 flex w-full items-center justify-center rounded-md bg-slate-900 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800">
-    @Localizer["Product_Bid"]
+          class="mt-4 flex w-full items-center justify-center rounded-md bg-slate-900 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+          @(Model.CanPlaceBid ? null : "disabled")>
+    @(Model.CanPlaceBid ? Localizer["Product_Bid"].Value : Localizer["Product_AuctionEnded"].Value)
   </button>
 
-  <div class="mt-5 space-y-1 text-sm">
-    <p class="font-medium text-blue-700">
+  <div class="mt-5 space-y-2 text-sm">
+    <div class="grid grid-cols-4 gap-2 text-center">
+      <div class="rounded-md bg-slate-50 px-2 py-2">
+        <p id="cdDays" class="text-lg font-bold tabular-nums text-slate-900">@Model.CountdownDays.ToString("D2")</p>
+        <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">@Localizer["Product_Days"]</p>
+      </div>
+      <div class="rounded-md bg-slate-50 px-2 py-2">
+        <p id="cdHours" class="text-lg font-bold tabular-nums text-slate-900">@Model.CountdownHours.ToString("D2")</p>
+        <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">@Localizer["Product_Hours"]</p>
+      </div>
+      <div class="rounded-md bg-slate-50 px-2 py-2">
+        <p id="cdMinutes" class="text-lg font-bold tabular-nums text-slate-900">@Model.CountdownMinutes.ToString("D2")</p>
+        <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">@Localizer["Product_Minutes"]</p>
+      </div>
+      <div class="rounded-md bg-slate-50 px-2 py-2">
+        <p id="cdSeconds" class="text-lg font-bold tabular-nums text-slate-900">@Model.CountdownSeconds.ToString("D2")</p>
+        <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">@Localizer["Product_Seconds"]</p>
+      </div>
+    </div>
+    <p id="countdownSummary" class="font-medium text-blue-700">
       @Localizer["Product_CountdownIn", Model.CountdownDays, Model.CountdownHours]
     </p>
-    <p class="text-slate-600">@Localizer["Product_EndsAt", Model.EndDate.ToString("MMM dd 'at' h:mmtt")]</p>
+    <p id="endsAtLabel" class="text-slate-600">@Localizer["Product_EndsAt", Model.EndDate.ToString("MMM dd 'at' h:mmtt")]</p>
     <p class="text-xs text-slate-400">@Localizer["Product_ClosureNote"]</p>
   </div>
 

@@ -51,6 +51,7 @@ internal static class ProductDetailMapper
             CountdownSeconds = seconds,
             AuctionStatus = auctionStatus,
             StatusBadgeClass = badgeClass,
+            CanPlaceBid = CanAcceptBids(auction),
             Seller = seller,
             Grading = BuildGrading(product.GradeLabel),
             BidHistory = MapBidHistory(bids),
@@ -91,7 +92,7 @@ internal static class ProductDetailMapper
         };
     }
 
-    private static List<BidHistoryItemViewModel> MapBidHistory(IEnumerable<Bid> bids) =>
+    public static List<BidHistoryItemViewModel> MapBidHistory(IEnumerable<Bid> bids) =>
         bids.Select(bid => new BidHistoryItemViewModel
         {
             BidderName = FormatBidderName(bid.Bidder),
@@ -157,6 +158,10 @@ internal static class ProductDetailMapper
             remaining.Minutes,
             remaining.Seconds);
     }
+
+    public static bool CanAcceptBids(Auction auction) =>
+        auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon &&
+        auction.EndDate.ToUniversalTime() > DateTime.UtcNow;
 
     private static (string Status, string BadgeClass) MapAuctionStatus(string status, DateTime endDate)
     {
