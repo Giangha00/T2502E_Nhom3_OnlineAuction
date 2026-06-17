@@ -55,7 +55,7 @@ internal static class ProductDetailMapper
             BidCount = bids.Count,
             LotNumber = 0,
             WatcherCount = registrationCount,
-            EstimatedValue = 0,
+            EstimatedValue = product.EstimatedValue ?? 0,
             ReserveMet = auction.CurrentPrice >= auction.StartingPrice,
             AuctionEventName = string.IsNullOrWhiteSpace(auction.AuctionEventName)
                 ? "RareCard Vault: Premium Trading Card Auction"
