@@ -258,8 +258,6 @@ public class UserService : IUserService
 
     public async Task<UserFormViewModel?> GetEditFormAsync(int id)
     {
-        Console.WriteLine("PUBLIC PROFILE RUNNING");
-        
         var user = await _dbContext.Users.AsNoTracking()
             .FirstOrDefaultAsync(user => user.Id == id);
 
