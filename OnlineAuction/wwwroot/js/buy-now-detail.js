@@ -1,6 +1,7 @@
 (function () {
   'use strict';
 
+  var i18n = (window.buyNowDetailConfig && window.buyNowDetailConfig.i18n) || {};
   var panel = document.querySelector('.product-buy-panel');
   var addToCartBtn = document.getElementById('addToCartBtn');
   var messageEl = document.getElementById('addToCartMessage');
@@ -21,7 +22,7 @@
     if (!productId) return;
 
     addToCartBtn.disabled = true;
-    addToCartBtn.textContent = 'Adding…';
+    addToCartBtn.textContent = i18n.adding || 'Adding…';
 
     var body = new URLSearchParams();
     body.append('productId', productId);
@@ -52,17 +53,17 @@
         }
 
         addToCartBtn.disabled = false;
-        addToCartBtn.textContent = 'Add to Cart';
+        addToCartBtn.textContent = i18n.addToCart || 'Add to Cart';
 
         if (messageEl) {
-          messageEl.textContent = data.message || 'Added to cart.';
+          messageEl.textContent = data.message || i18n.addedToCart || 'Added to cart.';
           messageEl.classList.remove('hidden');
         }
       })
       .catch(function () {
         addToCartBtn.disabled = false;
-        addToCartBtn.textContent = 'Add to Cart';
-        window.alert('Unable to add to cart. Please try again.');
+        addToCartBtn.textContent = i18n.addToCart || 'Add to Cart';
+        window.alert(i18n.addFailed || 'Unable to add to cart. Please try again.');
       });
   });
 })();

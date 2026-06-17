@@ -4,6 +4,8 @@
     var form = document.getElementById('contactForm');
     if (!form) return;
 
+    var i18n = (window.contactConfig && window.contactConfig.i18n) || {};
+
     var fullNameInput = document.getElementById('fullName');
     var emailInput = document.getElementById('email');
     var messageInput = document.getElementById('message');
@@ -21,7 +23,7 @@
     function validateName() {
         clearError(nameErrorSpan, fullNameInput);
         if (fullNameInput.value.trim() === '') {
-            showError(nameErrorSpan, fullNameInput, 'This field is required');
+            showError(nameErrorSpan, fullNameInput, i18n.required || 'This field is required');
             return false;
         }
         return true;
@@ -34,7 +36,7 @@
             return false;
         }
         if (!emailRegex.test(emailInput.value)) {
-            showError(emailErrorSpan, emailInput, 'Invalid email format');
+            showError(emailErrorSpan, emailInput, i18n.emailInvalid || 'Invalid email format');
             return false;
         }
         return true;
@@ -43,7 +45,7 @@
     function validateMessage() {
         clearError(messageErrorSpan, messageInput);
         if (messageInput.value.trim() === '') {
-            showError(messageErrorSpan, messageInput, 'This field is required');
+            showError(messageErrorSpan, messageInput, i18n.required || 'This field is required');
             return false;
         }
         return true;
@@ -71,7 +73,7 @@
         var submitBtn = form.querySelector('button[type="submit"]');
         var originalHtml = submitBtn.innerHTML;
 
-        submitBtn.innerHTML = '✓ Request Submitted';
+        submitBtn.textContent = i18n.submitted || '✓ Request Submitted';
         submitBtn.disabled = true;
         submitBtn.classList.add('bg-emerald-700', 'hover:bg-emerald-700');
         submitBtn.classList.remove('bg-blue-700', 'hover:bg-blue-800');

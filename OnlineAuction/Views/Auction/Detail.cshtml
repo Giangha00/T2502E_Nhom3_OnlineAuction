@@ -1,4 +1,13 @@
+@using System.Text.Json
 @model OnlineAuction.Models.ProductDetailViewModel
+@{
+    var productDetailI18n = new Dictionary<string, string>
+    {
+        ["placingBid"] = Localizer["Js_ProductDetail_PlacingBid"].Value,
+        ["bid"] = Localizer["Product_Bid"].Value,
+        ["bidFailed"] = Localizer["Js_ProductDetail_BidFailed"].Value
+    };
+}
 
 <div class="rarecard-page bg-white">
   <div class="w-full px-4 py-8 sm:px-8 lg:px-12 lg:py-10">
@@ -19,5 +28,10 @@
 </div>
 
 @section Scripts {
+  <script>
+    window.productDetailConfig = {
+      i18n: @Html.Raw(JsonSerializer.Serialize(productDetailI18n))
+    };
+  </script>
   <script src="~/js/product-detail.js" asp-append-version="true"></script>
 }

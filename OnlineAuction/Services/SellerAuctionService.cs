@@ -26,33 +26,54 @@ public class SellerAuctionService : ISellerAuctionService
         _photoService = photoService;
     }
 
-    public async Task<List<AuctionItemViewModel>> GetSellerAuctionsAsync(int sellerId)
+    public async Task<List<AuctionItemViewModel>> GetSellerAuctionsAsync(int sellerId, string? channel = null)
     {
-        // Read dung Database that: products.seller_id -> auctions.
-        // AsNoTracking dung cho man hinh chi doc de EF khong theo doi thay doi entity.
-        return await _db.Auctions
+        var normalizedChannel = channel?.ToLowerInvariant();
+
+        var rows = await _db.Auctions
             .AsNoTracking()
             .Where(auction =>
                 auction.Product.SellerId == sellerId &&
-                auction.Status != AuctionStatuses.Cancelled)
+                auction.Status != AuctionStatuses.Cancelled &&
+                (normalizedChannel == null ||
+                 (normalizedChannel == ListingTypes.BuyNow
+                     ? auction.ListingType == ListingTypes.BuyNow
+                     : auction.ListingType == ListingTypes.Auction)))
             .OrderByDescending(auction => auction.CreatedAt)
-            .Select(auction => new AuctionItemViewModel
+            .Select(auction => new
             {
-                Id = auction.Id,
-                Name = auction.Product.Name,
-                Category = auction.Product.Category.Name,
+                auction.Id,
+                auction.StartingPrice,
+                auction.CurrentPrice,
+                auction.Status,
+                auction.EndDate,
+                auction.ListingType,
+                ProductName = auction.Product.Name,
+                CategoryName = auction.Product.Category.Name,
                 ImageUrl = auction.Product.PrimaryImage,
-                StartingPrice = auction.StartingPrice,
-                CurrentPrice = auction.CurrentPrice,
-                Status = auction.Status,
-                Grade = auction.Product.GradeLabel ?? string.Empty,
+                Grade = auction.Product.GradeLabel,
                 Condition = auction.Product.Condition,
-                Year = auction.Product.Year ?? 0,
-                TimeRemaining = auction.EndDate > DateTime.UtcNow
-                    ? $"{(auction.EndDate - DateTime.UtcNow).Days} days left"
-                    : "Ended"
+                Year = auction.Product.Year
             })
             .ToListAsync();
+
+        return rows.Select(auction => new AuctionItemViewModel
+        {
+            Id = auction.Id,
+            Name = auction.ProductName,
+            Category = auction.CategoryName,
+            ImageUrl = auction.ImageUrl,
+            StartingPrice = auction.StartingPrice,
+            CurrentPrice = auction.CurrentPrice,
+            Status = auction.Status,
+            Grade = auction.Grade ?? string.Empty,
+            Condition = auction.Condition,
+            Year = auction.Year ?? 0,
+            ListingType = auction.ListingType,
+            TimeRemaining = auction.ListingType == ListingTypes.BuyNow
+                ? "In stock"
+                : FormatAuctionTimeRemaining(auction.EndDate)
+        }).ToList();
     }
 
     public async Task<(bool Success, string Message, int? AuctionId)> CreateAsync(
@@ -115,6 +136,7 @@ public class SellerAuctionService : ISellerAuctionService
             CurrentPrice = model.StartingPrice,
             StartDate = model.StartDate,
             EndDate = model.EndDate,
+            ListingType = ListingTypes.Auction,
             Status = AuctionStatuses.Live,
             CreatedAt = DateTime.UtcNow
         };
@@ -123,6 +145,68 @@ public class SellerAuctionService : ISellerAuctionService
         await _db.SaveChangesAsync();
 
         return (true, "Auction created successfully.", auction.Id);
+    }
+
+    public async Task<(bool Success, string Message, int? ProductId)> CreateBuyNowAsync(
+        CreateBuyNowViewModel model,
+        int sellerId)
+    {
+        if (model.Price <= 0)
+        {
+            return (false, "Price must be greater than 0.", null);
+        }
+
+        string? imageUrl;
+        try
+        {
+            imageUrl = await _photoService.AddPhotoAsync(model.PrimaryImageFile, ProductImageFolder);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return (false, ex.Message, null);
+        }
+
+        imageUrl = string.IsNullOrWhiteSpace(imageUrl)
+            ? DefaultProductImageUrl
+            : imageUrl;
+
+        var category = await GetOrCreateCategoryAsync(model.Category);
+        var now = DateTime.UtcNow;
+
+        var product = new Product
+        {
+            SellerId = sellerId,
+            Name = model.ProductName.Trim(),
+            CategoryId = category.Id,
+            ShortDescription = string.IsNullOrWhiteSpace(model.Subtitle) ? null : model.Subtitle.Trim(),
+            DescriptionHtml = model.ProductDescription,
+            Condition = model.Condition,
+            Year = model.Year,
+            SetName = string.IsNullOrWhiteSpace(model.SetName) ? null : model.SetName.Trim(),
+            GradeLabel = string.IsNullOrWhiteSpace(model.Grade) ? null : model.Grade.Trim(),
+            CertNumber = string.IsNullOrWhiteSpace(model.CertificateNumber) ? null : model.CertificateNumber.Trim(),
+            PrimaryImage = imageUrl,
+            Category = category,
+            CreatedAt = now
+        };
+
+        var auction = new Auction
+        {
+            Product = product,
+            StartingPrice = model.Price,
+            BidStep = 0.01m,
+            CurrentPrice = model.Price,
+            StartDate = now,
+            EndDate = now.AddYears(1),
+            ListingType = ListingTypes.BuyNow,
+            Status = AuctionStatuses.Live,
+            CreatedAt = now
+        };
+
+        _db.Auctions.Add(auction);
+        await _db.SaveChangesAsync();
+
+        return (true, "Buy now listing created successfully.", product.Id);
     }
 
     public async Task<SellerAuctionFormViewModel?> GetEditFormAsync(int auctionId, int sellerId)
@@ -267,6 +351,27 @@ public class SellerAuctionService : ISellerAuctionService
         await _db.SaveChangesAsync();
 
         return (true, "Auction cancelled successfully.");
+    }
+
+    private static string FormatAuctionTimeRemaining(DateTime endDate)
+    {
+        var remaining = endDate - DateTime.UtcNow;
+        if (remaining <= TimeSpan.Zero)
+        {
+            return "Ended";
+        }
+
+        if (remaining.TotalDays >= 1)
+        {
+            return $"{(int)remaining.TotalDays} days left";
+        }
+
+        if (remaining.TotalHours >= 1)
+        {
+            return $"{(int)remaining.TotalHours} hours left";
+        }
+
+        return $"{Math.Max(1, (int)remaining.TotalMinutes)} minutes left";
     }
 
     private async Task<Category> GetOrCreateCategoryAsync(string categoryName)

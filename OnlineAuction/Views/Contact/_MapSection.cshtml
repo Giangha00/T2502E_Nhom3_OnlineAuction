@@ -3,10 +3,10 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mb-8">
             <h2 class="text-3xl font-bold text-slate-900 sm:text-4xl">
-                Our Location
+                @Localizer["Contact_Map_Title"]
             </h2>
             <p class="mt-2 text-base text-slate-600">
-                Visit us at our Hanoi headquarters or connect with us online
+                @Localizer["Contact_Map_Desc"]
             </p>
         </div>
 
@@ -32,7 +32,7 @@
             <div class="space-y-6">
                 <!-- Main Office -->
                 <div class="rounded-xl border border-slate-200 bg-white/80 p-5 shadow-sm">
-                    <h3 class="font-semibold text-slate-900 mb-3">Main Office</h3>
+                    <h3 class="font-semibold text-slate-900 mb-3">@Localizer["Contact_MainOffice"]</h3>
                     <div class="space-y-3 text-sm text-slate-600">
                         <div class="flex gap-2">
                             <svg class="h-5 w-5 text-blue-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,19 +51,19 @@
 
                 <!-- Hours -->
                 <div class="rounded-xl border border-slate-200 bg-white/80 p-5 shadow-sm">
-                    <h3 class="font-semibold text-slate-900 mb-3">Business Hours</h3>
+                    <h3 class="font-semibold text-slate-900 mb-3">@Localizer["Contact_BusinessHours"]</h3>
                     <div class="space-y-2 text-sm text-slate-600">
                         <div class="flex justify-between">
-                            <span>Monday - Friday</span>
+                            <span>@Localizer["Contact_MonFri"]</span>
                             <span class="font-medium text-slate-900">08:00 - 18:00</span>
                         </div>
                         <div class="flex justify-between">
-                            <span>Saturday</span>
+                            <span>@Localizer["Contact_Saturday"]</span>
                             <span class="font-medium text-slate-900">09:00 - 17:00</span>
                         </div>
                         <div class="flex justify-between">
-                            <span>Sunday</span>
-                            <span class="font-medium text-slate-900">Closed</span>
+                            <span>@Localizer["Contact_Sunday"]</span>
+                            <span class="font-medium text-slate-900">@Localizer["Contact_Closed"]</span>
                         </div>
                     </div>
                 </div>
@@ -74,7 +74,7 @@
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                     </svg>
-                    Map embedded on this page
+                    @Localizer["Contact_MapEmbedded"]
                 </button>
             </div>
         </div>

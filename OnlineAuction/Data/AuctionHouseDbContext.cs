@@ -167,6 +167,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(a => a.BidStep).HasColumnName("bid_step").HasPrecision(18, 2);
             entity.Property(a => a.CurrentPrice).HasColumnName("current_price").HasPrecision(18, 2);
             entity.Property(a => a.BuyNowPrice).HasColumnName("buy_now_price").HasPrecision(18, 2);
+            entity.Property(a => a.ListingType).HasColumnName("listing_type").HasMaxLength(20).IsRequired().HasDefaultValue(ListingTypes.Auction);
             entity.Property(a => a.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(AuctionStatuses.Live);
             entity.Property(a => a.StartDate).HasColumnName("start_date");
             entity.Property(a => a.EndDate).HasColumnName("end_date");

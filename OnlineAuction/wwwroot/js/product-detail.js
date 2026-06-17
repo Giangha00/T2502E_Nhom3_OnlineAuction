@@ -1,6 +1,7 @@
 (function () {
   'use strict';
 
+  var i18n = (window.productDetailConfig && window.productDetailConfig.i18n) || {};
   var mainImage = document.getElementById('mainProductImage');
   var thumbs = document.querySelectorAll('.gallery-thumb');
   var bidSelect = document.getElementById('bidAmount');
@@ -70,7 +71,7 @@
       if (!auctionId || !amount) return;
 
       placeBidBtn.disabled = true;
-      placeBidBtn.textContent = 'Placing bid…';
+      placeBidBtn.textContent = i18n.placingBid || 'Placing bid…';
 
       var body = new URLSearchParams();
       body.append('auctionId', auctionId);
@@ -105,8 +106,8 @@
         })
         .catch(function () {
           placeBidBtn.disabled = false;
-          placeBidBtn.textContent = 'Bid';
-          window.alert('Unable to place bid. Please try again.');
+          placeBidBtn.textContent = i18n.bid || 'Bid';
+          window.alert(i18n.bidFailed || 'Unable to place bid. Please try again.');
         });
     });
   }

@@ -1,6 +1,6 @@
 @model OnlineAuction.Models.RefundConfirmationViewModel
 @{
-    ViewData["Title"] = "Refund Request Submitted";
+    ViewData["Title"] = Localizer["RefundConfirm_PageTitle"];
 }
 
 <div class="rarecard-page bg-white">
@@ -13,49 +13,49 @@
                 </svg>
             </div>
 
-            <h1 class="mt-6 text-3xl font-bold text-slate-900">Refund Request Received</h1>
+            <h1 class="mt-6 text-3xl font-bold text-slate-900">@Localizer["RefundConfirm_Title"]</h1>
             <p class="mt-3 text-slate-600">
-                Thank you. Your request has been submitted and is now under review by our support team.
+                @Localizer["RefundConfirm_ThankYou"]
             </p>
 
             <div class="mt-8 rounded-2xl border border-slate-100 bg-stone-50/80 p-6 text-left">
                 <dl class="space-y-4 text-sm">
                     <div class="flex justify-between gap-4">
-                        <dt class="text-slate-500">Request ID</dt>
+                        <dt class="text-slate-500">@Localizer["RefundConfirm_RequestId"]</dt>
                         <dd class="font-mono font-semibold text-slate-900">@Model.RequestId</dd>
                     </div>
                     <div class="flex justify-between gap-4">
-                        <dt class="text-slate-500">Order Reference</dt>
+                        <dt class="text-slate-500">@Localizer["Refund_OrderReference"]</dt>
                         <dd class="font-mono font-medium text-slate-900">@Model.OrderReference</dd>
                     </div>
                     <div class="flex justify-between gap-4">
-                        <dt class="text-slate-500">Reason</dt>
+                        <dt class="text-slate-500">@Localizer["Refund_Reason"]</dt>
                         <dd class="max-w-[60%] text-right font-medium text-slate-900">@Model.Reason</dd>
                     </div>
                     <div class="flex justify-between gap-4 border-t border-slate-200 pt-4">
-                        <dt class="font-semibold text-slate-900">Estimated Review</dt>
+                        <dt class="font-semibold text-slate-900">@Localizer["RefundConfirm_EstimatedReview"]</dt>
                         <dd class="font-medium text-blue-700">@Model.EstimatedReviewDays</dd>
                     </div>
                 </dl>
             </div>
 
             <div class="mt-8 rounded-xl bg-blue-50 p-4 text-left text-sm text-blue-900">
-                <p class="font-medium">What happens next?</p>
+                <p class="font-medium">@Localizer["PaymentConfirm_WhatNext"]</p>
                 <ul class="mt-2 list-inside list-disc space-y-1 text-blue-800">
-                    <li>Our team will verify your order and review submitted evidence.</li>
-                    <li>You will receive an email update once a decision is made.</li>
-                    <li>Approved refunds are processed within 7–14 business days.</li>
+                    <li>@Localizer["RefundConfirm_Step1"]</li>
+                    <li>@Localizer["RefundConfirm_Step2"]</li>
+                    <li>@Localizer["RefundConfirm_Step3"]</li>
                 </ul>
             </div>
 
             <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
                 <a asp-controller="Contact" asp-action="Index"
                    class="rounded-xl border border-amber-700 px-6 py-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50">
-                    Contact Support
+                    @Localizer["RefundConfirm_ContactSupport"]
                 </a>
                 <a asp-controller="Home" asp-action="Index"
                    class="rounded-xl bg-blue-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800">
-                    Back to Home
+                    @Localizer["PaymentConfirm_BackHome"]
                 </a>
             </div>
         </div>
