@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Localization
 @using Microsoft.AspNetCore.Identity
 @using OnlineAuction.Entities
+@using OnlineAuction.Models
 @inject IStringLocalizer<SharedResource> Localizer
 @inject UserManager<ApplicationUser> UserManager
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
@@ -16,12 +17,14 @@
     var isStandalonePage = isAuthPage || isPaymentInfoPage;
     var isHomePage = string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase);
     var isAuctionPage = string.Equals(currentController, "Auction", StringComparison.OrdinalIgnoreCase);
+    var isBuyNowPage = string.Equals(currentController, "BuyNow", StringComparison.OrdinalIgnoreCase);
     var isPolicyPage = string.Equals(currentController, "Policy", StringComparison.OrdinalIgnoreCase);
     var isSellPage = string.Equals(currentController, "Sell", StringComparison.OrdinalIgnoreCase);
     var isContactPage = string.Equals(currentController, "Contact", StringComparison.OrdinalIgnoreCase);
     var isAboutPage = string.Equals(currentController, "AboutUs", StringComparison.OrdinalIgnoreCase);
     var isFaqPage = string.Equals(currentController, "Faq", StringComparison.OrdinalIgnoreCase);
     var isRefundPage = string.Equals(currentController, "Refund", StringComparison.OrdinalIgnoreCase);
+    var isAccountPage = string.Equals(currentController, "Account", StringComparison.OrdinalIgnoreCase);
     var isAdminArea = string.Equals(ViewContext.RouteData.Values["area"]?.ToString(), "Admin", StringComparison.OrdinalIgnoreCase);
     var isRareCardTheme = !isStandalonePage && !isAdminArea;
 
@@ -32,6 +35,27 @@
     var currentUserId = currentUser?.Id ?? 0;
     var orderCount = isLoggedIn ? OnlineAuction.Data.WonOrderStore.GetCount(Context.Session) : 0;
     var isOrderPage = string.Equals(currentController, "Order", StringComparison.OrdinalIgnoreCase);
+
+    var userInitials = "U";
+    AccountShellViewModel? accountMenu = null;
+    if (isLoggedIn)
+    {
+        var nameParts = displayName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        userInitials = nameParts.Length >= 2
+            ? $"{nameParts[0][0]}{nameParts[^1][0]}".ToUpperInvariant()
+            : (string.IsNullOrWhiteSpace(displayName) ? "U" : char.ToUpperInvariant(displayName[0]).ToString());
+        var vaultId = currentUserId > 0 ? (11600000 + currentUserId).ToString() : "11608867";
+        accountMenu = new AccountShellViewModel
+        {
+            UserId = currentUserId,
+            DisplayName = displayName,
+            Initials = userInitials,
+            VaultAddressName = displayName,
+            VaultAddressLine1 = $"7560 SW Durham Rd, ID {vaultId}",
+            VaultAddressLine2 = "Tigard, OR 97224",
+            VaultId = vaultId
+        };
+    }
 
     string NavLinkClass(bool isActive) =>
         isActive
@@ -82,8 +106,8 @@
                                 class="@NavLinkClass(isHomePage)">@Localizer["Home"]</a></li>
                         <li><a asp-controller="Auction" asp-action="Index"
                                 class="@NavLinkClass(isAuctionPage)">@Localizer["Auction"]</a></li>
-                        <li><a asp-controller="Sell" asp-action="Create"
-                                class="@NavLinkClass(isSellPage)">@Localizer["Sell"]</a></li>
+                        <li><a asp-controller="BuyNow" asp-action="Index"
+                                class="@NavLinkClass(isBuyNowPage)">@Localizer["BuyNow"]</a></li>
                         <li><a asp-controller="AboutUs" asp-action="About"
                                 class="@NavLinkClass(isAboutPage)">@Localizer["AboutUs"]</a></li>
                         <li><a asp-controller="Contact" asp-action="Index"
@@ -115,32 +139,20 @@
 
                     @if (isLoggedIn)
                     {
-                        <div class="group relative hidden lg:block">
-                            <button type="button"
+                        <div class="relative hidden lg:block" id="userMenuRoot">
+                            <button type="button" id="userMenuBtn"
                                     class="flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white py-1.5 pl-2 pr-3 text-sm font-medium text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                    aria-haspopup="true">
-                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-700 text-xs font-bold uppercase text-white">
-                                    @(string.IsNullOrWhiteSpace(displayName) ? "U" : displayName.Trim()[0].ToString())
-                                </span>
+                                    aria-haspopup="true" aria-expanded="false" aria-controls="userMenuPanel">
+                                <span class="account-sidebar__avatar account-sidebar__avatar--sm">@userInitials</span>
                                 <span class="max-w-[140px] truncate" title="@displayName">@displayName</span>
-                                <svg class="h-4 w-4 text-slate-400 transition group-hover:text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <svg class="h-4 w-4 text-slate-400 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
                                 </svg>
                             </button>
-
-                            <div class="invisible absolute right-0 top-full z-50 mt-2 w-44 rounded-xl border border-slate-200 bg-white py-2 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                                <a asp-controller="User" asp-action="Detail" asp-route-id="@currentUserId"
-                                   class="block px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700">
-                                    Profile
-                                </a>
-                                <form asp-controller="Auth" asp-action="Logout" method="post">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit"
-                                            class="block w-full cursor-pointer px-4 py-2 text-left text-sm font-medium text-red-600 transition hover:bg-red-50">
-                                        Log out
-                                    </button>
-                                </form>
-                            </div>
+                            @if (accountMenu is not null)
+                            {
+                                @await Html.PartialAsync("Partials/_UserMenuDropdown", accountMenu)
+                            }
                         </div>
                     }
                     else
@@ -170,8 +182,8 @@
                             class="block border-b border-stone-100 py-3 text-sm font-medium @MobileNavLinkClass(isHomePage)">@Localizer["Home"]</a></li>
                     <li><a asp-controller="Auction" asp-action="Index"
                             class="block border-b border-stone-100 py-3 text-sm font-medium @MobileNavLinkClass(isAuctionPage)">@Localizer["Auction"]</a></li>
-                    <li><a asp-controller="Sell" asp-action="Create"
-                            class="block border-b border-stone-100 py-3 text-sm font-medium @MobileNavLinkClass(isSellPage)">@Localizer["Sell"]</a></li>
+                    <li><a asp-controller="BuyNow" asp-action="Index"
+                            class="block border-b border-stone-100 py-3 text-sm font-medium @MobileNavLinkClass(isBuyNowPage)">@Localizer["BuyNow"]</a></li>
                     <li><a asp-controller="AboutUs" asp-action="About"
                             class="block border-b border-stone-100 py-3 text-sm font-medium @MobileNavLinkClass(isAboutPage)">@Localizer["AboutUs"]</a></li>
                     <li><a asp-controller="Contact" asp-action="Index"
@@ -182,9 +194,21 @@
                         @if (isLoggedIn)
                         {
                             <p class="text-sm font-medium text-slate-700">@displayName</p>
-                            <a asp-controller="User" asp-action="Detail" asp-route-id="@currentUserId"
+                            <a asp-controller="Account" asp-action="Selling"
                                class="w-full rounded-full border border-blue-200 py-2 text-center text-sm font-medium text-blue-700 transition hover:bg-blue-50">
-                                Profile
+                                Selling
+                            </a>
+                            <a asp-controller="Account" asp-action="Wallet"
+                               class="w-full rounded-full border border-slate-200 py-2 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                                Wallet
+                            </a>
+                            <a asp-controller="Account" asp-action="Orders"
+                               class="w-full rounded-full border border-slate-200 py-2 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                                Orders
+                            </a>
+                            <a asp-controller="User" asp-action="Detail" asp-route-id="@currentUserId"
+                               class="w-full rounded-full border border-slate-200 py-2 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                                @Localizer["Layout_Profile"]
                             </a>
                             <form asp-controller="Auth" asp-action="Logout" method="post">
                                 @Html.AntiForgeryToken()
@@ -294,6 +318,7 @@
         @if (isLoggedIn)
         {
             <script src="~/js/header-notifications.js" asp-append-version="true"></script>
+            <script src="~/js/user-menu.js" asp-append-version="true"></script>
         }
         @if (TempData["OpenAuthModal"] is string openAuthTab)
         {
