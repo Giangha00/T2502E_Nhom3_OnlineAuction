@@ -1,75 +1,186 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OnlineAuction.Data;
+using Microsoft.AspNetCore.Identity;
+using OnlineAuction.Entities;
 using OnlineAuction.Models;
+using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
 
+[Authorize]
 public class SellController : Controller
 {
+    private readonly ISellService _sellService;
+    private readonly ISellerAuctionService _sellerAuctionService;
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public SellController(
+        ISellService sellService,
+        ISellerAuctionService sellerAuctionService,
+        UserManager<ApplicationUser> userManager)
+    {
+        _sellService = sellService;
+        _sellerAuctionService = sellerAuctionService;
+        _userManager = userManager;
+    }
+
     [HttpGet]
     public IActionResult Create()
     {
-        return View(BuildForm());
+        return View(_sellService.BuildCreateForm());
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Create(CreateAuctionViewModel model)
+    public async Task<IActionResult> Create(CreateAuctionViewModel model)
     {
-        PopulateOptions(model);
+        // View upload hien tai chua dat name cho input file.
+        // Neu sau nay view gui file len bang bat ky input file nao, dong nay se lay file dau tien de upload Cloudinary.
+        model.PrimaryImageFile ??= Request.Form.Files.FirstOrDefault();
 
-        if (model.StartDate < DateTime.Now.AddMinutes(-1))
+        foreach (var (key, message) in _sellService.ValidateCreateAuction(model))
         {
-            ModelState.AddModelError(nameof(model.StartDate), "Start date cannot be in the past.");
-        }
-
-        if (model.EndDate <= model.StartDate)
-        {
-            ModelState.AddModelError(nameof(model.EndDate), "End date must be greater than start date.");
-        }
-
-        if (model.BuyNowPrice.HasValue && model.BuyNowPrice.Value <= model.StartingPrice)
-        {
-            ModelState.AddModelError(nameof(model.BuyNowPrice), "Buy now price must be greater than starting price.");
+            ModelState.AddModelError(key, message);
         }
 
         if (!ModelState.IsValid)
         {
             if (Request.Headers.ContainsKey("X-Requested-With"))
             {
-                return BadRequest(ModelState);
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ModelState.Values
+                        .SelectMany(entry => entry.Errors)
+                        .Select(error => error.ErrorMessage)
+                        .FirstOrDefault() ?? "Please check the auction form."
+                });
             }
 
             return View(model);
         }
 
-        TempData["SuccessMessage"] = $"Your auction \"{model.ProductName}\" has been created successfully!";
+        var sellerId = await GetCurrentSellerIdAsync();
+        if (!sellerId.HasValue)
+        {
+            const string message = "No seller account was found. Please create a user account first.";
+
+            if (Request.Headers.ContainsKey("X-Requested-With"))
+            {
+                return BadRequest(new { success = false, message });
+            }
+
+            TempData["ErrorMessage"] = message;
+            return View(model);
+        }
+
+        var result = await _sellerAuctionService.CreateAsync(model, sellerId.Value);
+        if (!result.Success)
+        {
+            ModelState.AddModelError(string.Empty, result.Message);
+
+            if (Request.Headers.ContainsKey("X-Requested-With"))
+            {
+                return BadRequest(new { success = false, message = result.Message });
+            }
+
+            return View(model);
+        }
+
+        TempData["SuccessMessage"] = result.Message;
 
         if (Request.Headers.ContainsKey("X-Requested-With"))
         {
-            return Ok(new { success = true, message = TempData["SuccessMessage"] });
+            return Ok(new
+            {
+                success = true,
+                message = result.Message,
+                redirectUrl = Url.Action("Detail", "User", new { id = sellerId.Value }) + "#seller-auctions"
+            });
         }
 
-        return RedirectToAction(nameof(Create));
+        return RedirectToAction("Selling", "Account", new { tab = "active", channel = "auction" });
     }
 
-    private static CreateAuctionViewModel BuildForm()
+    [HttpGet]
+    public IActionResult BuyNow()
     {
-        var model = new CreateAuctionViewModel
+        return View(_sellService.BuildBuyNowForm());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> BuyNow(CreateBuyNowViewModel model)
+    {
+        model.PrimaryImageFile ??= Request.Form.Files.FirstOrDefault();
+
+        foreach (var (key, message) in _sellService.ValidateCreateBuyNow(model))
         {
-            StartDate = DateTime.Now.AddHours(1),
-            EndDate = DateTime.Now.AddDays(7),
-            BidStep = 50,
-            AuctionType = "Normal",
-            Condition = "New"
-        };
-        PopulateOptions(model);
-        return model;
+            ModelState.AddModelError(key, message);
+        }
+
+        if (!ModelState.IsValid)
+        {
+            if (Request.Headers.ContainsKey("X-Requested-With"))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ModelState.Values
+                        .SelectMany(entry => entry.Errors)
+                        .Select(error => error.ErrorMessage)
+                        .FirstOrDefault() ?? "Please check the listing form."
+                });
+            }
+
+            return View(model);
+        }
+
+        var sellerId = await GetCurrentSellerIdAsync();
+        if (!sellerId.HasValue)
+        {
+            const string message = "No seller account was found. Please create a user account first.";
+
+            if (Request.Headers.ContainsKey("X-Requested-With"))
+            {
+                return BadRequest(new { success = false, message });
+            }
+
+            TempData["ErrorMessage"] = message;
+            return View(model);
+        }
+
+        var result = await _sellerAuctionService.CreateBuyNowAsync(model, sellerId.Value);
+        if (!result.Success)
+        {
+            ModelState.AddModelError(string.Empty, result.Message);
+
+            if (Request.Headers.ContainsKey("X-Requested-With"))
+            {
+                return BadRequest(new { success = false, message = result.Message });
+            }
+
+            return View(model);
+        }
+
+        TempData["SuccessMessage"] = result.Message;
+
+        if (Request.Headers.ContainsKey("X-Requested-With"))
+        {
+            return Ok(new
+            {
+                success = true,
+                message = result.Message,
+                redirectUrl = Url.Action("Selling", "Account", new { tab = "active", channel = "buynow" })
+            });
+        }
+
+        return RedirectToAction("Selling", "Account", new { tab = "active", channel = "buynow" });
     }
 
-    private static void PopulateOptions(CreateAuctionViewModel model)
+    private async Task<int?> GetCurrentSellerIdAsync()
     {
-        model.Categories = MockAuctionData.GetCategoryNames().ToList();
-        model.Conditions = CreateAuctionMockData.Conditions.ToList();
+        var user = await _userManager.GetUserAsync(User);
+        return user?.Id;
     }
 }

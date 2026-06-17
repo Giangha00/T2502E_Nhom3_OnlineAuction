@@ -1,38 +1,37 @@
+@using System.Text.Json
 @model OnlineAuction.Models.ProductDetailViewModel
 @{
-    ViewData["Title"] = Model.Name;
+    var productDetailI18n = new Dictionary<string, string>
+    {
+        ["placingBid"] = Localizer["Js_ProductDetail_PlacingBid"].Value,
+        ["bid"] = Localizer["Product_Bid"].Value,
+        ["bidFailed"] = Localizer["Js_ProductDetail_BidFailed"].Value
+    };
 }
 
-<section class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-  @await Html.PartialAsync("Partials/_Breadcrumb", Model)
-  @await Html.PartialAsync("Partials/_ProductHeader", Model)
+<div class="rarecard-page bg-white">
+  <div class="w-full px-4 py-8 sm:px-8 lg:px-12 lg:py-10">
+    @await Html.PartialAsync("Partials/_Breadcrumb", Model)
 
-  <div class="grid gap-8 lg:grid-cols-2 lg:gap-10">
-    <div class="sticky-below-header">
-      @await Html.PartialAsync("Partials/_ProductGallery", Model)
+    <div class="product-detail-hero">
+      <div class="product-detail-hero__media">
+        @await Html.PartialAsync("Partials/_ProductGallery", Model)
+        @await Html.PartialAsync("Partials/_ProductDetailTabs", Model)
+      </div>
+      <div class="product-detail-hero__info sticky-below-header">
+        @await Html.PartialAsync("Partials/_ProductBidPanel", Model)
+      </div>
     </div>
-    <div>
-      @await Html.PartialAsync("Partials/_ProductInfo", Model)
-    </div>
+
+    @await Html.PartialAsync("Partials/_RelatedProducts", Model)
   </div>
-
-  <div class="mt-10 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-    <div class="border-b border-stone-100 px-6 py-4">
-      <h2 class="text-lg font-semibold text-stone-900">Product Description</h2>
-      <p class="mt-1 text-sm text-stone-500">@Model.Name · @Model.Category · @Model.Condition</p>
-    </div>
-    <div class="product-description px-6 py-6">
-      @Html.Raw(Model.DescriptionHtml)
-    </div>
-  </div>
-
-  <div class="mt-8">
-    @await Html.PartialAsync("Partials/_DocumentSection", Model)
-  </div>
-
-  @await Html.PartialAsync("Partials/_RelatedProducts", Model)
-</section>
+</div>
 
 @section Scripts {
+  <script>
+    window.productDetailConfig = {
+      i18n: @Html.Raw(JsonSerializer.Serialize(productDetailI18n))
+    };
+  </script>
   <script src="~/js/product-detail.js" asp-append-version="true"></script>
 }

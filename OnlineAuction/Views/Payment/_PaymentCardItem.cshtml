@@ -3,9 +3,9 @@
 @{
     var typeLabel = Model.CardType switch
     {
-        "mastercard" => "Mastercard",
-        "other" => "Other",
-        _ => "Visa"
+        "mastercard" => Localizer["Payment_Mastercard"].Value,
+        "other" => Localizer["Payment_Other"].Value,
+        _ => Localizer["Payment_Visa"].Value
     };
     var typeIcon = Model.CardType switch
     {
@@ -15,7 +15,7 @@
     };
 }
 
-<article class="payment-card-item rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition hover:border-amber-300"
+<article class="payment-card-item rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-300"
          data-card-id="@Model.Id"
          data-card-type="@Model.CardType"
          data-holder="@Model.HolderName"
@@ -29,22 +29,22 @@
                 @typeIcon
             </span>
             <div>
-                <p class="text-sm font-semibold text-stone-900">@typeLabel</p>
-                <p class="mt-1 font-mono text-sm tracking-wider text-stone-600">@Model.MaskedNumber</p>
-                <p class="mt-1 text-xs text-stone-500">Expires: @Model.ExpiryMonth/@Model.ExpiryYear</p>
+                <p class="text-sm font-semibold text-slate-900">@typeLabel</p>
+                <p class="mt-1 font-mono text-sm tracking-wider text-slate-600">@Model.MaskedNumber</p>
+                <p class="mt-1 text-xs text-slate-500">@Localizer["Payment_Expires"] @Model.ExpiryMonth/@Model.ExpiryYear</p>
             </div>
         </div>
         @if (Model.IsDefault)
         {
-            <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-800">Default</span>
+            <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-800">@Localizer["Payment_Default"]</span>
         }
     </div>
-    <div class="mt-4 flex flex-wrap gap-2 border-t border-stone-100 pt-4">
-        <button type="button" data-action="edit" class="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:border-amber-500 hover:text-amber-700">Edit</button>
-        <button type="button" data-action="remove" class="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50">Remove</button>
+    <div class="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
+        <button type="button" data-action="edit" class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-amber-500 hover:text-blue-700">@Localizer["Payment_Edit"]</button>
+        <button type="button" data-action="remove" class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50">@Localizer["Payment_Remove"]</button>
         @if (!Model.IsDefault)
         {
-            <button type="button" data-action="set-default" class="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-amber-700 transition hover:border-amber-500 hover:bg-amber-50">Set Default</button>
+            <button type="button" data-action="set-default" class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:border-amber-500 hover:bg-blue-50">@Localizer["Payment_SetDefaultBtn"]</button>
         }
     </div>
 </article>

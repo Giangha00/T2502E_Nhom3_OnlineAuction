@@ -59,19 +59,19 @@
             </div>
 
             <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Gender</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.Gender</dd>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Username</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.Username</dd>
             </div>
 
             <div>
                 <dt class="text-theme-xs font-medium uppercase text-gray-400">Created Date</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</dd>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
             </div>
 
             <div>
                 <dt class="text-theme-xs font-medium uppercase text-gray-400">Updated Date</dt>
                 <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    @(Model.UpdatedDate?.ToString("dd/MM/yyyy HH:mm") ?? "Not updated")
+                    @(Model.UpdatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Not updated")
                 </dd>
             </div>
 

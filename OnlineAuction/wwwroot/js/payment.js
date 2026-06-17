@@ -2,6 +2,8 @@
     const form = document.getElementById('paymentForm');
     if (!form) return;
 
+    const i18n = (window.paymentConfig && window.paymentConfig.i18n) || {};
+
     const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
     const cardDetails = document.getElementById('cardDetails');
     const bankDetails = document.getElementById('bankDetails');
@@ -48,31 +50,31 @@
         const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked');
 
         if (!fullName) {
-            setError('fullNameError', 'Full name is required.');
+            setError('fullNameError', i18n.fullNameRequired || 'Full name is required.');
             valid = false;
         }
         if (!phone) {
-            setError('phoneError', 'Phone number is required.');
+            setError('phoneError', i18n.phoneRequired || 'Phone number is required.');
             valid = false;
         }
         if (!email || !isValidEmail(email)) {
-            setError('emailError', 'Please enter a valid email address.');
+            setError('emailError', i18n.emailInvalid || 'Please enter a valid email address.');
             valid = false;
         }
         if (!address) {
-            setError('addressError', 'Street address is required.');
+            setError('addressError', i18n.addressRequired || 'Street address is required.');
             valid = false;
         }
         if (!city) {
-            setError('cityError', 'City is required.');
+            setError('cityError', i18n.cityRequired || 'City is required.');
             valid = false;
         }
         if (!selectedMethod) {
-            setError('paymentMethodError', 'Please select a payment method.');
+            setError('paymentMethodError', i18n.methodRequired || 'Please select a payment method.');
             valid = false;
         }
         if (!agreeTerms) {
-            setError('termsError', 'You must agree to the payment policy.');
+            setError('termsError', i18n.termsRequired || 'You must agree to the payment policy.');
             valid = false;
         }
 

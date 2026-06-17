@@ -9,6 +9,8 @@ public class UserListItemViewModel
 
     public string FullName { get; set; } = string.Empty;
 
+    public string Username { get; set; } = string.Empty;
+
     public string Email { get; set; } = string.Empty;
 
     public string PhoneNumber { get; set; } = string.Empty;
@@ -19,8 +21,5 @@ public class UserListItemViewModel
 
     public UserStatus Status { get; set; }
 
-    public Gender Gender { get; set; }
-
-    public DateTime CreatedDate { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
-  

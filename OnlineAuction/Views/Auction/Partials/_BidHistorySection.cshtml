@@ -1,0 +1,39 @@
+@model OnlineAuction.Models.ProductDetailViewModel
+
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-left text-sm">
+      <thead class="border-b border-slate-100 bg-slate-50 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+        <tr>
+          <th class="px-5 py-3">@Localizer["Product_Bidder"]</th>
+          <th class="px-5 py-3">@Localizer["Product_BidAmount"]</th>
+          <th class="px-5 py-3">@Localizer["Product_DateTime"]</th>
+          <th class="px-5 py-3">@Localizer["Product_Status"]</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        @foreach (var bid in Model.BidHistory)
+        {
+          <tr>
+            <td class="px-5 py-4 font-medium text-slate-800">@bid.BidderName</td>
+            <td class="px-5 py-4 font-bold tabular-nums text-slate-900">$@bid.Amount.ToString("N0")</td>
+            <td class="px-5 py-4 text-slate-500">@bid.BidTime.ToString("MMM dd, yyyy · HH:mm")</td>
+            <td class="px-5 py-4">
+              @if (bid.IsWinning)
+              {
+                <span class="inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700">@Localizer["Product_Winning"]</span>
+              }
+              else
+              {
+                <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-500">@Localizer["Product_Outbid"]</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="border-t border-slate-100 px-5 py-3 text-center">
+    <a href="#" class="text-xs font-semibold text-blue-700 hover:text-blue-900">@Localizer["Product_ViewAllBids", Model.BidHistory.Count + 38]</a>
+  </div>
+</div>

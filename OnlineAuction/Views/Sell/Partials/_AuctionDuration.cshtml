@@ -4,26 +4,26 @@
     var endValue = Model.EndDate.ToString("yyyy-MM-ddTHH:mm");
 }
 
-<div class="overflow-hidden rounded-2xl border border-stone-200 bg-white/90 shadow-sm">
-  <div class="border-b border-stone-100 bg-gradient-to-r from-stone-50 to-amber-50/50 px-6 py-4">
-    <h2 class="flex items-center gap-2 text-lg font-semibold text-stone-900">
-      <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-700 text-sm font-bold text-white">4</span>
-      Auction Duration
+<div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+  <div class="border-b border-slate-100 px-6 py-5">
+    <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+      <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">4</span>
+      @Localizer["Sell_Section4_Title"]
     </h2>
-    <p class="mt-1 pl-10 text-sm text-stone-500">When your auction starts and ends</p>
+    <p class="mt-1 pl-10 text-sm text-slate-500">@Localizer["Sell_Section4_Desc"]</p>
   </div>
 
   <div class="grid gap-5 p-6 sm:grid-cols-2">
     <div>
-      <label for="startDate" class="mb-2 block text-sm font-medium text-stone-700">Start Date <span class="text-red-500">*</span></label>
+      <label for="startDate" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_StartDate"] <span class="text-red-500">*</span></label>
       <input type="datetime-local" id="startDate" name="StartDate" value="@startValue"
-             class="field-input w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100"/>
+             class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
       <p class="field-error mt-1 hidden text-xs text-red-600" data-for="startDate"></p>
     </div>
     <div>
-      <label for="endDate" class="mb-2 block text-sm font-medium text-stone-700">End Date <span class="text-red-500">*</span></label>
+      <label for="endDate" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_EndDate"] <span class="text-red-500">*</span></label>
       <input type="datetime-local" id="endDate" name="EndDate" value="@endValue"
-             class="field-input w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100"/>
+             class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
       <p class="field-error mt-1 hidden text-xs text-red-600" data-for="endDate"></p>
     </div>
   </div>

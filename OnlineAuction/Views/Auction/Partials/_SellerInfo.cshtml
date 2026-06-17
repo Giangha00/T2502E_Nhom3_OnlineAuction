@@ -1,19 +1,17 @@
 @model OnlineAuction.Models.SellerViewModel
 
-<div class="flex items-center gap-4 rounded-2xl border border-stone-200 bg-stone-50/80 p-4">
+<a asp-controller="User" asp-action="Detail" asp-route-id="@Model.Id"
+   class="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-200 hover:bg-blue-50/40">
   <img src="@Model.AvatarUrl" alt="@Model.Username"
-       class="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-amber-100"/>
+       class="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-blue-100 transition group-hover:ring-blue-200"/>
   <div class="min-w-0 flex-1">
-    <p class="text-xs font-semibold uppercase tracking-widest text-stone-400">Seller</p>
-    <p class="truncate text-base font-bold text-stone-900">@Model.Username</p>
-    <div class="mt-1 flex items-center gap-2 text-xs text-stone-500">
-      <span class="font-semibold text-amber-700">@Model.Rating.ToString("0.0")</span>
-      <span>·</span>
-      <span>@Model.SuccessfulSales sales</span>
-    </div>
+    <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">@Localizer["Product_Seller"]</p>
+    <p class="truncate text-sm font-bold text-slate-900 transition group-hover:text-blue-700">@Model.Username</p>
+    <p class="mt-0.5 text-xs text-slate-500">@Model.Rating.ToString("0.0") ★ · @Localizer["Product_SalesCount", Model.SuccessfulSales]</p>
   </div>
-  <a asp-controller="User" asp-action="Detail" asp-route-id="@Model.Id"
-     class="shrink-0 rounded-xl border border-amber-300 bg-white px-4 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-50">
-    View Seller
-  </a>
-</div>
+  <span class="shrink-0 text-slate-400 transition group-hover:text-blue-600" aria-hidden="true">
+    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
+    </svg>
+  </span>
+</a>

@@ -42,6 +42,12 @@
             </div>
 
             <div>
+                <label asp-for="Username" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="Username" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="Username" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div>
                 <label asp-for="Email" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
                 <input asp-for="Email" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
                 <span asp-validation-for="Email" class="text-theme-xs text-error-600"></span>
@@ -73,12 +79,6 @@
             </div>
 
             <div>
-                <label asp-for="Gender" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <select asp-for="Gender" asp-items="Model.GenderOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></select>
-                <span asp-validation-for="Gender" class="text-theme-xs text-error-600"></span>
-            </div>
-
-            <div>
                 <label asp-for="AvatarFile" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400">Replace Avatar</label>
                 <input asp-for="AvatarFile" type="file" accept=".jpg,.jpeg,.png,.webp" class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
                 <span asp-validation-for="AvatarFile" class="text-theme-xs text-error-600"></span>
@@ -93,7 +93,7 @@
                 Cancel
             </a>
 
-            <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
+            <button type="submit" class="cursor-pointer rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
                 Save Changes
             </button>
         </div>
