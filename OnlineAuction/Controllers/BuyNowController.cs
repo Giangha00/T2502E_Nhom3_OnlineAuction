@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Data;
+using OnlineAuction.Entities;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -15,9 +16,9 @@ public class BuyNowController : Controller
         _auctionService = auctionService;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var model = _auctionService.GetAuctionIndex();
+        var model = await _auctionService.GetAuctionIndexAsync(ListingTypes.BuyNow);
         return View(model);
     }
 
