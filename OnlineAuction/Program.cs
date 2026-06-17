@@ -113,6 +113,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     await UserSeeder.SeedAsync(dbContext, userManager);
+    await AuctionCatalogSeeder.SeedAsync(dbContext);
 }
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
