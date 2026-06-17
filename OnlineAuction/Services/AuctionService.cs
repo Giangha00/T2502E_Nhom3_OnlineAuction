@@ -49,6 +49,8 @@ public class AuctionService : IAuctionService
             .AsNoTracking()
             .Include(a => a.Product)
                 .ThenInclude(p => p.Seller)
+            .Include(a => a.Product)
+                .ThenInclude(p => p.Category)
             .Include(a => a.Bids)
                 .ThenInclude(b => b.Bidder)
             .FirstOrDefaultAsync(a => a.Id == id);
@@ -77,9 +79,10 @@ public class AuctionService : IAuctionService
         var related = await _dbContext.Auctions
             .AsNoTracking()
             .Include(a => a.Product)
+                .ThenInclude(p => p.Category)
             .Where(a =>
                 a.Id != id &&
-                a.Product.Category == auction.Product.Category &&
+                a.Product.CategoryId == auction.Product.CategoryId &&
                 (a.Status == AuctionStatuses.Live || a.Status == AuctionStatuses.EndingSoon))
             .OrderBy(a => a.EndDate)
             .Take(4)

@@ -20,7 +20,7 @@ internal static class ProductDetailMapper
             Id = auction.Id,
             Name = product.Name,
             ShortDescription = product.ShortDescription ?? BuildDefaultShortDescription(product),
-            Category = product.Category,
+            Category = GetCategoryName(product),
             Condition = FormatCondition(product.Condition),
             Grade = product.GradeLabel ?? "—",
             Subtitle = BuildSubtitle(product),
@@ -77,7 +77,7 @@ internal static class ProductDetailMapper
         {
             Id = auction.Id,
             Name = product.Name,
-            Category = product.Category,
+            Category = GetCategoryName(product),
             ImageUrl = product.PrimaryImage,
             StartingPrice = auction.StartingPrice,
             CurrentPrice = auction.CurrentPrice,
@@ -225,7 +225,7 @@ internal static class ProductDetailMapper
             parts.Add(product.Year.Value.ToString());
         }
 
-        return parts.Count > 0 ? string.Join(" · ", parts) : product.Category;
+        return parts.Count > 0 ? string.Join(" · ", parts) : GetCategoryName(product);
     }
 
     private static string FormatCondition(string condition)
@@ -238,8 +238,11 @@ internal static class ProductDetailMapper
         return char.ToUpperInvariant(condition[0]) + (condition.Length > 1 ? condition[1..] : string.Empty);
     }
 
+    private static string GetCategoryName(Product product) =>
+        product.Category?.Name ?? string.Empty;
+
     private static string BuildDefaultShortDescription(Product product) =>
-        $"Authenticated {product.Category} listing from RareCard Vault.";
+        $"Authenticated {GetCategoryName(product)} listing from RareCard Vault.";
 
     private static string BuildDescriptionHtml(Product product, Auction auction)
     {
@@ -252,7 +255,7 @@ internal static class ProductDetailMapper
             <p>{BuildDefaultShortDescription(product)}</p>
             <h3>Listing details</h3>
             <ul>
-                <li>Category: {product.Category}</li>
+                <li>Category: {GetCategoryName(product)}</li>
                 <li>Grade: {product.GradeLabel ?? "—"}</li>
                 <li>Starting price: ${auction.StartingPrice:N0}</li>
                 <li>Current price: ${auction.CurrentPrice:N0}</li>
