@@ -16,3 +16,7 @@ wwwroot/css/output.css
 
 # OS
 .DS_Store
+
+# App settings
+appsettings.json
+appsettings.*.json
