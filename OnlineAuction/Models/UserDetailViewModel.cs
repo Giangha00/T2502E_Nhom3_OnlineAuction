@@ -1,5 +1,7 @@
 namespace OnlineAuction.Models;
 
+using OnlineAuction.Entities;
+
 public class UserDetailViewModel
 {
     public bool IsOwner { get; set; }
@@ -8,6 +10,7 @@ public class UserDetailViewModel
     public UserBasicInfoViewModel BasicInfo { get; set; } = new();
     public SellerStatisticsViewModel Statistics { get; set; } = new();
     public List<AuctionItemViewModel> Auctions { get; set; } = [];
+    public List<AuctionItemViewModel> BuyNowListings { get; set; } = [];
     public SellerRatingViewModel Rating { get; set; } = new();
     public List<AuctionItemViewModel> RelatedAuctions { get; set; } = [];
 }
@@ -27,6 +30,14 @@ public class SellerAuctionCardViewModel
 {
     public AuctionItemViewModel Auction { get; set; } = new();
     public bool IsOwner { get; set; }
+}
+
+public class SellerListingListViewModel
+{
+    public bool IsOwner { get; set; }
+    public string Channel { get; set; } = ListingTypes.Auction;
+    public string SectionId { get; set; } = "seller-auctions";
+    public List<AuctionItemViewModel> Listings { get; set; } = [];
 }
 
 public class UserBasicInfoViewModel

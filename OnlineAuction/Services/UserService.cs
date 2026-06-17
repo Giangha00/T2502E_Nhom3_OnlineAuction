@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -18,15 +18,18 @@ public class UserService : IUserService
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IAvatarStorageService _avatarStorageService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ISellerAuctionService _sellerAuctionService;
 
     public UserService(
         AuctionHouseDbContext dbContext,
         IAvatarStorageService avatarStorageService,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        ISellerAuctionService sellerAuctionService)
     {
         _dbContext = dbContext;
         _avatarStorageService = avatarStorageService;
         _userManager = userManager;
+        _sellerAuctionService = sellerAuctionService;
     }
 
     public async Task<PublicUserDetailViewModel?> GetPublicProfileAsync(int id)
@@ -53,45 +56,9 @@ public class UserService : IUserService
             return null;
         }
 
-        // Lay danh sach auction cua seller theo quan he: products.seller_id -> auctions.product_id.
-        var sellerAuctions = await _dbContext.Auctions
-            .AsNoTracking()
-            .Where(auction =>
-                auction.Product.SellerId == id &&
-                auction.Status != AuctionStatuses.Cancelled)
-            .OrderByDescending(auction => auction.CreatedAt)
-            .Select(auction => new
-            {
-                auction.Id,
-                auction.StartingPrice,
-                auction.CurrentPrice,
-                auction.Status,
-                auction.EndDate,
-                ProductName = auction.Product.Name,
-                CategoryName = auction.Product.Category.Name,
-                auction.Product.PrimaryImage,
-                auction.Product.GradeLabel,
-                auction.Product.Condition,
-                auction.Product.Year
-            })
-            .ToListAsync();
-
-        var auctions = sellerAuctions
-            .Select(auction => new AuctionItemViewModel
-            {
-                Id = auction.Id,
-                Name = auction.ProductName,
-                Category = auction.CategoryName,
-                ImageUrl = auction.PrimaryImage,
-                StartingPrice = auction.StartingPrice,
-                CurrentPrice = auction.CurrentPrice,
-                Status = auction.Status,
-                TimeRemaining = FormatAuctionTimeRemaining(auction.EndDate),
-                Grade = auction.GradeLabel ?? string.Empty,
-                Condition = auction.Condition,
-                Year = auction.Year ?? 0
-            })
-            .ToList();
+        // Lay danh sach tin dang theo loai: dau gia va mua ngay.
+        var auctions = await _sellerAuctionService.GetSellerAuctionsAsync(id, ListingTypes.Auction);
+        var buyNowListings = await _sellerAuctionService.GetSellerAuctionsAsync(id, ListingTypes.BuyNow);
 
         var completedAuctions = await _dbContext.Auctions
             .AsNoTracking()
@@ -103,7 +70,8 @@ public class UserService : IUserService
             .AsNoTracking()
             .Where(auction =>
                 auction.Product.SellerId != id &&
-                auction.Status == AuctionStatuses.Live)
+                auction.Status == AuctionStatuses.Live &&
+                auction.ListingType == ListingTypes.Auction)
             .OrderByDescending(auction => auction.CreatedAt)
             .Take(3)
             .Select(auction => new
@@ -159,12 +127,13 @@ public class UserService : IUserService
             },
             Statistics = new SellerStatisticsViewModel
             {
-                TotalAuctions = auctions.Count,
+                TotalAuctions = auctions.Count + buyNowListings.Count,
                 CompletedAuctions = completedAuctions,
                 TotalSales = completedAuctions,
                 Rating = 0
             },
             Auctions = auctions,
+            BuyNowListings = buyNowListings,
             Rating = new SellerRatingViewModel
             {
                 AverageRating = 0,

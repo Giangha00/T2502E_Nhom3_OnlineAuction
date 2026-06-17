@@ -1,6 +1,6 @@
 @model OnlineAuction.Models.AccountShellViewModel
 @{
-    ViewData["Title"] = "Orders";
+    ViewData["Title"] = Localizer["Account_Orders"];
 }
 
 <div class="account-dashboard min-h-screen bg-slate-50">
@@ -8,15 +8,15 @@
     <partial name="Partials/_AccountSidebar" model="Model"/>
 
     <div class="account-dashboard__main">
-      <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Orders</h1>
-      <p class="mt-2 text-sm text-slate-500">Track and view your purchases.</p>
+      <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">@Localizer["Account_Orders"]</h1>
+      <p class="mt-2 text-sm text-slate-500">@Localizer["Account_Orders_Desc"]</p>
 
       <div class="account-empty mt-16">
-        <h2 class="text-xl font-bold text-slate-900">View your won auctions</h2>
-        <p class="mt-2 max-w-md text-sm text-slate-500">Complete payment for auctions you've won and track order status.</p>
+        <h2 class="text-xl font-bold text-slate-900">@Localizer["Account_Orders_WonTitle"]</h2>
+        <p class="mt-2 max-w-md text-sm text-slate-500">@Localizer["Account_Orders_WonDesc"]</p>
         <a asp-controller="Order" asp-action="Index"
            class="mt-8 inline-flex rounded-full bg-slate-900 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
-          Go to Won Auctions
+          @Localizer["Account_Orders_GoToWon"]
         </a>
       </div>
     </div>

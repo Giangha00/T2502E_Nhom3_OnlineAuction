@@ -1,6 +1,8 @@
 (function () {
     'use strict';
 
+    var i18n = (window.orderConfig && window.orderConfig.i18n) || {};
+
     function formatCountdown(deadlineMs) {
         var diff = Math.max(0, deadlineMs - Date.now());
         var totalMinutes = Math.floor(diff / 60000);
@@ -8,10 +10,12 @@
         var minutes = totalMinutes % 60;
 
         if (hours > 0) {
-            return hours + 'H ' + String(minutes).padStart(2, '0') + 'M REMAINING';
+            var hoursTemplate = i18n.remainingHours || '{0}H {1}M REMAINING';
+            return hoursTemplate.replace('{0}', hours).replace('{1}', String(minutes).padStart(2, '0'));
         }
 
-        return String(minutes).padStart(2, '0') + 'M REMAINING';
+        var minutesTemplate = i18n.remainingMinutes || '{0}M REMAINING';
+        return minutesTemplate.replace('{0}', String(minutes).padStart(2, '0'));
     }
 
     function updateDeadlines() {

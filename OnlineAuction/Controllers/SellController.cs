@@ -99,6 +99,82 @@ public class SellController : Controller
             });
         }
 
+        return RedirectToAction("Selling", "Account", new { tab = "active", channel = "auction" });
+    }
+
+    [HttpGet]
+    public IActionResult BuyNow()
+    {
+        return View(_sellService.BuildBuyNowForm());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> BuyNow(CreateBuyNowViewModel model)
+    {
+        model.PrimaryImageFile ??= Request.Form.Files.FirstOrDefault();
+
+        foreach (var (key, message) in _sellService.ValidateCreateBuyNow(model))
+        {
+            ModelState.AddModelError(key, message);
+        }
+
+        if (!ModelState.IsValid)
+        {
+            if (Request.Headers.ContainsKey("X-Requested-With"))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ModelState.Values
+                        .SelectMany(entry => entry.Errors)
+                        .Select(error => error.ErrorMessage)
+                        .FirstOrDefault() ?? "Please check the listing form."
+                });
+            }
+
+            return View(model);
+        }
+
+        var sellerId = await GetCurrentSellerIdAsync();
+        if (!sellerId.HasValue)
+        {
+            const string message = "No seller account was found. Please create a user account first.";
+
+            if (Request.Headers.ContainsKey("X-Requested-With"))
+            {
+                return BadRequest(new { success = false, message });
+            }
+
+            TempData["ErrorMessage"] = message;
+            return View(model);
+        }
+
+        var result = await _sellerAuctionService.CreateBuyNowAsync(model, sellerId.Value);
+        if (!result.Success)
+        {
+            ModelState.AddModelError(string.Empty, result.Message);
+
+            if (Request.Headers.ContainsKey("X-Requested-With"))
+            {
+                return BadRequest(new { success = false, message = result.Message });
+            }
+
+            return View(model);
+        }
+
+        TempData["SuccessMessage"] = result.Message;
+
+        if (Request.Headers.ContainsKey("X-Requested-With"))
+        {
+            return Ok(new
+            {
+                success = true,
+                message = result.Message,
+                redirectUrl = Url.Action("Selling", "Account", new { tab = "active", channel = "buynow" })
+            });
+        }
+
         return RedirectToAction("Selling", "Account", new { tab = "active", channel = "buynow" });
     }
 

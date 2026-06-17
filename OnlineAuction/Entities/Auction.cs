@@ -14,6 +14,8 @@ public class Auction : AuditableEntity
 
     public decimal? BuyNowPrice { get; set; }
 
+    public string ListingType { get; set; } = ListingTypes.Auction;
+
     public string Status { get; set; } = AuctionStatuses.Live;
 
     public DateTime StartDate { get; set; }
@@ -29,6 +31,12 @@ public class Auction : AuditableEntity
     public ICollection<Bid> Bids { get; set; } = [];
 
     public ICollection<OrderItem> OrderItems { get; set; } = [];
+}
+
+public static class ListingTypes
+{
+    public const string Auction = "auction";
+    public const string BuyNow = "buynow";
 }
 
 public static class AuctionStatuses

@@ -1,5 +1,7 @@
 namespace OnlineAuction.Models;
 
+using OnlineAuction.Entities;
+
 public class HomeViewModel
 {
     public List<AuctionItemViewModel> HotAuctions { get; set; } = [];
@@ -24,6 +26,7 @@ public class AuctionItemViewModel
     public decimal CurrentPrice { get; set; }
     public string Status { get; set; } = string.Empty;
     public string TimeRemaining { get; set; } = string.Empty;
+    public string ListingType { get; set; } = ListingTypes.Auction;
     public string Grade { get; set; } = string.Empty;
     public string Subtitle { get; set; } = string.Empty;
     public string Condition { get; set; } = "Graded";

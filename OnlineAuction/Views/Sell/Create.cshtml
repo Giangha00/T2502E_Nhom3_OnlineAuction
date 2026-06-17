@@ -1,7 +1,38 @@
+@using System.Text.Json
 @model OnlineAuction.Models.CreateAuctionViewModel
 @{
-    ViewData["Title"] = "Sell Your Card";
+    ViewData["Title"] = Localizer["Sell_PageTitle"];
     var successMessage = TempData["SuccessMessage"] as string;
+    var sellI18n = new Dictionary<string, string>
+    {
+        ["productNameDefault"] = Localizer["Sell_Preview_ProductNameDefault"].Value,
+        ["timeEnded"] = Localizer["Sell_Preview_TimeEnded"].Value,
+        ["timeLeftDays"] = Localizer["Sell_Preview_TimeLeftDays"].Value,
+        ["timeLeftHours"] = Localizer["Sell_Preview_TimeLeftHours"].Value,
+        ["editorPlaceholder"] = Localizer["Sell_Editor_Placeholder"].Value,
+        ["remove"] = Localizer["Sell_Remove"].Value,
+        ["successCreated"] = Localizer["Sell_Success_Created"].Value,
+        ["errorCreateFailed"] = Localizer["Sell_Error_CreateFailed"].Value,
+        ["errorProductNameRequired"] = Localizer["Sell_Error_ProductNameRequired"].Value,
+        ["errorCategoryRequired"] = Localizer["Sell_Error_CategoryRequired"].Value,
+        ["errorConditionRequired"] = Localizer["Sell_Error_ConditionRequired"].Value,
+        ["errorStartingPriceRequired"] = Localizer["Sell_Error_StartingPriceRequired"].Value,
+        ["errorBidStepRequired"] = Localizer["Sell_Error_BidStepRequired"].Value,
+        ["errorBuyNowPriceInvalid"] = Localizer["Sell_Error_BuyNowPriceInvalid"].Value,
+        ["errorBuyNowPriceGreater"] = Localizer["Sell_Error_BuyNowPriceGreater"].Value,
+        ["errorAuctionTypeRequired"] = Localizer["Sell_Error_AuctionTypeRequired"].Value,
+        ["errorStartDateRequired"] = Localizer["Sell_Error_StartDateRequired"].Value,
+        ["errorStartDatePast"] = Localizer["Sell_Error_StartDatePast"].Value,
+        ["errorEndDateRequired"] = Localizer["Sell_Error_EndDateRequired"].Value,
+        ["errorEndDateAfterStart"] = Localizer["Sell_Error_EndDateAfterStart"].Value,
+        ["errorImageInvalidFormat"] = Localizer["Sell_Error_ImageInvalidFormat"].Value,
+        ["errorImageSizeLimit"] = Localizer["Sell_Error_ImageSizeLimit"].Value,
+        ["errorDocInvalidFormat"] = Localizer["Sell_Error_DocInvalidFormat"].Value,
+        ["errorDocSizeLimit"] = Localizer["Sell_Error_DocSizeLimit"].Value,
+        ["conditionNew"] = Localizer["Sell_Condition_New"].Value,
+        ["conditionLikeNew"] = Localizer["Sell_Condition_LikeNew"].Value,
+        ["conditionUsed"] = Localizer["Sell_Condition_Used"].Value
+    };
 }
 
 <div class="sell-page min-h-screen bg-slate-50">
@@ -17,19 +48,19 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
         </svg>
         <div>
-          <p id="successMessageText" class="font-semibold">@(successMessage ?? "Your auction has been created successfully!")</p>
-          <a asp-controller="Auction" asp-action="Index" class="mt-1 inline-block text-emerald-900 underline">View auctions →</a>
+          <p id="successMessageText" class="font-semibold">@(successMessage ?? Localizer["Sell_SuccessMessage"].Value)</p>
+          <a asp-controller="Auction" asp-action="Index" class="mt-1 inline-block text-emerald-900 underline">@Localizer["Sell_ViewAuctions"]</a>
         </div>
       </div>
     </div>
 
     <div id="draftBanner" class="mb-6 hidden rounded-xl border border-blue-200 bg-blue-50 px-5 py-3 text-sm text-blue-800">
-      Draft saved locally. You can continue editing anytime.
+      @Localizer["Sell_DraftSaved"]
     </div>
 
     <div class="mb-8">
-      <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">List Your Rare Collectible</h1>
-      <p class="mt-2 text-sm text-slate-500 sm:text-base">Provide precise details to maximize your card's auction potential.</p>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">@Localizer["Sell_Heading"]</h1>
+      <p class="mt-2 text-sm text-slate-500 sm:text-base">@Localizer["Sell_Subheading"]</p>
     </div>
 
     <form id="createAuctionForm" asp-action="Create" asp-controller="Sell" method="post" enctype="multipart/form-data" novalidate>
@@ -60,5 +91,10 @@
 
 @section Scripts {
   <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+  <script>
+    window.sellPageConfig = {
+      i18n: @Html.Raw(JsonSerializer.Serialize(sellI18n))
+    };
+  </script>
   <script src="~/js/create-auction.js" asp-append-version="true"></script>
 }
