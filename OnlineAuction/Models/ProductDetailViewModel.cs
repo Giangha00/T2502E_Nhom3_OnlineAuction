@@ -34,6 +34,7 @@ public class ProductDetailViewModel
     public int CountdownSeconds { get; set; }
     public string AuctionStatus { get; set; } = "Active Auction";
     public string StatusBadgeClass { get; set; } = "bg-emerald-600";
+    public bool CanPlaceBid { get; set; }
     public SellerViewModel Seller { get; set; } = new();
     public GradingScoreViewModel Grading { get; set; } = new();
     public List<BidHistoryItemViewModel> BidHistory { get; set; } = [];
