@@ -16,11 +16,16 @@ public class BidService : IBidService
     private const int BidHistoryLimit = 20;
 
     private readonly AuctionHouseDbContext _dbContext;
+    private readonly IAuctionRegistrationService _registrationService;
     private readonly ILogger<BidService> _logger;
 
-    public BidService(AuctionHouseDbContext dbContext, ILogger<BidService> logger)
+    public BidService(
+        AuctionHouseDbContext dbContext,
+        IAuctionRegistrationService registrationService,
+        ILogger<BidService> logger)
     {
         _dbContext = dbContext;
+        _registrationService = registrationService;
         _logger = logger;
     }
 
@@ -67,6 +72,21 @@ public class BidService : IBidService
                 bidderId,
                 validationError);
             return Fail(validationError);
+        }
+
+        var registrationError = await _registrationService.GetBidBlockMessageAsync(
+            auctionId,
+            bidderId,
+            auction.RequiresRegistration);
+
+        if (registrationError is not null)
+        {
+            _logger.LogWarning(
+                "Bid rejected for auction {AuctionId} by user {UserId}: {Reason}",
+                auctionId,
+                bidderId,
+                registrationError);
+            return Fail(registrationError);
         }
 
         var previousWinningBids = await _dbContext.Bids
