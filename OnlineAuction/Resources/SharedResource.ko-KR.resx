@@ -238,6 +238,19 @@
   <data name="Sell_Condition_Used" xml:space="preserve"><value>중고</value></data>
   <data name="Sell_ProductOrigin" xml:space="preserve"><value>상품 원산지</value></data>
   <data name="Sell_ProductOrigin_Placeholder" xml:space="preserve"><value>예: 일본 / 미국</value></data>
+  <data name="Sell_ShortDescription" xml:space="preserve"><value>짧은 설명</value></data>
+  <data name="Sell_ShortDescription_Placeholder" xml:space="preserve"><value>목록 헤더에 표시되는 요약 (최대 300자)</value></data>
+  <data name="Sell_Subtitle" xml:space="preserve"><value>부제</value></data>
+  <data name="Sell_Subtitle_Placeholder" xml:space="preserve"><value>상품명 아래에 표시되는 태그라인</value></data>
+  <data name="Sell_Section4_CardSpecs_Title" xml:space="preserve"><value>카드 사양</value></data>
+  <data name="Sell_Section4_CardSpecs_Desc" xml:space="preserve"><value>연도, 세트, 언어, 등급, 인증서 번호</value></data>
+  <data name="Sell_SetName_Placeholder" xml:space="preserve"><value>예: Base Set</value></data>
+  <data name="Sell_Grade" xml:space="preserve"><value>등급</value></data>
+  <data name="Sell_CertificateNumber" xml:space="preserve"><value>인증서 번호</value></data>
+  <data name="Sell_EstimatedValue" xml:space="preserve"><value>추정 가치</value></data>
+  <data name="Sell_AuctionEventName" xml:space="preserve"><value>경매 이벤트명</value></data>
+  <data name="Sell_AuctionEventName_Placeholder" xml:space="preserve"><value>예: RareCard Vault: Premium Trading Card Auction</value></data>
+  <data name="Sell_Error_YearInvalid" xml:space="preserve"><value>1800년에서 2100년 사이의 유효한 연도를 입력하세요.</value></data>
   <data name="Sell_Section2_Title" xml:space="preserve"><value>상품 이미지</value></data>
   <data name="Sell_Section2_Desc" xml:space="preserve"><value>여러 이미지 업로드 — JPG, PNG, WEBP (각 최대 5MB)</value></data>
   <data name="Sell_UploadImages_Title" xml:space="preserve"><value>상품 이미지 업로드</value></data>
