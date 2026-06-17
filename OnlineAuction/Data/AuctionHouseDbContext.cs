@@ -27,6 +27,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<Payment> Payments => Set<Payment>();
 
+    public DbSet<AuctionRegistration> AuctionRegistrations => Set<AuctionRegistration>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -36,6 +38,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureCategories(builder);
         ConfigureProducts(builder);
         ConfigureAuctions(builder);
+        ConfigureAuctionRegistrations(builder);
         ConfigureBids(builder);
         ConfigureOrders(builder);
         ConfigureOrderItems(builder);
@@ -168,6 +171,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(a => a.CurrentPrice).HasColumnName("current_price").HasPrecision(18, 2);
             entity.Property(a => a.BuyNowPrice).HasColumnName("buy_now_price").HasPrecision(18, 2);
             entity.Property(a => a.ListingType).HasColumnName("listing_type").HasMaxLength(20).IsRequired().HasDefaultValue(ListingTypes.Auction);
+            entity.Property(a => a.RequiresRegistration).HasColumnName("requires_registration").HasDefaultValue(true);
             entity.Property(a => a.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(AuctionStatuses.Live);
             entity.Property(a => a.StartDate).HasColumnName("start_date");
             entity.Property(a => a.EndDate).HasColumnName("end_date");
@@ -175,6 +179,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
             entity.HasIndex(a => a.ProductId).HasDatabaseName("ix_auctions_product_id");
             entity.HasIndex(a => new { a.Status, a.EndDate }).HasDatabaseName("ix_auctions_status_end_date");
+            entity.HasIndex(a => a.ListingType).HasDatabaseName("ix_auctions_listing_type");
 
             entity.HasOne(a => a.Product)
                 .WithMany(p => p.Auctions)
@@ -196,7 +201,56 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
                 "chk_auctions_dates",
                 "`end_date` > `start_date`"));
 
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_auctions_listing_type",
+                "`listing_type` IN ('auction', 'buynow')"));
+
             ConfigureAuditableEntity(entity, "auctions");
+        });
+    }
+
+    private static void ConfigureAuctionRegistrations(ModelBuilder builder)
+    {
+        builder.Entity<AuctionRegistration>(entity =>
+        {
+            entity.ToTable("auction_registrations");
+
+            entity.Property(r => r.Id).HasColumnName("id");
+            entity.Property(r => r.AuctionId).HasColumnName("auction_id");
+            entity.Property(r => r.UserId).HasColumnName("user_id");
+            entity.Property(r => r.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(AuctionRegistrationStatuses.Pending);
+            entity.Property(r => r.RegisteredAt).HasColumnName("registered_at");
+            entity.Property(r => r.ReviewedAt).HasColumnName("reviewed_at");
+            entity.Property(r => r.ReviewedBy).HasColumnName("reviewed_by");
+            entity.Property(r => r.RejectReason).HasColumnName("reject_reason").HasMaxLength(300);
+
+            entity.HasIndex(r => new { r.AuctionId, r.UserId }).IsUnique().HasDatabaseName("uk_registrations_auction_user");
+            entity.HasIndex(r => new { r.AuctionId, r.Status }).HasDatabaseName("ix_registrations_auction_status");
+            entity.HasIndex(r => new { r.UserId, r.Status }).HasDatabaseName("ix_registrations_user_status");
+
+            entity.HasOne(r => r.Auction)
+                .WithMany(a => a.Registrations)
+                .HasForeignKey(r => r.AuctionId)
+                .HasConstraintName("fk_registrations_auction")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(r => r.User)
+                .WithMany(u => u.AuctionRegistrations)
+                .HasForeignKey(r => r.UserId)
+                .HasConstraintName("fk_registrations_user")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(r => r.Reviewer)
+                .WithMany()
+                .HasForeignKey(r => r.ReviewedBy)
+                .HasConstraintName("fk_registrations_reviewed_by")
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_registrations_status",
+                "`status` IN ('pending', 'approved', 'rejected', 'cancelled')"));
+
+            ConfigureAuditableEntity(entity, "registrations");
         });
     }
 
