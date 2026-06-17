@@ -16,6 +16,8 @@ public class Auction : AuditableEntity
 
     public string ListingType { get; set; } = ListingTypes.Auction;
 
+    public bool RequiresRegistration { get; set; } = true;
+
     public string Status { get; set; } = AuctionStatuses.Live;
 
     public DateTime StartDate { get; set; }
@@ -31,6 +33,8 @@ public class Auction : AuditableEntity
     public ICollection<Bid> Bids { get; set; } = [];
 
     public ICollection<OrderItem> OrderItems { get; set; } = [];
+
+    public ICollection<AuctionRegistration> Registrations { get; set; } = [];
 }
 
 public static class ListingTypes
