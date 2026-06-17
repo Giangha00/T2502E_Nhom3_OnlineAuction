@@ -47,7 +47,7 @@ public class AuctionService : IAuctionService
     public AuctionViewModel GetAuctionIndex(string listingType = ListingTypes.Auction) =>
         GetAuctionIndexAsync(listingType).GetAwaiter().GetResult();
 
-    public async Task<ProductDetailViewModel?> GetProductDetailAsync(int id)
+    public async Task<ProductDetailViewModel?> GetProductDetailAsync(int id, int? currentUserId = null)
     {
         var auction = await _dbContext.Auctions
             .AsNoTracking()
@@ -62,6 +62,21 @@ public class AuctionService : IAuctionService
         if (auction?.Product?.Seller is null)
         {
             return null;
+        }
+
+        var registrationCount = await AuctionRegistrationService.CountApprovedRegistrationsAsync(_dbContext, id);
+
+        string? userRegistrationStatus = null;
+        string? registrationRejectReason = null;
+
+        if (currentUserId.HasValue)
+        {
+            var userRegistration = await _dbContext.AuctionRegistrations
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.AuctionId == id && r.UserId == currentUserId.Value);
+
+            userRegistrationStatus = userRegistration?.Status;
+            registrationRejectReason = userRegistration?.RejectReason;
         }
 
         var sellerId = auction.Product.SellerId;
@@ -98,7 +113,14 @@ public class AuctionService : IAuctionService
             .Select(ProductDetailMapper.MapToAuctionItem)
             .ToList();
 
-        return ProductDetailMapper.MapToViewModel(auction, seller, relatedItems);
+        return ProductDetailMapper.MapToViewModel(
+            auction,
+            seller,
+            relatedItems,
+            currentUserId,
+            userRegistrationStatus,
+            registrationRejectReason,
+            registrationCount);
     }
 
     public async Task<AuctionItemViewModel?> GetAuctionByIdAsync(int id)

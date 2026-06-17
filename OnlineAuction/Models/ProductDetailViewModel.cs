@@ -35,6 +35,13 @@ public class ProductDetailViewModel
     public string AuctionStatus { get; set; } = "Active Auction";
     public string StatusBadgeClass { get; set; } = "bg-emerald-600";
     public bool CanPlaceBid { get; set; }
+    public bool RequiresRegistration { get; set; } = true;
+    public bool IsRegistered { get; set; }
+    public string? RegistrationStatus { get; set; }
+    public string? RegistrationRejectReason { get; set; }
+    public bool CanBid { get; set; }
+    public bool IsSeller { get; set; }
+    public int RegistrationCount { get; set; }
     public SellerViewModel Seller { get; set; } = new();
     public GradingScoreViewModel Grading { get; set; } = new();
     public List<BidHistoryItemViewModel> BidHistory { get; set; } = [];
