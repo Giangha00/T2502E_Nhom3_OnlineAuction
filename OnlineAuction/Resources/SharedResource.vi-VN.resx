@@ -505,6 +505,9 @@
   <data name="Product_Days" xml:space="preserve"><value>Ngày</value></data>
   <data name="Product_Hours" xml:space="preserve"><value>Giờ</value></data>
   <data name="Product_Minutes" xml:space="preserve"><value>Phút</value></data>
+  <data name="Product_Seconds" xml:space="preserve"><value>Giây</value></data>
+  <data name="Product_NoBidsYet" xml:space="preserve"><value>Chưa có lượt đấu giá</value></data>
+  <data name="Product_AuctionEnded" xml:space="preserve"><value>Phiên đấu giá đã kết thúc</value></data>
   <data name="Product_CountdownPreview" xml:space="preserve"><value>Xem trước tĩnh — đếm ngược chưa hoạt động</value></data>
   <data name="Product_AuctionInfo" xml:space="preserve"><value>Thông tin đấu giá</value></data>
   <data name="Product_StartingPrice" xml:space="preserve"><value>Giá khởi điểm</value></data>
@@ -735,6 +738,8 @@
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Sản phẩm được bảo vệ bởi bảo mật vault. Mọi phiên thắng đều được xác minh kép trước khi giao hàng.</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Đang đặt giá…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Không thể đặt giá. Vui lòng thử lại.</value></data>
+  <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Đặt giá thành công!</value></data>
+  <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>Phiên đấu giá đã kết thúc</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>Đang thêm…</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>Đã thêm vào giỏ.</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>Không thể thêm vào giỏ. Vui lòng thử lại.</value></data>

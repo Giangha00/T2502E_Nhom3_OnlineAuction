@@ -5,6 +5,10 @@ namespace OnlineAuction.Services;
 
 internal static class ProductDetailMapper
 {
+    private const string DefaultProductImageUrl =
+        "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=600&h=750&fit=crop";
+
+    private const int HotBidCountThreshold = 5;
     public static ProductDetailViewModel MapToViewModel(
         Auction auction,
         SellerViewModel seller,
@@ -51,6 +55,7 @@ internal static class ProductDetailMapper
             CountdownSeconds = seconds,
             AuctionStatus = auctionStatus,
             StatusBadgeClass = badgeClass,
+            CanPlaceBid = CanAcceptBids(auction),
             Seller = seller,
             Grading = BuildGrading(product.GradeLabel),
             BidHistory = MapBidHistory(bids),
@@ -73,25 +78,44 @@ internal static class ProductDetailMapper
     public static AuctionItemViewModel MapToAuctionItem(Auction auction)
     {
         var product = auction.Product;
+        var bidCount = auction.Bids?.Count ?? 0;
+        var status = MapCardStatus(auction);
+
         return new AuctionItemViewModel
         {
             Id = auction.Id,
             Name = product.Name,
             Category = GetCategoryName(product),
-            ImageUrl = product.PrimaryImage,
+            ImageUrl = ResolveImageUrl(product.PrimaryImage),
             StartingPrice = auction.StartingPrice,
             CurrentPrice = auction.CurrentPrice,
-            Status = MapCardStatus(auction.Status),
+            Status = status,
             TimeRemaining = FormatTimeRemaining(auction.EndDate),
+            ListingType = auction.ListingType,
             Grade = product.GradeLabel ?? string.Empty,
             Subtitle = BuildSubtitle(product),
             Condition = FormatCondition(product.Condition),
             Year = product.Year ?? 0,
-            IsHot = auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon
+            BidCount = bidCount,
+            IsHot = status == "Ending Soon" || bidCount >= HotBidCountThreshold
         };
     }
 
-    private static List<BidHistoryItemViewModel> MapBidHistory(IEnumerable<Bid> bids) =>
+    public static List<CategoryViewModel> MapCategories(IReadOnlyList<AuctionItemViewModel> items) =>
+        items
+            .Where(item => !string.IsNullOrWhiteSpace(item.Category))
+            .GroupBy(item => item.Category)
+            .OrderBy(group => group.Key)
+            .Select(group => new CategoryViewModel
+            {
+                Name = group.Key,
+                ItemCount = group.Count(),
+                ImageUrl = group.First().ImageUrl,
+                DisplayCount = $"{group.Count()} Items"
+            })
+            .ToList();
+
+    public static List<BidHistoryItemViewModel> MapBidHistory(IEnumerable<Bid> bids) =>
         bids.Select(bid => new BidHistoryItemViewModel
         {
             BidderName = FormatBidderName(bid.Bidder),
@@ -158,6 +182,10 @@ internal static class ProductDetailMapper
             remaining.Seconds);
     }
 
+    public static bool CanAcceptBids(Auction auction) =>
+        auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon &&
+        auction.EndDate.ToUniversalTime() > DateTime.UtcNow;
+
     private static (string Status, string BadgeClass) MapAuctionStatus(string status, DateTime endDate)
     {
         if (endDate.ToUniversalTime() <= DateTime.UtcNow &&
@@ -177,14 +205,44 @@ internal static class ProductDetailMapper
         };
     }
 
-    private static string MapCardStatus(string status) => status switch
+    public static string MapCardStatus(Auction auction)
     {
-        AuctionStatuses.EndingSoon => "Ending Soon",
-        AuctionStatuses.Ended or AuctionStatuses.AwaitingPayment => "Ended",
-        AuctionStatuses.Completed => "Completed",
-        AuctionStatuses.Cancelled => "Cancelled",
-        _ => "Live"
-    };
+        if (auction.EndDate.ToUniversalTime() <= DateTime.UtcNow)
+        {
+            return "Ended";
+        }
+
+        if (auction.Status is AuctionStatuses.Ended or AuctionStatuses.AwaitingPayment)
+        {
+            return "Ended";
+        }
+
+        if (auction.Status == AuctionStatuses.Completed)
+        {
+            return "Completed";
+        }
+
+        if (auction.Status == AuctionStatuses.Cancelled)
+        {
+            return "Cancelled";
+        }
+
+        if (auction.Status == AuctionStatuses.EndingSoon)
+        {
+            return "Ending Soon";
+        }
+
+        var remaining = auction.EndDate.ToUniversalTime() - DateTime.UtcNow;
+        if (remaining.TotalHours <= 24)
+        {
+            return "Ending Soon";
+        }
+
+        return "Live";
+    }
+
+    private static string ResolveImageUrl(string? primaryImage) =>
+        string.IsNullOrWhiteSpace(primaryImage) ? DefaultProductImageUrl : primaryImage;
 
     private static string FormatTimeRemaining(DateTime endDate)
     {
