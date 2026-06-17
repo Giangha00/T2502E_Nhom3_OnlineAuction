@@ -238,6 +238,19 @@
   <data name="Sell_Condition_Used" xml:space="preserve"><value>中古</value></data>
   <data name="Sell_ProductOrigin" xml:space="preserve"><value>原産国</value></data>
   <data name="Sell_ProductOrigin_Placeholder" xml:space="preserve"><value>例: 日本 / アメリカ</value></data>
+  <data name="Sell_ShortDescription" xml:space="preserve"><value>短い説明</value></data>
+  <data name="Sell_ShortDescription_Placeholder" xml:space="preserve"><value>リストヘッダーに表示される要約（最大300文字）</value></data>
+  <data name="Sell_Subtitle" xml:space="preserve"><value>サブタイトル</value></data>
+  <data name="Sell_Subtitle_Placeholder" xml:space="preserve"><value>商品名の下に表示されるタグライン</value></data>
+  <data name="Sell_Section4_CardSpecs_Title" xml:space="preserve"><value>カード仕様</value></data>
+  <data name="Sell_Section4_CardSpecs_Desc" xml:space="preserve"><value>年、セット、言語、グレード、証明書番号</value></data>
+  <data name="Sell_SetName_Placeholder" xml:space="preserve"><value>例: Base Set</value></data>
+  <data name="Sell_Grade" xml:space="preserve"><value>グレード</value></data>
+  <data name="Sell_CertificateNumber" xml:space="preserve"><value>証明書番号</value></data>
+  <data name="Sell_EstimatedValue" xml:space="preserve"><value>推定価値</value></data>
+  <data name="Sell_AuctionEventName" xml:space="preserve"><value>オークションイベント名</value></data>
+  <data name="Sell_AuctionEventName_Placeholder" xml:space="preserve"><value>例: RareCard Vault: Premium Trading Card Auction</value></data>
+  <data name="Sell_Error_YearInvalid" xml:space="preserve"><value>1800年から2100年の有効な年を入力してください。</value></data>
   <data name="Sell_Section2_Title" xml:space="preserve"><value>商品画像</value></data>
   <data name="Sell_Section2_Desc" xml:space="preserve"><value>複数画像をアップロード — JPG, PNG, WEBP（各最大5MB）</value></data>
   <data name="Sell_UploadImages_Title" xml:space="preserve"><value>商品画像をアップロード</value></data>
