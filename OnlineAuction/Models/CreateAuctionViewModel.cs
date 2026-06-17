@@ -26,15 +26,20 @@ public class CreateAuctionViewModel
     [Display(Name = "Product Origin")]
     public string? ProductOrigin { get; set; }
 
-    [Display(Name = "Grade")]
-    public string Grade { get; set; } = "PSA 10";
+    [StringLength(300, ErrorMessage = "Short description cannot exceed 300 characters.")]
+    [Display(Name = "Short Description")]
+    public string? ShortDescription { get; set; }
 
+    [StringLength(160)]
     [Display(Name = "Subtitle")]
     public string? Subtitle { get; set; }
 
     [Range(1800, 2100, ErrorMessage = "Please enter a valid year.")]
     [Display(Name = "Year")]
     public int? Year { get; set; }
+
+    [Display(Name = "Grade")]
+    public string Grade { get; set; } = "PSA 10";
 
     [StringLength(120)]
     [Display(Name = "Set Name")]
@@ -53,6 +58,12 @@ public class CreateAuctionViewModel
     // Database khong luu file, chi luu URL Cloudinary vao cot products.primary_image.
     [Display(Name = "Primary Image")]
     public IFormFile? PrimaryImageFile { get; set; }
+
+    public List<IFormFile> GalleryImageFiles { get; set; } = [];
+
+    public List<IFormFile> DocumentFiles { get; set; } = [];
+
+    public List<string> DocumentNames { get; set; } = [];
 
     // Dung khi sua auction: neu seller khong chon anh moi thi giu URL anh cu.
     public string? ExistingPrimaryImage { get; set; }
@@ -90,6 +101,10 @@ public class CreateAuctionViewModel
     [StringLength(160)]
     [Display(Name = "Auction Event")]
     public string AuctionEventName { get; set; } = "RareCard Vault: Premium Trading Card Auction 2026";
+
+    [Range(0.01, double.MaxValue, ErrorMessage = "Estimated value must be greater than 0.")]
+    [Display(Name = "Estimated Value ($)")]
+    public decimal? EstimatedValue { get; set; }
 
     [Required(ErrorMessage = "Start date is required.")]
     [Display(Name = "Start Date")]

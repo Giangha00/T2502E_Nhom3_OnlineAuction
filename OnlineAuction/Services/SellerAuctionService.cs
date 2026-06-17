@@ -10,6 +10,8 @@ public class SellerAuctionService : ISellerAuctionService
 {
     private const string ProductImageFolder = "auction-house/products";
 
+    private const string DocumentFolder = "auction-house/documents";
+
     // Anh fallback giup products.primary_image khong bi null khi view hien tai chua gui file len server.
     // Khi view upload anh co name="PrimaryImageFile", Cloudinary URL se thay the gia tri nay.
     private const string DefaultProductImageUrl =
@@ -80,7 +82,6 @@ public class SellerAuctionService : ISellerAuctionService
         CreateAuctionViewModel model,
         int sellerId)
     {
-        // Validate lai trong Service vi client/JS co the bi tat hoac bi bypass.
         if (model.EndDate <= model.StartDate)
         {
             return (false, "End date must be greater than start date.", null);
@@ -91,60 +92,154 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "Starting price and bid step must be greater than 0.", null);
         }
 
-        string? imageUrl;
+        if (model.Year is < 1800 or > 2100)
+        {
+            return (false, "Please enter a valid year between 1800 and 2100.", null);
+        }
+
+        var galleryFiles = model.GalleryImageFiles
+            .Where(file => file is { Length: > 0 })
+            .Take(4)
+            .ToList();
+
+        if (1 + galleryFiles.Count > 5)
+        {
+            return (false, "You can upload up to 5 images.", null);
+        }
+
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+
         try
         {
-            // Neu form gui file len, upload len Cloudinary va luu URL vao MySQL.
-            imageUrl = await _photoService.AddPhotoAsync(model.PrimaryImageFile, ProductImageFolder);
+            string? imageUrl;
+            try
+            {
+                imageUrl = await _photoService.AddPhotoAsync(model.PrimaryImageFile, ProductImageFolder);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return (false, ex.Message, null);
+            }
+
+            imageUrl = string.IsNullOrWhiteSpace(imageUrl)
+                ? DefaultProductImageUrl
+                : imageUrl;
+
+            var category = await GetOrCreateCategoryAsync(model.Category);
+            var now = DateTime.UtcNow;
+
+            var product = new Product
+            {
+                SellerId = sellerId,
+                Name = model.ProductName.Trim(),
+                CategoryId = category.Id,
+                ShortDescription = TrimOrNull(model.ShortDescription),
+                Subtitle = TrimOrNull(model.Subtitle),
+                DescriptionHtml = model.ProductDescription,
+                Condition = model.Condition,
+                ProductOrigin = TrimOrNull(model.ProductOrigin),
+                Year = model.Year,
+                SetName = TrimOrNull(model.SetName),
+                Language = TrimOrNull(model.Language),
+                CardNumber = TrimOrNull(model.CardNumber),
+                GradeLabel = TrimOrNull(model.Grade),
+                CertNumber = TrimOrNull(model.CertificateNumber),
+                GradingCentering = TrimOrNull(model.GradingCentering),
+                GradingCorners = TrimOrNull(model.GradingCorners),
+                GradingEdges = TrimOrNull(model.GradingEdges),
+                GradingSurface = TrimOrNull(model.GradingSurface),
+                PrimaryImage = imageUrl,
+                EstimatedValue = model.EstimatedValue,
+                Category = category,
+                CreatedAt = now
+            };
+
+            var sortOrder = 1;
+            foreach (var galleryFile in galleryFiles)
+            {
+                try
+                {
+                    var galleryUrl = await _photoService.AddPhotoAsync(galleryFile, ProductImageFolder);
+                    if (string.IsNullOrWhiteSpace(galleryUrl))
+                    {
+                        continue;
+                    }
+
+                    product.Images.Add(new ProductImage
+                    {
+                        ImageUrl = galleryUrl,
+                        SortOrder = sortOrder++,
+                        CreatedAt = now
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    await transaction.RollbackAsync();
+                    return (false, ex.Message, null);
+                }
+            }
+
+            for (var i = 0; i < model.DocumentFiles.Count; i++)
+            {
+                var documentFile = model.DocumentFiles[i];
+                if (documentFile is not { Length: > 0 })
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var documentUrl = await _photoService.AddPhotoAsync(documentFile, DocumentFolder);
+                    if (string.IsNullOrWhiteSpace(documentUrl))
+                    {
+                        continue;
+                    }
+
+                    var documentName = i < model.DocumentNames.Count && !string.IsNullOrWhiteSpace(model.DocumentNames[i])
+                        ? model.DocumentNames[i].Trim()
+                        : documentFile.FileName;
+
+                    product.Documents.Add(new ProductDocument
+                    {
+                        Name = documentName,
+                        FileUrl = documentUrl,
+                        FileType = ResolveDocumentType(documentFile),
+                        CreatedAt = now
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    await transaction.RollbackAsync();
+                    return (false, ex.Message, null);
+                }
+            }
+
+            var auction = new Auction
+            {
+                Product = product,
+                StartingPrice = model.StartingPrice,
+                BidStep = model.BidStep,
+                CurrentPrice = model.StartingPrice,
+                BuyNowPrice = model.BuyNowPrice,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
+                AuctionEventName = TrimOrNull(model.AuctionEventName),
+                ListingType = ListingTypes.Auction,
+                Status = AuctionStatuses.Live,
+                CreatedAt = now
+            };
+
+            _db.Auctions.Add(auction);
+            await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return (true, "Auction created successfully.", auction.Id);
         }
-        catch (InvalidOperationException ex)
+        catch
         {
-            return (false, ex.Message, null);
+            await transaction.RollbackAsync();
+            throw;
         }
-
-        imageUrl = string.IsNullOrWhiteSpace(imageUrl)
-            ? DefaultProductImageUrl
-            : imageUrl;
-
-        var category = await GetOrCreateCategoryAsync(model.Category);
-
-        // Insert Product truoc. Product chua thong tin mat hang/card va gan voi seller_id.
-        // DB moi dung categories rieng, vi vay service nhan chuoi tu form va map thanh category_id.
-        var product = new Product
-        {
-            SellerId = sellerId,
-            Name = model.ProductName.Trim(),
-            CategoryId = category.Id,
-            ShortDescription = string.IsNullOrWhiteSpace(model.Subtitle) ? null : model.Subtitle.Trim(),
-            DescriptionHtml = model.ProductDescription,
-            Condition = model.Condition,
-            Year = model.Year,
-            SetName = string.IsNullOrWhiteSpace(model.SetName) ? null : model.SetName.Trim(),
-            GradeLabel = string.IsNullOrWhiteSpace(model.Grade) ? null : model.Grade.Trim(),
-            CertNumber = string.IsNullOrWhiteSpace(model.CertificateNumber) ? null : model.CertificateNumber.Trim(),
-            PrimaryImage = imageUrl,
-            Category = category,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        // Insert Auction sau. Auction chua gia, buoc gia, thoi gian va trang thai dau gia.
-        var auction = new Auction
-        {
-            Product = product,
-            StartingPrice = model.StartingPrice,
-            BidStep = model.BidStep,
-            CurrentPrice = model.StartingPrice,
-            StartDate = model.StartDate,
-            EndDate = model.EndDate,
-            ListingType = ListingTypes.Auction,
-            Status = AuctionStatuses.Live,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _db.Auctions.Add(auction);
-        await _db.SaveChangesAsync();
-
-        return (true, "Auction created successfully.", auction.Id);
     }
 
     public async Task<(bool Success, string Message, int? ProductId)> CreateBuyNowAsync(
@@ -418,5 +513,20 @@ public class SellerAuctionService : ISellerAuctionService
             .Split('-', StringSplitOptions.RemoveEmptyEntries));
 
         return string.IsNullOrWhiteSpace(slug) ? "uncategorized" : slug;
+    }
+
+    private static string? TrimOrNull(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    private static string ResolveDocumentType(IFormFile file)
+    {
+        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        return extension switch
+        {
+            ".pdf" => "PDF",
+            ".jpg" or ".jpeg" => "JPG",
+            ".png" => "PNG",
+            _ => "FILE"
+        };
     }
 }
