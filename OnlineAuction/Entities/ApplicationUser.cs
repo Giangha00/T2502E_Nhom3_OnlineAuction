@@ -32,4 +32,6 @@ public class ApplicationUser : IdentityUser<int>
     public ICollection<Bid> Bids { get; set; } = [];
 
     public ICollection<AuctionOrder> Orders { get; set; } = [];
+
+    public ICollection<AuctionRegistration> AuctionRegistrations { get; set; } = [];
 }
