@@ -1,3 +1,4 @@
+﻿
 ﻿using OnlineAuction.Enums;
 
 namespace OnlineAuction.Areas.Admin.ViewModels.Users;
@@ -22,3 +23,4 @@ public class UserListItemViewModel
 
     public DateTime CreatedDate { get; set; }
 }
+  
