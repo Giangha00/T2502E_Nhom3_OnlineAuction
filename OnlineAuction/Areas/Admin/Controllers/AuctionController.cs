@@ -30,9 +30,9 @@ public class AuctionController : Controller
         return View();
     }
 
-    public IActionResult Details(int id)
+    public async Task<IActionResult> Details(int id)
     {
-        var product = _auctionService.GetProductDetail(id);
+        var product = await _auctionService.GetProductDetailAsync(id);
         if (product is null)
         {
             return NotFound();
