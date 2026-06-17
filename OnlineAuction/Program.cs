@@ -52,12 +52,24 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
         CookieName = CookieRequestCultureProvider.DefaultCookieName
     });
 });
+var databaseProvider = builder.Configuration.GetValue<string>("DatabaseProvider") ?? "MySql";
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var serverVersion = ServerVersion.Parse("8.0.36-mysql");
 
 builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
+{
+    if (databaseProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
+    {
+        options.UseSqlite(connectionString);
+        return;
+    }
+
+    var serverVersion = ServerVersion.Parse("8.0.36-mysql");
     options.UseMySql(connectionString, serverVersion, mySqlOptions =>
-        mySqlOptions.MigrationsHistoryTable("__ef_migrations_history")));
+    {
+        mySqlOptions.MigrationsHistoryTable("__ef_migrations_history");
+        mySqlOptions.EnableRetryOnFailure();
+    });
+});
 
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
@@ -97,7 +109,14 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
-    await dbContext.Database.MigrateAsync();
+    if (dbContext.Database.ProviderName?.Contains("Sqlite", StringComparison.OrdinalIgnoreCase) == true)
+    {
+        await dbContext.Database.EnsureCreatedAsync();
+    }
+    else
+    {
+        await dbContext.Database.MigrateAsync();
+    }
 }
 
 using (var scope = app.Services.CreateScope())

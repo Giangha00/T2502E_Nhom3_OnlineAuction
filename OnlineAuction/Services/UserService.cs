@@ -35,7 +35,7 @@ public class UserService : IUserService
             .AsNoTracking()
             .FirstOrDefaultAsync(user => user.Id == id);
 
-        if (user is null || user.Status == UserStatus.Active)
+        if (user is null || user.Status == UserStatus.Inactive)
         {
             return null;
         }
