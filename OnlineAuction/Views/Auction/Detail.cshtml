@@ -11,7 +11,15 @@
         ["winning"] = Localizer["Product_Winning"].Value,
         ["outbid"] = Localizer["Product_Outbid"].Value,
         ["noBidsYet"] = Localizer["Product_NoBidsYet"].Value,
-        ["bidsCount"] = Localizer["Product_BidsCount", 0].Value.Replace("0", "{0}")
+        ["bidsCount"] = Localizer["Product_BidsCount", 0].Value.Replace("0", "{0}"),
+        ["registeredCount"] = Localizer["Product_RegisteredCount", 0].Value.Replace("0", "{0}"),
+        ["registerForAuction"] = Localizer["Product_RegisterForAuction"].Value,
+        ["registering"] = Localizer["Js_ProductDetail_Registering"].Value,
+        ["registrationSuccess"] = Localizer["Js_ProductDetail_RegistrationSuccess"].Value,
+        ["registrationFailed"] = Localizer["Js_ProductDetail_RegistrationFailed"].Value,
+        ["registrationCancelled"] = Localizer["Js_ProductDetail_RegistrationCancelled"].Value,
+        ["cancelRegistrationFailed"] = Localizer["Js_ProductDetail_CancelRegistrationFailed"].Value,
+        ["mustRegisterToBid"] = Localizer["Product_MustRegisterToBid"].Value
     };
 }
 
@@ -39,7 +47,8 @@
       auctionId: @Model.Id,
       bidStep: @Model.BidStep.ToString(System.Globalization.CultureInfo.InvariantCulture),
       endDate: @Html.Raw(JsonSerializer.Serialize(Model.EndDate.ToUniversalTime().ToString("o"))),
-      canBid: @(Model.CanPlaceBid ? "true" : "false"),
+      canBid: @(Model.CanBid ? "true" : "false"),
+      requiresRegistration: @(Model.RequiresRegistration ? "true" : "false"),
       bidOptionCount: 35,
       i18n: @Html.Raw(JsonSerializer.Serialize(productDetailI18n))
     };
