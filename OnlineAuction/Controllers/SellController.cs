@@ -34,9 +34,17 @@ public class SellController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateAuctionViewModel model)
     {
-        // View upload hien tai chua dat name cho input file.
-        // Neu sau nay view gui file len bang bat ky input file nao, dong nay se lay file dau tien de upload Cloudinary.
-        model.PrimaryImageFile ??= Request.Form.Files.FirstOrDefault();
+        model.PrimaryImageFile ??= Request.Form.Files
+            .FirstOrDefault(file => file.Name == "PrimaryImageFile");
+        model.GalleryImageFiles = Request.Form.Files
+            .Where(file => file.Name == "GalleryImageFiles")
+            .ToList();
+        model.DocumentFiles = Request.Form.Files
+            .Where(file => file.Name == "DocumentFiles")
+            .ToList();
+        model.DocumentNames = Request.Form["DocumentNames"]
+            .Select(name => name!)
+            .ToList();
 
         foreach (var (key, message) in _sellService.ValidateCreateAuction(model))
         {

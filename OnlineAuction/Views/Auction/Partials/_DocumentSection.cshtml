@@ -13,12 +13,14 @@
           <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-50 text-lg">📄</span>
           <div class="min-w-0">
             <p class="font-semibold text-slate-900">@doc.Name</p>
-            <p class="truncate text-sm text-slate-500">@doc.FileName</p>
+            <p class="truncate text-sm text-slate-500">@doc.FileType</p>
           </div>
         </div>
         <div class="flex gap-2 sm:shrink-0">
-          <button type="button" class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">@Localizer["Common_View"]</button>
-          <button type="button" class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-800">@Localizer["Common_Download"]</button>
+          <a href="@doc.FileUrl" target="_blank" rel="noopener noreferrer"
+             class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">@Localizer["Common_View"]</a>
+          <a href="@doc.FileUrl" download
+             class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-800">@Localizer["Common_Download"]</a>
         </div>
       </li>
     }
