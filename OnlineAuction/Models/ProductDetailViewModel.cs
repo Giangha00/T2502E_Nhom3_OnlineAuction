@@ -54,4 +54,5 @@ public class ProductDocumentViewModel
     public string Name { get; set; } = string.Empty;
     public string FileName { get; set; } = string.Empty;
     public string FileType { get; set; } = "PDF";
+    public string FileUrl { get; set; } = string.Empty;
 }

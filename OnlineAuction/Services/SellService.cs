@@ -70,6 +70,11 @@ public class SellService : ISellService
         {
             yield return (nameof(model.BuyNowPrice), "Buy now price must be greater than the starting price.");
         }
+
+        if (model.Year is < 1800 or > 2100)
+        {
+            yield return (nameof(model.Year), "Please enter a valid year between 1800 and 2100.");
+        }
     }
 
     public IEnumerable<(string Key, string Message)> ValidateCreateBuyNow(CreateBuyNowViewModel model)

@@ -44,22 +44,22 @@ internal static class ProductDetailMapper
             Subtitle = BuildSubtitle(product),
             Year = product.Year ?? 0,
             SetName = product.SetName ?? "—",
-            Language = "—",
-            CardNumber = "—",
+            Language = product.Language ?? "—",
+            CardNumber = product.CardNumber ?? "—",
             CertificateNumber = product.CertNumber ?? "—",
             DescriptionHtml = BuildDescriptionHtml(product, auction),
-            Images = string.IsNullOrWhiteSpace(product.PrimaryImage)
-                ? []
-                : [product.PrimaryImage],
+            Images = BuildImageGallery(product),
             StartingPrice = auction.StartingPrice,
             CurrentPrice = auction.CurrentPrice,
             BidStep = auction.BidStep,
             BidCount = bids.Count,
             LotNumber = 0,
             WatcherCount = registrationCount,
-            EstimatedValue = 0,
+            EstimatedValue = product.EstimatedValue ?? 0,
             ReserveMet = auction.CurrentPrice >= auction.StartingPrice,
-            AuctionEventName = "RareCard Vault: Premium Trading Card Auction",
+            AuctionEventName = string.IsNullOrWhiteSpace(auction.AuctionEventName)
+                ? "RareCard Vault: Premium Trading Card Auction"
+                : auction.AuctionEventName!,
             QuickBidAmounts = BuildQuickBidAmounts(auction.CurrentPrice, auction.BidStep),
             StartDate = auction.StartDate,
             EndDate = auction.EndDate,
@@ -78,9 +78,9 @@ internal static class ProductDetailMapper
             IsSeller = isSeller,
             RegistrationCount = registrationCount,
             Seller = seller,
-            Grading = BuildGrading(product.GradeLabel),
+            Grading = BuildGrading(product),
             BidHistory = MapBidHistory(bids),
-            Documents = [],
+            Documents = MapDocuments(product),
             RelatedProducts = relatedProducts.ToList()
         };
     }
@@ -179,7 +179,26 @@ internal static class ProductDetailMapper
         return $"{display[0]}***{display[^1]}";
     }
 
-    private static GradingScoreViewModel BuildGrading(string? gradeLabel)
+    private static GradingScoreViewModel BuildGrading(Product product)
+    {
+        if (!string.IsNullOrWhiteSpace(product.GradingCentering) ||
+            !string.IsNullOrWhiteSpace(product.GradingCorners) ||
+            !string.IsNullOrWhiteSpace(product.GradingEdges) ||
+            !string.IsNullOrWhiteSpace(product.GradingSurface))
+        {
+            return new GradingScoreViewModel
+            {
+                Centering = product.GradingCentering ?? "—",
+                Corners = product.GradingCorners ?? "—",
+                Edges = product.GradingEdges ?? "—",
+                Surface = product.GradingSurface ?? "—"
+            };
+        }
+
+        return BuildGradingFromGradeLabel(product.GradeLabel);
+    }
+
+    private static GradingScoreViewModel BuildGradingFromGradeLabel(string? gradeLabel)
     {
         var numeric = gradeLabel switch
         {
@@ -200,6 +219,38 @@ internal static class ProductDetailMapper
             Surface = numeric
         };
     }
+
+    private static List<string> BuildImageGallery(Product product)
+    {
+        var images = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(product.PrimaryImage))
+        {
+            images.Add(product.PrimaryImage);
+        }
+
+        foreach (var image in product.Images.OrderBy(item => item.SortOrder))
+        {
+            if (!string.IsNullOrWhiteSpace(image.ImageUrl) && !images.Contains(image.ImageUrl))
+            {
+                images.Add(image.ImageUrl);
+            }
+        }
+
+        return images.Count > 0 ? images : [DefaultProductImageUrl];
+    }
+
+    private static List<ProductDocumentViewModel> MapDocuments(Product product) =>
+        product.Documents
+            .OrderBy(document => document.Name)
+            .Select(document => new ProductDocumentViewModel
+            {
+                Name = document.Name,
+                FileName = document.Name,
+                FileType = document.FileType,
+                FileUrl = document.FileUrl
+            })
+            .ToList();
 
     private static List<decimal> BuildQuickBidAmounts(decimal currentPrice, decimal bidStep) =>
     [
@@ -308,6 +359,11 @@ internal static class ProductDetailMapper
 
     private static string BuildSubtitle(Product product)
     {
+        if (!string.IsNullOrWhiteSpace(product.Subtitle))
+        {
+            return product.Subtitle.Trim();
+        }
+
         var parts = new List<string>();
         if (!string.IsNullOrWhiteSpace(product.SetName))
         {
