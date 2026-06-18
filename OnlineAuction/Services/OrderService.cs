@@ -186,7 +186,12 @@ public class OrderService : IOrderService
 
         await _dbContext.SaveChangesAsync();
 
-        return (true, "Shipping saved. Payment integration will be available in the next sprint.");
+        if (string.Equals(request.PaymentMethod, "cod", StringComparison.OrdinalIgnoreCase))
+        {
+            return (true, "Order confirmed. Please pay cash when your items are delivered.");
+        }
+
+        return (true, "Shipping saved. You will be redirected to PayPal to complete payment.");
     }
 
     private static string BuildSubtitle(Product product)

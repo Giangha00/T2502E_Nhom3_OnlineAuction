@@ -41,9 +41,9 @@ orleans.codegen.cs
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
-# App settings (may contain secrets / local config)
-**/appsettings.json
-**/appsettings.*.json
+# App settings — commit base config; keep secrets/local overrides out of git
+**/appsettings.Local.json
+**/appsettings.*.local.json
 
 # Node
 node_modules/
