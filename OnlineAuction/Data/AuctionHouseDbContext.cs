@@ -29,6 +29,10 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<AuctionRegistration> AuctionRegistrations => Set<AuctionRegistration>();
 
+    public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+
+    public DbSet<ProductDocument> ProductDocuments => Set<ProductDocument>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -37,6 +41,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureUsers(builder);
         ConfigureCategories(builder);
         ConfigureProducts(builder);
+        ConfigureProductImages(builder);
+        ConfigureProductDocuments(builder);
         ConfigureAuctions(builder);
         ConfigureAuctionRegistrations(builder);
         ConfigureBids(builder);
@@ -126,13 +132,22 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(p => p.CategoryId).HasColumnName("category_id");
             entity.Property(p => p.Name).HasColumnName("name").HasMaxLength(120).IsRequired();
             entity.Property(p => p.ShortDescription).HasColumnName("short_description").HasMaxLength(300);
+            entity.Property(p => p.Subtitle).HasColumnName("subtitle").HasMaxLength(160);
             entity.Property(p => p.DescriptionHtml).HasColumnName("description_html");
             entity.Property(p => p.Condition).HasColumnName("condition").HasMaxLength(20).IsRequired().HasDefaultValue("graded");
+            entity.Property(p => p.ProductOrigin).HasColumnName("product_origin").HasMaxLength(120);
             entity.Property(p => p.Year).HasColumnName("year");
             entity.Property(p => p.SetName).HasColumnName("set_name").HasMaxLength(120);
+            entity.Property(p => p.Language).HasColumnName("language").HasMaxLength(20);
+            entity.Property(p => p.CardNumber).HasColumnName("card_number").HasMaxLength(30);
             entity.Property(p => p.GradeLabel).HasColumnName("grade_label").HasMaxLength(20);
             entity.Property(p => p.CertNumber).HasColumnName("cert_number").HasMaxLength(50);
+            entity.Property(p => p.GradingCentering).HasColumnName("grading_centering").HasMaxLength(10);
+            entity.Property(p => p.GradingCorners).HasColumnName("grading_corners").HasMaxLength(10);
+            entity.Property(p => p.GradingEdges).HasColumnName("grading_edges").HasMaxLength(10);
+            entity.Property(p => p.GradingSurface).HasColumnName("grading_surface").HasMaxLength(10);
             entity.Property(p => p.PrimaryImage).HasColumnName("primary_image").HasMaxLength(500).IsRequired();
+            entity.Property(p => p.EstimatedValue).HasColumnName("estimated_value").HasPrecision(18, 2);
             entity.Property(p => p.ImportPrice).HasColumnName("import_price").HasPrecision(18, 2);
 
             entity.HasIndex(p => p.SellerId).HasDatabaseName("ix_products_seller_id");
@@ -154,7 +169,58 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
                 "chk_products_import_price",
                 "`import_price` IS NULL OR `import_price` >= 0"));
 
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_products_estimated_value",
+                "`estimated_value` IS NULL OR `estimated_value` >= 0"));
+
             ConfigureAuditableEntity(entity, "products");
+        });
+    }
+
+    private static void ConfigureProductImages(ModelBuilder builder)
+    {
+        builder.Entity<ProductImage>(entity =>
+        {
+            entity.ToTable("product_images");
+
+            entity.Property(i => i.Id).HasColumnName("id");
+            entity.Property(i => i.ProductId).HasColumnName("product_id");
+            entity.Property(i => i.ImageUrl).HasColumnName("image_url").HasMaxLength(500).IsRequired();
+            entity.Property(i => i.SortOrder).HasColumnName("sort_order");
+
+            entity.HasIndex(i => i.ProductId).HasDatabaseName("ix_product_images_product_id");
+
+            entity.HasOne(i => i.Product)
+                .WithMany(p => p.Images)
+                .HasForeignKey(i => i.ProductId)
+                .HasConstraintName("fk_product_images_product")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            ConfigureAuditableEntity(entity, "product_images");
+        });
+    }
+
+    private static void ConfigureProductDocuments(ModelBuilder builder)
+    {
+        builder.Entity<ProductDocument>(entity =>
+        {
+            entity.ToTable("product_documents");
+
+            entity.Property(d => d.Id).HasColumnName("id");
+            entity.Property(d => d.ProductId).HasColumnName("product_id");
+            entity.Property(d => d.Name).HasColumnName("name").HasMaxLength(160).IsRequired();
+            entity.Property(d => d.FileUrl).HasColumnName("file_url").HasMaxLength(500).IsRequired();
+            entity.Property(d => d.FileType).HasColumnName("file_type").HasMaxLength(20).IsRequired();
+
+            entity.HasIndex(d => d.ProductId).HasDatabaseName("ix_product_documents_product_id");
+
+            entity.HasOne(d => d.Product)
+                .WithMany(p => p.Documents)
+                .HasForeignKey(d => d.ProductId)
+                .HasConstraintName("fk_product_documents_product")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            ConfigureAuditableEntity(entity, "product_documents");
         });
     }
 
@@ -175,6 +241,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(a => a.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(AuctionStatuses.Live);
             entity.Property(a => a.StartDate).HasColumnName("start_date");
             entity.Property(a => a.EndDate).HasColumnName("end_date");
+            entity.Property(a => a.AuctionEventName).HasColumnName("auction_event_name").HasMaxLength(160);
             entity.Property(a => a.WinnerId).HasColumnName("winner_id");
 
             entity.HasIndex(a => a.ProductId).HasDatabaseName("ix_auctions_product_id");

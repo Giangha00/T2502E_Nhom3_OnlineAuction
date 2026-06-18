@@ -29,6 +29,7 @@
         ["errorImageSizeLimit"] = Localizer["Sell_Error_ImageSizeLimit"].Value,
         ["errorDocInvalidFormat"] = Localizer["Sell_Error_DocInvalidFormat"].Value,
         ["errorDocSizeLimit"] = Localizer["Sell_Error_DocSizeLimit"].Value,
+        ["errorYearInvalid"] = Localizer["Sell_Error_YearInvalid"].Value,
         ["conditionNew"] = Localizer["Sell_Condition_New"].Value,
         ["conditionLikeNew"] = Localizer["Sell_Condition_LikeNew"].Value,
         ["conditionUsed"] = Localizer["Sell_Condition_Used"].Value
@@ -70,6 +71,8 @@
         <div class="space-y-6">
           @await Html.PartialAsync("Partials/_ProductForm", Model)
           @await Html.PartialAsync("Partials/_ImageUploader")
+          @await Html.PartialAsync("Partials/_GradingForm", Model)
+          @await Html.PartialAsync("Partials/_CardSpecsForm", Model)
           @await Html.PartialAsync("Partials/_AuctionSetting", Model)
           @await Html.PartialAsync("Partials/_AuctionDuration", Model)
           @await Html.PartialAsync("Partials/_DocumentUploader")

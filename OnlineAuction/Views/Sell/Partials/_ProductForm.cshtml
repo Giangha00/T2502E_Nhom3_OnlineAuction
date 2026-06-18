@@ -29,6 +29,13 @@
     @await Html.PartialAsync("Partials/_CategorySelect", Model)
 
     <div>
+      <label for="shortDescription" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_ShortDescription"]</label>
+      <textarea id="shortDescription" name="ShortDescription" rows="2" maxlength="300" placeholder="@Localizer["Sell_ShortDescription_Placeholder"]"
+                class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">@Model.ShortDescription</textarea>
+      <p class="field-error mt-1 hidden text-xs text-red-600" data-for="shortDescription"></p>
+    </div>
+
+    <div>
       <label for="productDescription" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_ProductDescription"]</label>
       <textarea id="productDescription" name="ProductDescription" class="hidden">@Model.ProductDescription</textarea>
       <div id="descriptionEditor" class="ckeditor-wrapper overflow-hidden rounded-lg border border-slate-200 bg-white"></div>
