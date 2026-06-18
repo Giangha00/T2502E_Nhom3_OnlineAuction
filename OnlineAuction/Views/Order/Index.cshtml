@@ -97,26 +97,30 @@
             <div class="mt-6 space-y-4">
               <div>
                 <label for="fullName" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["User_FullName"]</label>
-                <input type="text" id="fullName" name="fullName" value="@Model.FullName" readonly
-                       class="w-full rounded-lg border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-700"/>
+                <input type="text" id="fullName" name="fullName" value="@Model.FullName" required maxlength="120"
+                       class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
               </div>
               <div>
                 <label for="address" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Order_ShippingAddress"]</label>
-                <input type="text" id="address" name="address" value="123 Collector's Lane, Vault District" required
+                <input type="text" id="address" name="address" value="@Model.Address" required maxlength="300"
                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
               </div>
               <div class="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label for="city" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Checkout_City"]</label>
-                  <input type="text" id="city" name="city" value="San Francisco" required
+                  <input type="text" id="city" name="city" value="@Model.City" required maxlength="100"
                          class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
                 </div>
                 <div>
                   <label for="phone" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Checkout_Phone"]</label>
-                  <input type="tel" id="phone" name="phone" value="@Model.Phone" readonly
-                         class="w-full rounded-lg border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-700"/>
+                  <input type="tel" id="phone" name="phone" value="@Model.Phone" required maxlength="20"
+                         class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
                 </div>
               </div>
+              @if (Model.ShippingSaved)
+              {
+                <p class="text-xs font-medium text-emerald-600">@Localizer["Order_ShippingSaved"]</p>
+              }
             </div>
           </section>
 
@@ -128,11 +132,12 @@
             <div class="mt-6 space-y-3">
               @foreach (var method in Model.PaymentMethods)
               {
-                var isPayPal = method.Id == "paypal";
-                <label class="order-payment-option flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition @(isPayPal ? "border-blue-600 bg-blue-50/30" : "border-slate-200 hover:border-slate-300")">
+                var isSelected = string.Equals(Model.SelectedPaymentMethod, method.Id, StringComparison.OrdinalIgnoreCase)
+                    || (string.IsNullOrWhiteSpace(Model.SelectedPaymentMethod) && method.Id == "paypal");
+                <label class="order-payment-option flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition @(isSelected ? "border-blue-600 bg-blue-50/30" : "border-slate-200 hover:border-slate-300")">
                   <input type="radio" name="paymentMethod" value="@method.Id"
                          class="h-4 w-4 border-slate-300 text-blue-700 focus:ring-blue-500"
-                         @(isPayPal ? "checked" : null)/>
+                         @(isSelected ? "checked" : null)/>
                   <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white text-slate-600 shadow-sm ring-1 ring-slate-100">
                     @if (method.Id == "paypal")
                     {

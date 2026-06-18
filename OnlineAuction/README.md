@@ -67,3 +67,14 @@ Username is generated from the email local-part (e.g. `john@gmail.com` → `john
 Migration: `AddProductDetailSellFields`.
 
 Test URLs after seed: `/Auction/Detail/1` … `/Auction/Detail/5`.
+
+## Order flow (Task 1 — DB-backed)
+
+1. Auction ends → `AuctionFinalizationWorker` creates `orders` + `order_items` for winners
+2. `/Order` loads `pending_payment` orders from DB (not session)
+3. Shipping form: Full Name, Address, City, Phone — validated server-side, saved on `orders`
+4. Complete Order saves shipping + payment method; stays `pending_payment` until PayPal (next sprint)
+5. Header badge = pending payment count from DB
+6. Expired deadlines → order `cancelled` automatically
+
+Migration: `AddOrderShippingFields`. `WonOrderStore` removed.

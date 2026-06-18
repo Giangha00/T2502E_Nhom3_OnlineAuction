@@ -8,7 +8,11 @@ public interface IOrderService
 
     Task<int> CountPendingPaymentOrdersAsync(int buyerId);
 
+    Task<int> CancelExpiredPendingOrdersAsync(int buyerId);
+
+    Task<int> CancelAllExpiredPendingOrdersAsync();
+
     Task<(bool Success, string Message)> CompleteOrderAsync(
         int buyerId,
-        string paymentMethod);
+        CompleteOrderRequest request);
 }

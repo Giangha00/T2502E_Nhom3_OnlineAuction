@@ -377,6 +377,11 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(o => o.TotalAmount).HasColumnName("total_amount").HasPrecision(18, 2);
             entity.Property(o => o.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(OrderStatuses.PendingPayment);
             entity.Property(o => o.PaymentDeadline).HasColumnName("payment_deadline");
+            entity.Property(o => o.ShippingFullName).HasColumnName("shipping_full_name").HasMaxLength(120);
+            entity.Property(o => o.ShippingAddress).HasColumnName("shipping_address").HasMaxLength(300);
+            entity.Property(o => o.ShippingCity).HasColumnName("shipping_city").HasMaxLength(100);
+            entity.Property(o => o.ShippingPhone).HasColumnName("shipping_phone").HasMaxLength(20);
+            entity.Property(o => o.PaymentMethod).HasColumnName("payment_method").HasMaxLength(30);
 
             entity.HasIndex(o => o.OrderReference).IsUnique().HasDatabaseName("uk_orders_reference");
             entity.HasIndex(o => new { o.BuyerId, o.Status }).HasDatabaseName("ix_orders_buyer_status");
