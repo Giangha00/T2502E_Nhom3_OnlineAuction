@@ -12,6 +12,8 @@ public class Payment : AuditableEntity
 
     public string? TransactionId { get; set; }
 
+    public string? PayPalOrderId { get; set; }
+
     public DateTime? PaidAt { get; set; }
 
     public AuctionOrder Order { get; set; } = null!;

@@ -80,7 +80,8 @@ public class PaymentService : IPaymentService
             OrderReference = orderRef ?? "AH-00000000-0000",
             AuctionName = auctionName ?? "Your auction item",
             TotalAmount = total ?? 0,
-            PaymentMethod = method ?? "Bank Transfer"
+            PaymentMethod = method ?? "Bank Transfer",
+            PaidAt = DateTime.UtcNow
         };
     }
 

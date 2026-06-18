@@ -1,5 +1,90 @@
 # OnlineAuction — Dev Notes
 
+## Quick start (JetBrains Rider / Mac / Windows)
+
+### Prerequisites
+
+| Tool | Version |
+|------|---------|
+| [.NET SDK](https://dotnet.microsoft.com/download) | 8.0+ |
+| MySQL | 8.0+ (XAMPP, Docker, or native install) |
+| Node.js | 18+ (Tailwind build on `dotnet build`) |
+
+### 1. Clone & database
+
+```bash
+# Create database in MySQL/phpMyAdmin
+CREATE DATABASE online_auction CHARACTER SET utf8mb4;
+
+cd OnlineAuction
+dotnet ef database update
+```
+
+Default connection (empty MySQL root password, common on XAMPP Mac):
+
+`server=localhost;port=3306;database=online_auction;user=root;password=;`
+
+If your MySQL password differs (typical on Windows):
+
+```bash
+cp appsettings.Local.json.example appsettings.Local.json
+# Edit appsettings.Local.json with your password
+```
+
+### 2. PayPal Sandbox (optional — for `/Order` checkout)
+
+```bash
+dotnet user-secrets set "PayPal:ClientId" "YOUR_SANDBOX_CLIENT_ID"
+dotnet user-secrets set "PayPal:ClientSecret" "YOUR_SANDBOX_CLIENT_SECRET"
+dotnet user-secrets set "PayPal:Mode" "sandbox"
+```
+
+User Secrets work when `ASPNETCORE_ENVIRONMENT=Development` (default in `launchSettings.json`).
+
+### 3. Run from JetBrains Rider
+
+1. Open `Nhom3.sln`
+2. Select run configuration **OnlineAuction** (uses profile `http` → `http://localhost:5006`)
+3. Press Run
+
+Or from terminal:
+
+```bash
+cd OnlineAuction
+dotnet run --launch-profile http
+```
+
+### Configuration files
+
+| File | Committed? | Purpose |
+|------|------------|---------|
+| `appsettings.json` | Yes | Shared defaults (MySQL, PayPal placeholders) |
+| `appsettings.Local.json` | No (gitignored) | Machine-specific DB password / PayPal keys |
+| `appsettings.example.json` | Yes | Reference copy of base config |
+| User Secrets | Per machine | PayPal credentials (recommended) |
+
+**Do not** recreate `appsettings.Development.json` — it caused config overrides and confusion between machines.
+
+### Troubleshooting
+
+| Issue | Fix |
+|-------|-----|
+| Cannot connect to MySQL | Start XAMPP/MySQL; check `appsettings.Local.json` password |
+| PayPal not configured | Set User Secrets (step 2); restart app; env must be `Development` |
+| Port 5006 in use | Kill old process or change port in `launchSettings.json` |
+| HTTPS redirect warning | Fixed — HTTPS redirect only runs in Production |
+| Seeder crash on startup | Fixed — FK cleanup before delete; set `RefreshTestAuctionsInDevelopment` to `false` to disable |
+
+In **Development**, Pokémon test auctions (`RareCard Vault Test Auctions`) **auto-refresh on every app start** by default (`RefreshTestAuctionsInDevelopment: true`). Restart Rider to see fresh auctions with new countdown.
+
+To keep orders while testing PayPal, add to `appsettings.Local.json`:
+
+```json
+{ "SeedData": { "RefreshTestAuctionsInDevelopment": false } }
+```
+
+---
+
 ## Public user authentication (ASP.NET Core Identity)
 
 Public login/signup uses **Identity cookie auth** (`SignInManager` / `UserManager`), not session flags.
@@ -73,8 +158,54 @@ Test URLs after seed: `/Auction/Detail/1` … `/Auction/Detail/5`.
 1. Auction ends → `AuctionFinalizationWorker` creates `orders` + `order_items` for winners
 2. `/Order` loads `pending_payment` orders from DB (not session)
 3. Shipping form: Full Name, Address, City, Phone — validated server-side, saved on `orders`
-4. Complete Order saves shipping + payment method; stays `pending_payment` until PayPal (next sprint)
+4. Complete Order saves shipping + payment method; PayPal redirect/capture in Task 2
 5. Header badge = pending payment count from DB
 6. Expired deadlines → order `cancelled` automatically
 
 Migration: `AddOrderShippingFields`. `WonOrderStore` removed.
+
+## PayPal checkout (Task 2)
+
+Flow: `/Order` → shipping + PayPal → PayPal Sandbox approve → capture → `/Payment/Confirmation?orderId={id}` (DB-backed).
+
+### Configuration
+
+Set credentials via **User Secrets** (recommended) or environment variables — do not commit `ClientSecret`.
+
+```bash
+cd OnlineAuction
+dotnet user-secrets set "PayPal:ClientId" "YOUR_SANDBOX_CLIENT_ID"
+dotnet user-secrets set "PayPal:ClientSecret" "YOUR_SANDBOX_CLIENT_SECRET"
+dotnet user-secrets set "PayPal:Mode" "sandbox"
+```
+
+`appsettings.json` contains empty placeholders. `ReturnUrl` / `CancelUrl` in config are fallbacks; the app builds live URLs from the current request when starting checkout.
+
+| Key | Description |
+|-----|-------------|
+| `PayPal:ClientId` | REST app client ID (public in frontend only if using JS SDK — we use server-side redirect) |
+| `PayPal:ClientSecret` | REST app secret — **server only** |
+| `PayPal:Mode` | `sandbox` or `live` |
+| `PayPal:CurrencyCode` | Default `USD` |
+
+### Sandbox testing
+
+**Important:** The PayPal login page after checkout is **Sandbox only**. Do **not** use your real PayPal.com email/password. Use a **Sandbox Personal (Buyer)** account from Developer Dashboard → Testing Tools → Sandbox Accounts (e.g. `sb-xxx@personal.example.com`). Click the account → View/Edit → set or copy the password.
+
+1. Create a [PayPal Developer](https://developer.paypal.com/) app (Sandbox).
+2. Use Sandbox **Personal** (buyer) and **Business** (merchant) accounts from the developer dashboard.
+3. Run migrations: `dotnet ef database update`
+4. Log in as winning bidder (`user3@auctionhouse.local` / `User@123`), open `/Order`, complete shipping, choose PayPal, submit.
+5. Approve payment on PayPal Sandbox → redirected to Confirmation with paid order from DB.
+6. Cancel on PayPal → back to `/Order`, order stays `pending_payment`.
+
+### Endpoints
+
+| Route | Description |
+|-------|-------------|
+| `POST /Order/Complete` | Save shipping; if PayPal → create checkout + redirect |
+| `GET /Payment/PayPalReturn?token=` | Capture payment (authorized buyer only) |
+| `GET /Payment/PayPalCancel?token=` | Cancel pending PayPal session |
+| `GET /Payment/Confirmation?orderId=` | Paid order confirmation from DB |
+
+Migration: `AddPayPalOrderIdToPayments`.

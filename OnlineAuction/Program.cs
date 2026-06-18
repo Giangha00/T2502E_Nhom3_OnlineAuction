@@ -11,7 +11,7 @@ using OnlineAuction.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 var mvcBuilder = builder.Services.AddControllersWithViews()
     .AddViewLocalization()
     .AddDataAnnotationsLocalization(options =>
@@ -25,6 +25,7 @@ if (builder.Environment.IsDevelopment())
 }
 
 builder.Services.AddDistributedMemoryCache();
+builder.Services.AddMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -103,6 +104,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.Configure<PayPalSettings>(
+    builder.Configuration.GetSection(PayPalSettings.SectionName));
+
+builder.Services.AddHttpClient<IPayPalService, PayPalService>();
 
 builder.Services.AddScoped<IAvatarStorageService, CloudinaryAvatarStorageService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
@@ -113,6 +118,7 @@ builder.Services.AddScoped<IBidService, BidService>();
 builder.Services.AddScoped<IAuctionRegistrationService, AuctionRegistrationService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderCreationService, OrderCreationService>();
+builder.Services.AddScoped<IOrderPaymentService, OrderPaymentService>();
 builder.Services.AddHostedService<AuctionFinalizationWorker>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
@@ -129,8 +135,13 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var refreshTestAuctions = configuration.GetValue("SeedData:RefreshTestAuctionsOnStartup", false)
+        || (app.Environment.IsDevelopment()
+            && configuration.GetValue("SeedData:RefreshTestAuctionsInDevelopment", true));
+
     await UserSeeder.SeedAsync(dbContext, userManager);
-    await AuctionCatalogSeeder.SeedAsync(dbContext, app.Environment.IsDevelopment());
+    await AuctionCatalogSeeder.SeedAsync(dbContext, refreshTestAuctions);
 }
 
 using (var scope = app.Services.CreateScope())
@@ -144,11 +155,9 @@ using (var scope = app.Services.CreateScope())
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 // ✅ FIX: RequestLocalization phải được đặt trước Routing

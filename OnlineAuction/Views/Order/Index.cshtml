@@ -88,6 +88,7 @@
 
       <form id="orderCheckoutForm" asp-controller="Order" asp-action="Complete" method="post"
             class="mt-10 grid gap-8 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] xl:gap-10">
+        @Html.AntiForgeryToken()
         <div class="space-y-6">
           <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex items-center gap-3">
