@@ -421,6 +421,7 @@
   <data name="Order_Empty_Desc" xml:space="preserve"><value>Thắng một phiên đấu giá và sản phẩm sẽ xuất hiện tại đây để thanh toán.</value></data>
   <data name="Order_BrowseAuctions" xml:space="preserve"><value>Xem đấu giá</value></data>
   <data name="Order_PaymentDeadline" xml:space="preserve"><value>Hạn thanh toán:</value></data>
+  <data name="Order_PaymentExpired" xml:space="preserve"><value>Đã hết hạn thanh toán</value></data>
   <data name="BuyNow_PageTitle" xml:space="preserve"><value>Mua ngay</value></data>
   <data name="BuyNow_Subtitle" xml:space="preserve"><value>Mua ngay vật phẩm sưu tầm đã xác thực với giá cố định.</value></data>
   <data name="BuyNow_AvailableNow" xml:space="preserve"><value>Có sẵn</value></data>
