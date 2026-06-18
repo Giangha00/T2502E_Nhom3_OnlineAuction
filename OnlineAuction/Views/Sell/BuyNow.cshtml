@@ -2,6 +2,7 @@
 @model OnlineAuction.Models.CreateBuyNowViewModel
 @{
     ViewData["Title"] = Localizer["SellBuyNow_PageTitle"];
+    ViewData["DocumentSectionNumber"] = 6;
     var successMessage = TempData["SuccessMessage"] as string;
     var buyNowI18n = new Dictionary<string, string>
     {
@@ -16,6 +17,9 @@
         ["errorPriceRequired"] = Localizer["SellBuyNow_Error_PriceRequired"].Value,
         ["errorImageInvalidFormat"] = Localizer["Sell_Error_ImageInvalidFormat"].Value,
         ["errorImageSizeLimit"] = Localizer["Sell_Error_ImageSizeLimit"].Value,
+        ["errorDocInvalidFormat"] = Localizer["Sell_Error_DocInvalidFormat"].Value,
+        ["errorDocSizeLimit"] = Localizer["Sell_Error_DocSizeLimit"].Value,
+        ["errorYearInvalid"] = Localizer["Sell_Error_YearInvalid"].Value,
         ["conditionNew"] = Localizer["Sell_Condition_New"].Value,
         ["conditionLikeNew"] = Localizer["Sell_Condition_LikeNew"].Value,
         ["conditionUsed"] = Localizer["Sell_Condition_Used"].Value
@@ -24,6 +28,11 @@
 
 <div class="sell-page min-h-screen bg-slate-50">
   <section class="site-shell px-4 py-8 sm:px-6 lg:py-10">
+    <style>
+      #successBanner a {
+        display: none;
+      }
+    </style>
     <div id="successBanner" data-auto-dismiss="5000" class="@(string.IsNullOrEmpty(successMessage) ? "hidden" : "") fixed left-1/2 top-24 z-9999 w-[min(92vw,520px)] -translate-x-1/2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800 shadow-lg">
       <div class="flex items-start gap-3">
         <svg class="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -49,9 +58,12 @@
 
       <div class="grid gap-8 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px]">
         <div class="space-y-6">
-          @await Html.PartialAsync("Partials/_BuyNowProductForm", Model)
+          @await Html.PartialAsync("Partials/_ProductForm", Model)
           @await Html.PartialAsync("Partials/_ImageUploader")
+          @await Html.PartialAsync("Partials/_GradingForm", Model)
+          @await Html.PartialAsync("Partials/_CardSpecsForm", Model)
           @await Html.PartialAsync("Partials/_BuyNowPricing", Model)
+          @await Html.PartialAsync("Partials/_DocumentUploader")
 
           <div class="lg:hidden">
             @await Html.PartialAsync("Partials/_BuyNowPreviewCard")

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -149,7 +150,6 @@ public class SellerAuctionService : ISellerAuctionService
                 GradingEdges = TrimOrNull(model.GradingEdges),
                 GradingSurface = TrimOrNull(model.GradingSurface),
                 PrimaryImage = imageUrl,
-                EstimatedValue = model.EstimatedValue,
                 Category = category,
                 CreatedAt = now
             };
@@ -251,57 +251,151 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "Price must be greater than 0.", null);
         }
 
-        string? imageUrl;
+        if (model.Year is < 1800 or > 2100)
+        {
+            return (false, "Please enter a valid year between 1800 and 2100.", null);
+        }
+
+        var galleryFiles = model.GalleryImageFiles
+            .Where(file => file is { Length: > 0 })
+            .Take(4)
+            .ToList();
+
+        if (1 + galleryFiles.Count > 5)
+        {
+            return (false, "You can upload up to 5 images.", null);
+        }
+
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+
         try
         {
-            imageUrl = await _photoService.AddPhotoAsync(model.PrimaryImageFile, ProductImageFolder);
+            string? imageUrl;
+            try
+            {
+                imageUrl = await _photoService.AddPhotoAsync(model.PrimaryImageFile, ProductImageFolder);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return (false, ex.Message, null);
+            }
+
+            imageUrl = string.IsNullOrWhiteSpace(imageUrl)
+                ? DefaultProductImageUrl
+                : imageUrl;
+
+            var category = await GetOrCreateCategoryAsync(model.Category);
+            var now = DateTime.UtcNow;
+
+            var product = new Product
+            {
+                SellerId = sellerId,
+                Name = model.ProductName.Trim(),
+                CategoryId = category.Id,
+                ShortDescription = TrimOrNull(model.ShortDescription),
+                Subtitle = TrimOrNull(model.Subtitle),
+                DescriptionHtml = model.ProductDescription,
+                Condition = model.Condition,
+                ProductOrigin = TrimOrNull(model.ProductOrigin),
+                Year = model.Year,
+                SetName = TrimOrNull(model.SetName),
+                Language = TrimOrNull(model.Language),
+                CardNumber = TrimOrNull(model.CardNumber),
+                GradeLabel = TrimOrNull(model.Grade),
+                CertNumber = TrimOrNull(model.CertificateNumber),
+                GradingCentering = TrimOrNull(model.GradingCentering),
+                GradingCorners = TrimOrNull(model.GradingCorners),
+                GradingEdges = TrimOrNull(model.GradingEdges),
+                GradingSurface = TrimOrNull(model.GradingSurface),
+                PrimaryImage = imageUrl,
+                Category = category,
+                CreatedAt = now
+            };
+
+            var sortOrder = 1;
+            foreach (var galleryFile in galleryFiles)
+            {
+                try
+                {
+                    var galleryUrl = await _photoService.AddPhotoAsync(galleryFile, ProductImageFolder);
+                    if (string.IsNullOrWhiteSpace(galleryUrl))
+                    {
+                        continue;
+                    }
+
+                    product.Images.Add(new ProductImage
+                    {
+                        ImageUrl = galleryUrl,
+                        SortOrder = sortOrder++,
+                        CreatedAt = now
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    await transaction.RollbackAsync();
+                    return (false, ex.Message, null);
+                }
+            }
+
+            for (var i = 0; i < model.DocumentFiles.Count; i++)
+            {
+                var documentFile = model.DocumentFiles[i];
+                if (documentFile is not { Length: > 0 })
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var documentUrl = await _photoService.AddPhotoAsync(documentFile, DocumentFolder);
+                    if (string.IsNullOrWhiteSpace(documentUrl))
+                    {
+                        continue;
+                    }
+
+                    var documentName = i < model.DocumentNames.Count && !string.IsNullOrWhiteSpace(model.DocumentNames[i])
+                        ? model.DocumentNames[i].Trim()
+                        : documentFile.FileName;
+
+                    product.Documents.Add(new ProductDocument
+                    {
+                        Name = documentName,
+                        FileUrl = documentUrl,
+                        FileType = ResolveDocumentType(documentFile),
+                        CreatedAt = now
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    await transaction.RollbackAsync();
+                    return (false, ex.Message, null);
+                }
+            }
+
+            var auction = new Auction
+            {
+                Product = product,
+                StartingPrice = model.Price,
+                BidStep = 0.01m,
+                CurrentPrice = model.Price,
+                StartDate = now,
+                EndDate = now.AddYears(1),
+                ListingType = ListingTypes.BuyNow,
+                Status = AuctionStatuses.Live,
+                CreatedAt = now
+            };
+
+            _db.Auctions.Add(auction);
+            await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return (true, "Buy now listing created successfully.", product.Id);
         }
-        catch (InvalidOperationException ex)
+        catch
         {
-            return (false, ex.Message, null);
+            await transaction.RollbackAsync();
+            throw;
         }
-
-        imageUrl = string.IsNullOrWhiteSpace(imageUrl)
-            ? DefaultProductImageUrl
-            : imageUrl;
-
-        var category = await GetOrCreateCategoryAsync(model.Category);
-        var now = DateTime.UtcNow;
-
-        var product = new Product
-        {
-            SellerId = sellerId,
-            Name = model.ProductName.Trim(),
-            CategoryId = category.Id,
-            ShortDescription = string.IsNullOrWhiteSpace(model.Subtitle) ? null : model.Subtitle.Trim(),
-            DescriptionHtml = model.ProductDescription,
-            Condition = model.Condition,
-            Year = model.Year,
-            SetName = string.IsNullOrWhiteSpace(model.SetName) ? null : model.SetName.Trim(),
-            GradeLabel = string.IsNullOrWhiteSpace(model.Grade) ? null : model.Grade.Trim(),
-            CertNumber = string.IsNullOrWhiteSpace(model.CertificateNumber) ? null : model.CertificateNumber.Trim(),
-            PrimaryImage = imageUrl,
-            Category = category,
-            CreatedAt = now
-        };
-
-        var auction = new Auction
-        {
-            Product = product,
-            StartingPrice = model.Price,
-            BidStep = 0.01m,
-            CurrentPrice = model.Price,
-            StartDate = now,
-            EndDate = now.AddYears(1),
-            ListingType = ListingTypes.BuyNow,
-            Status = AuctionStatuses.Live,
-            CreatedAt = now
-        };
-
-        _db.Auctions.Add(auction);
-        await _db.SaveChangesAsync();
-
-        return (true, "Buy now listing created successfully.", product.Id);
     }
 
     public async Task<SellerAuctionFormViewModel?> GetEditFormAsync(int auctionId, int sellerId)
@@ -362,7 +456,7 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "Cannot edit auction that already has bids.");
         }
 
-        if (auction.Status != AuctionStatuses.Live || auction.EndDate <= DateTime.UtcNow)
+        if (auction.Status != AuctionStatuses.Live || !DateTimeUtilities.IsInFutureUtc(auction.EndDate))
         {
             return (false, "Only live auctions can be edited.");
         }
@@ -436,7 +530,7 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "Cannot cancel auction that already has a pending or paid order.");
         }
 
-        if (auction.Status != AuctionStatuses.Live || auction.EndDate <= DateTime.UtcNow)
+        if (auction.Status != AuctionStatuses.Live || !DateTimeUtilities.IsInFutureUtc(auction.EndDate))
         {
             return (false, "Only live auctions can be cancelled.");
         }
@@ -450,7 +544,7 @@ public class SellerAuctionService : ISellerAuctionService
 
     private static string FormatAuctionTimeRemaining(DateTime endDate)
     {
-        var remaining = endDate - DateTime.UtcNow;
+        var remaining = DateTimeUtilities.RemainingUtc(endDate);
         if (remaining <= TimeSpan.Zero)
         {
             return "Ended";

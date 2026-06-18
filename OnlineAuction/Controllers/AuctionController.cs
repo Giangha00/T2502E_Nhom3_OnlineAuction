@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OnlineAuction.Helpers;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
@@ -128,13 +129,14 @@ public class AuctionController : Controller
             currentPrice = result.CurrentPrice,
             bidCount = result.BidCount,
             minNextBid = result.MinNextBid,
-            endDate = result.EndDate?.ToUniversalTime().ToString("o"),
+            endDate = result.EndDate is null ? null : DateTimeUtilities.AsUtc(result.EndDate.Value).ToString("o"),
             bidHistory = result.BidHistory?.Select(bid => new
             {
                 bidderName = bid.BidderName,
                 amount = bid.Amount,
                 bidTime = bid.BidTime,
-                isWinning = bid.IsWinning
+                isWinning = bid.IsWinning,
+                status = bid.Status
             })
         });
     }

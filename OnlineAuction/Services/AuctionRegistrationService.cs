@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -211,12 +212,12 @@ public class AuctionRegistrationService : IAuctionRegistrationService
         }
 
         var now = DateTime.UtcNow;
-        if (now < auction.StartDate.ToUniversalTime())
+        if (now < DateTimeUtilities.AsUtc(auction.StartDate))
         {
             return "This auction has not started yet.";
         }
 
-        if (now >= auction.EndDate.ToUniversalTime())
+        if (!DateTimeUtilities.IsInFutureUtc(auction.EndDate))
         {
             return "This auction has ended.";
         }

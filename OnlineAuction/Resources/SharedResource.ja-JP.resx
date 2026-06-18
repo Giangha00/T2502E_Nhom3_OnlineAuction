@@ -500,6 +500,8 @@
   <data name="Product_Status" xml:space="preserve"><value>ステータス</value></data>
   <data name="Product_Winning" xml:space="preserve"><value>最高入札</value></data>
   <data name="Product_Outbid" xml:space="preserve"><value>上回られた</value></data>
+  <data name="Product_Raised" xml:space="preserve"><value>入札更新</value></data>
+  <data name="Product_BidHistoryNote" xml:space="preserve"><value>ステータスはオークション開催中の各入札を示します。最終落札者は終了後に確定します。</value></data>
   <data name="Product_ViewAllBids" xml:space="preserve"><value>全{0}件の入札を見る →</value></data>
   <data name="Product_Shipping_Desc" xml:space="preserve"><value>グレード済みカードは気候管理・全額保険付きVault梱包で発送。認証センターから玄関までホワイトグローブ対応。</value></data>
   <data name="Product_Shipping_Insurance" xml:space="preserve"><value>鑑定額相当の保険付き</value></data>

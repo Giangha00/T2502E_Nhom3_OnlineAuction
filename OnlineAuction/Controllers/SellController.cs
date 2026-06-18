@@ -120,7 +120,17 @@ public class SellController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> BuyNow(CreateBuyNowViewModel model)
     {
-        model.PrimaryImageFile ??= Request.Form.Files.FirstOrDefault();
+        model.PrimaryImageFile ??= Request.Form.Files
+            .FirstOrDefault(file => file.Name == "PrimaryImageFile");
+        model.GalleryImageFiles = Request.Form.Files
+            .Where(file => file.Name == "GalleryImageFiles")
+            .ToList();
+        model.DocumentFiles = Request.Form.Files
+            .Where(file => file.Name == "DocumentFiles")
+            .ToList();
+        model.DocumentNames = Request.Form["DocumentNames"]
+            .Select(name => name!)
+            .ToList();
 
         foreach (var (key, message) in _sellService.ValidateCreateBuyNow(model))
         {
