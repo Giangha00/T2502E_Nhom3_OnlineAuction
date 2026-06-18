@@ -3,10 +3,14 @@
 
   var DRAFT_KEY = 'auctionHouse_createBuyNow_draft';
   var MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+  var MAX_DOC_SIZE = 10 * 1024 * 1024;
+  var MAX_IMAGES = 5;
   var IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+  var DOC_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 
   var state = {
     images: [],
+    documents: [],
     editor: null
   };
 
@@ -46,11 +50,25 @@
   function getFormData() {
     return {
       productName: $('productName')?.value.trim() || '',
+      shortDescription: $('shortDescription')?.value.trim() || '',
+      subtitle: $('subtitle')?.value.trim() || '',
       category: $('category')?.value || '',
       productDescription: state.editor ? state.editor.getData() : ($('productDescription')?.value || ''),
       condition: getSelectedRadio('Condition'),
       productOrigin: $('productOrigin')?.value.trim() || '',
-      price: $('price')?.value || ''
+      year: $('year')?.value || '',
+      setName: $('setName')?.value.trim() || '',
+      language: $('language')?.value || '',
+      cardNumber: $('cardNumber')?.value.trim() || '',
+      grade: $('grade')?.value || '',
+      certificateNumber: $('certificateNumber')?.value.trim() || '',
+      gradingCentering: $('gradingCentering')?.value.trim() || '',
+      gradingCorners: $('gradingCorners')?.value.trim() || '',
+      gradingEdges: $('gradingEdges')?.value.trim() || '',
+      gradingSurface: $('gradingSurface')?.value.trim() || '',
+      price: $('price')?.value || '',
+      imageCount: state.images.length,
+      documentCount: state.documents.length
     };
   }
 
@@ -69,18 +87,24 @@
   }
 
   function buildPreviewSubtitle(data) {
+    if (data.subtitle) return data.subtitle;
+    if (data.shortDescription) return data.shortDescription;
     var parts = [];
     if (data.category) parts.push(data.category);
+    if (data.setName) parts.push(data.setName);
     if (data.productOrigin) parts.push(data.productOrigin);
     if (data.condition) parts.push(localizeCondition(data.condition));
     return parts.length ? parts.join(' · ') : '—';
   }
 
-  function setPreviewGradeBadge(condition) {
+  function setPreviewGradeBadge(grade) {
     $all('previewGrade').forEach(function (badge) {
-      var showGrade = condition && /^(PSA|BGS|CGC)\s/i.test(condition);
+      var showGrade = grade && /^(PSA|BGS|CGC)\s/i.test(grade);
       if (showGrade) {
-        badge.textContent = condition;
+        badge.textContent = grade;
+        badge.classList.remove('hidden');
+      } else if (grade) {
+        badge.textContent = grade;
         badge.classList.remove('hidden');
       } else {
         badge.textContent = '';
@@ -110,7 +134,7 @@
     setPreviewText('previewName', data.productName || t('productNameDefault', 'Product Name'));
     setPreviewText('previewSubtitle', buildPreviewSubtitle(data));
     setPreviewText('previewPrice', formatCardMoney(data.price));
-    setPreviewGradeBadge(data.condition);
+    setPreviewGradeBadge(data.grade);
     setPreviewMainImage(state.images.length > 0 ? state.images[0].url : '');
   }
 
@@ -150,13 +174,13 @@
 
     list.innerHTML = '';
     if (state.images.length === 0) {
-      grid.classList.add('hidden');
+      if (grid) grid.classList.add('hidden');
       updatePreview();
       return;
     }
 
-    grid.classList.remove('hidden');
-    count.textContent = '(' + state.images.length + ')';
+    if (grid) grid.classList.remove('hidden');
+    if (count) count.textContent = '(' + state.images.length + ')';
 
     state.images.forEach(function (img) {
       var card = document.createElement('div');
@@ -169,8 +193,7 @@
 
     list.querySelectorAll('[data-remove-image]').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        var id = btn.getAttribute('data-remove-image');
-        removeImage(id);
+        removeImage(btn.getAttribute('data-remove-image'));
       });
     });
 
@@ -179,34 +202,29 @@
 
   function addImages(files) {
     var errors = [];
-    var file = Array.from(files)[0];
+    Array.from(files).forEach(function (file) {
+      if (state.images.length >= MAX_IMAGES) {
+        return;
+      }
 
-    state.images.forEach(function (img) { URL.revokeObjectURL(img.url); });
-    state.images = [];
+      if (!IMAGE_TYPES.includes(file.type)) {
+        errors.push(tf(t('errorImageInvalidFormat', '{0}: invalid format (JPG, PNG, WEBP only)'), file.name));
+        return;
+      }
 
-    if (!file) {
-      renderImagePreviews();
-      return;
-    }
+      if (file.size > MAX_IMAGE_SIZE) {
+        errors.push(tf(t('errorImageSizeLimit', '{0}: exceeds 5MB limit'), file.name));
+        return;
+      }
 
-    if (!IMAGE_TYPES.includes(file.type)) {
-      errors.push(tf(t('errorImageInvalidFormat', '{0}: invalid format (JPG, PNG, WEBP only)'), file.name));
-    } else if (file.size > MAX_IMAGE_SIZE) {
-      errors.push(tf(t('errorImageSizeLimit', '{0}: exceeds 5MB limit'), file.name));
-    } else {
       state.images.push({
         id: 'img_' + Date.now() + '_' + Math.random().toString(36).slice(2),
         file: file,
         url: URL.createObjectURL(file)
       });
-    }
+    });
 
-    if (errors.length) {
-      showError('images', errors[0]);
-    } else {
-      showError('images', '');
-    }
-
+    showError('images', errors.length ? errors[0] : '');
     renderImagePreviews();
   }
 
@@ -230,7 +248,59 @@
     showError('images', '');
   }
 
-  function setupDropZone(zoneId, inputId, onFiles) {
+  function renderDocuments() {
+    var list = $('documentList');
+    if (!list) return;
+    list.innerHTML = '';
+
+    state.documents.forEach(function (doc) {
+      var li = document.createElement('li');
+      li.className = 'flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-3';
+      li.innerHTML =
+        '<div class="flex min-w-0 items-center gap-3">' +
+        '<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-xs font-bold text-blue-800">' +
+        doc.name.split('.').pop().toUpperCase().slice(0, 3) + '</span>' +
+        '<div class="min-w-0"><p class="truncate text-sm font-medium text-slate-800">' + doc.name + '</p>' +
+        '<p class="text-xs text-slate-400">' + (doc.size / 1024).toFixed(1) + ' KB</p></div></div>' +
+        '<button type="button" data-remove-doc="' + doc.id + '" class="shrink-0 cursor-pointer text-xs font-semibold text-red-600 hover:text-red-700">' + t('remove', 'Remove') + '</button>';
+      list.appendChild(li);
+    });
+
+    list.querySelectorAll('[data-remove-doc]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-remove-doc');
+        state.documents = state.documents.filter(function (d) { return d.id !== id; });
+        renderDocuments();
+      });
+    });
+
+    updatePreview();
+  }
+
+  function addDocuments(files) {
+    var errors = [];
+    Array.from(files).forEach(function (file) {
+      if (!DOC_TYPES.includes(file.type)) {
+        errors.push(tf(t('errorDocInvalidFormat', '{0}: invalid format (PDF, JPG, PNG only)'), file.name));
+        return;
+      }
+      if (file.size > MAX_DOC_SIZE) {
+        errors.push(tf(t('errorDocSizeLimit', '{0}: exceeds 10MB limit'), file.name));
+        return;
+      }
+      state.documents.push({
+        id: 'doc_' + Date.now() + '_' + Math.random().toString(36).slice(2),
+        name: file.name,
+        size: file.size,
+        file: file
+      });
+    });
+
+    showError('documents', errors.length ? errors[0] : '');
+    renderDocuments();
+  }
+
+  function setupDropZone(zoneId, inputId, onFiles, resetAfterChange) {
     var zone = $(zoneId);
     var input = $(inputId);
     if (!zone || !input) return;
@@ -250,6 +320,7 @@
     });
     input.addEventListener('change', function () {
       if (input.files.length) onFiles(input.files);
+      if (resetAfterChange) input.value = '';
     });
   }
 
@@ -273,6 +344,15 @@
     if (!data.condition) {
       showError('Condition', t('errorConditionRequired', 'Please select a condition'));
       valid = false;
+    }
+
+    if (data.year) {
+      var year = Number(data.year);
+      if (isNaN(year) || year < 1800 || year > 2100) {
+        showError('year', t('errorYearInvalid', 'Please enter a valid year between 1800 and 2100.'));
+        markInvalid($('year'));
+        valid = false;
+      }
     }
 
     var price = Number(data.price);
@@ -306,8 +386,20 @@
       var data = JSON.parse(raw);
 
       if ($('productName') && data.productName) $('productName').value = data.productName;
+      if ($('shortDescription') && data.shortDescription) $('shortDescription').value = data.shortDescription;
+      if ($('subtitle') && data.subtitle) $('subtitle').value = data.subtitle;
       if ($('category') && data.category) $('category').value = data.category;
       if ($('productOrigin') && data.productOrigin) $('productOrigin').value = data.productOrigin;
+      if ($('year') && data.year) $('year').value = data.year;
+      if ($('setName') && data.setName) $('setName').value = data.setName;
+      if ($('language') && data.language) $('language').value = data.language;
+      if ($('cardNumber') && data.cardNumber) $('cardNumber').value = data.cardNumber;
+      if ($('grade') && data.grade) $('grade').value = data.grade;
+      if ($('certificateNumber') && data.certificateNumber) $('certificateNumber').value = data.certificateNumber;
+      if ($('gradingCentering') && data.gradingCentering) $('gradingCentering').value = data.gradingCentering;
+      if ($('gradingCorners') && data.gradingCorners) $('gradingCorners').value = data.gradingCorners;
+      if ($('gradingEdges') && data.gradingEdges) $('gradingEdges').value = data.gradingEdges;
+      if ($('gradingSurface') && data.gradingSurface) $('gradingSurface').value = data.gradingSurface;
       if ($('price') && data.price) $('price').value = data.price;
 
       if (data.condition) {
@@ -350,6 +442,20 @@
     }
   }
 
+  function showSubmitStatus(type, message) {
+    var status = $('createBuyNowStatus');
+    if (!status) return;
+
+    status.textContent = message;
+    status.className = 'mb-4 rounded-lg border px-4 py-3 text-sm font-medium';
+
+    if (type === 'success') {
+      status.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-800');
+    } else {
+      status.classList.add('border-red-200', 'bg-red-50', 'text-red-700');
+    }
+  }
+
   function initEditor() {
     var el = $('descriptionEditor');
     if (!el || typeof ClassicEditor === 'undefined') return;
@@ -370,7 +476,14 @@
   }
 
   function bindEvents() {
-    ['productName', 'category', 'productOrigin', 'price'].forEach(function (id) {
+    var fields = [
+      'productName', 'shortDescription', 'subtitle', 'category', 'productOrigin',
+      'year', 'setName', 'language', 'cardNumber', 'grade', 'certificateNumber',
+      'gradingCentering', 'gradingCorners', 'gradingEdges', 'gradingSurface',
+      'price'
+    ];
+
+    fields.forEach(function (id) {
       var el = $(id);
       if (!el) return;
       el.addEventListener('input', updatePreview);
@@ -381,7 +494,8 @@
       el.addEventListener('change', updatePreview);
     });
 
-    setupDropZone('imageDropZone', 'imageInput', addImages);
+    setupDropZone('imageDropZone', 'imageInput', addImages, false);
+    setupDropZone('documentDropZone', 'documentInput', addDocuments, true);
 
     var clearBtn = $('clearAllImages');
     if (clearBtn) clearBtn.addEventListener('click', clearAllImages);
@@ -414,6 +528,13 @@
       if (state.images.length > 0) {
         formData.append('PrimaryImageFile', state.images[0].file);
       }
+      for (var i = 1; i < state.images.length; i++) {
+        formData.append('GalleryImageFiles', state.images[i].file);
+      }
+      state.documents.forEach(function (doc) {
+        formData.append('DocumentFiles', doc.file);
+        formData.append('DocumentNames', doc.name);
+      });
 
       fetch(form.action, {
         method: 'POST',
@@ -437,6 +558,7 @@
         .catch(function (error) {
           showError('images', error.message);
           showTopToast('error', error.message);
+          showSubmitStatus('error', error.message);
         });
     });
   }

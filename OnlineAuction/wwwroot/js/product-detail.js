@@ -135,11 +135,20 @@
     }
 
     bidHistoryBody.innerHTML = items.map(function (bid) {
-      var winning = !!bid.isWinning;
-      var badgeClass = winning
-        ? 'inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700'
-        : 'inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-500';
-      var statusLabel = winning ? (i18n.winning || 'Winning') : (i18n.outbid || 'Outbid');
+      var status = (bid.status || '').toUpperCase();
+      var badgeClass;
+      var statusLabel;
+
+      if (status === 'WINNING' || bid.isWinning) {
+        badgeClass = 'inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700';
+        statusLabel = i18n.winning || 'Highest bid';
+      } else if (status === 'RAISED') {
+        badgeClass = 'inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-blue-700';
+        statusLabel = i18n.raised || 'Raised';
+      } else {
+        badgeClass = 'inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-500';
+        statusLabel = i18n.outbid || 'Outbid';
+      }
 
       return '<tr>' +
         '<td class="px-5 py-4 font-medium text-slate-800">' + bid.bidderName + '</td>' +

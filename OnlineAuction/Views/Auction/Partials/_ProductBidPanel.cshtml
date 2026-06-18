@@ -1,5 +1,6 @@
 @model OnlineAuction.Models.ProductDetailViewModel
 @using OnlineAuction.Entities
+@using OnlineAuction.Helpers
 @{
     var minBid = Model.CurrentPrice + Model.BidStep;
     const int bidOptionCount = 35;
@@ -9,7 +10,7 @@
     if (!string.IsNullOrEmpty(Model.Condition)) specs.Add(Model.Condition);
     if (!string.IsNullOrEmpty(Model.CertificateNumber)) specs.Add(Localizer["Product_CertPrefix", Model.CertificateNumber].Value);
     var isLoggedIn = User.Identity?.IsAuthenticated == true;
-    var endDateIso = Model.EndDate.ToUniversalTime().ToString("o");
+    var endDateIso = DateTimeUtilities.ToUtcIsoString(Model.EndDate);
     var showRegistrationFlow = Model.RequiresRegistration && Model.CanPlaceBid && !Model.IsSeller;
     var showBidForm = !Model.IsSeller && Model.CanPlaceBid &&
         (!Model.RequiresRegistration || Model.RegistrationStatus == AuctionRegistrationStatuses.Approved);
@@ -47,10 +48,6 @@
   </div>
 
   <div class="product-bid-panel__divider"></div>
-
-  <p class="text-sm text-slate-700">
-    @Localizer["Product_EstimatedValue"] <span class="font-semibold text-slate-900">$@Model.EstimatedValue.ToString("N0")</span>
-  </p>
 
   <div class="mt-5 flex items-start justify-between gap-6">
     <div>
@@ -188,7 +185,7 @@
     <p id="countdownSummary" class="font-medium text-blue-700">
       @Localizer["Product_CountdownIn", Model.CountdownDays, Model.CountdownHours]
     </p>
-    <p id="endsAtLabel" class="text-slate-600">@Localizer["Product_EndsAt", Model.EndDate.ToString("MMM dd 'at' h:mmtt")]</p>
+    <p id="endsAtLabel" class="text-slate-600">@Localizer["Product_EndsAt", DateTimeUtilities.AsUtc(Model.EndDate).ToLocalTime().ToString("MMM dd 'at' h:mmtt")]</p>
     <p class="text-xs text-slate-400">@Localizer["Product_ClosureNote"]</p>
   </div>
 

@@ -498,8 +498,10 @@
   <data name="Product_BidAmount" xml:space="preserve"><value>Bid Amount</value></data>
   <data name="Product_DateTime" xml:space="preserve"><value>Date &amp;amp; Time</value></data>
   <data name="Product_Status" xml:space="preserve"><value>Status</value></data>
-  <data name="Product_Winning" xml:space="preserve"><value>Winning</value></data>
+  <data name="Product_Winning" xml:space="preserve"><value>Highest bid</value></data>
   <data name="Product_Outbid" xml:space="preserve"><value>Outbid</value></data>
+  <data name="Product_Raised" xml:space="preserve"><value>Raised</value></data>
+  <data name="Product_BidHistoryNote" xml:space="preserve"><value>Status shows each bid while the auction is live. The final winner is confirmed only after the auction ends.</value></data>
   <data name="Product_ViewAllBids" xml:space="preserve"><value>View All {0} Bids →</value></data>
   <data name="Product_Shipping_Desc" xml:space="preserve"><value>All graded cards ship in climate-controlled, fully insured vault packaging. White glove handling from our authentication center to your door.</value></data>
   <data name="Product_Shipping_Insurance" xml:space="preserve"><value>Full appraisal value insurance included</value></data>

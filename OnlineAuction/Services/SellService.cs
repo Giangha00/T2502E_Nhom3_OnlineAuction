@@ -36,7 +36,7 @@ public class SellService : ISellService
         return model;
     }
 
-    public void PopulateOptions(CreateAuctionViewModel model)
+    public void PopulateOptions(SellProductFormViewModel model)
     {
         model.Categories = MockAuctionData.GetCategoryNames().ToList();
         model.Conditions = CreateAuctionMockData.Conditions.ToList();
@@ -44,13 +44,9 @@ public class SellService : ISellService
         model.Languages = CreateAuctionMockData.Languages.ToList();
     }
 
-    public void PopulateOptions(CreateBuyNowViewModel model)
-    {
-        model.Categories = MockAuctionData.GetCategoryNames().ToList();
-        model.Conditions = CreateAuctionMockData.Conditions.ToList();
-        model.Grades = CreateAuctionMockData.Grades.ToList();
-        model.Languages = CreateAuctionMockData.Languages.ToList();
-    }
+    public void PopulateOptions(CreateAuctionViewModel model) => PopulateOptions((SellProductFormViewModel)model);
+
+    public void PopulateOptions(CreateBuyNowViewModel model) => PopulateOptions((SellProductFormViewModel)model);
 
     public IEnumerable<(string Key, string Message)> ValidateCreateAuction(CreateAuctionViewModel model)
     {
@@ -84,6 +80,11 @@ public class SellService : ISellService
         if (model.Price <= 0)
         {
             yield return (nameof(model.Price), "Price must be greater than 0.");
+        }
+
+        if (model.Year is < 1800 or > 2100)
+        {
+            yield return (nameof(model.Year), "Please enter a valid year between 1800 and 2100.");
         }
     }
 }

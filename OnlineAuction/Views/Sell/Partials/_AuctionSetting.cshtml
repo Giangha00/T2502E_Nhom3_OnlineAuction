@@ -61,20 +61,10 @@
       <p class="field-error mt-1 hidden text-xs text-red-600" data-for="AuctionType"></p>
     </div>
 
-    <div class="grid gap-5 sm:grid-cols-2">
-      <div>
-        <label for="estimatedValue" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_EstimatedValue"]</label>
-        <div class="relative">
-          <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">$</span>
-          <input type="number" id="estimatedValue" name="EstimatedValue" value="@(Model.EstimatedValue.HasValue && Model.EstimatedValue > 0 ? Model.EstimatedValue : "")" step="0.01" min="0" placeholder="150000"
-                 class="field-input w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-7 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
-        </div>
-      </div>
-      <div>
-        <label for="auctionEventName" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_AuctionEventName"]</label>
-        <input type="text" id="auctionEventName" name="AuctionEventName" value="@Model.AuctionEventName" maxlength="160" placeholder="@Localizer["Sell_AuctionEventName_Placeholder"]"
-               class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
-      </div>
+    <div>
+      <label for="auctionEventName" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_AuctionEventName"]</label>
+      <input type="text" id="auctionEventName" name="AuctionEventName" value="@Model.AuctionEventName" maxlength="160" placeholder="@Localizer["Sell_AuctionEventName_Placeholder"]"
+             class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
     </div>
   </div>
 </div>

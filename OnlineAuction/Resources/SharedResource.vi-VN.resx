@@ -498,8 +498,10 @@
   <data name="Product_BidAmount" xml:space="preserve"><value>Số tiền đấu giá</value></data>
   <data name="Product_DateTime" xml:space="preserve"><value>Ngày &amp;amp; Giờ</value></data>
   <data name="Product_Status" xml:space="preserve"><value>Trạng thái</value></data>
-  <data name="Product_Winning" xml:space="preserve"><value>Đang thắng</value></data>
+  <data name="Product_Winning" xml:space="preserve"><value>Giá cao nhất</value></data>
   <data name="Product_Outbid" xml:space="preserve"><value>Bị vượt giá</value></data>
+  <data name="Product_Raised" xml:space="preserve"><value>Đã nâng giá</value></data>
+  <data name="Product_BidHistoryNote" xml:space="preserve"><value>Trạng thái phản ánh từng lần đặt giá khi phiên còn diễn ra. Người thắng cuối cùng chỉ được xác định sau khi phiên kết thúc.</value></data>
   <data name="Product_ViewAllBids" xml:space="preserve"><value>Xem tất cả {0} lượt đấu giá →</value></data>
   <data name="Product_Shipping_Desc" xml:space="preserve"><value>Thẻ đã chấm điểm được vận chuyển trong bao bì kho kiểm soát khí hậu, bảo hiểm đầy đủ. Xử lý cẩn thận từ trung tâm xác thực đến tay bạn.</value></data>
   <data name="Product_Shipping_Insurance" xml:space="preserve"><value>Bao gồm bảo hiểm toàn bộ giá trị thẩm định</value></data>
