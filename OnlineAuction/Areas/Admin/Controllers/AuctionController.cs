@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using OnlineAuction.Areas.Admin.Services;
+using OnlineAuction.Areas.Admin.ViewModels.Auctions;
+using OnlineAuction.Data;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Areas.Admin.Controllers;
@@ -6,38 +9,112 @@ namespace OnlineAuction.Areas.Admin.Controllers;
 [Area("Admin")]
 public class AuctionController : Controller
 {
-    private readonly IAuctionService _auctionService;
+    private readonly AdminAuctionService _auctionService;
 
-    public AuctionController(IAuctionService auctionService)
+    public AuctionController(AuctionHouseDbContext dbContext, IPhotoService photoService)
     {
-        _auctionService = auctionService;
+        _auctionService = new AdminAuctionService(dbContext, photoService);
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index(AuctionFilterViewModel filter)
     {
-        ViewBag.Auctions = _auctionService.GetAllAuctions();
-        return View();
+        var model = await _auctionService.GetAuctionsAsync(filter);
+        return View(model);
     }
 
-    public IActionResult Create()
+    [HttpGet]
+    public async Task<IActionResult> Create()
     {
-        return View();
+        return View(await _auctionService.BuildCreateFormAsync());
     }
 
-    public IActionResult Edit(int id)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(AuctionFormViewModel model)
     {
-        ViewBag.Auction = _auctionService.GetAuctionById(id);
-        return View();
+        if (!ModelState.IsValid)
+        {
+            await _auctionService.PopulateFormOptionsAsync(model);
+            return View(model);
+        }
+
+        var result = await _auctionService.CreateAsync(model);
+
+        if (!result.Success)
+        {
+            ModelState.AddModelError(string.Empty, result.Message);
+            await _auctionService.PopulateFormOptionsAsync(model);
+            return View(model);
+        }
+
+        TempData["SuccessMessage"] = result.Message;
+        return RedirectToAction(nameof(Index));
     }
 
-    public async Task<IActionResult> Details(int id)
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
     {
-        var product = await _auctionService.GetProductDetailAsync(id);
-        if (product is null)
+        var model = await _auctionService.GetEditFormAsync(id);
+
+        if (model is null)
         {
             return NotFound();
         }
 
-        return View(product);
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(AuctionFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await _auctionService.PopulateFormOptionsAsync(model);
+            return View(model);
+        }
+
+        var result = await _auctionService.UpdateAsync(model);
+
+        if (!result.Success)
+        {
+            ModelState.AddModelError(string.Empty, result.Message);
+            await _auctionService.PopulateFormOptionsAsync(model);
+            return View(model);
+        }
+
+        TempData["SuccessMessage"] = result.Message;
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Details(int id)
+    {
+        var model = await _auctionService.GetDetailsAsync(id);
+
+        if (model is null)
+        {
+            return NotFound();
+        }
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var result = await _auctionService.DeleteAsync(id);
+
+        if (result.Success)
+        {
+            TempData["SuccessMessage"] = result.Message;
+        }
+        else
+        {
+            TempData["ErrorMessage"] = result.Message;
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 }

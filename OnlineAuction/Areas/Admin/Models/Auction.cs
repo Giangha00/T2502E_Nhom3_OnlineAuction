@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using OnlineAuction.Entities;
 
 namespace OnlineAuction.Areas.Admin.Models;
 
