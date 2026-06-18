@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
 
