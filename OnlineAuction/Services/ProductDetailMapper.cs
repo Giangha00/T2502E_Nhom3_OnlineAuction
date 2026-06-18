@@ -1,4 +1,5 @@
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 
 namespace OnlineAuction.Services;
@@ -55,7 +56,6 @@ internal static class ProductDetailMapper
             BidCount = bids.Count,
             LotNumber = 0,
             WatcherCount = registrationCount,
-            EstimatedValue = product.EstimatedValue ?? 0,
             ReserveMet = auction.CurrentPrice >= auction.StartingPrice,
             AuctionEventName = string.IsNullOrWhiteSpace(auction.AuctionEventName)
                 ? "RareCard Vault: Premium Trading Card Auction"
@@ -156,14 +156,36 @@ internal static class ProductDetailMapper
             })
             .ToList();
 
-    public static List<BidHistoryItemViewModel> MapBidHistory(IEnumerable<Bid> bids) =>
-        bids.Select(bid => new BidHistoryItemViewModel
+    public static List<BidHistoryItemViewModel> MapBidHistory(IEnumerable<Bid> bids)
+    {
+        var bidList = bids.ToList();
+        var winningBid = bidList.FirstOrDefault(bid => bid.IsWinning);
+
+        return bidList
+            .Select(bid => new BidHistoryItemViewModel
+            {
+                BidderName = FormatBidderName(bid.Bidder),
+                Amount = bid.Amount,
+                BidTime = bid.PlacedAt,
+                Status = ResolveBidStatus(bid, winningBid)
+            })
+            .ToList();
+    }
+
+    private static string ResolveBidStatus(Bid bid, Bid? winningBid)
+    {
+        if (bid.IsWinning)
         {
-            BidderName = FormatBidderName(bid.Bidder),
-            Amount = bid.Amount,
-            BidTime = bid.PlacedAt,
-            Status = bid.IsWinning ? "WINNING" : "OUTBID"
-        }).ToList();
+            return "WINNING";
+        }
+
+        if (winningBid is not null && bid.BidderId == winningBid.BidderId)
+        {
+            return "RAISED";
+        }
+
+        return "OUTBID";
+    }
 
     private static string FormatBidderName(ApplicationUser bidder)
     {
@@ -261,7 +283,7 @@ internal static class ProductDetailMapper
 
     private static (int Days, int Hours, int Minutes, int Seconds) CalculateCountdown(DateTime endDate)
     {
-        var remaining = endDate.ToUniversalTime() - DateTime.UtcNow;
+        var remaining = DateTimeUtilities.RemainingUtc(endDate);
         if (remaining <= TimeSpan.Zero)
         {
             return (0, 0, 0, 0);
@@ -276,11 +298,11 @@ internal static class ProductDetailMapper
 
     public static bool CanAcceptBids(Auction auction) =>
         auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon &&
-        auction.EndDate.ToUniversalTime() > DateTime.UtcNow;
+        DateTimeUtilities.IsInFutureUtc(auction.EndDate);
 
     private static (string Status, string BadgeClass) MapAuctionStatus(string status, DateTime endDate)
     {
-        if (endDate.ToUniversalTime() <= DateTime.UtcNow &&
+        if (!DateTimeUtilities.IsInFutureUtc(endDate) &&
             status is not AuctionStatuses.Cancelled)
         {
             return ("Ended", "bg-stone-600 text-white");
@@ -299,7 +321,7 @@ internal static class ProductDetailMapper
 
     public static string MapCardStatus(Auction auction)
     {
-        if (auction.EndDate.ToUniversalTime() <= DateTime.UtcNow)
+        if (!DateTimeUtilities.IsInFutureUtc(auction.EndDate))
         {
             return "Ended";
         }
@@ -324,7 +346,7 @@ internal static class ProductDetailMapper
             return "Ending Soon";
         }
 
-        var remaining = auction.EndDate.ToUniversalTime() - DateTime.UtcNow;
+        var remaining = DateTimeUtilities.RemainingUtc(auction.EndDate);
         if (remaining.TotalHours <= 24)
         {
             return "Ending Soon";
@@ -338,7 +360,7 @@ internal static class ProductDetailMapper
 
     private static string FormatTimeRemaining(DateTime endDate)
     {
-        var remaining = endDate.ToUniversalTime() - DateTime.UtcNow;
+        var remaining = DateTimeUtilities.RemainingUtc(endDate);
         if (remaining <= TimeSpan.Zero)
         {
             return "Ended";

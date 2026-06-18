@@ -1,4 +1,5 @@
 @using System.Text.Json
+@using OnlineAuction.Helpers
 @model OnlineAuction.Models.ProductDetailViewModel
 @{
     var productDetailI18n = new Dictionary<string, string>
@@ -9,6 +10,7 @@
         ["bidSuccess"] = Localizer["Js_ProductDetail_BidSuccess"].Value,
         ["auctionEnded"] = Localizer["Js_ProductDetail_AuctionEnded"].Value,
         ["winning"] = Localizer["Product_Winning"].Value,
+        ["raised"] = Localizer["Product_Raised"].Value,
         ["outbid"] = Localizer["Product_Outbid"].Value,
         ["noBidsYet"] = Localizer["Product_NoBidsYet"].Value,
         ["bidsCount"] = Localizer["Product_BidsCount", 0].Value.Replace("0", "{0}"),
@@ -46,7 +48,7 @@
     window.productDetailConfig = {
       auctionId: @Model.Id,
       bidStep: @Model.BidStep.ToString(System.Globalization.CultureInfo.InvariantCulture),
-      endDate: @Html.Raw(JsonSerializer.Serialize(Model.EndDate.ToUniversalTime().ToString("o"))),
+      endDate: @Html.Raw(JsonSerializer.Serialize(DateTimeUtilities.ToUtcIsoString(Model.EndDate))),
       canBid: @(Model.CanBid ? "true" : "false"),
       requiresRegistration: @(Model.RequiresRegistration ? "true" : "false"),
       bidOptionCount: 35,

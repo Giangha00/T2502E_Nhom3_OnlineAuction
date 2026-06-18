@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -113,9 +114,9 @@ public class BidService : IBidService
         auction.CurrentPrice = amount;
         auction.UpdatedAt = placedAt;
 
-        if ((auction.EndDate.ToUniversalTime() - placedAt).TotalMinutes < AntiSnipeThresholdMinutes)
+        if (DateTimeUtilities.RemainingUtc(auction.EndDate).TotalMinutes < AntiSnipeThresholdMinutes)
         {
-            auction.EndDate = auction.EndDate.AddMinutes(AntiSnipeExtensionMinutes);
+            // auction.EndDate = DateTimeUtilities.AsUtc(auction.EndDate).AddMinutes(AntiSnipeExtensionMinutes);
         }
 
         await _dbContext.SaveChangesAsync();
@@ -151,7 +152,7 @@ public class BidService : IBidService
             };
         }
 
-        if (DateTime.UtcNow >= auction.EndDate.ToUniversalTime())
+        if (!DateTimeUtilities.IsInFutureUtc(auction.EndDate))
         {
             return "This auction has ended.";
         }
