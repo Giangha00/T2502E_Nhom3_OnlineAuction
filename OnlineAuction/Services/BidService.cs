@@ -37,6 +37,12 @@ public class BidService : IBidService
             return Fail("Invalid bid.");
         }
 
+        var strategy = _dbContext.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(() => PlaceBidCoreAsync(auctionId, bidderId, amount));
+    }
+
+    private async Task<PlaceBidResult> PlaceBidCoreAsync(int auctionId, int bidderId, decimal amount)
+    {
         await using var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable);
 
         var auction = await _dbContext.Auctions

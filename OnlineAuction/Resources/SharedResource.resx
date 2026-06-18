@@ -421,6 +421,7 @@
   <data name="Order_Empty_Desc" xml:space="preserve"><value>Place a winning bid on any live auction and your item will appear here for checkout.</value></data>
   <data name="Order_BrowseAuctions" xml:space="preserve"><value>Browse Auctions</value></data>
   <data name="Order_PaymentDeadline" xml:space="preserve"><value>Payment Deadline:</value></data>
+  <data name="Order_PaymentExpired" xml:space="preserve"><value>Payment expired</value></data>
   <data name="BuyNow_PageTitle" xml:space="preserve"><value>Buy Now</value></data>
   <data name="BuyNow_Subtitle" xml:space="preserve"><value>Instantly purchase authenticated collectibles at fixed prices.</value></data>
   <data name="BuyNow_AvailableNow" xml:space="preserve"><value>Available now</value></data>

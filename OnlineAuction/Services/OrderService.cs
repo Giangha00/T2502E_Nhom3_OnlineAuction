@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Data;
+using OnlineAuction.Entities;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -6,17 +8,65 @@ namespace OnlineAuction.Services;
 
 public class OrderService : IOrderService
 {
-    public OrderPageViewModel BuildOrderPage(ISession session)
+    private static readonly HashSet<string> SupportedPaymentMethods = new(StringComparer.OrdinalIgnoreCase)
     {
-        var items = WonOrderStore.GetOrders(session);
-        var subtotal = items.Sum(i => i.WinningBid);
+        "paypal",
+        "cod"
+    };
+
+    private readonly AuctionHouseDbContext _dbContext;
+
+    public OrderService(AuctionHouseDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task<OrderPageViewModel?> BuildOrderPageAsync(int buyerId)
+    {
+        var buyer = await _dbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(user => user.Id == buyerId);
+
+        if (buyer is null)
+        {
+            return null;
+        }
+
+        var orders = await _dbContext.Orders
+            .AsNoTracking()
+            .Include(order => order.Items)
+                .ThenInclude(item => item.Auction)
+                    .ThenInclude(auction => auction.Product)
+            .Where(order =>
+                order.BuyerId == buyerId &&
+                order.Status == OrderStatuses.PendingPayment &&
+                order.DeletedAt == null)
+            .OrderBy(order => order.PaymentDeadline)
+            .ToListAsync();
+
+        var items = orders
+            .SelectMany(order => order.Items.Select(item => new WonOrderItem
+            {
+                OrderId = order.Id,
+                AuctionId = item.AuctionId,
+                Name = item.ItemName,
+                Subtitle = BuildSubtitle(item.Auction.Product),
+                Grade = item.ItemGrade ?? string.Empty,
+                ImageUrl = item.ItemImageUrl ?? string.Empty,
+                WinningBid = item.WinningBid,
+                PaymentDeadline = order.PaymentDeadline,
+                OrderReference = order.OrderReference
+            }))
+            .ToList();
 
         var model = new OrderPageViewModel
         {
             Items = items,
-            Subtotal = subtotal,
-            ShippingFee = items.Count > 0 ? 45m : 0m,
-            VaultInsurance = items.Count > 0 ? Math.Round(Math.Max(60m, subtotal * 0.00721m), 2) : 0m,
+            FullName = buyer.FullName,
+            Phone = buyer.PhoneNumber ?? string.Empty,
+            Subtotal = orders.Sum(order => order.Subtotal),
+            ShippingFee = orders.Sum(order => order.ShippingFee),
+            VaultInsurance = orders.Sum(order => order.VaultInsurance),
             PaymentMethods =
             [
                 new PaymentMethodOption
@@ -38,36 +88,66 @@ public class OrderService : IOrderService
         return model;
     }
 
-    public (bool Success, string OrderRef, string AuctionName, decimal Total, string Method) CompleteOrder(
-        ISession session,
+    public Task<int> CountPendingPaymentOrdersAsync(int buyerId) =>
+        _dbContext.Orders.CountAsync(order =>
+            order.BuyerId == buyerId &&
+            order.Status == OrderStatuses.PendingPayment &&
+            order.DeletedAt == null);
+
+    public async Task<(bool Success, string Message)> CompleteOrderAsync(
+        int buyerId,
         string paymentMethod)
     {
-        var items = WonOrderStore.GetOrders(session);
-        if (items.Count == 0)
+        if (!SupportedPaymentMethods.Contains(paymentMethod))
         {
-            return (false, string.Empty, string.Empty, 0, string.Empty);
+            return (false, "Please select a valid payment method.");
         }
 
-        var subtotal = items.Sum(i => i.WinningBid);
-        var shipping = 45m;
-        var insurance = Math.Round(Math.Max(60m, subtotal * 0.00721m), 2);
-        var total = subtotal + shipping + insurance;
-        var orderRef = items.Count == 1
-            ? items[0].OrderReference
-            : $"AH-{DateTime.UtcNow:yyyyMMdd}-B{items.Count}";
+        var orders = await _dbContext.Orders
+            .Where(order =>
+                order.BuyerId == buyerId &&
+                order.Status == OrderStatuses.PendingPayment &&
+                order.DeletedAt == null)
+            .ToListAsync();
 
-        var auctionName = items.Count == 1
-            ? items[0].Name
-            : $"{items.Count} won auctions";
-
-        var method = paymentMethod switch
+        if (orders.Count == 0)
         {
-            "cod" => "Cash on Delivery (COD)",
-            _ => "PayPal"
-        };
+            return (false, "No pending payment orders were found.");
+        }
 
-        WonOrderStore.Clear(session);
+        if (orders.Any(order => order.PaymentDeadline <= DateTime.UtcNow))
+        {
+            return (false, "One or more payment deadlines have expired.");
+        }
 
-        return (true, orderRef, auctionName, total, method);
+        foreach (var order in orders)
+        {
+            order.UpdatedAt = DateTime.UtcNow;
+        }
+
+        await _dbContext.SaveChangesAsync();
+
+        return (true, "Payment method saved. Payment integration will be available in the next sprint.");
+    }
+
+    private static string BuildSubtitle(Product product)
+    {
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(product.SetName))
+        {
+            parts.Add(product.SetName);
+        }
+
+        if (!string.IsNullOrWhiteSpace(product.GradeLabel))
+        {
+            parts.Add(product.GradeLabel);
+        }
+
+        if (product.Year.HasValue)
+        {
+            parts.Add(product.Year.Value.ToString());
+        }
+
+        return parts.Count > 0 ? string.Join(" · ", parts) : product.ShortDescription ?? string.Empty;
     }
 }

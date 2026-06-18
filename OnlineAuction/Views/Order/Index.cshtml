@@ -1,3 +1,4 @@
+@using OnlineAuction.Helpers
 @using System.Text.Json
 @model OnlineAuction.Models.OrderPageViewModel
 @{
@@ -41,11 +42,23 @@
     }
     else
     {
+      @if (TempData["OrderMessage"] is string orderMessage)
+      {
+        <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+          @orderMessage
+        </div>
+      }
+      @if (TempData["OrderError"] is string orderError)
+      {
+        <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          @orderError
+        </div>
+      }
       <div class="space-y-4">
         @foreach (var item in Model.Items)
         {
           <article class="order-won-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
-                   data-deadline="@item.PaymentDeadline.ToString("o")">
+                   data-deadline="@DateTimeUtilities.ToUtcIsoString(item.PaymentDeadline)">
             <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
               <div class="flex min-w-0 flex-1 items-center gap-4">
                 <div class="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-slate-50 sm:h-24 sm:w-24">
@@ -65,7 +78,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
               </svg>
               <p class="text-xs font-bold uppercase tracking-wide text-red-600">
-                @Localizer["Order_PaymentDeadline"]
+                @(item.IsExpired ? Localizer["Order_PaymentExpired"].Value : Localizer["Order_PaymentDeadline"].Value)
                 <span class="order-deadline-countdown tabular-nums">—</span>
               </p>
             </div>
@@ -84,8 +97,8 @@
             <div class="mt-6 space-y-4">
               <div>
                 <label for="fullName" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["User_FullName"]</label>
-                <input type="text" id="fullName" name="fullName" value="John Doe" required
-                       class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
+                <input type="text" id="fullName" name="fullName" value="@Model.FullName" readonly
+                       class="w-full rounded-lg border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-700"/>
               </div>
               <div>
                 <label for="address" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Order_ShippingAddress"]</label>
@@ -100,8 +113,8 @@
                 </div>
                 <div>
                   <label for="phone" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Checkout_Phone"]</label>
-                  <input type="tel" id="phone" name="phone" value="+1 (555) 000-0000" required
-                         class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
+                  <input type="tel" id="phone" name="phone" value="@Model.Phone" readonly
+                         class="w-full rounded-lg border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-700"/>
                 </div>
               </div>
             </div>
@@ -166,7 +179,8 @@
               </div>
             </dl>
             <button type="submit"
-                    class="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800">
+                    class="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+                    @(Model.HasExpiredOrder ? "disabled" : null)>
               @Localizer["Order_CompleteOrder"]
               <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>

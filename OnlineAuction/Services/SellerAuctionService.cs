@@ -108,6 +108,15 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "You can upload up to 5 images.", null);
         }
 
+        var strategy = _db.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(() => CreateAuctionCoreAsync(model, sellerId, galleryFiles));
+    }
+
+    private async Task<(bool Success, string Message, int? AuctionId)> CreateAuctionCoreAsync(
+        CreateAuctionViewModel model,
+        int sellerId,
+        IReadOnlyList<IFormFile> galleryFiles)
+    {
         await using var transaction = await _db.Database.BeginTransactionAsync();
 
         try
@@ -266,6 +275,15 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "You can upload up to 5 images.", null);
         }
 
+        var strategy = _db.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(() => CreateBuyNowCoreAsync(model, sellerId, galleryFiles));
+    }
+
+    private async Task<(bool Success, string Message, int? ProductId)> CreateBuyNowCoreAsync(
+        CreateBuyNowViewModel model,
+        int sellerId,
+        IReadOnlyList<IFormFile> galleryFiles)
+    {
         await using var transaction = await _db.Database.BeginTransactionAsync();
 
         try
