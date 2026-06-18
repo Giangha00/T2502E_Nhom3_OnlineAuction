@@ -22,7 +22,6 @@ public class ProductDetailViewModel
     public int BidCount { get; set; }
     public int LotNumber { get; set; }
     public int WatcherCount { get; set; }
-    public decimal EstimatedValue { get; set; }
     public bool ReserveMet { get; set; } = true;
     public string AuctionEventName { get; set; } = string.Empty;
     public List<decimal> QuickBidAmounts { get; set; } = [];

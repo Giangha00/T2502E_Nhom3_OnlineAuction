@@ -500,6 +500,8 @@
   <data name="Product_Status" xml:space="preserve"><value>상태</value></data>
   <data name="Product_Winning" xml:space="preserve"><value>최고 입찰</value></data>
   <data name="Product_Outbid" xml:space="preserve"><value>입찰 초과</value></data>
+  <data name="Product_Raised" xml:space="preserve"><value>입찰 갱신</value></data>
+  <data name="Product_BidHistoryNote" xml:space="preserve"><value>상태는 경매 진행 중 각 입찰을 나타냅니다. 최종 낙찰자는 경매 종료 후 확정됩니다.</value></data>
   <data name="Product_ViewAllBids" xml:space="preserve"><value>입찰 {0}건 모두 보기 →</value></data>
   <data name="Product_Shipping_Desc" xml:space="preserve"><value>등급 카드는 기후 조절 및 전액 보험 Vault 포장으로 배송됩니다. 인증 센터에서 문 앞까지 화이트 글러브 처리.</value></data>
   <data name="Product_Shipping_Insurance" xml:space="preserve"><value>감정가 전액 보험 포함</value></data>

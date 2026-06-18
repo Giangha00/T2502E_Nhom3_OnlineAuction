@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -6,6 +6,7 @@ using OnlineAuction.Areas.Admin.ViewModels.Users;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 using AdminUserDetailViewModel = OnlineAuction.Areas.Admin.ViewModels.Users.UserDetailViewModel;
@@ -492,7 +493,7 @@ public class UserService : IUserService
 
     private static string FormatAuctionTimeRemaining(DateTime endDate)
     {
-        var remaining = endDate - DateTime.UtcNow;
+        var remaining = DateTimeUtilities.RemainingUtc(endDate);
         if (remaining <= TimeSpan.Zero)
         {
             return "Ended";

@@ -58,12 +58,24 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
         CookieName = CookieRequestCultureProvider.DefaultCookieName
     });
 });
+var databaseProvider = builder.Configuration.GetValue<string>("DatabaseProvider") ?? "MySql";
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var serverVersion = ServerVersion.Parse("8.0.36-mysql");
 
 builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
+{
+    if (databaseProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
+    {
+        options.UseSqlite(connectionString);
+        return;
+    }
+
+    var serverVersion = ServerVersion.Parse("8.0.36-mysql");
     options.UseMySql(connectionString, serverVersion, mySqlOptions =>
-        mySqlOptions.MigrationsHistoryTable("__ef_migrations_history")));
+    {
+        mySqlOptions.MigrationsHistoryTable("__ef_migrations_history");
+        mySqlOptions.EnableRetryOnFailure();
+    });
+});
 
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
@@ -100,17 +112,22 @@ builder.Services.AddScoped<IAuctionService, AuctionService>();
 builder.Services.AddScoped<IBidService, BidService>();
 builder.Services.AddScoped<IAuctionRegistrationService, AuctionRegistrationService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<IOrderCreationService, OrderCreationService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
-builder.Services.AddHostedService<AuctionFinalizationWorker>();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
-    await dbContext.Database.MigrateAsync();
+    if (dbContext.Database.ProviderName?.Contains("Sqlite", StringComparison.OrdinalIgnoreCase) == true)
+    {
+        await dbContext.Database.EnsureCreatedAsync();
+    }
+    else
+    {
+        await dbContext.Database.MigrateAsync();
+    }
 }
 
 using (var scope = app.Services.CreateScope())
@@ -118,13 +135,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     await UserSeeder.SeedAsync(dbContext, userManager);
-    await AuctionCatalogSeeder.SeedAsync(dbContext);
-    if (app.Environment.IsDevelopment())
-    {
-        await OrderFlowDemoSeeder.SeedAsync(dbContext);
-        var orderCreationService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
-        await orderCreationService.FinalizeExpiredAuctionsAsync();
-    }
+    await AuctionCatalogSeeder.SeedAsync(dbContext, app.Environment.IsDevelopment());
 }
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
