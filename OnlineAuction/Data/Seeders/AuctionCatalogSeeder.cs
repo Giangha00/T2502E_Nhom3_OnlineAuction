@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
 using OnlineAuction.Helpers;
