@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region MVC + Localization
 
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 var mvcBuilder = builder.Services.AddControllersWithViews()
     .AddViewLocalization()
     .AddDataAnnotationsLocalization(options =>
@@ -27,6 +28,14 @@ if (builder.Environment.IsDevelopment())
     mvcBuilder.AddRazorRuntimeCompilation();
 }
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 builder.Services.AddLocalization(options =>
 {
     options.ResourcesPath = "Resources";
@@ -165,6 +174,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.Configure<PayPalSettings>(
+    builder.Configuration.GetSection(PayPalSettings.SectionName));
+
+builder.Services.AddHttpClient<IPayPalService, PayPalService>();
 
 builder.Services.AddScoped<IAvatarStorageService, CloudinaryAvatarStorageService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
@@ -175,6 +188,8 @@ builder.Services.AddScoped<IBidService, BidService>();
 builder.Services.AddScoped<IAuctionRegistrationService, AuctionRegistrationService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderCreationService, OrderCreationService>();
+builder.Services.AddScoped<IOrderPaymentService, OrderPaymentService>();
+builder.Services.AddHostedService<AuctionFinalizationWorker>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
@@ -199,6 +214,8 @@ using (var scope = app.Services.CreateScope())
     {
         await db.Database.MigrateAsync();
     }
+    var dbContext = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
+    await dbContext.Database.MigrateAsync();
 }
 
 using (var scope = app.Services.CreateScope())
@@ -210,12 +227,23 @@ using (var scope = app.Services.CreateScope())
     await UserSeeder.SeedAsync(db, userManager);
     await AdminSeeder.SeedAsync(db, userManager, roleManager);
     await AuctionCatalogSeeder.SeedAsync(db, app.Environment.IsDevelopment());
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var refreshTestAuctions = configuration.GetValue("SeedData:RefreshTestAuctionsOnStartup", false)
+        || (app.Environment.IsDevelopment()
+            && configuration.GetValue("SeedData:RefreshTestAuctionsInDevelopment", true));
+
+    await UserSeeder.SeedAsync(dbContext, userManager);
+    await AuctionCatalogSeeder.SeedAsync(dbContext, refreshTestAuctions);
 }
 
 using (var scope = app.Services.CreateScope())
 {
     var orderService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
     await orderService.FinalizeExpiredAuctionsAsync();
+    var orderCreationService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
+    var orderService = scope.ServiceProvider.GetRequiredService<IOrderService>();
+    await orderCreationService.FinalizeExpiredAuctionsAsync();
+    await orderService.CancelAllExpiredPendingOrdersAsync();
 }
 
 #endregion
@@ -226,9 +254,8 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRequestLocalization(

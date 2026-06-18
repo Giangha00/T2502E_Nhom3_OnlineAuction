@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineAuction.Data;
 
@@ -11,9 +12,11 @@ using OnlineAuction.Data;
 namespace OnlineAuction.Migrations
 {
     [DbContext(typeof(AuctionHouseDbContext))]
-    partial class AuctionHouseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260618105429_AddOrderShippingFields")]
+    partial class AddOrderShippingFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -940,11 +943,6 @@ namespace OnlineAuction.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("paid_at");
 
-                    b.Property<string>("PayPalOrderId")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("paypal_order_id");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -977,9 +975,6 @@ namespace OnlineAuction.Migrations
 
                     b.HasIndex("OrderId")
                         .HasDatabaseName("ix_payments_order_id");
-
-                    b.HasIndex("PayPalOrderId")
-                        .HasDatabaseName("ix_payments_paypal_order_id");
 
                     b.HasIndex("Status")
                         .HasDatabaseName("ix_payments_status");

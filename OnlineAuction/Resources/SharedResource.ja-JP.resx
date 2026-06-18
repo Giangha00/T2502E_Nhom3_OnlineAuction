@@ -633,6 +633,9 @@
   <data name="PaymentConfirm_Step3" xml:space="preserve"><value>発送後に追跡情報をお送りします。</value></data>
   <data name="PaymentConfirm_BrowseMore" xml:space="preserve"><value>他のオークションを見る</value></data>
   <data name="PaymentConfirm_BackHome" xml:space="preserve"><value>ホームに戻る</value></data>
+  <data name="PaymentConfirm_ViewDetails" xml:space="preserve"><value>注文詳細を見る</value></data>
+  <data name="PaymentConfirm_TransactionId" xml:space="preserve"><value>取引ID</value></data>
+  <data name="PaymentConfirm_PaidAt" xml:space="preserve"><value>支払日時</value></data>
   <data name="Contact_Hero_Label" xml:space="preserve"><value>カスタマーサポート</value></data>
   <data name="Contact_Hero_TitleLine1" xml:space="preserve"><value>上質なサポートで</value></data>
   <data name="Contact_Hero_TitleAccent" xml:space="preserve"><value>本格コレクターへ</value></data>
@@ -756,6 +759,7 @@
   <data name="Order_SecuredShipping" xml:space="preserve"><value>安全配送</value></data>
   <data name="Order_VaultInsurance" xml:space="preserve"><value>Vault保険</value></data>
   <data name="Order_CompleteOrder" xml:space="preserve"><value>注文を完了</value></data>
+  <data name="Order_ShippingSaved" xml:space="preserve"><value>配送情報を保存しました。</value></data>
   <data name="Order_SslSecure" xml:space="preserve"><value>SSL暗号化の安全な取引</value></data>
   <data name="Order_AuthenticityTitle" xml:space="preserve"><value>RareCard真正性保証</value></data>
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Vaultセキュリティで保護。発送前にすべての落札品を二重検証します。</value></data>
