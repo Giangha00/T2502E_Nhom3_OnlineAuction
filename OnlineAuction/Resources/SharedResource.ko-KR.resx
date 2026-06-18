@@ -756,6 +756,7 @@
   <data name="Order_SecuredShipping" xml:space="preserve"><value>안전 배송</value></data>
   <data name="Order_VaultInsurance" xml:space="preserve"><value>Vault 보험</value></data>
   <data name="Order_CompleteOrder" xml:space="preserve"><value>주문 완료</value></data>
+  <data name="Order_ShippingSaved" xml:space="preserve"><value>배송 정보가 저장되었습니다.</value></data>
   <data name="Order_SslSecure" xml:space="preserve"><value>SSL 암호화 안전 거래</value></data>
   <data name="Order_AuthenticityTitle" xml:space="preserve"><value>RareCard 진품 보증</value></data>
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Vault 보안으로 보호됩니다. 모든 낙찰품은 배송 전 이중 검증됩니다.</value></data>

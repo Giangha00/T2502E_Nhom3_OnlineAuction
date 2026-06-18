@@ -122,14 +122,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
-    if (dbContext.Database.ProviderName?.Contains("Sqlite", StringComparison.OrdinalIgnoreCase) == true)
-    {
-        await dbContext.Database.EnsureCreatedAsync();
-    }
-    else
-    {
-        await dbContext.Database.MigrateAsync();
-    }
+    await dbContext.Database.MigrateAsync();
 }
 
 using (var scope = app.Services.CreateScope())
@@ -143,7 +136,9 @@ using (var scope = app.Services.CreateScope())
 using (var scope = app.Services.CreateScope())
 {
     var orderCreationService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
+    var orderService = scope.ServiceProvider.GetRequiredService<IOrderService>();
     await orderCreationService.FinalizeExpiredAuctionsAsync();
+    await orderService.CancelAllExpiredPendingOrdersAsync();
 }
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

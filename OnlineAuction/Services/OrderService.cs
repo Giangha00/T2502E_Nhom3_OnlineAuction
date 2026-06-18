@@ -32,6 +32,8 @@ public class OrderService : IOrderService
             return null;
         }
 
+        await CancelExpiredPendingOrdersAsync(buyerId);
+
         var orders = await _dbContext.Orders
             .AsNoTracking()
             .Include(order => order.Items)
@@ -59,11 +61,17 @@ public class OrderService : IOrderService
             }))
             .ToList();
 
+        var orderWithShipping = orders.FirstOrDefault(order => !string.IsNullOrWhiteSpace(order.ShippingAddress));
+
         var model = new OrderPageViewModel
         {
             Items = items,
-            FullName = buyer.FullName,
-            Phone = buyer.PhoneNumber ?? string.Empty,
+            FullName = orderWithShipping?.ShippingFullName ?? buyer.FullName,
+            Address = orderWithShipping?.ShippingAddress ?? string.Empty,
+            City = orderWithShipping?.ShippingCity ?? string.Empty,
+            Phone = orderWithShipping?.ShippingPhone ?? buyer.PhoneNumber ?? string.Empty,
+            SelectedPaymentMethod = orderWithShipping?.PaymentMethod,
+            ShippingSaved = orderWithShipping is not null,
             Subtotal = orders.Sum(order => order.Subtotal),
             ShippingFee = orders.Sum(order => order.ShippingFee),
             VaultInsurance = orders.Sum(order => order.VaultInsurance),
@@ -92,16 +100,61 @@ public class OrderService : IOrderService
         _dbContext.Orders.CountAsync(order =>
             order.BuyerId == buyerId &&
             order.Status == OrderStatuses.PendingPayment &&
-            order.DeletedAt == null);
+            order.DeletedAt == null &&
+            order.PaymentDeadline > DateTime.UtcNow);
+
+    public async Task<int> CancelExpiredPendingOrdersAsync(int buyerId)
+    {
+        var now = DateTime.UtcNow;
+
+        return await _dbContext.Orders
+            .Where(order =>
+                order.BuyerId == buyerId &&
+                order.Status == OrderStatuses.PendingPayment &&
+                order.DeletedAt == null &&
+                order.PaymentDeadline <= now)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(order => order.Status, OrderStatuses.Cancelled)
+                .SetProperty(order => order.UpdatedAt, now));
+    }
+
+    public async Task<int> CancelAllExpiredPendingOrdersAsync()
+    {
+        var now = DateTime.UtcNow;
+
+        return await _dbContext.Orders
+            .Where(order =>
+                order.Status == OrderStatuses.PendingPayment &&
+                order.DeletedAt == null &&
+                order.PaymentDeadline <= now)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(order => order.Status, OrderStatuses.Cancelled)
+                .SetProperty(order => order.UpdatedAt, now));
+    }
 
     public async Task<(bool Success, string Message)> CompleteOrderAsync(
         int buyerId,
-        string paymentMethod)
+        CompleteOrderRequest request)
     {
-        if (!SupportedPaymentMethods.Contains(paymentMethod))
+        if (!SupportedPaymentMethods.Contains(request.PaymentMethod))
         {
             return (false, "Please select a valid payment method.");
         }
+
+        var fullName = request.FullName.Trim();
+        var address = request.Address.Trim();
+        var city = request.City.Trim();
+        var phone = request.Phone.Trim();
+
+        if (string.IsNullOrWhiteSpace(fullName)
+            || string.IsNullOrWhiteSpace(address)
+            || string.IsNullOrWhiteSpace(city)
+            || string.IsNullOrWhiteSpace(phone))
+        {
+            return (false, "Please complete all required shipping fields.");
+        }
+
+        await CancelExpiredPendingOrdersAsync(buyerId);
 
         var orders = await _dbContext.Orders
             .Where(order =>
@@ -120,14 +173,20 @@ public class OrderService : IOrderService
             return (false, "One or more payment deadlines have expired.");
         }
 
+        var now = DateTime.UtcNow;
         foreach (var order in orders)
         {
-            order.UpdatedAt = DateTime.UtcNow;
+            order.ShippingFullName = fullName;
+            order.ShippingAddress = address;
+            order.ShippingCity = city;
+            order.ShippingPhone = phone;
+            order.PaymentMethod = request.PaymentMethod.ToLowerInvariant();
+            order.UpdatedAt = now;
         }
 
         await _dbContext.SaveChangesAsync();
 
-        return (true, "Payment method saved. Payment integration will be available in the next sprint.");
+        return (true, "Shipping saved. Payment integration will be available in the next sprint.");
     }
 
     private static string BuildSubtitle(Product product)

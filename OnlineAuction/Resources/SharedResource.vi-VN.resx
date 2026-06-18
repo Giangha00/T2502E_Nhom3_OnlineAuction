@@ -757,6 +757,7 @@
   <data name="Order_SecuredShipping" xml:space="preserve"><value>Vận chuyển an toàn</value></data>
   <data name="Order_VaultInsurance" xml:space="preserve"><value>Bảo hiểm Vault</value></data>
   <data name="Order_CompleteOrder" xml:space="preserve"><value>Hoàn tất đơn hàng</value></data>
+  <data name="Order_ShippingSaved" xml:space="preserve"><value>Đã lưu thông tin giao hàng.</value></data>
   <data name="Order_SslSecure" xml:space="preserve"><value>Giao dịch mã hóa SSL an toàn</value></data>
   <data name="Order_AuthenticityTitle" xml:space="preserve"><value>Cam kết xác thực RareCard</value></data>
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Sản phẩm được bảo vệ bởi bảo mật vault. Mọi phiên thắng đều được xác minh kép trước khi giao hàng.</value></data>
