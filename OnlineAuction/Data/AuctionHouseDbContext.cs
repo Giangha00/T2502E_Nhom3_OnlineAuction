@@ -447,9 +447,11 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(p => p.Amount).HasColumnName("amount").HasPrecision(18, 2);
             entity.Property(p => p.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(PaymentStatuses.Pending);
             entity.Property(p => p.TransactionId).HasColumnName("transaction_id").HasMaxLength(100);
+            entity.Property(p => p.PayPalOrderId).HasColumnName("paypal_order_id").HasMaxLength(50);
             entity.Property(p => p.PaidAt).HasColumnName("paid_at");
 
             entity.HasIndex(p => p.OrderId).HasDatabaseName("ix_payments_order_id");
+            entity.HasIndex(p => p.PayPalOrderId).HasDatabaseName("ix_payments_paypal_order_id");
             entity.HasIndex(p => p.Status).HasDatabaseName("ix_payments_status");
             entity.HasIndex(p => p.TransactionId).HasDatabaseName("ix_payments_transaction_id");
 
