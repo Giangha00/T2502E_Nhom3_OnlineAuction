@@ -634,6 +634,9 @@
   <data name="PaymentConfirm_Step3" xml:space="preserve"><value>Thông tin theo dõi sẽ được gửi khi gói hàng được vận chuyển.</value></data>
   <data name="PaymentConfirm_BrowseMore" xml:space="preserve"><value>Xem thêm đấu giá</value></data>
   <data name="PaymentConfirm_BackHome" xml:space="preserve"><value>Về trang chủ</value></data>
+  <data name="PaymentConfirm_ViewDetails" xml:space="preserve"><value>Xem chi tiết đơn hàng</value></data>
+  <data name="PaymentConfirm_TransactionId" xml:space="preserve"><value>Mã giao dịch</value></data>
+  <data name="PaymentConfirm_PaidAt" xml:space="preserve"><value>Thanh toán lúc</value></data>
   <data name="Contact_Hero_Label" xml:space="preserve"><value>Hỗ trợ khách hàng</value></data>
   <data name="Contact_Hero_TitleLine1" xml:space="preserve"><value>Dịch vụ cao cấp cho</value></data>
   <data name="Contact_Hero_TitleAccent" xml:space="preserve"><value>Nhà sưu tầm chuyên nghiệp</value></data>
@@ -757,6 +760,7 @@
   <data name="Order_SecuredShipping" xml:space="preserve"><value>Vận chuyển an toàn</value></data>
   <data name="Order_VaultInsurance" xml:space="preserve"><value>Bảo hiểm Vault</value></data>
   <data name="Order_CompleteOrder" xml:space="preserve"><value>Hoàn tất đơn hàng</value></data>
+  <data name="Order_ShippingSaved" xml:space="preserve"><value>Đã lưu thông tin giao hàng.</value></data>
   <data name="Order_SslSecure" xml:space="preserve"><value>Giao dịch mã hóa SSL an toàn</value></data>
   <data name="Order_AuthenticityTitle" xml:space="preserve"><value>Cam kết xác thực RareCard</value></data>
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Sản phẩm được bảo vệ bởi bảo mật vault. Mọi phiên thắng đều được xác minh kép trước khi giao hàng.</value></data>

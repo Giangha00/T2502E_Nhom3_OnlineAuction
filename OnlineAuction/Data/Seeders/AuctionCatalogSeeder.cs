@@ -118,11 +118,11 @@ public static class AuctionCatalogSeeder
     private static async Task ClearSeededAuctionsAsync(AuctionHouseDbContext dbContext)
     {
         var testAuctions = await dbContext.Auctions
+            .AsNoTracking()
             .Where(auction =>
                 auction.AuctionEventName != null &&
                 LegacySeedEventNames.Contains(auction.AuctionEventName))
-            .Include(auction => auction.Bids)
-            .Include(auction => auction.Registrations)
+            .Select(auction => new { auction.Id, auction.ProductId })
             .ToListAsync();
 
         if (testAuctions.Count == 0)
@@ -130,27 +130,55 @@ public static class AuctionCatalogSeeder
             return;
         }
 
+        var auctionIds = testAuctions.Select(auction => auction.Id).ToList();
         var productIds = testAuctions.Select(auction => auction.ProductId).Distinct().ToList();
 
-        foreach (var auction in testAuctions)
-        {
-            dbContext.Bids.RemoveRange(auction.Bids);
-            dbContext.AuctionRegistrations.RemoveRange(auction.Registrations);
-        }
-
-        dbContext.Auctions.RemoveRange(testAuctions);
-        await dbContext.SaveChangesAsync();
-
-        var orphanProducts = await dbContext.Products
-            .Where(product => productIds.Contains(product.Id))
-            .Where(product => !product.Auctions.Any())
+        var orderIds = await dbContext.OrderItems
+            .AsNoTracking()
+            .Where(item => auctionIds.Contains(item.AuctionId))
+            .Select(item => item.OrderId)
+            .Distinct()
             .ToListAsync();
 
-        if (orphanProducts.Count > 0)
+        if (orderIds.Count > 0)
         {
-            dbContext.Products.RemoveRange(orphanProducts);
-            await dbContext.SaveChangesAsync();
+            await dbContext.Payments
+                .Where(payment => orderIds.Contains(payment.OrderId))
+                .ExecuteDeleteAsync();
+
+            await dbContext.OrderItems
+                .Where(item => auctionIds.Contains(item.AuctionId))
+                .ExecuteDeleteAsync();
+
+            await dbContext.Orders
+                .Where(order => orderIds.Contains(order.Id))
+                .ExecuteDeleteAsync();
         }
+
+        await dbContext.Bids
+            .Where(bid => auctionIds.Contains(bid.AuctionId))
+            .ExecuteDeleteAsync();
+
+        await dbContext.AuctionRegistrations
+            .Where(registration => auctionIds.Contains(registration.AuctionId))
+            .ExecuteDeleteAsync();
+
+        await dbContext.Auctions
+            .Where(auction => auctionIds.Contains(auction.Id))
+            .ExecuteDeleteAsync();
+
+        await dbContext.ProductImages
+            .Where(image => productIds.Contains(image.ProductId))
+            .ExecuteDeleteAsync();
+
+        await dbContext.ProductDocuments
+            .Where(document => productIds.Contains(document.ProductId))
+            .ExecuteDeleteAsync();
+
+        await dbContext.Products
+            .Where(product => productIds.Contains(product.Id))
+            .Where(product => !product.Auctions.Any())
+            .ExecuteDeleteAsync();
     }
 
     private static async Task<Category> GetOrCreateCategoryAsync(

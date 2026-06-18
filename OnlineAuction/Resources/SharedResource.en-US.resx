@@ -633,6 +633,9 @@
   <data name="PaymentConfirm_Step3" xml:space="preserve"><value>Tracking details will be sent once the package is dispatched.</value></data>
   <data name="PaymentConfirm_BrowseMore" xml:space="preserve"><value>Browse More Auctions</value></data>
   <data name="PaymentConfirm_BackHome" xml:space="preserve"><value>Back to Home</value></data>
+  <data name="PaymentConfirm_ViewDetails" xml:space="preserve"><value>View order details</value></data>
+  <data name="PaymentConfirm_TransactionId" xml:space="preserve"><value>Transaction ID</value></data>
+  <data name="PaymentConfirm_PaidAt" xml:space="preserve"><value>Paid at</value></data>
   <data name="Contact_Hero_Label" xml:space="preserve"><value>Customer Support</value></data>
   <data name="Contact_Hero_TitleLine1" xml:space="preserve"><value>Elevated Care for</value></data>
   <data name="Contact_Hero_TitleAccent" xml:space="preserve"><value>Serious Collectors</value></data>
@@ -756,6 +759,7 @@
   <data name="Order_SecuredShipping" xml:space="preserve"><value>Secured Shipping</value></data>
   <data name="Order_VaultInsurance" xml:space="preserve"><value>Vault Insurance</value></data>
   <data name="Order_CompleteOrder" xml:space="preserve"><value>Complete Order</value></data>
+  <data name="Order_ShippingSaved" xml:space="preserve"><value>Shipping details saved.</value></data>
   <data name="Order_SslSecure" xml:space="preserve"><value>SSL Encrypted Secure Transaction</value></data>
   <data name="Order_AuthenticityTitle" xml:space="preserve"><value>RareCard Authenticity Guarantee</value></data>
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Your items are protected by our vault security. All won auctions are double-verified before shipment to ensure grading integrity.</value></data>

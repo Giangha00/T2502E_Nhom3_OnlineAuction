@@ -25,11 +25,19 @@ public class AuctionFinalizationWorker : BackgroundService
             {
                 using var scope = _scopeFactory.CreateScope();
                 var orderCreationService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
+                var orderService = scope.ServiceProvider.GetRequiredService<IOrderService>();
+
                 var createdCount = await orderCreationService.FinalizeExpiredAuctionsAsync(stoppingToken);
+                var cancelledCount = await orderService.CancelAllExpiredPendingOrdersAsync();
 
                 if (createdCount > 0)
                 {
                     _logger.LogInformation("Created {CreatedCount} pending payment auction orders.", createdCount);
+                }
+
+                if (cancelledCount > 0)
+                {
+                    _logger.LogInformation("Cancelled {CancelledCount} expired pending payment orders.", cancelledCount);
                 }
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)

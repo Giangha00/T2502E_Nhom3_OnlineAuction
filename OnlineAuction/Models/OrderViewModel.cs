@@ -18,7 +18,11 @@ public class OrderPageViewModel
 {
     public List<WonOrderItem> Items { get; set; } = [];
     public string FullName { get; set; } = string.Empty;
+    public string Address { get; set; } = string.Empty;
+    public string City { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
+    public string? SelectedPaymentMethod { get; set; }
+    public bool ShippingSaved { get; set; }
     public bool HasExpiredOrder => Items.Any(item => item.IsExpired);
     public decimal Subtotal { get; set; }
     public decimal ShippingFee { get; set; }
