@@ -4,9 +4,12 @@ namespace OnlineAuction.Services.Interfaces;
 
 public interface IOrderService
 {
-    OrderPageViewModel BuildOrderPage(ISession session);
+    Task<OrderPageViewModel?> BuildOrderPageAsync(int buyerId);
 
-    (bool Success, string OrderRef, string AuctionName, decimal Total, string Method) CompleteOrder(
-        ISession session,
+    Task<int> CountPendingPaymentOrdersAsync(int buyerId);
+
+    Task<(bool Success, string Message)> CompleteOrderAsync(
+        int buyerId,
+        string shippingAddress,
         string paymentMethod);
 }

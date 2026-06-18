@@ -480,6 +480,11 @@ namespace OnlineAuction.Migrations
                         .HasDefaultValue(45.00m)
                         .HasColumnName("shipping_fee");
 
+                    b.Property<string>("ShippingAddress")
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("shipping_address");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -856,7 +861,9 @@ namespace OnlineAuction.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuctionId");
+                    b.HasIndex("AuctionId")
+                        .IsUnique()
+                        .HasDatabaseName("uk_order_items_auction");
 
                     b.HasIndex("CreatedBy");
 

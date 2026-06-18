@@ -15,29 +15,42 @@ public class OrderController : Controller
         _orderService = orderService;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var model = _orderService.BuildOrderPage(HttpContext.Session);
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        var model = await _orderService.BuildOrderPageAsync(userId.Value);
+        if (model is null)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
         return View(model);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Complete(string paymentMethod)
+    public async Task<IActionResult> Complete(string shippingAddress, string paymentMethod)
     {
-        var result = _orderService.CompleteOrder(HttpContext.Session, paymentMethod);
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        var result = await _orderService.CompleteOrderAsync(userId.Value, shippingAddress, paymentMethod);
         if (!result.Success)
         {
+            TempData["OrderError"] = result.Message;
             return RedirectToAction(nameof(Index));
         }
 
-        return RedirectToAction("Confirmation", "Payment", new
-        {
-            orderRef = result.OrderRef,
-            auctionName = result.AuctionName,
-            total = result.Total,
-            method = result.Method
-        });
+        TempData["OrderMessage"] = result.Message;
+        return RedirectToAction(nameof(Index));
     }
 
     protected int? GetCurrentUserId()

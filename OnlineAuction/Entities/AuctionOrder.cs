@@ -20,6 +20,8 @@ public class AuctionOrder : AuditableEntity
 
     public DateTime PaymentDeadline { get; set; }
 
+    public string? ShippingAddress { get; set; }
+
     public ApplicationUser Buyer { get; set; } = null!;
 
     public ICollection<OrderItem> Items { get; set; } = [];

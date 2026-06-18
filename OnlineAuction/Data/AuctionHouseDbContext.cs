@@ -377,6 +377,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(o => o.TotalAmount).HasColumnName("total_amount").HasPrecision(18, 2);
             entity.Property(o => o.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(OrderStatuses.PendingPayment);
             entity.Property(o => o.PaymentDeadline).HasColumnName("payment_deadline");
+            entity.Property(o => o.ShippingAddress).HasColumnName("shipping_address").HasMaxLength(300);
 
             entity.HasIndex(o => o.OrderReference).IsUnique().HasDatabaseName("uk_orders_reference");
             entity.HasIndex(o => new { o.BuyerId, o.Status }).HasDatabaseName("ix_orders_buyer_status");
@@ -410,6 +411,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(i => i.WinningBid).HasColumnName("winning_bid").HasPrecision(18, 2);
 
             entity.HasIndex(i => new { i.OrderId, i.AuctionId }).IsUnique().HasDatabaseName("uk_order_items_order_auction");
+            entity.HasIndex(i => i.AuctionId).IsUnique().HasDatabaseName("uk_order_items_auction");
 
             entity.HasOne(i => i.Order)
                 .WithMany(o => o.Items)

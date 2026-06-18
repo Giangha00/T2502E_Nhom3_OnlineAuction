@@ -8,6 +8,7 @@
 @inject IStringLocalizer<SharedResource> Localizer
 @inject UserManager<ApplicationUser> UserManager
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@inject OnlineAuction.Services.Interfaces.IOrderService OrderService
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
@@ -33,7 +34,7 @@
     ApplicationUser? currentUser = isLoggedIn ? await UserManager.GetUserAsync(User) : null;
     var displayName = currentUser?.FullName ?? User.Identity?.Name ?? "User";
     var currentUserId = currentUser?.Id ?? 0;
-    var orderCount = isLoggedIn ? OnlineAuction.Data.WonOrderStore.GetCount(Context.Session) : 0;
+    var orderCount = currentUser is not null ? await OrderService.CountPendingPaymentOrdersAsync(currentUser.Id) : 0;
     var isOrderPage = string.Equals(currentController, "Order", StringComparison.OrdinalIgnoreCase);
 
     var userInitials = "U";
