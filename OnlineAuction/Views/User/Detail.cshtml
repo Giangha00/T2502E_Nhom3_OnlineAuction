@@ -1,31 +1,76 @@
 @model OnlineAuction.Models.UserDetailViewModel
 @{
     ViewData["Title"] = Model.Profile.Username;
+    var successRate = Model.Statistics.TotalAuctions > 0
+        ? Math.Round((double)Model.Statistics.CompletedAuctions / Model.Statistics.TotalAuctions * 100)
+        : 0;
 }
 
 <div class="user-detail-page min-h-screen bg-slate-50">
   <section class="site-shell px-4 py-8 sm:px-6 lg:py-10">
-    <nav aria-label="Breadcrumb" class="mb-6">
-      <ol class="flex flex-wrap items-center gap-2 text-xs text-slate-400 sm:text-sm">
-        <li><a asp-controller="Home" asp-action="Index" class="transition hover:text-blue-700">Home</a></li>
-        <li aria-hidden="true">/</li>
-        <li><a asp-controller="Auction" asp-action="Index" class="transition hover:text-blue-700">Auction</a></li>
-        <li aria-hidden="true">/</li>
-        <li class="font-medium text-slate-700" aria-current="page">Seller Profile</li>
-      </ol>
-    </nav>
+    @if (TempData["SuccessMessage"] is string successMessage)
+    {
+      <div data-auto-dismiss="5000" class="fixed left-1/2 top-24 z-9999 w-[min(92vw,520px)] -translate-x-1/2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-800 shadow-lg">
+        @successMessage
+      </div>
+    }
+
+    @if (TempData["ErrorMessage"] is string errorMessage)
+    {
+      <div data-auto-dismiss="5000" class="fixed left-1/2 top-24 z-9999 w-[min(92vw,520px)] -translate-x-1/2 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700 shadow-lg">
+        @errorMessage
+      </div>
+    }
 
     @await Html.PartialAsync("Partials/_UserProfileHeader", Model)
+
+    <div class="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <div class="user-detail-stat-card">
+        <p class="user-detail-stat-card__label">@Localizer["User_Stat_TotalAuctions"]</p>
+        <p class="user-detail-stat-card__value">@Model.Statistics.TotalAuctions</p>
+      </div>
+      <div class="user-detail-stat-card">
+        <p class="user-detail-stat-card__label">@Localizer["User_Stat_Completed"]</p>
+        <p class="user-detail-stat-card__value">@Model.Statistics.CompletedAuctions</p>
+      </div>
+      <div class="user-detail-stat-card">
+        <p class="user-detail-stat-card__label">@Localizer["User_Stat_TotalSales"]</p>
+        <p class="user-detail-stat-card__value">@Model.Statistics.TotalSales</p>
+      </div>
+      <div class="user-detail-stat-card">
+        <p class="user-detail-stat-card__label">@Localizer["User_Stat_SuccessRate"]</p>
+        <p class="user-detail-stat-card__value user-detail-stat-card__value--accent">@successRate%</p>
+      </div>
+    </div>
 
     <div class="user-detail-actions-mobile mt-6 lg:hidden">
       @await Html.PartialAsync("Partials/_ActionButtons", Model.Profile)
     </div>
 
-    <div class="mt-8 grid gap-8 lg:grid-cols-[1fr_300px] xl:grid-cols-[1fr_320px]">
-      <div class="space-y-8">
+    <div class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         @await Html.PartialAsync("Partials/_UserInformation", Model.BasicInfo)
-        @await Html.PartialAsync("Partials/_SellerAuctionList", Model.Auctions)
-        @await Html.PartialAsync("Partials/_RatingSection", Model.Rating)
+        <div class="border-t border-slate-100"></div>
+        @await Html.PartialAsync("Partials/_SellerAuctionList", new SellerListingListViewModel
+        {
+          IsOwner = Model.IsOwner,
+          Channel = OnlineAuction.Entities.ListingTypes.Auction,
+          SectionId = "seller-auctions",
+          Listings = Model.Auctions
+        })
+        <div class="border-t border-slate-100"></div>
+        @await Html.PartialAsync("Partials/_SellerAuctionList", new SellerListingListViewModel
+        {
+          IsOwner = Model.IsOwner,
+          Channel = OnlineAuction.Entities.ListingTypes.BuyNow,
+          SectionId = "seller-buynow",
+          Listings = Model.BuyNowListings
+        })
+        @if (Model.Rating.ReviewCount > 0 || Model.Rating.Reviews.Count > 0)
+        {
+          <div class="border-t border-slate-100"></div>
+          @await Html.PartialAsync("Partials/_RatingSection", Model.Rating)
+        }
       </div>
 
       <aside class="hidden lg:block">

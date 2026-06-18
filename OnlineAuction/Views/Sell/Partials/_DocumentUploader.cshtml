@@ -1,17 +1,28 @@
+@{
+    string LocalizeDocType(string docType) => docType switch
+    {
+        "Certificate" => Localizer["Sell_DocType_Certificate"].Value,
+        "Warranty" => Localizer["Sell_DocType_Warranty"].Value,
+        "Invoice" => Localizer["Sell_DocType_Invoice"].Value,
+        "Verification" => Localizer["Sell_DocType_Verification"].Value,
+        _ => docType
+    };
+}
+
 <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
   <div class="border-b border-slate-100 px-6 py-5">
     <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
-      <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">5</span>
-      Product Documents
+      <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">7</span>
+      @Localizer["Sell_Section5_Title"]
     </h2>
-    <p class="mt-1 pl-10 text-sm text-slate-500">Certificate, warranty, invoice, or verification files</p>
+    <p class="mt-1 pl-10 text-sm text-slate-500">@Localizer["Sell_Section5_Desc"]</p>
   </div>
 
   <div class="p-6">
     <div class="mb-4 flex flex-wrap gap-2">
       @foreach (var docType in OnlineAuction.Data.CreateAuctionMockData.DocumentTypes)
       {
-        <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">@docType</span>
+        <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">@LocalizeDocType(docType)</span>
       }
     </div>
 
@@ -20,8 +31,8 @@
       <svg class="mb-2 h-8 w-8 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
       </svg>
-      <p class="text-sm font-semibold text-slate-700">Upload Documents</p>
-      <p class="mt-1 text-xs text-slate-500">PDF, JPG, PNG — max 10MB per file</p>
+      <p class="text-sm font-semibold text-slate-700">@Localizer["Sell_UploadDocuments"]</p>
+      <p class="mt-1 text-xs text-slate-500">@Localizer["Sell_UploadDocuments_Hint"]</p>
       <input type="file" id="documentInput" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" multiple class="sr-only"/>
     </div>
     <p class="field-error mt-2 hidden text-xs text-red-600" data-for="documents"></p>

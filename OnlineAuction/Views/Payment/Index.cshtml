@@ -2,9 +2,35 @@
 @using System.Text.Json
 @using System.Text.Json.Serialization
 @{
-    ViewData["Title"] = "Payment Information";
+    ViewData["Title"] = Localizer["Payment_PageTitle"];
     var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
     var initialMethodsJson = JsonSerializer.Serialize(Model.SavedMethods, jsonOptions);
+    var paymentInfoI18n = new Dictionary<string, string>
+    {
+        ["saveFailed"] = Localizer["Js_PaymentInfo_SaveFailed"].Value,
+        ["saveSuccess"] = Localizer["Js_PaymentInfo_SaveSuccess"].Value,
+        ["removed"] = Localizer["Js_PaymentInfo_Removed"].Value,
+        ["defaultUpdated"] = Localizer["Js_PaymentInfo_DefaultUpdated"].Value,
+        ["saveChanges"] = Localizer["Js_PaymentInfo_SaveChanges"].Value,
+        ["saveInfo"] = Localizer["Payment_SaveInfo"].Value,
+        ["cardRequired"] = Localizer["Js_PaymentInfo_CardRequired"].Value,
+        ["cardLength"] = Localizer["Js_PaymentInfo_CardLength"].Value,
+        ["holderRequired"] = Localizer["Js_PaymentInfo_HolderRequired"].Value,
+        ["holderInvalid"] = Localizer["Js_PaymentInfo_HolderInvalid"].Value,
+        ["expiryRequired"] = Localizer["Js_PaymentInfo_ExpiryRequired"].Value,
+        ["expired"] = Localizer["Js_PaymentInfo_Expired"].Value,
+        ["cvvInvalid"] = Localizer["Js_PaymentInfo_CvvInvalid"].Value,
+        ["billingRequired"] = Localizer["Js_PaymentInfo_BillingRequired"].Value,
+        ["visa"] = Localizer["Payment_Visa"].Value,
+        ["mastercard"] = Localizer["Payment_Mastercard"].Value,
+        ["other"] = Localizer["Payment_Other"].Value,
+        ["default"] = Localizer["Payment_Default"].Value,
+        ["edit"] = Localizer["Payment_Edit"].Value,
+        ["remove"] = Localizer["Payment_Remove"].Value,
+        ["setDefault"] = Localizer["Payment_SetDefaultBtn"].Value,
+        ["expires"] = Localizer["Payment_Expires"].Value,
+        ["methodCount"] = Localizer["Payment_MethodCount", "{0}"].Value.Replace("{0}", "{count}")
+    };
 }
 
 <div class="min-h-screen bg-white px-4 py-8 sm:py-12">
@@ -22,7 +48,7 @@
             {
                 <div class="border-b border-emerald-200/60 bg-emerald-50/80 px-6 py-4 sm:px-8">
                     <p class="text-sm text-emerald-800">
-                        Account created successfully. Please add your payment information to complete setup.
+                        @Localizer["Payment_SignUpSuccess"]
                     </p>
                 </div>
             }
@@ -44,7 +70,8 @@
 @section Scripts {
     <script>
         window.paymentInfoConfig = {
-            initialMethods: @Html.Raw(initialMethodsJson)
+            initialMethods: @Html.Raw(initialMethodsJson),
+            i18n: @Html.Raw(JsonSerializer.Serialize(paymentInfoI18n))
         };
     </script>
     <script src="~/js/payment-information.js" asp-append-version="true"></script>

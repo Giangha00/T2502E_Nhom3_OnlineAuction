@@ -1,4 +1,5 @@
 @model OnlineAuction.Models.ProductDetailViewModel
+@using OnlineAuction.Entities
 @{
     var minBid = Model.CurrentPrice + Model.BidStep;
     const int bidOptionCount = 35;
@@ -6,12 +7,27 @@
     if (!string.IsNullOrEmpty(Model.Grade)) specs.Add(Model.Grade);
     if (!string.IsNullOrEmpty(Model.SetName)) specs.Add(Model.SetName);
     if (!string.IsNullOrEmpty(Model.Condition)) specs.Add(Model.Condition);
-    if (!string.IsNullOrEmpty(Model.CertificateNumber)) specs.Add($"Cert. {Model.CertificateNumber}");
+    if (!string.IsNullOrEmpty(Model.CertificateNumber)) specs.Add(Localizer["Product_CertPrefix", Model.CertificateNumber].Value);
     var isLoggedIn = User.Identity?.IsAuthenticated == true;
+    var endDateIso = Model.EndDate.ToUniversalTime().ToString("o");
+    var showRegistrationFlow = Model.RequiresRegistration && Model.CanPlaceBid && !Model.IsSeller;
+    var showBidForm = !Model.IsSeller && Model.CanPlaceBid &&
+        (!Model.RequiresRegistration || Model.RegistrationStatus == AuctionRegistrationStatuses.Approved);
+    var registrationStatus = Model.RegistrationStatus ?? string.Empty;
 }
 
-<div class="product-bid-panel" data-is-logged-in="@(isLoggedIn ? "true" : "false")" data-auction-id="@Model.Id">
-  <p class="text-sm text-slate-500">Lot @Model.LotNumber</p>
+<div class="product-bid-panel"
+     data-is-logged-in="@(isLoggedIn ? "true" : "false")"
+     data-auction-id="@Model.Id"
+     data-end-date="@endDateIso"
+     data-bid-step="@Model.BidStep.ToString("0.##")"
+     data-current-price="@Model.CurrentPrice.ToString("0.##")"
+     data-can-bid="@(Model.CanBid ? "true" : "false")"
+     data-can-place-bid="@(Model.CanPlaceBid ? "true" : "false")"
+     data-requires-registration="@(Model.RequiresRegistration ? "true" : "false")"
+     data-is-seller="@(Model.IsSeller ? "true" : "false")"
+     data-registration-status="@registrationStatus">
+  <p class="text-sm text-slate-500">@Localizer["Product_Lot", Model.LotNumber]</p>
 
   <h1 class="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">@Model.Category</h1>
   <p class="mt-1 text-lg text-slate-800">
@@ -27,65 +43,153 @@
     <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/>
     </svg>
-    Authenticated listing
+    @Localizer["Product_AuthenticatedListing"]
   </div>
 
   <div class="product-bid-panel__divider"></div>
 
   <p class="text-sm text-slate-700">
-    Estimated value: <span class="font-semibold text-slate-900">$@Model.EstimatedValue.ToString("N0")</span>
+    @Localizer["Product_EstimatedValue"] <span class="font-semibold text-slate-900">$@Model.EstimatedValue.ToString("N0")</span>
   </p>
 
   <div class="mt-5 flex items-start justify-between gap-6">
     <div>
-      <p class="text-sm text-slate-700">Current bid</p>
-      <p class="mt-1 text-xs text-slate-500">
-        @Model.BidCount bid@(Model.BidCount == 1 ? "" : "s")@(Model.ReserveMet ? ", reserve met" : "")
+      <p class="text-sm text-slate-700">@Localizer["Product_CurrentBid"]</p>
+      <p id="bidCountLabel" class="mt-1 text-xs text-slate-500">
+        @Localizer["Product_BidsCount", Model.BidCount]@(Model.ReserveMet ? $", {Localizer["Product_ReserveMet"]}" : "")
       </p>
-      <p class="mt-0.5 text-xs text-slate-500">@Model.WatcherCount watchers</p>
+      <p id="registrationCountLabel" class="mt-0.5 text-xs text-slate-500">
+        @Localizer["Product_RegisteredCount", Model.RegistrationCount]
+      </p>
     </div>
-    <p class="text-3xl font-bold tabular-nums text-slate-900 sm:text-4xl">$@Model.CurrentPrice.ToString("N0")</p>
+    <p id="currentPriceDisplay" class="text-3xl font-bold tabular-nums text-slate-900 sm:text-4xl">$@Model.CurrentPrice.ToString("N0")</p>
   </div>
 
   <p class="mt-4 text-xs leading-relaxed text-slate-500">
-    Price includes buyer's premium. Shipping and taxes may apply.
+    @Localizer["Product_BuyersPremium"]
   </p>
 
   <div class="product-bid-panel__divider"></div>
 
-  <div>
-    <label for="bidAmount" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-800">
-      Place max bid
-      <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"/>
-      </svg>
-    </label>
-    <div class="relative mt-2">
-      <select id="bidAmount" name="bidAmount"
-              class="w-full appearance-none rounded-md border border-slate-300 bg-white py-3 pl-4 pr-10 text-sm font-medium text-slate-800 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900">
-        @for (var i = 0; i < bidOptionCount; i++)
-        {
-          var amount = minBid + Model.BidStep * i;
-          <option value="@amount.ToString("0.##")">$@amount.ToString("N0")</option>
-        }
-      </select>
-      <svg class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
-      </svg>
+  @if (Model.IsSeller)
+  {
+    <div class="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+      @Localizer["Product_YouAreTheSeller"]
     </div>
-  </div>
+  }
+  else if (!Model.CanPlaceBid)
+  {
+    <div class="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+      @Localizer["Product_AuctionEnded"]
+    </div>
+  }
+  else
+  {
+    @if (showRegistrationFlow)
+    {
+      <div id="registrationSection">
+        @if (Model.RegistrationStatus == AuctionRegistrationStatuses.Pending)
+        {
+          <div id="registrationBanner" class="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            @Localizer["Product_RegistrationPending"]
+          </div>
+        }
+        else if (Model.RegistrationStatus == AuctionRegistrationStatuses.Rejected)
+        {
+          <div id="registrationBanner" class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            @Localizer["Product_RegistrationRejected"]
+            @if (!string.IsNullOrWhiteSpace(Model.RegistrationRejectReason))
+            {
+              <span class="mt-1 block text-xs">@Model.RegistrationRejectReason</span>
+            }
+          </div>
+        }
+        else if (!Model.IsRegistered)
+        {
+          <p class="mb-3 text-sm text-slate-600">@Localizer["Product_MustRegisterToBid"]</p>
+          <button type="button" id="registerAuctionBtn"
+                  class="flex w-full items-center justify-center rounded-md bg-slate-900 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800">
+            @Localizer["Product_RegisterForAuction"]
+          </button>
+        }
 
-  <button type="button" id="placeBidBtn"
-          class="mt-4 flex w-full items-center justify-center rounded-md bg-slate-900 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800">
-    Bid
-  </button>
+        @if (Model.IsRegistered &&
+             Model.RegistrationStatus is AuctionRegistrationStatuses.Pending or AuctionRegistrationStatuses.Approved)
+        {
+          <button type="button" id="cancelRegistrationBtn"
+                  class="mt-3 w-full text-sm font-medium text-slate-500 underline-offset-2 hover:text-slate-700 hover:underline">
+            @Localizer["Product_CancelRegistration"]
+          </button>
+        }
+      </div>
+    }
 
-  <div class="mt-5 space-y-1 text-sm">
-    <p class="font-medium text-blue-700">
-      in <span id="cdDays">@Model.CountdownDays</span>d <span id="cdHours">@Model.CountdownHours</span>h
+    <div id="registrationFeedback" class="mt-3 hidden rounded-md px-3 py-2 text-sm font-medium" role="status" aria-live="polite"></div>
+
+    @if (showBidForm)
+    {
+      <div id="bidFormSection" class="@(showRegistrationFlow ? "mt-4" : string.Empty)">
+        <div>
+          <label for="bidAmount" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-800">
+            @Localizer["Product_PlaceMaxBid"]
+            <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"/>
+            </svg>
+          </label>
+          <div class="relative mt-2">
+            <select id="bidAmount" name="bidAmount"
+                    class="w-full appearance-none rounded-md border border-slate-300 bg-white py-3 pl-4 pr-10 text-sm font-medium text-slate-800 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900">
+              @for (var i = 0; i < bidOptionCount; i++)
+              {
+                var amount = minBid + Model.BidStep * i;
+                <option value="@amount.ToString("0.##")">$@amount.ToString("N0")</option>
+              }
+            </select>
+            <svg class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+            </svg>
+          </div>
+          <p class="mt-2 text-xs text-slate-400">
+            @Localizer["Product_MinBid"] <span id="minBidDisplay" class="font-semibold text-slate-600">$@minBid.ToString("N0")</span>
+            · @Localizer["Product_Step"] <span class="font-semibold text-slate-600">$@Model.BidStep.ToString("N0")</span>
+          </p>
+        </div>
+
+        <div id="bidFeedback" class="mt-3 hidden rounded-md px-3 py-2 text-sm font-medium" role="status" aria-live="polite"></div>
+
+        <button type="button" id="placeBidBtn"
+                class="mt-4 flex w-full items-center justify-center rounded-md bg-slate-900 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+                @(!Model.RequiresRegistration || Model.CanBid ? null : "disabled")>
+          @Localizer["Product_Bid"]
+        </button>
+      </div>
+    }
+  }
+
+  <div class="mt-5 space-y-2 text-sm">
+    <div class="grid grid-cols-4 gap-2 text-center">
+      <div class="rounded-md bg-slate-50 px-2 py-2">
+        <p id="cdDays" class="text-lg font-bold tabular-nums text-slate-900">@Model.CountdownDays.ToString("D2")</p>
+        <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">@Localizer["Product_Days"]</p>
+      </div>
+      <div class="rounded-md bg-slate-50 px-2 py-2">
+        <p id="cdHours" class="text-lg font-bold tabular-nums text-slate-900">@Model.CountdownHours.ToString("D2")</p>
+        <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">@Localizer["Product_Hours"]</p>
+      </div>
+      <div class="rounded-md bg-slate-50 px-2 py-2">
+        <p id="cdMinutes" class="text-lg font-bold tabular-nums text-slate-900">@Model.CountdownMinutes.ToString("D2")</p>
+        <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">@Localizer["Product_Minutes"]</p>
+      </div>
+      <div class="rounded-md bg-slate-50 px-2 py-2">
+        <p id="cdSeconds" class="text-lg font-bold tabular-nums text-slate-900">@Model.CountdownSeconds.ToString("D2")</p>
+        <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">@Localizer["Product_Seconds"]</p>
+      </div>
+    </div>
+    <p id="countdownSummary" class="font-medium text-blue-700">
+      @Localizer["Product_CountdownIn", Model.CountdownDays, Model.CountdownHours]
     </p>
-    <p class="text-slate-600">Ends @Model.EndDate.ToString("MMM dd 'at' h:mmtt")</p>
-    <p class="text-xs text-slate-400">*Closure times may be extended to accommodate last-minute bids</p>
+    <p id="endsAtLabel" class="text-slate-600">@Localizer["Product_EndsAt", Model.EndDate.ToString("MMM dd 'at' h:mmtt")]</p>
+    <p class="text-xs text-slate-400">@Localizer["Product_ClosureNote"]</p>
   </div>
 
   <div class="product-bid-panel__divider"></div>

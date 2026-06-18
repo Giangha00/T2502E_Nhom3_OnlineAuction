@@ -1,0 +1,21 @@
+@model OnlineAuction.Models.ProductDetailViewModel
+
+@if (Model.RelatedProducts.Count > 0)
+{
+  <section class="product-detail-section mt-14 border-t border-slate-200 pt-12">
+    <div class="mb-8 flex items-end justify-between gap-4">
+      <div>
+        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">@Localizer["BuyNow_MoreTitle"]</h2>
+        <p class="mt-1 text-sm text-slate-500">@Localizer["BuyNow_MoreSubtitle"]</p>
+      </div>
+      <a asp-controller="BuyNow" asp-action="Index" class="hidden text-sm font-semibold text-blue-700 hover:text-blue-900 sm:inline">@Localizer["BuyNow_ViewAll"]</a>
+    </div>
+    <div class="rarecard-auction-grid">
+      @foreach (var item in Model.RelatedProducts)
+      {
+        <partial name="~/Views/Shared/Partials/_TradingCardAuctionCard.cshtml"
+                 model="@(new AuctionCardViewModel { Item = item, Variant = "grid", CardMode = "buynow" })"/>
+      }
+    </div>
+  </section>
+}

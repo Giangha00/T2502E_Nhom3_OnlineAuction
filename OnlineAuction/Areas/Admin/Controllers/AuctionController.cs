@@ -13,9 +13,9 @@ public class AuctionController : Controller
         _auctionService = auctionService;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        ViewBag.Auctions = _auctionService.GetAllAuctions();
+        ViewBag.Auctions = await _auctionService.GetAllAuctionsAsync();
         return View();
     }
 
@@ -24,15 +24,15 @@ public class AuctionController : Controller
         return View();
     }
 
-    public IActionResult Edit(int id)
+    public async Task<IActionResult> Edit(int id)
     {
-        ViewBag.Auction = _auctionService.GetAuctionById(id);
+        ViewBag.Auction = await _auctionService.GetAuctionByIdAsync(id);
         return View();
     }
 
-    public IActionResult Details(int id)
+    public async Task<IActionResult> Details(int id)
     {
-        var product = _auctionService.GetProductDetail(id);
+        var product = await _auctionService.GetProductDetailAsync(id);
         if (product is null)
         {
             return NotFound();

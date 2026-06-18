@@ -18,9 +18,9 @@
         </div>
         <div class="home-auth-visual__overlay"></div>
         <div class="home-auth-visual__content">
-          <p class="home-auth-visual__eyebrow" id="authVisualEyebrow">RareCard Vault</p>
-          <h3 class="home-auth-visual__title" id="authVisualTitle">Welcome to RareCard</h3>
-          <p class="home-auth-visual__desc" id="authVisualDesc">Bid on authenticated graded cards from PSA, BGS &amp; CGC vaults.</p>
+          <p class="home-auth-visual__eyebrow" id="authVisualEyebrow">@Localizer["Auth_Slide1_Eyebrow"]</p>
+          <h3 class="home-auth-visual__title" id="authVisualTitle">@Localizer["Auth_Slide1_Title"]</h3>
+          <p class="home-auth-visual__desc" id="authVisualDesc">@Localizer["Auth_Slide1_Desc"]</p>
         </div>
         <div class="home-auth-visual__dots" role="tablist" aria-label="Gallery">
           <button type="button" class="auth-visual-dot is-active" data-slide="0" aria-label="Slide 1"></button>
@@ -30,7 +30,7 @@
       </aside>
 
       <div class="home-auth-form-col">
-        <button type="button" id="authModalClose" class="home-auth-close" aria-label="Close">
+        <button type="button" id="authModalClose" class="home-auth-close" aria-label="@Localizer["Auth_Close"]">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 6 6 18M6 6l12 12"/>
           </svg>
@@ -40,8 +40,8 @@
           <span class="home-auth-logo">RareCard</span>
         </div>
 
-        <h2 id="authModalTitle" class="home-auth-heading">Sign up or log in</h2>
-        <p class="home-auth-subheading">Join the world's premier trading card auction vault</p>
+        <h2 id="authModalTitle" class="home-auth-heading">@Localizer["Auth_Modal_Title"]</h2>
+        <p class="home-auth-subheading">@Localizer["Auth_Modal_Subtitle"]</p>
 
         @if (!string.IsNullOrWhiteSpace(authError))
         {
@@ -49,8 +49,8 @@
         }
 
         <div class="home-auth-tabs" role="tablist">
-          <button type="button" class="home-auth-tab home-auth-tab--active" data-tab="login" role="tab" aria-selected="true">Log in</button>
-          <button type="button" class="home-auth-tab" data-tab="signup" role="tab" aria-selected="false">Sign up</button>
+          <button type="button" class="home-auth-tab home-auth-tab--active" data-tab="login" role="tab" aria-selected="true">@Localizer["Auth_LogIn"]</button>
+          <button type="button" class="home-auth-tab" data-tab="signup" role="tab" aria-selected="false">@Localizer["Auth_SignUp"]</button>
         </div>
 
         <div id="authPanelLogin" class="home-auth-panel" role="tabpanel">
@@ -59,18 +59,18 @@
             <input type="hidden" name="returnUrl" value="@modalReturnUrl" />
             <input type="hidden" name="fromModal" value="true" />
             <div class="home-auth-field">
-              <label class="home-auth-field__label" for="modalEmail">Email</label>
-              <input name="email" id="modalEmail" type="email" placeholder="Enter your email address" required class="home-auth-input"/>
+              <label class="home-auth-field__label" for="modalEmail">@Localizer["Auth_Email"]</label>
+              <input name="email" id="modalEmail" type="email" placeholder="@Localizer["Auth_Placeholder_Email"]" required class="home-auth-input"/>
             </div>
             <div class="home-auth-field">
-              <label class="home-auth-field__label" for="modalPassword">Password</label>
-              <input name="password" id="modalPassword" type="password" placeholder="Enter your password" required class="home-auth-input"/>
+              <label class="home-auth-field__label" for="modalPassword">@Localizer["Auth_Password"]</label>
+              <input name="password" id="modalPassword" type="password" placeholder="@Localizer["Auth_Placeholder_Password"]" required class="home-auth-input"/>
             </div>
             <label class="mb-4 flex items-center gap-2 text-sm text-slate-600">
               <input name="rememberMe" type="checkbox" value="true" class="rounded border-slate-300 text-blue-700 focus:ring-blue-500" />
-              Remember me
+              @Localizer["Auth_RememberMe"]
             </label>
-            <button type="submit" class="home-auth-submit">Continue</button>
+            <button type="submit" class="home-auth-submit">@Localizer["Auth_Continue"]</button>
           </form>
         </div>
 
@@ -80,31 +80,31 @@
             <input type="hidden" name="returnUrl" value="@modalReturnUrl" />
             <input type="hidden" name="fromModal" value="true" />
             <div class="home-auth-field">
-              <label class="home-auth-field__label" for="modalFullName">Full name</label>
-              <input name="fullName" id="modalFullName" type="text" placeholder="Enter your full name" required class="home-auth-input"/>
+              <label class="home-auth-field__label" for="modalFullName">@Localizer["Auth_FullName"]</label>
+              <input name="fullName" id="modalFullName" type="text" placeholder="@Localizer["Auth_Placeholder_FullName"]" required class="home-auth-input"/>
             </div>
             <div class="home-auth-field">
-              <label class="home-auth-field__label" for="modalSignupEmail">Email</label>
-              <input name="email" id="modalSignupEmail" type="email" placeholder="Enter your email address" required class="home-auth-input"/>
+              <label class="home-auth-field__label" for="modalSignupEmail">@Localizer["Auth_Email"]</label>
+              <input name="email" id="modalSignupEmail" type="email" placeholder="@Localizer["Auth_Placeholder_Email"]" required class="home-auth-input"/>
             </div>
             <div class="home-auth-field">
-              <label class="home-auth-field__label" for="modalPhone">Phone</label>
-              <input name="phoneNumber" id="modalPhone" type="tel" placeholder="Enter your phone number" required class="home-auth-input"/>
+              <label class="home-auth-field__label" for="modalPhone">@Localizer["Auth_Phone"]</label>
+              <input name="phoneNumber" id="modalPhone" type="tel" placeholder="@Localizer["Auth_Placeholder_Phone"]" required class="home-auth-input"/>
             </div>
             <div class="home-auth-field">
-              <label class="home-auth-field__label" for="modalSignupPassword">Password</label>
-              <input name="password" id="modalSignupPassword" type="password" placeholder="Create a password" required class="home-auth-input"/>
+              <label class="home-auth-field__label" for="modalSignupPassword">@Localizer["Auth_Password"]</label>
+              <input name="password" id="modalSignupPassword" type="password" placeholder="@Localizer["Auth_Placeholder_SignupPassword"]" required class="home-auth-input"/>
             </div>
             <div class="home-auth-field">
-              <label class="home-auth-field__label" for="modalConfirmPassword">Confirm password</label>
-              <input name="confirmPassword" id="modalConfirmPassword" type="password" placeholder="Confirm your password" required class="home-auth-input"/>
+              <label class="home-auth-field__label" for="modalConfirmPassword">@Localizer["Auth_ConfirmPassword"]</label>
+              <input name="confirmPassword" id="modalConfirmPassword" type="password" placeholder="@Localizer["Auth_Placeholder_ConfirmPassword"]" required class="home-auth-input"/>
             </div>
-            <button type="submit" class="home-auth-submit">Create Account</button>
+            <button type="submit" class="home-auth-submit">@Localizer["Auth_CreateAccount"]</button>
           </form>
         </div>
 
         <p class="home-auth-legal">
-          By continuing, you agree to RareCard's Terms of Service and Privacy Policy.
+          @Localizer["Auth_Legal"]
         </p>
       </div>
     </div>

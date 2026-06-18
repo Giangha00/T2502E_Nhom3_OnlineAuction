@@ -1,116 +1,831 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-        <xsd:element name="root" msdata:IsDataSet="true">
-            
-        </xsd:element>
-    </xsd:schema>
-    <resheader name="resmimetype">
-        <value>text/microsoft-resx</value>
-    </resheader>
-    <resheader name="version">
-        <value>1.3</value>
-    </resheader>
-    <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <data name="Home" xml:space="preserve">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true"></xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Home" xml:space="preserve">
   <value>Trang chủ</value>
 </data>
-
-    <data name="Auction" xml:space="preserve">
+  <data name="Auction" xml:space="preserve">
   <value>Đấu giá</value>
 </data>
-
-    <data name="About" xml:space="preserve">
+  <data name="BuyNow" xml:space="preserve">
+  <value>Mua ngay</value>
+</data>
+  <data name="About" xml:space="preserve">
   <value>Về chúng tôi</value>
 </data>
-
-    <data name="Contact" xml:space="preserve">
+  <data name="Contact" xml:space="preserve">
   <value>Liên hệ</value>
 </data>
-
-    <data name="FAQ" xml:space="preserve">
+  <data name="FAQ" xml:space="preserve">
   <value>Câu hỏi thường gặp</value>
 </data>
-
-    <data name="Login" xml:space="preserve">
+  <data name="Login" xml:space="preserve">
   <value>Đăng nhập</value>
 </data>
-
-    <data name="SignUp" xml:space="preserve">
+  <data name="SignUp" xml:space="preserve">
   <value>Đăng ký</value>
 </data>
-
-    <data name="Language" xml:space="preserve">
+  <data name="Language" xml:space="preserve">
   <value>Ngôn ngữ</value>
 </data>
-
-    <data name="English" xml:space="preserve">
+  <data name="English" xml:space="preserve">
   <value>Tiếng Anh</value>
 </data>
-
-    <data name="Vietnamese" xml:space="preserve">
+  <data name="Vietnamese" xml:space="preserve">
   <value>Tiếng Việt</value>
 </data>
-
-    <data name="Japanese" xml:space="preserve">
+  <data name="Japanese" xml:space="preserve">
   <value>Tiếng Nhật</value>
 </data>
-
-    <data name="Korean" xml:space="preserve">
+  <data name="Korean" xml:space="preserve">
   <value>Tiếng Hàn</value>
 </data>
-
-    <data name="MyCart" xml:space="preserve">
+  <data name="MyCart" xml:space="preserve">
   <value>Giỏ hàng</value>
 </data>
-
-    <data name="AboutUs" xml:space="preserve">
+  <data name="AboutUs" xml:space="preserve">
   <value>Về chúng tôi</value>
 </data>
-
-    <data name="ContactUs" xml:space="preserve">
+  <data name="ContactUs" xml:space="preserve">
   <value>Liên hệ</value>
 </data>
-
-    <data name="PolicyAndTerms" xml:space="preserve">
+  <data name="PolicyAndTerms" xml:space="preserve">
   <value>Chính sách &amp; Điều khoản sử dụng</value>
 </data>
-
-    <data name="SearchPlaceholder" xml:space="preserve">
+  <data name="SearchPlaceholder" xml:space="preserve">
   <value>Tìm kiếm theo sản phẩm, danh mục, người bán...</value>
 </data>
-
-    <data name="AuctionHouse" xml:space="preserve">
+  <data name="AuctionHouse" xml:space="preserve">
   <value>Phòng đấu giá</value>
 </data>
-
-    <data name="DiscoverUnique" xml:space="preserve">
+  <data name="DiscoverUnique" xml:space="preserve">
   <value>Khám phá những sản phẩm độc đáo thông qua đấu giá trực tuyến.</value>
 </data>
-
-    <data name="AllRightsReserved" xml:space="preserve">
+  <data name="AllRightsReserved" xml:space="preserve">
   <value>Tất cả các quyền được bảo lưu.</value>
 </data>
-
-    <data name="Sell" xml:space="preserve">
+  <data name="Sell" xml:space="preserve">
   <value>Bán</value>
 </data>
-
-    <data name="Notifications" xml:space="preserve">
+  <data name="Notifications" xml:space="preserve">
   <value>Thông báo</value>
 </data>
-
-    <data name="ReadAll" xml:space="preserve">
+  <data name="ReadAll" xml:space="preserve">
   <value>Đánh dấu đã đọc</value>
 </data>
-
-    <data name="NoNotifications" xml:space="preserve">
+  <data name="NoNotifications" xml:space="preserve">
   <value>Chưa có thông báo</value>
 </data>
+  <data name="Home_ViewOrders" xml:space="preserve">
+    <value>Xem đơn hàng</value>
+  </data>
+  <data name="Home_PageTitle" xml:space="preserve">
+    <value>Trang chủ</value>
+  </data>
+  <data name="Common_RequiredField" xml:space="preserve">
+    <value>Trường bắt buộc</value>
+  </data>
+  <data name="Layout_Footer_CookiePolicy" xml:space="preserve">
+    <value>Chính sách cookie</value>
+  </data>
+  <data name="Home_EndingSoon_Title" xml:space="preserve">
+    <value>Sắp kết thúc</value>
+  </data>
+  <data name="Layout_Footer_Contact" xml:space="preserve">
+    <value>Liên hệ</value>
+  </data>
+  <data name="Common_Save" xml:space="preserve">
+    <value>Lưu</value>
+  </data>
+  <data name="Common_Submit" xml:space="preserve">
+    <value>Gửi</value>
+  </data>
+  <data name="Layout_Footer_HowToBid" xml:space="preserve">
+    <value>Cách đặt giá</value>
+  </data>
+  <data name="Layout_Footer_PrivacyPolicy" xml:space="preserve">
+    <value>Chính sách bảo mật</value>
+  </data>
+  <data name="Layout_WonAuctions" xml:space="preserve">
+    <value>Đấu giá đã thắng</value>
+  </data>
+  <data name="Home_Vault_Title" xml:space="preserve">
+    <value>Tin mới từ Vault</value>
+  </data>
+  <data name="Common_Success" xml:space="preserve">
+    <value>Thành công</value>
+  </data>
+  <data name="Home_Hero_TitleLine1" xml:space="preserve">
+    <value>Đầu tư vào những</value>
+  </data>
+  <data name="Common_Loading" xml:space="preserve">
+    <value>Đang tải...</value>
+  </data>
+  <data name="Layout_ToggleNavigation" xml:space="preserve">
+    <value>Mở/đóng điều hướng</value>
+  </data>
+  <data name="Home_BrowseByCategory_Title" xml:space="preserve">
+    <value>Duyệt theo danh mục</value>
+  </data>
+  <data name="Layout_Profile" xml:space="preserve">
+    <value>Hồ sơ</value>
+  </data>
+  <data name="UserMenu_UserInformation" xml:space="preserve">
+    <value>Thông tin người dùng</value>
+  </data>
+  <data name="UserMenu_UserInformation_Desc" xml:space="preserve">
+    <value>Xem chi tiết hồ sơ và thông tin liên hệ</value>
+  </data>
+  <data name="Home_CompletePayment_Title" xml:space="preserve">
+    <value>Hoàn tất thanh toán cho phiên đã thắng</value>
+  </data>
+  <data name="Layout_Footer_Legal" xml:space="preserve">
+    <value>Pháp lý</value>
+  </data>
+  <data name="Common_Error" xml:space="preserve">
+    <value>Lỗi</value>
+  </data>
+  <data name="Layout_Logout" xml:space="preserve">
+    <value>Đăng xuất</value>
+  </data>
+  <data name="Home_Hero_Subtitle" xml:space="preserve">
+    <value>Điểm đến cao cấp cho thẻ Pokémon, thể thao và TCG đã xác thực, được tuyển chọn cho những nhà sưu tầm khó tính nhất.</value>
+  </data>
+  <data name="Home_Hero_ExploreAuctions" xml:space="preserve">
+    <value>Khám phá đấu giá</value>
+  </data>
+  <data name="Layout_Footer_Support" xml:space="preserve">
+    <value>Hỗ trợ</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Hủy</value>
+  </data>
+  <data name="Home_BestSellers_Title" xml:space="preserve">
+    <value>Người bán hàng đầu</value>
+  </data>
+  <data name="Layout_Footer_About" xml:space="preserve">
+    <value>Giới thiệu</value>
+  </data>
+  <data name="Home_HotAuctions_Title" xml:space="preserve">
+    <value>Đấu giá nổi bật</value>
+  </data>
+  <data name="Layout_Footer_Help" xml:space="preserve">
+    <value>Trợ giúp</value>
+  </data>
+  <data name="Layout_Brand_Tagline" xml:space="preserve">
+    <value>Khám phá thẻ sưu tầm đã xác thực qua các phiên đấu giá trực tuyến cao cấp.</value>
+  </data>
+  <data name="Home_Hero_TitleAccent" xml:space="preserve">
+    <value>vật phẩm sưu tầm hiếm nhất</value>
+  </data>
+  <data name="Home_Hero_Eyebrow" xml:space="preserve">
+    <value>Kho RareCard</value>
+  </data>
+  <data name="Layout_Footer_Careers" xml:space="preserve">
+    <value>Tuyển dụng</value>
+  </data>
+  <data name="Common_ViewAll" xml:space="preserve">
+    <value>Xem tất cả</value>
+  </data>
+  <data name="Common_ViewAllPosts" xml:space="preserve">
+    <value>Xem tất cả bài viết</value>
+  </data>
+  <data name="Layout_Footer_SellerGuide" xml:space="preserve">
+    <value>Hướng dẫn người bán</value>
+  </data>
+  <data name="Layout_Footer_OurStory" xml:space="preserve">
+    <value>Câu chuyện của chúng tôi</value>
+  </data>
+  <data name="Home_Hero_SellYourCard" xml:space="preserve">
+    <value>Bán thẻ của bạn</value>
+  </data>
+  <data name="Common_ItemsSuffix" xml:space="preserve">
+    <value>{0}+ mục</value>
+  </data>
+  <data name="Layout_Footer_RefundRequest" xml:space="preserve">
+    <value>Yêu cầu hoàn tiền</value>
+  </data>
+  <data name="Sell_PageTitle" xml:space="preserve"><value>Đăng bán thẻ</value></data>
+  <data name="Sell_SuccessMessage" xml:space="preserve"><value>Phiên đấu giá của bạn đã được tạo thành công!</value></data>
+  <data name="Sell_ViewAuctions" xml:space="preserve"><value>Xem đấu giá →</value></data>
+  <data name="Sell_DraftSaved" xml:space="preserve"><value>Đã lưu bản nháp cục bộ. Bạn có thể tiếp tục chỉnh sửa bất cứ lúc nào.</value></data>
+  <data name="Sell_Heading" xml:space="preserve"><value>Đăng bán vật phẩm sưu tầm hiếm</value></data>
+  <data name="Sell_Subheading" xml:space="preserve"><value>Cung cấp thông tin chi tiết để tối đa hóa tiềm năng đấu giá cho thẻ của bạn.</value></data>
+  <data name="Sell_Section1_Title" xml:space="preserve"><value>Thông tin sản phẩm</value></data>
+  <data name="Sell_Section1_Desc" xml:space="preserve"><value>Thông tin cơ bản về vật phẩm sưu tầm</value></data>
+  <data name="Sell_ProductName" xml:space="preserve"><value>Tên sản phẩm</value></data>
+  <data name="Sell_ProductName_Placeholder" xml:space="preserve"><value>vd. 1999 Pokémon Base Set Charizard Holo</value></data>
+  <data name="Sell_Category" xml:space="preserve"><value>Danh mục</value></data>
+  <data name="Sell_Category_Placeholder" xml:space="preserve"><value>Chọn danh mục</value></data>
+  <data name="Sell_ProductDescription" xml:space="preserve"><value>Mô tả sản phẩm</value></data>
+  <data name="Sell_Condition" xml:space="preserve"><value>Tình trạng</value></data>
+  <data name="Sell_Condition_New" xml:space="preserve"><value>Mới</value></data>
+  <data name="Sell_Condition_LikeNew" xml:space="preserve"><value>Như mới</value></data>
+  <data name="Sell_Condition_Used" xml:space="preserve"><value>Đã qua sử dụng</value></data>
+  <data name="Sell_ProductOrigin" xml:space="preserve"><value>Xuất xứ sản phẩm</value></data>
+  <data name="Sell_ProductOrigin_Placeholder" xml:space="preserve"><value>vd. Nhật Bản / Mỹ</value></data>
+  <data name="Sell_ShortDescription" xml:space="preserve"><value>Mô tả ngắn</value></data>
+  <data name="Sell_ShortDescription_Placeholder" xml:space="preserve"><value>Tóm tắt hiển thị ở header (tối đa 300 ký tự)</value></data>
+  <data name="Sell_Subtitle" xml:space="preserve"><value>Phụ đề</value></data>
+  <data name="Sell_Subtitle_Placeholder" xml:space="preserve"><value>Dòng tagline dưới tên sản phẩm</value></data>
+  <data name="Sell_Section4_CardSpecs_Title" xml:space="preserve"><value>Thông số thẻ</value></data>
+  <data name="Sell_Section4_CardSpecs_Desc" xml:space="preserve"><value>Năm, bộ, ngôn ngữ, grade và số chứng nhận</value></data>
+  <data name="Sell_SetName_Placeholder" xml:space="preserve"><value>vd. Base Set</value></data>
+  <data name="Sell_Grade" xml:space="preserve"><value>Grade</value></data>
+  <data name="Sell_CertificateNumber" xml:space="preserve"><value>Số chứng nhận</value></data>
+  <data name="Sell_EstimatedValue" xml:space="preserve"><value>Giá trị ước tính</value></data>
+  <data name="Sell_AuctionEventName" xml:space="preserve"><value>Tên sự kiện đấu giá</value></data>
+  <data name="Sell_AuctionEventName_Placeholder" xml:space="preserve"><value>vd. RareCard Vault: Premium Trading Card Auction</value></data>
+  <data name="Sell_Error_YearInvalid" xml:space="preserve"><value>Vui lòng nhập năm hợp lệ từ 1800 đến 2100.</value></data>
+  <data name="Sell_Section2_Title" xml:space="preserve"><value>Hình ảnh sản phẩm</value></data>
+  <data name="Sell_Section2_Desc" xml:space="preserve"><value>Tải lên nhiều hình — JPG, PNG, WEBP (tối đa 5MB mỗi ảnh)</value></data>
+  <data name="Sell_UploadImages_Title" xml:space="preserve"><value>Tải lên hình ảnh sản phẩm</value></data>
+  <data name="Sell_UploadImages_DragDrop" xml:space="preserve"><value>Kéo thả file vào đây hoặc bấm để chọn</value></data>
+  <data name="Sell_UploadImages_CloudinaryNote" xml:space="preserve"><value>Hình ảnh sẽ được tải lên Cloudinary và lưu làm ảnh bìa tin đăng.</value></data>
+  <data name="Sell_UploadedImages" xml:space="preserve"><value>Hình ảnh đã tải lên</value></data>
+  <data name="Sell_RemoveAll" xml:space="preserve"><value>Xóa tất cả</value></data>
+  <data name="Sell_Section3_Title" xml:space="preserve"><value>Cài đặt đấu giá</value></data>
+  <data name="Sell_Section3_Desc" xml:space="preserve"><value>Thiết lập giá và loại hình đấu giá</value></data>
+  <data name="Sell_StartingPrice" xml:space="preserve"><value>Giá khởi điểm</value></data>
+  <data name="Sell_BidStep" xml:space="preserve"><value>Bước giá</value></data>
+  <data name="Sell_BuyNowPrice" xml:space="preserve"><value>Giá mua ngay</value></data>
+  <data name="Sell_AuctionType" xml:space="preserve"><value>Loại đấu giá</value></data>
+  <data name="Sell_AuctionType_Normal" xml:space="preserve"><value>Đấu giá thường</value></data>
+  <data name="Sell_AuctionType_Normal_Desc" xml:space="preserve"><value>Tin đấu giá tiêu chuẩn với mức hiển thị bình thường trên sàn.</value></data>
+  <data name="Sell_AuctionType_Featured" xml:space="preserve"><value>Đấu giá nổi bật</value></data>
+  <data name="Sell_AuctionType_Featured_Desc" xml:space="preserve"><value>Ưu tiên hiển thị trên trang chủ và danh mục. Phí bổ sung có thể áp dụng.</value></data>
+  <data name="Sell_Section4_Title" xml:space="preserve"><value>Thời gian đấu giá</value></data>
+  <data name="Sell_Section4_Desc" xml:space="preserve"><value>Thời điểm bắt đầu và kết thúc phiên đấu giá</value></data>
+  <data name="Sell_StartDate" xml:space="preserve"><value>Ngày bắt đầu</value></data>
+  <data name="Sell_EndDate" xml:space="preserve"><value>Ngày kết thúc</value></data>
+  <data name="Sell_Section5_Title" xml:space="preserve"><value>Tài liệu sản phẩm</value></data>
+  <data name="Sell_Section5_Desc" xml:space="preserve"><value>Chứng nhận, bảo hành, hóa đơn hoặc file xác minh</value></data>
+  <data name="Sell_DocType_Certificate" xml:space="preserve"><value>Chứng nhận</value></data>
+  <data name="Sell_DocType_Warranty" xml:space="preserve"><value>Bảo hành</value></data>
+  <data name="Sell_DocType_Invoice" xml:space="preserve"><value>Hóa đơn</value></data>
+  <data name="Sell_DocType_Verification" xml:space="preserve"><value>Xác minh</value></data>
+  <data name="Sell_UploadDocuments" xml:space="preserve"><value>Tải lên tài liệu</value></data>
+  <data name="Sell_UploadDocuments_Hint" xml:space="preserve"><value>PDF, JPG, PNG — tối đa 10MB mỗi file</value></data>
+  <data name="Sell_ReadyToPublish_Highlight" xml:space="preserve"><value>Sẵn sàng đăng?</value></data>
+  <data name="Sell_ReadyToPublish" xml:space="preserve"><value>Xem lại phần xem trước, sau đó tạo phiên đấu giá.</value></data>
+  <data name="Sell_SaveDraft" xml:space="preserve"><value>Lưu nháp</value></data>
+  <data name="Sell_CreateAuction" xml:space="preserve"><value>Tạo đấu giá</value></data>
+  <data name="Sell_Preview_Title" xml:space="preserve"><value>Xem trước đấu giá</value></data>
+  <data name="Sell_Preview_Desc" xml:space="preserve"><value>Cách tin đăng hiển thị trong đấu giá</value></data>
+  <data name="Sell_Preview_NoImage" xml:space="preserve"><value>Chưa có hình ảnh</value></data>
+  <data name="Sell_Preview_ProductNameDefault" xml:space="preserve"><value>Tên sản phẩm</value></data>
+  <data name="Sell_Preview_CurrentBid" xml:space="preserve"><value>Giá hiện tại</value></data>
+  <data name="Sell_Preview_TimeLeft" xml:space="preserve"><value>Thời gian còn lại</value></data>
+  <data name="Sell_Preview_ReviewNote" xml:space="preserve"><value>Thẻ của bạn sẽ được chuyên gia xem xét trước khi phiên đấu giá diễn ra để đảm bảo tính xác thực.</value></data>
+  <data name="Sell_Preview_TimeEnded" xml:space="preserve"><value>Đã kết thúc</value></data>
+  <data name="Sell_Preview_TimeLeftDays" xml:space="preserve"><value>Còn {0} ngày {1} giờ</value></data>
+  <data name="Sell_Preview_TimeLeftHours" xml:space="preserve"><value>Còn {0} giờ {1} phút</value></data>
+  <data name="Sell_Editor_Placeholder" xml:space="preserve"><value>Mô tả đặc điểm, điểm số và lịch sử của sản phẩm...</value></data>
+  <data name="Sell_Remove" xml:space="preserve"><value>Xóa</value></data>
+  <data name="Sell_Success_Created" xml:space="preserve"><value>Phiên đấu giá "{0}" đã được tạo thành công!</value></data>
+  <data name="Sell_Error_CreateFailed" xml:space="preserve"><value>Không thể tạo phiên đấu giá.</value></data>
+  <data name="Sell_Error_ProductNameRequired" xml:space="preserve"><value>Vui lòng nhập tên sản phẩm</value></data>
+  <data name="Sell_Error_CategoryRequired" xml:space="preserve"><value>Vui lòng chọn danh mục</value></data>
+  <data name="Sell_Error_ConditionRequired" xml:space="preserve"><value>Vui lòng chọn tình trạng</value></data>
+  <data name="Sell_Error_StartingPriceRequired" xml:space="preserve"><value>Giá khởi điểm phải lớn hơn 0</value></data>
+  <data name="Sell_Error_BidStepRequired" xml:space="preserve"><value>Bước giá phải lớn hơn 0</value></data>
+  <data name="Sell_Error_BuyNowPriceInvalid" xml:space="preserve"><value>Giá mua ngay phải lớn hơn 0</value></data>
+  <data name="Sell_Error_BuyNowPriceGreater" xml:space="preserve"><value>Giá mua ngay phải lớn hơn giá khởi điểm</value></data>
+  <data name="Sell_Error_AuctionTypeRequired" xml:space="preserve"><value>Vui lòng chọn loại đấu giá</value></data>
+  <data name="Sell_Error_StartDateRequired" xml:space="preserve"><value>Vui lòng chọn ngày bắt đầu</value></data>
+  <data name="Sell_Error_StartDatePast" xml:space="preserve"><value>Ngày bắt đầu không được ở quá khứ</value></data>
+  <data name="Sell_Error_EndDateRequired" xml:space="preserve"><value>Vui lòng chọn ngày kết thúc</value></data>
+  <data name="Sell_Error_EndDateAfterStart" xml:space="preserve"><value>Ngày kết thúc phải sau ngày bắt đầu</value></data>
+  <data name="Sell_Error_ImageInvalidFormat" xml:space="preserve"><value>{0}: định dạng không hợp lệ (chỉ JPG, PNG, WEBP)</value></data>
+  <data name="Sell_Error_ImageSizeLimit" xml:space="preserve"><value>{0}: vượt quá giới hạn 5MB</value></data>
+  <data name="Sell_Error_DocInvalidFormat" xml:space="preserve"><value>{0}: định dạng không hợp lệ (chỉ PDF, JPG, PNG)</value></data>
+  <data name="Sell_Error_DocSizeLimit" xml:space="preserve"><value>{0}: vượt quá giới hạn 10MB</value></data>
+  <data name="UserMenu_Orders" xml:space="preserve"><value>Đơn hàng</value></data>
+  <data name="UserMenu_Orders_Desc" xml:space="preserve"><value>Theo dõi và xem các giao dịch mua</value></data>
+  <data name="UserMenu_Bids" xml:space="preserve"><value>Đấu giá</value></data>
+  <data name="UserMenu_Bids_Desc" xml:space="preserve"><value>Xem các phiên đấu giá đang tham gia và đã qua</value></data>
+  <data name="UserMenu_Watchlist" xml:space="preserve"><value>Danh sách theo dõi</value></data>
+  <data name="UserMenu_Watchlist_Desc" xml:space="preserve"><value>Theo dõi các mục đã lưu</value></data>
+  <data name="UserMenu_Offers" xml:space="preserve"><value>Đề nghị</value></data>
+  <data name="UserMenu_Offers_Desc" xml:space="preserve"><value>Theo dõi đề nghị bạn đã gửi hoặc nhận</value></data>
+  <data name="UserMenu_Selling" xml:space="preserve"><value>Đang bán</value></data>
+  <data name="UserMenu_Selling_Desc" xml:space="preserve"><value>Theo dõi tin đăng và doanh số bán</value></data>
+  <data name="UserMenu_Summary" xml:space="preserve"><value>Tổng quan</value></data>
+  <data name="UserMenu_Summary_Desc" xml:space="preserve"><value>Tổng quan tài khoản của bạn</value></data>
+  <data name="UserMenu_Accounting" xml:space="preserve"><value>Kế toán</value></data>
+  <data name="UserMenu_Accounting_Desc" xml:space="preserve"><value>Xem số dư, tổng hợp và giao dịch</value></data>
+  <data name="UserMenu_Submissions" xml:space="preserve"><value>Hồ sơ gửi</value></data>
+  <data name="UserMenu_Submissions_Desc" xml:space="preserve"><value>Xem các mục đã gửi và tiến độ</value></data>
+  <data name="UserMenu_VaultAddress" xml:space="preserve"><value>Địa chỉ Vault của tôi</value></data>
+  <data name="UserMenu_CopyVault" xml:space="preserve"><value>Sao chép địa chỉ vault</value></data>
+  <data name="UserMenu_SubmitToVault" xml:space="preserve"><value>Gửi sản phẩm tới Vault</value></data>
+  <data name="UserMenu_AccountMenu" xml:space="preserve"><value>Menu tài khoản</value></data>
+  <data name="Account_Wallet" xml:space="preserve"><value>Ví</value></data>
+  <data name="Account_Orders" xml:space="preserve"><value>Đơn hàng</value></data>
+  <data name="Account_Bids" xml:space="preserve"><value>Đấu giá</value></data>
+  <data name="Account_Watchlist" xml:space="preserve"><value>Danh sách theo dõi</value></data>
+  <data name="Account_Offers" xml:space="preserve"><value>Đề nghị</value></data>
+  <data name="Account_Selling" xml:space="preserve"><value>Đang bán</value></data>
+  <data name="Account_Summary" xml:space="preserve"><value>Tổng quan</value></data>
+  <data name="Account_Accounting" xml:space="preserve"><value>Kế toán</value></data>
+  <data name="Account_Submissions" xml:space="preserve"><value>Hồ sơ gửi</value></data>
+  <data name="Account_Preferences" xml:space="preserve"><value>Tùy chọn</value></data>
+  <data name="Account_Orders_Desc" xml:space="preserve"><value>Theo dõi và xem các giao dịch mua</value></data>
+  <data name="Account_Bids_Desc" xml:space="preserve"><value>Xem các phiên đấu giá đang tham gia và đã qua</value></data>
+  <data name="Account_Watchlist_Desc" xml:space="preserve"><value>Theo dõi các mục đã lưu</value></data>
+  <data name="Account_Offers_Desc" xml:space="preserve"><value>Theo dõi đề nghị bạn đã gửi hoặc nhận</value></data>
+  <data name="Account_Summary_Desc" xml:space="preserve"><value>Tổng quan tài khoản của bạn</value></data>
+  <data name="Account_Accounting_Desc" xml:space="preserve"><value>Xem số dư, tổng hợp và giao dịch</value></data>
+  <data name="Account_Submissions_Desc" xml:space="preserve"><value>Xem các mục đã gửi và tiến độ</value></data>
+  <data name="Account_Preferences_Desc" xml:space="preserve"><value>Quản lý cài đặt tài khoản và thông báo</value></data>
+  <data name="Account_Empty_Title" xml:space="preserve"><value>Chưa có nội dung.</value></data>
+  <data name="Account_Empty_Desc" xml:space="preserve"><value>Phần này sẽ hiển thị hoạt động {0} khi bạn bắt đầu sử dụng RareCard.</value></data>
+  <data name="Auth_Modal_Title" xml:space="preserve"><value>Đăng ký hoặc đăng nhập</value></data>
+  <data name="Auth_Modal_Subtitle" xml:space="preserve"><value>Tham gia kho đấu giá thẻ sưu tầm hàng đầu thế giới</value></data>
+  <data name="Auth_LogIn" xml:space="preserve"><value>Đăng nhập</value></data>
+  <data name="Auth_SignUp" xml:space="preserve"><value>Đăng ký</value></data>
+  <data name="Auth_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Auth_Password" xml:space="preserve"><value>Mật khẩu</value></data>
+  <data name="Auth_RememberMe" xml:space="preserve"><value>Ghi nhớ đăng nhập</value></data>
+  <data name="Auth_Continue" xml:space="preserve"><value>Tiếp tục</value></data>
+  <data name="Auth_FullName" xml:space="preserve"><value>Họ và tên</value></data>
+  <data name="Auth_Phone" xml:space="preserve"><value>Số điện thoại</value></data>
+  <data name="Auth_ConfirmPassword" xml:space="preserve"><value>Xác nhận mật khẩu</value></data>
+  <data name="Auth_CreateAccount" xml:space="preserve"><value>Tạo tài khoản</value></data>
+  <data name="Auth_Legal" xml:space="preserve"><value>Tiếp tục nghĩa là bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của RareCard.</value></data>
+  <data name="Auth_Close" xml:space="preserve"><value>Đóng</value></data>
+  <data name="Auth_Placeholder_Email" xml:space="preserve"><value>Nhập địa chỉ email</value></data>
+  <data name="Auth_Placeholder_Password" xml:space="preserve"><value>Nhập mật khẩu</value></data>
+  <data name="Auth_Placeholder_FullName" xml:space="preserve"><value>Nhập họ và tên</value></data>
+  <data name="Auth_Placeholder_Phone" xml:space="preserve"><value>Nhập số điện thoại</value></data>
+  <data name="Auth_Placeholder_SignupPassword" xml:space="preserve"><value>Tạo mật khẩu</value></data>
+  <data name="Auth_Placeholder_ConfirmPassword" xml:space="preserve"><value>Xác nhận mật khẩu</value></data>
+  <data name="Auth_Slide1_Eyebrow" xml:space="preserve"><value>Kho RareCard</value></data>
+  <data name="Auth_Slide1_Title" xml:space="preserve"><value>Chào mừng đến RareCard</value></data>
+  <data name="Auth_Slide1_Desc" xml:space="preserve"><value>Đấu giá thẻ đã xác thực từ các kho PSA, BGS và CGC.</value></data>
+  <data name="Auth_Slide2_Eyebrow" xml:space="preserve"><value>Pokémon &amp; TCG</value></data>
+  <data name="Auth_Slide2_Title" xml:space="preserve"><value>Khám phá Holo hiếm</value></data>
+  <data name="Auth_Slide2_Desc" xml:space="preserve"><value>Charizard Base Set, Illustrator promo và manga rare parallels.</value></data>
+  <data name="Auth_Slide3_Eyebrow" xml:space="preserve"><value>Thể thao &amp; MTG</value></data>
+  <data name="Auth_Slide3_Title" xml:space="preserve"><value>Huyền thoại trên đấu giá</value></data>
+  <data name="Auth_Slide3_Desc" xml:space="preserve"><value>Từ Mickey Mantle rookie đến Alpha Black Lotus — tuyển chọn mỗi ngày.</value></data>
+  <data name="Layout_Footer_AboutUs" xml:space="preserve"><value>Về chúng tôi</value></data>
+  <data name="Layout_Footer_ContactUs" xml:space="preserve"><value>Liên hệ</value></data>
+  <data name="Layout_Footer_PolicyTerms" xml:space="preserve"><value>Chính sách &amp; Điều khoản</value></data>
+  <data name="Layout_Copyright" xml:space="preserve"><value>© {0} RareCard. Bảo lưu mọi quyền.</value></data>
+  <data name="Auction_PageTitle" xml:space="preserve"><value>Đấu giá trực tiếp</value></data>
+  <data name="Auction_Subtitle" xml:space="preserve"><value>Khám phá vật phẩm sưu tầm đã xác thực, chất lượng cao dành cho nhà sưu tầm khó tính.</value></data>
+  <data name="Auction_LiveNow" xml:space="preserve"><value>Đang diễn ra</value></data>
+  <data name="Auction_ActiveBids" xml:space="preserve"><value>Đấu giá đang tham gia ({0})</value></data>
+  <data name="Auction_WatchlistCount" xml:space="preserve"><value>Theo dõi ({0})</value></data>
+  <data name="Auction_Filter_Category" xml:space="preserve"><value>Danh mục</value></data>
+  <data name="Auction_Filter_Condition" xml:space="preserve"><value>Tình trạng</value></data>
+  <data name="Auction_Filter_Year" xml:space="preserve"><value>Năm sản xuất</value></data>
+  <data name="Auction_Filter_PriceRange" xml:space="preserve"><value>Khoảng giá</value></data>
+  <data name="Auction_Filter_EndingSoonOnly" xml:space="preserve"><value>Chỉ sắp kết thúc</value></data>
+  <data name="Auction_ClearFilters" xml:space="preserve"><value>Xóa bộ lọc</value></data>
+  <data name="Auction_ShowingItems" xml:space="preserve"><value>Hiển thị {0} mục</value></data>
+  <data name="Auction_Sort_Featured" xml:space="preserve"><value>Nổi bật</value></data>
+  <data name="Auction_Sort_EndingSoon" xml:space="preserve"><value>Sắp kết thúc</value></data>
+  <data name="Auction_Sort_PriceAsc" xml:space="preserve"><value>Giá: thấp đến cao</value></data>
+  <data name="Auction_Sort_PriceDesc" xml:space="preserve"><value>Giá: cao đến thấp</value></data>
+  <data name="Auction_Sort_Name" xml:space="preserve"><value>Tên A–Z</value></data>
+  <data name="Auction_Condition_Graded" xml:space="preserve"><value>Đã chấm điểm</value></data>
+  <data name="Auction_Condition_NotSpecified" xml:space="preserve"><value>Không xác định</value></data>
+  <data name="Card_CurrentBid" xml:space="preserve"><value>Giá hiện tại</value></data>
+  <data name="Card_TimeLeft" xml:space="preserve"><value>Thời gian còn lại</value></data>
+  <data name="Card_BidNow" xml:space="preserve"><value>Đấu giá ngay</value></data>
+  <data name="Card_AddToCart" xml:space="preserve"><value>Thêm vào giỏ</value></data>
+  <data name="Card_WinningBid" xml:space="preserve"><value>Giá thắng</value></data>
+  <data name="Card_CompletePayment" xml:space="preserve"><value>Hoàn tất thanh toán</value></data>
+  <data name="Card_PlaceBid" xml:space="preserve"><value>Đặt giá</value></data>
+  <data name="Card_EndingSoon" xml:space="preserve"><value>Sắp kết thúc</value></data>
+  <data name="Card_Hot" xml:space="preserve"><value>Hot</value></data>
+  <data name="Order_PageTitle" xml:space="preserve"><value>Phiên đấu giá đã thắng</value></data>
+  <data name="Order_ItemsWon" xml:space="preserve"><value>Đã thắng {0} mục</value></data>
+  <data name="Order_Empty_Title" xml:space="preserve"><value>Chưa có phiên đấu giá thắng</value></data>
+  <data name="Order_Empty_Desc" xml:space="preserve"><value>Thắng một phiên đấu giá và sản phẩm sẽ xuất hiện tại đây để thanh toán.</value></data>
+  <data name="Order_BrowseAuctions" xml:space="preserve"><value>Xem đấu giá</value></data>
+  <data name="Order_PaymentDeadline" xml:space="preserve"><value>Hạn thanh toán:</value></data>
+  <data name="BuyNow_PageTitle" xml:space="preserve"><value>Mua ngay</value></data>
+  <data name="BuyNow_Subtitle" xml:space="preserve"><value>Mua ngay vật phẩm sưu tầm đã xác thực với giá cố định.</value></data>
+  <data name="BuyNow_AvailableNow" xml:space="preserve"><value>Có sẵn</value></data>
+  <data name="User_SellerProfile" xml:space="preserve"><value>Hồ sơ người bán</value></data>
+  <data name="User_BasicInformation" xml:space="preserve"><value>Thông tin cơ bản</value></data>
+  <data name="User_BasicInformation_Desc" xml:space="preserve"><value>Thông tin liên hệ và hồ sơ</value></data>
+  <data name="User_FullName" xml:space="preserve"><value>Họ và tên</value></data>
+  <data name="User_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="User_PhoneNumber" xml:space="preserve"><value>Số điện thoại</value></data>
+  <data name="User_Address" xml:space="preserve"><value>Địa chỉ</value></data>
+  <data name="User_MemberSince" xml:space="preserve"><value>Thành viên từ {0}</value></data>
+  <data name="Contact_PageTitle" xml:space="preserve"><value>Liên hệ</value></data>
+  <data name="Payment_PageTitle" xml:space="preserve"><value>Thông tin thanh toán</value></data>
+  <data name="Payment_AddMethod" xml:space="preserve"><value>Thêm phương thức thanh toán</value></data>
+  <data name="Common_Search" xml:space="preserve"><value>Tìm kiếm</value></data>
+  <data name="Common_Breadcrumb_Home" xml:space="preserve"><value>Trang chủ</value></data>
+  <data name="Product_AuthenticatedListing" xml:space="preserve"><value>Tin đăng đã xác thực</value></data>
+  <data name="Product_CurrentBid" xml:space="preserve"><value>Giá hiện tại</value></data>
+  <data name="Product_PlaceMaxBid" xml:space="preserve"><value>Đặt giá tối đa</value></data>
+  <data name="Product_Bid" xml:space="preserve"><value>Đấu giá</value></data>
+  <data name="Product_AboutTheWork" xml:space="preserve"><value>Giới thiệu</value></data>
+  <data name="Product_Grading" xml:space="preserve"><value>Chấm điểm</value></data>
+  <data name="Product_BidHistory" xml:space="preserve"><value>Lịch sử đấu giá</value></data>
+  <data name="Product_Shipping" xml:space="preserve"><value>Vận chuyển</value></data>
+  <data name="Product_EstimatedValue" xml:space="preserve"><value>Giá trị ước tính:</value></data>
+  <data name="Product_BuyersPremium" xml:space="preserve"><value>Giá đã bao gồm phí người mua. Phí vận chuyển và thuế có thể áp dụng.</value></data>
+  <data name="Product_Lot" xml:space="preserve"><value>Lot {0}</value></data>
+  <data name="Product_EndsAt" xml:space="preserve"><value>Kết thúc {0}</value></data>
+  <data name="Product_ClosureNote" xml:space="preserve"><value>*Thời gian kết thúc có thể được gia hạn cho các lượt đấu giá phút chót</value></data>
+  <data name="Product_BidsCount" xml:space="preserve"><value>{0} lượt đấu giá</value></data>
+  <data name="Product_ReserveMet" xml:space="preserve"><value>đạt giá dự trữ</value></data>
+  <data name="Product_WatchersCount" xml:space="preserve"><value>{0} người theo dõi</value></data>
+  <data name="Product_CountdownIn" xml:space="preserve"><value>còn {0} ngày {1} giờ</value></data>
+  <data name="RelatedProducts_Title" xml:space="preserve"><value>Sản phẩm liên quan</value></data>
+  <data name="Faq_PageTitle" xml:space="preserve"><value>Câu hỏi thường gặp</value></data>
+  <data name="AboutUs_PageTitle" xml:space="preserve"><value>Về chúng tôi</value></data>
+  <data name="Policy_PageTitle" xml:space="preserve"><value>Chính sách &amp; Điều khoản</value></data>
+  <data name="Refund_PageTitle" xml:space="preserve"><value>Yêu cầu hoàn tiền</value></data>
+  <data name="Error_PageTitle" xml:space="preserve"><value>Lỗi</value></data>
+  <data name="Error_Description" xml:space="preserve"><value>Đã xảy ra lỗi khi xử lý yêu cầu của bạn.</value></data>
+  <data name="Account_Selling_Tab_Active" xml:space="preserve"><value>Đang bán</value></data>
+  <data name="Account_Selling_Tab_Sold" xml:space="preserve"><value>Đã bán</value></data>
+  <data name="Account_Selling_Tab_Unsold" xml:space="preserve"><value>Chưa bán</value></data>
+  <data name="Account_Selling_Tab_Scheduled" xml:space="preserve"><value>Đã lên lịch</value></data>
+  <data name="Account_Selling_EmptyHint_Auction" xml:space="preserve"><value>Thêm thẻ vào Đấu giá và bắt đầu bán.</value></data>
+  <data name="Account_Selling_EmptyHint_BuyNow" xml:space="preserve"><value>Thêm thẻ vào Mua ngay và bắt đầu bán.</value></data>
+  <data name="Account_Selling_SellOnAuction" xml:space="preserve"><value>Bán qua Đấu giá</value></data>
+  <data name="Account_Selling_SellOnBuyNow" xml:space="preserve"><value>Bán qua Mua ngay</value></data>
+  <data name="Account_Selling_EmptyTitle" xml:space="preserve"><value>Chưa có tin đăng.</value></data>
+  <data name="Account_Wallet_Desc" xml:space="preserve"><value>Quản lý phương thức thanh toán và số dư.</value></data>
+  <data name="Account_Wallet_AvailableBalance" xml:space="preserve"><value>Số dư khả dụng</value></data>
+  <data name="Account_Wallet_NoMethods" xml:space="preserve"><value>Chưa có phương thức thanh toán.</value></data>
+  <data name="Account_Wallet_NoMethodsDesc" xml:space="preserve"><value>Thêm thẻ hoặc tài khoản ngân hàng để nhận thanh toán từ doanh số bán.</value></data>
+  <data name="Account_Wallet_AddMethod" xml:space="preserve"><value>Thêm phương thức thanh toán</value></data>
+  <data name="Account_Orders_WonTitle" xml:space="preserve"><value>Xem phiên đấu giá đã thắng</value></data>
+  <data name="Account_Orders_WonDesc" xml:space="preserve"><value>Hoàn tất thanh toán cho các phiên đã thắng và theo dõi trạng thái đơn hàng.</value></data>
+  <data name="Account_Orders_GoToWon" xml:space="preserve"><value>Đến Phiên đã thắng</value></data>
+  <data name="Product_ViewImage" xml:space="preserve"><value>Xem ảnh {0}</value></data>
+  <data name="Product_Thumbnail" xml:space="preserve"><value>Ảnh thu nhỏ {0} {1}</value></data>
+  <data name="Product_Description" xml:space="preserve"><value>Mô tả</value></data>
+  <data name="Product_ItemOverview" xml:space="preserve"><value>Tổng quan sản phẩm</value></data>
+  <data name="Product_Year" xml:space="preserve"><value>Năm</value></data>
+  <data name="Product_Set" xml:space="preserve"><value>Bộ</value></data>
+  <data name="Product_Language" xml:space="preserve"><value>Ngôn ngữ</value></data>
+  <data name="Product_CardNumber" xml:space="preserve"><value>Số thẻ</value></data>
+  <data name="Product_GradingReport" xml:space="preserve"><value>Báo cáo chấm điểm {0}</value></data>
+  <data name="Product_Certificate" xml:space="preserve"><value>Chứng nhận #{0}</value></data>
+  <data name="Product_ViewCertificate" xml:space="preserve"><value>Xem chứng nhận →</value></data>
+  <data name="Product_Centering" xml:space="preserve"><value>Căn giữa</value></data>
+  <data name="Product_Corners" xml:space="preserve"><value>Góc</value></data>
+  <data name="Product_Edges" xml:space="preserve"><value>Cạnh</value></data>
+  <data name="Product_Surface" xml:space="preserve"><value>Bề mặt</value></data>
+  <data name="Product_VerifiedAuthentic" xml:space="preserve"><value>Slab xác thực đã được kiểm tra bởi đội ngũ RareCard trước khi đăng.</value></data>
+  <data name="Product_Bidder" xml:space="preserve"><value>Người đấu giá</value></data>
+  <data name="Product_BidAmount" xml:space="preserve"><value>Số tiền đấu giá</value></data>
+  <data name="Product_DateTime" xml:space="preserve"><value>Ngày &amp;amp; Giờ</value></data>
+  <data name="Product_Status" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="Product_Winning" xml:space="preserve"><value>Đang thắng</value></data>
+  <data name="Product_Outbid" xml:space="preserve"><value>Bị vượt giá</value></data>
+  <data name="Product_ViewAllBids" xml:space="preserve"><value>Xem tất cả {0} lượt đấu giá →</value></data>
+  <data name="Product_Shipping_Desc" xml:space="preserve"><value>Thẻ đã chấm điểm được vận chuyển trong bao bì kho kiểm soát khí hậu, bảo hiểm đầy đủ. Xử lý cẩn thận từ trung tâm xác thực đến tay bạn.</value></data>
+  <data name="Product_Shipping_Insurance" xml:space="preserve"><value>Bao gồm bảo hiểm toàn bộ giá trị thẩm định</value></data>
+  <data name="Product_Shipping_Climate" xml:space="preserve"><value>Vận chuyển kiểm soát khí hậu</value></data>
+  <data name="Product_Shipping_International" xml:space="preserve"><value>Hỗ trợ vận chuyển quốc tế ưu tiên</value></data>
+  <data name="Product_Documents_Title" xml:space="preserve"><value>Tài liệu sản phẩm</value></data>
+  <data name="Product_Documents_Desc" xml:space="preserve"><value>Chứng nhận, bảo hành và tệp xác minh</value></data>
+  <data name="Common_View" xml:space="preserve"><value>Xem</value></data>
+  <data name="Common_Download" xml:space="preserve"><value>Tải xuống</value></data>
+  <data name="Product_Seller" xml:space="preserve"><value>Người bán</value></data>
+  <data name="Product_SalesCount" xml:space="preserve"><value>{0} giao dịch</value></data>
+  <data name="Product_EndingSoonTitle" xml:space="preserve"><value>Sắp kết thúc</value></data>
+  <data name="Product_RelatedSubtitle" xml:space="preserve"><value>Các vật phẩm hiếm khác bạn có thể quan tâm</value></data>
+  <data name="Product_ViewAllArrow" xml:space="preserve"><value>Xem tất cả →</value></data>
+  <data name="Product_CountdownTitle" xml:space="preserve"><value>Đấu giá kết thúc sau</value></data>
+  <data name="Product_Days" xml:space="preserve"><value>Ngày</value></data>
+  <data name="Product_Hours" xml:space="preserve"><value>Giờ</value></data>
+  <data name="Product_Minutes" xml:space="preserve"><value>Phút</value></data>
+  <data name="Product_Seconds" xml:space="preserve"><value>Giây</value></data>
+  <data name="Product_NoBidsYet" xml:space="preserve"><value>Chưa có lượt đấu giá</value></data>
+  <data name="Product_AuctionEnded" xml:space="preserve"><value>Phiên đấu giá đã kết thúc</value></data>
+  <data name="Product_RegisterForAuction" xml:space="preserve"><value>Đăng ký tham gia đấu giá</value></data>
+  <data name="Product_RegistrationPending" xml:space="preserve"><value>Đang chờ duyệt đăng ký.</value></data>
+  <data name="Product_RegistrationApproved" xml:space="preserve"><value>Bạn đã được duyệt tham gia phiên đấu giá này.</value></data>
+  <data name="Product_RegistrationRejected" xml:space="preserve"><value>Đăng ký của bạn đã bị từ chối.</value></data>
+  <data name="Product_MustRegisterToBid" xml:space="preserve"><value>Bạn cần đăng ký tham gia phiên đấu giá trước khi đặt giá.</value></data>
+  <data name="Product_RegisteredCount" xml:space="preserve"><value>{0} người đã đăng ký</value></data>
+  <data name="Product_YouAreTheSeller" xml:space="preserve"><value>Bạn là người bán sản phẩm này.</value></data>
+  <data name="Product_CancelRegistration" xml:space="preserve"><value>Hủy đăng ký</value></data>
+  <data name="Product_CountdownPreview" xml:space="preserve"><value>Xem trước tĩnh — đếm ngược chưa hoạt động</value></data>
+  <data name="Product_AuctionInfo" xml:space="preserve"><value>Thông tin đấu giá</value></data>
+  <data name="Product_StartingPrice" xml:space="preserve"><value>Giá khởi điểm</value></data>
+  <data name="Product_CurrentPrice" xml:space="preserve"><value>Giá hiện tại</value></data>
+  <data name="Product_MinBidStep" xml:space="preserve"><value>Bước giá tối thiểu</value></data>
+  <data name="Product_Condition" xml:space="preserve"><value>Tình trạng</value></data>
+  <data name="Product_AuctionTime" xml:space="preserve"><value>Thời gian đấu giá</value></data>
+  <data name="Product_StartLabel" xml:space="preserve"><value>Bắt đầu:</value></data>
+  <data name="Product_EndLabel" xml:space="preserve"><value>Kết thúc:</value></data>
+  <data name="Product_PlaceBidTitle" xml:space="preserve"><value>Đặt giá đấu</value></data>
+  <data name="Product_BidPreviewNote" xml:space="preserve"><value>Chỉ xem trước giao diện — đấu giá chưa được bật</value></data>
+  <data name="Product_BidAmountLabel" xml:space="preserve"><value>Số tiền đấu giá</value></data>
+  <data name="Product_MinBid" xml:space="preserve"><value>Giá tối thiểu:</value></data>
+  <data name="Product_Step" xml:space="preserve"><value>Bước giá:</value></data>
+  <data name="Product_CertPrefix" xml:space="preserve"><value>Chứng nhận {0}</value></data>
+  <data name="BuyNow_Price" xml:space="preserve"><value>Giá</value></data>
+  <data name="BuyNow_FixedPrice" xml:space="preserve"><value>Giá mua ngay cố định</value></data>
+  <data name="BuyNow_InStock" xml:space="preserve"><value>Còn hàng</value></data>
+  <data name="BuyNow_MoreTitle" xml:space="preserve"><value>Thêm Mua ngay</value></data>
+  <data name="BuyNow_MoreSubtitle" xml:space="preserve"><value>Các vật phẩm sưu tầm đã xác thực khác đang có sẵn</value></data>
+  <data name="BuyNow_ViewAll" xml:space="preserve"><value>Xem tất cả →</value></data>
+  <data name="Payment_SignUpSuccess" xml:space="preserve"><value>Tạo tài khoản thành công. Vui lòng thêm thông tin thanh toán để hoàn tất thiết lập.</value></data>
+  <data name="Payment_Form_DemoNote" xml:space="preserve"><value>Nhập thông tin thẻ bên dưới. Dữ liệu chỉ lưu cục bộ cho demo giao diện.</value></data>
+  <data name="Payment_CardType" xml:space="preserve"><value>Loại thẻ</value></data>
+  <data name="Payment_Visa" xml:space="preserve"><value>Visa</value></data>
+  <data name="Payment_Mastercard" xml:space="preserve"><value>Mastercard</value></data>
+  <data name="Payment_Other" xml:space="preserve"><value>Khác</value></data>
+  <data name="Payment_CardNumber" xml:space="preserve"><value>Số thẻ</value></data>
+  <data name="Payment_CardHolder" xml:space="preserve"><value>Tên chủ thẻ</value></data>
+  <data name="Payment_ExpiryMonth" xml:space="preserve"><value>Tháng hết hạn</value></data>
+  <data name="Payment_ExpiryYear" xml:space="preserve"><value>Năm hết hạn</value></data>
+  <data name="Payment_CVV" xml:space="preserve"><value>CVV</value></data>
+  <data name="Payment_BillingAddress" xml:space="preserve"><value>Địa chỉ thanh toán</value></data>
+  <data name="Payment_SetDefault" xml:space="preserve"><value>Đặt làm phương thức mặc định</value></data>
+  <data name="Payment_SaveInfo" xml:space="preserve"><value>Lưu thông tin thanh toán</value></data>
+  <data name="Payment_EmptyTitle" xml:space="preserve"><value>Không tìm thấy phương thức thanh toán</value></data>
+  <data name="Payment_EmptyDesc" xml:space="preserve"><value>Thêm phương thức thanh toán đầu tiên bằng biểu mẫu phía trên.</value></data>
+  <data name="Payment_EmptyAction" xml:space="preserve"><value>Thêm phương thức thanh toán đầu tiên</value></data>
+  <data name="Payment_SavedMethods" xml:space="preserve"><value>Phương thức thanh toán đã lưu</value></data>
+  <data name="Payment_SavedMethodsDesc" xml:space="preserve"><value>Quản lý thẻ đã lưu để thanh toán nhanh hơn.</value></data>
+  <data name="Payment_MethodCount" xml:space="preserve"><value>{0} phương thức</value></data>
+  <data name="Payment_CardPreview" xml:space="preserve"><value>Xem trước thẻ</value></data>
+  <data name="Payment_CardPreviewDesc" xml:space="preserve"><value>Cập nhật theo thời gian thực khi bạn nhập.</value></data>
+  <data name="Payment_CardPreviewNote" xml:space="preserve"><value>Chỉ xem trước — không xử lý thanh toán thực</value></data>
+  <data name="Payment_PreviewHolder" xml:space="preserve"><value>Chủ thẻ</value></data>
+  <data name="Payment_PreviewExpires" xml:space="preserve"><value>Hết hạn</value></data>
+  <data name="Payment_Default" xml:space="preserve"><value>Mặc định</value></data>
+  <data name="Payment_Edit" xml:space="preserve"><value>Sửa</value></data>
+  <data name="Payment_Remove" xml:space="preserve"><value>Xóa</value></data>
+  <data name="Payment_SetDefaultBtn" xml:space="preserve"><value>Đặt mặc định</value></data>
+  <data name="Payment_Expires" xml:space="preserve"><value>Hết hạn:</value></data>
+  <data name="Checkout_PageTitle" xml:space="preserve"><value>Thanh toán</value></data>
+  <data name="Checkout_Label" xml:space="preserve"><value>Thanh toán an toàn</value></data>
+  <data name="Checkout_Title" xml:space="preserve"><value>Hoàn tất thanh toán</value></data>
+  <data name="Checkout_Description" xml:space="preserve"><value>Chúc mừng bạn đã thắng đấu giá. Vui lòng hoàn tất thanh toán trước {0} để giữ sản phẩm. Mã đơn: {1}.</value></data>
+  <data name="Checkout_Step_Review" xml:space="preserve"><value>Xem lại đơn hàng</value></data>
+  <data name="Checkout_Step_Payment" xml:space="preserve"><value>Chi tiết thanh toán</value></data>
+  <data name="Checkout_Step_Confirmation" xml:space="preserve"><value>Xác nhận</value></data>
+  <data name="Checkout_ShippingInfo" xml:space="preserve"><value>Thông tin giao hàng</value></data>
+  <data name="Checkout_ShippingDesc" xml:space="preserve"><value>Chúng tôi nên giao sản phẩm thắng đến đâu?</value></data>
+  <data name="Checkout_FullName" xml:space="preserve"><value>Họ và tên</value></data>
+  <data name="Checkout_Phone" xml:space="preserve"><value>Số điện thoại</value></data>
+  <data name="Checkout_Email" xml:space="preserve"><value>Địa chỉ email</value></data>
+  <data name="Checkout_StreetAddress" xml:space="preserve"><value>Địa chỉ</value></data>
+  <data name="Checkout_City" xml:space="preserve"><value>Thành phố</value></data>
+  <data name="Checkout_PostalCode" xml:space="preserve"><value>Mã bưu điện</value></data>
+  <data name="Checkout_PaymentMethod" xml:space="preserve"><value>Phương thức thanh toán</value></data>
+  <data name="Checkout_PaymentMethodDesc" xml:space="preserve"><value>Chọn cách bạn muốn thanh toán cho giá thắng.</value></data>
+  <data name="Checkout_CardDetails" xml:space="preserve"><value>Chi tiết thẻ</value></data>
+  <data name="Checkout_ManageSaved" xml:space="preserve"><value>Quản lý phương thức đã lưu →</value></data>
+  <data name="Checkout_ExpiryDate" xml:space="preserve"><value>Ngày hết hạn</value></data>
+  <data name="Checkout_BankTransfer" xml:space="preserve"><value>Chi tiết chuyển khoản</value></data>
+  <data name="Checkout_Bank" xml:space="preserve"><value>Ngân hàng</value></data>
+  <data name="Checkout_AccountName" xml:space="preserve"><value>Tên tài khoản</value></data>
+  <data name="Checkout_AccountNumber" xml:space="preserve"><value>Số tài khoản</value></data>
+  <data name="Checkout_TransferContent" xml:space="preserve"><value>Nội dung chuyển khoản</value></data>
+  <data name="Checkout_AgreeTerms" xml:space="preserve"><value>Tôi đồng ý với</value></data>
+  <data name="Checkout_PaymentPolicy" xml:space="preserve"><value>Chính sách thanh toán</value></data>
+  <data name="Checkout_WinningBidderConfirm" xml:space="preserve"><value>và xác nhận tôi là người thắng đấu giá cho sản phẩm này.</value></data>
+  <data name="Checkout_OrderSummary" xml:space="preserve"><value>Tóm tắt đơn hàng</value></data>
+  <data name="Checkout_Won" xml:space="preserve"><value>Đã thắng</value></data>
+  <data name="Checkout_WinningBid" xml:space="preserve"><value>Giá thắng</value></data>
+  <data name="Checkout_PlatformFee" xml:space="preserve"><value>Phí nền tảng (2.5%)</value></data>
+  <data name="Checkout_Shipping" xml:space="preserve"><value>Vận chuyển</value></data>
+  <data name="Checkout_Total" xml:space="preserve"><value>Tổng cộng</value></data>
+  <data name="Checkout_PayNow" xml:space="preserve"><value>Thanh toán {0} ngay</value></data>
+  <data name="Checkout_SecurePayment" xml:space="preserve"><value>Thanh toán mã hóa SSL an toàn</value></data>
+  <data name="Checkout_NeedHelp" xml:space="preserve"><value>Cần trợ giúp?</value></data>
+  <data name="Checkout_ContactSupport" xml:space="preserve"><value>Liên hệ hỗ trợ</value></data>
+  <data name="PaymentConfirm_PageTitle" xml:space="preserve"><value>Đã xác nhận thanh toán</value></data>
+  <data name="PaymentConfirm_Success" xml:space="preserve"><value>Thanh toán thành công</value></data>
+  <data name="PaymentConfirm_ThankYou" xml:space="preserve"><value>Cảm ơn bạn! Thanh toán đã được nhận và đơn hàng đang được xử lý.</value></data>
+  <data name="PaymentConfirm_OrderReference" xml:space="preserve"><value>Mã đơn hàng</value></data>
+  <data name="PaymentConfirm_Item" xml:space="preserve"><value>Sản phẩm</value></data>
+  <data name="PaymentConfirm_PaymentMethod" xml:space="preserve"><value>Phương thức thanh toán</value></data>
+  <data name="PaymentConfirm_AmountPaid" xml:space="preserve"><value>Số tiền đã thanh toán</value></data>
+  <data name="PaymentConfirm_WhatNext" xml:space="preserve"><value>Tiếp theo là gì?</value></data>
+  <data name="PaymentConfirm_Step1" xml:space="preserve"><value>Bạn sẽ nhận email xác nhận trong thời gian ngắn.</value></data>
+  <data name="PaymentConfirm_Step2" xml:space="preserve"><value>Người bán sẽ chuẩn bị sản phẩm để giao hàng.</value></data>
+  <data name="PaymentConfirm_Step3" xml:space="preserve"><value>Thông tin theo dõi sẽ được gửi khi gói hàng được vận chuyển.</value></data>
+  <data name="PaymentConfirm_BrowseMore" xml:space="preserve"><value>Xem thêm đấu giá</value></data>
+  <data name="PaymentConfirm_BackHome" xml:space="preserve"><value>Về trang chủ</value></data>
+  <data name="Contact_Hero_Label" xml:space="preserve"><value>Hỗ trợ khách hàng</value></data>
+  <data name="Contact_Hero_TitleLine1" xml:space="preserve"><value>Dịch vụ cao cấp cho</value></data>
+  <data name="Contact_Hero_TitleAccent" xml:space="preserve"><value>Nhà sưu tầm chuyên nghiệp</value></data>
+  <data name="Contact_Hero_Desc" xml:space="preserve"><value>Dù bạn hỏi về bán riêng hay cần hỗ trợ danh mục thẻ cao cấp, chuyên gia của chúng tôi sẵn sàng hỗ trợ.</value></data>
+  <data name="Contact_Hero_Alt" xml:space="preserve"><value>Văn phòng hỗ trợ RareCard</value></data>
+  <data name="Contact_Form_Title" xml:space="preserve"><value>Gửi yêu cầu</value></data>
+  <data name="Contact_Form_ResponseTime" xml:space="preserve"><value>Thời gian phản hồi trung bình: 2 giờ (ngày làm việc)</value></data>
+  <data name="Contact_Reason" xml:space="preserve"><value>Lý do liên hệ</value></data>
+  <data name="Contact_Reason_Auction" xml:space="preserve"><value>Hỏi về đấu giá</value></data>
+  <data name="Contact_Reason_PrivateSale" xml:space="preserve"><value>Bán riêng</value></data>
+  <data name="Contact_Reason_Account" xml:space="preserve"><value>Hỗ trợ tài khoản</value></data>
+  <data name="Contact_Reason_Shipping" xml:space="preserve"><value>Vận chuyển &amp;amp; Bảo hiểm</value></data>
+  <data name="Contact_Reason_Other" xml:space="preserve"><value>Khác</value></data>
+  <data name="Contact_Message" xml:space="preserve"><value>Tin nhắn của bạn</value></data>
+  <data name="Contact_Message_Placeholder" xml:space="preserve"><value>Đội ngũ của chúng tôi có thể hỗ trợ bạn thế nào hôm nay?</value></data>
+  <data name="Contact_SecurityNote" xml:space="preserve"><value>Dữ liệu của bạn được bảo mật bằng mã hóa 256-bit.</value></data>
+  <data name="Contact_Submit" xml:space="preserve"><value>Gửi yêu cầu</value></data>
+  <data name="Contact_GetInTouch" xml:space="preserve"><value>Liên hệ</value></data>
+  <data name="Contact_EmailUs" xml:space="preserve"><value>Email cho chúng tôi</value></data>
+  <data name="Contact_CallDirectly" xml:space="preserve"><value>Gọi trực tiếp</value></data>
+  <data name="Contact_JoinCommunity" xml:space="preserve"><value>Tham gia cộng đồng</value></data>
+  <data name="Contact_HQLocation" xml:space="preserve"><value>Trụ sở</value></data>
+  <data name="Contact_FaqTitle" xml:space="preserve"><value>Tìm câu trả lời nhanh?</value></data>
+  <data name="Contact_FaqDesc" xml:space="preserve"><value>Cơ sở kiến thức của chúng tôi có thông tin chi tiết về tiêu chuẩn chấm điểm, bảo hiểm và vận chuyển quốc tế.</value></data>
+  <data name="Contact_ExploreFaqs" xml:space="preserve"><value>Xem FAQ</value></data>
+  <data name="Contact_Map_Title" xml:space="preserve"><value>Vị trí của chúng tôi</value></data>
+  <data name="Contact_Map_Desc" xml:space="preserve"><value>Ghé thăm trụ sở Hà Nội hoặc kết nối trực tuyến</value></data>
+  <data name="Contact_MainOffice" xml:space="preserve"><value>Văn phòng chính</value></data>
+  <data name="Contact_BusinessHours" xml:space="preserve"><value>Giờ làm việc</value></data>
+  <data name="Contact_MonFri" xml:space="preserve"><value>Thứ Hai - Thứ Sáu</value></data>
+  <data name="Contact_Saturday" xml:space="preserve"><value>Thứ Bảy</value></data>
+  <data name="Contact_Sunday" xml:space="preserve"><value>Chủ Nhật</value></data>
+  <data name="Contact_Closed" xml:space="preserve"><value>Đóng cửa</value></data>
+  <data name="Contact_MapEmbedded" xml:space="preserve"><value>Bản đồ nhúng trên trang này</value></data>
+  <data name="Refund_Label" xml:space="preserve"><value>Bảo vệ người mua</value></data>
+  <data name="Refund_Description" xml:space="preserve"><value>Gửi yêu cầu hoàn tiền cho giao dịch đấu giá đã hoàn tất. Đội ngũ sẽ xem xét trong 3–5 ngày làm việc.</value></data>
+  <data name="Refund_Step_Policy" xml:space="preserve"><value>Xem chính sách</value></data>
+  <data name="Refund_Step_Submit" xml:space="preserve"><value>Gửi yêu cầu</value></data>
+  <data name="Refund_Step_Confirmation" xml:space="preserve"><value>Xác nhận</value></data>
+  <data name="Refund_PolicyTitle" xml:space="preserve"><value>Chính sách hoàn tiền</value></data>
+  <data name="Refund_PolicyDesc" xml:space="preserve"><value>Auction House bảo vệ người mua khi giao dịch không đáp ứng tiêu chuẩn hoặc cam kết giao hàng.</value></data>
+  <data name="Refund_BeforeSubmit" xml:space="preserve"><value>Trước khi gửi</value></data>
+  <data name="Refund_BeforeTip1" xml:space="preserve"><value>Liên hệ người bán trước qua hệ thống nhắn tin.</value></data>
+  <data name="Refund_BeforeTip2" xml:space="preserve"><value>Giữ ảnh, mã vận đơn và biên lai thanh toán làm bằng chứng.</value></data>
+  <data name="Refund_BeforeTip3" xml:space="preserve"><value>Yêu cầu hoàn tiền phải nộp trong &lt;strong&gt;14 ngày&lt;/strong&gt; kể từ ngày giao hoặc ngày giao dự kiến.</value></data>
+  <data name="Refund_ReadFullTerms" xml:space="preserve"><value>Đọc điều khoản đầy đủ tại</value></data>
+  <data name="Refund_FormTitle" xml:space="preserve"><value>Gửi yêu cầu hoàn tiền</value></data>
+  <data name="Refund_FormDesc" xml:space="preserve"><value>Điền thông tin bên dưới. Trường bắt buộc được đánh dấu</value></data>
+  <data name="Refund_OrderReference" xml:space="preserve"><value>Mã đơn hàng</value></data>
+  <data name="Refund_SelectOrder" xml:space="preserve"><value>Chọn đơn hàng</value></data>
+  <data name="Refund_OtherOrder" xml:space="preserve"><value>Đơn khác (nhập thủ công bên dưới)</value></data>
+  <data name="Refund_ManualOrderRef" xml:space="preserve"><value>Mã đơn nhập thủ công</value></data>
+  <data name="Refund_Reason" xml:space="preserve"><value>Lý do hoàn tiền</value></data>
+  <data name="Refund_SelectReason" xml:space="preserve"><value>Chọn lý do</value></data>
+  <data name="Refund_DescriptionLabel" xml:space="preserve"><value>Mô tả</value></data>
+  <data name="Refund_DescriptionPlaceholder" xml:space="preserve"><value>Mô tả chi tiết vấn đề. Bao gồm ngày giao, tình trạng sản phẩm và liên lạc với người bán...</value></data>
+  <data name="Refund_AmountLabel" xml:space="preserve"><value>Số tiền hoàn yêu cầu (USD)</value></data>
+  <data name="Refund_AmountHint" xml:space="preserve"><value>Để trống để yêu cầu hoàn toàn bộ đơn hàng.</value></data>
+  <data name="Refund_AgreePolicy" xml:space="preserve"><value>Tôi xác nhận thông tin chính xác và đồng ý với</value></data>
+  <data name="Refund_PolicyLink" xml:space="preserve"><value>chính sách hoàn tiền</value></data>
+  <data name="Refund_Submit" xml:space="preserve"><value>Gửi yêu cầu hoàn tiền</value></data>
+  <data name="RefundConfirm_PageTitle" xml:space="preserve"><value>Đã gửi yêu cầu hoàn tiền</value></data>
+  <data name="RefundConfirm_Title" xml:space="preserve"><value>Đã nhận yêu cầu hoàn tiền</value></data>
+  <data name="RefundConfirm_ThankYou" xml:space="preserve"><value>Cảm ơn bạn. Yêu cầu đã được gửi và đang được đội hỗ trợ xem xét.</value></data>
+  <data name="RefundConfirm_RequestId" xml:space="preserve"><value>Mã yêu cầu</value></data>
+  <data name="RefundConfirm_EstimatedReview" xml:space="preserve"><value>Thời gian xem xét dự kiến</value></data>
+  <data name="RefundConfirm_Step1" xml:space="preserve"><value>Đội ngũ sẽ xác minh đơn hàng và bằng chứng đã gửi.</value></data>
+  <data name="RefundConfirm_Step2" xml:space="preserve"><value>Bạn sẽ nhận email cập nhật khi có quyết định.</value></data>
+  <data name="RefundConfirm_Step3" xml:space="preserve"><value>Hoàn tiền được duyệt sẽ xử lý trong 7–14 ngày làm việc.</value></data>
+  <data name="RefundConfirm_ContactSupport" xml:space="preserve"><value>Liên hệ hỗ trợ</value></data>
+  <data name="User_ReviewsTitle" xml:space="preserve"><value>Đánh giá người bán</value></data>
+  <data name="User_ReviewsDesc" xml:space="preserve"><value>Phản hồi từ người mua đã xác minh</value></data>
+  <data name="User_ReviewCount" xml:space="preserve"><value>{0} đánh giá</value></data>
+  <data name="User_NoReviews" xml:space="preserve"><value>Chưa có đánh giá.</value></data>
+  <data name="User_SellerAuctions" xml:space="preserve"><value>Đấu giá của người bán</value></data>
+  <data name="User_ListingCount" xml:space="preserve"><value>{0} tin đang hoạt động</value></data>
+  <data name="User_CreateListing" xml:space="preserve"><value>Tạo tin đăng</value></data>
+  <data name="User_DiscoverMore" xml:space="preserve"><value>Khám phá thêm</value></data>
+  <data name="User_RelatedAuctions" xml:space="preserve"><value>Đấu giá liên quan</value></data>
+  <data name="User_SellerActions" xml:space="preserve"><value>Thao tác người bán</value></data>
+  <data name="User_ConnectSeller" xml:space="preserve"><value>Kết nối với người bán này</value></data>
+  <data name="User_ContactSeller" xml:space="preserve"><value>Liên hệ người bán</value></data>
+  <data name="User_ViewAuctions" xml:space="preserve"><value>Xem đấu giá</value></data>
+  <data name="User_NoAuctions" xml:space="preserve"><value>Chưa có đấu giá</value></data>
+  <data name="User_NoAuctionsDesc" xml:space="preserve"><value>Người bán này chưa đăng sản phẩm nào.</value></data>
+  <data name="User_CurrentBid" xml:space="preserve"><value>Giá hiện tại</value></data>
+  <data name="User_Ends" xml:space="preserve"><value>Kết thúc</value></data>
+  <data name="User_ViewDetail" xml:space="preserve"><value>Xem chi tiết</value></data>
+  <data name="User_CancelListing" xml:space="preserve"><value>Hủy</value></data>
+  <data name="User_CancelConfirm" xml:space="preserve"><value>Hủy tin đấu giá này?</value></data>
+  <data name="User_Status_Active" xml:space="preserve"><value>Đấu giá đang diễn ra</value></data>
+  <data name="User_Status_EndingSoon" xml:space="preserve"><value>Sắp kết thúc</value></data>
+  <data name="User_Status_Completed" xml:space="preserve"><value>Đã hoàn tất</value></data>
+  <data name="UserAuction_EditTitle" xml:space="preserve"><value>Sửa đấu giá</value></data>
+  <data name="UserAuction_EditDesc" xml:space="preserve"><value>Chỉ sửa được đấu giá đang diễn ra và chưa có lượt đấu giá.</value></data>
+  <data name="UserAuction_ProductName" xml:space="preserve"><value>Tên sản phẩm</value></data>
+  <data name="UserAuction_ShortDescription" xml:space="preserve"><value>Mô tả ngắn</value></data>
+  <data name="UserAuction_SetName" xml:space="preserve"><value>Tên bộ</value></data>
+  <data name="UserAuction_Grade" xml:space="preserve"><value>Điểm</value></data>
+  <data name="UserAuction_CertNumber" xml:space="preserve"><value>Số chứng nhận</value></data>
+  <data name="UserAuction_CurrentCover" xml:space="preserve"><value>Ảnh bìa hiện tại</value></data>
+  <data name="UserAuction_ReplaceCover" xml:space="preserve"><value>Thay ảnh bìa</value></data>
+  <data name="UserAuction_StartDate" xml:space="preserve"><value>Ngày bắt đầu</value></data>
+  <data name="UserAuction_EndDate" xml:space="preserve"><value>Ngày kết thúc</value></data>
+  <data name="UserAuction_SaveChanges" xml:space="preserve"><value>Lưu thay đổi</value></data>
+  <data name="Sell_AuctionHeader_Label" xml:space="preserve"><value>Bảng điều khiển người bán</value></data>
+  <data name="Sell_AuctionHeader_Title" xml:space="preserve"><value>Tạo đấu giá mới</value></data>
+  <data name="Sell_AuctionHeader_Desc" xml:space="preserve"><value>Bán sản phẩm qua đấu giá. Hoàn thành biểu mẫu và xem lại tin đăng trước khi xuất bản.</value></data>
+  <data name="Sell_Grading_Title" xml:space="preserve"><value>Chi tiết chấm điểm</value></data>
+  <data name="Sell_Grading_Desc" xml:space="preserve"><value>Điểm phụ hiển thị ở tab Chấm điểm trên trang chi tiết</value></data>
+  <data name="Card_Live" xml:space="preserve"><value>Trực tiếp</value></data>
+  <data name="Card_ViewLot" xml:space="preserve"><value>Xem lot →</value></data>
+  <data name="Card_BidsCount" xml:space="preserve"><value>{0} lượt đấu giá</value></data>
+  <data name="Card_WinningBidLabel" xml:space="preserve"><value>Giá thắng</value></data>
+  <data name="Card_CompletePaymentArrow" xml:space="preserve"><value>Hoàn tất thanh toán →</value></data>
+  <data name="Order_ShippingInfo" xml:space="preserve"><value>Thông tin giao hàng</value></data>
+  <data name="Order_ShippingAddress" xml:space="preserve"><value>Địa chỉ giao hàng</value></data>
+  <data name="Order_PaymentMethod" xml:space="preserve"><value>Phương thức thanh toán</value></data>
+  <data name="Order_Summary" xml:space="preserve"><value>Tóm tắt đơn hàng</value></data>
+  <data name="Order_Subtotal" xml:space="preserve"><value>Tạm tính ({0} mục)</value></data>
+  <data name="Order_SecuredShipping" xml:space="preserve"><value>Vận chuyển an toàn</value></data>
+  <data name="Order_VaultInsurance" xml:space="preserve"><value>Bảo hiểm Vault</value></data>
+  <data name="Order_CompleteOrder" xml:space="preserve"><value>Hoàn tất đơn hàng</value></data>
+  <data name="Order_SslSecure" xml:space="preserve"><value>Giao dịch mã hóa SSL an toàn</value></data>
+  <data name="Order_AuthenticityTitle" xml:space="preserve"><value>Cam kết xác thực RareCard</value></data>
+  <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Sản phẩm được bảo vệ bởi bảo mật vault. Mọi phiên thắng đều được xác minh kép trước khi giao hàng.</value></data>
+  <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Đang đặt giá…</value></data>
+  <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Không thể đặt giá. Vui lòng thử lại.</value></data>
+  <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Đặt giá thành công!</value></data>
+  <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>Phiên đấu giá đã kết thúc</value></data>
+  <data name="Js_ProductDetail_Registering" xml:space="preserve"><value>Đang đăng ký…</value></data>
+  <data name="Js_ProductDetail_RegistrationSuccess" xml:space="preserve"><value>Đăng ký thành công!</value></data>
+  <data name="Js_ProductDetail_RegistrationFailed" xml:space="preserve"><value>Không thể đăng ký. Vui lòng thử lại.</value></data>
+  <data name="Js_ProductDetail_RegistrationCancelled" xml:space="preserve"><value>Đã hủy đăng ký.</value></data>
+  <data name="Js_ProductDetail_CancelRegistrationFailed" xml:space="preserve"><value>Không thể hủy đăng ký.</value></data>
+  <data name="Js_BuyNow_Adding" xml:space="preserve"><value>Đang thêm…</value></data>
+  <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>Đã thêm vào giỏ.</value></data>
+  <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>Không thể thêm vào giỏ. Vui lòng thử lại.</value></data>
+  <data name="Js_Order_RemainingHours" xml:space="preserve"><value>CÒN {0} GIỜ {1} PHÚT</value></data>
+  <data name="Js_Order_RemainingMinutes" xml:space="preserve"><value>CÒN {0} PHÚT</value></data>
+  <data name="Js_PaymentInfo_SaveFailed" xml:space="preserve"><value>Không thể lưu thông tin thanh toán</value></data>
+  <data name="Js_PaymentInfo_SaveSuccess" xml:space="preserve"><value>Lưu thông tin thanh toán thành công! Đang chuyển về trang chủ...</value></data>
+  <data name="Js_PaymentInfo_Removed" xml:space="preserve"><value>Đã xóa phương thức thanh toán</value></data>
+  <data name="Js_PaymentInfo_DefaultUpdated" xml:space="preserve"><value>Đã cập nhật phương thức mặc định</value></data>
+  <data name="Js_PaymentInfo_SaveChanges" xml:space="preserve"><value>Lưu thay đổi</value></data>
+  <data name="Js_PaymentInfo_CardRequired" xml:space="preserve"><value>Yêu cầu số thẻ</value></data>
+  <data name="Js_PaymentInfo_CardLength" xml:space="preserve"><value>Số thẻ phải có 13–19 chữ số</value></data>
+  <data name="Js_PaymentInfo_HolderRequired" xml:space="preserve"><value>Yêu cầu tên chủ thẻ</value></data>
+  <data name="Js_PaymentInfo_HolderInvalid" xml:space="preserve"><value>Không cho phép ký tự đặc biệt</value></data>
+  <data name="Js_PaymentInfo_ExpiryRequired" xml:space="preserve"><value>Yêu cầu ngày hết hạn</value></data>
+  <data name="Js_PaymentInfo_Expired" xml:space="preserve"><value>Thẻ đã hết hạn</value></data>
+  <data name="Js_PaymentInfo_CvvInvalid" xml:space="preserve"><value>CVV không hợp lệ</value></data>
+  <data name="Js_PaymentInfo_BillingRequired" xml:space="preserve"><value>Yêu cầu địa chỉ thanh toán</value></data>
+  <data name="Js_Payment_FullNameRequired" xml:space="preserve"><value>Yêu cầu họ và tên.</value></data>
+  <data name="Js_Payment_PhoneRequired" xml:space="preserve"><value>Yêu cầu số điện thoại.</value></data>
+  <data name="Js_Payment_EmailInvalid" xml:space="preserve"><value>Vui lòng nhập email hợp lệ.</value></data>
+  <data name="Js_Payment_AddressRequired" xml:space="preserve"><value>Yêu cầu địa chỉ.</value></data>
+  <data name="Js_Payment_CityRequired" xml:space="preserve"><value>Yêu cầu thành phố.</value></data>
+  <data name="Js_Payment_MethodRequired" xml:space="preserve"><value>Vui lòng chọn phương thức thanh toán.</value></data>
+  <data name="Js_Payment_TermsRequired" xml:space="preserve"><value>Bạn phải đồng ý chính sách thanh toán.</value></data>
+  <data name="Js_Contact_Required" xml:space="preserve"><value>Trường này là bắt buộc</value></data>
+  <data name="Js_Contact_EmailInvalid" xml:space="preserve"><value>Email không hợp lệ</value></data>
+  <data name="Js_Contact_Submitted" xml:space="preserve"><value>✓ Đã gửi yêu cầu</value></data>
+  <data name="Js_Refund_OrderRequired" xml:space="preserve"><value>Vui lòng chọn đơn hàng.</value></data>
+  <data name="Js_Refund_ManualRequired" xml:space="preserve"><value>Vui lòng nhập mã đơn hàng.</value></data>
+  <data name="Js_Refund_FullNameRequired" xml:space="preserve"><value>Yêu cầu họ và tên.</value></data>
+  <data name="Js_Refund_EmailInvalid" xml:space="preserve"><value>Vui lòng nhập email hợp lệ.</value></data>
+  <data name="Js_Refund_ReasonRequired" xml:space="preserve"><value>Vui lòng chọn lý do hoàn tiền.</value></data>
+  <data name="Js_Refund_DescriptionRequired" xml:space="preserve"><value>Vui lòng mô tả chi tiết (ít nhất 20 ký tự).</value></data>
+  <data name="Js_Refund_PolicyRequired" xml:space="preserve"><value>Bạn phải đồng ý chính sách hoàn tiền.</value></data>
+  <data name="User_Verified" xml:space="preserve"><value>Đã xác minh</value></data>
+  <data name="User_YourAuctionList" xml:space="preserve"><value>Danh sách đấu giá của bạn</value></data>
+  <data name="User_Stat_TotalAuctions" xml:space="preserve"><value>Tổng đấu giá</value></data>
+  <data name="User_Stat_Completed" xml:space="preserve"><value>Hoàn tất</value></data>
+  <data name="User_Stat_TotalSales" xml:space="preserve"><value>Tổng doanh số</value></data>
+  <data name="User_Stat_SuccessRate" xml:space="preserve"><value>Tỷ lệ thành công</value></data>
+  <data name="User_NotUpdated" xml:space="preserve"><value>Chưa cập nhật</value></data>
+  <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
+  <data name="SellBuyNow_PageTitle" xml:space="preserve"><value>Đăng bán Mua ngay</value></data>
+  <data name="SellBuyNow_Heading" xml:space="preserve"><value>Đăng sản phẩm Mua ngay</value></data>
+  <data name="SellBuyNow_Subheading" xml:space="preserve"><value>Bán sản phẩm với giá cố định. Người mua có thể mua ngay mà không cần đấu giá.</value></data>
+  <data name="SellBuyNow_Section3_Title" xml:space="preserve"><value>Giá bán</value></data>
+  <data name="SellBuyNow_Section3_Desc" xml:space="preserve"><value>Nhập giá cố định cho sản phẩm</value></data>
+  <data name="SellBuyNow_Price" xml:space="preserve"><value>Giá</value></data>
+  <data name="SellBuyNow_PriceHint" xml:space="preserve"><value>Đây là giá người mua sẽ trả để mua ngay.</value></data>
+  <data name="SellBuyNow_Preview_Desc" xml:space="preserve"><value>Xem trước tin đăng trên trang Mua ngay</value></data>
+  <data name="SellBuyNow_Preview_ReviewNote" xml:space="preserve"><value>Kiểm tra thông tin trước khi đăng. Tin giá cố định sẽ hiển thị trên Mua ngay.</value></data>
+  <data name="SellBuyNow_ReadyToPublish_Highlight" xml:space="preserve"><value>Sẵn sàng đăng?</value></data>
+  <data name="SellBuyNow_ReadyToPublish" xml:space="preserve"><value>Tin đăng sẽ xuất hiện trên Mua ngay ngay lập tức.</value></data>
+  <data name="SellBuyNow_CreateListing" xml:space="preserve"><value>Đăng tin</value></data>
+  <data name="SellBuyNow_SuccessMessage" xml:space="preserve"><value>Đã tạo tin Mua ngay thành công.</value></data>
+  <data name="SellBuyNow_Success_Created" xml:space="preserve"><value>Tin đăng "{0}" đã được tạo thành công!</value></data>
+  <data name="SellBuyNow_Error_CreateFailed" xml:space="preserve"><value>Không thể tạo tin đăng.</value></data>
+  <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>Giá phải lớn hơn 0</value></data>
+  <data name="User_YourBuyNowList" xml:space="preserve"><value>Danh sách Mua ngay của bạn</value></data>
+  <data name="User_SellerBuyNowList" xml:space="preserve"><value>Danh sách Mua ngay</value></data>
+  <data name="Account_Selling_CreateListing" xml:space="preserve"><value>Đăng bán sản phẩm</value></data>
 </root>

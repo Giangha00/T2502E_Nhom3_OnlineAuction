@@ -6,13 +6,6 @@ namespace OnlineAuction.Services;
 
 public class OrderService : IOrderService
 {
-    private readonly IAuctionService _auctionService;
-
-    public OrderService(IAuctionService auctionService)
-    {
-        _auctionService = auctionService;
-    }
-
     public OrderPageViewModel BuildOrderPage(ISession session)
     {
         var items = WonOrderStore.GetOrders(session);
@@ -43,40 +36,6 @@ public class OrderService : IOrderService
 
         model.TotalAmount = model.Subtotal + model.ShippingFee + model.VaultInsurance;
         return model;
-    }
-
-    public (bool Success, string Message, string? RedirectUrl) PlaceBid(
-        ISession session,
-        int auctionId,
-        decimal amount)
-    {
-        if (auctionId <= 0 || amount <= 0)
-        {
-            return (false, "Invalid bid.", null);
-        }
-
-        var auction = _auctionService.GetAuctionById(auctionId);
-        if (auction is null)
-        {
-            return (false, "Auction not found.", null);
-        }
-
-        var deadlineHours = 2 + (auctionId % 19);
-        var order = new WonOrderItem
-        {
-            AuctionId = auction.Id,
-            Name = auction.Year > 0 ? $"{auction.Year} {auction.Name}" : auction.Name,
-            Subtitle = BuildSubtitle(auction),
-            Grade = auction.Grade,
-            ImageUrl = auction.ImageUrl,
-            WinningBid = amount,
-            PaymentDeadline = DateTime.UtcNow.AddHours(deadlineHours),
-            OrderReference = $"AH-{DateTime.UtcNow:yyyyMMdd}-{auction.Id:D4}"
-        };
-
-        WonOrderStore.AddOrder(session, order);
-
-        return (true, "Congratulations! You won this auction.", "/Order");
     }
 
     public (bool Success, string OrderRef, string AuctionName, decimal Total, string Method) CompleteOrder(
@@ -110,21 +69,5 @@ public class OrderService : IOrderService
         WonOrderStore.Clear(session);
 
         return (true, orderRef, auctionName, total, method);
-    }
-
-    private static string BuildSubtitle(AuctionItemViewModel auction)
-    {
-        var parts = new List<string>();
-        if (!string.IsNullOrWhiteSpace(auction.Subtitle))
-        {
-            parts.Add(auction.Subtitle.Split('·')[0].Trim());
-        }
-
-        if (!string.IsNullOrWhiteSpace(auction.Grade))
-        {
-            parts.Add($"{auction.Grade} Graded");
-        }
-
-        return parts.Count > 0 ? string.Join(" · ", parts) : auction.Category;
     }
 }

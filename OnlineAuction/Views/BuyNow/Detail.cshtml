@@ -1,0 +1,48 @@
+@using System.Text.Json
+@model OnlineAuction.Models.ProductDetailViewModel
+@{
+    var productDetailI18n = new Dictionary<string, string>
+    {
+        ["placingBid"] = Localizer["Js_ProductDetail_PlacingBid"].Value,
+        ["bid"] = Localizer["Product_Bid"].Value,
+        ["bidFailed"] = Localizer["Js_ProductDetail_BidFailed"].Value
+    };
+    var buyNowI18n = new Dictionary<string, string>
+    {
+        ["adding"] = Localizer["Js_BuyNow_Adding"].Value,
+        ["addToCart"] = Localizer["Card_AddToCart"].Value,
+        ["addedToCart"] = Localizer["Js_BuyNow_AddedToCart"].Value,
+        ["addFailed"] = Localizer["Js_BuyNow_AddFailed"].Value
+    };
+}
+
+<div class="rarecard-page bg-white">
+  <div class="w-full px-4 py-8 sm:px-8 lg:px-12 lg:py-10">
+    @await Html.PartialAsync("Partials/_Breadcrumb", Model)
+
+    <div class="product-detail-hero">
+      <div class="product-detail-hero__media">
+        @await Html.PartialAsync("~/Views/Auction/Partials/_ProductGallery.cshtml", Model)
+        @await Html.PartialAsync("Partials/_ProductDetailTabs", Model)
+      </div>
+      <div class="product-detail-hero__info sticky-below-header">
+        @await Html.PartialAsync("Partials/_ProductBuyNowPanel", Model)
+      </div>
+    </div>
+
+    @await Html.PartialAsync("Partials/_RelatedProducts", Model)
+  </div>
+</div>
+
+@section Scripts {
+  <script>
+    window.productDetailConfig = {
+      i18n: @Html.Raw(JsonSerializer.Serialize(productDetailI18n))
+    };
+    window.buyNowDetailConfig = {
+      i18n: @Html.Raw(JsonSerializer.Serialize(buyNowI18n))
+    };
+  </script>
+  <script src="~/js/product-detail.js" asp-append-version="true"></script>
+  <script src="~/js/buy-now-detail.js" asp-append-version="true"></script>
+}

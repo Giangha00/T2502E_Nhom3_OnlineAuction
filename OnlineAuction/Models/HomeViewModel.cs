@@ -1,5 +1,7 @@
 namespace OnlineAuction.Models;
 
+using OnlineAuction.Entities;
+
 public class HomeViewModel
 {
     public List<AuctionItemViewModel> HotAuctions { get; set; } = [];
@@ -24,12 +26,13 @@ public class AuctionItemViewModel
     public decimal CurrentPrice { get; set; }
     public string Status { get; set; } = string.Empty;
     public string TimeRemaining { get; set; } = string.Empty;
+    public string ListingType { get; set; } = ListingTypes.Auction;
     public string Grade { get; set; } = string.Empty;
     public string Subtitle { get; set; } = string.Empty;
     public string Condition { get; set; } = "Graded";
     public int Year { get; set; }
     public bool IsHot { get; set; }
-    public int BidCount => (Id * 3 + 7) % 24 + 3;
+    public int BidCount { get; set; }
 }
 
 public class SellerViewModel

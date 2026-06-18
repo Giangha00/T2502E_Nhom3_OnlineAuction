@@ -16,25 +16,40 @@
   var slideTimer = null;
   var currentSlide = 0;
 
-  var slideCopy = [
-    {
-      eyebrow: 'RareCard Vault',
-      title: 'Welcome to RareCard',
-      desc: 'Bid on authenticated graded cards from PSA, BGS & CGC vaults.'
-    },
-    {
-      eyebrow: 'Pokémon & TCG',
-      title: 'Discover Rare Holos',
-      desc: 'Base Set Charizards, Illustrator promos & manga rare parallels.'
-    },
-    {
-      eyebrow: 'Sports & MTG',
-      title: 'Legends on Auction',
-      desc: 'From Mickey Mantle rookies to Alpha Black Lotus — curated daily.'
-    }
-  ];
+  var slideCopy = (function () {
+    var i18n = (window.authModalConfig && window.authModalConfig.i18n) || {};
+    return [
+      {
+        eyebrow: i18n.slide1Eyebrow || 'RareCard Vault',
+        title: i18n.slide1Title || 'Welcome to RareCard',
+        desc: i18n.slide1Desc || 'Bid on authenticated graded cards from PSA, BGS & CGC vaults.'
+      },
+      {
+        eyebrow: i18n.slide2Eyebrow || 'Pokémon & TCG',
+        title: i18n.slide2Title || 'Discover Rare Holos',
+        desc: i18n.slide2Desc || 'Base Set Charizards, Illustrator promos & manga rare parallels.'
+      },
+      {
+        eyebrow: i18n.slide3Eyebrow || 'Sports & MTG',
+        title: i18n.slide3Title || 'Legends on Auction',
+        desc: i18n.slide3Desc || 'From Mickey Mantle rookies to Alpha Black Lotus — curated daily.'
+      }
+    ];
+  })();
 
   if (!overlay) return;
+
+  var returnUrlInputs = overlay.querySelectorAll('input[name="returnUrl"]');
+  var defaultReturnUrl = returnUrlInputs.length
+    ? returnUrlInputs[0].value
+    : window.location.pathname + window.location.search;
+
+  function setReturnUrl(url) {
+    var nextUrl = url || defaultReturnUrl;
+    returnUrlInputs.forEach(function (input) {
+      input.value = nextUrl;
+    });
+  }
 
   function switchTab(tabName) {
     tabs.forEach(function (tab) {
@@ -86,7 +101,8 @@
     }
   }
 
-  function openModal(tabName) {
+  function openModal(tabName, returnUrl) {
+    setReturnUrl(returnUrl);
     switchTab(tabName || 'login');
     overlay.classList.remove('home-auth-overlay--hidden');
     overlay.setAttribute('aria-hidden', 'false');
@@ -112,12 +128,16 @@
     overlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('home-auth-open');
     stopCarousel();
+    setReturnUrl(null);
   }
 
   triggers.forEach(function (trigger) {
     trigger.addEventListener('click', function (e) {
       e.preventDefault();
-      openModal(trigger.getAttribute('data-auth-tab') || 'login');
+      openModal(
+        trigger.getAttribute('data-auth-tab') || 'login',
+        trigger.getAttribute('data-auth-return-url')
+      );
     });
   });
 

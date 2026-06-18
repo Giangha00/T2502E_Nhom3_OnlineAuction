@@ -17,6 +17,14 @@ public class ApplicationUser : IdentityUser<int>
 
     public DateTime? UpdatedAt { get; set; }
 
+    public int? CreatedBy { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime? DeletedAt { get; set; }
+
+    public int? DeletedBy { get; set; }
+
     public ICollection<Product> Products { get; set; } = [];
 
     public ICollection<Auction> WonAuctions { get; set; } = [];
@@ -24,4 +32,6 @@ public class ApplicationUser : IdentityUser<int>
     public ICollection<Bid> Bids { get; set; } = [];
 
     public ICollection<AuctionOrder> Orders { get; set; } = [];
+
+    public ICollection<AuctionRegistration> AuctionRegistrations { get; set; } = [];
 }

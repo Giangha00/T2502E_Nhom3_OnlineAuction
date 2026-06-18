@@ -3,6 +3,8 @@
   const form = document.getElementById("paymentInfoForm");
   if (!form) return;
 
+  const i18n = (window.paymentInfoConfig && window.paymentInfoConfig.i18n) || {};
+
   const listEl = document.getElementById("savedPaymentList");
   const emptyState = document.getElementById("paymentEmptyState");
   const countBadge = document.getElementById("savedCountBadge");
@@ -46,9 +48,9 @@
   }
 
   function typeLabel(type) {
-    if (type === "mastercard") return "Mastercard";
-    if (type === "other") return "Other";
-    return "Visa";
+    if (type === "mastercard") return i18n.mastercard || "Mastercard";
+    if (type === "other") return i18n.other || "Other";
+    return i18n.visa || "Visa";
   }
 
   function typeIcon(type) {
@@ -175,40 +177,40 @@
 
     if (!cardInfo.unchanged) {
       if (!cardNumber) {
-        setError("cardNumberError", "Card number is required");
+        setError("cardNumberError", i18n.cardRequired || "Card number is required");
         valid = false;
       } else if (cardNumber.length < 13 || cardNumber.length > 19) {
-        setError("cardNumberError", "Card number must be 13–19 digits");
+        setError("cardNumberError", i18n.cardLength || "Card number must be 13–19 digits");
         valid = false;
       }
     }
 
     if (!holder) {
-      setError("cardHolderError", "Card holder name is required");
+      setError("cardHolderError", i18n.holderRequired || "Card holder name is required");
       valid = false;
     } else if (!/^[a-zA-Z\s]+$/.test(holder)) {
-      setError("cardHolderError", "No special characters allowed");
+      setError("cardHolderError", i18n.holderInvalid || "No special characters allowed");
       valid = false;
     }
 
     if (!month || !year) {
-      setError("expiryError", "Expiry date is required");
+      setError("expiryError", i18n.expiryRequired || "Expiry date is required");
       valid = false;
     } else if (isExpired(month, year)) {
-      setError("expiryError", "Card has expired");
+      setError("expiryError", i18n.expired || "Card has expired");
       valid = false;
     }
 
     if (!cvv) {
-      setError("cvvError", "Invalid CVV");
+      setError("cvvError", i18n.cvvInvalid || "Invalid CVV");
       valid = false;
     } else if (cvv.length < 3 || cvv.length > 4) {
-      setError("cvvError", "Invalid CVV");
+      setError("cvvError", i18n.cvvInvalid || "Invalid CVV");
       valid = false;
     }
 
     if (!billing) {
-      setError("billingError", "Billing address is required");
+      setError("billingError", i18n.billingRequired || "Billing address is required");
       valid = false;
     }
 
@@ -217,11 +219,11 @@
 
   function buildCardHtml(method) {
     const defaultBadge = method.isDefault
-      ? '<span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-800">Default</span>'
+      ? '<span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-800">' + (i18n.default || 'Default') + '</span>'
       : "";
     const setDefaultBtn = method.isDefault
       ? ""
-      : '<button type="button" data-action="set-default" class="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-amber-700 transition hover:border-amber-500 hover:bg-amber-50">Set Default</button>';
+      : '<button type="button" data-action="set-default" class="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-amber-700 transition hover:border-amber-500 hover:bg-amber-50">' + (i18n.setDefault || 'Set Default') + '</button>';
 
     return (
       '<article class="payment-card-item rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition hover:border-amber-300"' +
@@ -258,7 +260,7 @@
       '<p class="mt-1 font-mono text-sm tracking-wider text-stone-600">' +
       method.maskedNumber +
       "</p>" +
-      '<p class="mt-1 text-xs text-stone-500">Expires: ' +
+      '<p class="mt-1 text-xs text-stone-500">' + (i18n.expires || 'Expires:') + ' ' +
       method.expiryMonth +
       "/" +
       method.expiryYear +
@@ -267,8 +269,8 @@
       defaultBadge +
       "</div>" +
       '<div class="mt-4 flex flex-wrap gap-2 border-t border-stone-100 pt-4">' +
-      '<button type="button" data-action="edit" class="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:border-amber-500 hover:text-amber-700">Edit</button>' +
-      '<button type="button" data-action="remove" class="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50">Remove</button>' +
+      '<button type="button" data-action="edit" class="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:border-amber-500 hover:text-amber-700">' + (i18n.edit || 'Edit') + '</button>' +
+      '<button type="button" data-action="remove" class="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50">' + (i18n.remove || 'Remove') + '</button>' +
       setDefaultBtn +
       "</div></article>"
     );
@@ -294,8 +296,8 @@
     }
 
     if (countBadge) {
-      countBadge.textContent =
-        methods.length + " method" + (methods.length === 1 ? "" : "s");
+      var countTemplate = i18n.methodCount || "{count} method(s)";
+      countBadge.textContent = countTemplate.replace("{count}", methods.length);
     }
   }
 
@@ -304,7 +306,7 @@
     editingIdInput.value = "";
     document.querySelector('input[name="cardType"][value="visa"]').checked =
       true;
-    saveBtn.textContent = "Save Payment Information";
+    saveBtn.textContent = i18n.saveInfo || "Save Payment Information";
     document
       .querySelectorAll(".payment-card-item.is-editing")
       .forEach(function (el) {
@@ -334,7 +336,7 @@
     fields.setAsDefault().checked = !!cardEl.querySelector(".bg-amber-100");
 
     editingIdInput.value = cardEl.dataset.cardId || "";
-    saveBtn.textContent = "Save Changes";
+    saveBtn.textContent = i18n.saveChanges || "Save Changes";
 
     document.querySelectorAll(".payment-card-item").forEach(function (el) {
       el.classList.toggle("is-editing", el === cardEl);
@@ -348,7 +350,7 @@
     event.preventDefault();
 
     if (!validateForm()) {
-      showNotification("Unable to save payment information", "error");
+      showNotification(i18n.saveFailed || "Unable to save payment information", "error");
       return;
     }
 
@@ -398,7 +400,7 @@
     renderList();
     resetForm();
     showNotification(
-      "Payment information saved successfully! Redirecting to home...",
+      i18n.saveSuccess || "Payment information saved successfully! Redirecting to home...",
       "success",
     );
 
@@ -447,7 +449,7 @@
       persistMethods();
       renderList();
       if (editingIdInput.value === cardId) resetForm();
-      showNotification("Payment method removed", "success");
+      showNotification(i18n.removed || "Payment method removed", "success");
       return;
     }
 
@@ -457,7 +459,7 @@
       });
       persistMethods();
       renderList();
-      showNotification("Default payment method updated", "success");
+      showNotification(i18n.defaultUpdated || "Default payment method updated", "success");
     }
   });
 

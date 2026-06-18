@@ -1,6 +1,6 @@
 namespace OnlineAuction.Entities;
 
-public class Auction
+public class Auction : AuditableEntity
 {
     public int Id { get; set; }
 
@@ -12,15 +12,21 @@ public class Auction
 
     public decimal CurrentPrice { get; set; }
 
+    public decimal? BuyNowPrice { get; set; }
+
+    public string ListingType { get; set; } = ListingTypes.Auction;
+
+    public bool RequiresRegistration { get; set; } = true;
+
     public string Status { get; set; } = AuctionStatuses.Live;
 
     public DateTime StartDate { get; set; }
 
     public DateTime EndDate { get; set; }
 
-    public int? WinnerId { get; set; }
+    public string? AuctionEventName { get; set; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public int? WinnerId { get; set; }
 
     public Product Product { get; set; } = null!;
 
@@ -29,6 +35,14 @@ public class Auction
     public ICollection<Bid> Bids { get; set; } = [];
 
     public ICollection<OrderItem> OrderItems { get; set; } = [];
+
+    public ICollection<AuctionRegistration> Registrations { get; set; } = [];
+}
+
+public static class ListingTypes
+{
+    public const string Auction = "auction";
+    public const string BuyNow = "buynow";
 }
 
 public static class AuctionStatuses
