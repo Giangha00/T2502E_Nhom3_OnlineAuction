@@ -112,6 +112,8 @@ builder.Services.AddScoped<IAuctionService, AuctionService>();
 builder.Services.AddScoped<IBidService, BidService>();
 builder.Services.AddScoped<IAuctionRegistrationService, AuctionRegistrationService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderCreationService, OrderCreationService>();
+builder.Services.AddHostedService<AuctionFinalizationWorker>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
@@ -136,6 +138,12 @@ using (var scope = app.Services.CreateScope())
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     await UserSeeder.SeedAsync(dbContext, userManager);
     await AuctionCatalogSeeder.SeedAsync(dbContext, app.Environment.IsDevelopment());
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var orderCreationService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
+    await orderCreationService.FinalizeExpiredAuctionsAsync();
 }
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
