@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
@@ -39,7 +40,7 @@ public class OrderController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Complete(string paymentMethod)
+    public async Task<IActionResult> Complete(CompleteOrderRequest request)
     {
         var userId = GetCurrentUserId();
         if (!userId.HasValue)
@@ -47,7 +48,19 @@ public class OrderController : Controller
             return RedirectToAction("Index", "Home");
         }
 
-        var result = await _orderService.CompleteOrderAsync(userId.Value, paymentMethod);
+        if (!ModelState.IsValid)
+        {
+            var error = ModelState.Values
+                .SelectMany(value => value.Errors)
+                .Select(error => error.ErrorMessage)
+                .FirstOrDefault(message => !string.IsNullOrWhiteSpace(message))
+                ?? "Please complete all required fields.";
+
+            TempData["OrderError"] = error;
+            return RedirectToAction(nameof(Index));
+        }
+
+        var result = await _orderService.CompleteOrderAsync(userId.Value, request);
         if (!result.Success)
         {
             TempData["OrderError"] = result.Message;
