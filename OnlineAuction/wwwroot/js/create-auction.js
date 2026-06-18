@@ -124,7 +124,6 @@
       startingPrice: $('startingPrice')?.value || '',
       bidStep: $('bidStep')?.value || '',
       buyNowPrice: $('buyNowPrice')?.value || '',
-      estimatedValue: $('estimatedValue')?.value || '',
       auctionEventName: $('auctionEventName')?.value.trim() || '',
       startDate: $('startDate')?.value || '',
       endDate: $('endDate')?.value || '',
@@ -515,7 +514,6 @@
       if ($('startingPrice') && data.startingPrice) $('startingPrice').value = data.startingPrice;
       if ($('bidStep') && data.bidStep) $('bidStep').value = data.bidStep;
       if ($('buyNowPrice') && data.buyNowPrice) $('buyNowPrice').value = data.buyNowPrice;
-      if ($('estimatedValue') && data.estimatedValue) $('estimatedValue').value = data.estimatedValue;
       if ($('auctionEventName') && data.auctionEventName) $('auctionEventName').value = data.auctionEventName;
       if ($('startDate') && data.startDate) $('startDate').value = data.startDate;
       if ($('endDate') && data.endDate) $('endDate').value = data.endDate;
@@ -606,7 +604,7 @@
       'productName', 'shortDescription', 'subtitle', 'category', 'productOrigin',
       'year', 'setName', 'language', 'cardNumber', 'grade', 'certificateNumber',
       'gradingCentering', 'gradingCorners', 'gradingEdges', 'gradingSurface',
-      'startingPrice', 'bidStep', 'buyNowPrice', 'estimatedValue', 'auctionEventName',
+      'startingPrice', 'bidStep', 'buyNowPrice', 'auctionEventName',
       'startDate', 'endDate'
     ];
 
