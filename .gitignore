@@ -35,6 +35,10 @@ orleans.codegen.cs
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
+# App settings (may contain secrets / local config)
+**/appsettings.json
+**/appsettings.*.json
+
 # Node
 node_modules/
 npm-debug.log*
