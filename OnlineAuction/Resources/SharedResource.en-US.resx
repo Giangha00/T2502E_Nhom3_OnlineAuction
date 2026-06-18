@@ -756,6 +756,7 @@
   <data name="Order_SecuredShipping" xml:space="preserve"><value>Secured Shipping</value></data>
   <data name="Order_VaultInsurance" xml:space="preserve"><value>Vault Insurance</value></data>
   <data name="Order_CompleteOrder" xml:space="preserve"><value>Complete Order</value></data>
+  <data name="Order_ShippingSaved" xml:space="preserve"><value>Shipping details saved.</value></data>
   <data name="Order_SslSecure" xml:space="preserve"><value>SSL Encrypted Secure Transaction</value></data>
   <data name="Order_AuthenticityTitle" xml:space="preserve"><value>RareCard Authenticity Guarantee</value></data>
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Your items are protected by our vault security. All won auctions are double-verified before shipment to ensure grading integrity.</value></data>
