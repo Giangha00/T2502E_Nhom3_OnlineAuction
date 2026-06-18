@@ -76,8 +76,7 @@ public class AccountController : Controller
             PageDescription = description
         });
     }
-
-    private async Task<AccountShellViewModel> BuildShellAsync(string activeSection)
+private async Task<AccountShellViewModel> BuildShellAsync(string activeSection)
     {
         var user = await _userManager.GetUserAsync(User);
         var displayName = user?.FullName ?? User.Identity?.Name ?? "User";

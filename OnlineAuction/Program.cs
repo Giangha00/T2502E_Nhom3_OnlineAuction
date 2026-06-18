@@ -3,16 +3,17 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Data.Seeders;
-using OnlineAuction.Configurations;
 using OnlineAuction.Entities;
 using OnlineAuction.Services;
 using OnlineAuction.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+#region MVC + Localization
+
 var mvcBuilder = builder.Services.AddControllersWithViews()
     .AddViewLocalization()
     .AddDataAnnotationsLocalization(options =>
@@ -26,15 +27,6 @@ if (builder.Environment.IsDevelopment())
     mvcBuilder.AddRazorRuntimeCompilation();
 }
 
-builder.Services.AddDistributedMemoryCache();
-
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
-
 builder.Services.AddLocalization(options =>
 {
     options.ResourcesPath = "Resources";
@@ -42,7 +34,7 @@ builder.Services.AddLocalization(options =>
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
-    var supportedCultures = new[]
+    var cultures = new[]
     {
         new CultureInfo("en-US"),
         new CultureInfo("vi-VN"),
@@ -51,8 +43,8 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     };
 
     options.DefaultRequestCulture = new RequestCulture("en-US");
-    options.SupportedCultures = supportedCultures;
-    options.SupportedUICultures = supportedCultures;
+    options.SupportedCultures = cultures;
+    options.SupportedUICultures = cultures;
 
     options.RequestCultureProviders.Clear();
     options.RequestCultureProviders.Add(new QueryStringRequestCultureProvider());
@@ -62,34 +54,55 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     });
 });
 
-var databaseProvider = builder.Configuration.GetValue<string>("DatabaseProvider") ?? "MySql";
+#endregion
+
+#region Session
+
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+#endregion
+
+#region Database
+
+var dbProvider = builder.Configuration.GetValue<string>("DatabaseProvider") ?? "MySql";
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
 {
-    if (databaseProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
+    if (dbProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
     {
         options.UseSqlite(connectionString);
-        return;
     }
-
-    var serverVersion = ServerVersion.Parse("8.0.36-mysql");
-
-    options.UseMySql(connectionString, serverVersion, mySqlOptions =>
+    else
     {
-        mySqlOptions.MigrationsHistoryTable("__ef_migrations_history");
-        mySqlOptions.EnableRetryOnFailure();
-    });
+        var serverVersion = ServerVersion.Parse("8.0.36-mysql");
+        options.UseMySql(connectionString, serverVersion, mySql =>
+        {
+            mySql.MigrationsHistoryTable("__ef_migrations_history");
+            mySql.EnableRetryOnFailure();
+        });
+    }
 });
+
+#endregion
+
+#region Identity (FIXED ARCHITECTURE)
 
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
     {
+        options.Password.RequiredLength = 6;
         options.Password.RequireDigit = true;
         options.Password.RequireLowercase = true;
         options.Password.RequireUppercase = true;
         options.Password.RequireNonAlphanumeric = false;
-        options.Password.RequiredLength = 6;
 
         options.User.RequireUniqueEmail = true;
 
@@ -99,6 +112,8 @@ builder.Services
     })
     .AddEntityFrameworkStores<AuctionHouseDbContext>()
     .AddDefaultTokenProviders();
+
+#endregion
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -111,6 +126,12 @@ builder.Services.ConfigureApplicationCookie(options =>
 
     options.Events.OnRedirectToLogin = context =>
     {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        }
+
         if (context.Request.Path.StartsWithSegments("/Admin", StringComparison.OrdinalIgnoreCase))
         {
             context.Response.Redirect(context.RedirectUri);
@@ -140,6 +161,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
+#region Cloudinary + Services
+
 builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));
 
@@ -152,48 +175,53 @@ builder.Services.AddScoped<IBidService, BidService>();
 builder.Services.AddScoped<IAuctionRegistrationService, AuctionRegistrationService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderCreationService, OrderCreationService>();
-builder.Services.AddHostedService<AuctionFinalizationWorker>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 
+builder.Services.AddHostedService<AuctionFinalizationWorker>();
+
+#endregion
+
 var app = builder.Build();
 
-// Database init
+#region DB Init + Seeders
+
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
+    var db = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
 
-    if (dbContext.Database.ProviderName?.Contains("Sqlite", StringComparison.OrdinalIgnoreCase) == true)
+    if (db.Database.ProviderName?.Contains("Sqlite") == true)
     {
-        await dbContext.Database.EnsureCreatedAsync();
+        await db.Database.EnsureCreatedAsync();
     }
     else
     {
-        await dbContext.Database.MigrateAsync();
+        await db.Database.MigrateAsync();
     }
 }
 
-// Seeders
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
+    var db = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
 
-    await UserSeeder.SeedAsync(dbContext, userManager);
-    await AdminSeeder.SeedAsync(dbContext, userManager, roleManager);
-    await AuctionCatalogSeeder.SeedAsync(dbContext, app.Environment.IsDevelopment());
+    await UserSeeder.SeedAsync(db, userManager);
+    await AdminSeeder.SeedAsync(db, userManager, roleManager);
+    await AuctionCatalogSeeder.SeedAsync(db, app.Environment.IsDevelopment());
 }
 
-// Finalize auctions
 using (var scope = app.Services.CreateScope())
 {
-    var orderCreationService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
-    await orderCreationService.FinalizeExpiredAuctionsAsync();
+    var orderService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
+    await orderService.FinalizeExpiredAuctionsAsync();
 }
 
-// Pipeline
+#endregion
+
+#region Pipeline
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -203,17 +231,19 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-var localizationOptions = app.Services
-    .GetRequiredService<IOptions<RequestLocalizationOptions>>()
-    .Value;
-
-app.UseRequestLocalization(localizationOptions);
+app.UseRequestLocalization(
+    app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
 
 app.UseRouting();
 
 app.UseSession();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+#endregion
+
+#region Routes
 
 app.MapControllerRoute(
     name: "areas",
@@ -223,5 +253,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.Run();
+#endregion
 
+app.Run();
