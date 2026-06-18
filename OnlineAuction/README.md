@@ -44,10 +44,26 @@ Username is generated from the email local-part (e.g. `john@gmail.com` → `john
 
 | Field | Default |
 |-------|---------|
-| `LotNumber`, `WatcherCount`, `EstimatedValue` | `0` |
-| `Language`, `CardNumber` | `"—"` |
-| `Documents` | empty list |
+| `LotNumber`, `WatcherCount` | `0` |
 | `Seller.Rating` | `0` |
-| Gallery | `Product.PrimaryImage` only (no `product_images` table yet) |
+
+### Sell form → Product Detail field mapping
+
+| Sell form field | DB column / table |
+|-----------------|-------------------|
+| Short Description | `products.short_description` |
+| Subtitle | `products.subtitle` |
+| Year, Set Name, Language, Card Number | `products.year`, `set_name`, `language`, `card_number` |
+| Grade, Certificate Number | `products.grade_label`, `cert_number` |
+| Grading sub-scores | `products.grading_centering/corners/edges/surface` |
+| Product Origin | `products.product_origin` |
+| Gallery image 1 | `products.primary_image` |
+| Gallery images 2–5 | `product_images` |
+| Documents | `product_documents` |
+| Estimated Value | `products.estimated_value` |
+| Auction Event Name | `auctions.auction_event_name` |
+| Buy Now Price | `auctions.buy_now_price` |
+
+Migration: `AddProductDetailSellFields`.
 
 Test URLs after seed: `/Auction/Detail/1` … `/Auction/Detail/5`.

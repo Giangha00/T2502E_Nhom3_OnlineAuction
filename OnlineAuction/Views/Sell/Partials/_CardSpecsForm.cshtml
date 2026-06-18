@@ -1,0 +1,83 @@
+@model OnlineAuction.Models.SellProductFormViewModel
+
+<div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+  <div class="border-b border-slate-100 px-6 py-5">
+    <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+      <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">4</span>
+      @Localizer["Sell_Section4_CardSpecs_Title"]
+    </h2>
+    <p class="mt-1 pl-10 text-sm text-slate-500">@Localizer["Sell_Section4_CardSpecs_Desc"]</p>
+  </div>
+
+  <div class="space-y-5 p-6">
+    <div>
+      <label for="subtitle" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_Subtitle"]</label>
+      <input type="text" id="subtitle" name="Subtitle" value="@Model.Subtitle" maxlength="160" placeholder="@Localizer["Sell_Subtitle_Placeholder"]"
+             class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="year" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Product_Year"]</label>
+        <input type="number" id="year" name="Year" value="@(Model.Year.HasValue ? Model.Year : "")" min="1800" max="2100" placeholder="1999"
+               class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
+        <p class="field-error mt-1 hidden text-xs text-red-600" data-for="year"></p>
+      </div>
+      <div>
+        <label for="setName" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Product_Set"]</label>
+        <input type="text" id="setName" name="SetName" value="@Model.SetName" maxlength="120" placeholder="@Localizer["Sell_SetName_Placeholder"]"
+               class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
+      </div>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="language" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Product_Language"]</label>
+        <select id="language" name="Language"
+                class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+          @foreach (var language in Model.Languages)
+          {
+            if (Model.Language == language)
+            {
+              <option value="@language" selected="selected">@language</option>
+            }
+            else
+            {
+              <option value="@language">@language</option>
+            }
+          }
+        </select>
+      </div>
+      <div>
+        <label for="cardNumber" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Product_CardNumber"]</label>
+        <input type="text" id="cardNumber" name="CardNumber" value="@Model.CardNumber" maxlength="30" placeholder="4/102"
+               class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
+      </div>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="grade" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_Grade"]</label>
+        <select id="grade" name="Grade"
+                class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+          @foreach (var grade in Model.Grades)
+          {
+            if (Model.Grade == grade)
+            {
+              <option value="@grade" selected="selected">@grade</option>
+            }
+            else
+            {
+              <option value="@grade">@grade</option>
+            }
+          }
+        </select>
+      </div>
+      <div>
+        <label for="certificateNumber" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_CertificateNumber"]</label>
+        <input type="text" id="certificateNumber" name="CertificateNumber" value="@Model.CertificateNumber" maxlength="50" placeholder="PSA-48000137"
+               class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
+      </div>
+    </div>
+  </div>
+</div>

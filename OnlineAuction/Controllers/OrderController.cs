@@ -23,27 +23,6 @@ public class OrderController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult PlaceBid(int auctionId, decimal amount)
-    {
-        var result = _orderService.PlaceBid(HttpContext.Session, auctionId, amount);
-
-        if (!result.Success)
-        {
-            return result.Message == "Auction not found."
-                ? NotFound(new { success = false, message = result.Message })
-                : BadRequest(new { success = false, message = result.Message });
-        }
-
-        return Json(new
-        {
-            success = true,
-            message = result.Message,
-            redirectUrl = Url.Action(nameof(Index))
-        });
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
     public IActionResult Complete(string paymentMethod)
     {
         var result = _orderService.CompleteOrder(HttpContext.Session, paymentMethod);

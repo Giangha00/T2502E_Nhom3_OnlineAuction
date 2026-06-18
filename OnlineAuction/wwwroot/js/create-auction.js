@@ -4,6 +4,7 @@
   var DRAFT_KEY = 'auctionHouse_createAuction_draft';
   var MAX_IMAGE_SIZE = 5 * 1024 * 1024;
   var MAX_DOC_SIZE = 10 * 1024 * 1024;
+  var MAX_IMAGES = 5;
   var IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
   var DOC_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 
@@ -103,14 +104,27 @@
   function getFormData() {
     return {
       productName: $('productName')?.value.trim() || '',
+      shortDescription: $('shortDescription')?.value.trim() || '',
+      subtitle: $('subtitle')?.value.trim() || '',
       category: $('category')?.value || '',
       productDescription: state.editor ? state.editor.getData() : ($('productDescription')?.value || ''),
       condition: getSelectedRadio('Condition'),
       productOrigin: $('productOrigin')?.value.trim() || '',
+      year: $('year')?.value || '',
+      setName: $('setName')?.value.trim() || '',
+      language: $('language')?.value || '',
+      cardNumber: $('cardNumber')?.value.trim() || '',
+      grade: $('grade')?.value || '',
+      certificateNumber: $('certificateNumber')?.value.trim() || '',
+      gradingCentering: $('gradingCentering')?.value.trim() || '',
+      gradingCorners: $('gradingCorners')?.value.trim() || '',
+      gradingEdges: $('gradingEdges')?.value.trim() || '',
+      gradingSurface: $('gradingSurface')?.value.trim() || '',
       auctionType: getSelectedRadio('AuctionType'),
       startingPrice: $('startingPrice')?.value || '',
       bidStep: $('bidStep')?.value || '',
       buyNowPrice: $('buyNowPrice')?.value || '',
+      auctionEventName: $('auctionEventName')?.value.trim() || '',
       startDate: $('startDate')?.value || '',
       endDate: $('endDate')?.value || '',
       imageCount: state.images.length,
@@ -146,18 +160,24 @@
   }
 
   function buildPreviewSubtitle(data) {
+    if (data.subtitle) return data.subtitle;
+    if (data.shortDescription) return data.shortDescription;
     var parts = [];
     if (data.category) parts.push(data.category);
+    if (data.setName) parts.push(data.setName);
     if (data.productOrigin) parts.push(data.productOrigin);
     if (data.condition) parts.push(localizeCondition(data.condition));
     return parts.length ? parts.join(' · ') : '—';
   }
 
-  function setPreviewGradeBadge(condition) {
+  function setPreviewGradeBadge(grade) {
     $all('previewGrade').forEach(function (badge) {
-      var showGrade = condition && /^(PSA|BGS|CGC)\s/i.test(condition);
+      var showGrade = grade && /^(PSA|BGS|CGC)\s/i.test(grade);
       if (showGrade) {
-        badge.textContent = condition;
+        badge.textContent = grade;
+        badge.classList.remove('hidden');
+      } else if (grade) {
+        badge.textContent = grade;
         badge.classList.remove('hidden');
       } else {
         badge.textContent = '';
@@ -189,7 +209,7 @@
     setPreviewText('previewSubtitle', buildPreviewSubtitle(data));
     setPreviewText('previewCurrentBid', formatCardMoney(data.startingPrice));
     setPreviewText('previewTimeRemaining', formatTimeRemaining(data.endDate));
-    setPreviewGradeBadge(data.condition);
+    setPreviewGradeBadge(data.grade);
     setPreviewMainImage(state.images.length > 0 ? state.images[0].url : '');
   }
 
@@ -230,27 +250,27 @@
 
   function addImages(files) {
     var errors = [];
-    var file = Array.from(files)[0];
+    Array.from(files).forEach(function (file) {
+      if (state.images.length >= MAX_IMAGES) {
+        return;
+      }
 
-    state.images.forEach(function (img) { URL.revokeObjectURL(img.url); });
-    state.images = [];
+      if (!IMAGE_TYPES.includes(file.type)) {
+        errors.push(tf(t('errorImageInvalidFormat', '{0}: invalid format (JPG, PNG, WEBP only)'), file.name));
+        return;
+      }
 
-    if (!file) {
-      renderImagePreviews();
-      return;
-    }
+      if (file.size > MAX_IMAGE_SIZE) {
+        errors.push(tf(t('errorImageSizeLimit', '{0}: exceeds 5MB limit'), file.name));
+        return;
+      }
 
-    if (!IMAGE_TYPES.includes(file.type)) {
-      errors.push(tf(t('errorImageInvalidFormat', '{0}: invalid format (JPG, PNG, WEBP only)'), file.name));
-    } else if (file.size > MAX_IMAGE_SIZE) {
-      errors.push(tf(t('errorImageSizeLimit', '{0}: exceeds 5MB limit'), file.name));
-    } else {
       state.images.push({
         id: 'img_' + Date.now() + '_' + Math.random().toString(36).slice(2),
         file: file,
         url: URL.createObjectURL(file)
       });
-    }
+    });
 
     if (errors.length) {
       showError('images', errors[0]);
@@ -385,6 +405,15 @@
       valid = false;
     }
 
+    if (data.year) {
+      var year = Number(data.year);
+      if (isNaN(year) || year < 1800 || year > 2100) {
+        showError('year', t('errorYearInvalid', 'Please enter a valid year between 1800 and 2100.'));
+        markInvalid($('year'));
+        valid = false;
+      }
+    }
+
     var price = Number(data.startingPrice);
     if (!data.startingPrice || isNaN(price) || price <= 0) {
       showError('startingPrice', t('errorStartingPriceRequired', 'Starting price must be greater than 0'));
@@ -468,11 +497,24 @@
       var data = JSON.parse(raw);
 
       if ($('productName') && data.productName) $('productName').value = data.productName;
+      if ($('shortDescription') && data.shortDescription) $('shortDescription').value = data.shortDescription;
+      if ($('subtitle') && data.subtitle) $('subtitle').value = data.subtitle;
       if ($('category') && data.category) $('category').value = data.category;
       if ($('productOrigin') && data.productOrigin) $('productOrigin').value = data.productOrigin;
+      if ($('year') && data.year) $('year').value = data.year;
+      if ($('setName') && data.setName) $('setName').value = data.setName;
+      if ($('language') && data.language) $('language').value = data.language;
+      if ($('cardNumber') && data.cardNumber) $('cardNumber').value = data.cardNumber;
+      if ($('grade') && data.grade) $('grade').value = data.grade;
+      if ($('certificateNumber') && data.certificateNumber) $('certificateNumber').value = data.certificateNumber;
+      if ($('gradingCentering') && data.gradingCentering) $('gradingCentering').value = data.gradingCentering;
+      if ($('gradingCorners') && data.gradingCorners) $('gradingCorners').value = data.gradingCorners;
+      if ($('gradingEdges') && data.gradingEdges) $('gradingEdges').value = data.gradingEdges;
+      if ($('gradingSurface') && data.gradingSurface) $('gradingSurface').value = data.gradingSurface;
       if ($('startingPrice') && data.startingPrice) $('startingPrice').value = data.startingPrice;
       if ($('bidStep') && data.bidStep) $('bidStep').value = data.bidStep;
       if ($('buyNowPrice') && data.buyNowPrice) $('buyNowPrice').value = data.buyNowPrice;
+      if ($('auctionEventName') && data.auctionEventName) $('auctionEventName').value = data.auctionEventName;
       if ($('startDate') && data.startDate) $('startDate').value = data.startDate;
       if ($('endDate') && data.endDate) $('endDate').value = data.endDate;
 
@@ -559,8 +601,11 @@
 
   function bindEvents() {
     var fields = [
-      'productName', 'category', 'productOrigin',
-      'startingPrice', 'bidStep', 'buyNowPrice', 'startDate', 'endDate'
+      'productName', 'shortDescription', 'subtitle', 'category', 'productOrigin',
+      'year', 'setName', 'language', 'cardNumber', 'grade', 'certificateNumber',
+      'gradingCentering', 'gradingCorners', 'gradingEdges', 'gradingSurface',
+      'startingPrice', 'bidStep', 'buyNowPrice', 'auctionEventName',
+      'startDate', 'endDate'
     ];
 
     fields.forEach(function (id) {
@@ -608,6 +653,13 @@
       if (state.images.length > 0) {
         formData.append('PrimaryImageFile', state.images[0].file);
       }
+      for (var i = 1; i < state.images.length; i++) {
+        formData.append('GalleryImageFiles', state.images[i].file);
+      }
+      state.documents.forEach(function (doc) {
+        formData.append('DocumentFiles', doc.file);
+        formData.append('DocumentNames', doc.name);
+      });
 
       fetch(form.action, {
         method: 'POST',

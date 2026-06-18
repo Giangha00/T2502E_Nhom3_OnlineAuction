@@ -16,10 +16,12 @@ public class AuctionController : Controller
         _auctionService = new AdminAuctionService(dbContext, photoService);
     }
 
+
     public async Task<IActionResult> Index(AuctionFilterViewModel filter)
     {
         var model = await _auctionService.GetAuctionsAsync(filter);
         return View(model);
+
     }
 
     [HttpGet]
@@ -27,6 +29,7 @@ public class AuctionController : Controller
     {
         return View(await _auctionService.BuildCreateFormAsync());
     }
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -49,6 +52,7 @@ public class AuctionController : Controller
 
         TempData["SuccessMessage"] = result.Message;
         return RedirectToAction(nameof(Index));
+
     }
 
     [HttpGet]

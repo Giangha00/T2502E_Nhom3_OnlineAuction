@@ -238,6 +238,19 @@
   <data name="Sell_Condition_Used" xml:space="preserve"><value>Đã qua sử dụng</value></data>
   <data name="Sell_ProductOrigin" xml:space="preserve"><value>Xuất xứ sản phẩm</value></data>
   <data name="Sell_ProductOrigin_Placeholder" xml:space="preserve"><value>vd. Nhật Bản / Mỹ</value></data>
+  <data name="Sell_ShortDescription" xml:space="preserve"><value>Mô tả ngắn</value></data>
+  <data name="Sell_ShortDescription_Placeholder" xml:space="preserve"><value>Tóm tắt hiển thị ở header (tối đa 300 ký tự)</value></data>
+  <data name="Sell_Subtitle" xml:space="preserve"><value>Phụ đề</value></data>
+  <data name="Sell_Subtitle_Placeholder" xml:space="preserve"><value>Dòng tagline dưới tên sản phẩm</value></data>
+  <data name="Sell_Section4_CardSpecs_Title" xml:space="preserve"><value>Thông số thẻ</value></data>
+  <data name="Sell_Section4_CardSpecs_Desc" xml:space="preserve"><value>Năm, bộ, ngôn ngữ, grade và số chứng nhận</value></data>
+  <data name="Sell_SetName_Placeholder" xml:space="preserve"><value>vd. Base Set</value></data>
+  <data name="Sell_Grade" xml:space="preserve"><value>Grade</value></data>
+  <data name="Sell_CertificateNumber" xml:space="preserve"><value>Số chứng nhận</value></data>
+  <data name="Sell_EstimatedValue" xml:space="preserve"><value>Giá trị ước tính</value></data>
+  <data name="Sell_AuctionEventName" xml:space="preserve"><value>Tên sự kiện đấu giá</value></data>
+  <data name="Sell_AuctionEventName_Placeholder" xml:space="preserve"><value>vd. RareCard Vault: Premium Trading Card Auction</value></data>
+  <data name="Sell_Error_YearInvalid" xml:space="preserve"><value>Vui lòng nhập năm hợp lệ từ 1800 đến 2100.</value></data>
   <data name="Sell_Section2_Title" xml:space="preserve"><value>Hình ảnh sản phẩm</value></data>
   <data name="Sell_Section2_Desc" xml:space="preserve"><value>Tải lên nhiều hình — JPG, PNG, WEBP (tối đa 5MB mỗi ảnh)</value></data>
   <data name="Sell_UploadImages_Title" xml:space="preserve"><value>Tải lên hình ảnh sản phẩm</value></data>
@@ -485,8 +498,10 @@
   <data name="Product_BidAmount" xml:space="preserve"><value>Số tiền đấu giá</value></data>
   <data name="Product_DateTime" xml:space="preserve"><value>Ngày &amp;amp; Giờ</value></data>
   <data name="Product_Status" xml:space="preserve"><value>Trạng thái</value></data>
-  <data name="Product_Winning" xml:space="preserve"><value>Đang thắng</value></data>
+  <data name="Product_Winning" xml:space="preserve"><value>Giá cao nhất</value></data>
   <data name="Product_Outbid" xml:space="preserve"><value>Bị vượt giá</value></data>
+  <data name="Product_Raised" xml:space="preserve"><value>Đã nâng giá</value></data>
+  <data name="Product_BidHistoryNote" xml:space="preserve"><value>Trạng thái phản ánh từng lần đặt giá khi phiên còn diễn ra. Người thắng cuối cùng chỉ được xác định sau khi phiên kết thúc.</value></data>
   <data name="Product_ViewAllBids" xml:space="preserve"><value>Xem tất cả {0} lượt đấu giá →</value></data>
   <data name="Product_Shipping_Desc" xml:space="preserve"><value>Thẻ đã chấm điểm được vận chuyển trong bao bì kho kiểm soát khí hậu, bảo hiểm đầy đủ. Xử lý cẩn thận từ trung tâm xác thực đến tay bạn.</value></data>
   <data name="Product_Shipping_Insurance" xml:space="preserve"><value>Bao gồm bảo hiểm toàn bộ giá trị thẩm định</value></data>
@@ -505,6 +520,17 @@
   <data name="Product_Days" xml:space="preserve"><value>Ngày</value></data>
   <data name="Product_Hours" xml:space="preserve"><value>Giờ</value></data>
   <data name="Product_Minutes" xml:space="preserve"><value>Phút</value></data>
+  <data name="Product_Seconds" xml:space="preserve"><value>Giây</value></data>
+  <data name="Product_NoBidsYet" xml:space="preserve"><value>Chưa có lượt đấu giá</value></data>
+  <data name="Product_AuctionEnded" xml:space="preserve"><value>Phiên đấu giá đã kết thúc</value></data>
+  <data name="Product_RegisterForAuction" xml:space="preserve"><value>Đăng ký tham gia đấu giá</value></data>
+  <data name="Product_RegistrationPending" xml:space="preserve"><value>Đang chờ duyệt đăng ký.</value></data>
+  <data name="Product_RegistrationApproved" xml:space="preserve"><value>Bạn đã được duyệt tham gia phiên đấu giá này.</value></data>
+  <data name="Product_RegistrationRejected" xml:space="preserve"><value>Đăng ký của bạn đã bị từ chối.</value></data>
+  <data name="Product_MustRegisterToBid" xml:space="preserve"><value>Bạn cần đăng ký tham gia phiên đấu giá trước khi đặt giá.</value></data>
+  <data name="Product_RegisteredCount" xml:space="preserve"><value>{0} người đã đăng ký</value></data>
+  <data name="Product_YouAreTheSeller" xml:space="preserve"><value>Bạn là người bán sản phẩm này.</value></data>
+  <data name="Product_CancelRegistration" xml:space="preserve"><value>Hủy đăng ký</value></data>
   <data name="Product_CountdownPreview" xml:space="preserve"><value>Xem trước tĩnh — đếm ngược chưa hoạt động</value></data>
   <data name="Product_AuctionInfo" xml:space="preserve"><value>Thông tin đấu giá</value></data>
   <data name="Product_StartingPrice" xml:space="preserve"><value>Giá khởi điểm</value></data>
@@ -735,6 +761,13 @@
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Sản phẩm được bảo vệ bởi bảo mật vault. Mọi phiên thắng đều được xác minh kép trước khi giao hàng.</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Đang đặt giá…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Không thể đặt giá. Vui lòng thử lại.</value></data>
+  <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Đặt giá thành công!</value></data>
+  <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>Phiên đấu giá đã kết thúc</value></data>
+  <data name="Js_ProductDetail_Registering" xml:space="preserve"><value>Đang đăng ký…</value></data>
+  <data name="Js_ProductDetail_RegistrationSuccess" xml:space="preserve"><value>Đăng ký thành công!</value></data>
+  <data name="Js_ProductDetail_RegistrationFailed" xml:space="preserve"><value>Không thể đăng ký. Vui lòng thử lại.</value></data>
+  <data name="Js_ProductDetail_RegistrationCancelled" xml:space="preserve"><value>Đã hủy đăng ký.</value></data>
+  <data name="Js_ProductDetail_CancelRegistrationFailed" xml:space="preserve"><value>Không thể hủy đăng ký.</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>Đang thêm…</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>Đã thêm vào giỏ.</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>Không thể thêm vào giỏ. Vui lòng thử lại.</value></data>

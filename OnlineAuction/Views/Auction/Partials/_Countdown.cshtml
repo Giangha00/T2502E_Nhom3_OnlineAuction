@@ -4,17 +4,16 @@
   <p class="text-center text-sm font-semibold uppercase tracking-widest text-amber-100">@Localizer["Product_CountdownTitle"]</p>
   <div class="mt-4 grid grid-cols-3 gap-3 text-center">
     <div class="rounded-xl bg-white/10 px-3 py-4 backdrop-blur">
-      <p class="text-3xl font-bold tabular-nums">@Model.CountdownDays.ToString("D2")</p>
+      <p id="cdDays" class="text-3xl font-bold tabular-nums">@Model.CountdownDays.ToString("D2")</p>
       <p class="mt-1 text-xs font-medium uppercase tracking-wide text-amber-100">@Localizer["Product_Days"]</p>
     </div>
     <div class="rounded-xl bg-white/10 px-3 py-4 backdrop-blur">
-      <p class="text-3xl font-bold tabular-nums">@Model.CountdownHours.ToString("D2")</p>
+      <p id="cdHours" class="text-3xl font-bold tabular-nums">@Model.CountdownHours.ToString("D2")</p>
       <p class="mt-1 text-xs font-medium uppercase tracking-wide text-amber-100">@Localizer["Product_Hours"]</p>
     </div>
     <div class="rounded-xl bg-white/10 px-3 py-4 backdrop-blur">
-      <p class="text-3xl font-bold tabular-nums">@Model.CountdownMinutes.ToString("D2")</p>
+      <p id="cdMinutes" class="text-3xl font-bold tabular-nums">@Model.CountdownMinutes.ToString("D2")</p>
       <p class="mt-1 text-xs font-medium uppercase tracking-wide text-amber-100">@Localizer["Product_Minutes"]</p>
     </div>
   </div>
-  <p class="mt-4 text-center text-xs text-amber-100/80">@Localizer["Product_CountdownPreview"]</p>
 </div>

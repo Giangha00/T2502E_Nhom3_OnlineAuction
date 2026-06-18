@@ -77,7 +77,6 @@ public static class MockProductDetailData
             BidCount = (id * 3 + 7) % 24 + 3,
             LotNumber = (id % 12) + 1,
             WatcherCount = (id * 5 + 11) % 50 + 5,
-            EstimatedValue = Math.Round(auction.CurrentPrice * 1.85m, 0),
             ReserveMet = auction.CurrentPrice >= auction.StartingPrice,
             AuctionEventName = "RareCard Vault: Premium Trading Card Auction 2026",
             QuickBidAmounts = BuildQuickBids(auction.CurrentPrice, bidStep),
