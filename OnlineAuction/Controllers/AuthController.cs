@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Entities;
@@ -55,6 +55,12 @@ public class AuthController : Controller
         if (user.Status != UserStatus.Active)
         {
             ModelState.AddModelError(string.Empty, "Your account has been deactivated.");
+            return AuthFailureView(model, "login", fromModal);
+        }
+
+        if (await _userManager.IsInRoleAsync(user, UserRole.Admin.ToString()))
+        {
+            ModelState.AddModelError(string.Empty, "Please use the admin login page.");
             return AuthFailureView(model, "login", fromModal);
         }
 
