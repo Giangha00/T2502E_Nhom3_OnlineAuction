@@ -194,8 +194,6 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 
-builder.Services.AddHostedService<AuctionFinalizationWorker>();
-
 #endregion
 
 var app = builder.Build();
@@ -214,32 +212,21 @@ using (var scope = app.Services.CreateScope())
     {
         await db.Database.MigrateAsync();
     }
-    var dbContext = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
-    await dbContext.Database.MigrateAsync();
-}
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
-
-    await UserSeeder.SeedAsync(db, userManager);
-    await AdminSeeder.SeedAsync(db, userManager, roleManager);
-    await AuctionCatalogSeeder.SeedAsync(db, app.Environment.IsDevelopment());
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     var refreshTestAuctions = configuration.GetValue("SeedData:RefreshTestAuctionsOnStartup", false)
         || (app.Environment.IsDevelopment()
             && configuration.GetValue("SeedData:RefreshTestAuctionsInDevelopment", true));
 
-    await UserSeeder.SeedAsync(dbContext, userManager);
-    await AuctionCatalogSeeder.SeedAsync(dbContext, refreshTestAuctions);
+    await UserSeeder.SeedAsync(db, userManager);
+    await AdminSeeder.SeedAsync(db, userManager, roleManager);
+    await AuctionCatalogSeeder.SeedAsync(db, refreshTestAuctions);
 }
 
 using (var scope = app.Services.CreateScope())
 {
-    var orderService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
-    await orderService.FinalizeExpiredAuctionsAsync();
     var orderCreationService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
     var orderService = scope.ServiceProvider.GetRequiredService<IOrderService>();
     await orderCreationService.FinalizeExpiredAuctionsAsync();

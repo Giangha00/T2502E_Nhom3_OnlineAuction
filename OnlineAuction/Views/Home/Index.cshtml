@@ -73,7 +73,7 @@
     <div class="grid w-full grid-cols-1 gap-4 px-4 sm:grid-cols-2 sm:px-8 lg:grid-cols-4 lg:px-12">
       @foreach (var category in Model.Categories.Take(4))
       {
-        <a asp-controller="Auction" asp-action="Index" asp-fragment="category-@category.Name.Replace(" ", "-").ToLowerInvariant()"
+        <a asp-controller="Auction" asp-action="Index" asp-fragment="category-@CategorySlug.ToSlug(category.Name)"
            class="rarecard-category-tile group relative overflow-hidden rounded-2xl">
           <img src="@category.ImageUrl" alt="@category.Name" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"/>
           <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent"></div>

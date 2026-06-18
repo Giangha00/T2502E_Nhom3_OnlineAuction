@@ -1,3 +1,4 @@
+using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Helpers;
 using OnlineAuction.Models;
@@ -151,7 +152,7 @@ internal static class ProductDetailMapper
             {
                 Name = group.Key,
                 ItemCount = group.Count(),
-                ImageUrl = group.First().ImageUrl,
+                ImageUrl = MockAuctionData.GetCategoryImageUrl(group.Key),
                 DisplayCount = $"{group.Count()} Items"
             })
             .ToList();

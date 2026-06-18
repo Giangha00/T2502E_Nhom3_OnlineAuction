@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -40,7 +41,7 @@ public class AuctionService : IAuctionService
         return new AuctionViewModel
         {
             Auctions = auctions.ToList(),
-            Categories = ProductDetailMapper.MapCategories(auctions)
+            Categories = await BuildAuctionCategoriesAsync(auctions)
         };
     }
 
@@ -178,6 +179,39 @@ public class AuctionService : IAuctionService
 
         return auctions
             .Select(ProductDetailMapper.MapToAuctionItem)
+            .ToList();
+    }
+
+    private async Task<List<CategoryViewModel>> BuildAuctionCategoriesAsync(
+        IReadOnlyList<AuctionItemViewModel> auctions)
+    {
+        var countsByName = auctions
+            .Where(item => !string.IsNullOrWhiteSpace(item.Category))
+            .GroupBy(item => item.Category, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(group => group.Key, group => group.Count(), StringComparer.OrdinalIgnoreCase);
+
+        var dbCategoryNames = await _dbContext.Categories
+            .AsNoTracking()
+            .Where(category => category.IsActive)
+            .OrderBy(category => category.SortOrder)
+            .ThenBy(category => category.Name)
+            .Select(category => category.Name)
+            .ToListAsync();
+
+        var categoryNames = dbCategoryNames.Count > 0
+            ? dbCategoryNames
+            : countsByName.Keys.OrderBy(name => name, StringComparer.OrdinalIgnoreCase).ToList();
+
+        return categoryNames
+            .Select(name => new CategoryViewModel
+            {
+                Name = name,
+                ItemCount = countsByName.GetValueOrDefault(name, 0),
+                ImageUrl = MockAuctionData.GetCategoryImageUrl(name),
+                DisplayCount = countsByName.TryGetValue(name, out var count)
+                    ? $"{count} Items"
+                    : "0 Items"
+            })
             .ToList();
     }
 }

@@ -20,10 +20,6 @@ public static class AuctionCatalogSeeder
         {
             await ClearSeededAuctionsAsync(dbContext);
         }
-        else if (await dbContext.Auctions.AnyAsync())
-        {
-            return;
-        }
 
         var seller = await dbContext.Users
             .AsNoTracking()
@@ -38,81 +34,115 @@ public static class AuctionCatalogSeeder
             return;
         }
 
+        var existingProductNames = await GetExistingSeededProductNamesAsync(dbContext);
         var now = DateTime.UtcNow;
         var categoryCache = new Dictionary<string, Category>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var entry in SpreadsheetAuctionCatalog.GetEntries())
         {
-            var category = await GetOrCreateCategoryAsync(dbContext, entry.CategoryName, categoryCache);
-            var bidStep = SpreadsheetAuctionCatalog.ComputeBidStep(entry.StartingPrice);
-
-            var product = new Product
+            if (existingProductNames.Contains(entry.Name))
             {
-                SellerId = seller.Id,
-                CategoryId = category.Id,
-                Name = entry.Name,
-                ShortDescription = SpreadsheetAuctionCatalog.BuildShortDescription(entry.Description),
-                DescriptionHtml = SpreadsheetAuctionCatalog.BuildDescriptionHtml(entry.Description),
-                Condition = entry.Condition,
-                Year = entry.Year,
-                SetName = entry.SetName,
-                Language = entry.Language,
-                CardNumber = entry.CardNumber,
-                GradeLabel = entry.GradeLabel,
-                CertNumber = entry.Condition == "graded"
-                    ? $"{entry.GradeLabel.Replace(" ", "-")}-{entry.CardNumber.Replace("/", "-")}"
-                    : null,
-                PrimaryImage = entry.PrimaryImage,
-                Category = category,
-                CreatedAt = now
-            };
-
-            dbContext.Products.Add(product);
-            await dbContext.SaveChangesAsync();
-
-            var startDate = DateTimeUtilities.AsUtc(now.AddSeconds(-30));
-            var endDate = DateTimeUtilities.AsUtc(now.AddMinutes(entry.EndMinutes));
-
-            var auction = new Auction
-            {
-                ProductId = product.Id,
-                StartingPrice = entry.StartingPrice,
-                BidStep = bidStep,
-                CurrentPrice = entry.StartingPrice,
-                Status = AuctionStatuses.Live,
-                ListingType = ListingTypes.Auction,
-                AuctionEventName = SpreadsheetAuctionCatalog.TestAuctionEventName,
-                StartDate = startDate,
-                EndDate = endDate,
-                CreatedAt = now
-            };
-
-            dbContext.Auctions.Add(auction);
-            await dbContext.SaveChangesAsync();
-
-            if (bidder is not null && entry.ExistingBidCount > 0)
-            {
-                var bids = new List<Bid>();
-                var amount = entry.StartingPrice;
-
-                for (var i = 0; i < entry.ExistingBidCount; i++)
-                {
-                    amount += bidStep;
-                    bids.Add(new Bid
-                    {
-                        AuctionId = auction.Id,
-                        BidderId = bidder.Id,
-                        Amount = amount,
-                        IsWinning = i == entry.ExistingBidCount - 1,
-                        PlacedAt = now.AddMinutes(-(entry.ExistingBidCount - i))
-                    });
-                }
-
-                auction.CurrentPrice = amount;
-                dbContext.Bids.AddRange(bids);
-                await dbContext.SaveChangesAsync();
+                continue;
             }
+
+            await SeedEntryAsync(dbContext, entry, seller.Id, bidder?.Id, categoryCache, now);
+            existingProductNames.Add(entry.Name);
         }
+    }
+
+    private static async Task<HashSet<string>> GetExistingSeededProductNamesAsync(AuctionHouseDbContext dbContext)
+    {
+        var names = await dbContext.Products
+            .AsNoTracking()
+            .Where(product =>
+                product.Auctions.Any(auction =>
+                    auction.AuctionEventName != null &&
+                    LegacySeedEventNames.Contains(auction.AuctionEventName)))
+            .Select(product => product.Name)
+            .ToListAsync();
+
+        return names.ToHashSet(StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static async Task SeedEntryAsync(
+        AuctionHouseDbContext dbContext,
+        SpreadsheetAuctionCatalog.Entry entry,
+        int sellerId,
+        int? bidderId,
+        Dictionary<string, Category> categoryCache,
+        DateTime now)
+    {
+        var category = await GetOrCreateCategoryAsync(dbContext, entry.CategoryName, categoryCache);
+        var bidStep = SpreadsheetAuctionCatalog.ComputeBidStep(entry.StartingPrice);
+
+        var product = new Product
+        {
+            SellerId = sellerId,
+            CategoryId = category.Id,
+            Name = entry.Name,
+            ShortDescription = SpreadsheetAuctionCatalog.BuildShortDescription(entry.Description),
+            DescriptionHtml = SpreadsheetAuctionCatalog.BuildDescriptionHtml(entry.Description),
+            Condition = entry.Condition,
+            Year = entry.Year,
+            SetName = entry.SetName,
+            Language = entry.Language,
+            CardNumber = entry.CardNumber,
+            GradeLabel = entry.GradeLabel,
+            CertNumber = entry.Condition == "graded"
+                ? $"{entry.GradeLabel.Replace(" ", "-")}-{entry.CardNumber.Replace("/", "-")}"
+                : null,
+            PrimaryImage = entry.PrimaryImage,
+            Category = category,
+            CreatedAt = now
+        };
+
+        dbContext.Products.Add(product);
+        await dbContext.SaveChangesAsync();
+
+        var startDate = DateTimeUtilities.AsUtc(now.AddSeconds(-30));
+        var endDate = DateTimeUtilities.AsUtc(now.AddDays(7));
+
+        var auction = new Auction
+        {
+            ProductId = product.Id,
+            StartingPrice = entry.StartingPrice,
+            BidStep = bidStep,
+            CurrentPrice = entry.StartingPrice,
+            Status = AuctionStatuses.Live,
+            ListingType = ListingTypes.Auction,
+            AuctionEventName = SpreadsheetAuctionCatalog.TestAuctionEventName,
+            StartDate = startDate,
+            EndDate = endDate,
+            CreatedAt = now
+        };
+
+        dbContext.Auctions.Add(auction);
+        await dbContext.SaveChangesAsync();
+
+        if (bidderId is null || entry.ExistingBidCount <= 0)
+        {
+            return;
+        }
+
+        var bids = new List<Bid>();
+        var amount = entry.StartingPrice;
+
+        for (var i = 0; i < entry.ExistingBidCount; i++)
+        {
+            amount += bidStep;
+            bids.Add(new Bid
+            {
+                AuctionId = auction.Id,
+                BidderId = bidderId.Value,
+                Amount = amount,
+                IsWinning = i == entry.ExistingBidCount - 1,
+                PlacedAt = now.AddMinutes(-(entry.ExistingBidCount - i))
+            });
+        }
+
+        auction.CurrentPrice = amount;
+        dbContext.Bids.AddRange(bids);
+        await dbContext.SaveChangesAsync();
     }
 
     private static async Task ClearSeededAuctionsAsync(AuctionHouseDbContext dbContext)
@@ -191,7 +221,7 @@ public static class AuctionCatalogSeeder
             return cached;
         }
 
-        var slug = BuildSlug(categoryName);
+        var slug = CategorySlug.ToSlug(categoryName);
         var category = await dbContext.Categories
             .FirstOrDefaultAsync(item => item.Name == categoryName || item.Slug == slug);
 
@@ -212,19 +242,5 @@ public static class AuctionCatalogSeeder
 
         cache[categoryName] = category;
         return category;
-    }
-
-    private static string BuildSlug(string value)
-    {
-        var chars = value
-            .Trim()
-            .ToLowerInvariant()
-            .Select(ch => char.IsLetterOrDigit(ch) ? ch : '-')
-            .ToArray();
-
-        var slug = string.Join("-", new string(chars)
-            .Split('-', StringSplitOptions.RemoveEmptyEntries));
-
-        return string.IsNullOrWhiteSpace(slug) ? "uncategorized" : slug;
     }
 }
