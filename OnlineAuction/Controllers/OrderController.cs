@@ -11,13 +11,16 @@ public class OrderController : Controller
 {
     private readonly IOrderService _orderService;
     private readonly IOrderCreationService _orderCreationService;
+    private readonly IOrderPaymentService _orderPaymentService;
 
     public OrderController(
         IOrderService orderService,
-        IOrderCreationService orderCreationService)
+        IOrderCreationService orderCreationService,
+        IOrderPaymentService orderPaymentService)
     {
         _orderService = orderService;
         _orderCreationService = orderCreationService;
+        _orderPaymentService = orderPaymentService;
     }
 
     public async Task<IActionResult> Index()
@@ -65,6 +68,24 @@ public class OrderController : Controller
         {
             TempData["OrderError"] = result.Message;
             return RedirectToAction(nameof(Index));
+        }
+
+        if (string.Equals(request.PaymentMethod, "paypal", StringComparison.OrdinalIgnoreCase))
+        {
+            var returnUrl = Url.Action("PayPalReturn", "Payment", null, Request.Scheme)!;
+            var cancelUrl = Url.Action("PayPalCancel", "Payment", null, Request.Scheme)!;
+            var paypalResult = await _orderPaymentService.InitiatePayPalCheckoutAsync(
+                userId.Value,
+                returnUrl,
+                cancelUrl);
+
+            if (!paypalResult.Success || string.IsNullOrWhiteSpace(paypalResult.ApprovalUrl))
+            {
+                TempData["OrderError"] = paypalResult.ErrorMessage ?? "Unable to start PayPal checkout.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            return Redirect(paypalResult.ApprovalUrl);
         }
 
         TempData["OrderMessage"] = result.Message;

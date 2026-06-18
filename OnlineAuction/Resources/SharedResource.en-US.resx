@@ -633,6 +633,9 @@
   <data name="PaymentConfirm_Step3" xml:space="preserve"><value>Tracking details will be sent once the package is dispatched.</value></data>
   <data name="PaymentConfirm_BrowseMore" xml:space="preserve"><value>Browse More Auctions</value></data>
   <data name="PaymentConfirm_BackHome" xml:space="preserve"><value>Back to Home</value></data>
+  <data name="PaymentConfirm_ViewDetails" xml:space="preserve"><value>View order details</value></data>
+  <data name="PaymentConfirm_TransactionId" xml:space="preserve"><value>Transaction ID</value></data>
+  <data name="PaymentConfirm_PaidAt" xml:space="preserve"><value>Paid at</value></data>
   <data name="Contact_Hero_Label" xml:space="preserve"><value>Customer Support</value></data>
   <data name="Contact_Hero_TitleLine1" xml:space="preserve"><value>Elevated Care for</value></data>
   <data name="Contact_Hero_TitleAccent" xml:space="preserve"><value>Serious Collectors</value></data>

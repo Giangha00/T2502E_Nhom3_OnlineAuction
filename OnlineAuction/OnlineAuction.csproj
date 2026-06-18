@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>OnlineAuction</RootNamespace>
         <RazorLangVersion>8.0</RazorLangVersion>
+        <UserSecretsId>online-auction-dev-secrets</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(Configuration)' == 'Debug'">
