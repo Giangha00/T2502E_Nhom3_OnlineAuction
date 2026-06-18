@@ -1,19 +1,38 @@
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 
 namespace OnlineAuction.Services;
 
 internal static class ProductDetailMapper
 {
+    private const string DefaultProductImageUrl =
+        "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=600&h=750&fit=crop";
+
+    private const int HotBidCountThreshold = 5;
     public static ProductDetailViewModel MapToViewModel(
         Auction auction,
         SellerViewModel seller,
-        IReadOnlyList<AuctionItemViewModel> relatedProducts)
+        IReadOnlyList<AuctionItemViewModel> relatedProducts,
+        int? currentUserId = null,
+        string? userRegistrationStatus = null,
+        string? registrationRejectReason = null,
+        int registrationCount = 0)
     {
         var product = auction.Product;
         var bids = auction.Bids.OrderByDescending(b => b.PlacedAt).ToList();
         var (days, hours, minutes, seconds) = CalculateCountdown(auction.EndDate);
         var (auctionStatus, badgeClass) = MapAuctionStatus(auction.Status, auction.EndDate);
+        var isSeller = currentUserId.HasValue && product.SellerId == currentUserId.Value;
+        var auctionAcceptsBids = CanAcceptBids(auction);
+        var canBid = ComputeCanBid(
+            auction,
+            currentUserId,
+            userRegistrationStatus,
+            isSeller,
+            auctionAcceptsBids);
+        var isRegistered = userRegistrationStatus is not null &&
+                           userRegistrationStatus != AuctionRegistrationStatuses.Cancelled;
 
         return new ProductDetailViewModel
         {
@@ -26,22 +45,21 @@ internal static class ProductDetailMapper
             Subtitle = BuildSubtitle(product),
             Year = product.Year ?? 0,
             SetName = product.SetName ?? "—",
-            Language = "—",
-            CardNumber = "—",
+            Language = product.Language ?? "—",
+            CardNumber = product.CardNumber ?? "—",
             CertificateNumber = product.CertNumber ?? "—",
             DescriptionHtml = BuildDescriptionHtml(product, auction),
-            Images = string.IsNullOrWhiteSpace(product.PrimaryImage)
-                ? []
-                : [product.PrimaryImage],
+            Images = BuildImageGallery(product),
             StartingPrice = auction.StartingPrice,
             CurrentPrice = auction.CurrentPrice,
             BidStep = auction.BidStep,
             BidCount = bids.Count,
             LotNumber = 0,
-            WatcherCount = 0,
-            EstimatedValue = 0,
+            WatcherCount = registrationCount,
             ReserveMet = auction.CurrentPrice >= auction.StartingPrice,
-            AuctionEventName = "RareCard Vault: Premium Trading Card Auction",
+            AuctionEventName = string.IsNullOrWhiteSpace(auction.AuctionEventName)
+                ? "RareCard Vault: Premium Trading Card Auction"
+                : auction.AuctionEventName!,
             QuickBidAmounts = BuildQuickBidAmounts(auction.CurrentPrice, auction.BidStep),
             StartDate = auction.StartDate,
             EndDate = auction.EndDate,
@@ -51,12 +69,40 @@ internal static class ProductDetailMapper
             CountdownSeconds = seconds,
             AuctionStatus = auctionStatus,
             StatusBadgeClass = badgeClass,
+            CanPlaceBid = auctionAcceptsBids,
+            RequiresRegistration = auction.RequiresRegistration,
+            IsRegistered = isRegistered,
+            RegistrationStatus = userRegistrationStatus,
+            RegistrationRejectReason = registrationRejectReason,
+            CanBid = canBid,
+            IsSeller = isSeller,
+            RegistrationCount = registrationCount,
             Seller = seller,
-            Grading = BuildGrading(product.GradeLabel),
+            Grading = BuildGrading(product),
             BidHistory = MapBidHistory(bids),
-            Documents = [],
+            Documents = MapDocuments(product),
             RelatedProducts = relatedProducts.ToList()
         };
+    }
+
+    public static bool ComputeCanBid(
+        Auction auction,
+        int? currentUserId,
+        string? registrationStatus,
+        bool isSeller,
+        bool auctionAcceptsBids)
+    {
+        if (!auctionAcceptsBids || !currentUserId.HasValue || isSeller)
+        {
+            return false;
+        }
+
+        if (!auction.RequiresRegistration)
+        {
+            return true;
+        }
+
+        return registrationStatus == AuctionRegistrationStatuses.Approved;
     }
 
     public static SellerViewModel MapSeller(ApplicationUser seller, int auctionCount, int successfulSales) =>
@@ -73,32 +119,73 @@ internal static class ProductDetailMapper
     public static AuctionItemViewModel MapToAuctionItem(Auction auction)
     {
         var product = auction.Product;
+        var bidCount = auction.Bids?.Count ?? 0;
+        var status = MapCardStatus(auction);
+
         return new AuctionItemViewModel
         {
             Id = auction.Id,
             Name = product.Name,
             Category = GetCategoryName(product),
-            ImageUrl = product.PrimaryImage,
+            ImageUrl = ResolveImageUrl(product.PrimaryImage),
             StartingPrice = auction.StartingPrice,
             CurrentPrice = auction.CurrentPrice,
-            Status = MapCardStatus(auction.Status),
+            Status = status,
             TimeRemaining = FormatTimeRemaining(auction.EndDate),
+            ListingType = auction.ListingType,
             Grade = product.GradeLabel ?? string.Empty,
             Subtitle = BuildSubtitle(product),
             Condition = FormatCondition(product.Condition),
             Year = product.Year ?? 0,
-            IsHot = auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon
+            BidCount = bidCount,
+            IsHot = status == "Ending Soon" || bidCount >= HotBidCountThreshold
         };
     }
 
-    private static List<BidHistoryItemViewModel> MapBidHistory(IEnumerable<Bid> bids) =>
-        bids.Select(bid => new BidHistoryItemViewModel
+    public static List<CategoryViewModel> MapCategories(IReadOnlyList<AuctionItemViewModel> items) =>
+        items
+            .Where(item => !string.IsNullOrWhiteSpace(item.Category))
+            .GroupBy(item => item.Category)
+            .OrderBy(group => group.Key)
+            .Select(group => new CategoryViewModel
+            {
+                Name = group.Key,
+                ItemCount = group.Count(),
+                ImageUrl = group.First().ImageUrl,
+                DisplayCount = $"{group.Count()} Items"
+            })
+            .ToList();
+
+    public static List<BidHistoryItemViewModel> MapBidHistory(IEnumerable<Bid> bids)
+    {
+        var bidList = bids.ToList();
+        var winningBid = bidList.FirstOrDefault(bid => bid.IsWinning);
+
+        return bidList
+            .Select(bid => new BidHistoryItemViewModel
+            {
+                BidderName = FormatBidderName(bid.Bidder),
+                Amount = bid.Amount,
+                BidTime = bid.PlacedAt,
+                Status = ResolveBidStatus(bid, winningBid)
+            })
+            .ToList();
+    }
+
+    private static string ResolveBidStatus(Bid bid, Bid? winningBid)
+    {
+        if (bid.IsWinning)
         {
-            BidderName = FormatBidderName(bid.Bidder),
-            Amount = bid.Amount,
-            BidTime = bid.PlacedAt,
-            Status = bid.IsWinning ? "WINNING" : "OUTBID"
-        }).ToList();
+            return "WINNING";
+        }
+
+        if (winningBid is not null && bid.BidderId == winningBid.BidderId)
+        {
+            return "RAISED";
+        }
+
+        return "OUTBID";
+    }
 
     private static string FormatBidderName(ApplicationUser bidder)
     {
@@ -114,7 +201,26 @@ internal static class ProductDetailMapper
         return $"{display[0]}***{display[^1]}";
     }
 
-    private static GradingScoreViewModel BuildGrading(string? gradeLabel)
+    private static GradingScoreViewModel BuildGrading(Product product)
+    {
+        if (!string.IsNullOrWhiteSpace(product.GradingCentering) ||
+            !string.IsNullOrWhiteSpace(product.GradingCorners) ||
+            !string.IsNullOrWhiteSpace(product.GradingEdges) ||
+            !string.IsNullOrWhiteSpace(product.GradingSurface))
+        {
+            return new GradingScoreViewModel
+            {
+                Centering = product.GradingCentering ?? "—",
+                Corners = product.GradingCorners ?? "—",
+                Edges = product.GradingEdges ?? "—",
+                Surface = product.GradingSurface ?? "—"
+            };
+        }
+
+        return BuildGradingFromGradeLabel(product.GradeLabel);
+    }
+
+    private static GradingScoreViewModel BuildGradingFromGradeLabel(string? gradeLabel)
     {
         var numeric = gradeLabel switch
         {
@@ -136,6 +242,38 @@ internal static class ProductDetailMapper
         };
     }
 
+    private static List<string> BuildImageGallery(Product product)
+    {
+        var images = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(product.PrimaryImage))
+        {
+            images.Add(product.PrimaryImage);
+        }
+
+        foreach (var image in product.Images.OrderBy(item => item.SortOrder))
+        {
+            if (!string.IsNullOrWhiteSpace(image.ImageUrl) && !images.Contains(image.ImageUrl))
+            {
+                images.Add(image.ImageUrl);
+            }
+        }
+
+        return images.Count > 0 ? images : [DefaultProductImageUrl];
+    }
+
+    private static List<ProductDocumentViewModel> MapDocuments(Product product) =>
+        product.Documents
+            .OrderBy(document => document.Name)
+            .Select(document => new ProductDocumentViewModel
+            {
+                Name = document.Name,
+                FileName = document.Name,
+                FileType = document.FileType,
+                FileUrl = document.FileUrl
+            })
+            .ToList();
+
     private static List<decimal> BuildQuickBidAmounts(decimal currentPrice, decimal bidStep) =>
     [
         currentPrice + bidStep,
@@ -145,7 +283,7 @@ internal static class ProductDetailMapper
 
     private static (int Days, int Hours, int Minutes, int Seconds) CalculateCountdown(DateTime endDate)
     {
-        var remaining = endDate.ToUniversalTime() - DateTime.UtcNow;
+        var remaining = DateTimeUtilities.RemainingUtc(endDate);
         if (remaining <= TimeSpan.Zero)
         {
             return (0, 0, 0, 0);
@@ -158,9 +296,13 @@ internal static class ProductDetailMapper
             remaining.Seconds);
     }
 
+    public static bool CanAcceptBids(Auction auction) =>
+        auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon &&
+        DateTimeUtilities.IsInFutureUtc(auction.EndDate);
+
     private static (string Status, string BadgeClass) MapAuctionStatus(string status, DateTime endDate)
     {
-        if (endDate.ToUniversalTime() <= DateTime.UtcNow &&
+        if (!DateTimeUtilities.IsInFutureUtc(endDate) &&
             status is not AuctionStatuses.Cancelled)
         {
             return ("Ended", "bg-stone-600 text-white");
@@ -177,18 +319,48 @@ internal static class ProductDetailMapper
         };
     }
 
-    private static string MapCardStatus(string status) => status switch
+    public static string MapCardStatus(Auction auction)
     {
-        AuctionStatuses.EndingSoon => "Ending Soon",
-        AuctionStatuses.Ended or AuctionStatuses.AwaitingPayment => "Ended",
-        AuctionStatuses.Completed => "Completed",
-        AuctionStatuses.Cancelled => "Cancelled",
-        _ => "Live"
-    };
+        if (!DateTimeUtilities.IsInFutureUtc(auction.EndDate))
+        {
+            return "Ended";
+        }
+
+        if (auction.Status is AuctionStatuses.Ended or AuctionStatuses.AwaitingPayment)
+        {
+            return "Ended";
+        }
+
+        if (auction.Status == AuctionStatuses.Completed)
+        {
+            return "Completed";
+        }
+
+        if (auction.Status == AuctionStatuses.Cancelled)
+        {
+            return "Cancelled";
+        }
+
+        if (auction.Status == AuctionStatuses.EndingSoon)
+        {
+            return "Ending Soon";
+        }
+
+        var remaining = DateTimeUtilities.RemainingUtc(auction.EndDate);
+        if (remaining.TotalHours <= 24)
+        {
+            return "Ending Soon";
+        }
+
+        return "Live";
+    }
+
+    private static string ResolveImageUrl(string? primaryImage) =>
+        string.IsNullOrWhiteSpace(primaryImage) ? DefaultProductImageUrl : primaryImage;
 
     private static string FormatTimeRemaining(DateTime endDate)
     {
-        var remaining = endDate.ToUniversalTime() - DateTime.UtcNow;
+        var remaining = DateTimeUtilities.RemainingUtc(endDate);
         if (remaining <= TimeSpan.Zero)
         {
             return "Ended";
@@ -209,6 +381,11 @@ internal static class ProductDetailMapper
 
     private static string BuildSubtitle(Product product)
     {
+        if (!string.IsNullOrWhiteSpace(product.Subtitle))
+        {
+            return product.Subtitle.Trim();
+        }
+
         var parts = new List<string>();
         if (!string.IsNullOrWhiteSpace(product.SetName))
         {

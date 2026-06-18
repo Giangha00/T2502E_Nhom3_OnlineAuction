@@ -26,12 +26,6 @@ public class AccountController : Controller
         _sellerAuctionService = sellerAuctionService;
     }
 
-    public async Task<IActionResult> Orders()
-    {
-        var shell = await BuildShellAsync("orders");
-        return View(shell);
-    }
-
     public Task<IActionResult> Bids() =>
         PageAsync("bids", _localizer["Account_Bids"], _localizer["Account_Bids_Desc"]);
 

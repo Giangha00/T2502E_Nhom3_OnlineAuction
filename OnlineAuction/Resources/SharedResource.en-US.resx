@@ -238,6 +238,19 @@
   <data name="Sell_Condition_Used" xml:space="preserve"><value>Used</value></data>
   <data name="Sell_ProductOrigin" xml:space="preserve"><value>Product Origin</value></data>
   <data name="Sell_ProductOrigin_Placeholder" xml:space="preserve"><value>e.g. Japan / USA</value></data>
+  <data name="Sell_ShortDescription" xml:space="preserve"><value>Short Description</value></data>
+  <data name="Sell_ShortDescription_Placeholder" xml:space="preserve"><value>Brief summary shown in the listing header (max 300 characters)</value></data>
+  <data name="Sell_Subtitle" xml:space="preserve"><value>Subtitle</value></data>
+  <data name="Sell_Subtitle_Placeholder" xml:space="preserve"><value>Tagline shown under the product name</value></data>
+  <data name="Sell_Section4_CardSpecs_Title" xml:space="preserve"><value>Card Specifications</value></data>
+  <data name="Sell_Section4_CardSpecs_Desc" xml:space="preserve"><value>Year, set, language, grade, and certificate details</value></data>
+  <data name="Sell_SetName_Placeholder" xml:space="preserve"><value>e.g. Base Set</value></data>
+  <data name="Sell_Grade" xml:space="preserve"><value>Grade</value></data>
+  <data name="Sell_CertificateNumber" xml:space="preserve"><value>Certificate Number</value></data>
+  <data name="Sell_EstimatedValue" xml:space="preserve"><value>Estimated Value</value></data>
+  <data name="Sell_AuctionEventName" xml:space="preserve"><value>Auction Event Name</value></data>
+  <data name="Sell_AuctionEventName_Placeholder" xml:space="preserve"><value>e.g. RareCard Vault: Premium Trading Card Auction</value></data>
+  <data name="Sell_Error_YearInvalid" xml:space="preserve"><value>Please enter a valid year between 1800 and 2100.</value></data>
   <data name="Sell_Section2_Title" xml:space="preserve"><value>Product Images</value></data>
   <data name="Sell_Section2_Desc" xml:space="preserve"><value>Upload multiple images — JPG, PNG, WEBP (max 5MB each)</value></data>
   <data name="Sell_UploadImages_Title" xml:space="preserve"><value>Upload Product Images</value></data>
@@ -485,8 +498,10 @@
   <data name="Product_BidAmount" xml:space="preserve"><value>Bid Amount</value></data>
   <data name="Product_DateTime" xml:space="preserve"><value>Date &amp;amp; Time</value></data>
   <data name="Product_Status" xml:space="preserve"><value>Status</value></data>
-  <data name="Product_Winning" xml:space="preserve"><value>Winning</value></data>
+  <data name="Product_Winning" xml:space="preserve"><value>Highest bid</value></data>
   <data name="Product_Outbid" xml:space="preserve"><value>Outbid</value></data>
+  <data name="Product_Raised" xml:space="preserve"><value>Raised</value></data>
+  <data name="Product_BidHistoryNote" xml:space="preserve"><value>Status shows each bid while the auction is live. The final winner is confirmed only after the auction ends.</value></data>
   <data name="Product_ViewAllBids" xml:space="preserve"><value>View All {0} Bids →</value></data>
   <data name="Product_Shipping_Desc" xml:space="preserve"><value>All graded cards ship in climate-controlled, fully insured vault packaging. White glove handling from our authentication center to your door.</value></data>
   <data name="Product_Shipping_Insurance" xml:space="preserve"><value>Full appraisal value insurance included</value></data>
@@ -505,6 +520,17 @@
   <data name="Product_Days" xml:space="preserve"><value>Days</value></data>
   <data name="Product_Hours" xml:space="preserve"><value>Hours</value></data>
   <data name="Product_Minutes" xml:space="preserve"><value>Minutes</value></data>
+  <data name="Product_Seconds" xml:space="preserve"><value>Seconds</value></data>
+  <data name="Product_NoBidsYet" xml:space="preserve"><value>No bids yet</value></data>
+  <data name="Product_AuctionEnded" xml:space="preserve"><value>Auction ended</value></data>
+  <data name="Product_RegisterForAuction" xml:space="preserve"><value>Register for auction</value></data>
+  <data name="Product_RegistrationPending" xml:space="preserve"><value>Your registration is pending approval.</value></data>
+  <data name="Product_RegistrationApproved" xml:space="preserve"><value>You are registered for this auction.</value></data>
+  <data name="Product_RegistrationRejected" xml:space="preserve"><value>Your registration was rejected.</value></data>
+  <data name="Product_MustRegisterToBid" xml:space="preserve"><value>You must register for this auction before placing a bid.</value></data>
+  <data name="Product_RegisteredCount" xml:space="preserve"><value>{0} registered</value></data>
+  <data name="Product_YouAreTheSeller" xml:space="preserve"><value>You are the seller of this listing.</value></data>
+  <data name="Product_CancelRegistration" xml:space="preserve"><value>Cancel registration</value></data>
   <data name="Product_CountdownPreview" xml:space="preserve"><value>Static preview — countdown is not live</value></data>
   <data name="Product_AuctionInfo" xml:space="preserve"><value>Auction Information</value></data>
   <data name="Product_StartingPrice" xml:space="preserve"><value>Starting Price</value></data>
@@ -735,6 +761,13 @@
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Your items are protected by our vault security. All won auctions are double-verified before shipment to ensure grading integrity.</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Placing bid…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Unable to place bid. Please try again.</value></data>
+  <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Bid placed successfully!</value></data>
+  <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>Auction ended</value></data>
+  <data name="Js_ProductDetail_Registering" xml:space="preserve"><value>Registering…</value></data>
+  <data name="Js_ProductDetail_RegistrationSuccess" xml:space="preserve"><value>Registration successful!</value></data>
+  <data name="Js_ProductDetail_RegistrationFailed" xml:space="preserve"><value>Unable to register. Please try again.</value></data>
+  <data name="Js_ProductDetail_RegistrationCancelled" xml:space="preserve"><value>Registration cancelled.</value></data>
+  <data name="Js_ProductDetail_CancelRegistrationFailed" xml:space="preserve"><value>Unable to cancel registration.</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>Adding…</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>Added to cart.</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>Unable to add to cart. Please try again.</value></data>

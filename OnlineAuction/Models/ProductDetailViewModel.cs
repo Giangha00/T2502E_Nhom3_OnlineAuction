@@ -22,7 +22,6 @@ public class ProductDetailViewModel
     public int BidCount { get; set; }
     public int LotNumber { get; set; }
     public int WatcherCount { get; set; }
-    public decimal EstimatedValue { get; set; }
     public bool ReserveMet { get; set; } = true;
     public string AuctionEventName { get; set; } = string.Empty;
     public List<decimal> QuickBidAmounts { get; set; } = [];
@@ -34,6 +33,14 @@ public class ProductDetailViewModel
     public int CountdownSeconds { get; set; }
     public string AuctionStatus { get; set; } = "Active Auction";
     public string StatusBadgeClass { get; set; } = "bg-emerald-600";
+    public bool CanPlaceBid { get; set; }
+    public bool RequiresRegistration { get; set; } = true;
+    public bool IsRegistered { get; set; }
+    public string? RegistrationStatus { get; set; }
+    public string? RegistrationRejectReason { get; set; }
+    public bool CanBid { get; set; }
+    public bool IsSeller { get; set; }
+    public int RegistrationCount { get; set; }
     public SellerViewModel Seller { get; set; } = new();
     public GradingScoreViewModel Grading { get; set; } = new();
     public List<BidHistoryItemViewModel> BidHistory { get; set; } = [];
@@ -46,4 +53,5 @@ public class ProductDocumentViewModel
     public string Name { get; set; } = string.Empty;
     public string FileName { get; set; } = string.Empty;
     public string FileType { get; set; } = "PDF";
+    public string FileUrl { get; set; } = string.Empty;
 }

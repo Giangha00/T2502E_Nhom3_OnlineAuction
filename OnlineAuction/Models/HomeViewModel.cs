@@ -32,7 +32,7 @@ public class AuctionItemViewModel
     public string Condition { get; set; } = "Graded";
     public int Year { get; set; }
     public bool IsHot { get; set; }
-    public int BidCount => (Id * 3 + 7) % 24 + 3;
+    public int BidCount { get; set; }
 }
 
 public class SellerViewModel
