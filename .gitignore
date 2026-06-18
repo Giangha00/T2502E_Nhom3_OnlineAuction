@@ -3,6 +3,7 @@
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+.tmp/
 
 # Visual Studio / Rider
 .vs/
@@ -27,6 +28,11 @@ artifacts/
 *.pdb
 *.cache
 *.dbmdl
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
 *.jfm
 *.pfx
 *.publishsettings
