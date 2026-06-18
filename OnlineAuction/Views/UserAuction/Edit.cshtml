@@ -1,0 +1,133 @@
+@model OnlineAuction.Models.SellerAuctionFormViewModel
+
+@{
+    ViewData["Title"] = Localizer["UserAuction_EditTitle"];
+}
+
+<div class="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-3xl">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-slate-900">@Localizer["UserAuction_EditTitle"]</h1>
+            <p class="mt-1 text-sm text-slate-500">@Localizer["UserAuction_EditDesc"]</p>
+        </div>
+
+        <form asp-controller="UserAuction"
+              asp-action="Edit"
+              asp-route-auctionId="@Model.AuctionId"
+              method="post"
+              enctype="multipart/form-data"
+              class="space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            @Html.AntiForgeryToken()
+
+            <input asp-for="AuctionId" type="hidden" />
+            <input asp-for="PrimaryImage" type="hidden" />
+
+            <div asp-validation-summary="ModelOnly" class="text-sm text-red-600"></div>
+
+            <div>
+                <label asp-for="ProductName" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_ProductName"]</label>
+                <input asp-for="ProductName" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                <span asp-validation-for="ProductName" class="text-xs text-red-600"></span>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label asp-for="Category" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["Sell_Category"]</label>
+                    <input asp-for="Category" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    <span asp-validation-for="Category" class="text-xs text-red-600"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Condition" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["Sell_Condition"]</label>
+                    <input asp-for="Condition" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    <span asp-validation-for="Condition" class="text-xs text-red-600"></span>
+                </div>
+            </div>
+
+            <div>
+                <label asp-for="ShortDescription" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_ShortDescription"]</label>
+                <input asp-for="ShortDescription" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                <span asp-validation-for="ShortDescription" class="text-xs text-red-600"></span>
+            </div>
+
+            <div>
+                <label asp-for="DescriptionHtml" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["Product_Description"]</label>
+                <textarea asp-for="DescriptionHtml" rows="5" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"></textarea>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-3">
+                <div>
+                    <label asp-for="Year" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["Product_Year"]</label>
+                    <input asp-for="Year" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                </div>
+
+                <div>
+                    <label asp-for="SetName" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_SetName"]</label>
+                    <input asp-for="SetName" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                </div>
+
+                <div>
+                    <label asp-for="GradeLabel" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_Grade"]</label>
+                    <input asp-for="GradeLabel" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                </div>
+            </div>
+
+            <div>
+                <label asp-for="CertNumber" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_CertNumber"]</label>
+                <input asp-for="CertNumber" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+            </div>
+
+            <div class="rounded-lg border border-slate-200 p-4">
+                <p class="mb-3 text-sm font-medium text-slate-700">@Localizer["UserAuction_CurrentCover"]</p>
+                <img src="@Model.PrimaryImage" alt="@Model.ProductName" class="h-32 w-32 rounded-lg object-cover" />
+
+                <label asp-for="PrimaryImageFile" class="mt-4 mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_ReplaceCover"]</label>
+                <input asp-for="PrimaryImageFile"
+                       type="file"
+                       accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                       class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label asp-for="StartingPrice" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["Sell_StartingPrice"]</label>
+                    <input asp-for="StartingPrice" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    <span asp-validation-for="StartingPrice" class="text-xs text-red-600"></span>
+                </div>
+
+                <div>
+                    <label asp-for="BidStep" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["Sell_BidStep"]</label>
+                    <input asp-for="BidStep" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    <span asp-validation-for="BidStep" class="text-xs text-red-600"></span>
+                </div>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label asp-for="StartDate" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_StartDate"]</label>
+                    <input asp-for="StartDate" type="datetime-local" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" readonly />
+                </div>
+
+                <div>
+                    <label asp-for="EndDate" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_EndDate"]</label>
+                    <input asp-for="EndDate" type="datetime-local" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    <span asp-validation-for="EndDate" class="text-xs text-red-600"></span>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 border-t border-slate-100 pt-5">
+                <a href="javascript:history.back()"
+                   class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                    @Localizer["Common_Cancel"]
+                </a>
+                <button type="submit" class="cursor-pointer rounded-lg bg-blue-700 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-800">
+                    @Localizer["UserAuction_SaveChanges"]
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

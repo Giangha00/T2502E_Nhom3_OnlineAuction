@@ -9,8 +9,7 @@ public static class MockAuctionData
         "Pokémon",
         "One Piece",
         "Yu-Gi-Oh!",
-        "Sports",
-        "Magic: The Gathering"
+        "Sports"
     ];
 
     private static readonly Dictionary<string, (string Image, string DisplayCount)> CategoryMeta = new()
@@ -18,8 +17,7 @@ public static class MockAuctionData
         ["Pokémon"] = ("https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=800&h=500&fit=crop", "1,240+ Items"),
         ["One Piece"] = ("https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=800&h=500&fit=crop", "860+ Items"),
         ["Yu-Gi-Oh!"] = ("https://images.unsplash.com/photo-1606107557195-0a29cbf1f2b3?w=800&h=500&fit=crop", "540+ Items"),
-        ["Sports"] = ("https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&h=500&fit=crop", "920+ Items"),
-        ["Magic: The Gathering"] = ("https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=500&fit=crop", "710+ Items")
+        ["Sports"] = ("https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&h=500&fit=crop", "920+ Items")
     };
 
     public static List<AuctionItemViewModel> GetAllAuctions() =>

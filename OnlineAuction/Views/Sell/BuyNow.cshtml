@@ -1,0 +1,79 @@
+@using System.Text.Json
+@model OnlineAuction.Models.CreateBuyNowViewModel
+@{
+    ViewData["Title"] = Localizer["SellBuyNow_PageTitle"];
+    var successMessage = TempData["SuccessMessage"] as string;
+    var buyNowI18n = new Dictionary<string, string>
+    {
+        ["productNameDefault"] = Localizer["Sell_Preview_ProductNameDefault"].Value,
+        ["editorPlaceholder"] = Localizer["Sell_Editor_Placeholder"].Value,
+        ["remove"] = Localizer["Sell_Remove"].Value,
+        ["successCreated"] = Localizer["SellBuyNow_Success_Created"].Value,
+        ["errorCreateFailed"] = Localizer["SellBuyNow_Error_CreateFailed"].Value,
+        ["errorProductNameRequired"] = Localizer["Sell_Error_ProductNameRequired"].Value,
+        ["errorCategoryRequired"] = Localizer["Sell_Error_CategoryRequired"].Value,
+        ["errorConditionRequired"] = Localizer["Sell_Error_ConditionRequired"].Value,
+        ["errorPriceRequired"] = Localizer["SellBuyNow_Error_PriceRequired"].Value,
+        ["errorImageInvalidFormat"] = Localizer["Sell_Error_ImageInvalidFormat"].Value,
+        ["errorImageSizeLimit"] = Localizer["Sell_Error_ImageSizeLimit"].Value,
+        ["conditionNew"] = Localizer["Sell_Condition_New"].Value,
+        ["conditionLikeNew"] = Localizer["Sell_Condition_LikeNew"].Value,
+        ["conditionUsed"] = Localizer["Sell_Condition_Used"].Value
+    };
+}
+
+<div class="sell-page min-h-screen bg-slate-50">
+  <section class="site-shell px-4 py-8 sm:px-6 lg:py-10">
+    <div id="successBanner" data-auto-dismiss="5000" class="@(string.IsNullOrEmpty(successMessage) ? "hidden" : "") fixed left-1/2 top-24 z-9999 w-[min(92vw,520px)] -translate-x-1/2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800 shadow-lg">
+      <div class="flex items-start gap-3">
+        <svg class="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+        </svg>
+        <div>
+          <p id="successMessageText" class="font-semibold">@(successMessage ?? Localizer["SellBuyNow_SuccessMessage"].Value)</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="draftBanner" class="mb-6 hidden rounded-xl border border-blue-200 bg-blue-50 px-5 py-3 text-sm text-blue-800">
+      @Localizer["Sell_DraftSaved"]
+    </div>
+
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">@Localizer["SellBuyNow_Heading"]</h1>
+      <p class="mt-2 text-sm text-slate-500 sm:text-base">@Localizer["SellBuyNow_Subheading"]</p>
+    </div>
+
+    <form id="createBuyNowForm" asp-action="BuyNow" asp-controller="Sell" method="post" enctype="multipart/form-data" novalidate>
+      @Html.AntiForgeryToken()
+
+      <div class="grid gap-8 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px]">
+        <div class="space-y-6">
+          @await Html.PartialAsync("Partials/_BuyNowProductForm", Model)
+          @await Html.PartialAsync("Partials/_ImageUploader")
+          @await Html.PartialAsync("Partials/_BuyNowPricing", Model)
+
+          <div class="lg:hidden">
+            @await Html.PartialAsync("Partials/_BuyNowPreviewCard")
+          </div>
+        </div>
+
+        <div class="hidden lg:sticky lg:top-28 lg:block lg:self-start">
+          @await Html.PartialAsync("Partials/_BuyNowPreviewCard")
+        </div>
+      </div>
+
+      @await Html.PartialAsync("Partials/_BuyNowFooterActions")
+    </form>
+  </section>
+</div>
+
+@section Scripts {
+  <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+  <script>
+    window.sellBuyNowPageConfig = {
+      i18n: @Html.Raw(JsonSerializer.Serialize(buyNowI18n))
+    };
+  </script>
+  <script src="~/js/create-buy-now.js" asp-append-version="true"></script>
+}
