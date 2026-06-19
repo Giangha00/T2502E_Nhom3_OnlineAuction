@@ -17,17 +17,60 @@ public class AuctionService : IAuctionService
 
     public HomeViewModel GetHomePage()
     {
-        var allAuctions = MockAuctionData.GetAllAuctions();
-        var endingSoon = allAuctions.Where(a => a.Status == "Ending Soon").ToList();
+        var now = DateTime.UtcNow;
+        var auctions = _dbContext.Auctions
+            .AsNoTracking()
+            .Include(a => a.Product)
+                .ThenInclude(p => p.Category)
+            .Include(a => a.Product)
+                .ThenInclude(p => p.Seller)
+            .Include(a => a.Bids)
+            .Where(a =>
+                a.ListingType == ListingTypes.Auction &&
+                (a.Status == AuctionStatuses.Live || a.Status == AuctionStatuses.EndingSoon) &&
+                a.EndDate > now)
+            .OrderByDescending(a => a.CreatedAt)
+            .ToList();
+
+        var allAuctions = auctions
+            .Select(ProductDetailMapper.MapToAuctionItem)
+            .ToList();
+
+        var endingSoon = allAuctions
+            .Where(a => a.Status == "Ending Soon")
+            .Take(8)
+            .ToList();
+
+        var hotAuctions = allAuctions
+            .Where(a => a.IsHot)
+            .OrderByDescending(a => a.CurrentPrice)
+            .Take(8)
+            .ToList();
+
+        if (hotAuctions.Count == 0)
+        {
+            hotAuctions = allAuctions.Take(8).ToList();
+        }
+
+        var bestSellers = auctions
+            .Where(a => a.Product.Seller is not null)
+            .GroupBy(a => a.Product.Seller)
+            .Select(group => ProductDetailMapper.MapSeller(
+                group.Key,
+                group.Select(a => a.ProductId).Distinct().Count(),
+                group.Count(a => a.Status == AuctionStatuses.Completed)))
+            .OrderByDescending(seller => seller.AuctionCount)
+            .Take(5)
+            .ToList();
 
         return new HomeViewModel
         {
-            HotAuctions = MockAuctionData.GetHotAuctions(),
-            FeaturedAuctions = MockAuctionData.GetFeaturedAuctions(),
+            HotAuctions = hotAuctions,
+            FeaturedAuctions = allAuctions.Take(12).ToList(),
             EndingSoonAuctions = endingSoon,
-            WonAuctions = MockAuctionData.GetWonAuctions(),
-            BestSellers = MockAuctionData.GetBestSellers(),
-            Categories = MockAuctionData.GetCategories(),
+            WonAuctions = [],
+            BestSellers = bestSellers,
+            Categories = ProductDetailMapper.MapCategories(allAuctions),
             VaultPosts = MockAuctionData.GetVaultPosts(),
             TotalLiveAuctions = allAuctions.Count,
             EndingSoonCount = endingSoon.Count

@@ -11,6 +11,7 @@ public static class AuctionCatalogSeeder
     private static readonly string[] LegacySeedEventNames =
     [
         SpreadsheetAuctionCatalog.TestAuctionEventName,
+        "RareCard Vault Test Auctions",
         "RareCard Vault Daily Auctions"
     ];
 
@@ -25,15 +26,18 @@ public static class AuctionCatalogSeeder
             return;
         }
 
-        var seller = await dbContext.Users
+        var sellers = await dbContext.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Email == "user1@auctionhouse.local" && u.Status == UserStatus.Active);
+            .Where(u => u.Status == UserStatus.Active && u.Role == UserRole.User)
+            .OrderBy(u => u.Id)
+            .Take(8)
+            .ToListAsync();
 
         var bidder = await dbContext.Users
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Email == "user3@auctionhouse.local" && u.Status == UserStatus.Active);
 
-        if (seller is null)
+        if (sellers.Count == 0)
         {
             return;
         }
@@ -41,8 +45,11 @@ public static class AuctionCatalogSeeder
         var now = DateTime.UtcNow;
         var categoryCache = new Dictionary<string, Category>(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var entry in SpreadsheetAuctionCatalog.GetEntries())
+        var entries = SpreadsheetAuctionCatalog.GetEntries();
+        for (var entryIndex = 0; entryIndex < entries.Count; entryIndex++)
         {
+            var entry = entries[entryIndex];
+            var seller = sellers[entryIndex % sellers.Count];
             var category = await GetOrCreateCategoryAsync(dbContext, entry.CategoryName, categoryCache);
             var bidStep = SpreadsheetAuctionCatalog.ComputeBidStep(entry.StartingPrice);
 

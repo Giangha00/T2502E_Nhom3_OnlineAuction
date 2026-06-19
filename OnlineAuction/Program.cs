@@ -28,14 +28,7 @@ if (builder.Environment.IsDevelopment())
     mvcBuilder.AddRazorRuntimeCompilation();
 }
 
-builder.Services.AddDistributedMemoryCache();
 builder.Services.AddMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
 builder.Services.AddLocalization(options =>
 {
     options.ResourcesPath = "Resources";
@@ -194,8 +187,6 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 
-builder.Services.AddHostedService<AuctionFinalizationWorker>();
-
 #endregion
 
 var app = builder.Build();
@@ -214,8 +205,6 @@ using (var scope = app.Services.CreateScope())
     {
         await db.Database.MigrateAsync();
     }
-    var dbContext = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
-    await dbContext.Database.MigrateAsync();
 }
 
 using (var scope = app.Services.CreateScope())
@@ -232,16 +221,14 @@ using (var scope = app.Services.CreateScope())
         || (app.Environment.IsDevelopment()
             && configuration.GetValue("SeedData:RefreshTestAuctionsInDevelopment", true));
 
-    await UserSeeder.SeedAsync(dbContext, userManager);
-    await AuctionCatalogSeeder.SeedAsync(dbContext, refreshTestAuctions);
+    await AuctionCatalogSeeder.SeedAsync(db, refreshTestAuctions);
 }
 
 using (var scope = app.Services.CreateScope())
 {
-    var orderService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
-    await orderService.FinalizeExpiredAuctionsAsync();
     var orderCreationService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
     var orderService = scope.ServiceProvider.GetRequiredService<IOrderService>();
+
     await orderCreationService.FinalizeExpiredAuctionsAsync();
     await orderService.CancelAllExpiredPendingOrdersAsync();
 }
