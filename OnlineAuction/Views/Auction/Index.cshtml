@@ -255,6 +255,14 @@
         pagination.classList.toggle('hidden', !hasResults || totalPages <= 1);
       }
 
+      function normalizeCategory(value) {
+        return decodeURIComponent(String(value || ''))
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, '');
+      }
+
       function applyFilters() {
         var query = searchInput.value.trim().toLowerCase();
         var categories = getCheckedValues('.filter-category').map(function (el) { return el.value; });
@@ -300,10 +308,10 @@
         if (currentPage < totalPages) { currentPage++; renderPage(); grid.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
       });
 
-      if (window.location.hash) {
-        var hash = window.location.hash.replace('#category-', '').replace(/-/g, ' ');
+      if (window.location.hash.startsWith('#category-')) {
+        var hashSlug = normalizeCategory(window.location.hash.slice('#category-'.length));
         document.querySelectorAll('.filter-category').forEach(function (el) {
-          if (el.value.toLowerCase() === hash || el.value.toLowerCase().replace('!', '') === hash.replace('!', '')) {
+          if (normalizeCategory(el.value) === hashSlug) {
             el.checked = true;
           }
         });

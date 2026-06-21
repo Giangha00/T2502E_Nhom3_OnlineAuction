@@ -12,13 +12,19 @@ public static class MockAuctionData
         "Sports"
     ];
 
-    private static readonly Dictionary<string, (string Image, string DisplayCount)> CategoryMeta = new()
+    private static readonly Dictionary<string, (string Image, string DisplayCount)> CategoryMeta = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["Pokémon"] = ("https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=800&h=500&fit=crop", "1,240+ Items"),
-        ["One Piece"] = ("https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=800&h=500&fit=crop", "860+ Items"),
-        ["Yu-Gi-Oh!"] = ("https://images.unsplash.com/photo-1606107557195-0a29cbf1f2b3?w=800&h=500&fit=crop", "540+ Items"),
-        ["Sports"] = ("https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&h=500&fit=crop", "920+ Items")
+        ["Pokémon"] = ("/images/categories/pokemon.png", "1,240+ Items"),
+        ["One Piece"] = ("/images/categories/one-piece.png", "860+ Items"),
+        ["Yu-Gi-Oh!"] = ("/images/categories/yu-gi-oh.jpg", "540+ Items"),
+        ["Sports"] = ("/images/categories/sports.jpg", "920+ Items"),
+        ["Magic: The Gathering"] = ("https://cards.scryfall.io/large/front/b/0/b0faa7f2-b547-42c4-a810-839da50dadfe.jpg?1559591477", "320+ Items")
     };
+
+    public static string GetCategoryImageUrl(string categoryName) =>
+        CategoryMeta.TryGetValue(categoryName, out var meta)
+            ? meta.Image
+            : "/images/categories/pokemon.png";
 
     public static List<AuctionItemViewModel> GetAllAuctions() =>
     [
