@@ -215,7 +215,6 @@ using (var scope = app.Services.CreateScope())
 
     await UserSeeder.SeedAsync(db, userManager);
     await AdminSeeder.SeedAsync(db, userManager, roleManager);
-    await AuctionCatalogSeeder.SeedAsync(db, app.Environment.IsDevelopment());
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     var refreshTestAuctions = configuration.GetValue("SeedData:RefreshTestAuctionsOnStartup", false)
         || (app.Environment.IsDevelopment()
