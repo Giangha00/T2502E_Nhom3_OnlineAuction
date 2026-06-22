@@ -11,7 +11,6 @@ public static class AuctionCatalogSeeder
     private static readonly string[] LegacySeedEventNames =
     [
         SpreadsheetAuctionCatalog.TestAuctionEventName,
-        "RareCard Vault Test Auctions",
         "RareCard Vault Daily Auctions"
     ];
 
@@ -22,18 +21,15 @@ public static class AuctionCatalogSeeder
             await ClearSeededAuctionsAsync(dbContext);
         }
 
-        var sellers = await dbContext.Users
+        var seller = await dbContext.Users
             .AsNoTracking()
-            .Where(u => u.Status == UserStatus.Active && u.Role == UserRole.User)
-            .OrderBy(u => u.Id)
-            .Take(8)
-            .ToListAsync();
+            .FirstOrDefaultAsync(u => u.Email == "user1@auctionhouse.local" && u.Status == UserStatus.Active);
 
         var bidder = await dbContext.Users
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Email == "user3@auctionhouse.local" && u.Status == UserStatus.Active);
 
-        if (sellers.Count == 0)
+        if (seller is null)
         {
             return;
         }
@@ -42,12 +38,8 @@ public static class AuctionCatalogSeeder
         var now = DateTime.UtcNow;
         var categoryCache = new Dictionary<string, Category>(StringComparer.OrdinalIgnoreCase);
 
-        var entries = SpreadsheetAuctionCatalog.GetEntries();
-        for (var entryIndex = 0; entryIndex < entries.Count; entryIndex++)
+        foreach (var entry in SpreadsheetAuctionCatalog.GetEntries())
         {
-            var entry = entries[entryIndex];
-            var seller = sellers[entryIndex % sellers.Count];
-
             if (existingProductNames.Contains(entry.Name))
             {
                 continue;
@@ -62,13 +54,14 @@ public static class AuctionCatalogSeeder
     {
         var names = await dbContext.Products
             .AsNoTracking()
-            .Where(product => product.Auctions.Any(auction =>
-                auction.AuctionEventName != null &&
-                LegacySeedEventNames.Contains(auction.AuctionEventName)))
+            .Where(product =>
+                product.Auctions.Any(auction =>
+                    auction.AuctionEventName != null &&
+                    LegacySeedEventNames.Contains(auction.AuctionEventName)))
             .Select(product => product.Name)
             .ToListAsync();
 
-        return new HashSet<string>(names, StringComparer.OrdinalIgnoreCase);
+        return names.ToHashSet(StringComparer.OrdinalIgnoreCase);
     }
 
     private static async Task SeedEntryAsync(
@@ -107,7 +100,7 @@ public static class AuctionCatalogSeeder
         await dbContext.SaveChangesAsync();
 
         var startDate = DateTimeUtilities.AsUtc(now.AddSeconds(-30));
-        var endDate = DateTimeUtilities.AsUtc(now.AddMinutes(entry.EndMinutes));
+        var endDate = DateTimeUtilities.AsUtc(now.AddDays(7));
 
         var auction = new Auction
         {
@@ -126,7 +119,7 @@ public static class AuctionCatalogSeeder
         dbContext.Auctions.Add(auction);
         await dbContext.SaveChangesAsync();
 
-        if (bidderId is null || entry.ExistingBidCount == 0)
+        if (bidderId is null || entry.ExistingBidCount <= 0)
         {
             return;
         }
@@ -228,7 +221,7 @@ public static class AuctionCatalogSeeder
             return cached;
         }
 
-        var slug = BuildSlug(categoryName);
+        var slug = CategorySlug.ToSlug(categoryName);
         var category = await dbContext.Categories
             .FirstOrDefaultAsync(item => item.Name == categoryName || item.Slug == slug);
 
@@ -249,19 +242,5 @@ public static class AuctionCatalogSeeder
 
         cache[categoryName] = category;
         return category;
-    }
-
-    private static string BuildSlug(string value)
-    {
-        var chars = value
-            .Trim()
-            .ToLowerInvariant()
-            .Select(ch => char.IsLetterOrDigit(ch) ? ch : '-')
-            .ToArray();
-
-        var slug = string.Join("-", new string(chars)
-            .Split('-', StringSplitOptions.RemoveEmptyEntries));
-
-        return string.IsNullOrWhiteSpace(slug) ? "uncategorized" : slug;
     }
 }

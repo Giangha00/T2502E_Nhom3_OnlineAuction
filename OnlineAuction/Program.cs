@@ -28,7 +28,14 @@ if (builder.Environment.IsDevelopment())
     mvcBuilder.AddRazorRuntimeCompilation();
 }
 
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 builder.Services.AddLocalization(options =>
 {
     options.ResourcesPath = "Resources";
@@ -205,21 +212,16 @@ using (var scope = app.Services.CreateScope())
     {
         await db.Database.MigrateAsync();
     }
-}
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
-
-    await UserSeeder.SeedAsync(db, userManager);
-    await AdminSeeder.SeedAsync(db, userManager, roleManager);
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     var refreshTestAuctions = configuration.GetValue("SeedData:RefreshTestAuctionsOnStartup", false)
         || (app.Environment.IsDevelopment()
             && configuration.GetValue("SeedData:RefreshTestAuctionsInDevelopment", true));
 
+    await UserSeeder.SeedAsync(db, userManager);
+    await AdminSeeder.SeedAsync(db, userManager, roleManager);
     await AuctionCatalogSeeder.SeedAsync(db, refreshTestAuctions);
 }
 
