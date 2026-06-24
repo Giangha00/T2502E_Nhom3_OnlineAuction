@@ -430,7 +430,6 @@
   <data name="User_FullName" xml:space="preserve"><value>이름</value></data>
   <data name="User_Email" xml:space="preserve"><value>이메일</value></data>
   <data name="User_PhoneNumber" xml:space="preserve"><value>전화번호</value></data>
-  <data name="User_Address" xml:space="preserve"><value>주소</value></data>
   <data name="User_MemberSince" xml:space="preserve"><value>{0}년부터 회원</value></data>
   <data name="Contact_PageTitle" xml:space="preserve"><value>문의하기</value></data>
   <data name="Payment_PageTitle" xml:space="preserve"><value>결제 정보</value></data>
