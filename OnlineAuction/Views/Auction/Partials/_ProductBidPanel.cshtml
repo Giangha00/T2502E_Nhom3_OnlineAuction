@@ -1,4 +1,6 @@
 @model OnlineAuction.Models.ProductDetailViewModel
+@using Microsoft.AspNetCore.Authentication
+@using OnlineAuction.Configurations
 @using OnlineAuction.Entities
 @using OnlineAuction.Helpers
 @{
@@ -9,7 +11,8 @@
     if (!string.IsNullOrEmpty(Model.SetName)) specs.Add(Model.SetName);
     if (!string.IsNullOrEmpty(Model.Condition)) specs.Add(Model.Condition);
     if (!string.IsNullOrEmpty(Model.CertificateNumber)) specs.Add(Localizer["Product_CertPrefix", Model.CertificateNumber].Value);
-    var isLoggedIn = User.Identity?.IsAuthenticated == true;
+    var userAuth = await Context.AuthenticateAsync(AuthSchemes.User);
+    var isLoggedIn = userAuth.Succeeded;
     var endDateIso = DateTimeUtilities.ToUtcIsoString(Model.EndDate);
     var showRegistrationFlow = Model.RequiresRegistration && Model.CanPlaceBid && !Model.IsSeller;
     var showBidForm = !Model.IsSeller && Model.CanPlaceBid &&

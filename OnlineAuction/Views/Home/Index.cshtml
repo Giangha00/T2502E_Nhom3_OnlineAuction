@@ -1,11 +1,12 @@
 ﻿@model OnlineAuction.Models.HomeViewModel
+@using Microsoft.AspNetCore.Authentication
+@using OnlineAuction.Configurations
 @inject IStringLocalizer<SharedResource> Localizer
 @{
-    // Localizer lay chuoi tu SharedResource theo culture hien tai.
-    // Vi du: vi-VN se doc key Home_PageTitle trong SharedResource.vi-VN.resx.
     ViewData["Title"] = Localizer["Home_PageTitle"];
     var heroImage = PageBannerImages.Home;
-    var isLoggedIn = User.Identity?.IsAuthenticated == true;
+    var userAuth = await Context.AuthenticateAsync(AuthSchemes.User);
+    var isLoggedIn = userAuth.Succeeded;
 }
 
 <div id="homePageContent" class="rarecard-page">
