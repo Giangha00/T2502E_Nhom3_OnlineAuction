@@ -430,7 +430,6 @@
   <data name="User_FullName" xml:space="preserve"><value>氏名</value></data>
   <data name="User_Email" xml:space="preserve"><value>メール</value></data>
   <data name="User_PhoneNumber" xml:space="preserve"><value>電話番号</value></data>
-  <data name="User_Address" xml:space="preserve"><value>住所</value></data>
   <data name="User_MemberSince" xml:space="preserve"><value>{0}年から会員</value></data>
   <data name="Contact_PageTitle" xml:space="preserve"><value>お問い合わせ</value></data>
   <data name="Payment_PageTitle" xml:space="preserve"><value>支払い情報</value></data>

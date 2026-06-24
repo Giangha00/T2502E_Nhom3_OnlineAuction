@@ -430,7 +430,6 @@
   <data name="User_FullName" xml:space="preserve"><value>Full Name</value></data>
   <data name="User_Email" xml:space="preserve"><value>Email</value></data>
   <data name="User_PhoneNumber" xml:space="preserve"><value>Phone Number</value></data>
-  <data name="User_Address" xml:space="preserve"><value>Address</value></data>
   <data name="User_MemberSince" xml:space="preserve"><value>Member since {0}</value></data>
   <data name="Contact_PageTitle" xml:space="preserve"><value>Contact Us</value></data>
   <data name="Payment_PageTitle" xml:space="preserve"><value>Payment Information</value></data>

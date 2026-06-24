@@ -34,8 +34,7 @@ public static class MockUserDetailData
             {
                 FullName = profileExtras.FullName,
                 Email = profileExtras.Email,
-                PhoneNumber = profileExtras.Phone,
-                Address = profileExtras.Address
+                PhoneNumber = profileExtras.Phone
             },
             Statistics = new SellerStatisticsViewModel
             {
@@ -55,14 +54,14 @@ public static class MockUserDetailData
         };
     }
 
-    private static (string FullName, string Email, string Phone, string Address, int MemberSince, int TotalSales, int ReviewCount) GetProfileExtras(int id) =>
+    private static (string FullName, string Email, string Phone, int MemberSince, int TotalSales, int ReviewCount) GetProfileExtras(int id) =>
         id switch
         {
-            1 => ("Elena Voss", "elena.voss@gmail.com", "+84 912 345 678", "Ha Noi, Viet Nam", 2022, 120, 98),
-            2 => ("Marcus Chen", "marcus.chen@gmail.com", "+84 987 654 321", "Ho Chi Minh, Viet Nam", 2023, 95, 76),
-            3 => ("Sofia Nguyen", "sofia.gallery@gmail.com", "+84 901 234 567", "Da Nang, Viet Nam", 2021, 156, 142),
-            4 => ("James Retro", "james.retro@gmail.com", "+84 933 221 100", "Ha Noi, Viet Nam", 2024, 88, 54),
-            _ => ("John Smith", "john@gmail.com", "+84 xxx xxx xxx", "Ha Noi, Viet Nam", 2026, 120, 120)
+            1 => ("Elena Voss", "elena.voss@gmail.com", "+84 912 345 678", 2022, 120, 98),
+            2 => ("Marcus Chen", "marcus.chen@gmail.com", "+84 987 654 321", 2023, 95, 76),
+            3 => ("Sofia Nguyen", "sofia.gallery@gmail.com", "+84 901 234 567", 2021, 156, 142),
+            4 => ("James Retro", "james.retro@gmail.com", "+84 933 221 100", 2024, 88, 54),
+            _ => ("John Smith", "john@gmail.com", "+84 xxx xxx xxx", 2026, 120, 120)
         };
 
     private static List<SellerReviewViewModel> GetReviewsForSeller(int id) =>
