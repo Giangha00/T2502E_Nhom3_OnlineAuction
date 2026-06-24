@@ -1,0 +1,33 @@
+@model OnlineAuction.Models.AuctionItemViewModel
+@{
+    var isBuyNow = string.Equals(Model.ListingType, OnlineAuction.Entities.ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
+    var isGreatDeal = string.Equals(Model.DealLabel, "Great Deal", StringComparison.OrdinalIgnoreCase);
+    var title = string.IsNullOrWhiteSpace(Model.DisplayTitle) ? Model.Name : Model.DisplayTitle;
+}
+
+<article class="recommended-deal-card group">
+  <a asp-controller="@(isBuyNow ? "BuyNow" : "Auction")"
+     asp-action="Detail"
+     asp-route-id="@Model.Id"
+     class="block">
+    <div class="recommended-deal-card__image-wrap">
+      <img src="@Model.ImageUrl" alt="@title" loading="lazy" class="recommended-deal-card__image"/>
+    </div>
+    <div class="recommended-deal-card__body">
+      <h3 class="recommended-deal-card__title">@title</h3>
+      <div class="recommended-deal-card__footer">
+        <p class="recommended-deal-card__price">$@Model.CurrentPrice.ToString("N0")</p>
+        <div class="recommended-deal-card__meta">
+          @if (!string.IsNullOrWhiteSpace(Model.DealLabel))
+          {
+            <span class="deal-badge @(isGreatDeal ? "deal-badge--great" : "deal-badge--good")">@Model.DealLabel</span>
+          }
+          @if (!string.IsNullOrWhiteSpace(Model.DealNote))
+          {
+            <span class="recommended-deal-card__note">@Model.DealNote</span>
+          }
+        </div>
+      </div>
+    </div>
+  </a>
+</article>
