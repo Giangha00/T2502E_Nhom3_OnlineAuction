@@ -1,12 +1,13 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OnlineAuction.Configurations;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = AuthSchemes.User)]
 public class OrderController : Controller
 {
     private readonly IOrderService _orderService;

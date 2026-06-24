@@ -123,14 +123,12 @@ builder.Services
     .AddEntityFrameworkStores<AuctionHouseDbContext>()
     .AddDefaultTokenProviders();
 
-#endregion
-
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Admin/Account/Login";
-    options.LogoutPath = "/Admin/Account/Logout";
-    options.AccessDeniedPath = "/Admin/Account/AccessDenied";
-
+    options.Cookie.Name = ".AuctionHouse.User";
+    options.LoginPath = "/Auth/Login";
+    options.LogoutPath = "/Auth/Logout";
+    options.AccessDeniedPath = "/Auth/Login";
     options.SlidingExpiration = true;
     options.ExpireTimeSpan = TimeSpan.FromDays(14);
 
@@ -142,34 +140,53 @@ builder.Services.ConfigureApplicationCookie(options =>
             return Task.CompletedTask;
         }
 
-        if (context.Request.Path.StartsWithSegments("/Admin", StringComparison.OrdinalIgnoreCase))
-        {
-            context.Response.Redirect(context.RedirectUri);
-        }
-        else
-        {
-            var returnUrl = context.Request.Path + context.Request.QueryString;
-            var loginUrl = $"/Auth/Login?returnUrl={Uri.EscapeDataString(returnUrl)}";
-            context.Response.Redirect(loginUrl);
-        }
-
+        var returnUrl = context.Request.Path + context.Request.QueryString;
+        var loginUrl = $"/Auth/Login?returnUrl={Uri.EscapeDataString(returnUrl)}";
+        context.Response.Redirect(loginUrl);
         return Task.CompletedTask;
     };
 
     options.Events.OnRedirectToAccessDenied = context =>
     {
-        if (context.Request.Path.StartsWithSegments("/Admin", StringComparison.OrdinalIgnoreCase))
+        if (context.Request.Path.StartsWithSegments("/api"))
         {
-            context.Response.Redirect(context.RedirectUri);
-        }
-        else
-        {
-            context.Response.Redirect("/Auth/Login");
+            context.Response.StatusCode = 403;
+            return Task.CompletedTask;
         }
 
+        context.Response.Redirect("/Auth/Login");
         return Task.CompletedTask;
     };
 });
+
+builder.Services.AddAuthentication()
+    .AddCookie(AuthSchemes.Admin, options =>
+    {
+        options.Cookie.Name = ".AuctionHouse.Admin";
+        options.Cookie.Path = "/Admin";
+        options.LoginPath = "/Admin/Account/Login";
+        options.LogoutPath = "/Admin/Account/Logout";
+        options.AccessDeniedPath = "/Admin/Account/AccessDenied";
+        options.SlidingExpiration = true;
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.Redirect(context.RedirectUri);
+            return Task.CompletedTask;
+        };
+
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            context.Response.Redirect(context.RedirectUri);
+            return Task.CompletedTask;
+        };
+    });
+
+#endregion
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 
 #region Cloudinary + Services
 
