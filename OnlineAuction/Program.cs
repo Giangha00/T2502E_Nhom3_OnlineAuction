@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OnlineAuction.Configurations;
+using OnlineAuction.Areas.Admin.Services;
 using OnlineAuction.Data;
 using OnlineAuction.Data.Seeders;
 using OnlineAuction.Entities;
@@ -193,6 +194,7 @@ builder.Services.AddHostedService<AuctionFinalizationWorker>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
+builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 
 #endregion
 
