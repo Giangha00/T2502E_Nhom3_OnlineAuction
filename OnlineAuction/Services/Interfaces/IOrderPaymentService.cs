@@ -25,4 +25,9 @@ public interface IOrderPaymentService
         int buyerId,
         int orderId,
         CancellationToken cancellationToken = default);
+    Task<string> TestProcessIpnAsync(
+        string payPalOrderId,
+        string transactionId,
+        string paymentStatus,
+        CancellationToken cancellationToken = default);
 }
