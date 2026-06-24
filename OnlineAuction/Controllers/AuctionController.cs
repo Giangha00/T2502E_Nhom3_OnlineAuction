@@ -1,6 +1,8 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OnlineAuction.Configurations;
 using OnlineAuction.Helpers;
 using OnlineAuction.Services.Interfaces;
 
@@ -40,7 +42,7 @@ public class AuctionController : Controller
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(int auctionId)
     {
@@ -71,7 +73,7 @@ public class AuctionController : Controller
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CancelRegistration(int auctionId)
     {
@@ -100,12 +102,13 @@ public class AuctionController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> PlaceBid(int auctionId, decimal amount)
     {
-        if (User.Identity?.IsAuthenticated != true)
+        var userAuth = await HttpContext.AuthenticateAsync(AuthSchemes.User);
+        if (!userAuth.Succeeded)
         {
             return Unauthorized(new { success = false, message = "Please sign in to place a bid." });
         }
 
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userIdClaim = userAuth.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!int.TryParse(userIdClaim, out var bidderId))
         {
             return Unauthorized(new { success = false, message = "Please sign in to place a bid." });

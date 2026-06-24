@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Models;
@@ -34,7 +35,7 @@ public class BuyNowController : Controller
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddToCart(int productId)
     {

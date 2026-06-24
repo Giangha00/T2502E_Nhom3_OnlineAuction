@@ -1,8 +1,10 @@
 @using Microsoft.Extensions.Localization
 @using OnlineAuction
 @using OnlineAuction.Resources
+@using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Localization
 @using Microsoft.AspNetCore.Identity
+@using OnlineAuction.Configurations
 @using OnlineAuction.Entities
 @using OnlineAuction.Models
 @inject IStringLocalizer<SharedResource> Localizer
@@ -30,9 +32,12 @@
     var isRareCardTheme = !isStandalonePage && !isAdminArea;
 
     var currentCulture = Context.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name ?? "en-US";
-    var isLoggedIn = User.Identity?.IsAuthenticated == true;
-    ApplicationUser? currentUser = isLoggedIn ? await UserManager.GetUserAsync(User) : null;
-    var displayName = currentUser?.FullName ?? User.Identity?.Name ?? "User";
+    var userAuth = await Context.AuthenticateAsync(AuthSchemes.User);
+    var isLoggedIn = userAuth.Succeeded;
+    ApplicationUser? currentUser = isLoggedIn && userAuth.Principal is not null
+        ? await UserManager.GetUserAsync(userAuth.Principal)
+        : null;
+    var displayName = currentUser?.FullName ?? userAuth.Principal?.Identity?.Name ?? "User";
     var currentUserId = currentUser?.Id ?? 0;
     var orderCount = currentUser is not null ? await OrderService.CountPendingPaymentOrdersAsync(currentUser.Id) : 0;
     var isOrderPage = string.Equals(currentController, "Order", StringComparison.OrdinalIgnoreCase);

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Models;
@@ -9,7 +10,7 @@ using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = AuthSchemes.User)]
 [Route("User/Auction")]
 public class UserAuctionController : Controller
 {
