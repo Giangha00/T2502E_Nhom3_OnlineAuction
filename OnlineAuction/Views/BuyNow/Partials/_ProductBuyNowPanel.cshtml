@@ -1,11 +1,14 @@
 @model OnlineAuction.Models.ProductDetailViewModel
+@using Microsoft.AspNetCore.Authentication
+@using OnlineAuction.Configurations
 @{
     var specs = new List<string>();
     if (!string.IsNullOrEmpty(Model.Grade)) specs.Add(Model.Grade);
     if (!string.IsNullOrEmpty(Model.SetName)) specs.Add(Model.SetName);
     if (!string.IsNullOrEmpty(Model.Condition)) specs.Add(Model.Condition);
     if (!string.IsNullOrEmpty(Model.CertificateNumber)) specs.Add(Localizer["Product_CertPrefix", Model.CertificateNumber].Value);
-    var isLoggedIn = User.Identity?.IsAuthenticated == true;
+    var userAuth = await Context.AuthenticateAsync(AuthSchemes.User);
+    var isLoggedIn = userAuth.Succeeded;
 }
 
 <div class="product-bid-panel product-buy-panel" data-is-logged-in="@(isLoggedIn ? "true" : "false")" data-product-id="@Model.Id">
