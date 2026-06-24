@@ -394,6 +394,7 @@
   <data name="Auction_WatchlistCount" xml:space="preserve"><value>Watchlist ({0})</value></data>
   <data name="Auction_Filter_Category" xml:space="preserve"><value>Category</value></data>
   <data name="Auction_Filter_Condition" xml:space="preserve"><value>Condition</value></data>
+  <data name="Auction_Filter_Authenticator" xml:space="preserve"><value>Authenticator</value></data>
   <data name="Auction_Filter_Year" xml:space="preserve"><value>Year Manufactured</value></data>
   <data name="Auction_Filter_PriceRange" xml:space="preserve"><value>Price Range</value></data>
   <data name="Auction_Filter_EndingSoonOnly" xml:space="preserve"><value>Ending Soon Only</value></data>
