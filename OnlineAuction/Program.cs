@@ -221,7 +221,8 @@ builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<IAdminAuctionVerificationService, AdminAuctionVerificationService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
-
+builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
+builder.Services.AddScoped<IRegistrationDepositRefundService, RegistrationDepositRefundService>();
 #endregion
 
 var firebaseSettings = builder.Configuration

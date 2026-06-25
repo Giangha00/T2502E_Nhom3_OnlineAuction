@@ -14,4 +14,12 @@ public interface IPayPalService
     Task<PayPalCaptureResult> CaptureOrderAsync(
         string payPalOrderId,
         CancellationToken cancellationToken = default);
+    // Hoàn tiền cho một capture đã thanh toán thành công.
+    // captureId: PayPal capture id đã lưu trong deposit.PayPalCaptureId.
+    // amount: số tiền muốn refund, thường là deposit.Amount.
+    // Kết quả trả về refund id để mình lưu vào database.
+    Task<PayPalRefundResult> RefundCaptureAsync(
+        string captureId,
+        decimal amount,
+        CancellationToken cancellationToken = default);
 }
