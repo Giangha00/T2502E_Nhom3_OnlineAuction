@@ -26,9 +26,11 @@ public class AuctionFinalizationWorker : BackgroundService
                 using var scope = _scopeFactory.CreateScope();
                 var orderCreationService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
                 var orderService = scope.ServiceProvider.GetRequiredService<IOrderService>();
+                var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
                 var createdCount = await orderCreationService.FinalizeExpiredAuctionsAsync(stoppingToken);
                 var cancelledCount = await orderService.CancelAllExpiredPendingOrdersAsync();
+                await notificationService.ProcessAuctionEndingSoonNotificationsAsync(stoppingToken);
 
                 if (createdCount > 0)
                 {

@@ -12,15 +12,18 @@ public class OrderPaymentService : IOrderPaymentService
 {
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IPayPalService _payPalService;
+    private readonly INotificationService _notificationService;
     private readonly ILogger<OrderPaymentService> _logger;
 
     public OrderPaymentService(
         AuctionHouseDbContext dbContext,
         IPayPalService payPalService,
+        INotificationService notificationService,
         ILogger<OrderPaymentService> logger)
     {
         _dbContext = dbContext;
         _payPalService = payPalService;
+        _notificationService = notificationService;
         _logger = logger;
     }
 
@@ -184,6 +187,18 @@ public class OrderPaymentService : IOrderPaymentService
             await _dbContext.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
         });
+
+        foreach (var orderId in paidOrderIds)
+        {
+            await _notificationService.CreateAndPushAsync(
+                buyerId,
+                "Payment successful",
+                "Your payment has been confirmed. View your order confirmation.",
+                NotificationType.Payment,
+                $"/Payment/Confirmation?orderId={orderId}",
+                NotificationReferenceTypes.PaymentSuccess,
+                orderId);
+        }
 
         return PayPalCaptureCheckoutResult.Ok(paidOrderIds[0], paidOrderIds);
     }
@@ -422,6 +437,19 @@ public async Task<string> TestProcessIpnAsync(
          */
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        foreach (var payment in payments)
+        {
+            await _notificationService.CreateAndPushAsync(
+                payment.Order.BuyerId,
+                "Payment successful",
+                "Your payment has been confirmed. View your order confirmation.",
+                NotificationType.Payment,
+                $"/Payment/Confirmation?orderId={payment.OrderId}",
+                NotificationReferenceTypes.PaymentSuccess,
+                payment.OrderId,
+                cancellationToken: cancellationToken);
+        }
 
         return "Thanh toán thành công";
     }
