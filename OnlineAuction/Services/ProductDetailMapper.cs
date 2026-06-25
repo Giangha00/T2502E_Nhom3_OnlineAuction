@@ -77,6 +77,7 @@ internal static class ProductDetailMapper
             RegistrationRejectReason = registrationRejectReason,
             CanBid = canBid,
             IsSeller = isSeller,
+            IsVerifiedAuthentic = auction.VerifiedAt.HasValue,
             RegistrationCount = registrationCount,
             Seller = seller,
             Grading = BuildGrading(product),
@@ -384,6 +385,9 @@ internal static class ProductDetailMapper
 
         return status switch
         {
+            AuctionStatuses.PendingReview => ("Pending Review", "bg-amber-500 text-white"),
+            AuctionStatuses.Rejected => ("Rejected", "bg-red-600 text-white"),
+            AuctionStatuses.Scheduled => ("Scheduled", "bg-sky-600 text-white"),
             AuctionStatuses.Live => ("Active Auction", "bg-emerald-600 text-white"),
             AuctionStatuses.EndingSoon => ("Ending Soon", "bg-orange-600 text-white"),
             AuctionStatuses.Ended or AuctionStatuses.AwaitingPayment => ("Ended", "bg-stone-600 text-white"),
@@ -413,6 +417,21 @@ internal static class ProductDetailMapper
         if (auction.Status == AuctionStatuses.Cancelled)
         {
             return "Cancelled";
+        }
+
+        if (auction.Status == AuctionStatuses.PendingReview)
+        {
+            return "Pending Review";
+        }
+
+        if (auction.Status == AuctionStatuses.Rejected)
+        {
+            return "Rejected";
+        }
+
+        if (auction.Status == AuctionStatuses.Scheduled)
+        {
+            return "Scheduled";
         }
 
         if (auction.Status == AuctionStatuses.EndingSoon)
