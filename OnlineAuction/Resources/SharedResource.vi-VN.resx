@@ -394,6 +394,7 @@
   <data name="Auction_WatchlistCount" xml:space="preserve"><value>Theo dõi ({0})</value></data>
   <data name="Auction_Filter_Category" xml:space="preserve"><value>Danh mục</value></data>
   <data name="Auction_Filter_Condition" xml:space="preserve"><value>Tình trạng</value></data>
+  <data name="Auction_Filter_Authenticator" xml:space="preserve"><value>Authenticator</value></data>
   <data name="Auction_Filter_Year" xml:space="preserve"><value>Năm sản xuất</value></data>
   <data name="Auction_Filter_PriceRange" xml:space="preserve"><value>Khoảng giá</value></data>
   <data name="Auction_Filter_EndingSoonOnly" xml:space="preserve"><value>Chỉ sắp kết thúc</value></data>

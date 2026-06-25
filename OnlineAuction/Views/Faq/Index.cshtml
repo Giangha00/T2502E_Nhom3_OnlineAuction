@@ -1,12 +1,5 @@
-﻿@{
+@{
     ViewData["Title"] = Localizer["Faq_PageTitle"];
-
-    var categories = new[]
-    {
-        new { Id = "buying", Label = "Buying", Icon = "cart" },
-        new { Id = "selling", Label = "Selling", Icon = "tag" },
-        new { Id = "security", Label = "Security", Icon = "shield" }
-    };
 
     var faqSections = new Dictionary<string, (string Title, string Icon, (string Question, string Answer)[] Items)>
     {
@@ -29,110 +22,95 @@
     };
 }
 
-<div class="faq-page bg-white">
-  @* Hero *@
-  <section class="site-shell px-4 pt-10 pb-8 text-center sm:px-6 sm:pt-12 lg:pt-14">
-    <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Help Center</h1>
-    <p class="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
-      Find answers to common questions about bidding, grading, and security at RareCard Auctions.
-    </p>
+<div class="faq-page min-h-screen bg-slate-50">
+  <section class="relative overflow-hidden border-b border-slate-200/80 bg-gradient-to-b from-blue-50/80 via-white to-slate-50">
+    <div class="pointer-events-none absolute -left-24 top-0 h-64 w-64 rounded-full bg-blue-200/30 blur-3xl" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-indigo-100/40 blur-3xl" aria-hidden="true"></div>
 
-    <div class="mx-auto mt-8 grid max-w-4xl gap-4 sm:grid-cols-[1fr_auto]">
-      <div class="rounded-xl border border-slate-200 bg-white p-2 shadow-sm">
-        <div class="flex items-center gap-3 rounded-lg bg-slate-50 px-4 py-3">
-          <svg class="h-5 w-5 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-          </svg>
-          <input id="faqSearch" type="search" placeholder="Search for questions..."
-                 class="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"/>
-        </div>
-      </div>
-
-      <div class="relative overflow-hidden rounded-xl bg-blue-700 px-6 py-5 text-left shadow-sm sm:min-w-[280px]">
-        <p class="text-sm font-bold text-white">Need direct support?</p>
-        <p class="mt-1 text-xs text-blue-100">Our specialists are available 24/7.</p>
-        <a asp-controller="Contact" asp-action="Index"
-           class="mt-4 inline-flex rounded-lg bg-white px-4 py-2 text-xs font-semibold text-blue-700 transition hover:bg-blue-50">
-          Contact Us
-        </a>
-        <svg class="pointer-events-none absolute -bottom-2 right-2 h-24 w-24 text-white/10" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.375c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375V8.51m11.25 0V9.375c0 .621-.504 1.125-1.125 1.125h-4.125c-.621 0-1.125-.504-1.125-1.125V8.51"/>
-        </svg>
-      </div>
+    <div class="site-shell relative px-4 py-10 text-center sm:px-6 sm:py-12">
+      <span class="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-blue-700 shadow-sm backdrop-blur-sm">
+        <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+        Help Center
+      </span>
+      <h1 class="mx-auto mt-4 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+        @Localizer["Faq_PageTitle"]
+      </h1>
+      <p class="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
+        Find answers about bidding, selling, grading, and security at RareCard Auctions.
+      </p>
     </div>
   </section>
 
-  @* Main content *@
-  <section class="site-shell px-4 pb-16 sm:px-6 lg:pb-20">
-    <div class="grid gap-8 lg:grid-cols-[220px_1fr] xl:grid-cols-[240px_1fr]">
-      @* Sidebar *@
-      <aside class="sticky-below-header lg:self-start">
-        <nav class="space-y-1 rounded-xl border border-slate-200 bg-white p-2 shadow-sm" aria-label="FAQ categories">
-          @foreach (var cat in categories)
-          {
-            var isFirst = cat.Id == "buying";
-            <button type="button" data-faq-nav="@cat.Id"
-                    class="faq-nav-btn flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition @(isFirst ? "bg-blue-700 text-white" : "text-slate-700 hover:bg-slate-50")">
-              @cat.Label
-              <svg class="h-4 w-4 @(isFirst ? "text-white" : "text-slate-400")" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
-              </svg>
-            </button>
-          }
-        </nav>
-      </aside>
-
-      @* FAQ sections *@
-      <div class="space-y-10">
-        @foreach (var faqGroup in faqSections)
-        {
-          var meta = faqGroup.Value;
-          <div id="faq-@faqGroup.Key" class="faq-section scroll-mt-header" data-faq-section="@faqGroup.Key">
-            <div class="mb-4 flex items-center gap-3">
-              <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+  <section class="site-shell px-4 py-8 sm:px-6 sm:py-10 lg:py-12">
+    <div class="mx-auto max-w-4xl space-y-6">
+      @foreach (var faqGroup in faqSections)
+      {
+        var meta = faqGroup.Value;
+        <div id="faq-@faqGroup.Key" class="faq-section scroll-mt-header" data-faq-section="@faqGroup.Key">
+          <article class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+            <header class="flex items-center gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-blue-50/50 px-5 py-4 sm:px-6 sm:py-5">
+              <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-700 text-white shadow-sm">
                 @if (meta.Icon == "cart")
                 {
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
                   </svg>
                 }
                 else if (meta.Icon == "tag")
                 {
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z"/>
                   </svg>
                 }
                 else
                 {
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/>
                   </svg>
                 }
               </div>
-              <h2 class="text-lg font-bold text-slate-900">@meta.Title</h2>
-            </div>
+              <div>
+                <h2 class="text-lg font-bold text-slate-900 sm:text-xl">@meta.Title</h2>
+                <p class="mt-0.5 text-xs text-slate-500 sm:text-sm">@meta.Items.Length question@(meta.Items.Length == 1 ? "" : "s")</p>
+              </div>
+            </header>
 
-            <div class="space-y-2">
+            <div class="divide-y divide-slate-100">
               @foreach (var item in meta.Items)
               {
-                <article class="faq-item overflow-hidden rounded-lg border border-slate-200 bg-white" data-faq-question="@item.Question.ToLowerInvariant()">
-                  <button type="button" class="faq-question flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
-                    <span class="text-sm font-medium text-slate-900">@item.Question</span>
+                <div class="faq-item" data-faq-question="@item.Question.ToLowerInvariant()">
+                  <button type="button" class="faq-question flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-slate-50/80 sm:px-6 sm:py-5">
+                    <span class="text-sm font-medium text-slate-900 sm:text-base">@item.Question</span>
                     <svg class="faq-chevron h-4 w-4 shrink-0 text-slate-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
                     </svg>
                   </button>
-                  <div class="faq-answer hidden border-t border-slate-100 px-5 pb-4">
-                    <p class="pt-3 text-sm leading-relaxed text-slate-500">@item.Answer</p>
+                  <div class="faq-answer hidden px-5 pb-5 sm:px-6 sm:pb-6">
+                    <p class="text-sm leading-relaxed text-slate-600 sm:text-[0.9375rem]">@item.Answer</p>
                   </div>
-                </article>
+                </div>
               }
             </div>
-          </div>
-        }
+          </article>
+        </div>
+      }
 
-        <p id="faqNoResults" class="hidden py-8 text-center text-sm text-slate-500">No questions match your search.</p>
+      <div class="rounded-2xl bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 px-6 py-8 text-center shadow-lg sm:px-10 sm:py-10">
+        <h3 class="text-lg font-bold text-white sm:text-xl">Still need help?</h3>
+        <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-blue-100">
+          Can't find what you're looking for? Contact our team or submit a refund request.
+        </p>
+        <div class="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <a asp-controller="Contact" asp-action="Index"
+             class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-blue-800 transition hover:bg-blue-50 sm:w-auto">
+            @Localizer["Layout_Footer_ContactUs"]
+          </a>
+          <a asp-controller="Refund" asp-action="Index"
+             class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20 sm:w-auto">
+            @Localizer["Layout_Footer_RefundRequest"]
+          </a>
+        </div>
       </div>
     </div>
   </section>

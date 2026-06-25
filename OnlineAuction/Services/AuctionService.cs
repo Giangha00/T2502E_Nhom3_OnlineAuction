@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Enums;
 using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
@@ -9,6 +10,8 @@ namespace OnlineAuction.Services;
 
 public class AuctionService : IAuctionService
 {
+    private const int HomeSectionItemCount = 15;
+
     private readonly AuctionHouseDbContext _dbContext;
 
     public AuctionService(AuctionHouseDbContext dbContext)
@@ -16,22 +19,54 @@ public class AuctionService : IAuctionService
         _dbContext = dbContext;
     }
 
-    public HomeViewModel GetHomePage()
+    public HomeViewModel GetHomePage() =>
+        GetHomePageAsync().GetAwaiter().GetResult();
+
+    public async Task<HomeViewModel> GetHomePageAsync()
     {
-        var allAuctions = MockAuctionData.GetAllAuctions();
-        var endingSoon = allAuctions.Where(a => a.Status == "Ending Soon").ToList();
+        var auctionEntities = await QueryLiveAuctionEntitiesAsync(ListingTypes.Auction);
+        var buyNowEntities = await QueryLiveAuctionEntitiesAsync(ListingTypes.BuyNow);
+        var allEntities = auctionEntities.Concat(buyNowEntities).ToList();
+
+        var auctionItems = auctionEntities.Select(ProductDetailMapper.MapToAuctionItem).ToList();
+        var buyNowItems = buyNowEntities.Select(ProductDetailMapper.MapToAuctionItem).ToList();
+        var allItems = auctionItems.Concat(buyNowItems).ToList();
+
+        var recommended = PickSection(
+            allItems
+                .Where(ProductDetailMapper.IsRecommendedDeal)
+                .OrderByDescending(item => item.DealLabel == "Great Deal")
+                .ThenByDescending(item => item.CurrentPrice),
+            HomeSectionItemCount);
+
+        var trendingOnAuction = PickSection(
+            auctionItems
+                .OrderByDescending(item => item.BidCount)
+                .ThenByDescending(item => item.CurrentPrice),
+            HomeSectionItemCount);
+
+        var trendingOnBuyNow = PickSection(
+            buyNowItems.OrderByDescending(item => item.CurrentPrice),
+            HomeSectionItemCount);
+
+        var recentlyAdded = PickSection(
+            allEntities
+                .OrderByDescending(auction => auction.CreatedAt)
+                .Select(ProductDetailMapper.MapToAuctionItem),
+            HomeSectionItemCount);
+
+        var categories = await BuildAuctionCategoriesAsync(allItems);
+        var bestSellers = await QueryBestSellersAsync();
 
         return new HomeViewModel
         {
-            HotAuctions = MockAuctionData.GetHotAuctions(),
-            FeaturedAuctions = MockAuctionData.GetFeaturedAuctions(),
-            EndingSoonAuctions = endingSoon,
-            WonAuctions = MockAuctionData.GetWonAuctions(),
-            BestSellers = MockAuctionData.GetBestSellers(),
-            Categories = MockAuctionData.GetCategories(),
-            VaultPosts = MockAuctionData.GetVaultPosts(),
-            TotalLiveAuctions = allAuctions.Count,
-            EndingSoonCount = endingSoon.Count
+            Recommended = WithFallback(recommended, MockAuctionData.GetRecommended),
+            TrendingOnAuction = WithFallback(trendingOnAuction, MockAuctionData.GetTrendingOnAuction),
+            TrendingOnBuyNow = WithFallback(trendingOnBuyNow, MockAuctionData.GetTrendingOnBuyNow),
+            RecentlyAdded = WithFallback(recentlyAdded, MockAuctionData.GetRecentlyAdded),
+            BestSellers = WithFallback(bestSellers, MockAuctionData.GetBestSellers),
+            Categories = categories.Count > 0 ? categories : MockAuctionData.GetCategories(),
+            VaultPosts = MockAuctionData.GetVaultPosts()
         };
     }
 
@@ -163,9 +198,18 @@ public class AuctionService : IAuctionService
 
     private async Task<IReadOnlyList<AuctionItemViewModel>> QueryPublicListingsAsync(string listingType)
     {
+        var auctions = await QueryLiveAuctionEntitiesAsync(listingType);
+        return auctions
+            .OrderByDescending(auction => auction.CreatedAt)
+            .Select(ProductDetailMapper.MapToAuctionItem)
+            .ToList();
+    }
+
+    private async Task<List<Auction>> QueryLiveAuctionEntitiesAsync(string listingType)
+    {
         var now = DateTime.UtcNow;
 
-        var auctions = await _dbContext.Auctions
+        return await _dbContext.Auctions
             .AsNoTracking()
             .Include(a => a.Product)
                 .ThenInclude(p => p.Category)
@@ -174,13 +218,44 @@ public class AuctionService : IAuctionService
                 a.ListingType == listingType &&
                 (a.Status == AuctionStatuses.Live || a.Status == AuctionStatuses.EndingSoon) &&
                 a.EndDate > now)
-            .OrderByDescending(a => a.CreatedAt)
+            .ToListAsync();
+    }
+
+    private async Task<List<SellerViewModel>> QueryBestSellersAsync(int count = 5)
+    {
+        var now = DateTime.UtcNow;
+        var sellers = await _dbContext.Users
+            .AsNoTracking()
+            .Include(user => user.Products)
+                .ThenInclude(product => product.Auctions)
+            .Where(user => user.Status == UserStatus.Active && user.Role == UserRole.User)
             .ToListAsync();
 
-        return auctions
-            .Select(ProductDetailMapper.MapToAuctionItem)
+        return sellers
+            .Select(user =>
+            {
+                var auctions = user.Products.SelectMany(product => product.Auctions).ToList();
+                var liveCount = auctions.Count(auction =>
+                    (auction.Status == AuctionStatuses.Live || auction.Status == AuctionStatuses.EndingSoon) &&
+                    auction.EndDate > now);
+                var completedCount = auctions.Count(auction => auction.Status == AuctionStatuses.Completed);
+
+                return ProductDetailMapper.MapSeller(user, liveCount, completedCount);
+            })
+            .Where(seller => seller.AuctionCount > 0)
+            .OrderByDescending(seller => seller.AuctionCount)
+            .ThenByDescending(seller => seller.SuccessfulSales)
+            .Take(count)
             .ToList();
     }
+
+    private static List<AuctionItemViewModel> PickSection(
+        IEnumerable<AuctionItemViewModel> source,
+        int count) =>
+        source.Take(count).ToList();
+
+    private static List<T> WithFallback<T>(List<T> primary, Func<List<T>> fallback) =>
+        primary.Count > 0 ? primary : fallback();
 
     private async Task<List<CategoryViewModel>> BuildAuctionCategoriesAsync(
         IReadOnlyList<AuctionItemViewModel> auctions)

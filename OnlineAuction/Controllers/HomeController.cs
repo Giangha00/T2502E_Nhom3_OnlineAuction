@@ -16,9 +16,9 @@ public class HomeController : Controller
         _auctionService = auctionService;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var model = _auctionService.GetHomePage();
+        var model = await _auctionService.GetHomePageAsync();
         return View(model);
     }
 
