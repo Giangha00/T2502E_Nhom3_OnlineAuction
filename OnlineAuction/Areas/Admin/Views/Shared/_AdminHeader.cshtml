@@ -1,8 +1,12 @@
 @using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using OnlineAuction.Configurations
 @{
-    var displayEmail = User.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
-    var displayName = User.FindFirstValue("FullName")
-        ?? User.FindFirstValue(ClaimTypes.Name)
+    var adminAuth = await Context.AuthenticateAsync(AuthSchemes.Admin);
+    var adminPrincipal = adminAuth.Succeeded ? adminAuth.Principal : null;
+    var displayEmail = adminPrincipal?.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
+    var displayName = adminPrincipal?.FindFirstValue("FullName")
+        ?? adminPrincipal?.FindFirstValue(ClaimTypes.Name)
         ?? "Admin";
 }
 
