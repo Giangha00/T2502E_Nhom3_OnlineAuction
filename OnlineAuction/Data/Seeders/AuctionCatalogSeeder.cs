@@ -100,7 +100,7 @@ public static class AuctionCatalogSeeder
         await dbContext.SaveChangesAsync();
 
         var startDate = DateTimeUtilities.AsUtc(now.AddSeconds(-30));
-        var endDate = DateTimeUtilities.AsUtc(now.AddMinutes(1));
+        var endDate = DateTimeUtilities.AsUtc(now.AddMinutes(7));
         var auction = new Auction
         {
             ProductId = product.Id,

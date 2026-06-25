@@ -70,3 +70,37 @@ public class PayPalCaptureCheckoutResult
     public static PayPalCaptureCheckoutResult Fail(string message) =>
         new() { Success = false, ErrorMessage = message };
 }
+public class PayPalRefundResult
+{
+    // true nếu PayPal refund thành công
+    public bool Success { get; init; }
+
+    // Refund id do PayPal trả về
+    // Cần lưu vào deposit.PayPalRefundId
+    public string? RefundId { get; init; }
+
+    // Trạng thái refund từ PayPal, ví dụ COMPLETED / PENDING
+    public string? Status { get; init; }
+
+    // Message lỗi nếu refund thất bại
+    public string? ErrorMessage { get; init; }
+
+    public static PayPalRefundResult Ok(string refundId, string status)
+    {
+        return new PayPalRefundResult
+        {
+            Success = true,
+            RefundId = refundId,
+            Status = status
+        };
+    }
+
+    public static PayPalRefundResult Fail(string message)
+    {
+        return new PayPalRefundResult
+        {
+            Success = false,
+            ErrorMessage = message
+        };
+    }
+}
