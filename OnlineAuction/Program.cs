@@ -37,6 +37,10 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "RequestVerificationToken";
+});
 builder.Services.AddLocalization(options =>
 {
     options.ResourcesPath = "Resources";
@@ -83,15 +87,6 @@ builder.Services.AddSession(options =>
 
 var dbProvider = builder.Configuration.GetValue<string>("DatabaseProvider") ?? "MySql";
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-if (string.IsNullOrWhiteSpace(connectionString))
-{
-    connectionString = dbProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase)
-        ? "Data Source=online_auction.db"
-        : throw new InvalidOperationException(
-            "ConnectionStrings:DefaultConnection is not configured. " +
-            "Copy appsettings.Local.json.example to appsettings.Local.json or start MySQL.");
-}
 
 builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
 {
@@ -186,6 +181,8 @@ builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.Configure<PayPalSettings>(
     builder.Configuration.GetSection(PayPalSettings.SectionName));
+builder.Services.Configure<FirebaseSettings>(
+    builder.Configuration.GetSection(FirebaseSettings.SectionName));
 
 builder.Services.AddHttpClient<IPayPalService, PayPalService>();
 
@@ -204,11 +201,20 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
-builder.Services.AddScoped<IAdminProductService, AdminProductService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
 
 #endregion
 
+var firebaseSettings = builder.Configuration
+    .GetSection(FirebaseSettings.SectionName)
+    .Get<FirebaseSettings>() ?? new FirebaseSettings();
+
 var app = builder.Build();
+
+FirebaseMessagingService.Initialize(
+    firebaseSettings,
+    app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Firebase"));
 
 #region DB Init + Seeders
 

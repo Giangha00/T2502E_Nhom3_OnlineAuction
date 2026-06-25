@@ -16,5 +16,14 @@
   "PayPal": {
     "ClientId": "YOUR_SANDBOX_CLIENT_ID",
     "ClientSecret": "YOUR_SANDBOX_CLIENT_SECRET"
+  },
+  "FirebaseSettings": {
+    "ProjectId": "YOUR_FIREBASE_PROJECT_ID",
+    "ClientEmail": "firebase-adminsdk-xxxxx@YOUR_FIREBASE_PROJECT_ID.iam.gserviceaccount.com",
+    "PrivateKey": "-----BEGIN PRIVATE KEY-----\\n...\\n-----END PRIVATE KEY-----\\n",
+    "WebApiKey": "YOUR_WEB_API_KEY",
+    "MessagingSenderId": "YOUR_MESSAGING_SENDER_ID",
+    "AppId": "1:YOUR_MESSAGING_SENDER_ID:web:YOUR_APP_HASH",
+    "VapidKey": "YOUR_WEB_PUSH_VAPID_KEY"
   }
 }

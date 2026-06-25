@@ -9,6 +9,8 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @inject OnlineAuction.Services.Interfaces.IOrderService OrderService
+@inject OnlineAuction.Services.Interfaces.INotificationService NotificationService
+@inject Microsoft.Extensions.Options.IOptions<OnlineAuction.Configurations.FirebaseSettings> FirebaseOptions
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
@@ -35,6 +37,11 @@
     var displayName = currentUser?.FullName ?? User.Identity?.Name ?? "User";
     var currentUserId = currentUser?.Id ?? 0;
     var orderCount = currentUser is not null ? await OrderService.CountPendingPaymentOrdersAsync(currentUser.Id) : 0;
+    var headerNotifications = currentUser is not null
+        ? await NotificationService.GetRecentForUserAsync(currentUser.Id)
+        : [];
+    var firebaseSettings = FirebaseOptions.Value;
+    var fcmEnabled = isLoggedIn && firebaseSettings.IsClientConfigured;
     var isOrderPage = string.Equals(currentController, "Order", StringComparison.OrdinalIgnoreCase);
 
     var userInitials = "U";
@@ -121,7 +128,7 @@
                 <div class="ml-auto flex items-center gap-2">
                     @if (isLoggedIn)
                     {
-                        @await Html.PartialAsync("Partials/_HeaderNotifications", OnlineAuction.Data.MockNotificationData.GetNotifications())
+                        @await Html.PartialAsync("Partials/_HeaderNotifications", headerNotifications)
                         <a asp-controller="Order" asp-action="Index"
                            class="relative flex h-10 w-10 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-blue-700 @(isOrderPage ? "bg-blue-50 text-blue-700" : "")"
                            aria-label="@Localizer["Layout_WonAuctions"]">
@@ -283,8 +290,10 @@
                                 </li>
                                 <li><a asp-controller="Refund" asp-action="Index"
                                         class="@FooterLinkClass(isRefundPage)">@Localizer["Layout_Footer_RefundRequest"]</a></li>
-                                <li><a href="#" class="@FooterLinkClass(false)">@Localizer["Layout_Footer_HowToBid"]</a></li>
-                                <li><a href="#" class="@FooterLinkClass(false)">@Localizer["Layout_Footer_SellerGuide"]</a></li>
+                                <li><a asp-controller="Faq" asp-action="Index" asp-fragment="faq-buying"
+                                        class="@FooterLinkClass(isFaqPage)">@Localizer["Layout_Footer_HowToBid"]</a></li>
+                                <li><a asp-controller="Faq" asp-action="Index" asp-fragment="faq-selling"
+                                        class="@FooterLinkClass(isFaqPage)">@Localizer["Layout_Footer_SellerGuide"]</a></li>
                             </ul>
                         </div>
                         <div>
@@ -330,6 +339,23 @@
         @if (isLoggedIn)
         {
             <script src="~/js/header-notifications.js" asp-append-version="true"></script>
+            @if (fcmEnabled)
+            {
+                <script>
+                    window.fcmConfig = {
+                        enabled: true,
+                        vapidKey: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(firebaseSettings.VapidKey)),
+                        firebase: {
+                            apiKey: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(firebaseSettings.WebApiKey)),
+                            authDomain: @Html.Raw(System.Text.Json.JsonSerializer.Serialize($"{firebaseSettings.ProjectId}.firebaseapp.com")),
+                            projectId: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(firebaseSettings.ProjectId)),
+                            messagingSenderId: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(firebaseSettings.MessagingSenderId)),
+                            appId: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(firebaseSettings.AppId))
+                        }
+                    };
+                </script>
+                <script src="~/js/fcm-notifications.js" asp-append-version="true"></script>
+            }
             <script src="~/js/user-menu.js" asp-append-version="true"></script>
         }
         @if (TempData["OpenAuthModal"] is string openAuthTab)

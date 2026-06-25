@@ -33,6 +33,10 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<ProductDocument> ProductDocuments => Set<ProductDocument>();
 
+    public DbSet<Notification> Notifications => Set<Notification>();
+
+    public DbSet<UserDeviceToken> UserDeviceTokens => Set<UserDeviceToken>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -49,6 +53,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureOrders(builder);
         ConfigureOrderItems(builder);
         ConfigurePayments(builder);
+        ConfigureNotifications(builder);
+        ConfigureUserDeviceTokens(builder);
     }
 
     private static void ConfigureIdentityTables(ModelBuilder builder)
@@ -466,6 +472,62 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
                 "`amount` > 0"));
 
             ConfigureAuditableEntity(entity, "payments");
+        });
+    }
+
+    private static void ConfigureNotifications(ModelBuilder builder)
+    {
+        builder.Entity<Notification>(entity =>
+        {
+            entity.ToTable("notifications");
+
+            entity.Property(n => n.Id).HasColumnName("id");
+            entity.Property(n => n.UserId).HasColumnName("user_id");
+            entity.Property(n => n.Title).HasColumnName("title").HasMaxLength(200).IsRequired();
+            entity.Property(n => n.Message).HasColumnName("message").HasMaxLength(500).IsRequired();
+            entity.Property(n => n.Type).HasColumnName("type").HasMaxLength(30).IsRequired();
+            entity.Property(n => n.RelatedUrl).HasColumnName("related_url").HasMaxLength(260);
+            entity.Property(n => n.IsRead).HasColumnName("is_read");
+            entity.Property(n => n.ReadAt).HasColumnName("read_at");
+            entity.Property(n => n.ReferenceType).HasColumnName("reference_type").HasMaxLength(50);
+            entity.Property(n => n.ReferenceId).HasColumnName("reference_id");
+
+            entity.HasIndex(n => new { n.UserId, n.IsRead }).HasDatabaseName("ix_notifications_user_read");
+            entity.HasIndex(n => new { n.UserId, n.CreatedAt }).HasDatabaseName("ix_notifications_user_created");
+            entity.HasIndex(n => new { n.ReferenceType, n.ReferenceId, n.UserId })
+                .HasDatabaseName("ix_notifications_reference");
+
+            entity.HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
+                .HasConstraintName("fk_notifications_user")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            ConfigureAuditableEntity(entity, "notifications");
+        });
+    }
+
+    private static void ConfigureUserDeviceTokens(ModelBuilder builder)
+    {
+        builder.Entity<UserDeviceToken>(entity =>
+        {
+            entity.ToTable("user_device_tokens");
+
+            entity.Property(t => t.Id).HasColumnName("id");
+            entity.Property(t => t.UserId).HasColumnName("user_id");
+            entity.Property(t => t.FcmToken).HasColumnName("fcm_token").HasMaxLength(512).IsRequired();
+            entity.Property(t => t.DeviceInfo).HasColumnName("device_info").HasMaxLength(260);
+            entity.Property(t => t.CreatedAt).HasColumnName("created_at");
+            entity.Property(t => t.LastUsedAt).HasColumnName("last_used_at");
+
+            entity.HasIndex(t => t.FcmToken).IsUnique().HasDatabaseName("uk_user_device_tokens_fcm_token");
+            entity.HasIndex(t => t.UserId).HasDatabaseName("ix_user_device_tokens_user_id");
+
+            entity.HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .HasConstraintName("fk_user_device_tokens_user")
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 

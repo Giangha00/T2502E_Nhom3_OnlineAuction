@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Models;
 
 namespace OnlineAuction.Controllers
@@ -11,7 +11,7 @@ namespace OnlineAuction.Controllers
             {
                 ContactInfo = new ContactInfoModel
                 {
-                    Address = "900 Collector's Plaza, 14th Floor, Manhattan, New York 10001",
+                    Address = "Tòa nhà FPT Polytechnic, Trịnh Văn Bô, Xuân Phương, Hà Nội 100000",
                     Phone = "+1 (888) RARE-CRD",
                     Email = "support@rarecard.com",
                     Discord = "RareCard Discord"
@@ -19,10 +19,10 @@ namespace OnlineAuction.Controllers
                 Location = new LocationModel
                 {
                     Name = "HQ Location",
-                    Address = "900 Collector's Plaza, 14th Floor, Manhattan, New York 10001",
+                    Address = "Tòa nhà FPT Polytechnic, Trịnh Văn Bô, Xuân Phương, Hà Nội 100000",
                     Phone = "+1 (888) RARE-CRD",
-                    Latitude = 40.7484,
-                    Longitude = -73.9857
+                    Latitude = 21.0375,
+                    Longitude = 105.7433
                 },
                 FAQItems = new List<FAQItemModel>
                 {
