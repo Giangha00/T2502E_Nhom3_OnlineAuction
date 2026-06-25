@@ -40,6 +40,7 @@ public class ProductDetailViewModel
     public string? RegistrationRejectReason { get; set; }
     public bool CanBid { get; set; }
     public bool IsSeller { get; set; }
+    public bool IsVerifiedAuthentic { get; set; }
     public int RegistrationCount { get; set; }
     public SellerViewModel Seller { get; set; } = new();
     public GradingScoreViewModel Grading { get; set; } = new();

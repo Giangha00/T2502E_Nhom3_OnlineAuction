@@ -33,6 +33,7 @@ public class AuctionItemViewModel
     public decimal StartingPrice { get; set; }
     public decimal CurrentPrice { get; set; }
     public string Status { get; set; } = string.Empty;
+    public string? RejectReason { get; set; }
     public string TimeRemaining { get; set; } = string.Empty;
     public string ListingType { get; set; } = ListingTypes.Auction;
     public string Grade { get; set; } = string.Empty;
