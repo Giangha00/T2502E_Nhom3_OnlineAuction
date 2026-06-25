@@ -1,4 +1,4 @@
-﻿@using System.Text.Json
+@using System.Text.Json
 @model OnlineAuction.Models.ContactPageViewModel
 @{
     ViewData["Title"] = Localizer["Contact_PageTitle"];
@@ -9,29 +9,59 @@
         ["submitted"] = Localizer["Js_Contact_Submitted"].Value
     };
 }
-<div class="contact-page bg-slate-50">
+<div class="contact-page min-h-screen bg-slate-50">
   <partial name="_ContactHeroSection" />
 
-  <section class="site-shell px-4 pb-16 sm:px-6 lg:pb-20">
-    <div class="grid gap-8 lg:grid-cols-[340px_1fr] xl:grid-cols-[380px_1fr] xl:gap-10">
+  <section class="site-shell relative z-10 -mt-6 px-4 pb-12 sm:px-6 sm:pb-16 lg:-mt-8">
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,360px)_1fr] lg:gap-10 xl:grid-cols-[minmax(0,400px)_1fr]">
       <partial name="_ContactInfoSection" model="Model" />
       <partial name="_ContactFormSection" />
+    </div>
+
+    <div class="mt-12 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/50">
+      <div class="flex flex-col gap-1 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-blue-50/30 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900 sm:text-xl">@Localizer["Contact_Map_Title"]</h2>
+          <p class="mt-1 text-sm text-slate-500">@Localizer["Contact_Map_Desc"]</p>
+        </div>
+        <div class="mt-3 flex items-center gap-2 text-sm text-slate-600 sm:mt-0">
+          <svg class="h-4 w-4 shrink-0 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
+          </svg>
+          <span class="font-medium">FPT Polytechnic, Hà Nội</span>
+        </div>
+      </div>
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12104.732669536184!2d105.74325493307715!3d21.03749454480402!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313455305afd834b%3A0x17268e09af37081e!2sT%C3%B2a%20nh%C3%A0%20FPT%20Polytechnic.!5e0!3m2!1svi!2s!4v1781168481501!5m2!1svi!2s"
+        class="block h-[360px] w-full border-0 sm:h-[420px] lg:h-[480px]"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        title="@Localizer["Contact_Map_Title"]"></iframe>
     </div>
   </section>
 
   <section class="border-t border-slate-200 bg-white px-4 py-14 sm:px-6 sm:py-16">
-    <div class="site-shell mx-auto max-w-2xl text-center">
-      <h2 class="text-xl font-bold text-slate-900 sm:text-2xl">@Localizer["Contact_FaqTitle"]</h2>
-      <p class="mt-3 text-sm leading-relaxed text-slate-500 sm:text-base">
-        @Localizer["Contact_FaqDesc"]
-      </p>
-      <a asp-controller="Faq" asp-action="Index"
-         class="mt-6 inline-flex items-center gap-2 rounded-lg border border-blue-700 px-6 py-2.5 text-sm font-semibold text-blue-700 transition hover:bg-blue-50">
-        @Localizer["Contact_ExploreFaqs"]
-        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H6v12h12V8.625M10.5 13.5 21 3m0 0h-5.25M21 3v5.25"/>
-        </svg>
-      </a>
+    <div class="site-shell mx-auto max-w-3xl">
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 px-8 py-10 text-center shadow-xl shadow-blue-900/20 sm:px-12 sm:py-12">
+        <div class="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-white/5" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -bottom-12 -left-8 h-48 w-48 rounded-full bg-indigo-400/10" aria-hidden="true"></div>
+
+        <div class="relative">
+          <h2 class="text-xl font-bold text-white sm:text-2xl">@Localizer["Contact_FaqTitle"]</h2>
+          <p class="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-blue-100 sm:text-base">
+            @Localizer["Contact_FaqDesc"]
+          </p>
+          <a asp-controller="Faq" asp-action="Index"
+             class="mt-7 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-blue-800 shadow-lg transition hover:bg-blue-50">
+            @Localizer["Contact_ExploreFaqs"]
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H6v12h12V8.625M10.5 13.5 21 3m0 0h-5.25M21 3v5.25"/>
+            </svg>
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 </div>

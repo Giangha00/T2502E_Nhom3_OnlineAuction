@@ -394,6 +394,7 @@
   <data name="Auction_WatchlistCount" xml:space="preserve"><value>관심 목록 ({0})</value></data>
   <data name="Auction_Filter_Category" xml:space="preserve"><value>카테고리</value></data>
   <data name="Auction_Filter_Condition" xml:space="preserve"><value>상태</value></data>
+  <data name="Auction_Filter_Authenticator" xml:space="preserve"><value>Authenticator</value></data>
   <data name="Auction_Filter_Year" xml:space="preserve"><value>제조 연도</value></data>
   <data name="Auction_Filter_PriceRange" xml:space="preserve"><value>가격 범위</value></data>
   <data name="Auction_Filter_EndingSoonOnly" xml:space="preserve"><value>곧 종료만</value></data>

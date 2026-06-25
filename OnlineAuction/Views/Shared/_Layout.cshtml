@@ -283,8 +283,10 @@
                                 </li>
                                 <li><a asp-controller="Refund" asp-action="Index"
                                         class="@FooterLinkClass(isRefundPage)">@Localizer["Layout_Footer_RefundRequest"]</a></li>
-                                <li><a href="#" class="@FooterLinkClass(false)">@Localizer["Layout_Footer_HowToBid"]</a></li>
-                                <li><a href="#" class="@FooterLinkClass(false)">@Localizer["Layout_Footer_SellerGuide"]</a></li>
+                                <li><a asp-controller="Faq" asp-action="Index" asp-fragment="faq-buying"
+                                        class="@FooterLinkClass(isFaqPage)">@Localizer["Layout_Footer_HowToBid"]</a></li>
+                                <li><a asp-controller="Faq" asp-action="Index" asp-fragment="faq-selling"
+                                        class="@FooterLinkClass(isFaqPage)">@Localizer["Layout_Footer_SellerGuide"]</a></li>
                             </ul>
                         </div>
                         <div>
