@@ -325,4 +325,95 @@ public class PayPalService : IPayPalService
     {
         public string Value { get; set; } = string.Empty;
     }
+    public async Task<PayPalRefundResult> RefundCaptureAsync(
+    string captureId,
+    decimal amount,
+    CancellationToken cancellationToken = default)
+{
+    // Kiểm tra captureId có hợp lệ không
+    if (string.IsNullOrWhiteSpace(captureId))
+    {
+        return PayPalRefundResult.Fail("Missing PayPal capture id.");
+    }
+
+    // Số tiền hoàn phải lớn hơn 0
+    if (amount <= 0)
+    {
+        return PayPalRefundResult.Fail("Refund amount must be greater than 0.");
+    }
+
+    // Lấy access token PayPal
+    var accessToken = await GetAccessTokenAsync(cancellationToken);
+
+    if (string.IsNullOrWhiteSpace(accessToken))
+    {
+        return PayPalRefundResult.Fail("Unable to get PayPal access token.");
+    }
+
+    // Body gửi lên PayPal để refund đúng số tiền
+    var payload = new
+    {
+        amount = new
+        {
+            currency_code = _settings.CurrencyCode,
+            value = FormatAmount(amount)
+        }
+    };
+
+    using var request = new HttpRequestMessage(
+        HttpMethod.Post,
+        $"{_settings.ApiBaseUrl}/v2/payments/captures/{captureId}/refund");
+
+    request.Headers.Authorization =
+        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+    request.Content = new StringContent(
+        System.Text.Json.JsonSerializer.Serialize(payload, JsonOptions),
+        System.Text.Encoding.UTF8,
+        "application/json");
+
+    HttpResponseMessage response;
+
+    try
+    {
+        response = await _httpClient.SendAsync(request, cancellationToken);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "PayPal refund request failed. CaptureId={CaptureId}", captureId);
+
+        return PayPalRefundResult.Fail("Không thể kết nối PayPal để hoàn tiền.");
+    }
+
+    var body = await response.Content.ReadAsStringAsync(cancellationToken);
+
+    if (!response.IsSuccessStatusCode)
+    {
+        _logger.LogWarning(
+            "PayPal refund failed. CaptureId={CaptureId}, StatusCode={StatusCode}, Body={Body}",
+            captureId,
+            response.StatusCode,
+            body);
+
+        return PayPalRefundResult.Fail("PayPal refund thất bại.");
+    }
+
+    using var document = System.Text.Json.JsonDocument.Parse(body);
+    var root = document.RootElement;
+
+    var refundId = root.TryGetProperty("id", out var idElement)
+        ? idElement.GetString()
+        : null;
+
+    var status = root.TryGetProperty("status", out var statusElement)
+        ? statusElement.GetString()
+        : "UNKNOWN";
+
+    if (string.IsNullOrWhiteSpace(refundId))
+    {
+        return PayPalRefundResult.Fail("PayPal refund response không có refund id.");
+    }
+
+    return PayPalRefundResult.Ok(refundId, status ?? "UNKNOWN");
+}
 }

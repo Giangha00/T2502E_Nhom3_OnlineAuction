@@ -195,7 +195,8 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
-
+builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
+builder.Services.AddScoped<IRegistrationDepositRefundService, RegistrationDepositRefundService>();
 #endregion
 
 var app = builder.Build();
