@@ -32,11 +32,14 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
 
     public DbSet<ProductDocument> ProductDocuments => Set<ProductDocument>();
+    
+    public DbSet<AuctionRegistrationDeposit> AuctionRegistrationDeposits => Set<AuctionRegistrationDeposit>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        
         base.OnModelCreating(builder);
-
+        ConfigureAuctionRegistrationDeposits(builder);
         ConfigureIdentityTables(builder);
         ConfigureUsers(builder);
         ConfigureCategories(builder);
@@ -50,6 +53,69 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureOrderItems(builder);
         ConfigurePayments(builder);
     }
+    private static void ConfigureAuctionRegistrationDeposits(ModelBuilder builder)
+{
+    builder.Entity<AuctionRegistrationDeposit>(entity =>
+    {
+        entity.ToTable("auction_registration_deposits");
+
+        entity.Property(d => d.Id).HasColumnName("id");
+
+        entity.Property(d => d.AuctionId).HasColumnName("auction_id");
+
+        entity.Property(d => d.UserId).HasColumnName("user_id");
+
+        entity.Property(d => d.AuctionRegistrationId)
+            .HasColumnName("auction_registration_id");
+
+        // Tiền nên set precision để tránh lỗi làm tròn trong database
+        entity.Property(d => d.Amount)
+            .HasColumnName("amount")
+            .HasPrecision(18, 2);
+
+        entity.Property(d => d.Status)
+            .HasColumnName("status")
+            .HasMaxLength(30)
+            .IsRequired();
+
+        entity.Property(d => d.PayPalOrderId)
+            .HasColumnName("paypal_order_id")
+            .HasMaxLength(120);
+
+        entity.Property(d => d.PayPalCaptureId)
+            .HasColumnName("paypal_capture_id")
+            .HasMaxLength(120);
+
+        entity.Property(d => d.PayPalRefundId)
+            .HasColumnName("paypal_refund_id")
+            .HasMaxLength(120);
+
+        entity.Property(d => d.PaidAt).HasColumnName("paid_at");
+
+        entity.Property(d => d.RefundedAt).HasColumnName("refunded_at");
+
+        // Tìm deposit bằng paypal_order_id khi PayPal return về token
+        entity.HasIndex(d => d.PayPalOrderId)
+            .HasDatabaseName("ix_deposits_paypal_order_id");
+
+        entity.HasOne(d => d.Auction)
+            .WithMany()
+            .HasForeignKey(d => d.AuctionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        entity.HasOne(d => d.User)
+            .WithMany()
+            .HasForeignKey(d => d.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        entity.HasOne(d => d.Registration)
+            .WithMany(r => r.Deposits)
+            .HasForeignKey(d => d.AuctionRegistrationId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        ConfigureAuditableEntity(entity, "auction_registration_deposits");
+    });
+}
 
     private static void ConfigureIdentityTables(ModelBuilder builder)
     {

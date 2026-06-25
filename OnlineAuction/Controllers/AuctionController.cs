@@ -11,15 +11,20 @@ public class AuctionController : Controller
     private readonly IAuctionService _auctionService;
     private readonly IBidService _bidService;
     private readonly IAuctionRegistrationService _registrationService;
-
+    private readonly IRegistrationDepositService _registrationDepositService;
+    private readonly IRegistrationDepositRefundService _depositRefundService;
     public AuctionController(
         IAuctionService auctionService,
         IBidService bidService,
-        IAuctionRegistrationService registrationService)
+        IAuctionRegistrationService registrationService,
+        IRegistrationDepositService registrationDepositService ,
+        IRegistrationDepositRefundService depositRefundService)
     {
         _auctionService = auctionService;
         _bidService = bidService;
         _registrationService = registrationService;
+        _registrationDepositService = registrationDepositService;
+        _depositRefundService = depositRefundService;
     }
 
     public async Task<IActionResult> Index()
@@ -69,7 +74,159 @@ public class AuctionController : Controller
             registrationCount = result.RegistrationCount
         });
     }
+    
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RefundDeposit(long depositId)
+    {
+        // Tạm thời API này dùng để test refund sandbox.
+        // Sau này nên giới hạn chỉ Admin hoặc Worker được gọi.
 
+        var result = await _depositRefundService.RefundDepositAsync(depositId);
+
+        if (!result.Success)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = result.Message
+            });
+        }
+
+        return Json(new
+        {
+            success = true,
+            message = result.Message,
+            auctionId = result.AuctionId,
+            depositAmount = result.DepositAmount
+        });
+    }
+    
+    
+    [HttpPost]
+[Authorize]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> InitiateDeposit(int auctionId)
+{
+    // Lấy user hiện tại từ Claims
+    var userId = GetCurrentUserId();
+
+    if (!userId.HasValue)
+    {
+        return Unauthorized(new
+        {
+            success = false,
+            message = "Bạn cần đăng nhập để đăng ký đấu giá."
+        });
+    }
+
+    // PayPal thanh toán thành công sẽ redirect về URL này
+    var returnUrl = Url.Action(
+        nameof(DepositPayPalReturn),
+        "Auction",
+        null,
+        Request.Scheme)!;
+
+    // PayPal bị user hủy sẽ redirect về URL này
+    var cancelUrl = Url.Action(
+        nameof(DepositPayPalCancel),
+        "Auction",
+        null,
+        Request.Scheme)!;
+
+    // Gọi service xử lý toàn bộ logic:
+    // validate auction
+    // tính tiền cọc
+    // tạo registration pending
+    // tạo deposit pending
+    // tạo PayPal order
+    var result = await _registrationDepositService.InitiateDepositAsync(
+        auctionId,
+        userId.Value,
+        returnUrl,
+        cancelUrl);
+
+    if (!result.Success)
+    {
+        return BadRequest(new
+        {
+            success = false,
+            message = result.Message
+        });
+    }
+
+    // Trả approvalUrl cho frontend
+    // Frontend sẽ window.location.href = approvalUrl
+    return Json(new
+    {
+        success = true,
+        message = result.Message,
+        approvalUrl = result.ApprovalUrl,
+        depositAmount = result.DepositAmount
+    });
+}
+
+[HttpGet]
+[Authorize]
+public async Task<IActionResult> DepositPayPalReturn(string token)
+{
+    // token PayPal gửi về chính là PayPalOrderId
+    var userId = GetCurrentUserId();
+
+    if (!userId.HasValue)
+    {
+        return RedirectToAction("Login", "Account");
+    }
+
+    // Capture tiền từ PayPal
+    // Nếu capture thành công:
+    // deposit.status = paid
+    // registration.status = approved
+    var result = await _registrationDepositService.CaptureDepositAsync(
+        userId.Value,
+        token);
+
+    if (!result.Success)
+    {
+        TempData["ErrorMessage"] = result.Message;
+        return RedirectToAction(nameof(Index));
+    }
+
+    TempData["SuccessMessage"] = result.Message;
+
+    // Quay lại trang chi tiết phiên đấu giá
+    return RedirectToAction(nameof(Detail), new
+    {
+        id = result.AuctionId
+    });
+}
+
+[HttpGet]
+[Authorize]
+public async Task<IActionResult> DepositPayPalCancel(string token)
+{
+    var userId = GetCurrentUserId();
+
+    if (!userId.HasValue)
+    {
+        return RedirectToAction("Login", "Account");
+    }
+
+    // User hủy thanh toán trên PayPal
+    // deposit.status = cancelled
+    // registration.status = cancelled
+    var result = await _registrationDepositService.CancelDepositAsync(
+        userId.Value,
+        token);
+
+    TempData["ErrorMessage"] = result.Message;
+
+    return RedirectToAction(nameof(Detail), new
+    {
+        id = result.AuctionId
+    });
+}
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
