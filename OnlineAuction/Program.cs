@@ -84,6 +84,15 @@ builder.Services.AddSession(options =>
 var dbProvider = builder.Configuration.GetValue<string>("DatabaseProvider") ?? "MySql";
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    connectionString = dbProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase)
+        ? "Data Source=online_auction.db"
+        : throw new InvalidOperationException(
+            "ConnectionStrings:DefaultConnection is not configured. " +
+            "Copy appsettings.Local.json.example to appsettings.Local.json or start MySQL.");
+}
+
 builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
 {
     if (dbProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
@@ -195,6 +204,7 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+builder.Services.AddScoped<IAdminProductService, AdminProductService>();
 
 #endregion
 

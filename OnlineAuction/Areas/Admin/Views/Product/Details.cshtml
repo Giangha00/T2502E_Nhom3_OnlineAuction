@@ -1,0 +1,231 @@
+@model OnlineAuction.Areas.Admin.ViewModels.Products.ProductDetailViewModel
+
+@{
+    ViewData["Title"] = "Product Details";
+    ViewData["AdminPage"] = "products";
+
+    string FormatStatus(string status) => status.Replace('_', ' ');
+}
+
+<div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Product Details</h2>
+            <p class="text-theme-sm text-gray-500 dark:text-gray-400">Viewing product #@Model.Id.</p>
+        </div>
+
+        <div class="flex gap-3">
+            <a asp-area="Admin"
+               asp-controller="Product"
+               asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
+                Edit
+            </a>
+
+            <a asp-area="Admin"
+               asp-controller="Product"
+               asp-action="Index"
+               class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                Back
+            </a>
+        </div>
+    </div>
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="flex flex-col gap-6 md:flex-row">
+            @if (!string.IsNullOrWhiteSpace(Model.PrimaryImage))
+            {
+                <img src="@Model.PrimaryImage"
+                     alt="@Model.Name"
+                     class="h-40 w-40 rounded-xl object-cover" />
+            }
+
+            <div class="flex-1">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white/90">@Model.Name</h3>
+                @if (!string.IsNullOrWhiteSpace(Model.Subtitle))
+                {
+                    <p class="mt-1 text-theme-sm text-gray-500 dark:text-gray-400">@Model.Subtitle</p>
+                }
+                <p class="mt-1 text-theme-sm capitalize text-gray-500 dark:text-gray-400">
+                    @Model.Condition · @Model.CategoryName
+                </p>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
+        {
+            <p class="mt-4 text-theme-sm text-gray-700 dark:text-gray-300">@Model.ShortDescription</p>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.DescriptionHtml))
+        {
+            <div class="prose prose-sm mt-6 max-w-none rounded-xl border border-gray-100 bg-gray-50 p-4 text-theme-sm text-gray-700 dark:border-gray-800 dark:bg-white/[0.02] dark:text-gray-300">
+                @Html.Raw(Model.DescriptionHtml)
+            </div>
+        }
+
+        <dl class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Seller</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.SellerName</dd>
+                <dd class="text-theme-xs text-gray-500">@Model.SellerEmail</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Product Origin</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.ProductOrigin ?? "—")</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Year</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.Year?.ToString() ?? "—")</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Set Name</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.SetName ?? "—")</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Language</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.Language ?? "—")</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Card Number</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.CardNumber ?? "—")</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Grade Label</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.GradeLabel ?? "—")</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Cert Number</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.CertNumber ?? "—")</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Grading</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
+                    C: @(Model.Centering ?? "—") · Co: @(Model.Corners ?? "—") · E: @(Model.Edges ?? "—") · S: @(Model.Surface ?? "—")
+                </dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Estimated Value</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.EstimatedValue?.ToString("N2") ?? "—")</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Import Price</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.ImportPrice?.ToString("N2") ?? "—")</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Created</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Updated</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.UpdatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Not updated")</dd>
+            </div>
+        </dl>
+
+        @if (Model.GalleryImages.Count > 0)
+        {
+            <div class="mt-8">
+                <h4 class="mb-3 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Gallery</h4>
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    @foreach (var image in Model.GalleryImages)
+                    {
+                        <img src="@image.ImageUrl" alt="Gallery image" class="h-28 w-full rounded-lg object-cover" />
+                    }
+                </div>
+            </div>
+        }
+
+        @if (Model.Documents.Count > 0)
+        {
+            <div class="mt-8">
+                <h4 class="mb-3 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Documents</h4>
+                <ul class="space-y-2">
+                    @foreach (var document in Model.Documents)
+                    {
+                        <li>
+                            <a href="@document.FileUrl" target="_blank" rel="noopener" class="text-theme-sm font-medium text-brand-500 hover:underline">
+                                @document.Name (@document.FileType)
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+
+    <div class="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-800">
+            <h4 class="text-theme-sm font-semibold text-gray-800 dark:text-white/90">Related Auctions</h4>
+        </div>
+
+        <div class="max-w-full overflow-x-auto">
+            <table class="w-full min-w-[900px]">
+                <thead>
+                <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Auction ID</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Status</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Start Price</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Current Price</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Dates</th>
+                    <th class="px-5 py-3 text-right text-theme-xs font-medium uppercase text-gray-500">Links</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                @if (Model.Auctions.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="px-5 py-8 text-center text-theme-sm text-gray-500">No auctions linked to this product.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var auction in Model.Auctions)
+                    {
+                        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                            <td class="px-5 py-4 text-theme-sm text-gray-800 dark:text-white/90">#@auction.AuctionId</td>
+                            <td class="px-5 py-4 text-theme-sm capitalize text-gray-700 dark:text-gray-300">@FormatStatus(auction.Status)</td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@auction.StartingPrice.ToString("N0")</td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@auction.CurrentPrice.ToString("N0")</td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">
+                                @auction.StartDate.ToString("dd/MM/yyyy HH:mm") — @auction.EndDate.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                            <td class="px-5 py-4">
+                                <div class="flex justify-end gap-3">
+                                    <a asp-area="Admin"
+                                       asp-controller="Auction"
+                                       asp-action="Details"
+                                       asp-route-id="@auction.AuctionId"
+                                       class="text-theme-sm font-medium text-brand-500 hover:underline">
+                                        Admin
+                                    </a>
+                                    <a asp-controller="Auction"
+                                       asp-action="Detail"
+                                       asp-route-id="@auction.AuctionId"
+                                       target="_blank"
+                                       rel="noopener"
+                                       class="text-theme-sm font-medium text-gray-600 hover:underline dark:text-gray-400">
+                                        Public
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

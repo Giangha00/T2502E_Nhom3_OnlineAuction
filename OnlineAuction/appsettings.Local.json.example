@@ -1,7 +1,18 @@
 {
+  "_comment": "Copy to appsettings.Local.json and adjust for your machine. This file overrides appsettings.json.",
+
+  "DatabaseProvider": "Sqlite",
   "ConnectionStrings": {
-    "DefaultConnection": "server=localhost;port=3306;database=online_auction;user=root;password=YOUR_MYSQL_PASSWORD;"
+    "DefaultConnection": "Data Source=online_auction.db"
   },
+
+  "_mysql_example": {
+    "DatabaseProvider": "MySql",
+    "ConnectionStrings": {
+      "DefaultConnection": "server=localhost;port=3306;database=online_auction;user=root;password=YOUR_MYSQL_PASSWORD;"
+    }
+  },
+
   "PayPal": {
     "ClientId": "YOUR_SANDBOX_CLIENT_ID",
     "ClientSecret": "YOUR_SANDBOX_CLIENT_SECRET"

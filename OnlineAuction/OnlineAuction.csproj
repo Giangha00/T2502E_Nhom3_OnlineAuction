@@ -75,6 +75,9 @@
 
     <ItemGroup>
       <Content Include="Documents\.DS_Store" />
+      <Content Update="appsettings.Local.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <Target Name="BuildTailwindCss" BeforeTargets="Build">
