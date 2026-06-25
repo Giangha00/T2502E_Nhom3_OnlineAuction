@@ -174,6 +174,9 @@ public class BidService : IBidService
         {
             return auction.Status switch
             {
+                AuctionStatuses.PendingReview => "This auction is pending review and not yet open for bidding.",
+                AuctionStatuses.Rejected => "This auction listing was rejected.",
+                AuctionStatuses.Scheduled => "This auction has not started yet.",
                 AuctionStatuses.Ended or AuctionStatuses.AwaitingPayment => "This auction has ended.",
                 AuctionStatuses.Cancelled => "This auction has been cancelled.",
                 AuctionStatuses.Completed => "This auction is completed.",

@@ -78,7 +78,7 @@ public class AuctionController : Controller
     }
     
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RefundDeposit(long depositId)
     {

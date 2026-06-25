@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineAuction.Data;
 
@@ -11,9 +12,11 @@ using OnlineAuction.Data;
 namespace OnlineAuction.Migrations
 {
     [DbContext(typeof(AuctionHouseDbContext))]
-    partial class AuctionHouseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260625111405_AddAuctionVerificationFields")]
+    partial class AddAuctionVerificationFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -484,11 +487,6 @@ namespace OnlineAuction.Migrations
                         .HasColumnType("int")
                         .HasColumnName("deleted_by");
 
-                    b.Property<decimal>("DepositApplied")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("deposit_applied");
-
                     b.Property<string>("OrderReference")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -679,108 +677,6 @@ namespace OnlineAuction.Migrations
                         {
                             t.HasCheckConstraint("chk_registrations_status", "`status` IN ('pending', 'approved', 'rejected', 'cancelled')");
                         });
-                });
-
-            modelBuilder.Entity("OnlineAuction.Entities.AuctionRegistrationDeposit", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("amount");
-
-                    b.Property<int>("AuctionId")
-                        .HasColumnType("int")
-                        .HasColumnName("auction_id");
-
-                    b.Property<long>("AuctionRegistrationId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("auction_registration_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
-
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<int?>("DeletedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("deleted_by");
-
-                    b.Property<DateTime?>("PaidAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("paid_at");
-
-                    b.Property<string>("PayPalCaptureId")
-                        .HasMaxLength(120)
-                        .HasColumnType("varchar(120)")
-                        .HasColumnName("paypal_capture_id");
-
-                    b.Property<string>("PayPalOrderId")
-                        .HasMaxLength(120)
-                        .HasColumnType("varchar(120)")
-                        .HasColumnName("paypal_order_id");
-
-                    b.Property<string>("PayPalRefundId")
-                        .HasMaxLength(120)
-                        .HasColumnType("varchar(120)")
-                        .HasColumnName("paypal_refund_id");
-
-                    b.Property<DateTime?>("RefundedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("refunded_at");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("updated_by");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuctionId");
-
-                    b.HasIndex("AuctionRegistrationId");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("DeletedAt")
-                        .HasDatabaseName("ix_auction_registration_deposits_deleted_at");
-
-                    b.HasIndex("DeletedBy");
-
-                    b.HasIndex("PayPalOrderId")
-                        .HasDatabaseName("ix_deposits_paypal_order_id");
-
-                    b.HasIndex("UpdatedBy");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("auction_registration_deposits", (string)null);
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.Bid", b =>
@@ -1762,51 +1658,6 @@ namespace OnlineAuction.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("OnlineAuction.Entities.AuctionRegistrationDeposit", b =>
-                {
-                    b.HasOne("OnlineAuction.Entities.Auction", "Auction")
-                        .WithMany()
-                        .HasForeignKey("AuctionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("OnlineAuction.Entities.AuctionRegistration", "Registration")
-                        .WithMany("Deposits")
-                        .HasForeignKey("AuctionRegistrationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("fk_auction_registration_deposits_created_by");
-
-                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("DeletedBy")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("fk_auction_registration_deposits_deleted_by");
-
-                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("fk_auction_registration_deposits_updated_by");
-
-                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Auction");
-
-                    b.Navigation("Registration");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("OnlineAuction.Entities.Bid", b =>
                 {
                     b.HasOne("OnlineAuction.Entities.Auction", "Auction")
@@ -2104,11 +1955,6 @@ namespace OnlineAuction.Migrations
                     b.Navigation("Items");
 
                     b.Navigation("Payments");
-                });
-
-            modelBuilder.Entity("OnlineAuction.Entities.AuctionRegistration", b =>
-                {
-                    b.Navigation("Deposits");
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.Category", b =>

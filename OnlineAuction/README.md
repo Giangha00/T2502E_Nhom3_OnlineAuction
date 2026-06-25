@@ -117,6 +117,28 @@ Header modal (`_AuthModal`) posts to the same actions. Protected pages (e.g. `/O
 
 After deploy, clear old Identity cookies in the browser if both areas still appear linked.
 
+---
+
+## Auction listing verification
+
+Seller submissions from `/Sell` start as **`pending_review`** and are hidden from public `/Auction` and Home DB sections until an admin approves them.
+
+| Who | Flow |
+|-----|------|
+| Seller | Submit → pending review → (optional) edit & resubmit after reject |
+| Admin | **Verify Auctions** queue → Approve / Reject with reason |
+| Admin direct create | **Auctions → Create** can set `live` immediately (bypass review) |
+
+See [identity/7_auction_verification.md](identity/7_auction_verification.md) for status values, approve/reject rules, and manual test checklist.
+
+Apply migration after pull:
+
+```bash
+dotnet ef database update
+```
+
+---
+
 ### Test accounts (after `UserSeeder` runs on empty DB)
 
 | Email | Password | Notes |
