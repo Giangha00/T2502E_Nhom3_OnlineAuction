@@ -28,7 +28,7 @@
   <div class="flex w-full flex-col lg:flex-row">
     <aside class="rarecard-sidebar shrink-0 border-b border-stone-200 bg-slate-50 px-4 py-6 sm:px-8 lg:w-72 lg:border-b-0 lg:border-r lg:px-6 xl:w-80">
       <form id="auctionFilterForm" class="space-y-6">
-        <div>
+        <div class="border-b border-stone-200 pb-6">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">@Localizer["Auction_Filter_Category"]</h3>
           <div class="mt-3 space-y-2">
             @foreach (var category in Model.Categories)
@@ -41,62 +41,25 @@
           </div>
         </div>
 
-        <div>
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">@Localizer["Auction_Filter_Condition"]</h3>
-          <div class="mt-3 space-y-2">
-            @foreach (var cond in new[] { "Graded", "New", "Used", "Not Specified" })
-            {
-              var condLabel = cond switch
-              {
-                  "Graded" => Localizer["Auction_Condition_Graded"].Value,
-                  "Not Specified" => Localizer["Auction_Condition_NotSpecified"].Value,
-                  _ => cond
-              };
-              <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
-                <input type="checkbox" name="condition" value="@cond" class="filter-condition rounded border-stone-300 text-blue-700 focus:ring-blue-600"/>
-                @condLabel
-              </label>
-            }
-          </div>
-        </div>
+        @{
+          ViewData["RangeTitle"] = "Year";
+          ViewData["RangeKey"] = "Year";
+        }
+        @await Html.PartialAsync("Partials/_MinMaxRangeFilter")
 
-        <div>
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">@Localizer["Auction_Filter_Year"]</h3>
-          <div class="mt-3 space-y-2">
-            @foreach (var (label, min, max) in new (string, int, int)[] {
-              ("Pre-1990", 0, 1989),
-              ("1990–1999", 1990, 1999),
-              ("2000–2009", 2000, 2009),
-              ("2010–2019", 2010, 2019),
-              ("2020+", 2020, 9999)
-            })
-            {
-              <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
-                <input type="checkbox" name="year" value="@min-@max" data-min="@min" data-max="@max" class="filter-year rounded border-stone-300 text-blue-700 focus:ring-blue-600"/>
-                @label
-              </label>
-            }
-          </div>
-        </div>
+        @await Html.PartialAsync("Partials/_AuthenticatorFilter")
 
-        <div>
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">@Localizer["Auction_Filter_PriceRange"]</h3>
-          <div class="mt-3 space-y-2">
-            @foreach (var (label, min, max) in new (string, int, int)[] {
-              ("Under $1,000", 0, 999),
-              ("$1,000 – $5,000", 1000, 5000),
-              ("$5,000 – $25,000", 5000, 25000),
-              ("$25,000 – $50,000", 25000, 50000),
-              ("$50,000+", 50000, 99999999)
-            })
-            {
-              <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
-                <input type="checkbox" name="price" value="@min-@max" data-min="@min" data-max="@max" class="filter-price rounded border-stone-300 text-blue-700 focus:ring-blue-600"/>
-                @label
-              </label>
-            }
-          </div>
-        </div>
+        @{
+          ViewData["RangeTitle"] = "Grade";
+          ViewData["RangeKey"] = "Grade";
+        }
+        @await Html.PartialAsync("Partials/_MinMaxRangeFilter")
+
+        @{
+          ViewData["RangeTitle"] = Localizer["Auction_Filter_PriceRange"].Value;
+          ViewData["RangeKey"] = "Price";
+        }
+        @await Html.PartialAsync("Partials/_MinMaxRangeFilter")
 
         <div class="flex items-center justify-between rounded-xl border border-stone-200 bg-white px-4 py-3">
           <span class="text-sm font-medium text-slate-800">@Localizer["Auction_Filter_EndingSoonOnly"]</span>
@@ -166,6 +129,12 @@
       var sortSelect = document.getElementById('auctionSort');
       var endingSoonToggle = document.getElementById('filterEndingSoon');
       var clearBtn = document.getElementById('clearFilters');
+      var yearMinInput = document.getElementById('filterYearMin');
+      var yearMaxInput = document.getElementById('filterYearMax');
+      var gradeMinInput = document.getElementById('filterGradeMin');
+      var gradeMaxInput = document.getElementById('filterGradeMax');
+      var priceMinInput = document.getElementById('filterPriceMin');
+      var priceMaxInput = document.getElementById('filterPriceMax');
       var cards = Array.from(document.querySelectorAll('.auction-card'));
 
       var currentPage = 1;
@@ -185,13 +154,15 @@
         return Array.from(document.querySelectorAll(selector + ':checked')).map(function (el) { return el; });
       }
 
-      function matchesRange(value, checks, attrMin, attrMax) {
-        if (checks.length === 0) return true;
-        return checks.some(function (el) {
-          var min = Number(el.getAttribute(attrMin));
-          var max = Number(el.getAttribute(attrMax));
-          return value >= min && value <= max;
-        });
+      function matchesInputRange(value, minInput, maxInput) {
+        var hasMin = minInput && minInput.value.trim() !== '';
+        var hasMax = maxInput && maxInput.value.trim() !== '';
+        if (!hasMin && !hasMax) return true;
+        var num = Number(value);
+        if (!value || isNaN(num)) return false;
+        if (hasMin && num < Number(minInput.value)) return false;
+        if (hasMax && num > Number(maxInput.value)) return false;
+        return true;
       }
 
       function sortCards(list) {
@@ -266,17 +237,16 @@
       function applyFilters() {
         var query = searchInput.value.trim().toLowerCase();
         var categories = getCheckedValues('.filter-category').map(function (el) { return el.value; });
-        var conditions = getCheckedValues('.filter-condition').map(function (el) { return el.value; });
-        var yearChecks = getCheckedValues('.filter-year');
-        var priceChecks = getCheckedValues('.filter-price');
+        var authenticators = getCheckedValues('.filter-authenticator').map(function (el) { return el.value; });
         var endingOnly = endingSoonToggle.checked;
 
         filteredCards = cards.filter(function (card) {
           if (query && !card.dataset.name.includes(query)) return false;
           if (categories.length && categories.indexOf(card.dataset.category) === -1) return false;
-          if (conditions.length && conditions.indexOf(card.dataset.condition) === -1) return false;
-          if (!matchesRange(Number(card.dataset.year), yearChecks, 'data-min', 'data-max')) return false;
-          if (!matchesRange(Number(card.dataset.price), priceChecks, 'data-min', 'data-max')) return false;
+          if (authenticators.length && authenticators.indexOf(card.dataset.authenticator) === -1) return false;
+          if (!matchesInputRange(card.dataset.year, yearMinInput, yearMaxInput)) return false;
+          if (!matchesInputRange(card.dataset.grade, gradeMinInput, gradeMaxInput)) return false;
+          if (!matchesInputRange(card.dataset.price, priceMinInput, priceMaxInput)) return false;
           if (endingOnly && card.dataset.endingSoon !== 'true') return false;
           return true;
         });
@@ -286,15 +256,32 @@
         renderPage();
       }
 
-      document.querySelectorAll('.filter-category, .filter-condition, .filter-year, .filter-price').forEach(function (el) {
+      document.querySelectorAll('.filter-category, .filter-authenticator').forEach(function (el) {
         el.addEventListener('change', applyFilters);
+      });
+      document.getElementById('filterYearApply').addEventListener('click', applyFilters);
+      document.getElementById('filterGradeApply').addEventListener('click', applyFilters);
+      document.getElementById('filterPriceApply').addEventListener('click', applyFilters);
+      [yearMinInput, yearMaxInput, gradeMinInput, gradeMaxInput, priceMinInput, priceMaxInput].forEach(function (input) {
+        input.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            applyFilters();
+          }
+        });
       });
       endingSoonToggle.addEventListener('change', applyFilters);
       searchInput.addEventListener('input', applyFilters);
       sortSelect.addEventListener('change', applyFilters);
 
       clearBtn.addEventListener('click', function () {
-        document.querySelectorAll('.filter-category, .filter-condition, .filter-year, .filter-price').forEach(function (el) { el.checked = false; });
+        document.querySelectorAll('.filter-category, .filter-authenticator').forEach(function (el) { el.checked = false; });
+        yearMinInput.value = '';
+        yearMaxInput.value = '';
+        gradeMinInput.value = '';
+        gradeMaxInput.value = '';
+        priceMinInput.value = '';
+        priceMaxInput.value = '';
         endingSoonToggle.checked = false;
         searchInput.value = '';
         applyFilters();
