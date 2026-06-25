@@ -1,16 +1,23 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Models;
+using OnlineAuction.Entities;
 using OnlineAuction.Services.Interfaces;
+using System.Security.Claims;
 
 namespace OnlineAuction.Controllers;
 
 public class RefundController : Controller
 {
     private readonly IPaymentService _paymentService;
+    private readonly INotificationService _notificationService;
 
-    public RefundController(IPaymentService paymentService)
+    public RefundController(
+        IPaymentService paymentService,
+        INotificationService notificationService)
     {
         _paymentService = paymentService;
+        _notificationService = notificationService;
     }
 
     public IActionResult Index()
@@ -55,7 +62,8 @@ public class RefundController : Controller
         return View(model);
     }
 
-    public IActionResult Confirmation(string? requestId, string? orderRef, string? reason)
+    [Authorize]
+    public async Task<IActionResult> Confirmation(string? requestId, string? orderRef, string? reason, CancellationToken cancellationToken)
     {
         var model = new RefundConfirmationViewModel
         {
@@ -64,6 +72,27 @@ public class RefundController : Controller
             Reason = reason ?? "Not specified"
         };
 
+        var userId = GetCurrentUserId();
+        if (userId.HasValue)
+        {
+            var referenceId = Math.Abs((requestId ?? model.RequestId).GetHashCode());
+            await _notificationService.CreateAndPushAsync(
+                userId.Value,
+                "Refund approved",
+                $"Your refund request for order {model.OrderReference} has been approved.",
+                NotificationType.Refund,
+                $"/Refund/Confirmation?requestId={Uri.EscapeDataString(model.RequestId)}&orderRef={Uri.EscapeDataString(model.OrderReference)}",
+                NotificationReferenceTypes.RefundApproved,
+                referenceId,
+                cancellationToken: cancellationToken);
+        }
+
         return View(model);
+    }
+
+    private int? GetCurrentUserId()
+    {
+        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return int.TryParse(value, out var userId) ? userId : null;
     }
 }

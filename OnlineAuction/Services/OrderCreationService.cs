@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Helpers;
+using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Services;
@@ -13,13 +14,16 @@ public class OrderCreationService : IOrderCreationService
 
     private readonly AuctionHouseDbContext _dbContext;
     private readonly ILogger<OrderCreationService> _logger;
+    private readonly INotificationService _notificationService;
 
     public OrderCreationService(
         AuctionHouseDbContext dbContext,
-        ILogger<OrderCreationService> logger)
+        ILogger<OrderCreationService> logger,
+        INotificationService notificationService)
     {
         _dbContext = dbContext;
         _logger = logger;
+        _notificationService = notificationService;
     }
 
     public async Task<int> FinalizeExpiredAuctionsAsync(CancellationToken cancellationToken = default)
@@ -155,6 +159,16 @@ public class OrderCreationService : IOrderCreationService
                 .Select(item => (int?)item.OrderId)
                 .FirstOrDefaultAsync(cancellationToken);
         }
+
+        await _notificationService.CreateAndPushAsync(
+            winningBid.BidderId,
+            "You won the auction!",
+            $"Congratulations! You won {auction.Product.Name}. Complete payment within 48 hours.",
+            NotificationType.Winning,
+            "/Order",
+            NotificationReferenceTypes.AuctionWon,
+            auction.Id,
+            cancellationToken: cancellationToken);
 
         return order.Id;
     }

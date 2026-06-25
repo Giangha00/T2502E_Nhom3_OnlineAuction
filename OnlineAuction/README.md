@@ -209,3 +209,92 @@ dotnet user-secrets set "PayPal:Mode" "sandbox"
 | `GET /Payment/Confirmation?orderId=` | Paid order confirmation from DB |
 
 Migration: `AddPayPalOrderIdToPayments`.
+
+---
+
+## Notifications (in-app + FCM Web Push)
+
+### Overview
+
+- **In-app:** Header dropdown loads from `notifications` table (per user). Badge = unread count from DB.
+- **Push:** Firebase Cloud Messaging (FCM) when browser grants permission. Works foreground (toast + badge) and background (system notification via service worker).
+
+Without Firebase config, in-app notifications still work; push is disabled.
+
+### Firebase setup (dev)
+
+1. Create a project at [Firebase Console](https://console.firebase.google.com/).
+2. Enable **Cloud Messaging** (Project settings → Cloud Messaging).
+3. Register a **Web app** → copy `apiKey`, `messagingSenderId`, `appId`, `projectId`.
+4. Cloud Messaging → **Web Push certificates** → generate/copy **VAPID key**.
+5. Project settings → **Service accounts** → Generate new private key (JSON). Use:
+   - `client_email` → `FirebaseSettings:ClientEmail`
+   - `private_key` → `FirebaseSettings:PrivateKey` (escape newlines as `\n` in JSON)
+   - `project_id` → `FirebaseSettings:ProjectId`
+
+6. Add **Authorized domains**: `localhost` (and your production domain).
+
+### Configuration (do not commit secrets)
+
+Put real values in `appsettings.Local.json` or User Secrets:
+
+```bash
+cd OnlineAuction
+dotnet user-secrets set "FirebaseSettings:ProjectId" "your-project-id"
+dotnet user-secrets set "FirebaseSettings:ClientEmail" "firebase-adminsdk-...@....iam.gserviceaccount.com"
+dotnet user-secrets set "FirebaseSettings:PrivateKey" "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+dotnet user-secrets set "FirebaseSettings:WebApiKey" "AIza..."
+dotnet user-secrets set "FirebaseSettings:MessagingSenderId" "123456789"
+dotnet user-secrets set "FirebaseSettings:AppId" "1:123:web:abc"
+dotnet user-secrets set "FirebaseSettings:VapidKey" "BEl..."
+```
+
+See `appsettings.Local.json.example` for the full `FirebaseSettings` block.
+
+### Database
+
+```bash
+dotnet ef database update
+```
+
+Tables: `notifications`, `user_device_tokens`. Migration: `AddNotificationsAndDeviceTokens`.
+
+### API endpoints (authenticated)
+
+| Route | Description |
+|-------|-------------|
+| `POST /Notification/RegisterDevice` | Save FCM token |
+| `POST /Notification/UnregisterDevice` | Remove token on logout |
+| `GET /Notification/List` | JSON list + unread count |
+| `POST /Notification/MarkRead/{id}` | Mark one read |
+| `POST /Notification/MarkAllRead` | Mark all read |
+
+### Test push (localhost)
+
+1. Run app: `dotnet run --launch-profile http` → `http://localhost:5006`
+2. Log in (`user1@auctionhouse.local` / `User@123`).
+3. Allow browser notifications when prompted.
+4. Trigger events:
+   - **Outbid:** User A bids, User B outbids on same auction.
+   - **Win:** Let auction end (worker ~15s) → winner gets notification.
+   - **Payment:** Complete PayPal sandbox checkout.
+5. **Foreground:** Toast + dropdown badge updates.
+6. **Background:** Minimize tab → trigger event → system notification → click opens `relatedUrl`.
+
+### Supported browsers
+
+| Browser | Web Push (FCM) |
+|---------|----------------|
+| Chrome / Edge | Yes |
+| Firefox | Yes |
+| Safari (macOS 13+, iOS 16.4+ PWA) | Limited — test on Chrome/Firefox first |
+
+### Automatic notification events
+
+| Event | Recipient | Type |
+|-------|-----------|------|
+| Outbid (debounced 5 min/auction) | Previous high bidder | Auction |
+| Auction ending within 1 hour | Bidders + approved watchers | Auction |
+| Auction won | Winner | Winning |
+| Payment captured (PayPal) | Buyer | Payment |
+| Refund confirmation page | Buyer | Refund |
