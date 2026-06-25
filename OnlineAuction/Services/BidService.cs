@@ -18,15 +18,18 @@ public class BidService : IBidService
 
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IAuctionRegistrationService _registrationService;
+    private readonly INotificationService _notificationService;
     private readonly ILogger<BidService> _logger;
 
     public BidService(
         AuctionHouseDbContext dbContext,
         IAuctionRegistrationService registrationService,
+        INotificationService notificationService,
         ILogger<BidService> logger)
     {
         _dbContext = dbContext;
         _registrationService = registrationService;
+        _notificationService = notificationService;
         _logger = logger;
     }
 
@@ -100,6 +103,12 @@ public class BidService : IBidService
             .Where(b => b.AuctionId == auctionId && b.IsWinning)
             .ToListAsync();
 
+        var outbidUserIds = previousWinningBids
+            .Where(b => b.BidderId != bidderId)
+            .Select(b => b.BidderId)
+            .Distinct()
+            .ToList();
+
         foreach (var previousBid in previousWinningBids)
         {
             previousBid.IsWinning = false;
@@ -127,6 +136,20 @@ public class BidService : IBidService
 
         await _dbContext.SaveChangesAsync();
         await transaction.CommitAsync();
+
+        var productName = auction.Product.Name;
+        foreach (var outbidUserId in outbidUserIds)
+        {
+            await _notificationService.CreateAndPushAsync(
+                outbidUserId,
+                "You've been outbid",
+                $"Someone placed a higher bid on {productName}.",
+                NotificationType.Auction,
+                $"/Auction/Detail/{auctionId}",
+                NotificationReferenceTypes.AuctionOutbid,
+                auctionId,
+                TimeSpan.FromMinutes(5));
+        }
 
         var bidCount = await _dbContext.Bids.CountAsync(b => b.AuctionId == auctionId);
         var bidHistory = await LoadBidHistoryAsync(auctionId);
