@@ -221,6 +221,7 @@
   </data>
   <data name="Sell_PageTitle" xml:space="preserve"><value>Đăng bán thẻ</value></data>
   <data name="Sell_SuccessMessage" xml:space="preserve"><value>Phiên đấu giá của bạn đã được tạo thành công!</value></data>
+  <data name="Sell_SubmittedForReview" xml:space="preserve"><value>Listing đã được gửi duyệt. Chuyên gia sẽ xem xét trước khi đăng công khai.</value></data>
   <data name="Sell_ViewAuctions" xml:space="preserve"><value>Xem đấu giá →</value></data>
   <data name="Sell_DraftSaved" xml:space="preserve"><value>Đã lưu bản nháp cục bộ. Bạn có thể tiếp tục chỉnh sửa bất cứ lúc nào.</value></data>
   <data name="Sell_Heading" xml:space="preserve"><value>Đăng bán vật phẩm sưu tầm hiếm</value></data>
@@ -495,6 +496,7 @@
   <data name="Product_Edges" xml:space="preserve"><value>Cạnh</value></data>
   <data name="Product_Surface" xml:space="preserve"><value>Bề mặt</value></data>
   <data name="Product_VerifiedAuthentic" xml:space="preserve"><value>Slab xác thực đã được kiểm tra bởi đội ngũ RareCard trước khi đăng.</value></data>
+  <data name="Product_PendingVerification" xml:space="preserve"><value>Listing này chưa hoàn tất xác minh chuyên gia.</value></data>
   <data name="Product_Bidder" xml:space="preserve"><value>Người đấu giá</value></data>
   <data name="Product_BidAmount" xml:space="preserve"><value>Số tiền đấu giá</value></data>
   <data name="Product_DateTime" xml:space="preserve"><value>Ngày &amp;amp; Giờ</value></data>
@@ -816,6 +818,10 @@
   <data name="User_Stat_SuccessRate" xml:space="preserve"><value>Tỷ lệ thành công</value></data>
   <data name="User_NotUpdated" xml:space="preserve"><value>Chưa cập nhật</value></data>
   <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
+  <data name="User_Status_PendingReview" xml:space="preserve"><value>Chờ duyệt</value></data>
+  <data name="User_Status_Rejected" xml:space="preserve"><value>Bị từ chối</value></data>
+  <data name="User_Status_Scheduled" xml:space="preserve"><value>Đã lên lịch</value></data>
+  <data name="User_RejectReason" xml:space="preserve"><value>Bị từ chối: {0}</value></data>
   <data name="SellBuyNow_PageTitle" xml:space="preserve"><value>Đăng bán Mua ngay</value></data>
   <data name="SellBuyNow_Heading" xml:space="preserve"><value>Đăng sản phẩm Mua ngay</value></data>
   <data name="SellBuyNow_Subheading" xml:space="preserve"><value>Bán sản phẩm với giá cố định. Người mua có thể mua ngay mà không cần đấu giá.</value></data>
@@ -829,6 +835,7 @@
   <data name="SellBuyNow_ReadyToPublish" xml:space="preserve"><value>Tin đăng sẽ xuất hiện trên Mua ngay ngay lập tức.</value></data>
   <data name="SellBuyNow_CreateListing" xml:space="preserve"><value>Đăng tin</value></data>
   <data name="SellBuyNow_SuccessMessage" xml:space="preserve"><value>Đã tạo tin Mua ngay thành công.</value></data>
+  <data name="SellBuyNow_SubmittedForReview" xml:space="preserve"><value>Listing đã được gửi duyệt. Chuyên gia sẽ xem xét trước khi đăng công khai.</value></data>
   <data name="SellBuyNow_Success_Created" xml:space="preserve"><value>Tin đăng "{0}" đã được tạo thành công!</value></data>
   <data name="SellBuyNow_Error_CreateFailed" xml:space="preserve"><value>Không thể tạo tin đăng.</value></data>
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>Giá phải lớn hơn 0</value></data>

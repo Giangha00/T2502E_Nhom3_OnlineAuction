@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineAuction.Data;
 
@@ -11,9 +12,11 @@ using OnlineAuction.Data;
 namespace OnlineAuction.Migrations
 {
     [DbContext(typeof(AuctionHouseDbContext))]
-    partial class AuctionHouseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260625111405_AddAuctionVerificationFields")]
+    partial class AddAuctionVerificationFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

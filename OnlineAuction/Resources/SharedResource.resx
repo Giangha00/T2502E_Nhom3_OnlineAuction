@@ -221,6 +221,7 @@
   </data>
   <data name="Sell_PageTitle" xml:space="preserve"><value>Sell Your Card</value></data>
   <data name="Sell_SuccessMessage" xml:space="preserve"><value>Your auction has been created successfully!</value></data>
+  <data name="Sell_SubmittedForReview" xml:space="preserve"><value>Listing submitted for review. Our specialists will verify it before it goes live.</value></data>
   <data name="Sell_ViewAuctions" xml:space="preserve"><value>View auctions →</value></data>
   <data name="Sell_DraftSaved" xml:space="preserve"><value>Draft saved locally. You can continue editing anytime.</value></data>
   <data name="Sell_Heading" xml:space="preserve"><value>List Your Rare Collectible</value></data>
@@ -495,6 +496,7 @@
   <data name="Product_Edges" xml:space="preserve"><value>Edges</value></data>
   <data name="Product_Surface" xml:space="preserve"><value>Surface</value></data>
   <data name="Product_VerifiedAuthentic" xml:space="preserve"><value>Verified authentic slab — inspected by RareCard curation team before listing.</value></data>
+  <data name="Product_PendingVerification" xml:space="preserve"><value>This listing has not yet completed specialist verification.</value></data>
   <data name="Product_Bidder" xml:space="preserve"><value>Bidder</value></data>
   <data name="Product_BidAmount" xml:space="preserve"><value>Bid Amount</value></data>
   <data name="Product_DateTime" xml:space="preserve"><value>Date &amp;amp; Time</value></data>
@@ -816,6 +818,10 @@
   <data name="User_Stat_SuccessRate" xml:space="preserve"><value>Success Rate</value></data>
   <data name="User_NotUpdated" xml:space="preserve"><value>Not updated</value></data>
   <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
+  <data name="User_Status_PendingReview" xml:space="preserve"><value>Pending Review</value></data>
+  <data name="User_Status_Rejected" xml:space="preserve"><value>Rejected</value></data>
+  <data name="User_Status_Scheduled" xml:space="preserve"><value>Scheduled</value></data>
+  <data name="User_RejectReason" xml:space="preserve"><value>Rejected: {0}</value></data>
   <data name="SellBuyNow_PageTitle" xml:space="preserve"><value>Sell Buy Now</value></data>
   <data name="SellBuyNow_Heading" xml:space="preserve"><value>List a Buy Now Product</value></data>
   <data name="SellBuyNow_Subheading" xml:space="preserve"><value>Sell your product at a fixed price. Buyers can purchase instantly without bidding.</value></data>
@@ -829,6 +835,7 @@
   <data name="SellBuyNow_ReadyToPublish" xml:space="preserve"><value>Your listing will appear on Buy Now immediately.</value></data>
   <data name="SellBuyNow_CreateListing" xml:space="preserve"><value>Publish Listing</value></data>
   <data name="SellBuyNow_SuccessMessage" xml:space="preserve"><value>Buy now listing created successfully.</value></data>
+  <data name="SellBuyNow_SubmittedForReview" xml:space="preserve"><value>Listing submitted for review. Our specialists will verify it before it goes live.</value></data>
   <data name="SellBuyNow_Success_Created" xml:space="preserve"><value>Your listing "{0}" has been created successfully!</value></data>
   <data name="SellBuyNow_Error_CreateFailed" xml:space="preserve"><value>Could not create listing.</value></data>
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>Price must be greater than 0</value></data>
