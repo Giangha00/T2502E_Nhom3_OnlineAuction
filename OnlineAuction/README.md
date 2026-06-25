@@ -85,17 +85,37 @@ To keep orders while testing PayPal, add to `appsettings.Local.json`:
 
 ---
 
-## Public user authentication (ASP.NET Core Identity)
+## Authentication (dual session)
 
-Public login/signup uses **Identity cookie auth** (`SignInManager` / `UserManager`), not session flags.
+Admin and public users use **separate cookies** — logging in on one side does not auto-login the other.
+
+| Area | Login URL | Cookie | Scheme |
+|------|-----------|--------|--------|
+| Public site | `/Auth/Login` | `.AuctionHouse.User` | `Identity.Application` |
+| Admin | `/Admin/Account/Login` | `.AuctionHouse.Admin` (path `/Admin`) | `Admin` |
+
+See [identity/6_dual_session.md](identity/6_dual_session.md) for architecture and manual test checklist.
+
+### Public user authentication (ASP.NET Core Identity)
+
+Public login/signup uses **User scheme** (`SignInManager` / `UserManager`), not session flags.
 
 | Route | Method | Description |
 |-------|--------|-------------|
-| `/Auth/Login` | GET/POST | Sign in with email + password |
+| `/Auth/Login` | GET/POST | Sign in with email + password (User scheme) |
 | `/Auth/SignUp` | GET/POST | Register new user (`UserRole.User`) |
-| `/Auth/Logout` | POST | Sign out + clear legacy session |
+| `/Auth/Logout` | POST | Sign out User cookie only |
 
-Header modal (`_AuthModal`) posts to the same actions. Protected pages (e.g. `/Order`) require `User.Identity.IsAuthenticated`.
+Header modal (`_AuthModal`) posts to the same actions. Protected pages (e.g. `/Order`) require User scheme authentication.
+
+### Admin authentication
+
+| Route | Method | Description |
+|-------|--------|-------------|
+| `/Admin/Account/Login` | GET/POST | Admin login (Admin scheme, role `Admin`) |
+| `/Admin/Account/Logout` | POST | Sign out Admin cookie only |
+
+After deploy, clear old Identity cookies in the browser if both areas still appear linked.
 
 ### Test accounts (after `UserSeeder` runs on empty DB)
 
@@ -104,7 +124,7 @@ Header modal (`_AuthModal`) posts to the same actions. Protected pages (e.g. `/O
 | `user1@auctionhouse.local` | `User@123` | Active regular user |
 | `user3@auctionhouse.local` | `User@123` | Active regular user |
 | `user4@auctionhouse.local` | `User@123` | **Inactive** — login rejected |
-| `user12@auctionhouse.local` | `User@123` | Admin role (can still sign in on public site) |
+| `user12@auctionhouse.local` | `User@123` | Admin role — use `/Admin/Account/Login`, not `/Auth/Login` |
 
 Seeder creates `user1` … `user150@auctionhouse.local`, all with password **`User@123`**.
 

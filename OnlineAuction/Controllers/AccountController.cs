@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OnlineAuction.Configurations;
 using OnlineAuction.Entities;
 using OnlineAuction.Models;
 using OnlineAuction.Resources;
@@ -9,7 +10,7 @@ using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = AuthSchemes.User)]
 public class AccountController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;
