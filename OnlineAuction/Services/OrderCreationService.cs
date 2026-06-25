@@ -93,11 +93,16 @@ public class OrderCreationService : IOrderCreationService
             return null;
         }
 
-        var winningBid = await _dbContext.Bids
+        // SQLite provider in EF Core 9 does not support decimal ORDER BY translation.
+        // Materialize first, then sort in memory for cross-provider behavior.
+        var winningBidCandidates = await _dbContext.Bids
             .Where(bid => bid.AuctionId == auctionId && bid.IsWinning)
+            .ToListAsync(cancellationToken);
+
+        var winningBid = winningBidCandidates
             .OrderByDescending(bid => bid.Amount)
             .ThenByDescending(bid => bid.PlacedAt)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefault();
 
         if (winningBid is null)
         {

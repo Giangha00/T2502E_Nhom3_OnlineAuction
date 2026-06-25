@@ -4,6 +4,10 @@ public class Product : AuditableEntity
 {
     public int Id { get; set; }
 
+    public string? ProductNumber { get; set; }
+
+    public int? ProductTemplateId { get; set; }
+
     public int SellerId { get; set; }
 
     public int CategoryId { get; set; }
@@ -46,7 +50,13 @@ public class Product : AuditableEntity
 
     public decimal? ImportPrice { get; set; }
 
+    public decimal? Price { get; set; }
+
+    public int Quantity { get; set; } = 1;
+
     public ApplicationUser Seller { get; set; } = null!;
+
+    public ProductTemplate? ProductTemplate { get; set; }
 
     public Category Category { get; set; } = null!;
 

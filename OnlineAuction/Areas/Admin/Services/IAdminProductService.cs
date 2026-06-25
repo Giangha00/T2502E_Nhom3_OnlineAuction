@@ -6,6 +6,8 @@ public interface IAdminProductService
 {
     Task<ProductListViewModel> GetProductsAsync(ProductFilterViewModel filter);
 
+    Task<ProductTemplateInstancesViewModel?> GetTemplateInstancesAsync(int templateId);
+
     Task<ProductDetailViewModel?> GetDetailsAsync(int id);
 
     Task<ProductFormViewModel> BuildCreateFormAsync();

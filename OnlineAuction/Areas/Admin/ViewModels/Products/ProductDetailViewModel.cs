@@ -4,6 +4,8 @@ public class ProductDetailViewModel
 {
     public int Id { get; set; }
 
+    public string ProductNumber { get; set; } = string.Empty;
+
     public string Name { get; set; } = string.Empty;
 
     public string? ShortDescription { get; set; }

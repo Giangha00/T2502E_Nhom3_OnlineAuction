@@ -44,56 +44,68 @@ public class AdminProductService : IAdminProductService
 
     public async Task<ProductListViewModel> GetProductsAsync(ProductFilterViewModel filter)
     {
+        await ProductNumberBackfill.BackfillMissingAsync(_dbContext);
+        await ProductTemplateSync.SyncAsync(_dbContext);
+
         NormalizeFilter(filter);
 
-        var query = _dbContext.Products
+        var query = _dbContext.ProductTemplates
             .AsNoTracking()
-            .Where(product => product.DeletedAt == null);
+            .Where(template => template.DeletedAt == null)
+            .Where(template => template.Products.Any(product => product.DeletedAt == null));
 
         if (!string.IsNullOrWhiteSpace(filter.Search))
         {
             var keyword = filter.Search.Trim();
-            query = query.Where(product =>
-                product.Name.Contains(keyword) ||
-                (product.CardNumber != null && product.CardNumber.Contains(keyword)) ||
-                (product.CertNumber != null && product.CertNumber.Contains(keyword)) ||
-                product.Seller.FullName.Contains(keyword));
+            query = query.Where(template =>
+                template.Name.Contains(keyword) ||
+                (template.ShortDescription != null && template.ShortDescription.Contains(keyword)) ||
+                template.Products.Any(product =>
+                    product.DeletedAt == null &&
+                    ((product.ProductNumber != null && product.ProductNumber.Contains(keyword)) ||
+                     product.Name.Contains(keyword) ||
+                     (product.CardNumber != null && product.CardNumber.Contains(keyword)) ||
+                     product.Seller.FullName.Contains(keyword))));
         }
 
         if (filter.CategoryId.HasValue)
         {
-            query = query.Where(product => product.CategoryId == filter.CategoryId.Value);
+            query = query.Where(template => template.CategoryId == filter.CategoryId.Value);
         }
 
         if (filter.SellerId.HasValue)
         {
-            query = query.Where(product => product.SellerId == filter.SellerId.Value);
+            query = query.Where(template =>
+                template.Products.Any(product =>
+                    product.DeletedAt == null && product.SellerId == filter.SellerId.Value));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.Condition))
         {
-            query = query.Where(product => product.Condition == filter.Condition);
+            query = query.Where(template =>
+                template.Products.Any(product =>
+                    product.DeletedAt == null && product.Condition == filter.Condition));
         }
 
         var dateRange = ParseDateRange(filter.DateRange);
 
         if (dateRange.StartDate.HasValue && dateRange.EndDate.HasValue)
         {
-            query = query.Where(product =>
-                product.CreatedAt >= dateRange.StartDate.Value &&
-                product.CreatedAt < dateRange.EndDate.Value);
+            query = query.Where(template =>
+                template.CreatedAt >= dateRange.StartDate.Value &&
+                template.CreatedAt < dateRange.EndDate.Value);
         }
         else
         {
             if (filter.FromDate.HasValue)
             {
-                query = query.Where(product => product.CreatedAt >= filter.FromDate.Value);
+                query = query.Where(template => template.CreatedAt >= filter.FromDate.Value);
             }
 
             if (filter.ToDate.HasValue)
             {
                 var toDate = filter.ToDate.Value.Date.AddDays(1);
-                query = query.Where(product => product.CreatedAt < toDate);
+                query = query.Where(template => template.CreatedAt < toDate);
             }
         }
 
@@ -107,34 +119,62 @@ public class AdminProductService : IAdminProductService
 
         query = filter.SortOrder switch
         {
-            "name_desc" => query.OrderByDescending(product => product.Name),
-            "date_asc" => query.OrderBy(product => product.CreatedAt),
-            "date_desc" => query.OrderByDescending(product => product.CreatedAt),
-            _ => query.OrderBy(product => product.Name)
+            "name_desc" => query.OrderByDescending(template => template.Name),
+            "instances_desc" => query.OrderByDescending(template =>
+                template.Products.Count(product => product.DeletedAt == null)),
+            "date_asc" => query.OrderBy(template => template.CreatedAt),
+            "date_desc" => query.OrderByDescending(template => template.CreatedAt),
+            _ => query.OrderBy(template => template.Name)
         };
 
-        var products = await query
+        var templates = await query
             .Skip((filter.Page - 1) * filter.PageSize)
             .Take(filter.PageSize)
-            .Select(product => new ProductListItemViewModel
+            .Select(template => new ProductTemplateListItemViewModel
             {
-                Id = product.Id,
-                Name = product.Name,
-                PrimaryImage = product.PrimaryImage,
-                CategoryName = product.Category.Name,
-                SellerName = product.Seller.FullName,
-                Condition = product.Condition,
-                CardNumber = product.CardNumber,
-                CertNumber = product.CertNumber,
-                ImageCount = product.Images.Count(image => image.DeletedAt == null) + 1,
-                AuctionCount = product.Auctions.Count(auction => auction.DeletedAt == null),
-                CreatedAt = product.CreatedAt
+                Id = template.Id,
+                Name = template.Name,
+                ShortDescription = template.ShortDescription,
+                PrimaryImage = template.PrimaryImage,
+                CategoryName = template.Category.Name,
+                InstanceCount = template.Products.Count(product => product.DeletedAt == null),
+                CreatedAt = template.CreatedAt
             })
             .ToListAsync();
 
+        if (templates.Count > 0)
+        {
+            var templateIds = templates.Select(template => template.Id).ToList();
+            var pricesByTemplate = (await _dbContext.Products
+                    .AsNoTracking()
+                    .Where(product =>
+                        product.DeletedAt == null &&
+                        product.ProductTemplateId != null &&
+                        templateIds.Contains(product.ProductTemplateId.Value) &&
+                        product.Price != null)
+                    .Select(product => new
+                    {
+                        TemplateId = product.ProductTemplateId!.Value,
+                        product.Price
+                    })
+                    .ToListAsync())
+                .GroupBy(item => item.TemplateId)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Min(item => item.Price));
+
+            foreach (var template in templates)
+            {
+                if (pricesByTemplate.TryGetValue(template.Id, out var minPrice))
+                {
+                    template.MinPrice = minPrice;
+                }
+            }
+        }
+
         return new ProductListViewModel
         {
-            Products = products,
+            Templates = templates,
             Filter = filter,
             CategoryOptions = await BuildCategoryOptionsAsync(filter.CategoryId),
             SellerOptions = await BuildSellerOptionsAsync(filter.SellerId),
@@ -144,14 +184,90 @@ public class AdminProductService : IAdminProductService
         };
     }
 
+    public async Task<ProductTemplateInstancesViewModel?> GetTemplateInstancesAsync(int templateId)
+    {
+        await ProductTemplateSync.SyncAsync(_dbContext);
+
+        var template = await _dbContext.ProductTemplates
+            .AsNoTracking()
+            .Where(item => item.Id == templateId && item.DeletedAt == null)
+            .Select(item => new ProductTemplateInstancesViewModel
+            {
+                TemplateId = item.Id,
+                TemplateName = item.Name,
+                ShortDescription = item.ShortDescription,
+                PrimaryImage = item.PrimaryImage,
+                CategoryName = item.Category.Name,
+                InstanceCount = item.Products.Count(product => product.DeletedAt == null)
+            })
+            .FirstOrDefaultAsync();
+
+        if (template is null)
+        {
+            return null;
+        }
+
+        var instanceRows = await _dbContext.Products
+            .AsNoTracking()
+            .Where(product => product.DeletedAt == null && product.ProductTemplateId == templateId)
+            .OrderBy(product => product.Id)
+            .Select(product => new
+            {
+                product.Id,
+                ProductNumber = product.ProductNumber ?? string.Empty,
+                product.Name,
+                product.PrimaryImage,
+                CategoryName = product.Category.Name,
+                SellerName = product.Seller.FullName,
+                product.SellerId,
+                product.Condition,
+                product.CardNumber,
+                product.CertNumber,
+                product.Price,
+                product.EstimatedValue,
+                product.ImportPrice,
+                product.Quantity,
+                ImageCount = product.Images.Count(image => image.DeletedAt == null) + 1,
+                AuctionCount = product.Auctions.Count(auction => auction.DeletedAt == null),
+                product.CreatedAt
+            })
+            .ToListAsync();
+
+        template.Instances = instanceRows
+            .Select(row => new ProductListItemViewModel
+            {
+                Id = row.Id,
+                ProductNumber = row.ProductNumber,
+                Name = row.Name,
+                PrimaryImage = row.PrimaryImage,
+                CategoryName = row.CategoryName,
+                SellerName = row.SellerName,
+                SellerId = row.SellerId,
+                Condition = row.Condition,
+                CardNumber = row.CardNumber,
+                CertNumber = row.CertNumber,
+                Price = row.Price ?? row.EstimatedValue ?? row.ImportPrice,
+                Quantity = row.Quantity,
+                ImageCount = row.ImageCount,
+                AuctionCount = row.AuctionCount,
+                CreatedAt = row.CreatedAt
+            })
+            .ToList();
+
+        return template;
+    }
+
     public async Task<ProductDetailViewModel?> GetDetailsAsync(int id)
     {
+        await ProductNumberBackfill.BackfillMissingAsync(_dbContext);
+
         var product = await _dbContext.Products
             .AsNoTracking()
             .Where(item => item.Id == id && item.DeletedAt == null)
             .Select(item => new ProductDetailViewModel
             {
                 Id = item.Id,
+                ProductNumber = item.ProductNumber ?? string.Empty,
                 Name = item.Name,
                 ShortDescription = item.ShortDescription,
                 Subtitle = item.Subtitle,
@@ -263,6 +379,8 @@ public class AdminProductService : IAdminProductService
             Surface = product.GradingSurface,
             EstimatedValue = product.EstimatedValue,
             ImportPrice = product.ImportPrice,
+            Price = product.Price,
+            Quantity = product.Quantity,
             PrimaryImageUrl = product.PrimaryImage,
             CanChangeSeller = !HasLockedAuction(product.Auctions),
             ExistingGalleryImages = await _dbContext.ProductImages
@@ -340,7 +458,14 @@ public class AdminProductService : IAdminProductService
                 : imageUrl;
 
             var now = DateTime.UtcNow;
+            var productNumber = await GenerateProductNumberAsync();
             var product = MapToEntity(model, imageUrl, now, createdBy);
+            product.ProductNumber = productNumber;
+
+            var template = await ProductTemplateSync.ResolveTemplateForProductAsync(_dbContext, product, createdBy);
+            product.ProductTemplateId = template.Id;
+            product.Price = model.Price ?? model.EstimatedValue ?? model.ImportPrice;
+            product.Quantity = model.Quantity > 0 ? model.Quantity : 1;
 
             var sortOrder = 1;
             foreach (var galleryFile in galleryFiles)
@@ -648,6 +773,8 @@ public class AdminProductService : IAdminProductService
             GradingSurface = TrimOrNull(model.Surface),
             EstimatedValue = model.EstimatedValue,
             ImportPrice = model.ImportPrice,
+            Price = model.Price ?? model.EstimatedValue ?? model.ImportPrice,
+            Quantity = model.Quantity > 0 ? model.Quantity : 1,
             PrimaryImage = primaryImage,
             CreatedAt = now,
             CreatedBy = createdBy
@@ -680,6 +807,8 @@ public class AdminProductService : IAdminProductService
         product.GradingSurface = TrimOrNull(model.Surface);
         product.EstimatedValue = model.EstimatedValue;
         product.ImportPrice = model.ImportPrice;
+        product.Price = model.Price ?? model.EstimatedValue ?? model.ImportPrice;
+        product.Quantity = model.Quantity > 0 ? model.Quantity : 1;
         product.PrimaryImage = primaryImage;
         product.UpdatedAt = now;
         product.UpdatedBy = updatedBy;
@@ -801,6 +930,22 @@ public class AdminProductService : IAdminProductService
 
     private static string FormatStatusLabel(string status) =>
         status.Replace('_', ' ');
+
+    private async Task<string> GenerateProductNumberAsync()
+    {
+        while (true)
+        {
+            var candidate = $"PRD-{DateTime.UtcNow:yyyyMMddHHmmssfff}{Random.Shared.Next(100, 999)}";
+            var exists = await _dbContext.Products
+                .AsNoTracking()
+                .AnyAsync(product => product.ProductNumber == candidate);
+
+            if (!exists)
+            {
+                return candidate;
+            }
+        }
+    }
 
     private static (DateTime? StartDate, DateTime? EndDate) ParseDateRange(string? dateRange)
     {

@@ -88,6 +88,14 @@ public class ProductFormViewModel : IValidatableObject
     [Display(Name = "Import Price")]
     public decimal? ImportPrice { get; set; }
 
+    [Range(0, double.MaxValue, ErrorMessage = "Price must be zero or greater.")]
+    [Display(Name = "Price")]
+    public decimal? Price { get; set; }
+
+    [Range(0, int.MaxValue, ErrorMessage = "Quantity must be zero or greater.")]
+    [Display(Name = "Quantity")]
+    public int Quantity { get; set; } = 1;
+
     public string? PrimaryImageUrl { get; set; }
 
     [Display(Name = "Primary Image")]

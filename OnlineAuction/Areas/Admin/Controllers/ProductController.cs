@@ -96,6 +96,19 @@ public class ProductController : BaseAdminController
     }
 
     [HttpGet]
+    public async Task<IActionResult> Template(int id)
+    {
+        var model = await _productService.GetTemplateInstancesAsync(id);
+
+        if (model is null)
+        {
+            return NotFound();
+        }
+
+        return View(model);
+    }
+
+    [HttpGet]
     public async Task<IActionResult> Details(int id)
     {
         var model = await _productService.GetDetailsAsync(id);

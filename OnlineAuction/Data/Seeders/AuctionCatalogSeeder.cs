@@ -99,6 +99,13 @@ public static class AuctionCatalogSeeder
         dbContext.Products.Add(product);
         await dbContext.SaveChangesAsync();
 
+        product.ProductNumber = $"PRD-{product.Id:D8}";
+        var template = await ProductTemplateSync.ResolveTemplateForProductAsync(dbContext, product, null);
+        product.ProductTemplateId = template.Id;
+        product.Price ??= entry.StartingPrice;
+        product.Quantity = 1;
+        await dbContext.SaveChangesAsync();
+
         var startDate = DateTimeUtilities.AsUtc(now.AddSeconds(-30));
         var endDate = DateTimeUtilities.AsUtc(now.AddMinutes(1));
         var auction = new Auction

@@ -17,6 +17,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<Product> Products => Set<Product>();
 
+    public DbSet<ProductTemplate> ProductTemplates => Set<ProductTemplate>();
+
     public DbSet<Auction> Auctions => Set<Auction>();
 
     public DbSet<Bid> Bids => Set<Bid>();
@@ -44,6 +46,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureIdentityTables(builder);
         ConfigureUsers(builder);
         ConfigureCategories(builder);
+        ConfigureProductTemplates(builder);
         ConfigureProducts(builder);
         ConfigureProductImages(builder);
         ConfigureProductDocuments(builder);
@@ -127,6 +130,34 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         });
     }
 
+    private static void ConfigureProductTemplates(ModelBuilder builder)
+    {
+        builder.Entity<ProductTemplate>(entity =>
+        {
+            entity.ToTable("product_templates");
+
+            entity.Property(t => t.Id).HasColumnName("id");
+            entity.Property(t => t.Name).HasColumnName("name").HasMaxLength(120).IsRequired();
+            entity.Property(t => t.ShortDescription).HasColumnName("short_description").HasMaxLength(300);
+            entity.Property(t => t.DescriptionHtml).HasColumnName("description_html");
+            entity.Property(t => t.PrimaryImage).HasColumnName("primary_image").HasMaxLength(500).IsRequired();
+            entity.Property(t => t.CategoryId).HasColumnName("category_id");
+            entity.Property(t => t.Slug).HasColumnName("slug").HasMaxLength(140).IsRequired();
+
+            entity.HasIndex(t => t.Name).HasDatabaseName("ix_product_templates_name");
+            entity.HasIndex(t => t.Slug).IsUnique().HasDatabaseName("uk_product_templates_slug");
+            entity.HasIndex(t => t.CategoryId).HasDatabaseName("ix_product_templates_category_id");
+
+            entity.HasOne(t => t.Category)
+                .WithMany()
+                .HasForeignKey(t => t.CategoryId)
+                .HasConstraintName("fk_product_templates_category")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            ConfigureAuditableEntity(entity, "product_templates");
+        });
+    }
+
     private static void ConfigureProducts(ModelBuilder builder)
     {
         builder.Entity<Product>(entity =>
@@ -134,6 +165,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.ToTable("products");
 
             entity.Property(p => p.Id).HasColumnName("id");
+            entity.Property(p => p.ProductNumber).HasColumnName("product_number").HasMaxLength(30);
+            entity.Property(p => p.ProductTemplateId).HasColumnName("product_template_id");
             entity.Property(p => p.SellerId).HasColumnName("seller_id");
             entity.Property(p => p.CategoryId).HasColumnName("category_id");
             entity.Property(p => p.Name).HasColumnName("name").HasMaxLength(120).IsRequired();
@@ -155,9 +188,19 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(p => p.PrimaryImage).HasColumnName("primary_image").HasMaxLength(500).IsRequired();
             entity.Property(p => p.EstimatedValue).HasColumnName("estimated_value").HasPrecision(18, 2);
             entity.Property(p => p.ImportPrice).HasColumnName("import_price").HasPrecision(18, 2);
+            entity.Property(p => p.Price).HasColumnName("price").HasPrecision(18, 2);
+            entity.Property(p => p.Quantity).HasColumnName("quantity").HasDefaultValue(1);
 
             entity.HasIndex(p => p.SellerId).HasDatabaseName("ix_products_seller_id");
             entity.HasIndex(p => p.CategoryId).HasDatabaseName("ix_products_category_id");
+            entity.HasIndex(p => p.ProductTemplateId).HasDatabaseName("ix_products_product_template_id");
+            entity.HasIndex(p => p.ProductNumber).IsUnique().HasDatabaseName("uk_products_product_number");
+
+            entity.HasOne(p => p.ProductTemplate)
+                .WithMany(t => t.Products)
+                .HasForeignKey(p => p.ProductTemplateId)
+                .HasConstraintName("fk_products_product_template")
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasOne(p => p.Seller)
                 .WithMany(u => u.Products)
@@ -178,6 +221,14 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_products_estimated_value",
                 "`estimated_value` IS NULL OR `estimated_value` >= 0"));
+
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_products_price",
+                "`price` IS NULL OR `price` >= 0"));
+
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_products_quantity",
+                "`quantity` >= 0"));
 
             ConfigureAuditableEntity(entity, "products");
         });

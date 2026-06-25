@@ -4,7 +4,7 @@ namespace OnlineAuction.Areas.Admin.ViewModels.Products;
 
 public class ProductListViewModel
 {
-    public List<ProductListItemViewModel> Products { get; set; } = [];
+    public List<ProductTemplateListItemViewModel> Templates { get; set; } = [];
 
     public ProductFilterViewModel Filter { get; set; } = new();
 
