@@ -346,43 +346,76 @@
 
   if (registerAuctionBtn && bidPanel) {
     registerAuctionBtn.addEventListener('click', function () {
+      // Kiểm tra user đã đăng nhập chưa.
+      // Nếu chưa đăng nhập thì mở modal login/register như logic cũ của project.
       var isLoggedIn = bidPanel.getAttribute('data-is-logged-in') === 'true';
       if (!isLoggedIn) {
         openAuthModal();
         return;
       }
 
+      // Lấy auctionId từ data-auction-id trong _ProductBidPanel.cshtml
       var auctionId = bidPanel.getAttribute('data-auction-id');
       if (!auctionId) {
+        showFeedback(registrationFeedback, 'Không tìm thấy mã phiên đấu giá.', false);
         return;
       }
 
+      // Disable nút để tránh user bấm nhiều lần tạo nhiều PayPal order
       registerAuctionBtn.disabled = true;
-      registerAuctionBtn.textContent = i18n.registering || 'Registering…';
 
-      postForm('/Auction/Register', { auctionId: auctionId })
-        .then(function (response) {
-          if (response.status === 401) {
-            openAuthModal();
-            throw new Error(i18n.registrationFailed || 'Please sign in to register.');
-          }
+      // Đổi text để user biết hệ thống đang tạo yêu cầu đặt cọc
+      registerAuctionBtn.textContent = i18n.registering || 'Creating deposit…';
 
-          return response.json().then(function (data) {
-            if (!response.ok || !data.success) {
-              throw new Error(data.message || i18n.registrationFailed || 'Unable to register. Please try again.');
+      // Gọi API mới:
+      // Không gọi /Auction/Register nữa vì Register cũ approve trực tiếp.
+      // Luồng mới phải là:
+      // InitiateDeposit -> tạo registration pending -> tạo deposit pending -> tạo PayPal order.
+      postForm('/Auction/InitiateDeposit', { auctionId: auctionId })
+          .then(function (response) {
+            // Nếu hết session hoặc chưa login thì mở modal đăng nhập
+            if (response.status === 401) {
+              openAuthModal();
+              throw new Error(i18n.registrationFailed || 'Please sign in to register.');
             }
 
-            return data;
+            return response.json().then(function (data) {
+              // Nếu server trả lỗi nghiệp vụ:
+              // seller tự đăng ký, auction ended, productValue <= 0, PayPal lỗi...
+              if (!response.ok || !data.success) {
+                throw new Error(data.message || i18n.registrationFailed || 'Unable to create deposit.');
+              }
+
+              return data;
+            });
+          })
+          .then(function (data) {
+            // Server phải trả về approvalUrl từ PayPal.
+            // Đây là URL để redirect user sang PayPal Sandbox thanh toán tiền cọc.
+            if (!data.approvalUrl) {
+              throw new Error('Không nhận được link thanh toán PayPal.');
+            }
+
+            // Hiển thị thông báo trước khi chuyển trang
+            showFeedback(
+                registrationFeedback,
+                data.message || 'Đang chuyển sang PayPal để thanh toán tiền cọc...',
+                true
+            );
+
+            // Redirect user sang PayPal Sandbox
+            window.location.href = data.approvalUrl;
+          })
+          .catch(function (error) {
+            // Nếu lỗi thì hiện message ra giao diện
+            showFeedback(registrationFeedback, error.message, false);
+          })
+          .finally(function () {
+            // Nếu redirect thành công thì dòng này gần như không thấy.
+            // Nếu lỗi thì enable lại nút để user thử lại.
+            registerAuctionBtn.disabled = false;
+            registerAuctionBtn.textContent = i18n.registerForAuction || 'Register for auction';
           });
-        })
-        .then(handleRegistrationSuccess)
-        .catch(function (error) {
-          showFeedback(registrationFeedback, error.message, false);
-        })
-        .finally(function () {
-          registerAuctionBtn.disabled = false;
-          registerAuctionBtn.textContent = i18n.registerForAuction || 'Register for auction';
-        });
     });
   }
 
