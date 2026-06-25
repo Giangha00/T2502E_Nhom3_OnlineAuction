@@ -73,7 +73,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
         entity.Property(d => d.AuctionRegistrationId)
             .HasColumnName("auction_registration_id");
-
+        
         // Tiền nên set precision để tránh lỗi làm tròn trong database
         entity.Property(d => d.Amount)
             .HasColumnName("amount")
@@ -83,7 +83,6 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             .HasColumnName("status")
             .HasMaxLength(30)
             .IsRequired();
-
         entity.Property(d => d.PayPalOrderId)
             .HasColumnName("paypal_order_id")
             .HasMaxLength(120);
@@ -449,6 +448,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(o => o.TotalAmount).HasColumnName("total_amount").HasPrecision(18, 2);
             entity.Property(o => o.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(OrderStatuses.PendingPayment);
             entity.Property(o => o.PaymentDeadline).HasColumnName("payment_deadline");
+            entity.Property(o => o.DepositApplied).HasColumnName("deposit_applied").HasPrecision(18, 2);
+
             entity.Property(o => o.ShippingFullName).HasColumnName("shipping_full_name").HasMaxLength(120);
             entity.Property(o => o.ShippingAddress).HasColumnName("shipping_address").HasMaxLength(300);
             entity.Property(o => o.ShippingCity).HasColumnName("shipping_city").HasMaxLength(100);

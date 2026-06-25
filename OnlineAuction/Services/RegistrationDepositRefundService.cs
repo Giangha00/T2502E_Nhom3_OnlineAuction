@@ -84,4 +84,76 @@ public class RegistrationDepositRefundService : IRegistrationDepositRefundServic
             auctionId: deposit.AuctionId,
             depositAmount: deposit.Amount);
     }
+    public async Task<int> RefundLoserDepositsForAuctionAsync(
+    int auctionId,
+    CancellationToken cancellationToken = default)
+{
+    // Lấy auction để biết WinnerId.
+    // WinnerId được set khi hệ thống tạo order cho người thắng.
+    var auction = await _dbContext.Auctions
+        .AsNoTracking()
+        .FirstOrDefaultAsync(a => a.Id == auctionId, cancellationToken);
+
+    if (auction == null)
+    {
+        _logger.LogWarning(
+            "Cannot refund deposits because auction {AuctionId} was not found.",
+            auctionId);
+
+        return 0;
+    }
+
+    // Nếu auction.WinnerId có giá trị:
+    // - người đó là winner
+    // - không refund tiền cọc cho winner
+    //
+    // Nếu auction.WinnerId null:
+    // - nghĩa là auction không có người thắng
+    // - refund tất cả deposit đã paid
+    var winnerId = auction.WinnerId;
+
+    // Chỉ lấy deposit đã paid.
+    // Không lấy refunded để tránh refund trùng.
+    // Không lấy pending/cancelled vì chưa thanh toán hoặc đã hủy.
+    var loserDepositIds = await _dbContext.AuctionRegistrationDeposits
+        .AsNoTracking()
+        .Where(d =>
+            d.AuctionId == auctionId &&
+            d.Status == AuctionRegistrationDepositStatuses.Paid &&
+            d.PayPalCaptureId != null &&
+            (!winnerId.HasValue || d.UserId != winnerId.Value))
+        .Select(d => d.Id)
+        .ToListAsync(cancellationToken);
+
+    var refundedCount = 0;
+
+    foreach (var depositId in loserDepositIds)
+    {
+        // Gọi lại method RefundDepositAsync đã có.
+        // Method này đã xử lý:
+        // - kiểm tra deposit paid
+        // - gọi PayPal RefundCaptureAsync
+        // - lưu paypal_refund_id
+        // - chuyển status = refunded
+        // - idempotency nếu đã refund rồi
+        var result = await RefundDepositAsync(depositId, cancellationToken);
+
+        if (result.Success)
+        {
+            refundedCount++;
+        }
+        else
+        {
+            // Không throw exception để tránh 1 refund fail làm dừng toàn bộ auction finalization.
+            // Log lại để sau này admin/worker có thể retry.
+            _logger.LogWarning(
+                "Auto refund failed. AuctionId={AuctionId}, DepositId={DepositId}, Message={Message}",
+                auctionId,
+                depositId,
+                result.Message);
+        }
+    }
+
+    return refundedCount;
+}
 }
