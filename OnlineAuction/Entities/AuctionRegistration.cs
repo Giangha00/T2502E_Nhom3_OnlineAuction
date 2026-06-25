@@ -23,6 +23,8 @@ public class AuctionRegistration : AuditableEntity
     public ApplicationUser User { get; set; } = null!;
 
     public ApplicationUser? Reviewer { get; set; }
+    
+    public ICollection<AuctionRegistrationDeposit> Deposits { get; set; } = [];
 }
 
 public static class AuctionRegistrationStatuses
@@ -32,3 +34,4 @@ public static class AuctionRegistrationStatuses
     public const string Rejected = "rejected";
     public const string Cancelled = "cancelled";
 }
+
