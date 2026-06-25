@@ -377,6 +377,317 @@ footer .footer-link--active:visited {
   }
 }
 
+.rarecard-home-row {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0.35rem 0 0.65rem;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rarecard-home-row.is-scrolling .rarecard-home-row__item {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+}
+
+.rarecard-home-row.is-scrolling .rarecard-home-row__item {
+  opacity: 0.92;
+  transform: scale(0.985);
+}
+
+.rarecard-home-row.is-nudge-left {
+  animation: homeCarouselNudgeLeft 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rarecard-home-row.is-nudge-right {
+  animation: homeCarouselNudgeRight 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes homeCarouselNudgeLeft {
+  0% { transform: translateX(0); }
+  35% { transform: translateX(10px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes homeCarouselNudgeRight {
+  0% { transform: translateX(0); }
+  35% { transform: translateX(-10px); }
+  100% { transform: translateX(0); }
+}
+
+.rarecard-home-row::-webkit-scrollbar {
+  display: none;
+}
+
+.rarecard-home-row__item {
+  flex: 0 0 212px;
+  scroll-snap-align: start;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+}
+
+@media (min-width: 640px) {
+  .rarecard-home-row__item {
+    flex-basis: 240px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .rarecard-home-row__item {
+    flex-basis: 260px;
+  }
+}
+
+.home-carousel-shell {
+  position: relative;
+}
+
+.home-carousel-fade {
+  position: absolute;
+  top: 0;
+  bottom: 0.65rem;
+  z-index: 1;
+  width: 2.5rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.home-carousel-fade--left {
+  left: 0.5rem;
+  background: linear-gradient(to right, #fff 15%, rgba(255, 255, 255, 0));
+}
+
+.home-carousel-fade--right {
+  right: 0.5rem;
+  background: linear-gradient(to left, #fff 15%, rgba(255, 255, 255, 0));
+}
+
+.home-carousel-shell.can-scroll-left .home-carousel-fade--left,
+.home-carousel-shell.can-scroll-right .home-carousel-fade--right {
+  opacity: 1;
+}
+
+.home-product-section .relative {
+  position: relative;
+}
+
+.home-carousel-btn {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: none;
+  height: 2.5rem;
+  width: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d6d3d1;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #334155;
+  font-size: 1.35rem;
+  line-height: 1;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1);
+  transform: translateY(-50%);
+  transition: transform 0.2s ease, background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.2s ease;
+}
+
+.home-carousel-btn:hover:not(:disabled) {
+  border-color: #94a3b8;
+  background: #fff;
+  color: #0f172a;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.14);
+  transform: translateY(-50%) scale(1.06);
+}
+
+.home-carousel-btn.is-pressed:not(:disabled) {
+  transform: translateY(-50%) scale(0.94);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.home-carousel-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.rarecard-recommended-row {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0.35rem 0 0.65rem;
+}
+
+.rarecard-recommended-row::-webkit-scrollbar {
+  display: none;
+}
+
+.rarecard-recommended-row__item {
+  flex: 0 0 220px;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 640px) {
+  .rarecard-recommended-row__item {
+    flex-basis: 248px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .rarecard-recommended-row__item {
+    flex-basis: 272px;
+  }
+}
+
+.home-recommended-section .home-carousel-shell .home-carousel-btn {
+  display: none;
+}
+
+.home-carousel-header-btn {
+  display: inline-flex;
+  height: 2rem;
+  width: 2rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d6d3d1;
+  border-radius: 9999px;
+  background: #fff;
+  color: #334155;
+  font-size: 1.15rem;
+  line-height: 1;
+  transition: transform 0.2s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.home-carousel-header-btn:hover:not(:disabled) {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  transform: scale(1.05);
+}
+
+.home-carousel-header-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.recommended-deal-card {
+  height: 100%;
+}
+
+.recommended-deal-card__image-wrap {
+  display: flex;
+  aspect-ratio: 4 / 5;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid #e7e5e4;
+  background: #f5f5f4;
+  padding: 1rem;
+}
+
+.recommended-deal-card__image {
+  max-height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 18px rgba(15, 23, 42, 0.12));
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.recommended-deal-card:hover .recommended-deal-card__image {
+  transform: scale(1.03);
+}
+
+.recommended-deal-card__body {
+  padding: 0.85rem 0.15rem 0.25rem;
+}
+
+.recommended-deal-card__title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  min-height: 2.6rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #0f172a;
+}
+
+.recommended-deal-card__footer {
+  margin-top: 0.85rem;
+}
+
+.recommended-deal-card__price {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+.recommended-deal-card__meta {
+  margin-top: 0.55rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.deal-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.deal-badge--great {
+  background: #1a8a3d;
+  color: #fff;
+}
+
+.deal-badge--good {
+  background: #d4edda;
+  color: #155724;
+}
+
+.recommended-deal-card__note {
+  font-size: 0.72rem;
+  line-height: 1.25;
+  color: #64748b;
+}
+
+.home-carousel-btn--prev {
+  left: 0.25rem;
+}
+
+.home-carousel-btn--next {
+  right: 0.25rem;
+}
+
+@media (min-width: 640px) {
+  .home-carousel-btn {
+    display: flex;
+  }
+
+  .home-carousel-btn--prev {
+    left: 0.5rem;
+  }
+
+  .home-carousel-btn--next {
+    right: 0.5rem;
+  }
+}
+
 .rarecard-category-tile {
   display: block;
   min-height: 10rem;

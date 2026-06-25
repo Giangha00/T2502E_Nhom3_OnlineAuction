@@ -7,6 +7,8 @@ public interface IAuctionService
 {
     HomeViewModel GetHomePage();
 
+    Task<HomeViewModel> GetHomePageAsync();
+
     Task<AuctionViewModel> GetAuctionIndexAsync(string listingType = ListingTypes.Auction);
 
     AuctionViewModel GetAuctionIndex(string listingType = ListingTypes.Auction);

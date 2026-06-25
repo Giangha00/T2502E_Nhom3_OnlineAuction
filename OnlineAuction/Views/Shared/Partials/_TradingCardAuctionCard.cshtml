@@ -1,4 +1,5 @@
 @model OnlineAuction.Models.AuctionCardViewModel
+@using System.Text.RegularExpressions
 @{
     var item = Model.Item;
     var variant = Model.Variant ?? "grid";
@@ -6,8 +7,17 @@
     var isEndingSoon = item.Status == "Ending Soon";
     var isWon = item.Status == "Won";
     var actionLabel = isBuyNow ? Localizer["Card_AddToCart"].Value : (isWon ? Localizer["Card_CompletePayment"].Value : Localizer["Card_BidNow"].Value);
+    var gradeNumber = string.Empty;
+    if (!string.IsNullOrWhiteSpace(item.Grade))
+    {
+        var gradeMatch = Regex.Match(item.Grade, @"(\d+(?:\.\d+)?)");
+        if (gradeMatch.Success)
+        {
+            gradeNumber = gradeMatch.Groups[1].Value;
+        }
+    }
     var filterAttrs = Model.EnableFiltering
-        ? $"data-id=\"{item.Id}\" data-name=\"{item.Name.ToLowerInvariant()}\" data-category=\"{item.Category}\" data-price=\"{item.CurrentPrice}\" data-time=\"{item.TimeRemaining}\" data-year=\"{item.Year}\" data-condition=\"{item.Condition}\" data-ending-soon=\"{isEndingSoon.ToString().ToLowerInvariant()}\""
+        ? $"data-id=\"{item.Id}\" data-name=\"{item.Name.ToLowerInvariant()}\" data-category=\"{item.Category}\" data-price=\"{item.CurrentPrice}\" data-time=\"{item.TimeRemaining}\" data-year=\"{item.Year}\" data-grade=\"{gradeNumber}\" data-authenticator=\"{item.Authenticator}\" data-ending-soon=\"{isEndingSoon.ToString().ToLowerInvariant()}\""
         : "";
 }
 
@@ -62,6 +72,45 @@ else if (variant == "compact")
             <p class="mt-0.5 text-xs font-medium text-red-600">@item.TimeRemaining</p>
         </div>
     </a>
+}
+else if (variant == "home")
+{
+    <article class="rarecard-card rarecard-card--home group">
+        <a asp-controller="@(isBuyNow ? "BuyNow" : "Auction")"
+           asp-action="Detail"
+           asp-route-id="@item.Id"
+           class="block">
+            <div class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition duration-300 group-hover:shadow-lg">
+                <div class="relative aspect-[3/4] bg-stone-50">
+                    <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"/>
+                    @if (!string.IsNullOrEmpty(item.Grade))
+                    {
+                        <span class="absolute left-3 top-3 rounded-md bg-slate-900 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">@item.Grade</span>
+                    }
+                </div>
+                <div class="p-4">
+                    <h3 class="line-clamp-2 text-base font-semibold leading-snug text-stone-900">@item.Name</h3>
+                    @if (!string.IsNullOrEmpty(item.Subtitle))
+                    {
+                        <p class="mt-1 line-clamp-1 text-xs text-stone-500">@item.Subtitle</p>
+                    }
+                    <div class="mt-3.5 flex items-end justify-between gap-2 border-t border-stone-100 pt-3.5">
+                        <div>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-stone-400">@Localizer["Card_CurrentBid"]</p>
+                            <p class="text-xl font-bold tabular-nums text-blue-700">$@item.CurrentPrice.ToString("N0")</p>
+                        </div>
+                        <p class="max-w-[6rem] truncate text-right text-xs font-medium tabular-nums @(isEndingSoon ? "text-red-600" : "text-stone-600")">@item.TimeRemaining</p>
+                    </div>
+                    @if (Model.ShowBidLink)
+                    {
+                        <span class="mt-3.5 block w-full rounded-full bg-blue-700 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-white transition group-hover:bg-blue-800">
+                            @actionLabel
+                        </span>
+                    }
+                </div>
+            </div>
+        </a>
+    </article>
 }
 else
 {
