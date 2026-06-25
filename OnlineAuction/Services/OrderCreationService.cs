@@ -15,15 +15,19 @@ public class OrderCreationService : IOrderCreationService
     private readonly AuctionHouseDbContext _dbContext;
     private readonly ILogger<OrderCreationService> _logger;
     private readonly INotificationService _notificationService;
+    private readonly IRegistrationDepositRefundService _depositRefundService;
 
     public OrderCreationService(
         AuctionHouseDbContext dbContext,
         ILogger<OrderCreationService> logger,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        IRegistrationDepositRefundService depositRefundService)
     {
         _dbContext = dbContext;
         _logger = logger;
         _notificationService = notificationService;
+        // Service này dùng để tự động hoàn tiền cọc cho loser khi auction kết thúc
+        _depositRefundService = depositRefundService;
     }
 
     public async Task<int> FinalizeExpiredAuctionsAsync(CancellationToken cancellationToken = default)
@@ -43,12 +47,51 @@ public class OrderCreationService : IOrderCreationService
             .ToList();
 
         var createdCount = 0;
+
         foreach (var auctionId in auctionIds)
         {
-            var orderId = await CreatePendingPaymentOrderForAuctionAsync(auctionId, cancellationToken);
+            // Bước 1:
+            // Finalize auction:
+            // - Nếu có người thắng: tạo order pending payment
+            // - Set auction.Status = AwaitingPayment
+            // - Set auction.WinnerId = winningBid.BidderId
+            // - Gửi notification cho winner
+            //
+            // Nếu không có bid:
+            // - Set auction.Status = Ended
+            var orderId = await CreatePendingPaymentOrderForAuctionAsync(
+                auctionId,
+                cancellationToken);
+
             if (orderId.HasValue)
             {
                 createdCount++;
+            }
+
+            // Bước 2:
+            // Sau khi auction đã finalize xong, tự động refund cọc cho người thua.
+            //
+            // Lý do đặt ở đây:
+            // - Lúc này auction.WinnerId đã được lưu vào database
+            // - Refund service có thể biết ai là winner để không refund cho winner
+            // - Không gọi PayPal refund bên trong transaction tạo order
+            //   vì PayPal là API bên ngoài, nếu chậm/lỗi sẽ làm transaction DB bị giữ lâu.
+            //
+            // RefundLoserDepositsForAuctionAsync sẽ:
+            // - Lấy deposit status = paid
+            // - Bỏ qua user winner
+            // - Gọi PayPal refund
+            // - Update deposit.status = refunded
+            // - Lưu paypal_refund_id
+            var refundedCount = await _depositRefundService
+                .RefundLoserDepositsForAuctionAsync(auctionId, cancellationToken);
+
+            if (refundedCount > 0)
+            {
+                _logger.LogInformation(
+                    "Auto refunded {RefundedCount} loser deposits for auction {AuctionId}.",
+                    refundedCount,
+                    auctionId);
             }
         }
 
@@ -109,18 +152,65 @@ public class OrderCreationService : IOrderCreationService
         }
 
         var now = DateTime.UtcNow;
+
+// Giá thắng của phiên đấu giá
         var subtotal = winningBid.Amount;
+
+// ------------------------------------------------------------
+// Lấy tiền cọc đã thanh toán của winner.
+//
+// Chỉ lấy deposit status = paid.
+// Không lấy pending/cancelled/refunded.
+// Nếu không có deposit thì depositAmount = 0.
+// ------------------------------------------------------------
+        var winnerDeposit = await _dbContext.AuctionRegistrationDeposits
+            .FirstOrDefaultAsync(d =>
+                    d.AuctionId == auctionId &&
+                    d.UserId == winningBid.BidderId &&
+                    d.Status == AuctionRegistrationDepositStatuses.Paid,
+                cancellationToken);
+
+        var depositAmount = winnerDeposit?.Amount ?? 0m;
+
+// Phí bảo hiểm vault hiện có của hệ thống
         var insurance = Math.Round(Math.Max(60m, subtotal * 0.00721m), 2);
-        var total = subtotal + ShippingFee + insurance;
+
+// Tổng tiền gốc trước khi trừ cọc
+        var totalBeforeDeposit = subtotal + ShippingFee + insurance;
+
+// ------------------------------------------------------------
+// Trừ tiền cọc vào tổng tiền winner cần thanh toán.
+//
+// Ví dụ:
+// Winning bid = 500
+// Shipping = 45
+// Insurance = 60
+// Deposit = 50
+//
+// TotalAmount = 500 + 45 + 60 - 50 = 555
+// ------------------------------------------------------------
+        var total = Math.Max(0, totalBeforeDeposit - depositAmount);
 
         var order = new AuctionOrder
         {
             OrderReference = $"AH-{now:yyyyMMdd}-{auction.Id}",
             BuyerId = winningBid.BidderId,
+
+            // Giá thắng
             Subtotal = subtotal,
+
+            // Phí ship
             ShippingFee = ShippingFee,
+
+            // Phí bảo hiểm
             VaultInsurance = insurance,
+
+            // Tiền cọc của winner được trừ vào order
+            DepositApplied = depositAmount,
+
+            // Số tiền winner còn phải thanh toán sau khi trừ cọc
             TotalAmount = total,
+
             Status = OrderStatuses.PendingPayment,
             PaymentDeadline = now.AddHours(48),
             CreatedAt = now,
@@ -137,7 +227,6 @@ public class OrderCreationService : IOrderCreationService
                 }
             ]
         };
-
         _dbContext.Orders.Add(order);
         auction.Status = AuctionStatuses.AwaitingPayment;
         auction.WinnerId = winningBid.BidderId;
