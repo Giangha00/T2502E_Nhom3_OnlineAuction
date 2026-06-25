@@ -174,6 +174,32 @@ public class OrderPaymentService : IOrderPaymentService
                 order.PaymentMethod = "paypal";
                 order.UpdatedAt = now;
                 paidOrderIds.Add(order.Id);
+
+                // ------------------------------------------------------------
+                // Tiền cọc của winner đã được sử dụng.
+                //
+                // Deposit:
+                // Paid
+                //      ↓
+                // Applied
+                //
+                // Không refund nữa.
+                // ------------------------------------------------------------
+
+                var auctionId = order.Items.First().AuctionId;
+
+                var winnerDeposit = await _dbContext.AuctionRegistrationDeposits
+                    .FirstOrDefaultAsync(d =>
+                            d.AuctionId == auctionId &&
+                            d.UserId == order.BuyerId &&
+                            d.Status == AuctionRegistrationDepositStatuses.Paid,
+                        cancellationToken);
+
+                if (winnerDeposit != null)
+                {
+                    winnerDeposit.Status = AuctionRegistrationDepositStatuses.Applied;
+                    winnerDeposit.UpdatedAt = now;
+                }
             }
 
             foreach (var payment in pendingPayments.Where(payment => payment.Status == PaymentStatuses.Pending))

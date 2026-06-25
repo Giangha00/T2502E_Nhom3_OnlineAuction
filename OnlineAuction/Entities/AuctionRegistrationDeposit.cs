@@ -46,4 +46,8 @@ public static class AuctionRegistrationDepositStatuses
     public const string Cancelled = "cancelled";
     public const string Refunded = "refunded";
     public const string Failed = "failed";
+    // Tiền cọc của người thắng đã được dùng để trừ vào số tiền cần thanh toán của order.
+    // Ví dụ: thắng bid 500$, đã cọc 50$ thì order chỉ cần trả phần còn lại.
+    // Trạng thái này KHÔNG phải refund, vì tiền không trả lại qua PayPal.
+    public const string Applied = "applied";
 }
