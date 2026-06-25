@@ -37,6 +37,10 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "RequestVerificationToken";
+});
 builder.Services.AddLocalization(options =>
 {
     options.ResourcesPath = "Resources";
@@ -177,6 +181,8 @@ builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.Configure<PayPalSettings>(
     builder.Configuration.GetSection(PayPalSettings.SectionName));
+builder.Services.Configure<FirebaseSettings>(
+    builder.Configuration.GetSection(FirebaseSettings.SectionName));
 
 builder.Services.AddHttpClient<IPayPalService, PayPalService>();
 
@@ -195,11 +201,20 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
-builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
-builder.Services.AddScoped<IRegistrationDepositRefundService, RegistrationDepositRefundService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
+
 #endregion
 
+var firebaseSettings = builder.Configuration
+    .GetSection(FirebaseSettings.SectionName)
+    .Get<FirebaseSettings>() ?? new FirebaseSettings();
+
 var app = builder.Build();
+
+FirebaseMessagingService.Initialize(
+    firebaseSettings,
+    app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Firebase"));
 
 #region DB Init + Seeders
 
