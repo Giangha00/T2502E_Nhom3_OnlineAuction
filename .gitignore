@@ -79,5 +79,3 @@ Thumbs.db
 # JetBrains Rider
 *.sln.iml
 
-.env
-cloud-email-service/.env
