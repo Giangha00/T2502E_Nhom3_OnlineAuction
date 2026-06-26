@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using OnlineAuction.Areas.Admin.ViewModels.Users;
 using OnlineAuction.Data;
+using OnlineAuction.Data.Seeders;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
 using OnlineAuction.Helpers;
@@ -335,9 +336,13 @@ public class UserService : IUserService
 
         var result = await _userManager.CreateAsync(user, model.InitialPassword);
 
-        return result.Succeeded
-            ? (true, "User created successfully.")
-            : (false, string.Join(" ", result.Errors.Select(error => error.Description)));
+        if (!result.Succeeded)
+        {
+            return (false, string.Join(" ", result.Errors.Select(error => error.Description)));
+        }
+
+        await IdentityRoleSyncService.SyncUserRoleAsync(_userManager, user, model.Role);
+        return (true, "User created successfully.");
     }
 
     public async Task<(bool Success, string Message)> UpdateAsync(UserFormViewModel model)
@@ -402,6 +407,7 @@ public class UserService : IUserService
             }
         }
 
+        await IdentityRoleSyncService.SyncUserRoleAsync(_userManager, user, model.Role);
         return (true, "User updated successfully.");
     }
 
@@ -480,6 +486,7 @@ public class UserService : IUserService
             {
                 user.Role = model.Role.Value;
                 user.UpdatedAt = DateTime.UtcNow;
+                await IdentityRoleSyncService.SyncUserRoleAsync(_userManager, user, model.Role.Value);
             }
 
             await _dbContext.SaveChangesAsync();
@@ -526,7 +533,9 @@ public class UserService : IUserService
         model.RoleOptions =
         [
             new SelectListItem("User", UserRole.User.ToString()),
-            new SelectListItem("Admin", UserRole.Admin.ToString())
+            new SelectListItem("Admin", UserRole.Admin.ToString()),
+            new SelectListItem("Moderator", UserRole.Moderator.ToString()),
+            new SelectListItem("Support", UserRole.Support.ToString())
         ];
 
         model.StatusOptions =

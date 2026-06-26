@@ -139,6 +139,22 @@ dotnet ef database update
 
 ---
 
+## Dynamic permissions (Admin)
+
+Admin actions use **permission policies** (`[RequirePermission("auctions.verify")]`) instead of only `Roles = Admin`. Permissions are stored in DB and loaded into the Admin cookie at login.
+
+| Area | Details |
+|------|---------|
+| Manage matrix | `/Admin/RolePermission` (requires `users.manage`) |
+| Superuser | Identity role **Admin** bypasses all permission checks |
+| Staff roles | Admin, Moderator, Support (+ regular User) |
+
+See [identity/8_dynamic_permissions.md](identity/8_dynamic_permissions.md).
+
+After changing permissions, staff must **re-login** to refresh claims.
+
+---
+
 ### Test accounts (after `UserSeeder` runs on empty DB)
 
 | Email | Password | Notes |
@@ -147,6 +163,9 @@ dotnet ef database update
 | `user3@auctionhouse.local` | `User@123` | Active regular user |
 | `user4@auctionhouse.local` | `User@123` | **Inactive** — login rejected |
 | `user12@auctionhouse.local` | `User@123` | Admin role — use `/Admin/Account/Login`, not `/Auth/Login` |
+| `admin@auctionhouse.com` | `User@123` | System admin (full permissions) |
+| `moderator@auctionhouse.com` | `User@123` | Moderator — verify auctions only |
+| `support@auctionhouse.com` | `User@123` | Support — view users/dashboard |
 
 Seeder creates `user1` … `user150@auctionhouse.local`, all with password **`User@123`**.
 

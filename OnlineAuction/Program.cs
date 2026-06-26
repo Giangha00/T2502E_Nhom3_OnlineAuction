@@ -1,8 +1,10 @@
 using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using OnlineAuction.Authorization;
 using OnlineAuction.Configurations;
 using OnlineAuction.Areas.Admin.Services;
 using OnlineAuction.Data;
@@ -187,6 +189,25 @@ builder.Services.AddAuthentication()
         };
     });
 
+builder.Services.AddAuthorization(options =>
+{
+    foreach (var permissionCode in PermissionCodes.All)
+    {
+        options.AddPolicy(
+            PermissionCodes.ToPolicyName(permissionCode),
+            policy => policy.Requirements.Add(new PermissionRequirement(permissionCode)));
+    }
+
+    options.AddPolicy("ListingOwner", policy =>
+    {
+        policy.AddAuthenticationSchemes(AuthSchemes.User);
+        policy.Requirements.Add(new ListingOwnerRequirement());
+    });
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ListingOwnerAuthorizationHandler>();
+
 #endregion
 
 builder.Services.AddHttpContextAccessor();
@@ -219,6 +240,7 @@ builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<IAdminAuctionVerificationService, AdminAuctionVerificationService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
 builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
@@ -259,6 +281,7 @@ using (var scope = app.Services.CreateScope())
 
     await UserSeeder.SeedAsync(db, userManager);
     await AdminSeeder.SeedAsync(db, userManager, roleManager);
+    await PermissionSeeder.SeedAsync(db, roleManager, userManager);
     await AuctionCatalogSeeder.SeedAsync(db, refreshTestAuctions);
 }
 
