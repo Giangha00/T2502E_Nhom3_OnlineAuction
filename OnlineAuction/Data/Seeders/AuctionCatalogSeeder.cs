@@ -11,8 +11,11 @@ public static class AuctionCatalogSeeder
     private static readonly string[] LegacySeedEventNames =
     [
         SpreadsheetAuctionCatalog.TestAuctionEventName,
+        "RareCard Vault Buy Now",
         "RareCard Vault Daily Auctions"
     ];
+
+    private const int SeededAuctionDurationDays = 7;
 
     public static async Task SeedAsync(AuctionHouseDbContext dbContext, bool refreshInDevelopment = false)
     {
@@ -48,6 +51,13 @@ public static class AuctionCatalogSeeder
             await SeedEntryAsync(dbContext, entry, seller.Id, bidder?.Id, categoryCache, now);
             existingProductNames.Add(entry.Name);
         }
+
+        await BackfillBuyNowPricesAsync(dbContext);
+
+        if (!refreshInDevelopment)
+        {
+            await ReactivateExpiredSeededListingsAsync(dbContext, now);
+        }
     }
 
     private static async Task<HashSet<string>> GetExistingSeededProductNamesAsync(AuctionHouseDbContext dbContext)
@@ -74,6 +84,7 @@ public static class AuctionCatalogSeeder
     {
         var category = await GetOrCreateCategoryAsync(dbContext, entry.CategoryName, categoryCache);
         var bidStep = SpreadsheetAuctionCatalog.ComputeBidStep(entry.StartingPrice);
+        var buyNowPrice = SpreadsheetAuctionCatalog.TryGetBuyNowPrice(entry.Name);
 
         var product = new Product
         {
@@ -100,15 +111,18 @@ public static class AuctionCatalogSeeder
         await dbContext.SaveChangesAsync();
 
         var startDate = DateTimeUtilities.AsUtc(now.AddSeconds(-30));
-        var endDate = DateTimeUtilities.AsUtc(now.AddMinutes(7));
+        var endDate = DateTimeUtilities.AsUtc(now.AddDays(SeededAuctionDurationDays));
+
         var auction = new Auction
         {
             ProductId = product.Id,
             StartingPrice = entry.StartingPrice,
             BidStep = bidStep,
             CurrentPrice = entry.StartingPrice,
+            BuyNowPrice = buyNowPrice,
             Status = AuctionStatuses.Live,
             ListingType = ListingTypes.Auction,
+            RequiresRegistration = true,
             AuctionEventName = SpreadsheetAuctionCatalog.TestAuctionEventName,
             StartDate = startDate,
             EndDate = endDate,
@@ -142,6 +156,86 @@ public static class AuctionCatalogSeeder
         auction.CurrentPrice = amount;
         dbContext.Bids.AddRange(bids);
         await dbContext.SaveChangesAsync();
+    }
+
+    private static async Task BackfillBuyNowPricesAsync(AuctionHouseDbContext dbContext)
+    {
+        var priceMap = SpreadsheetAuctionCatalog.GetBuyNowPriceMap();
+        if (priceMap.Count == 0)
+        {
+            return;
+        }
+
+        var productNames = priceMap.Keys.ToList();
+        var auctions = await dbContext.Auctions
+            .Include(auction => auction.Product)
+            .Where(auction =>
+                auction.BuyNowPrice == null &&
+                auction.Product.Name != null &&
+                productNames.Contains(auction.Product.Name))
+            .ToListAsync();
+
+        if (auctions.Count == 0)
+        {
+            return;
+        }
+
+        var changed = false;
+        foreach (var auction in auctions)
+        {
+            if (priceMap.TryGetValue(auction.Product.Name, out var buyNowPrice))
+            {
+                auction.BuyNowPrice = buyNowPrice;
+                auction.UpdatedAt = DateTime.UtcNow;
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
+    private static async Task ReactivateExpiredSeededListingsAsync(AuctionHouseDbContext dbContext, DateTime now)
+    {
+        var seededListings = await dbContext.Auctions
+            .Where(auction =>
+                auction.AuctionEventName != null &&
+                LegacySeedEventNames.Contains(auction.AuctionEventName))
+            .ToListAsync();
+
+        if (seededListings.Count == 0)
+        {
+            return;
+        }
+
+        var changed = false;
+
+        foreach (var auction in seededListings)
+        {
+            var shouldReactivate = auction.EndDate <= now
+                || auction.Status is AuctionStatuses.Ended
+                    or AuctionStatuses.AwaitingPayment
+                    or AuctionStatuses.Completed;
+
+            if (!shouldReactivate)
+            {
+                continue;
+            }
+
+            auction.Status = AuctionStatuses.Live;
+            auction.StartDate = DateTimeUtilities.AsUtc(now.AddSeconds(-30));
+            auction.EndDate = DateTimeUtilities.AsUtc(now.AddDays(SeededAuctionDurationDays));
+            auction.WinnerId = null;
+            auction.UpdatedAt = now;
+            changed = true;
+        }
+
+        if (changed)
+        {
+            await dbContext.SaveChangesAsync();
+        }
     }
 
     private static async Task ClearSeededAuctionsAsync(AuctionHouseDbContext dbContext)

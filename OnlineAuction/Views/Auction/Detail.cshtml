@@ -51,7 +51,6 @@
       endDate: @Html.Raw(JsonSerializer.Serialize(DateTimeUtilities.ToUtcIsoString(Model.EndDate))),
       canBid: @(Model.CanBid ? "true" : "false"),
       requiresRegistration: @(Model.RequiresRegistration ? "true" : "false"),
-      bidOptionCount: 35,
       i18n: @Html.Raw(JsonSerializer.Serialize(productDetailI18n))
     };
   </script>
