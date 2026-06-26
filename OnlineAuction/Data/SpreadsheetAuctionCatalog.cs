@@ -37,7 +37,7 @@ public static class SpreadsheetAuctionCatalog
             1999,
             "English",
             "4/102",
-            endMinutes: 10),
+            endMinutes: 1),
         CreateEntry(
             "Pokémon",
             "PSA 10 Charizard 1st Edition Holo #4 Base Set Shadowless 1999",
