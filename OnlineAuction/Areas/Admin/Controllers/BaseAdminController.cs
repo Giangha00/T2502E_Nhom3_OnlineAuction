@@ -5,7 +5,7 @@ using OnlineAuction.Configurations;
 namespace OnlineAuction.Areas.Admin.Controllers;
 
 [Area("Admin")]
-[Authorize(AuthenticationSchemes = AuthSchemes.Admin, Roles = "Admin")]
+[Authorize(AuthenticationSchemes = AuthSchemes.Admin)]
 public abstract class BaseAdminController : Controller
 {
 }

@@ -1,0 +1,66 @@
+@model RolePermissionIndexViewModel
+
+@{
+    ViewData["Title"] = "Roles & Permissions";
+    ViewData["AdminPage"] = "role-permissions";
+}
+
+<div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+    <div class="mb-6">
+        <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Roles & Permissions</h2>
+        <p class="text-theme-sm text-gray-500 dark:text-gray-400">
+            Assign module permissions to staff roles. Users must re-login after permission changes.
+        </p>
+    </div>
+
+    @if (TempData["SuccessMessage"] is not null)
+    {
+        <div class="mb-4 rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-theme-sm text-success-700">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] is not null)
+    {
+        <div class="mb-4 rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-theme-sm text-error-700">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+            <thead class="bg-gray-50 dark:bg-white/[0.02]">
+                <tr>
+                    <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Role</th>
+                    <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Permissions</th>
+                    <th class="px-4 py-3 text-right text-theme-xs font-semibold uppercase text-gray-500">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+                @foreach (var role in Model.Roles)
+                {
+                    <tr>
+                        <td class="px-4 py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">@role.Name</td>
+                        <td class="px-4 py-3 text-theme-sm text-gray-600 dark:text-gray-300">
+                            @(role.IsSuperRole ? "All permissions (superuser)" : $"{role.PermissionCount} assigned")
+                        </td>
+                        <td class="px-4 py-3 text-right">
+                            @if (role.IsSuperRole)
+                            {
+                                <span class="text-theme-xs text-gray-400">Managed automatically</span>
+                            }
+                            else
+                            {
+                                <a asp-action="Edit"
+                                   asp-route-id="@role.Id"
+                                   class="inline-flex rounded-lg bg-brand-500 px-3 py-1.5 text-theme-xs font-medium text-white hover:bg-brand-600">
+                                    Edit permissions
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

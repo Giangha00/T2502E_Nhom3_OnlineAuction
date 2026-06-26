@@ -29,6 +29,7 @@ public class UserAuctionController : Controller
     }
 
     [HttpGet("Edit/{auctionId:int}")]
+    [Authorize(Policy = "ListingOwner")]
     public async Task<IActionResult> Edit(int auctionId)
     {
         var sellerId = await GetCurrentSellerIdAsync();
@@ -44,6 +45,7 @@ public class UserAuctionController : Controller
 
     [HttpPost("Edit/{auctionId:int}")]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = "ListingOwner")]
     public async Task<IActionResult> Edit(int auctionId, SellerAuctionFormViewModel model)
     {
         model.PrimaryImageFile ??= Request.Form.Files.FirstOrDefault();
@@ -84,6 +86,7 @@ public class UserAuctionController : Controller
 
     [HttpPost("Delete/{auctionId:int}")]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = "ListingOwner")]
     public async Task<IActionResult> Delete(int auctionId)
     {
         var sellerId = await GetCurrentSellerIdAsync();
