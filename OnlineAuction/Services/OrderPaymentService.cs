@@ -13,17 +13,23 @@ public class OrderPaymentService : IOrderPaymentService
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IPayPalService _payPalService;
     private readonly INotificationService _notificationService;
+    private readonly IOrderService _orderService;
+    private readonly IRealtimePublisher _realtimePublisher;
     private readonly ILogger<OrderPaymentService> _logger;
 
     public OrderPaymentService(
         AuctionHouseDbContext dbContext,
         IPayPalService payPalService,
         INotificationService notificationService,
+        IOrderService orderService,
+        IRealtimePublisher realtimePublisher,
         ILogger<OrderPaymentService> logger)
     {
         _dbContext = dbContext;
         _payPalService = payPalService;
         _notificationService = notificationService;
+        _orderService = orderService;
+        _realtimePublisher = realtimePublisher;
         _logger = logger;
     }
 
@@ -225,6 +231,9 @@ public class OrderPaymentService : IOrderPaymentService
                 NotificationReferenceTypes.PaymentSuccess,
                 orderId);
         }
+
+        var orderCount = await _orderService.CountPendingPaymentOrdersAsync(buyerId);
+        await _realtimePublisher.SendOrderCountToUserAsync(buyerId, orderCount);
 
         return PayPalCaptureCheckoutResult.Ok(paidOrderIds[0], paidOrderIds);
     }
@@ -475,6 +484,13 @@ public async Task<string> TestProcessIpnAsync(
                 NotificationReferenceTypes.PaymentSuccess,
                 payment.OrderId,
                 cancellationToken: cancellationToken);
+        }
+
+        var buyerIds = payments.Select(p => p.Order.BuyerId).Distinct();
+        foreach (var buyerId in buyerIds)
+        {
+            var orderCount = await _orderService.CountPendingPaymentOrdersAsync(buyerId);
+            await _realtimePublisher.SendOrderCountToUserAsync(buyerId, orderCount, cancellationToken);
         }
 
         return "Thanh toán thành công";

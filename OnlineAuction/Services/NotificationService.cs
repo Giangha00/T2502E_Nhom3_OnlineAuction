@@ -14,15 +14,18 @@ public class NotificationService : INotificationService
 
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IFcmService _fcmService;
+    private readonly IRealtimePublisher _realtimePublisher;
     private readonly ILogger<NotificationService> _logger;
 
     public NotificationService(
         AuctionHouseDbContext dbContext,
         IFcmService fcmService,
+        IRealtimePublisher realtimePublisher,
         ILogger<NotificationService> logger)
     {
         _dbContext = dbContext;
         _fcmService = fcmService;
+        _realtimePublisher = realtimePublisher;
         _logger = logger;
     }
 
@@ -115,7 +118,11 @@ public class NotificationService : INotificationService
             _logger.LogWarning(ex, "FCM push failed for user {UserId}, notification {NotificationId} was saved.", userId, notification.Id);
         }
 
-        return MapToViewModel(notification);
+        var viewModel = MapToViewModel(notification);
+        var unreadCount = await GetUnreadCountAsync(userId, cancellationToken);
+        await _realtimePublisher.SendNotificationToUserAsync(userId, viewModel, unreadCount, cancellationToken);
+
+        return viewModel;
     }
 
     public async Task<IReadOnlyList<NotificationItemViewModel>> GetRecentForUserAsync(

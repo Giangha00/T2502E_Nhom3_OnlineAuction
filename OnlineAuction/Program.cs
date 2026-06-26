@@ -138,7 +138,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 
     options.Events.OnRedirectToLogin = context =>
     {
-        if (context.Request.Path.StartsWithSegments("/api"))
+        if (context.Request.Path.StartsWithSegments("/api")
+            || context.Request.Path.StartsWithSegments("/hubs"))
         {
             context.Response.StatusCode = 401;
             return Task.CompletedTask;
@@ -223,6 +224,8 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
 builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
 builder.Services.AddScoped<IRegistrationDepositRefundService, RegistrationDepositRefundService>();
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<IRealtimePublisher, RealtimePublisher>();
 #endregion
 
 var firebaseSettings = builder.Configuration
@@ -303,6 +306,8 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<OnlineAuction.Hubs.AppHub>("/hubs/app");
 
 #endregion
 
