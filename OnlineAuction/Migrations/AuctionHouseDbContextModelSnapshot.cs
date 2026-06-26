@@ -367,6 +367,11 @@ namespace OnlineAuction.Migrations
                         .HasColumnType("int")
                         .HasColumnName("product_id");
 
+                    b.Property<string>("RejectReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("reject_reason");
+
                     b.Property<bool>("RequiresRegistration")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
@@ -390,6 +395,10 @@ namespace OnlineAuction.Migrations
                         .HasDefaultValue("live")
                         .HasColumnName("status");
 
+                    b.Property<DateTime?>("SubmittedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("submitted_at");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
@@ -397,6 +406,14 @@ namespace OnlineAuction.Migrations
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("int")
                         .HasColumnName("updated_by");
+
+                    b.Property<DateTime?>("VerifiedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("verified_at");
+
+                    b.Property<int?>("VerifiedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("verified_by");
 
                     b.Property<int?>("WinnerId")
                         .HasColumnType("int")
@@ -419,6 +436,8 @@ namespace OnlineAuction.Migrations
 
                     b.HasIndex("UpdatedBy");
 
+                    b.HasIndex("VerifiedBy");
+
                     b.HasIndex("WinnerId");
 
                     b.HasIndex("Status", "EndDate")
@@ -431,6 +450,8 @@ namespace OnlineAuction.Migrations
                             t.HasCheckConstraint("chk_auctions_listing_type", "`listing_type` IN ('auction', 'buynow')");
 
                             t.HasCheckConstraint("chk_auctions_prices", "`starting_price` > 0 AND `bid_step` > 0 AND `current_price` >= 0 AND (`buy_now_price` IS NULL OR `buy_now_price` > `starting_price`)");
+
+                            t.HasCheckConstraint("chk_auctions_status", "`status` IN ('pending_review','rejected','scheduled','live','ending_soon','ended','awaiting_payment','completed','cancelled')");
                         });
                 });
 
@@ -462,6 +483,11 @@ namespace OnlineAuction.Migrations
                     b.Property<int?>("DeletedBy")
                         .HasColumnType("int")
                         .HasColumnName("deleted_by");
+
+                    b.Property<decimal>("DepositApplied")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("deposit_applied");
 
                     b.Property<string>("OrderReference")
                         .IsRequired()
@@ -655,6 +681,108 @@ namespace OnlineAuction.Migrations
                         });
                 });
 
+            modelBuilder.Entity("OnlineAuction.Entities.AuctionRegistrationDeposit", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<int>("AuctionId")
+                        .HasColumnType("int")
+                        .HasColumnName("auction_id");
+
+                    b.Property<long>("AuctionRegistrationId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("auction_registration_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("paid_at");
+
+                    b.Property<string>("PayPalCaptureId")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("paypal_capture_id");
+
+                    b.Property<string>("PayPalOrderId")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("paypal_order_id");
+
+                    b.Property<string>("PayPalRefundId")
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("paypal_refund_id");
+
+                    b.Property<DateTime?>("RefundedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("refunded_at");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("updated_by");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuctionId");
+
+                    b.HasIndex("AuctionRegistrationId");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("DeletedAt")
+                        .HasDatabaseName("ix_auction_registration_deposits_deleted_at");
+
+                    b.HasIndex("DeletedBy");
+
+                    b.HasIndex("PayPalOrderId")
+                        .HasDatabaseName("ix_deposits_paypal_order_id");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("auction_registration_deposits", (string)null);
+                });
+
             modelBuilder.Entity("OnlineAuction.Entities.Bid", b =>
                 {
                     b.Property<long>("Id")
@@ -815,6 +943,106 @@ namespace OnlineAuction.Migrations
                     b.HasIndex("UpdatedBy");
 
                     b.ToTable("categories", (string)null);
+                });
+
+            modelBuilder.Entity("OnlineAuction.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_read");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("message");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("read_at");
+
+                    b.Property<int?>("ReferenceId")
+                        .HasColumnType("int")
+                        .HasColumnName("reference_id");
+
+                    b.Property<string>("ReferenceType")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("reference_type");
+
+                    b.Property<string>("RelatedUrl")
+                        .HasMaxLength(260)
+                        .HasColumnType("varchar(260)")
+                        .HasColumnName("related_url");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("title");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("type");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("updated_by");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("DeletedAt")
+                        .HasDatabaseName("ix_notifications_deleted_at");
+
+                    b.HasIndex("DeletedBy");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.HasIndex("UserId", "CreatedAt")
+                        .HasDatabaseName("ix_notifications_user_created");
+
+                    b.HasIndex("UserId", "IsRead")
+                        .HasDatabaseName("ix_notifications_user_read");
+
+                    b.HasIndex("ReferenceType", "ReferenceId", "UserId")
+                        .HasDatabaseName("ix_notifications_reference");
+
+                    b.ToTable("notifications", (string)null);
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.OrderItem", b =>
@@ -1295,6 +1523,50 @@ namespace OnlineAuction.Migrations
                     b.ToTable("product_images", (string)null);
                 });
 
+            modelBuilder.Entity("OnlineAuction.Entities.UserDeviceToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DeviceInfo")
+                        .HasMaxLength(260)
+                        .HasColumnType("varchar(260)")
+                        .HasColumnName("device_info");
+
+                    b.Property<string>("FcmToken")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar(512)")
+                        .HasColumnName("fcm_token");
+
+                    b.Property<DateTime>("LastUsedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("last_used_at");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FcmToken")
+                        .IsUnique()
+                        .HasDatabaseName("uk_user_device_tokens_fcm_token");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_user_device_tokens_user_id");
+
+                    b.ToTable("user_device_tokens", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
@@ -1394,6 +1666,12 @@ namespace OnlineAuction.Migrations
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_auctions_updated_by");
 
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "Verifier")
+                        .WithMany()
+                        .HasForeignKey("VerifiedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_auctions_verified_by");
+
                     b.HasOne("OnlineAuction.Entities.ApplicationUser", "Winner")
                         .WithMany("WonAuctions")
                         .HasForeignKey("WinnerId")
@@ -1401,6 +1679,8 @@ namespace OnlineAuction.Migrations
                         .HasConstraintName("fk_auctions_winner");
 
                     b.Navigation("Product");
+
+                    b.Navigation("Verifier");
 
                     b.Navigation("Winner");
                 });
@@ -1482,6 +1762,51 @@ namespace OnlineAuction.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("OnlineAuction.Entities.AuctionRegistrationDeposit", b =>
+                {
+                    b.HasOne("OnlineAuction.Entities.Auction", "Auction")
+                        .WithMany()
+                        .HasForeignKey("AuctionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OnlineAuction.Entities.AuctionRegistration", "Registration")
+                        .WithMany("Deposits")
+                        .HasForeignKey("AuctionRegistrationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_auction_registration_deposits_created_by");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("DeletedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_auction_registration_deposits_deleted_by");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_auction_registration_deposits_updated_by");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Auction");
+
+                    b.Navigation("Registration");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("OnlineAuction.Entities.Bid", b =>
                 {
                     b.HasOne("OnlineAuction.Entities.Auction", "Auction")
@@ -1540,6 +1865,36 @@ namespace OnlineAuction.Migrations
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_categories_updated_by");
+                });
+
+            modelBuilder.Entity("OnlineAuction.Entities.Notification", b =>
+                {
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_notifications_created_by");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("DeletedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_notifications_deleted_by");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_notifications_updated_by");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_notifications_user");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.OrderItem", b =>
@@ -1710,6 +2065,18 @@ namespace OnlineAuction.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("OnlineAuction.Entities.UserDeviceToken", b =>
+                {
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_device_tokens_user");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("OnlineAuction.Entities.ApplicationUser", b =>
                 {
                     b.Navigation("AuctionRegistrations");
@@ -1737,6 +2104,11 @@ namespace OnlineAuction.Migrations
                     b.Navigation("Items");
 
                     b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("OnlineAuction.Entities.AuctionRegistration", b =>
+                {
+                    b.Navigation("Deposits");
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.Category", b =>

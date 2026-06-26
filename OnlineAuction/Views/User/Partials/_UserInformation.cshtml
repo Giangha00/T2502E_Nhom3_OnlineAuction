@@ -29,10 +29,5 @@
       <input type="text" readonly value="@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? Localizer["User_NotUpdated"].Value : Model.PhoneNumber)"
              class="user-detail-field__input @(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "user-detail-field__input--placeholder" : "")"/>
     </div>
-    <div>
-      <label class="user-detail-field__label">@Localizer["User_Address"]</label>
-      <input type="text" readonly value="@(string.IsNullOrWhiteSpace(Model.Address) ? Localizer["User_NotUpdated"].Value : Model.Address)"
-             class="user-detail-field__input user-detail-field__input--placeholder"/>
-    </div>
   </div>
 </section>

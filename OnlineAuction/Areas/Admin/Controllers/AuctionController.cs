@@ -6,8 +6,7 @@ using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Areas.Admin.Controllers;
 
-[Area("Admin")]
-public class AuctionController : Controller
+public class AuctionController : BaseAdminController
 {
     private readonly AdminAuctionService _auctionService;
 

@@ -30,6 +30,14 @@
 
     <h3 class="mt-2 line-clamp-2 text-sm font-bold text-slate-900 sm:text-base">@auction.Name</h3>
 
+    @if (Model.IsOwner && string.Equals(auction.Status, "rejected", StringComparison.OrdinalIgnoreCase)
+        && !string.IsNullOrWhiteSpace(auction.RejectReason))
+    {
+      <p class="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+        @Localizer["User_RejectReason", auction.RejectReason]
+      </p>
+    }
+
     <div class="mt-3 flex flex-wrap gap-x-8 gap-y-2 text-sm">
       <div>
         <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-400">

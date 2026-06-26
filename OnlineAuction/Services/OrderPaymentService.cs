@@ -12,15 +12,24 @@ public class OrderPaymentService : IOrderPaymentService
 {
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IPayPalService _payPalService;
+    private readonly INotificationService _notificationService;
+    private readonly IOrderService _orderService;
+    private readonly IRealtimePublisher _realtimePublisher;
     private readonly ILogger<OrderPaymentService> _logger;
 
     public OrderPaymentService(
         AuctionHouseDbContext dbContext,
         IPayPalService payPalService,
+        INotificationService notificationService,
+        IOrderService orderService,
+        IRealtimePublisher realtimePublisher,
         ILogger<OrderPaymentService> logger)
     {
         _dbContext = dbContext;
         _payPalService = payPalService;
+        _notificationService = notificationService;
+        _orderService = orderService;
+        _realtimePublisher = realtimePublisher;
         _logger = logger;
     }
 
@@ -171,6 +180,32 @@ public class OrderPaymentService : IOrderPaymentService
                 order.PaymentMethod = "paypal";
                 order.UpdatedAt = now;
                 paidOrderIds.Add(order.Id);
+
+                // ------------------------------------------------------------
+                // Tiền cọc của winner đã được sử dụng.
+                //
+                // Deposit:
+                // Paid
+                //      ↓
+                // Applied
+                //
+                // Không refund nữa.
+                // ------------------------------------------------------------
+
+                var auctionId = order.Items.First().AuctionId;
+
+                var winnerDeposit = await _dbContext.AuctionRegistrationDeposits
+                    .FirstOrDefaultAsync(d =>
+                            d.AuctionId == auctionId &&
+                            d.UserId == order.BuyerId &&
+                            d.Status == AuctionRegistrationDepositStatuses.Paid,
+                        cancellationToken);
+
+                if (winnerDeposit != null)
+                {
+                    winnerDeposit.Status = AuctionRegistrationDepositStatuses.Applied;
+                    winnerDeposit.UpdatedAt = now;
+                }
             }
 
             foreach (var payment in pendingPayments.Where(payment => payment.Status == PaymentStatuses.Pending))
@@ -184,6 +219,21 @@ public class OrderPaymentService : IOrderPaymentService
             await _dbContext.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
         });
+
+        foreach (var orderId in paidOrderIds)
+        {
+            await _notificationService.CreateAndPushAsync(
+                buyerId,
+                "Payment successful",
+                "Your payment has been confirmed. View your order confirmation.",
+                NotificationType.Payment,
+                $"/Payment/Confirmation?orderId={orderId}",
+                NotificationReferenceTypes.PaymentSuccess,
+                orderId);
+        }
+
+        var orderCount = await _orderService.CountPendingPaymentOrdersAsync(buyerId);
+        await _realtimePublisher.SendOrderCountToUserAsync(buyerId, orderCount);
 
         return PayPalCaptureCheckoutResult.Ok(paidOrderIds[0], paidOrderIds);
     }
@@ -309,7 +359,183 @@ public class OrderPaymentService : IOrderPaymentService
             .OrderBy(order => order.PaymentDeadline)
             .ToListAsync(cancellationToken);
     }
+public async Task<string> TestProcessIpnAsync(
+    string payPalOrderId,
+    string transactionId,
+    string paymentStatus,
+    CancellationToken cancellationToken = default)
+{
+    /*
+     * Hàm này dùng để xử lý IPN.
+     *
+     * Đầu vào:
+     *
+     * payPalOrderId
+     * Mã Order bên PayPal.
+     *
+     * transactionId
+     * Mã giao dịch PayPal.
+     *
+     * paymentStatus
+     * Completed / Pending / Failed...
+     */
 
+    // Kiểm tra dữ liệu đầu vào
+    if (string.IsNullOrWhiteSpace(payPalOrderId))
+    {
+        return "Thiếu PayPalOrderId";
+    }
+
+    if (string.IsNullOrWhiteSpace(transactionId))
+    {
+        return "Thiếu TransactionId";
+    }
+
+    /*
+     * Tìm Payment theo PayPalOrderId.
+     *
+     * Include(Order)
+     * nghĩa là lấy luôn Order liên kết với Payment.
+     */
+
+    var payments = await _dbContext.Payments
+        .Include(x => x.Order)
+        .Where(x => x.PayPalOrderId == payPalOrderId)
+        .ToListAsync(cancellationToken);
+
+    /*
+     * Nếu không tìm thấy Payment
+     */
+
+    if (payments.Count == 0)
+    {
+        return "Không tìm thấy Payment";
+    }
+
+    /*
+     * Chống xử lý trùng.
+     *
+     * PayPal có thể gửi IPN nhiều lần.
+     * Nếu TransactionId đã tồn tại thì không xử lý nữa.
+     */
+
+    var transactionExists = await _dbContext.Payments
+        .AnyAsync(
+            x => x.TransactionId == transactionId,
+            cancellationToken);
+
+    if (transactionExists)
+    {
+        return "Transaction đã xử lý";
+    }
+
+    /*
+     * Lấy thời gian hiện tại UTC
+     */
+
+    var now = DateTime.UtcNow;
+
+    /*
+     * Nếu PayPal báo thanh toán thành công
+     */
+
+    if (paymentStatus == "Completed")
+    {
+        foreach (var payment in payments)
+        {
+            /*
+             * Cập nhật Payment
+             */
+
+            payment.Status = PaymentStatuses.Success;
+
+            payment.TransactionId = transactionId;
+
+            payment.PaidAt = now;
+
+            payment.UpdatedAt = now;
+
+            /*
+             * Cập nhật Order
+             */
+
+            payment.Order.Status = OrderStatuses.Paid;
+
+            payment.Order.PaymentMethod = "paypal";
+
+            payment.Order.UpdatedAt = now;
+        }
+
+        /*
+         * SaveChanges
+         * lưu tất cả thay đổi xuống database
+         */
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        foreach (var payment in payments)
+        {
+            await _notificationService.CreateAndPushAsync(
+                payment.Order.BuyerId,
+                "Payment successful",
+                "Your payment has been confirmed. View your order confirmation.",
+                NotificationType.Payment,
+                $"/Payment/Confirmation?orderId={payment.OrderId}",
+                NotificationReferenceTypes.PaymentSuccess,
+                payment.OrderId,
+                cancellationToken: cancellationToken);
+        }
+
+        var buyerIds = payments.Select(p => p.Order.BuyerId).Distinct();
+        foreach (var buyerId in buyerIds)
+        {
+            var orderCount = await _orderService.CountPendingPaymentOrdersAsync(buyerId);
+            await _realtimePublisher.SendOrderCountToUserAsync(buyerId, orderCount, cancellationToken);
+        }
+
+        return "Thanh toán thành công";
+    }
+
+    /*
+     * Payment Pending
+     */
+
+    if (paymentStatus == "Pending")
+    {
+        foreach (var payment in payments)
+        {
+            payment.Status = PaymentStatuses.Pending;
+
+            payment.UpdatedAt = now;
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return "Thanh toán đang chờ";
+    }
+
+    /*
+     * Payment thất bại
+     */
+
+    if (paymentStatus == "Failed"
+        || paymentStatus == "Denied")
+    {
+        foreach (var payment in payments)
+        {
+            payment.Status = PaymentStatuses.Failed;
+
+            payment.UpdatedAt = now;
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return "Thanh toán thất bại";
+    }
+
+    return $"Chưa xử lý status: {paymentStatus}";
+}
     private static bool AmountsMatch(decimal expected, decimal actual) =>
         Math.Abs(expected - actual) < 0.01m;
+    
 }

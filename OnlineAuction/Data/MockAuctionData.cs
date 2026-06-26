@@ -1,4 +1,6 @@
+using OnlineAuction.Entities;
 using OnlineAuction.Models;
+using OnlineAuction.Services;
 
 namespace OnlineAuction.Data;
 
@@ -12,13 +14,19 @@ public static class MockAuctionData
         "Sports"
     ];
 
-    private static readonly Dictionary<string, (string Image, string DisplayCount)> CategoryMeta = new()
+    private static readonly Dictionary<string, (string Image, string DisplayCount)> CategoryMeta = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["Pokémon"] = ("https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=800&h=500&fit=crop", "1,240+ Items"),
-        ["One Piece"] = ("https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=800&h=500&fit=crop", "860+ Items"),
-        ["Yu-Gi-Oh!"] = ("https://images.unsplash.com/photo-1606107557195-0a29cbf1f2b3?w=800&h=500&fit=crop", "540+ Items"),
-        ["Sports"] = ("https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&h=500&fit=crop", "920+ Items")
+        ["Pokémon"] = ("/images/categories/pokemon.png", "1,240+ Items"),
+        ["One Piece"] = ("/images/categories/one-piece.png", "860+ Items"),
+        ["Yu-Gi-Oh!"] = ("/images/categories/yu-gi-oh.jpg", "540+ Items"),
+        ["Sports"] = ("/images/categories/sports.jpg", "920+ Items"),
+        ["Magic: The Gathering"] = ("https://cards.scryfall.io/large/front/b/0/b0faa7f2-b547-42c4-a810-839da50dadfe.jpg?1559591477", "320+ Items")
     };
+
+    public static string GetCategoryImageUrl(string categoryName) =>
+        CategoryMeta.TryGetValue(categoryName, out var meta)
+            ? meta.Image
+            : "/images/categories/pokemon.png";
 
     public static List<AuctionItemViewModel> GetAllAuctions() =>
     [
@@ -44,6 +52,107 @@ public static class MockAuctionData
 
     public static List<AuctionItemViewModel> GetHotAuctions() =>
         GetAllAuctions().Where(a => a.IsHot).Take(4).ToList();
+
+    private const int HomeSectionItemCount = 15;
+
+    private static List<AuctionItemViewModel> TakeHomeSectionItems(IEnumerable<AuctionItemViewModel> source)
+    {
+        var pool = source.ToList();
+        if (pool.Count == 0)
+        {
+            return [];
+        }
+
+        var result = new List<AuctionItemViewModel>(HomeSectionItemCount);
+        while (result.Count < HomeSectionItemCount)
+        {
+            foreach (var item in pool)
+            {
+                if (result.Count >= HomeSectionItemCount)
+                {
+                    break;
+                }
+
+                result.Add(item);
+            }
+        }
+
+        return result;
+    }
+
+    public static List<AuctionItemViewModel> GetRecommended()
+    {
+        var deals = GetAllAuctions()
+            .Concat(GetBuyNowListings())
+            .Select(item =>
+            {
+                AssignMockRecommendedDeal(item);
+                return item;
+            })
+            .Where(ProductDetailMapper.IsRecommendedDeal)
+            .OrderByDescending(item => item.DealLabel == "Great Deal")
+            .ThenByDescending(item => item.CurrentPrice)
+            .ToList();
+
+        return TakeHomeSectionItems(deals);
+    }
+
+    private static void AssignMockRecommendedDeal(AuctionItemViewModel item)
+    {
+        ProductDetailMapper.ApplyDealInfo(item);
+        if (ProductDetailMapper.IsRecommendedDeal(item))
+        {
+            return;
+        }
+
+        if (item.Id % 2 == 0)
+        {
+            item.DealLabel = "Great Deal";
+            item.DealNote = "$600 offer being considered";
+        }
+        else
+        {
+            item.DealLabel = "Good Deal";
+            item.DealNote = "Offers being negotiated";
+        }
+
+        item.DisplayTitle = ProductDetailMapper.BuildListingTitle(item);
+    }
+
+    public static List<AuctionItemViewModel> GetTrendingOnAuction() =>
+        TakeHomeSectionItems(
+            GetAllAuctions()
+                .Where(a => a.Status is "Live" or "Ending Soon")
+                .OrderByDescending(a => a.BidCount)
+                .ThenByDescending(a => a.CurrentPrice));
+
+    public static List<AuctionItemViewModel> GetBuyNowListings() =>
+    [
+        new() { Id = 101, Name = "Charizard VMAX Rainbow", Category = "Pokémon", Subtitle = "Champion's Path · 2020", Grade = "PSA 10", Year = 2020, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=600&h=750&fit=crop", StartingPrice = 850, CurrentPrice = 1250, Status = "Live", TimeRemaining = "In stock", IsHot = true, BidCount = 42 },
+        new() { Id = 102, Name = "Luffy Gear 5 Leader Alt", Category = "One Piece", Subtitle = "ST-21 · 2024", Grade = "PSA 10", Year = 2024, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=600&h=750&fit=crop", StartingPrice = 320, CurrentPrice = 480, Status = "Live", TimeRemaining = "In stock", IsHot = true, BidCount = 38 },
+        new() { Id = 103, Name = "Blue-Eyes Alternative Art", Category = "Yu-Gi-Oh!", Subtitle = "RA · 2021", Grade = "BGS 9.5", Year = 2021, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1606107557195-0a29cbf1f2b3?w=600&h=750&fit=crop", StartingPrice = 2100, CurrentPrice = 2890, Status = "Live", TimeRemaining = "In stock", BidCount = 31 },
+        new() { Id = 104, Name = "Victor Wembanyama Prizm RC", Category = "Sports", Subtitle = "2023 Prizm · #275", Grade = "PSA 10", Year = 2023, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&h=750&fit=crop", StartingPrice = 4200, CurrentPrice = 5650, Status = "Live", TimeRemaining = "In stock", BidCount = 29 },
+        new() { Id = 105, Name = "Sol Ring Secret Lair", Category = "Magic: The Gathering", Subtitle = "Secret Lair · 2022", Grade = "CGC 9.5", Year = 2022, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=600&h=750&fit=crop", StartingPrice = 180, CurrentPrice = 245, Status = "Live", TimeRemaining = "In stock", BidCount = 24 },
+        new() { Id = 106, Name = "Umbreon VMAX Alt Art", Category = "Pokémon", Subtitle = "Evolving Skies · 2021", Grade = "PSA 10", Year = 2021, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=600&h=750&fit=crop", StartingPrice = 680, CurrentPrice = 920, Status = "Live", TimeRemaining = "In stock", BidCount = 22 },
+        new() { Id = 107, Name = "Shanks Manga Rare", Category = "One Piece", Subtitle = "OP-09 · 2024", Grade = "PSA 10", Year = 2024, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&h=750&fit=crop", StartingPrice = 2400, CurrentPrice = 3100, Status = "Live", TimeRemaining = "In stock", BidCount = 20 },
+        new() { Id = 108, Name = "Dark Magician Starlight", Category = "Yu-Gi-Oh!", Subtitle = "LOB · 2002", Grade = "PSA 9", Year = 2002, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1565538810643-b5bdb4dfa845?w=600&h=750&fit=crop", StartingPrice = 5200, CurrentPrice = 6400, Status = "Live", TimeRemaining = "In stock", BidCount = 18 },
+        new() { Id = 109, Name = "Travis Kelce Prizm RC", Category = "Sports", Subtitle = "2013 Prizm · #165", Grade = "PSA 10", Year = 2013, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1606107557195-0a29b4b9efab?w=600&h=750&fit=crop", StartingPrice = 1800, CurrentPrice = 2350, Status = "Live", TimeRemaining = "In stock", BidCount = 17 },
+        new() { Id = 110, Name = "Black Lotus Proxy Set", Category = "Magic: The Gathering", Subtitle = "30th Anniversary · 2022", Grade = "BGS 9", Year = 2022, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1606169046337-54513793d481?w=600&h=750&fit=crop", StartingPrice = 95, CurrentPrice = 140, Status = "Live", TimeRemaining = "In stock", BidCount = 15 },
+        new() { Id = 111, Name = "Pikachu VMAX Gold", Category = "Pokémon", Subtitle = "Shining Fates · 2021", Grade = "PSA 10", Year = 2021, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=600&h=750&fit=crop", StartingPrice = 420, CurrentPrice = 580, Status = "Live", TimeRemaining = "In stock", BidCount = 14 },
+        new() { Id = 112, Name = "Nami SP Parallel", Category = "One Piece", Subtitle = "OP-08 · 2024", Grade = "BGS 9.5", Year = 2024, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=600&h=750&fit=crop", StartingPrice = 890, CurrentPrice = 1120, Status = "Live", TimeRemaining = "In stock", BidCount = 13 },
+        new() { Id = 113, Name = "Gengar VMAX Alt Art", Category = "Pokémon", Subtitle = "Fusion Strike · 2021", Grade = "PSA 10", Year = 2021, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=600&h=750&fit=crop", StartingPrice = 760, CurrentPrice = 990, Status = "Live", TimeRemaining = "In stock", BidCount = 12 },
+        new() { Id = 114, Name = "Zoro Manga Rare", Category = "One Piece", Subtitle = "OP-06 · 2024", Grade = "PSA 10", Year = 2024, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&h=750&fit=crop", StartingPrice = 1950, CurrentPrice = 2480, Status = "Live", TimeRemaining = "In stock", BidCount = 11 },
+        new() { Id = 115, Name = "Tom Brady Contenders RC", Category = "Sports", Subtitle = "2000 Contenders · #144", Grade = "BGS 9.5", Year = 2000, ListingType = ListingTypes.BuyNow, ImageUrl = "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&h=750&fit=crop", StartingPrice = 6800, CurrentPrice = 8450, Status = "Live", TimeRemaining = "In stock", BidCount = 10 }
+    ];
+
+    public static List<AuctionItemViewModel> GetTrendingOnBuyNow() =>
+        TakeHomeSectionItems(GetBuyNowListings().OrderByDescending(a => a.CurrentPrice));
+
+    public static List<AuctionItemViewModel> GetRecentlyAdded() =>
+        TakeHomeSectionItems(
+            GetAllAuctions()
+                .Concat(GetBuyNowListings())
+                .OrderByDescending(a => a.Id));
 
     public static AuctionItemViewModel? GetAuctionById(int id) =>
         GetAllAuctions().FirstOrDefault(a => a.Id == id);

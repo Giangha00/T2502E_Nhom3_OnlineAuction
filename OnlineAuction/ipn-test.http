@@ -1,0 +1,8 @@
+﻿POST http://localhost:5006/Payment/PayPalIpn
+Content-Type: application/x-www-form-urlencoded
+
+payment_status=Completed&
+txn_id=TEST_TXN_001&
+paypal_order_id=4Y637495N74938216&
+mc_gross=1405.00&
+mc_currency=USD

@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OnlineAuction.Configurations;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
 using OnlineAuction.Helpers;
@@ -26,9 +28,10 @@ public class AuthController : Controller
     }
 
     [HttpGet]
-    public IActionResult Login(string? returnUrl = null)
+    public async Task<IActionResult> Login(string? returnUrl = null)
     {
-        if (User.Identity?.IsAuthenticated == true)
+        var userAuth = await HttpContext.AuthenticateAsync(AuthSchemes.User);
+        if (userAuth.Succeeded)
         {
             return Redirect(AuthRedirectHelper.ResolveReturnUrl(Url, returnUrl));
         }
@@ -55,6 +58,12 @@ public class AuthController : Controller
         if (user.Status != UserStatus.Active)
         {
             ModelState.AddModelError(string.Empty, "Your account has been deactivated.");
+            return AuthFailureView(model, "login", fromModal);
+        }
+
+        if (await _userManager.IsInRoleAsync(user, UserRole.Admin.ToString()))
+        {
+            ModelState.AddModelError(string.Empty, "Please use the admin login page.");
             return AuthFailureView(model, "login", fromModal);
         }
 
@@ -91,9 +100,10 @@ public class AuthController : Controller
     }
 
     [HttpGet]
-    public IActionResult SignUp(string? returnUrl = null)
+    public async Task<IActionResult> SignUp(string? returnUrl = null)
     {
-        if (User.Identity?.IsAuthenticated == true)
+        var userAuth = await HttpContext.AuthenticateAsync(AuthSchemes.User);
+        if (userAuth.Succeeded)
         {
             return Redirect(AuthRedirectHelper.ResolveReturnUrl(Url, returnUrl));
         }

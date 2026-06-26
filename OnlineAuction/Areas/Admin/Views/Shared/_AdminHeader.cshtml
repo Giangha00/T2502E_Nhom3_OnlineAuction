@@ -1,3 +1,15 @@
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using OnlineAuction.Configurations
+@{
+    var adminAuth = await Context.AuthenticateAsync(AuthSchemes.Admin);
+    var adminPrincipal = adminAuth.Succeeded ? adminAuth.Principal : null;
+    var displayEmail = adminPrincipal?.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
+    var displayName = adminPrincipal?.FindFirstValue("FullName")
+        ?? adminPrincipal?.FindFirstValue(ClaimTypes.Name)
+        ?? "Admin";
+}
+
 <header
     class="sticky top-0 z-99999 flex w-full border-gray-200 bg-white lg:border-b dark:border-gray-800 dark:bg-gray-900">
     <div class="flex grow flex-col items-center justify-between lg:flex-row lg:px-6">
@@ -59,10 +71,16 @@
 
             <div class="flex items-center gap-3">
                 <span class="hidden text-right sm:block">
-                    <span class="block text-theme-sm font-medium text-gray-700 dark:text-gray-400">Admin User</span>
-                    <span class="block text-theme-xs text-gray-500 dark:text-gray-400">admin@auctionhouse.com</span>
+                    <span class="block text-theme-sm font-medium text-gray-700 dark:text-gray-400">@displayName</span>
+                    <span class="block text-theme-xs text-gray-500 dark:text-gray-400">@displayEmail</span>
                 </span>
-                @* <img class="h-11 w-11 overflow-hidden rounded-full" src="~/admin/images/user/user-01.jpg" alt="Admin user" /> *@
+                <form asp-area="Admin" asp-controller="Account" asp-action="Logout" method="post" class="inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit"
+                            class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+                        Logout
+                    </button>
+                </form>
             </div>
         </div>
     </div>

@@ -4,8 +4,7 @@ using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Areas.Admin.Controllers;
 
-[Area("Admin")]
-public class CategoryController : Controller
+public class CategoryController : BaseAdminController
 {
     private readonly ICategoryService _categoryService;
 

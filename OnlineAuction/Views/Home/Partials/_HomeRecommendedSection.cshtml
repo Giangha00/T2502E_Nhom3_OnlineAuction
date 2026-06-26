@@ -1,0 +1,45 @@
+@model OnlineAuction.Models.HomeViewModel
+
+@if (Model.Recommended.Count > 0)
+{
+  <section class="home-recommended-section border-b border-stone-200 py-10 sm:py-12"
+           data-home-carousel
+           data-home-carousel-header-nav>
+    <div class="mb-6 flex flex-col gap-4 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
+      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Recommended</h2>
+      <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+        <span class="text-sm text-slate-500" data-home-carousel-range>Showing 1–@Math.Min(4, Model.Recommended.Count) of @Model.Recommended.Count</span>
+        <div class="flex items-center gap-1">
+          <button type="button"
+                  class="home-carousel-header-btn"
+                  data-home-carousel-prev
+                  aria-label="Scroll recommended left">
+            ‹
+          </button>
+          <button type="button"
+                  class="home-carousel-header-btn"
+                  data-home-carousel-next
+                  aria-label="Scroll recommended right">
+            ›
+          </button>
+        </div>
+        <a asp-controller="Auction" asp-action="Index"
+           class="text-sm font-semibold text-blue-700 hover:text-blue-900">
+          @Localizer["Common_ViewAll"] <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+    <div class="home-carousel-shell relative px-4 sm:px-8 lg:px-12">
+      <div class="home-carousel-fade home-carousel-fade--left" aria-hidden="true"></div>
+      <div class="home-carousel-fade home-carousel-fade--right" aria-hidden="true"></div>
+      <div class="rarecard-recommended-row" data-home-carousel-track id="home-carousel-recommended">
+        @foreach (var item in Model.Recommended)
+        {
+          <div class="rarecard-recommended-row__item">
+            <partial name="Partials/_RecommendedDealCard" model="item"/>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+}

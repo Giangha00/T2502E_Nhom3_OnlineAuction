@@ -49,7 +49,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
         </svg>
         <div>
-          <p id="successMessageText" class="font-semibold">@(successMessage ?? Localizer["Sell_SuccessMessage"].Value)</p>
+          <p id="successMessageText" class="font-semibold">@(successMessage ?? Localizer["Sell_SubmittedForReview"].Value)</p>
           <a asp-controller="Auction" asp-action="Index" class="mt-1 inline-block text-emerald-900 underline">@Localizer["Sell_ViewAuctions"]</a>
         </div>
       </div>

@@ -32,11 +32,18 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
 
     public DbSet<ProductDocument> ProductDocuments => Set<ProductDocument>();
+    
+    public DbSet<AuctionRegistrationDeposit> AuctionRegistrationDeposits => Set<AuctionRegistrationDeposit>();
+
+    public DbSet<Notification> Notifications => Set<Notification>();
+
+    public DbSet<UserDeviceToken> UserDeviceTokens => Set<UserDeviceToken>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        
         base.OnModelCreating(builder);
-
+        ConfigureAuctionRegistrationDeposits(builder);
         ConfigureIdentityTables(builder);
         ConfigureUsers(builder);
         ConfigureCategories(builder);
@@ -49,7 +56,71 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureOrders(builder);
         ConfigureOrderItems(builder);
         ConfigurePayments(builder);
+        ConfigureNotifications(builder);
+        ConfigureUserDeviceTokens(builder);
     }
+    private static void ConfigureAuctionRegistrationDeposits(ModelBuilder builder)
+{
+    builder.Entity<AuctionRegistrationDeposit>(entity =>
+    {
+        entity.ToTable("auction_registration_deposits");
+
+        entity.Property(d => d.Id).HasColumnName("id");
+
+        entity.Property(d => d.AuctionId).HasColumnName("auction_id");
+
+        entity.Property(d => d.UserId).HasColumnName("user_id");
+
+        entity.Property(d => d.AuctionRegistrationId)
+            .HasColumnName("auction_registration_id");
+        
+        // Tiền nên set precision để tránh lỗi làm tròn trong database
+        entity.Property(d => d.Amount)
+            .HasColumnName("amount")
+            .HasPrecision(18, 2);
+
+        entity.Property(d => d.Status)
+            .HasColumnName("status")
+            .HasMaxLength(30)
+            .IsRequired();
+        entity.Property(d => d.PayPalOrderId)
+            .HasColumnName("paypal_order_id")
+            .HasMaxLength(120);
+
+        entity.Property(d => d.PayPalCaptureId)
+            .HasColumnName("paypal_capture_id")
+            .HasMaxLength(120);
+
+        entity.Property(d => d.PayPalRefundId)
+            .HasColumnName("paypal_refund_id")
+            .HasMaxLength(120);
+
+        entity.Property(d => d.PaidAt).HasColumnName("paid_at");
+
+        entity.Property(d => d.RefundedAt).HasColumnName("refunded_at");
+
+        // Tìm deposit bằng paypal_order_id khi PayPal return về token
+        entity.HasIndex(d => d.PayPalOrderId)
+            .HasDatabaseName("ix_deposits_paypal_order_id");
+
+        entity.HasOne(d => d.Auction)
+            .WithMany()
+            .HasForeignKey(d => d.AuctionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        entity.HasOne(d => d.User)
+            .WithMany()
+            .HasForeignKey(d => d.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        entity.HasOne(d => d.Registration)
+            .WithMany(r => r.Deposits)
+            .HasForeignKey(d => d.AuctionRegistrationId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        ConfigureAuditableEntity(entity, "auction_registration_deposits");
+    });
+}
 
     private static void ConfigureIdentityTables(ModelBuilder builder)
     {
@@ -239,6 +310,10 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(a => a.ListingType).HasColumnName("listing_type").HasMaxLength(20).IsRequired().HasDefaultValue(ListingTypes.Auction);
             entity.Property(a => a.RequiresRegistration).HasColumnName("requires_registration").HasDefaultValue(true);
             entity.Property(a => a.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(AuctionStatuses.Live);
+            entity.Property(a => a.SubmittedAt).HasColumnName("submitted_at");
+            entity.Property(a => a.VerifiedAt).HasColumnName("verified_at");
+            entity.Property(a => a.VerifiedBy).HasColumnName("verified_by");
+            entity.Property(a => a.RejectReason).HasColumnName("reject_reason").HasMaxLength(500);
             entity.Property(a => a.StartDate).HasColumnName("start_date");
             entity.Property(a => a.EndDate).HasColumnName("end_date");
             entity.Property(a => a.AuctionEventName).HasColumnName("auction_event_name").HasMaxLength(160);
@@ -260,6 +335,12 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
                 .HasConstraintName("fk_auctions_winner")
                 .OnDelete(DeleteBehavior.SetNull);
 
+            entity.HasOne(a => a.Verifier)
+                .WithMany()
+                .HasForeignKey(a => a.VerifiedBy)
+                .HasConstraintName("fk_auctions_verified_by")
+                .OnDelete(DeleteBehavior.SetNull);
+
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_auctions_prices",
                 "`starting_price` > 0 AND `bid_step` > 0 AND `current_price` >= 0 AND (`buy_now_price` IS NULL OR `buy_now_price` > `starting_price`)"));
@@ -271,6 +352,10 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_auctions_listing_type",
                 "`listing_type` IN ('auction', 'buynow')"));
+
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_auctions_status",
+                "`status` IN ('pending_review','rejected','scheduled','live','ending_soon','ended','awaiting_payment','completed','cancelled')"));
 
             ConfigureAuditableEntity(entity, "auctions");
         });
@@ -377,6 +462,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(o => o.TotalAmount).HasColumnName("total_amount").HasPrecision(18, 2);
             entity.Property(o => o.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(OrderStatuses.PendingPayment);
             entity.Property(o => o.PaymentDeadline).HasColumnName("payment_deadline");
+            entity.Property(o => o.DepositApplied).HasColumnName("deposit_applied").HasPrecision(18, 2);
+
             entity.Property(o => o.ShippingFullName).HasColumnName("shipping_full_name").HasMaxLength(120);
             entity.Property(o => o.ShippingAddress).HasColumnName("shipping_address").HasMaxLength(300);
             entity.Property(o => o.ShippingCity).HasColumnName("shipping_city").HasMaxLength(100);
@@ -466,6 +553,62 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
                 "`amount` > 0"));
 
             ConfigureAuditableEntity(entity, "payments");
+        });
+    }
+
+    private static void ConfigureNotifications(ModelBuilder builder)
+    {
+        builder.Entity<Notification>(entity =>
+        {
+            entity.ToTable("notifications");
+
+            entity.Property(n => n.Id).HasColumnName("id");
+            entity.Property(n => n.UserId).HasColumnName("user_id");
+            entity.Property(n => n.Title).HasColumnName("title").HasMaxLength(200).IsRequired();
+            entity.Property(n => n.Message).HasColumnName("message").HasMaxLength(500).IsRequired();
+            entity.Property(n => n.Type).HasColumnName("type").HasMaxLength(30).IsRequired();
+            entity.Property(n => n.RelatedUrl).HasColumnName("related_url").HasMaxLength(260);
+            entity.Property(n => n.IsRead).HasColumnName("is_read");
+            entity.Property(n => n.ReadAt).HasColumnName("read_at");
+            entity.Property(n => n.ReferenceType).HasColumnName("reference_type").HasMaxLength(50);
+            entity.Property(n => n.ReferenceId).HasColumnName("reference_id");
+
+            entity.HasIndex(n => new { n.UserId, n.IsRead }).HasDatabaseName("ix_notifications_user_read");
+            entity.HasIndex(n => new { n.UserId, n.CreatedAt }).HasDatabaseName("ix_notifications_user_created");
+            entity.HasIndex(n => new { n.ReferenceType, n.ReferenceId, n.UserId })
+                .HasDatabaseName("ix_notifications_reference");
+
+            entity.HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
+                .HasConstraintName("fk_notifications_user")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            ConfigureAuditableEntity(entity, "notifications");
+        });
+    }
+
+    private static void ConfigureUserDeviceTokens(ModelBuilder builder)
+    {
+        builder.Entity<UserDeviceToken>(entity =>
+        {
+            entity.ToTable("user_device_tokens");
+
+            entity.Property(t => t.Id).HasColumnName("id");
+            entity.Property(t => t.UserId).HasColumnName("user_id");
+            entity.Property(t => t.FcmToken).HasColumnName("fcm_token").HasMaxLength(512).IsRequired();
+            entity.Property(t => t.DeviceInfo).HasColumnName("device_info").HasMaxLength(260);
+            entity.Property(t => t.CreatedAt).HasColumnName("created_at");
+            entity.Property(t => t.LastUsedAt).HasColumnName("last_used_at");
+
+            entity.HasIndex(t => t.FcmToken).IsUnique().HasDatabaseName("uk_user_device_tokens_fcm_token");
+            entity.HasIndex(t => t.UserId).HasDatabaseName("ix_user_device_tokens_user_id");
+
+            entity.HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .HasConstraintName("fk_user_device_tokens_user")
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 
