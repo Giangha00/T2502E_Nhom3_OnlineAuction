@@ -1,9 +1,8 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Configurations;
-using OnlineAuction.Data;
 using OnlineAuction.Entities;
-using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
@@ -11,22 +10,26 @@ namespace OnlineAuction.Controllers;
 public class BuyNowController : Controller
 {
     private readonly IAuctionService _auctionService;
+    private readonly IOrderCreationService _orderCreationService;
 
-    public BuyNowController(IAuctionService auctionService)
+    public BuyNowController(
+        IAuctionService auctionService,
+        IOrderCreationService orderCreationService)
     {
         _auctionService = auctionService;
+        _orderCreationService = orderCreationService;
     }
 
     public async Task<IActionResult> Index()
     {
-        var model = await _auctionService.GetAuctionIndexAsync(ListingTypes.BuyNow);
+        var model = await _auctionService.GetBuyNowIndexAsync();
         return View(model);
     }
 
     public async Task<IActionResult> Detail(int id)
     {
         var product = await _auctionService.GetProductDetailAsync(id);
-        if (product is null)
+        if (product is null || !product.HasBuyNow)
         {
             return NotFound();
         }
@@ -37,29 +40,41 @@ public class BuyNowController : Controller
     [HttpPost]
     [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddToCart(int productId)
+    public async Task<IActionResult> AddToCart(int auctionId, CancellationToken cancellationToken)
     {
-        var product = await _auctionService.GetProductDetailAsync(productId);
-        if (product is null)
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return Unauthorized(new { success = false, message = "Please sign in to continue." });
+        }
+
+        var listing = await _auctionService.GetAuctionByIdAsync(auctionId);
+        if (listing is null || !listing.HasBuyNow)
         {
             return NotFound(new { success = false, message = "Product not found." });
         }
 
-        var imageUrl = product.Images.FirstOrDefault() ?? string.Empty;
-        CartStore.AddItem(HttpContext.Session, new CartItemViewModel
+        var result = await _orderCreationService.CreatePendingPaymentOrderForBuyNowAsync(
+            auctionId,
+            userId.Value,
+            cancellationToken);
+
+        if (!result.Success)
         {
-            ProductId = product.Id,
-            Name = product.Name,
-            ImageUrl = imageUrl,
-            Price = product.CurrentPrice,
-            Category = product.Category
-        });
+            return BadRequest(new { success = false, message = result.Message });
+        }
 
         return Json(new
         {
             success = true,
-            message = "Added to cart.",
-            cartCount = CartStore.GetCount(HttpContext.Session)
+            message = result.Message,
+            redirectUrl = Url.Action("Index", "Order")
         });
+    }
+
+    private int? GetCurrentUserId()
+    {
+        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return int.TryParse(value, out var userId) ? userId : null;
     }
 }

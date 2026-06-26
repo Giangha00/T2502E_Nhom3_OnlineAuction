@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    var POLL_INTERVAL_MS = 15000;
+    var POLL_INTERVAL_MS = 60000;
 
     var root = document.getElementById('headerNotifications');
     if (!root) return;
@@ -192,12 +192,17 @@
     });
 
     document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'visible') {
+        if (document.visibilityState === 'visible'
+            && (!window.realtimeHub || !window.realtimeHub.isConnected())) {
             refreshFromServer();
         }
     });
 
-    setInterval(refreshFromServer, POLL_INTERVAL_MS);
+    setInterval(function () {
+        if (!window.realtimeHub || !window.realtimeHub.isConnected()) {
+            refreshFromServer();
+        }
+    }, POLL_INTERVAL_MS);
 
     function closeLanguageDropdown() {
         var langDropdown = document.getElementById('languageDropdown');

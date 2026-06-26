@@ -25,11 +25,15 @@ public class AuctionService : IAuctionService
     public async Task<HomeViewModel> GetHomePageAsync()
     {
         var auctionEntities = await QueryLiveAuctionEntitiesAsync(ListingTypes.Auction);
-        var buyNowEntities = await QueryLiveAuctionEntitiesAsync(ListingTypes.BuyNow);
+        var buyNowEntities = await QueryLiveBuyNowEntitiesAsync();
         var allEntities = auctionEntities.Concat(buyNowEntities).ToList();
 
-        var auctionItems = auctionEntities.Select(ProductDetailMapper.MapToAuctionItem).ToList();
-        var buyNowItems = buyNowEntities.Select(ProductDetailMapper.MapToAuctionItem).ToList();
+        var auctionItems = auctionEntities
+            .Select(auction => ProductDetailMapper.MapToAuctionItem(auction))
+            .ToList();
+        var buyNowItems = buyNowEntities
+            .Select(auction => ProductDetailMapper.MapToAuctionItem(auction, true))
+            .ToList();
         var allItems = auctionItems.Concat(buyNowItems).ToList();
 
         var recommended = PickSection(
@@ -52,7 +56,7 @@ public class AuctionService : IAuctionService
         var recentlyAdded = PickSection(
             allEntities
                 .OrderByDescending(auction => auction.CreatedAt)
-                .Select(ProductDetailMapper.MapToAuctionItem),
+                .Select(auction => ProductDetailMapper.MapToAuctionItem(auction)),
             HomeSectionItemCount);
 
         var categories = await BuildAuctionCategoriesAsync(allItems);
@@ -62,11 +66,21 @@ public class AuctionService : IAuctionService
         {
             Recommended = WithFallback(recommended, MockAuctionData.GetRecommended),
             TrendingOnAuction = WithFallback(trendingOnAuction, MockAuctionData.GetTrendingOnAuction),
-            TrendingOnBuyNow = WithFallback(trendingOnBuyNow, MockAuctionData.GetTrendingOnBuyNow),
+            TrendingOnBuyNow = trendingOnBuyNow,
             RecentlyAdded = WithFallback(recentlyAdded, MockAuctionData.GetRecentlyAdded),
             BestSellers = WithFallback(bestSellers, MockAuctionData.GetBestSellers),
             Categories = categories.Count > 0 ? categories : MockAuctionData.GetCategories(),
             VaultPosts = MockAuctionData.GetVaultPosts()
+        };
+    }
+
+    public async Task<AuctionViewModel> GetBuyNowIndexAsync()
+    {
+        var auctions = await QueryPublicBuyNowListingsAsync();
+        return new AuctionViewModel
+        {
+            Auctions = auctions.ToList(),
+            Categories = await BuildAuctionCategoriesAsync(auctions)
         };
     }
 
@@ -150,7 +164,7 @@ public class AuctionService : IAuctionService
             .ToListAsync();
 
         var relatedItems = related
-            .Select(ProductDetailMapper.MapToAuctionItem)
+            .Select(auction => ProductDetailMapper.MapToAuctionItem(auction))
             .ToList();
 
         return ProductDetailMapper.MapToViewModel(
@@ -189,20 +203,45 @@ public class AuctionService : IAuctionService
             .ToListAsync();
 
         return auctions
-            .Select(ProductDetailMapper.MapToAuctionItem)
+            .Select(auction => ProductDetailMapper.MapToAuctionItem(auction))
             .ToList();
     }
 
     public IReadOnlyList<AuctionItemViewModel> GetAllAuctions() =>
         GetAllAuctionsAsync().GetAwaiter().GetResult();
 
+    private async Task<IReadOnlyList<AuctionItemViewModel>> QueryPublicBuyNowListingsAsync()
+    {
+        var auctions = await QueryLiveBuyNowEntitiesAsync();
+        return auctions
+            .OrderByDescending(auction => auction.CreatedAt)
+            .Select(auction => ProductDetailMapper.MapToAuctionItem(auction, true))
+            .ToList();
+    }
+
     private async Task<IReadOnlyList<AuctionItemViewModel>> QueryPublicListingsAsync(string listingType)
     {
         var auctions = await QueryLiveAuctionEntitiesAsync(listingType);
         return auctions
             .OrderByDescending(auction => auction.CreatedAt)
-            .Select(ProductDetailMapper.MapToAuctionItem)
+            .Select(auction => ProductDetailMapper.MapToAuctionItem(auction))
             .ToList();
+    }
+
+    private async Task<List<Auction>> QueryLiveBuyNowEntitiesAsync()
+    {
+        var now = DateTime.UtcNow;
+
+        return await _dbContext.Auctions
+            .AsNoTracking()
+            .Include(a => a.Product)
+                .ThenInclude(p => p.Category)
+            .Include(a => a.Bids)
+            .Where(a =>
+                a.BuyNowPrice != null &&
+                (a.Status == AuctionStatuses.Live || a.Status == AuctionStatuses.EndingSoon) &&
+                a.EndDate > now)
+            .ToListAsync();
     }
 
     private async Task<List<Auction>> QueryLiveAuctionEntitiesAsync(string listingType)
