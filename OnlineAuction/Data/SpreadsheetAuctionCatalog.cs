@@ -24,7 +24,34 @@ public static class SpreadsheetAuctionCatalog
         int EndMinutes,
         int ExistingBidCount = 0);
 
-    public static IReadOnlyList<Entry> GetEntries() =>
+    public static IReadOnlyList<Entry> GetEntries() => GetAuctionEntries();
+
+    private static readonly IReadOnlyDictionary<string, decimal> BuyNowPricesByName =
+        new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["PSA 10 Pikachu VMAX Rainbow Rare #188 Vivid Voltage 2020"] = 450,
+            ["PSA 10 Umbreon VMAX Alternate Art #215 Evolving Skies 2021"] = 1_650,
+            ["PSA 10 Blastoise 1st Edition Holo #2 Base Set 1999"] = 48_000,
+            ["PSA 10 Venusaur 1st Edition Holo #15 Base Set 1999"] = 37_500,
+            ["PSA 10 Mewtwo 1st Edition Holo #10 Base Set 1999"] = 28_500,
+            ["PSA 10 Umbreon Gold Star #17 EX Unseen Forces 2005"] = 15_500,
+            ["PSA 10 Rayquaza Gold Star #107 EX Deoxys 2005"] = 23_500,
+            ["PSA 10 Shining Charizard #107 Neo Destiny 2002"] = 20_500,
+            ["PSA 10 Lugia 1st Edition Holo #9 Neo Genesis 2000"] = 12_800,
+            ["PSA 10 Pikachu Red Cheeks #58 Base Set Unlimited 1999"] = 850,
+            ["PSA 10 Blue-Eyes White Dragon #001 LOB 1st Edition 2002"] = 95_000,
+            ["PSA 10 Nami SR Parallel #OP03-076 Pillars of Strength 2023"] = 1_250,
+            ["CGC 9.5 Black Lotus Alpha 1993"] = 225_000,
+            ["PSA 10 Michael Jordan 1986 Fleer #57 Rookie Card"] = 580_000,
+            ["PSA 10 LeBron James 2003 Topps Chrome #111 Rookie Card"] = 220_000
+        };
+
+    public static decimal? TryGetBuyNowPrice(string productName) =>
+        BuyNowPricesByName.TryGetValue(productName, out var price) ? price : null;
+
+    public static IReadOnlyDictionary<string, decimal> GetBuyNowPriceMap() => BuyNowPricesByName;
+
+    public static IReadOnlyList<Entry> GetAuctionEntries() =>
     [
         CreateEntry(
             "Pokémon",
@@ -959,6 +986,7 @@ public static class SpreadsheetAuctionCatalog
             endMinutes: 9,
             existingBidCount: 1)
     ];
+
 
     private static Entry CreateEntry(
         string categoryName,
