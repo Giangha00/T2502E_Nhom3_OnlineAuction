@@ -11,6 +11,8 @@ public interface IAuctionService
 
     Task<AuctionViewModel> GetAuctionIndexAsync(string listingType = ListingTypes.Auction);
 
+    Task<AuctionViewModel> GetBuyNowIndexAsync();
+
     AuctionViewModel GetAuctionIndex(string listingType = ListingTypes.Auction);
 
     Task<ProductDetailViewModel?> GetProductDetailAsync(int id, int? currentUserId = null);

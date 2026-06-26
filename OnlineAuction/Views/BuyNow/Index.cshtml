@@ -18,7 +18,10 @@
           <span class="h-2 w-2 rounded-full bg-blue-600"></span>
           @Localizer["BuyNow_AvailableNow"]
         </span>
-        <button type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-slate-700">My Cart (0)</button>
+        <a asp-controller="Order" asp-action="Index"
+           class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-white">
+          @Localizer["MyCart"]
+        </a>
         <button type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-slate-700">Watchlist (0)</button>
       </div>
     </div>
@@ -105,6 +108,7 @@
 </div>
 
 @section Scripts {
+  <script src="~/js/buy-now-cart.js" asp-append-version="true"></script>
   <script>
     (function () {
       var PAGE_SIZE = 12;

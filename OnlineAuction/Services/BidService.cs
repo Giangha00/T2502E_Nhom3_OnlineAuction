@@ -19,17 +19,20 @@ public class BidService : IBidService
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IAuctionRegistrationService _registrationService;
     private readonly INotificationService _notificationService;
+    private readonly IRealtimePublisher _realtimePublisher;
     private readonly ILogger<BidService> _logger;
 
     public BidService(
         AuctionHouseDbContext dbContext,
         IAuctionRegistrationService registrationService,
         INotificationService notificationService,
+        IRealtimePublisher realtimePublisher,
         ILogger<BidService> logger)
     {
         _dbContext = dbContext;
         _registrationService = registrationService;
         _notificationService = notificationService;
+        _realtimePublisher = realtimePublisher;
         _logger = logger;
     }
 
@@ -154,6 +157,9 @@ public class BidService : IBidService
         var bidCount = await _dbContext.Bids.CountAsync(b => b.AuctionId == auctionId);
         var bidHistory = await LoadBidHistoryAsync(auctionId);
 
+        var bidState = BuildBidState(auctionId, auction, bidCount, bidHistory);
+        await _realtimePublisher.SendBidUpdateAsync(auctionId, bidState);
+
         return PlaceBidResult.Ok(
             "Bid placed successfully.",
             auction.CurrentPrice,
@@ -215,6 +221,48 @@ public class BidService : IBidService
 
         var steps = increment / bidStep;
         return steps == decimal.Truncate(steps);
+    }
+
+    public async Task<AuctionBidStateViewModel?> GetBidStateAsync(
+        int auctionId,
+        CancellationToken cancellationToken = default)
+    {
+        var auction = await _dbContext.Auctions
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == auctionId, cancellationToken);
+
+        if (auction is null)
+        {
+            return null;
+        }
+
+        var bidCount = await _dbContext.Bids.CountAsync(b => b.AuctionId == auctionId, cancellationToken);
+        var bidHistory = await LoadBidHistoryAsync(auctionId);
+        return BuildBidState(auctionId, auction, bidCount, bidHistory);
+    }
+
+    private static AuctionBidStateViewModel BuildBidState(
+        int auctionId,
+        Auction auction,
+        int bidCount,
+        IReadOnlyList<BidHistoryItemViewModel> bidHistory)
+    {
+        var isEnded = !DateTimeUtilities.IsInFutureUtc(auction.EndDate)
+            || auction.Status is AuctionStatuses.Ended
+                or AuctionStatuses.AwaitingPayment
+                or AuctionStatuses.Completed
+                or AuctionStatuses.Cancelled;
+
+        return new AuctionBidStateViewModel
+        {
+            AuctionId = auctionId,
+            CurrentPrice = auction.CurrentPrice,
+            BidCount = bidCount,
+            MinNextBid = auction.CurrentPrice + auction.BidStep,
+            EndDate = auction.EndDate,
+            IsEnded = isEnded,
+            BidHistory = bidHistory
+        };
     }
 
     private async Task<IReadOnlyList<BidHistoryItemViewModel>> LoadBidHistoryAsync(int auctionId)

@@ -8,7 +8,9 @@
     var isLoggedIn = User.Identity?.IsAuthenticated == true;
 }
 
-<div class="product-bid-panel product-buy-panel" data-is-logged-in="@(isLoggedIn ? "true" : "false")" data-product-id="@Model.Id">
+<div class="product-bid-panel product-buy-panel"
+     data-is-logged-in="@(isLoggedIn ? "true" : "false")"
+     data-auction-id="@Model.Id">
   <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">@Model.Category</h1>
   <p class="mt-1 text-lg text-slate-800">
     <em>@Model.Name</em>@if (Model.Year > 0) { <span>, @Model.Year</span> }
@@ -34,7 +36,7 @@
       <p class="mt-1 text-xs text-slate-500">@Localizer["BuyNow_FixedPrice"]</p>
       <p class="mt-0.5 text-xs font-medium text-emerald-700">@Localizer["BuyNow_InStock"]</p>
     </div>
-    <p class="text-3xl font-bold tabular-nums text-slate-900 sm:text-4xl">$@Model.CurrentPrice.ToString("N0")</p>
+    <p class="text-3xl font-bold tabular-nums text-slate-900 sm:text-4xl">$@((Model.BuyNowPrice ?? Model.CurrentPrice).ToString("N0"))</p>
   </div>
 
   <p class="mt-4 text-xs leading-relaxed text-slate-500">

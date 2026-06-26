@@ -545,6 +545,8 @@
   <data name="Product_BidAmountLabel" xml:space="preserve"><value>Bid Amount</value></data>
   <data name="Product_MinBid" xml:space="preserve"><value>Minimum bid:</value></data>
   <data name="Product_Step" xml:space="preserve"><value>Step:</value></data>
+  <data name="Product_DecreaseBid" xml:space="preserve"><value>Decrease bid</value></data>
+  <data name="Product_IncreaseBid" xml:space="preserve"><value>Increase bid</value></data>
   <data name="Product_CertPrefix" xml:space="preserve"><value>Cert. {0}</value></data>
   <data name="BuyNow_Price" xml:space="preserve"><value>Price</value></data>
   <data name="BuyNow_FixedPrice" xml:space="preserve"><value>Fixed buy now price</value></data>

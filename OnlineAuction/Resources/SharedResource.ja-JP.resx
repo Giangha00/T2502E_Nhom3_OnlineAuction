@@ -545,6 +545,8 @@
   <data name="Product_BidAmountLabel" xml:space="preserve"><value>入札額</value></data>
   <data name="Product_MinBid" xml:space="preserve"><value>最低入札:</value></data>
   <data name="Product_Step" xml:space="preserve"><value>単位:</value></data>
+  <data name="Product_DecreaseBid" xml:space="preserve"><value>入札額を下げる</value></data>
+  <data name="Product_IncreaseBid" xml:space="preserve"><value>入札額を上げる</value></data>
   <data name="Product_CertPrefix" xml:space="preserve"><value>証明書 {0}</value></data>
   <data name="BuyNow_Price" xml:space="preserve"><value>価格</value></data>
   <data name="BuyNow_FixedPrice" xml:space="preserve"><value>即購入固定価格</value></data>

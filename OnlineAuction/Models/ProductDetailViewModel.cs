@@ -46,6 +46,8 @@ public class ProductDetailViewModel
     public List<BidHistoryItemViewModel> BidHistory { get; set; } = [];
     public List<ProductDocumentViewModel> Documents { get; set; } = [];
     public List<AuctionItemViewModel> RelatedProducts { get; set; } = [];
+    public decimal? BuyNowPrice { get; set; }
+    public bool HasBuyNow => BuyNowPrice.HasValue && BuyNowPrice.Value > 0;
 }
 
 public class ProductDocumentViewModel

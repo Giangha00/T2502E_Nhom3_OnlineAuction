@@ -545,6 +545,8 @@
   <data name="Product_BidAmountLabel" xml:space="preserve"><value>입찰 금액</value></data>
   <data name="Product_MinBid" xml:space="preserve"><value>최소 입찰:</value></data>
   <data name="Product_Step" xml:space="preserve"><value>단위:</value></data>
+  <data name="Product_DecreaseBid" xml:space="preserve"><value>입찰가 내리기</value></data>
+  <data name="Product_IncreaseBid" xml:space="preserve"><value>입찰가 올리기</value></data>
   <data name="Product_CertPrefix" xml:space="preserve"><value>인증 {0}</value></data>
   <data name="BuyNow_Price" xml:space="preserve"><value>가격</value></data>
   <data name="BuyNow_FixedPrice" xml:space="preserve"><value>즉시 구매 고정가</value></data>

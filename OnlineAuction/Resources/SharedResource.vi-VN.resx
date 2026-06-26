@@ -546,6 +546,8 @@
   <data name="Product_BidAmountLabel" xml:space="preserve"><value>Số tiền đấu giá</value></data>
   <data name="Product_MinBid" xml:space="preserve"><value>Giá tối thiểu:</value></data>
   <data name="Product_Step" xml:space="preserve"><value>Bước giá:</value></data>
+  <data name="Product_DecreaseBid" xml:space="preserve"><value>Giảm giá đặt</value></data>
+  <data name="Product_IncreaseBid" xml:space="preserve"><value>Tăng giá đặt</value></data>
   <data name="Product_CertPrefix" xml:space="preserve"><value>Chứng nhận {0}</value></data>
   <data name="BuyNow_Price" xml:space="preserve"><value>Giá</value></data>
   <data name="BuyNow_FixedPrice" xml:space="preserve"><value>Giá mua ngay cố định</value></data>
