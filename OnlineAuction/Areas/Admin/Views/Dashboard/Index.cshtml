@@ -1,75 +1,116 @@
+@model AdminDashboardViewModel
+@using System.Text.Json
 @{
     ViewData["Title"] = "Dashboard";
     ViewData["AdminPage"] = "dashboard";
+
+    var chartDataJson = JsonSerializer.Serialize(new
+    {
+        revenue = Model.RevenueChart,
+        bids = Model.BidsChart,
+        statusBreakdown = Model.AuctionStatusBreakdown
+    });
 }
 
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
-    <div class="mb-6">
-        <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Auction Overview</h2>
-        <p class="text-theme-sm text-gray-500 dark:text-gray-400">Monitor platform performance and recent auction activity.</p>
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Auction Overview</h2>
+            <p class="text-theme-sm text-gray-500 dark:text-gray-400">Monitor platform performance and recent auction activity.</p>
+        </div>
+        <a asp-area="Admin"
+           asp-controller="Dashboard"
+           asp-action="Export"
+           asp-route-period="30"
+           class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
+            Export CSV (30d)
+        </a>
     </div>
 
     <div class="grid grid-cols-1 gap-4 md:gap-6 xl:grid-cols-2 2xl:grid-cols-4">
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                <svg class="fill-gray-800 dark:fill-white/90" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.665 3.75621C11.8762 3.65064 12.1247 3.65064 12.3358 3.75621L18.7807 6.97856L12.3358 10.2009C12.1247 10.3065 11.8762 10.3065 11.665 10.2009L5.22014 6.97856L11.665 3.75621ZM4.29297 8.19203V16.0946C4.29297 16.3787 4.45347 16.6384 4.70757 16.7654L11.25 20.0366V11.6513C11.1631 11.6205 11.0777 11.5843 10.9942 11.5426L4.29297 8.19203ZM12.75 20.037L19.2933 16.7654C19.5474 16.6384 19.7079 16.3787 19.7079 16.0946V8.19202L13.0066 11.5426C12.9229 11.5844 12.8372 11.6208 12.75 11.6516V20.037ZM13.0066 2.41456C12.3732 2.09786 11.6277 2.09786 10.9942 2.41456L4.03676 5.89319C3.27449 6.27432 2.79297 7.05342 2.79297 7.90566V16.0946C2.79297 16.9469 3.27448 17.726 4.03676 18.1071L10.9942 21.5857C11.6277 21.9024 12.3732 21.9024 13.0066 21.5857L19.9641 18.1071C20.7264 17.726 21.2079 16.9469 21.2079 16.0946V7.90566C21.2079 7.05342 20.7264 6.27432 19.9641 5.89319L13.0066 2.41456Z" fill="" />
-                </svg>
-            </div>
-            <div class="mt-5 flex items-end justify-between">
-                <div>
-                    <span class="text-sm text-gray-500 dark:text-gray-400">Active Auctions</span>
-                    <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">128</h4>
+        @foreach (var card in Model.KpiCards)
+        {
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
+                    <span class="text-lg font-semibold text-gray-700 dark:text-white/80">@card.Label[..1]</span>
                 </div>
-                <span class="flex items-center gap-1 rounded-full bg-success-50 py-0.5 pl-2 pr-2.5 text-sm font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500">+12.5%</span>
+                <div class="mt-5 flex items-end justify-between">
+                    <div>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">@card.Label</span>
+                        <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">@card.DisplayValue</h4>
+                    </div>
+                    @if (!string.IsNullOrEmpty(card.ChangeDisplay))
+                    {
+                        var changeClass = card.ChangeDisplay == "N/A"
+                            ? "bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-gray-400"
+                            : card.IsPositiveChange
+                                ? "bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500"
+                                : "bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500";
+
+                        <span class="flex items-center gap-1 rounded-full py-0.5 pl-2 pr-2.5 text-sm font-medium @changeClass">
+                            @card.ChangeDisplay
+                        </span>
+                    }
+                </div>
             </div>
+        }
+    </div>
+
+    @if (Model.SecondaryKpiCards.Count > 0)
+    {
+        <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 md:gap-6">
+            @foreach (var card in Model.SecondaryKpiCards)
+            {
+                var cardTag = string.IsNullOrWhiteSpace(card.LinkUrl) ? "div" : "a";
+                @if (string.IsNullOrWhiteSpace(card.LinkUrl))
+                {
+                    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">@card.Label</span>
+                        <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">@card.DisplayValue</h4>
+                    </div>
+                }
+                else
+                {
+                    <a href="@card.LinkUrl"
+                       class="rounded-2xl border border-gray-200 bg-white p-5 transition hover:border-brand-300 hover:shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">@card.Label</span>
+                        <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">@card.DisplayValue</h4>
+                    </a>
+                }
+            }
+        </div>
+    }
+
+    <div class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-2 md:gap-6">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Revenue (Last 7 Days)</h3>
+                <p class="text-theme-sm text-gray-500 dark:text-gray-400">Successful payments by day</p>
+            </div>
+            <div id="dashboard-revenue-chart" class="min-h-[280px]"></div>
+            <p id="dashboard-revenue-empty" class="hidden py-10 text-center text-theme-sm text-gray-500">No data for selected period</p>
         </div>
 
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                <svg class="fill-gray-800 dark:fill-white/90" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M8.80443 5.60156C7.59109 5.60156 6.60749 6.58517 6.60749 7.79851C6.60749 9.01185 7.59109 9.99545 8.80443 9.99545C10.0178 9.99545 11.0014 9.01185 11.0014 7.79851C11.0014 6.58517 10.0178 5.60156 8.80443 5.60156ZM4.07591 19.8987H13.4249C14.6071 19.8987 15.7658 18.8971 15.4446 17.5202C15.2207 16.5607 14.7397 15.2906 13.6937 14.2549C12.6292 13.2009 11.0448 12.455 8.75042 12.455C6.45602 12.455 4.87163 13.2009 3.8071 14.2549C2.89369 19.8987 4.07591 19.8987Z" fill="" />
-                </svg>
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Bids (Last 7 Days)</h3>
+                <p class="text-theme-sm text-gray-500 dark:text-gray-400">Daily bid activity</p>
             </div>
-            <div class="mt-5 flex items-end justify-between">
-                <div>
-                    <span class="text-sm text-gray-500 dark:text-gray-400">Registered Users</span>
-                    <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">3,782</h4>
-                </div>
-                <span class="flex items-center gap-1 rounded-full bg-success-50 py-0.5 pl-2 pr-2.5 text-sm font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500">+8.2%</span>
-            </div>
-        </div>
-
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                <svg class="fill-gray-800 dark:fill-white/90" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2.25C6.62391 2.25 2.25 6.62391 2.25 12C2.25 17.3761 6.62391 21.75 12 21.75C17.3761 21.75 21.75 17.3761 21.75 12C21.75 6.62391 17.3761 2.25 12 2.25ZM12 7.5C11.5858 7.5 11.25 7.83579 11.25 8.25V12C11.25 12.4142 11.5858 12.75 12 12.75H15.75C16.1642 12.75 16.5 12.4142 16.5 12C16.5 11.5858 16.1642 11.25 15.75 11.25H12.75V8.25C12.75 7.83579 12.4142 7.5 12 7.5Z" fill="" />
-                </svg>
-            </div>
-            <div class="mt-5 flex items-end justify-between">
-                <div>
-                    <span class="text-sm text-gray-500 dark:text-gray-400">Total Bids Today</span>
-                    <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">1,245</h4>
-                </div>
-                <span class="flex items-center gap-1 rounded-full bg-success-50 py-0.5 pl-2 pr-2.5 text-sm font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500">+18.1%</span>
-            </div>
-        </div>
-
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                <svg class="fill-gray-800 dark:fill-white/90" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M10.268 2.90805C10.1187 2.80204 9.88127 2.80204 9.73199 2.90805L3.73199 7.10805C3.59628 7.20481 3.5 7.36013 3.5 7.52805V16.4719C3.5 16.6398 3.59628 16.7951 3.73199 16.8919L9.73199 21.0919C9.88127 21.1979 10.1187 21.1979 10.268 21.0919L16.268 16.8919C16.4037 16.7951 16.5 16.6398 16.5 16.4719V7.52805C16.5 7.36013 16.4037 7.20481 16.268 7.10805L10.268 2.90805ZM8.99999 4.53305L5.49999 7.03305V16.9669L8.99999 19.4669L12.5 16.9669V7.03305L8.99999 4.53305Z" fill="" />
-                </svg>
-            </div>
-            <div class="mt-5 flex items-end justify-between">
-                <div>
-                    <span class="text-sm text-gray-500 dark:text-gray-400">Revenue (USD)</span>
-                    <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">$84,320</h4>
-                </div>
-                <span class="flex items-center gap-1 rounded-full bg-error-50 py-0.5 pl-2 pr-2.5 text-sm font-medium text-error-600 dark:bg-error-500/15 dark:text-error-500">-2.4%</span>
-            </div>
+            <div id="dashboard-bids-chart" class="min-h-[280px]"></div>
+            <p id="dashboard-bids-empty" class="hidden py-10 text-center text-theme-sm text-gray-500">No data for selected period</p>
         </div>
     </div>
+
+    @if (Model.AuctionStatusBreakdown.Count > 0)
+    {
+        <div class="mt-6 rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Auctions by Status</h3>
+                <p class="text-theme-sm text-gray-500 dark:text-gray-400">Current distribution across all listings</p>
+            </div>
+            <div id="dashboard-status-chart" class="mx-auto min-h-[320px] max-w-xl"></div>
+        </div>
+    }
 
     <div class="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
         <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -77,9 +118,12 @@
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Recent Auctions</h3>
                 <p class="text-theme-sm text-gray-500 dark:text-gray-400">Latest listings and bidding status</p>
             </div>
-            <button class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
+            <a asp-area="Admin"
+               asp-controller="Auction"
+               asp-action="Index"
+               class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
                 View All
-            </button>
+            </a>
         </div>
 
         <div class="max-w-full overflow-x-auto">
@@ -94,36 +138,48 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                    <tr>
-                        <td class="py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">Vintage Oil Painting</td>
-                        <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">art_collector_01</td>
-                        <td class="py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">$2,450</td>
-                        <td class="py-3"><span class="rounded-full bg-success-50 px-2.5 py-0.5 text-theme-xs font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500">Live</span></td>
-                        <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">2h 15m</td>
-                    </tr>
-                    <tr>
-                        <td class="py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">Antique Pocket Watch</td>
-                        <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">timekeeper_vn</td>
-                        <td class="py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">$890</td>
-                        <td class="py-3"><span class="rounded-full bg-warning-50 px-2.5 py-0.5 text-theme-xs font-medium text-warning-600 dark:bg-warning-500/15 dark:text-warning-400">Ending Soon</span></td>
-                        <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">35m</td>
-                    </tr>
-                    <tr>
-                        <td class="py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">Signed Baseball Jersey</td>
-                        <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">sports_fan_88</td>
-                        <td class="py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">$1,120</td>
-                        <td class="py-3"><span class="rounded-full bg-success-50 px-2.5 py-0.5 text-theme-xs font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500">Live</span></td>
-                        <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">5h 40m</td>
-                    </tr>
-                    <tr>
-                        <td class="py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">Rare Vinyl Record</td>
-                        <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">vinyl_hunter</td>
-                        <td class="py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">$320</td>
-                        <td class="py-3"><span class="rounded-full bg-gray-100 px-2.5 py-0.5 text-theme-xs font-medium text-gray-600 dark:bg-white/5 dark:text-gray-400">Closed</span></td>
-                        <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">Ended</td>
-                    </tr>
+                    @if (Model.RecentAuctions.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="5" class="py-10 text-center text-theme-sm text-gray-500 dark:text-gray-400">
+                                No auctions found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var auction in Model.RecentAuctions)
+                        {
+                            <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3">
+                                    <a asp-area="Admin"
+                                       asp-controller="Auction"
+                                       asp-action="Details"
+                                       asp-route-id="@auction.Id"
+                                       class="text-theme-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400">
+                                        @auction.ProductName
+                                    </a>
+                                </td>
+                                <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">@auction.SellerName</td>
+                                <td class="py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">@auction.CurrentPrice.ToString("C2")</td>
+                                <td class="py-3">
+                                    <span class="rounded-full px-2.5 py-0.5 text-theme-xs font-medium @auction.StatusBadgeClass">
+                                        @auction.StatusLabel
+                                    </span>
+                                </td>
+                                <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">@auction.EndsIn</td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+<script type="application/json" id="dashboard-chart-data">@Html.Raw(chartDataJson)</script>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.54.1/dist/apexcharts.min.js"></script>
+    <script src="~/admin/js/dashboard.js" asp-append-version="true"></script>
+}

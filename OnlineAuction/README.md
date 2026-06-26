@@ -75,7 +75,7 @@ dotnet run --launch-profile http
 | HTTPS redirect warning | Fixed — HTTPS redirect only runs in Production |
 | Seeder crash on startup | Fixed — FK cleanup before delete; set `RefreshTestAuctionsInDevelopment` to `false` to disable |
 
-In **Development**, Pokémon test auctions (`RareCard Vault Test Auctions`) **auto-refresh on every app start** by default (`RefreshTestAuctionsInDevelopment: true`). Restart Rider to see fresh auctions with new countdown.
+In **Development**, sample auction listings (`RareCard Vault Test Auctions`) **auto-refresh on every app start** by default (`RefreshTestAuctionsInDevelopment: true`). Restart the app to load fresh auctions (7-day countdown). Some auctions also have `buy_now_price` set for the Buy Now catalog.
 
 To keep orders while testing PayPal, add to `appsettings.Local.json`:
 
@@ -85,17 +85,59 @@ To keep orders while testing PayPal, add to `appsettings.Local.json`:
 
 ---
 
-## Public user authentication (ASP.NET Core Identity)
+## Authentication (dual session)
 
-Public login/signup uses **Identity cookie auth** (`SignInManager` / `UserManager`), not session flags.
+Admin and public users use **separate cookies** — logging in on one side does not auto-login the other.
+
+| Area | Login URL | Cookie | Scheme |
+|------|-----------|--------|--------|
+| Public site | `/Auth/Login` | `.AuctionHouse.User` | `Identity.Application` |
+| Admin | `/Admin/Account/Login` | `.AuctionHouse.Admin` (path `/Admin`) | `Admin` |
+
+See [identity/6_dual_session.md](identity/6_dual_session.md) for architecture and manual test checklist.
+
+### Public user authentication (ASP.NET Core Identity)
+
+Public login/signup uses **User scheme** (`SignInManager` / `UserManager`), not session flags.
 
 | Route | Method | Description |
 |-------|--------|-------------|
-| `/Auth/Login` | GET/POST | Sign in with email + password |
+| `/Auth/Login` | GET/POST | Sign in with email + password (User scheme) |
 | `/Auth/SignUp` | GET/POST | Register new user (`UserRole.User`) |
-| `/Auth/Logout` | POST | Sign out + clear legacy session |
+| `/Auth/Logout` | POST | Sign out User cookie only |
 
-Header modal (`_AuthModal`) posts to the same actions. Protected pages (e.g. `/Order`) require `User.Identity.IsAuthenticated`.
+Header modal (`_AuthModal`) posts to the same actions. Protected pages (e.g. `/Order`) require User scheme authentication.
+
+### Admin authentication
+
+| Route | Method | Description |
+|-------|--------|-------------|
+| `/Admin/Account/Login` | GET/POST | Admin login (Admin scheme, role `Admin`) |
+| `/Admin/Account/Logout` | POST | Sign out Admin cookie only |
+
+After deploy, clear old Identity cookies in the browser if both areas still appear linked.
+
+---
+
+## Auction listing verification
+
+Seller submissions from `/Sell` start as **`pending_review`** and are hidden from public `/Auction` and Home DB sections until an admin approves them.
+
+| Who | Flow |
+|-----|------|
+| Seller | Submit → pending review → (optional) edit & resubmit after reject |
+| Admin | **Verify Auctions** queue → Approve / Reject with reason |
+| Admin direct create | **Auctions → Create** can set `live` immediately (bypass review) |
+
+See [identity/7_auction_verification.md](identity/7_auction_verification.md) for status values, approve/reject rules, and manual test checklist.
+
+Apply migration after pull:
+
+```bash
+dotnet ef database update
+```
+
+---
 
 ### Test accounts (after `UserSeeder` runs on empty DB)
 
@@ -104,7 +146,7 @@ Header modal (`_AuthModal`) posts to the same actions. Protected pages (e.g. `/O
 | `user1@auctionhouse.local` | `User@123` | Active regular user |
 | `user3@auctionhouse.local` | `User@123` | Active regular user |
 | `user4@auctionhouse.local` | `User@123` | **Inactive** — login rejected |
-| `user12@auctionhouse.local` | `User@123` | Admin role (can still sign in on public site) |
+| `user12@auctionhouse.local` | `User@123` | Admin role — use `/Admin/Account/Login`, not `/Auth/Login` |
 
 Seeder creates `user1` … `user150@auctionhouse.local`, all with password **`User@123`**.
 
@@ -123,7 +165,9 @@ Username is generated from the email local-part (e.g. `john@gmail.com` → `john
 - **URL `id` = Auction ID** (not Product ID).
 - Data source: `AuctionService.GetProductDetailAsync` → `AuctionHouseDbContext` (`auctions`, `products`, `users`, `bids`).
 - `MockProductDetailData` is no longer used for the public detail page.
-- On first run with an empty catalog, `AuctionCatalogSeeder` creates 5 sample auctions (requires `UserSeeder` first).
+- On first run, `AuctionCatalogSeeder` creates **~60 auction listings** from `SpreadsheetAuctionCatalog` (requires `UserSeeder` first). **15** of them get a `buy_now_price` for instant purchase.
+- **Auction** list: `/Auction` — live auctions.
+- **Buy Now** list: `/BuyNow` — auctions where `buy_now_price IS NOT NULL` (same listing can appear in both auction bidding and buy now).
 
 ### UI fields without DB columns (temporary defaults)
 
@@ -151,7 +195,7 @@ Username is generated from the email local-part (e.g. `john@gmail.com` → `john
 
 Migration: `AddProductDetailSellFields`.
 
-Test URLs after seed: `/Auction/Detail/1` … `/Auction/Detail/5`.
+Test URLs after seed: `/Auction`, `/BuyNow`, `/Auction/Detail/{id}`.
 
 ## Order flow (Task 1 — DB-backed)
 
@@ -209,3 +253,132 @@ dotnet user-secrets set "PayPal:Mode" "sandbox"
 | `GET /Payment/Confirmation?orderId=` | Paid order confirmation from DB |
 
 Migration: `AddPayPalOrderIdToPayments`.
+
+---
+
+## Notifications (in-app + FCM Web Push)
+
+### Overview
+
+- **In-app:** Header dropdown loads from `notifications` table (per user). Badge = unread count from DB.
+- **Push:** Firebase Cloud Messaging (FCM) when browser grants permission. Works foreground (toast + badge) and background (system notification via service worker).
+
+Without Firebase config, in-app notifications still work; push is disabled.
+
+### Firebase setup (dev)
+
+1. Create a project at [Firebase Console](https://console.firebase.google.com/).
+2. Enable **Cloud Messaging** (Project settings → Cloud Messaging).
+3. Register a **Web app** → copy `apiKey`, `messagingSenderId`, `appId`, `projectId`.
+4. Cloud Messaging → **Web Push certificates** → generate/copy **VAPID key**.
+5. Project settings → **Service accounts** → Generate new private key (JSON). Use:
+   - `client_email` → `FirebaseSettings:ClientEmail`
+   - `private_key` → `FirebaseSettings:PrivateKey` (escape newlines as `\n` in JSON)
+   - `project_id` → `FirebaseSettings:ProjectId`
+
+6. Add **Authorized domains**: `localhost` (and your production domain).
+
+### Configuration (do not commit secrets)
+
+Put real values in `appsettings.Local.json` or User Secrets:
+
+```bash
+cd OnlineAuction
+dotnet user-secrets set "FirebaseSettings:ProjectId" "your-project-id"
+dotnet user-secrets set "FirebaseSettings:ClientEmail" "firebase-adminsdk-...@....iam.gserviceaccount.com"
+dotnet user-secrets set "FirebaseSettings:PrivateKey" "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+dotnet user-secrets set "FirebaseSettings:WebApiKey" "AIza..."
+dotnet user-secrets set "FirebaseSettings:MessagingSenderId" "123456789"
+dotnet user-secrets set "FirebaseSettings:AppId" "1:123:web:abc"
+dotnet user-secrets set "FirebaseSettings:VapidKey" "BEl..."
+```
+
+See `appsettings.Local.json.example` for the full `FirebaseSettings` block.
+
+### Database
+
+```bash
+dotnet ef database update
+```
+
+Tables: `notifications`, `user_device_tokens`. Migration: `AddNotificationsAndDeviceTokens`.
+
+### API endpoints (authenticated)
+
+| Route | Description |
+|-------|-------------|
+| `POST /Notification/RegisterDevice` | Save FCM token |
+| `POST /Notification/UnregisterDevice` | Remove token on logout |
+| `GET /Notification/List` | JSON list + unread count |
+| `POST /Notification/MarkRead/{id}` | Mark one read |
+| `POST /Notification/MarkAllRead` | Mark all read |
+
+### Test push (localhost)
+
+1. Run app: `dotnet run --launch-profile http` → `http://localhost:5006`
+2. Log in (`user1@auctionhouse.local` / `User@123`).
+3. Allow browser notifications when prompted.
+4. Trigger events:
+   - **Outbid:** User A bids, User B outbids on same auction.
+   - **Win:** Let auction end (worker ~15s) → winner gets notification.
+   - **Payment:** Complete PayPal sandbox checkout.
+5. **Foreground:** Toast + dropdown badge updates.
+6. **Background:** Minimize tab → trigger event → system notification → click opens `relatedUrl`.
+
+### Supported browsers
+
+| Browser | Web Push (FCM) |
+|---------|----------------|
+| Chrome / Edge | Yes |
+| Firefox | Yes |
+| Safari (macOS 13+, iOS 16.4+ PWA) | Limited — test on Chrome/Firefox first |
+
+### Automatic notification events
+
+| Event | Recipient | Type |
+|-------|-----------|------|
+| Outbid (debounced 5 min/auction) | Previous high bidder | Auction |
+| Auction ending within 1 hour | Bidders + approved watchers | Auction |
+| Auction won | Winner | Winning |
+| Payment captured (PayPal) | Buyer | Payment |
+| Refund confirmation page | Buyer | Refund |
+
+## Realtime (SignalR)
+
+The app uses **ASP.NET Core SignalR** for instant in-app updates when a browser tab is open. FCM still handles push when the tab is in the background.
+
+### Hub
+
+| Item | Value |
+|------|-------|
+| Endpoint | `/hubs/app` |
+| Hub class | `Hubs/AppHub.cs` |
+| Publisher | `Services/RealtimePublisher.cs` |
+
+### Client events
+
+| Event | Who receives | UI effect |
+|-------|--------------|-----------|
+| `BidUpdated` | Viewers on auction detail (`JoinAuction`) | Price, bid count, history update without refresh |
+| `NotificationReceived` | Logged-in user (`user:{id}` group) | Header dropdown + unread badge |
+| `OrderCountUpdated` | Logged-in user | Won-auctions nav badge |
+
+### Fallback
+
+If SignalR disconnects, `header-notifications.js` polls `/Notification/List` every 60 seconds. When the tab becomes visible and the hub is offline, it refreshes once.
+
+### Test realtime (two browsers)
+
+1. Run: `dotnet run --launch-profile http`
+2. Open the same auction detail in two windows (can be different users).
+3. Place a bid in one window → the other updates price/history immediately.
+4. Log in as outbid user → notification badge updates without refresh.
+5. Let auction end (background worker ~15s) → detail page shows ended state; winner sees order badge update.
+
+### Files
+
+| File | Role |
+|------|------|
+| `wwwroot/js/realtime-hub.js` | SignalR client, order badge, dispatches `auction:bid-updated` |
+| `wwwroot/js/product-detail.js` | Listens for `auction:bid-updated` |
+| `GET /Auction/BidState/{id}` | JSON fallback for bid state |

@@ -1,0 +1,47 @@
+@model OnlineAuction.Models.HomeProductSectionViewModel
+@{
+    var sectionKey = string.IsNullOrWhiteSpace(Model.SectionKey)
+        ? Model.Title.ToLowerInvariant().Replace(" ", "-")
+        : Model.SectionKey;
+}
+
+@if (Model.Items.Count > 0)
+{
+  <section class="home-product-section border-b border-stone-200 py-10 sm:py-12" data-home-carousel>
+    <div class="mb-6 flex w-full items-end justify-between gap-4 px-4 sm:px-8 lg:px-12">
+      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">@Model.Title</h2>
+      @if (Model.ShowViewAll)
+      {
+        <a asp-controller="@Model.ViewAllController" asp-action="@Model.ViewAllAction"
+           class="text-sm font-semibold text-blue-700 hover:text-blue-900">
+          @Localizer["Common_ViewAll"] <span aria-hidden="true">→</span>
+        </a>
+      }
+    </div>
+    <div class="home-carousel-shell relative px-4 sm:px-8 lg:px-12">
+      <button type="button"
+              class="home-carousel-btn home-carousel-btn--prev"
+              data-home-carousel-prev
+              aria-label="Scroll @Model.Title left">
+        ‹
+      </button>
+      <div class="home-carousel-fade home-carousel-fade--left" aria-hidden="true"></div>
+      <div class="home-carousel-fade home-carousel-fade--right" aria-hidden="true"></div>
+      <div class="rarecard-home-row" data-home-carousel-track id="home-carousel-@sectionKey">
+        @foreach (var item in Model.Items)
+        {
+          <div class="rarecard-home-row__item">
+            <partial name="Partials/_TradingCardAuctionCard"
+                     model="@(new AuctionCardViewModel { Item = item, Variant = "home", CardMode = Model.CardMode, ShowBidLink = true })"/>
+          </div>
+        }
+      </div>
+      <button type="button"
+              class="home-carousel-btn home-carousel-btn--next"
+              data-home-carousel-next
+              aria-label="Scroll @Model.Title right">
+        ›
+      </button>
+    </div>
+  </section>
+}

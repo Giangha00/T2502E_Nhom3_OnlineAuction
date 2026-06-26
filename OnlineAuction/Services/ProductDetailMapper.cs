@@ -1,3 +1,4 @@
+using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Helpers;
 using OnlineAuction.Models;
@@ -76,12 +77,14 @@ internal static class ProductDetailMapper
             RegistrationRejectReason = registrationRejectReason,
             CanBid = canBid,
             IsSeller = isSeller,
+            IsVerifiedAuthentic = auction.VerifiedAt.HasValue,
             RegistrationCount = registrationCount,
             Seller = seller,
             Grading = BuildGrading(product),
             BidHistory = MapBidHistory(bids),
             Documents = MapDocuments(product),
-            RelatedProducts = relatedProducts.ToList()
+            RelatedProducts = relatedProducts.ToList(),
+            BuyNowPrice = auction.BuyNowPrice
         };
     }
 
@@ -116,31 +119,119 @@ internal static class ProductDetailMapper
             Rating = 0
         };
 
-    public static AuctionItemViewModel MapToAuctionItem(Auction auction)
+    public static AuctionItemViewModel MapToAuctionItem(Auction auction, bool forBuyNowCatalog = false)
     {
         var product = auction.Product;
         var bidCount = auction.Bids?.Count ?? 0;
         var status = MapCardStatus(auction);
+        var hasBuyNow = auction.BuyNowPrice.HasValue && auction.BuyNowPrice.Value > 0;
 
-        return new AuctionItemViewModel
+        var item = new AuctionItemViewModel
         {
             Id = auction.Id,
             Name = product.Name,
             Category = GetCategoryName(product),
             ImageUrl = ResolveImageUrl(product.PrimaryImage),
             StartingPrice = auction.StartingPrice,
-            CurrentPrice = auction.CurrentPrice,
+            CurrentPrice = forBuyNowCatalog && hasBuyNow
+                ? auction.BuyNowPrice!.Value
+                : auction.CurrentPrice,
             Status = status,
-            TimeRemaining = FormatTimeRemaining(auction.EndDate),
+            TimeRemaining = forBuyNowCatalog && hasBuyNow
+                ? "In stock"
+                : auction.ListingType == ListingTypes.BuyNow
+                    ? "In stock"
+                    : FormatTimeRemaining(auction.EndDate),
             ListingType = auction.ListingType,
+            BuyNowPrice = auction.BuyNowPrice,
             Grade = product.GradeLabel ?? string.Empty,
+            Authenticator = ResolveAuthenticator(product.GradeLabel),
             Subtitle = BuildSubtitle(product),
             Condition = FormatCondition(product.Condition),
             Year = product.Year ?? 0,
             BidCount = bidCount,
             IsHot = status == "Ending Soon" || bidCount >= HotBidCountThreshold
         };
+
+        ApplyDealInfo(item);
+        return item;
     }
+
+    public static void ApplyDealInfo(AuctionItemViewModel item)
+    {
+        item.DisplayTitle = BuildListingTitle(item);
+
+        if (!string.IsNullOrWhiteSpace(item.DealLabel))
+        {
+            return;
+        }
+
+        if (item.ListingType == ListingTypes.BuyNow && item.StartingPrice > 0)
+        {
+            var savings = item.StartingPrice - item.CurrentPrice;
+            if (savings >= item.StartingPrice * 0.12m)
+            {
+                item.DealLabel = "Great Deal";
+                item.DealNote = savings > 0
+                    ? $"${savings:N0} below list"
+                    : "Offers being negotiated";
+                return;
+            }
+
+            if (savings > 0)
+            {
+                item.DealLabel = "Good Deal";
+                item.DealNote = "Offers being negotiated";
+                return;
+            }
+        }
+
+        if (item.BuyNowPrice.HasValue && item.BuyNowPrice.Value > item.CurrentPrice)
+        {
+            item.DealLabel = "Buy Now";
+            item.DealNote = $"Instant purchase at ${item.BuyNowPrice.Value:N0}";
+            return;
+        }
+
+        if (item.BidCount <= 1 && item.CurrentPrice <= item.StartingPrice * 1.08m)
+        {
+            if (item.CurrentPrice >= 3000m || item.BidCount == 0)
+            {
+                item.DealLabel = "Great Deal";
+                item.DealNote = item.BidCount == 0
+                    ? "No offers yet"
+                    : $"${Math.Round(item.CurrentPrice * 0.9m):N0} offer being considered";
+                return;
+            }
+
+            item.DealLabel = "Good Deal";
+            item.DealNote = "Offers being negotiated";
+        }
+    }
+
+    public static string BuildListingTitle(AuctionItemViewModel item)
+    {
+        var parts = new List<string>();
+        if (item.Year > 0)
+        {
+            parts.Add(item.Year.ToString());
+        }
+
+        if (!string.IsNullOrWhiteSpace(item.Name))
+        {
+            parts.Add(item.Name);
+        }
+
+        if (!string.IsNullOrWhiteSpace(item.Grade))
+        {
+            parts.Add(item.Grade);
+        }
+
+        return parts.Count > 0 ? string.Join(' ', parts) : item.Name;
+    }
+
+    public static bool IsRecommendedDeal(AuctionItemViewModel item) =>
+        item.DealLabel is "Great Deal" or "Good Deal";
 
     public static List<CategoryViewModel> MapCategories(IReadOnlyList<AuctionItemViewModel> items) =>
         items
@@ -151,7 +242,7 @@ internal static class ProductDetailMapper
             {
                 Name = group.Key,
                 ItemCount = group.Count(),
-                ImageUrl = group.First().ImageUrl,
+                ImageUrl = MockAuctionData.GetCategoryImageUrl(group.Key),
                 DisplayCount = $"{group.Count()} Items"
             })
             .ToList();
@@ -310,6 +401,9 @@ internal static class ProductDetailMapper
 
         return status switch
         {
+            AuctionStatuses.PendingReview => ("Pending Review", "bg-amber-500 text-white"),
+            AuctionStatuses.Rejected => ("Rejected", "bg-red-600 text-white"),
+            AuctionStatuses.Scheduled => ("Scheduled", "bg-sky-600 text-white"),
             AuctionStatuses.Live => ("Active Auction", "bg-emerald-600 text-white"),
             AuctionStatuses.EndingSoon => ("Ending Soon", "bg-orange-600 text-white"),
             AuctionStatuses.Ended or AuctionStatuses.AwaitingPayment => ("Ended", "bg-stone-600 text-white"),
@@ -339,6 +433,21 @@ internal static class ProductDetailMapper
         if (auction.Status == AuctionStatuses.Cancelled)
         {
             return "Cancelled";
+        }
+
+        if (auction.Status == AuctionStatuses.PendingReview)
+        {
+            return "Pending Review";
+        }
+
+        if (auction.Status == AuctionStatuses.Rejected)
+        {
+            return "Rejected";
+        }
+
+        if (auction.Status == AuctionStatuses.Scheduled)
+        {
+            return "Scheduled";
         }
 
         if (auction.Status == AuctionStatuses.EndingSoon)
@@ -413,6 +522,42 @@ internal static class ProductDetailMapper
         }
 
         return char.ToUpperInvariant(condition[0]) + (condition.Length > 1 ? condition[1..] : string.Empty);
+    }
+
+    private static string ResolveAuthenticator(string? gradeLabel)
+    {
+        if (string.IsNullOrWhiteSpace(gradeLabel))
+        {
+            return string.Empty;
+        }
+
+        var normalized = gradeLabel.ToUpperInvariant();
+        if (normalized.Contains("PSA/DNA", StringComparison.Ordinal))
+        {
+            return "PSA/DNA";
+        }
+
+        if (normalized.Contains("BGS", StringComparison.Ordinal))
+        {
+            return "BGS";
+        }
+
+        if (normalized.Contains("CGC", StringComparison.Ordinal))
+        {
+            return "CGC";
+        }
+
+        if (normalized.Contains("SGC", StringComparison.Ordinal))
+        {
+            return "SGC";
+        }
+
+        if (normalized.Contains("PSA", StringComparison.Ordinal))
+        {
+            return "PSA";
+        }
+
+        return string.Empty;
     }
 
     private static string GetCategoryName(Product product) =>

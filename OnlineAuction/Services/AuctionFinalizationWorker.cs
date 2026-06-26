@@ -1,4 +1,5 @@
 using OnlineAuction.Services.Interfaces;
+using OnlineAuction.Areas.Admin.Services;
 
 namespace OnlineAuction.Services;
 
@@ -26,9 +27,13 @@ public class AuctionFinalizationWorker : BackgroundService
                 using var scope = _scopeFactory.CreateScope();
                 var orderCreationService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
                 var orderService = scope.ServiceProvider.GetRequiredService<IOrderService>();
+                var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+                var verificationService = scope.ServiceProvider.GetRequiredService<IAdminAuctionVerificationService>();
 
                 var createdCount = await orderCreationService.FinalizeExpiredAuctionsAsync(stoppingToken);
                 var cancelledCount = await orderService.CancelAllExpiredPendingOrdersAsync();
+                await notificationService.ProcessAuctionEndingSoonNotificationsAsync(stoppingToken);
+                var activatedCount = await verificationService.ActivateScheduledAuctionsAsync(stoppingToken);
 
                 if (createdCount > 0)
                 {
@@ -38,6 +43,11 @@ public class AuctionFinalizationWorker : BackgroundService
                 if (cancelledCount > 0)
                 {
                     _logger.LogInformation("Cancelled {CancelledCount} expired pending payment orders.", cancelledCount);
+                }
+
+                if (activatedCount > 0)
+                {
+                    _logger.LogInformation("Activated {ActivatedCount} scheduled auctions.", activatedCount);
                 }
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)

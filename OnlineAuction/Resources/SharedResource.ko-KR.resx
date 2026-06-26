@@ -221,6 +221,7 @@
   </data>
   <data name="Sell_PageTitle" xml:space="preserve"><value>카드 판매</value></data>
   <data name="Sell_SuccessMessage" xml:space="preserve"><value>경매가 성공적으로 생성되었습니다!</value></data>
+  <data name="Sell_SubmittedForReview" xml:space="preserve"><value>리스팅이 검토를 위해 제출되었습니다. 공개 전 전문가가 확인합니다.</value></data>
   <data name="Sell_ViewAuctions" xml:space="preserve"><value>경매 보기 →</value></data>
   <data name="Sell_DraftSaved" xml:space="preserve"><value>임시 저장되었습니다. 언제든지 편집을 계속할 수 있습니다.</value></data>
   <data name="Sell_Heading" xml:space="preserve"><value>희귀 수집품 등록</value></data>
@@ -394,6 +395,7 @@
   <data name="Auction_WatchlistCount" xml:space="preserve"><value>관심 목록 ({0})</value></data>
   <data name="Auction_Filter_Category" xml:space="preserve"><value>카테고리</value></data>
   <data name="Auction_Filter_Condition" xml:space="preserve"><value>상태</value></data>
+  <data name="Auction_Filter_Authenticator" xml:space="preserve"><value>Authenticator</value></data>
   <data name="Auction_Filter_Year" xml:space="preserve"><value>제조 연도</value></data>
   <data name="Auction_Filter_PriceRange" xml:space="preserve"><value>가격 범위</value></data>
   <data name="Auction_Filter_EndingSoonOnly" xml:space="preserve"><value>곧 종료만</value></data>
@@ -430,7 +432,6 @@
   <data name="User_FullName" xml:space="preserve"><value>이름</value></data>
   <data name="User_Email" xml:space="preserve"><value>이메일</value></data>
   <data name="User_PhoneNumber" xml:space="preserve"><value>전화번호</value></data>
-  <data name="User_Address" xml:space="preserve"><value>주소</value></data>
   <data name="User_MemberSince" xml:space="preserve"><value>{0}년부터 회원</value></data>
   <data name="Contact_PageTitle" xml:space="preserve"><value>문의하기</value></data>
   <data name="Payment_PageTitle" xml:space="preserve"><value>결제 정보</value></data>
@@ -494,6 +495,7 @@
   <data name="Product_Edges" xml:space="preserve"><value>가장자리</value></data>
   <data name="Product_Surface" xml:space="preserve"><value>표면</value></data>
   <data name="Product_VerifiedAuthentic" xml:space="preserve"><value>인증된 슬랩 — 등록 전 RareCard 큐레이션 팀이 검수했습니다.</value></data>
+  <data name="Product_PendingVerification" xml:space="preserve"><value>이 리스팅은 아직 전문가 검토가 완료되지 않았습니다.</value></data>
   <data name="Product_Bidder" xml:space="preserve"><value>입찰자</value></data>
   <data name="Product_BidAmount" xml:space="preserve"><value>입찰 금액</value></data>
   <data name="Product_DateTime" xml:space="preserve"><value>날짜 및 시간</value></data>
@@ -545,6 +547,8 @@
   <data name="Product_BidAmountLabel" xml:space="preserve"><value>입찰 금액</value></data>
   <data name="Product_MinBid" xml:space="preserve"><value>최소 입찰:</value></data>
   <data name="Product_Step" xml:space="preserve"><value>단위:</value></data>
+  <data name="Product_DecreaseBid" xml:space="preserve"><value>입찰가 내리기</value></data>
+  <data name="Product_IncreaseBid" xml:space="preserve"><value>입찰가 올리기</value></data>
   <data name="Product_CertPrefix" xml:space="preserve"><value>인증 {0}</value></data>
   <data name="BuyNow_Price" xml:space="preserve"><value>가격</value></data>
   <data name="BuyNow_FixedPrice" xml:space="preserve"><value>즉시 구매 고정가</value></data>
@@ -815,6 +819,10 @@
   <data name="User_Stat_SuccessRate" xml:space="preserve"><value>성공률</value></data>
   <data name="User_NotUpdated" xml:space="preserve"><value>미업데이트</value></data>
   <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
+  <data name="User_Status_PendingReview" xml:space="preserve"><value>검토 대기</value></data>
+  <data name="User_Status_Rejected" xml:space="preserve"><value>거부됨</value></data>
+  <data name="User_Status_Scheduled" xml:space="preserve"><value>예약됨</value></data>
+  <data name="User_RejectReason" xml:space="preserve"><value>거부 사유: {0}</value></data>
   <data name="SellBuyNow_PageTitle" xml:space="preserve"><value>즉시 구매 등록</value></data>
   <data name="SellBuyNow_Heading" xml:space="preserve"><value>즉시 구매 상품 등록</value></data>
   <data name="SellBuyNow_Subheading" xml:space="preserve"><value>고정가로 판매. 입찰 없이 즉시 구매할 수 있습니다.</value></data>
@@ -828,6 +836,7 @@
   <data name="SellBuyNow_ReadyToPublish" xml:space="preserve"><value>등록 즉시 즉시 구매에 표시됩니다.</value></data>
   <data name="SellBuyNow_CreateListing" xml:space="preserve"><value>등록하기</value></data>
   <data name="SellBuyNow_SuccessMessage" xml:space="preserve"><value>즉시 구매 등록이 완료되었습니다.</value></data>
+  <data name="SellBuyNow_SubmittedForReview" xml:space="preserve"><value>리스팅이 검토를 위해 제출되었습니다. 공개 전 전문가가 확인합니다.</value></data>
   <data name="SellBuyNow_Success_Created" xml:space="preserve"><value>등록 "{0}"이(가) 생성되었습니다!</value></data>
   <data name="SellBuyNow_Error_CreateFailed" xml:space="preserve"><value>등록을 생성할 수 없습니다.</value></data>
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>가격은 0보다 커야 합니다</value></data>

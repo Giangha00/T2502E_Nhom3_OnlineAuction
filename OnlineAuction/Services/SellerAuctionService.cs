@@ -49,6 +49,7 @@ public class SellerAuctionService : ISellerAuctionService
                 auction.StartingPrice,
                 auction.CurrentPrice,
                 auction.Status,
+                auction.RejectReason,
                 auction.EndDate,
                 auction.ListingType,
                 ProductName = auction.Product.Name,
@@ -69,6 +70,7 @@ public class SellerAuctionService : ISellerAuctionService
             StartingPrice = auction.StartingPrice,
             CurrentPrice = auction.CurrentPrice,
             Status = auction.Status,
+            RejectReason = auction.RejectReason,
             Grade = auction.Grade ?? string.Empty,
             Condition = auction.Condition,
             Year = auction.Year ?? 0,
@@ -234,7 +236,8 @@ public class SellerAuctionService : ISellerAuctionService
                 EndDate = model.EndDate,
                 AuctionEventName = TrimOrNull(model.AuctionEventName),
                 ListingType = ListingTypes.Auction,
-                Status = AuctionStatuses.Live,
+                Status = AuctionStatuses.PendingReview,
+                SubmittedAt = now,
                 CreatedAt = now
             };
 
@@ -242,7 +245,7 @@ public class SellerAuctionService : ISellerAuctionService
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return (true, "Auction created successfully.", auction.Id);
+            return (true, "Listing submitted for review.", auction.Id);
         }
         catch
         {
@@ -399,7 +402,8 @@ public class SellerAuctionService : ISellerAuctionService
                 StartDate = now,
                 EndDate = now.AddYears(1),
                 ListingType = ListingTypes.BuyNow,
-                Status = AuctionStatuses.Live,
+                Status = AuctionStatuses.PendingReview,
+                SubmittedAt = now,
                 CreatedAt = now
             };
 
@@ -407,7 +411,7 @@ public class SellerAuctionService : ISellerAuctionService
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return (true, "Buy now listing created successfully.", product.Id);
+            return (true, "Listing submitted for review.", product.Id);
         }
         catch
         {
@@ -474,9 +478,10 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "Cannot edit auction that already has bids.");
         }
 
-        if (auction.Status != AuctionStatuses.Live || !DateTimeUtilities.IsInFutureUtc(auction.EndDate))
+        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.PendingReview or AuctionStatuses.Rejected)
+            || (auction.Status == AuctionStatuses.Live && !DateTimeUtilities.IsInFutureUtc(auction.EndDate)))
         {
-            return (false, "Only live auctions can be edited.");
+            return (false, "Only pending or live listings can be edited.");
         }
 
         if (model.EndDate < auction.EndDate)
@@ -516,9 +521,22 @@ public class SellerAuctionService : ISellerAuctionService
         auction.BidStep = model.BidStep;
         auction.EndDate = model.EndDate;
 
+        if (auction.Status == AuctionStatuses.Rejected)
+        {
+            auction.Status = AuctionStatuses.PendingReview;
+            auction.SubmittedAt = DateTime.UtcNow;
+            auction.RejectReason = null;
+            auction.VerifiedAt = null;
+            auction.VerifiedBy = null;
+        }
+
         await _db.SaveChangesAsync();
 
-        return (true, "Auction updated successfully.");
+        var message = auction.Status == AuctionStatuses.PendingReview
+            ? "Listing updated and resubmitted for review."
+            : "Auction updated successfully.";
+
+        return (true, message);
     }
 
     public async Task<(bool Success, string Message)> CancelAsync(int auctionId, int sellerId)
@@ -548,9 +566,10 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "Cannot cancel auction that already has a pending or paid order.");
         }
 
-        if (auction.Status != AuctionStatuses.Live || !DateTimeUtilities.IsInFutureUtc(auction.EndDate))
+        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.PendingReview or AuctionStatuses.Rejected)
+            || (auction.Status == AuctionStatuses.Live && !DateTimeUtilities.IsInFutureUtc(auction.EndDate)))
         {
-            return (false, "Only live auctions can be cancelled.");
+            return (false, "This listing cannot be cancelled.");
         }
 
         // Soft delete: khong xoa row khoi database, chi doi status de con lich su.

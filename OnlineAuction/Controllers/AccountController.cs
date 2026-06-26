@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OnlineAuction.Configurations;
 using OnlineAuction.Entities;
 using OnlineAuction.Models;
 using OnlineAuction.Resources;
@@ -9,7 +10,7 @@ using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = AuthSchemes.User)]
 public class AccountController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;
@@ -76,8 +77,7 @@ public class AccountController : Controller
             PageDescription = description
         });
     }
-
-    private async Task<AccountShellViewModel> BuildShellAsync(string activeSection)
+private async Task<AccountShellViewModel> BuildShellAsync(string activeSection)
     {
         var user = await _userManager.GetUserAsync(User);
         var displayName = user?.FullName ?? User.Identity?.Name ?? "User";
