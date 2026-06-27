@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OnlineAuction.Configurations;
 using OnlineAuction.Services.Interfaces;
 using Microsoft.AspNetCore.Antiforgery;
 namespace OnlineAuction.Controllers;
@@ -124,7 +125,7 @@ public async Task<IActionResult> PayPalIpn()
 
     return Ok(result);
 }
-    [Authorize]
+    [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     public async Task<IActionResult> Confirmation(int orderId)
     {
         var userId = GetCurrentUserId();
@@ -142,7 +143,7 @@ public async Task<IActionResult> PayPalIpn()
         return View(model);
     }
 
-    [Authorize]
+    [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     public async Task<IActionResult> PayPalReturn(string? token)
     { 
         var userId = GetCurrentUserId();
@@ -169,7 +170,7 @@ public async Task<IActionResult> PayPalIpn()
     }
     
 
-    [Authorize]
+    [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     public async Task<IActionResult> PayPalCancel(string? token)
     {
         var userId = GetCurrentUserId();

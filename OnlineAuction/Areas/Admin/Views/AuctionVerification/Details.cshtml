@@ -1,0 +1,186 @@
+@model AuctionVerificationDetailViewModel
+
+@{
+    ViewData["Title"] = "Review Listing";
+    ViewData["AdminPage"] = "verify-auctions";
+}
+
+<div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Review Listing</h2>
+            <p class="text-theme-sm text-gray-500 dark:text-gray-400">Auction #@Model.Id · submitted @(Model.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "—")</p>
+        </div>
+        <a asp-action="Index"
+           class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+            Back to queue
+        </a>
+    </div>
+
+    @if (TempData["ErrorMessage"] is not null)
+    {
+        <div class="mb-4 rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-theme-sm text-error-700">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div class="space-y-6 xl:col-span-2">
+            <section class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+                <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Product</h3>
+                <div class="flex flex-col gap-6 md:flex-row">
+                    <img src="@Model.PrimaryImage" alt="@Model.ProductName" class="h-48 w-48 rounded-xl object-cover" />
+                    <div class="flex-1">
+                        <h4 class="text-xl font-semibold text-gray-800 dark:text-white/90">@Model.ProductName</h4>
+                        <p class="mt-1 text-theme-sm text-gray-500">@Model.CategoryName · @Model.Condition</p>
+                        @if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
+                        {
+                            <p class="mt-3 text-theme-sm text-gray-700 dark:text-gray-300">@Model.ShortDescription</p>
+                        }
+                    </div>
+                </div>
+
+                <dl class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div><dt class="text-theme-xs uppercase text-gray-400">Grade</dt><dd class="mt-1 text-theme-sm">@(Model.GradeLabel ?? "—")</dd></div>
+                    <div><dt class="text-theme-xs uppercase text-gray-400">Cert #</dt><dd class="mt-1 text-theme-sm">@(Model.CertNumber ?? "—")</dd></div>
+                    <div><dt class="text-theme-xs uppercase text-gray-400">Language</dt><dd class="mt-1 text-theme-sm">@(Model.Language ?? "—")</dd></div>
+                    <div><dt class="text-theme-xs uppercase text-gray-400">Card #</dt><dd class="mt-1 text-theme-sm">@(Model.CardNumber ?? "—")</dd></div>
+                    <div><dt class="text-theme-xs uppercase text-gray-400">Year</dt><dd class="mt-1 text-theme-sm">@(Model.Year?.ToString() ?? "—")</dd></div>
+                    <div><dt class="text-theme-xs uppercase text-gray-400">Set</dt><dd class="mt-1 text-theme-sm">@(Model.SetName ?? "—")</dd></div>
+                </dl>
+
+                @if (!string.IsNullOrWhiteSpace(Model.DescriptionHtml))
+                {
+                    <div class="prose prose-sm mt-6 max-w-none rounded-xl border border-gray-100 bg-gray-50 p-4 text-theme-sm dark:border-gray-800 dark:bg-white/[0.02]">
+                        @Html.Raw(Model.DescriptionHtml)
+                    </div>
+                }
+            </section>
+
+            <section class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+                <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Grading</h3>
+                <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                    <div class="text-center"><p class="text-2xl font-bold">@(Model.GradingCentering ?? "—")</p><p class="text-theme-xs uppercase text-gray-400">Centering</p></div>
+                    <div class="text-center"><p class="text-2xl font-bold">@(Model.GradingCorners ?? "—")</p><p class="text-theme-xs uppercase text-gray-400">Corners</p></div>
+                    <div class="text-center"><p class="text-2xl font-bold">@(Model.GradingEdges ?? "—")</p><p class="text-theme-xs uppercase text-gray-400">Edges</p></div>
+                    <div class="text-center"><p class="text-2xl font-bold">@(Model.GradingSurface ?? "—")</p><p class="text-theme-xs uppercase text-gray-400">Surface</p></div>
+                </div>
+            </section>
+
+            @if (Model.GalleryImages.Count > 0)
+            {
+                <section class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+                    <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Gallery</h3>
+                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        @foreach (var image in Model.GalleryImages)
+                        {
+                            <img src="@image" alt="Gallery image" class="h-28 w-full rounded-lg object-cover" />
+                        }
+                    </div>
+                </section>
+            }
+
+            @if (Model.Documents.Count > 0)
+            {
+                <section class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+                    <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Documents</h3>
+                    <ul class="space-y-2">
+                        @foreach (var document in Model.Documents)
+                        {
+                            <li>
+                                <a href="@document.FileUrl" target="_blank" rel="noopener"
+                                   class="text-theme-sm font-medium text-brand-600 hover:text-brand-700">
+                                    @document.Name (@document.FileType)
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+
+            <section class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+                <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Auction</h3>
+                <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div><dt class="text-theme-xs uppercase text-gray-400">Starting price</dt><dd class="mt-1 text-theme-sm">$@Model.StartingPrice.ToString("N0")</dd></div>
+                    <div><dt class="text-theme-xs uppercase text-gray-400">Bid step</dt><dd class="mt-1 text-theme-sm">$@Model.BidStep.ToString("N0")</dd></div>
+                    @if (Model.BuyNowPrice.HasValue)
+                    {
+                        <div><dt class="text-theme-xs uppercase text-gray-400">Buy now</dt><dd class="mt-1 text-theme-sm">$@Model.BuyNowPrice.Value.ToString("N0")</dd></div>
+                    }
+                    <div><dt class="text-theme-xs uppercase text-gray-400">Schedule</dt><dd class="mt-1 text-theme-sm">@Model.StartDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm") – @Model.EndDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd></div>
+                    <div><dt class="text-theme-xs uppercase text-gray-400">Event</dt><dd class="mt-1 text-theme-sm">@(Model.AuctionEventName ?? "—")</dd></div>
+                    <div><dt class="text-theme-xs uppercase text-gray-400">Registration required</dt><dd class="mt-1 text-theme-sm">@(Model.RequiresRegistration ? "Yes" : "No")</dd></div>
+                    <div><dt class="text-theme-xs uppercase text-gray-400">Listing type</dt><dd class="mt-1 text-theme-sm capitalize">@Model.ListingType</dd></div>
+                </dl>
+            </section>
+
+            <section class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+                <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Seller</h3>
+                <p class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@Model.SellerName</p>
+                <p class="text-theme-xs text-gray-500">@Model.SellerEmail</p>
+                <a asp-area="Admin"
+                   asp-controller="User"
+                   asp-action="Details"
+                   asp-route-id="@Model.SellerId"
+                   class="mt-3 inline-flex text-theme-sm font-medium text-brand-600 hover:text-brand-700">
+                    View seller in Admin
+                </a>
+            </section>
+        </div>
+
+        <aside class="xl:col-span-1">
+            <div class="sticky top-24 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Decision</h3>
+                <p class="mt-2 text-theme-sm text-gray-500 dark:text-gray-400">
+                    Approve to publish this listing. Reject with a clear reason so the seller can fix and resubmit.
+                </p>
+
+                <form asp-action="Approve"
+                      asp-route-id="@Model.Id"
+                      method="post"
+                      class="mt-6"
+                      onsubmit="return confirm('Approve this listing and publish it?');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit"
+                            class="w-full rounded-lg bg-success-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-success-600">
+                        Approve
+                    </button>
+                </form>
+
+                <form asp-action="Reject"
+                      asp-route-id="@Model.Id"
+                      method="post"
+                      class="mt-4 space-y-3"
+                      onsubmit="return validateRejectReason();">
+                    @Html.AntiForgeryToken()
+                    <label class="block text-theme-xs font-medium text-gray-500">Reject reason (min 10 characters)</label>
+                    <textarea id="rejectReason"
+                              name="rejectReason"
+                              rows="4"
+                              required
+                              minlength="10"
+                              maxlength="500"
+                              placeholder="Explain what needs to be fixed..."
+                              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></textarea>
+                    <button type="submit"
+                            class="w-full rounded-lg bg-error-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-error-600">
+                        Reject
+                    </button>
+                </form>
+            </div>
+        </aside>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function validateRejectReason() {
+            const value = document.getElementById('rejectReason').value.trim();
+            if (value.length < 10) {
+                alert('Reject reason must be at least 10 characters.');
+                return false;
+            }
+            return confirm('Reject this listing? The seller will see your reason.');
+        }
+    </script>
+}

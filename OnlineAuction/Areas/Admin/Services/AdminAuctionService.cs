@@ -17,6 +17,9 @@ public class AdminAuctionService
 
     private static readonly string[] AllowedStatuses =
     [
+        AuctionStatuses.PendingReview,
+        AuctionStatuses.Rejected,
+        AuctionStatuses.Scheduled,
         AuctionStatuses.Live,
         AuctionStatuses.EndingSoon,
         AuctionStatuses.Ended,
@@ -244,9 +247,13 @@ public class AdminAuctionService
             CurrentPrice = model.StartingPrice,
             ListingType = model.ListingType,
             RequiresRegistration = model.RequiresRegistration,
+            // Admin-created listings bypass seller review and can go live immediately.
             Status = model.Status,
             StartDate = model.StartDate,
             EndDate = model.EndDate,
+            VerifiedAt = model.Status is AuctionStatuses.Live or AuctionStatuses.Scheduled or AuctionStatuses.EndingSoon
+                ? now
+                : null,
             CreatedAt = now
         };
 

@@ -131,53 +131,71 @@ builder.Services
     .AddEntityFrameworkStores<AuctionHouseDbContext>()
     .AddDefaultTokenProviders();
 
-#endregion
-
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Admin/Account/Login";
-    options.LogoutPath = "/Admin/Account/Logout";
-    options.AccessDeniedPath = "/Admin/Account/AccessDenied";
-
+    options.Cookie.Name = ".AuctionHouse.User";
+    options.LoginPath = "/Auth/Login";
+    options.LogoutPath = "/Auth/Logout";
+    options.AccessDeniedPath = "/Auth/Login";
     options.SlidingExpiration = true;
     options.ExpireTimeSpan = TimeSpan.FromDays(14);
 
     options.Events.OnRedirectToLogin = context =>
     {
-        if (context.Request.Path.StartsWithSegments("/api"))
+        if (context.Request.Path.StartsWithSegments("/api")
+            || context.Request.Path.StartsWithSegments("/hubs"))
         {
             context.Response.StatusCode = 401;
             return Task.CompletedTask;
         }
 
-        if (context.Request.Path.StartsWithSegments("/Admin", StringComparison.OrdinalIgnoreCase))
-        {
-            context.Response.Redirect(context.RedirectUri);
-        }
-        else
-        {
-            var returnUrl = context.Request.Path + context.Request.QueryString;
-            var loginUrl = $"/Auth/Login?returnUrl={Uri.EscapeDataString(returnUrl)}";
-            context.Response.Redirect(loginUrl);
-        }
-
+        var returnUrl = context.Request.Path + context.Request.QueryString;
+        var loginUrl = $"/Auth/Login?returnUrl={Uri.EscapeDataString(returnUrl)}";
+        context.Response.Redirect(loginUrl);
         return Task.CompletedTask;
     };
 
     options.Events.OnRedirectToAccessDenied = context =>
     {
-        if (context.Request.Path.StartsWithSegments("/Admin", StringComparison.OrdinalIgnoreCase))
+        if (context.Request.Path.StartsWithSegments("/api"))
         {
-            context.Response.Redirect(context.RedirectUri);
-        }
-        else
-        {
-            context.Response.Redirect("/Auth/Login");
+            context.Response.StatusCode = 403;
+            return Task.CompletedTask;
         }
 
+        context.Response.Redirect("/Auth/Login");
         return Task.CompletedTask;
     };
 });
+
+builder.Services.AddAuthentication()
+    .AddCookie(AuthSchemes.Admin, options =>
+    {
+        options.Cookie.Name = ".AuctionHouse.Admin";
+        options.Cookie.Path = "/Admin";
+        options.LoginPath = "/Admin/Account/Login";
+        options.LogoutPath = "/Admin/Account/Logout";
+        options.AccessDeniedPath = "/Admin/Account/AccessDenied";
+        options.SlidingExpiration = true;
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.Redirect(context.RedirectUri);
+            return Task.CompletedTask;
+        };
+
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            context.Response.Redirect(context.RedirectUri);
+            return Task.CompletedTask;
+        };
+    });
+
+#endregion
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 
 #region Cloudinary + Services
 
@@ -205,10 +223,13 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+builder.Services.AddScoped<IAdminAuctionVerificationService, AdminAuctionVerificationService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
 builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
 builder.Services.AddScoped<IRegistrationDepositRefundService, RegistrationDepositRefundService>();
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<IRealtimePublisher, RealtimePublisher>();
 #endregion
 
 var firebaseSettings = builder.Configuration
@@ -289,6 +310,8 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<OnlineAuction.Hubs.AppHub>("/hubs/app");
 
 #endregion
 

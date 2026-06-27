@@ -77,12 +77,14 @@ internal static class ProductDetailMapper
             RegistrationRejectReason = registrationRejectReason,
             CanBid = canBid,
             IsSeller = isSeller,
+            IsVerifiedAuthentic = auction.VerifiedAt.HasValue,
             RegistrationCount = registrationCount,
             Seller = seller,
             Grading = BuildGrading(product),
             BidHistory = MapBidHistory(bids),
             Documents = MapDocuments(product),
-            RelatedProducts = relatedProducts.ToList()
+            RelatedProducts = relatedProducts.ToList(),
+            BuyNowPrice = auction.BuyNowPrice
         };
     }
 
@@ -117,11 +119,12 @@ internal static class ProductDetailMapper
             Rating = 0
         };
 
-    public static AuctionItemViewModel MapToAuctionItem(Auction auction)
+    public static AuctionItemViewModel MapToAuctionItem(Auction auction, bool forBuyNowCatalog = false)
     {
         var product = auction.Product;
         var bidCount = auction.Bids?.Count ?? 0;
         var status = MapCardStatus(auction);
+        var hasBuyNow = auction.BuyNowPrice.HasValue && auction.BuyNowPrice.Value > 0;
 
         var item = new AuctionItemViewModel
         {
@@ -130,10 +133,17 @@ internal static class ProductDetailMapper
             Category = GetCategoryName(product),
             ImageUrl = ResolveImageUrl(product.PrimaryImage),
             StartingPrice = auction.StartingPrice,
-            CurrentPrice = auction.CurrentPrice,
+            CurrentPrice = forBuyNowCatalog && hasBuyNow
+                ? auction.BuyNowPrice!.Value
+                : auction.CurrentPrice,
             Status = status,
-            TimeRemaining = FormatTimeRemaining(auction.EndDate),
+            TimeRemaining = forBuyNowCatalog && hasBuyNow
+                ? "In stock"
+                : auction.ListingType == ListingTypes.BuyNow
+                    ? "In stock"
+                    : FormatTimeRemaining(auction.EndDate),
             ListingType = auction.ListingType,
+            BuyNowPrice = auction.BuyNowPrice,
             Grade = product.GradeLabel ?? string.Empty,
             Authenticator = ResolveAuthenticator(product.GradeLabel),
             Subtitle = BuildSubtitle(product),
@@ -174,6 +184,13 @@ internal static class ProductDetailMapper
                 item.DealNote = "Offers being negotiated";
                 return;
             }
+        }
+
+        if (item.BuyNowPrice.HasValue && item.BuyNowPrice.Value > item.CurrentPrice)
+        {
+            item.DealLabel = "Buy Now";
+            item.DealNote = $"Instant purchase at ${item.BuyNowPrice.Value:N0}";
+            return;
         }
 
         if (item.BidCount <= 1 && item.CurrentPrice <= item.StartingPrice * 1.08m)
@@ -384,6 +401,9 @@ internal static class ProductDetailMapper
 
         return status switch
         {
+            AuctionStatuses.PendingReview => ("Pending Review", "bg-amber-500 text-white"),
+            AuctionStatuses.Rejected => ("Rejected", "bg-red-600 text-white"),
+            AuctionStatuses.Scheduled => ("Scheduled", "bg-sky-600 text-white"),
             AuctionStatuses.Live => ("Active Auction", "bg-emerald-600 text-white"),
             AuctionStatuses.EndingSoon => ("Ending Soon", "bg-orange-600 text-white"),
             AuctionStatuses.Ended or AuctionStatuses.AwaitingPayment => ("Ended", "bg-stone-600 text-white"),
@@ -413,6 +433,21 @@ internal static class ProductDetailMapper
         if (auction.Status == AuctionStatuses.Cancelled)
         {
             return "Cancelled";
+        }
+
+        if (auction.Status == AuctionStatuses.PendingReview)
+        {
+            return "Pending Review";
+        }
+
+        if (auction.Status == AuctionStatuses.Rejected)
+        {
+            return "Rejected";
+        }
+
+        if (auction.Status == AuctionStatuses.Scheduled)
+        {
+            return "Scheduled";
         }
 
         if (auction.Status == AuctionStatuses.EndingSoon)
