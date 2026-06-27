@@ -384,6 +384,30 @@
   <data name="Auth_Slide3_Eyebrow" xml:space="preserve"><value>Sports &amp; MTG</value></data>
   <data name="Auth_Slide3_Title" xml:space="preserve"><value>Legends on Auction</value></data>
   <data name="Auth_Slide3_Desc" xml:space="preserve"><value>From Mickey Mantle rookies to Alpha Black Lotus — curated daily.</value></data>
+  <data name="Auth_ForgotPassword" xml:space="preserve"><value>Forgot password?</value></data>
+  <data name="Auth_Forgot_Title" xml:space="preserve"><value>Forgot password?</value></data>
+  <data name="Auth_Forgot_Subtitle" xml:space="preserve"><value>Enter your email to receive a 6-digit verification code.</value></data>
+  <data name="Auth_Forgot_SendOtp" xml:space="preserve"><value>Send verification code</value></data>
+  <data name="Auth_Forgot_BackToLogin" xml:space="preserve"><value>Back to log in</value></data>
+  <data name="Auth_Forgot_OtpTitle" xml:space="preserve"><value>Enter verification code</value></data>
+  <data name="Auth_Forgot_OtpSubtitle" xml:space="preserve"><value>We sent a 6-digit code to your email.</value></data>
+  <data name="Auth_Forgot_OtpSent" xml:space="preserve"><value>If {0} exists, enter the 6-digit code we sent.</value></data>
+  <data name="Auth_Forgot_OtpLabel" xml:space="preserve"><value>Verification code</value></data>
+  <data name="Auth_Forgot_OtpDigit" xml:space="preserve"><value>Digit {0}</value></data>
+  <data name="Auth_Forgot_VerifyOtp" xml:space="preserve"><value>Verify code</value></data>
+  <data name="Auth_Forgot_ChangeEmail" xml:space="preserve"><value>Use a different email</value></data>
+  <data name="Auth_Forgot_ResetTitle" xml:space="preserve"><value>Create new password</value></data>
+  <data name="Auth_Forgot_ResetSubtitle" xml:space="preserve"><value>Choose a new password for your RareCard account.</value></data>
+  <data name="Auth_Forgot_NewPassword" xml:space="preserve"><value>New password</value></data>
+  <data name="Auth_Forgot_ResetSubmit" xml:space="preserve"><value>Reset password</value></data>
+  <data name="Auth_Forgot_BackToOtp" xml:space="preserve"><value>Back to verification code</value></data>
+  <data name="Auth_Forgot_DevOtpTitle" xml:space="preserve"><value>Development OTP</value></data>
+  <data name="Auth_Forgot_DevOtpDesc" xml:space="preserve"><value>Email is not configured yet, so Development shows the code here.</value></data>
+  <data name="Auth_Forgot_InvalidEmail" xml:space="preserve"><value>Enter a valid email address.</value></data>
+  <data name="Auth_Forgot_InvalidOtp" xml:space="preserve"><value>Invalid or expired verification code.</value></data>
+  <data name="Auth_Forgot_ResetFailed" xml:space="preserve"><value>Unable to reset password. Please try again.</value></data>
+  <data name="Auth_Forgot_SessionExpired" xml:space="preserve"><value>Your verification session expired. Please start again.</value></data>
+  <data name="Auth_Forgot_ResetSuccess" xml:space="preserve"><value>Password reset successfully. Please log in with your new password.</value></data>
   <data name="Layout_Footer_AboutUs" xml:space="preserve"><value>About Us</value></data>
   <data name="Layout_Footer_ContactUs" xml:space="preserve"><value>Contact Us</value></data>
   <data name="Layout_Footer_PolicyTerms" xml:space="preserve"><value>Policy &amp; Term of Use</value></data>
