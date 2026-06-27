@@ -384,6 +384,30 @@
   <data name="Auth_Slide3_Eyebrow" xml:space="preserve"><value>スポーツ &amp; MTG</value></data>
   <data name="Auth_Slide3_Title" xml:space="preserve"><value>伝説のオークション</value></data>
   <data name="Auth_Slide3_Desc" xml:space="preserve"><value>ミッキーマンテルからAlpha Black Lotusまで毎日厳選。</value></data>
+  <data name="Auth_ForgotPassword" xml:space="preserve"><value>パスワードをお忘れですか？</value></data>
+  <data name="Auth_Forgot_Title" xml:space="preserve"><value>パスワードをお忘れですか？</value></data>
+  <data name="Auth_Forgot_Subtitle" xml:space="preserve"><value>メールアドレスを入力して6桁の認証コードを受け取ってください。</value></data>
+  <data name="Auth_Forgot_SendOtp" xml:space="preserve"><value>認証コードを送信</value></data>
+  <data name="Auth_Forgot_BackToLogin" xml:space="preserve"><value>ログインに戻る</value></data>
+  <data name="Auth_Forgot_OtpTitle" xml:space="preserve"><value>認証コードを入力</value></data>
+  <data name="Auth_Forgot_OtpSubtitle" xml:space="preserve"><value>6桁のコードをメールで送信しました。</value></data>
+  <data name="Auth_Forgot_OtpSent" xml:space="preserve"><value>{0} が存在する場合、送信した6桁のコードを入力してください。</value></data>
+  <data name="Auth_Forgot_OtpLabel" xml:space="preserve"><value>認証コード</value></data>
+  <data name="Auth_Forgot_OtpDigit" xml:space="preserve"><value>桁 {0}</value></data>
+  <data name="Auth_Forgot_VerifyOtp" xml:space="preserve"><value>コードを確認</value></data>
+  <data name="Auth_Forgot_ChangeEmail" xml:space="preserve"><value>別のメールを使用</value></data>
+  <data name="Auth_Forgot_ResetTitle" xml:space="preserve"><value>新しいパスワードを作成</value></data>
+  <data name="Auth_Forgot_ResetSubtitle" xml:space="preserve"><value>RareCardアカウントの新しいパスワードを設定してください。</value></data>
+  <data name="Auth_Forgot_NewPassword" xml:space="preserve"><value>新しいパスワード</value></data>
+  <data name="Auth_Forgot_ResetSubmit" xml:space="preserve"><value>パスワードをリセット</value></data>
+  <data name="Auth_Forgot_BackToOtp" xml:space="preserve"><value>認証コードに戻る</value></data>
+  <data name="Auth_Forgot_DevOtpTitle" xml:space="preserve"><value>開発用OTP</value></data>
+  <data name="Auth_Forgot_DevOtpDesc" xml:space="preserve"><value>メールが未設定のため、開発環境ではここにコードを表示します。</value></data>
+  <data name="Auth_Forgot_InvalidEmail" xml:space="preserve"><value>有効なメールアドレスを入力してください。</value></data>
+  <data name="Auth_Forgot_InvalidOtp" xml:space="preserve"><value>認証コードが無効または期限切れです。</value></data>
+  <data name="Auth_Forgot_ResetFailed" xml:space="preserve"><value>パスワードをリセットできませんでした。もう一度お試しください。</value></data>
+  <data name="Auth_Forgot_SessionExpired" xml:space="preserve"><value>認証セッションの有効期限が切れました。最初からやり直してください。</value></data>
+  <data name="Auth_Forgot_ResetSuccess" xml:space="preserve"><value>パスワードをリセットしました。新しいパスワードでログインしてください。</value></data>
   <data name="Layout_Footer_AboutUs" xml:space="preserve"><value>会社概要</value></data>
   <data name="Layout_Footer_ContactUs" xml:space="preserve"><value>お問い合わせ</value></data>
   <data name="Layout_Footer_PolicyTerms" xml:space="preserve"><value>ポリシーと利用規約</value></data>

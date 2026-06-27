@@ -228,6 +228,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
 builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
 builder.Services.AddScoped<IRegistrationDepositRefundService, RegistrationDepositRefundService>();
+builder.Services.AddSingleton<IPasswordResetOtpService, PasswordResetOtpService>();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IRealtimePublisher, RealtimePublisher>();
 #endregion

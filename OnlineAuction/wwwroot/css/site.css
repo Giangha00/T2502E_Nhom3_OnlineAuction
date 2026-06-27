@@ -756,8 +756,8 @@ footer .footer-link--active:visited {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 84rem;
-  max-height: min(54rem, calc(100vh - 2rem));
+  max-width: 54rem;
+  height: min(50rem, calc(100vh - 2rem));
   overflow: hidden;
   border-radius: 1rem;
   background: #fff;
@@ -765,25 +765,17 @@ footer .footer-link--active:visited {
   animation: authModalIn 0.4s ease;
 }
 
-.home-auth-modal--compact {
-  max-width: 78rem;
-}
-
 .home-auth-modal__grid {
   display: grid;
   grid-template-columns: 1fr;
   align-items: stretch;
+  height: 100%;
+  min-height: 0;
 }
 
 @media (min-width: 768px) {
   .home-auth-modal__grid {
-    grid-template-columns: 1.06fr 1fr;
-    min-height: min(48rem, calc(100vh - 2rem));
-  }
-
-  .home-auth-modal--compact .home-auth-modal__grid {
-    grid-template-columns: 1.03fr 0.94fr;
-    min-height: min(44rem, calc(100vh - 2rem));
+    grid-template-columns: 0.95fr 1fr;
   }
 }
 
@@ -894,16 +886,17 @@ footer .footer-link--active:visited {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 0;
-  max-height: inherit;
+  height: 100%;
+  min-height: 0;
   overflow-y: auto;
   padding: 1.6rem 1.35rem 1.5rem;
 }
 
 @media (min-width: 768px) {
   .home-auth-form-col {
-    padding: 2.55rem 3.05rem 2.25rem;
+    padding: 2.1rem 2.35rem 2rem;
   }
 }
 
@@ -972,6 +965,14 @@ footer .footer-link--active:visited {
   border-radius: 9999px;
   background: #f3f6fb;
   box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+  flex-shrink: 0;
+  transition: visibility 0.2s ease, opacity 0.2s ease;
+}
+
+.home-auth-tabs--collapsed {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .home-auth-tab {
@@ -1005,7 +1006,34 @@ footer .footer-link--active:visited {
 }
 
 .home-auth-form--compact {
-  margin-top: 1.5rem;
+  margin-top: 0;
+}
+
+.home-auth-panels {
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.home-auth-panel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  overflow-y: auto;
+}
+
+.home-auth-panel:not(.home-auth-panel--active) {
+  visibility: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.home-auth-panel.home-auth-panel--active {
+  visibility: visible;
+  pointer-events: auto;
+  opacity: 1;
 }
 
 .home-auth-field {
@@ -1090,11 +1118,65 @@ footer .footer-link--active:visited {
   line-height: 1.5;
   text-align: center;
   color: #94a3b8;
+  flex-shrink: 0;
+  transition: visibility 0.2s ease, opacity 0.2s ease;
+}
+
+.home-auth-legal--collapsed {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.home-auth-otp-hint {
+  margin: 0 0 1rem;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  text-align: center;
+  color: #64748b;
+}
+
+.home-auth-dev-otp {
+  margin-bottom: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  padding: 0.85rem 1rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #1e3a8a;
+  text-align: center;
+}
+
+.home-auth-otp-group {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.home-auth-otp-input {
+  width: 100%;
+  aspect-ratio: 1;
+  min-height: 2.85rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d2dae4;
+  background: #fff;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.home-auth-otp-input:focus {
+  border-color: #0f172a;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
 }
 
 @media (max-width: 767px) {
   .home-auth-modal {
-    max-height: calc(100vh - 1rem);
+    height: min(50rem, calc(100vh - 1rem));
     border-radius: 0.9rem;
   }
 

@@ -10,14 +10,24 @@ public class ForgotPasswordViewModel
     public string Email { get; set; } = string.Empty;
 }
 
-public class ResetPasswordViewModel
+public class VerifyPasswordOtpViewModel
 {
     [Required(ErrorMessage = "Email is required.")]
     [EmailAddress(ErrorMessage = "Enter a valid email address.")]
     public string Email { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Reset token is required.")]
-    public string Code { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Verification code is required.")]
+    [StringLength(6, MinimumLength = 6, ErrorMessage = "Enter the 6-digit verification code.")]
+    [RegularExpression(@"^\d{6}$", ErrorMessage = "Enter the 6-digit verification code.")]
+    [Display(Name = "Verification code")]
+    public string Otp { get; set; } = string.Empty;
+}
+
+public class ResetPasswordViewModel
+{
+    [Required(ErrorMessage = "Email is required.")]
+    [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+    public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Password is required.")]
     [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters.")]
