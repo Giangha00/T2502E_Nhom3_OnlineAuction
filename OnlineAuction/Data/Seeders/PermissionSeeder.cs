@@ -24,27 +24,13 @@ public static class PermissionSeeder
         new(PermissionCodes.ComplaintsReview, "Review Complaints", "Complaints", "Complaint review module (backlog)")
     ];
 
-    private static readonly Dictionary<string, string[]> RolePermissionMap = new(StringComparer.Ordinal)
-    {
-        [StaffRoleNames.Moderator] =
-        [
-            PermissionCodes.DashboardView,
-            PermissionCodes.AuctionsView,
-            PermissionCodes.AuctionsVerify
-        ],
-        [StaffRoleNames.Support] =
-        [
-            PermissionCodes.DashboardView,
-            PermissionCodes.UsersView,
-            PermissionCodes.ComplaintsReview
-        ]
-    };
-
     public static async Task SeedAsync(
         AuctionHouseDbContext dbContext,
         RoleManager<IdentityRole<int>> roleManager,
         UserManager<ApplicationUser> userManager)
     {
+        await MigrateLegacyStaffRolesAsync(dbContext, userManager);
+
         foreach (var seed in PermissionCatalog)
         {
             var exists = await dbContext.Permissions.AnyAsync(permission => permission.Code == seed.Code);
@@ -64,104 +50,35 @@ public static class PermissionSeeder
 
         await dbContext.SaveChangesAsync();
 
-        foreach (var roleName in StaffRoleNames.All)
+        if (!await roleManager.RoleExistsAsync(StaffRoleNames.Admin))
         {
-            if (!await roleManager.RoleExistsAsync(roleName))
-            {
-                await roleManager.CreateAsync(new IdentityRole<int> { Name = roleName });
-            }
+            await roleManager.CreateAsync(new IdentityRole<int> { Name = StaffRoleNames.Admin });
         }
 
-        var permissionsByCode = await dbContext.Permissions
-            .ToDictionaryAsync(permission => permission.Code, permission => permission.Id);
+        await SyncExistingUserRolesAsync(dbContext, userManager);
+    }
 
-        foreach (var (roleName, permissionCodes) in RolePermissionMap)
+    private static async Task MigrateLegacyStaffRolesAsync(
+        AuctionHouseDbContext dbContext,
+        UserManager<ApplicationUser> userManager)
+    {
+        await dbContext.Database.ExecuteSqlRawAsync(
+            "UPDATE users SET role = {0} WHERE role IN (3, 4)",
+            (int)UserRole.User);
+
+        var legacyStaffEmails = new[] { "moderator@auctionhouse.com", "support@auctionhouse.com" };
+        foreach (var email in legacyStaffEmails)
         {
-            var role = await roleManager.FindByNameAsync(roleName);
-            if (role is null)
+            var user = await userManager.FindByEmailAsync(email);
+            if (user is null)
             {
                 continue;
             }
 
-            var desiredPermissionIds = permissionCodes
-                .Where(permissionsByCode.ContainsKey)
-                .Select(code => permissionsByCode[code])
-                .ToHashSet();
-
-            var existing = await dbContext.RolePermissions
-                .Where(rp => rp.RoleId == role.Id)
-                .ToListAsync();
-
-            var existingIds = existing.Select(rp => rp.PermissionId).ToHashSet();
-
-            foreach (var permissionId in desiredPermissionIds.Where(id => !existingIds.Contains(id)))
-            {
-                dbContext.RolePermissions.Add(new RolePermission
-                {
-                    RoleId = role.Id,
-                    PermissionId = permissionId
-                });
-            }
+            user.Role = UserRole.User;
+            await userManager.UpdateAsync(user);
+            await IdentityRoleSyncService.SyncUserRoleAsync(userManager, user, UserRole.User);
         }
-
-        await dbContext.SaveChangesAsync();
-
-        await SeedDemoStaffUsersAsync(dbContext, userManager);
-        await SyncExistingUserRolesAsync(dbContext, userManager);
-    }
-
-    private static async Task SeedDemoStaffUsersAsync(
-        AuctionHouseDbContext dbContext,
-        UserManager<ApplicationUser> userManager)
-    {
-        await EnsureStaffUserAsync(
-            userManager,
-            email: "moderator@auctionhouse.com",
-            username: "moderator",
-            fullName: "Demo Moderator",
-            role: UserRole.Moderator,
-            identityRole: StaffRoleNames.Moderator);
-
-        await EnsureStaffUserAsync(
-            userManager,
-            email: "support@auctionhouse.com",
-            username: "support",
-            fullName: "Demo Support",
-            role: UserRole.Support,
-            identityRole: StaffRoleNames.Support);
-    }
-
-    private static async Task EnsureStaffUserAsync(
-        UserManager<ApplicationUser> userManager,
-        string email,
-        string username,
-        string fullName,
-        UserRole role,
-        string identityRole)
-    {
-        var user = await userManager.FindByEmailAsync(email);
-        if (user is null)
-        {
-            user = new ApplicationUser
-            {
-                UserName = username,
-                Email = email,
-                FullName = fullName,
-                PhoneNumber = "0900000001",
-                Role = role,
-                Status = UserStatus.Active,
-                EmailConfirmed = true,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            var createResult = await userManager.CreateAsync(user, "User@123");
-            if (!createResult.Succeeded)
-            {
-                return;
-            }
-        }
-
-        await IdentityRoleSyncService.SyncUserRoleAsync(userManager, user, role);
     }
 
     private static async Task SyncExistingUserRolesAsync(
