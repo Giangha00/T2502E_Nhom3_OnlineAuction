@@ -22,4 +22,6 @@ public class CompleteOrderRequest
 
     [Required(ErrorMessage = "Please select a payment method.")]
     public string PaymentMethod { get; set; } = string.Empty;
+
+    public List<int> SelectedOrderIds { get; set; } = [];
 }

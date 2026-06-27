@@ -68,7 +68,7 @@ public class BuyNowController : Controller
         {
             success = true,
             message = result.Message,
-            redirectUrl = Url.Action("Index", "Order")
+            redirectUrl = Url.Action("Index", "Order", new { added = 1 })
         });
     }
 
