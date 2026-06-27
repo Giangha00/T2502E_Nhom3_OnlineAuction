@@ -10,8 +10,6 @@ public static class IdentityRoleSyncService
     public static string? MapUserRoleToIdentityRole(UserRole role) => role switch
     {
         UserRole.Admin => StaffRoleNames.Admin,
-        UserRole.Moderator => StaffRoleNames.Moderator,
-        UserRole.Support => StaffRoleNames.Support,
         _ => null
     };
 
@@ -33,9 +31,8 @@ public static class IdentityRoleSyncService
         }
     }
 
-    public static async Task<bool> HasStaffAccessAsync(UserManager<ApplicationUser> userManager, ApplicationUser user)
+    public static async Task<bool> HasAdminAccessAsync(UserManager<ApplicationUser> userManager, ApplicationUser user)
     {
-        var roles = await userManager.GetRolesAsync(user);
-        return roles.Any(role => StaffRoleNames.All.Contains(role));
+        return await userManager.IsInRoleAsync(user, StaffRoleNames.Admin);
     }
 }

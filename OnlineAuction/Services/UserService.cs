@@ -533,9 +533,7 @@ public class UserService : IUserService
         model.RoleOptions =
         [
             new SelectListItem("User", UserRole.User.ToString()),
-            new SelectListItem("Admin", UserRole.Admin.ToString()),
-            new SelectListItem("Moderator", UserRole.Moderator.ToString()),
-            new SelectListItem("Support", UserRole.Support.ToString())
+            new SelectListItem("Admin", UserRole.Admin.ToString())
         ];
 
         model.StatusOptions =

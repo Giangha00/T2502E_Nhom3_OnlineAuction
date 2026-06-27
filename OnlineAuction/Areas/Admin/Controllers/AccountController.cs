@@ -37,7 +37,7 @@ public class AccountController : Controller
             if (int.TryParse(userIdValue, out var userId))
             {
                 var existingUser = await _userManager.FindByIdAsync(userId.ToString());
-                if (existingUser is not null && await IdentityRoleSyncService.HasStaffAccessAsync(_userManager, existingUser))
+                if (existingUser is not null && await IdentityRoleSyncService.HasAdminAccessAsync(_userManager, existingUser))
                 {
                     return RedirectToAction("Index", "Dashboard");
                 }
@@ -82,9 +82,9 @@ public class AccountController : Controller
             return View(model);
         }
 
-        if (!await IdentityRoleSyncService.HasStaffAccessAsync(_userManager, user))
+        if (!await IdentityRoleSyncService.HasAdminAccessAsync(_userManager, user))
         {
-            ModelState.AddModelError(string.Empty, "Staff access required.");
+            ModelState.AddModelError(string.Empty, "Admin access required.");
             return View(model);
         }
 
