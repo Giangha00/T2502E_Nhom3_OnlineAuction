@@ -384,6 +384,30 @@
   <data name="Auth_Slide3_Eyebrow" xml:space="preserve"><value>Thể thao &amp; MTG</value></data>
   <data name="Auth_Slide3_Title" xml:space="preserve"><value>Huyền thoại trên đấu giá</value></data>
   <data name="Auth_Slide3_Desc" xml:space="preserve"><value>Từ Mickey Mantle rookie đến Alpha Black Lotus — tuyển chọn mỗi ngày.</value></data>
+  <data name="Auth_ForgotPassword" xml:space="preserve"><value>Quên mật khẩu?</value></data>
+  <data name="Auth_Forgot_Title" xml:space="preserve"><value>Quên mật khẩu?</value></data>
+  <data name="Auth_Forgot_Subtitle" xml:space="preserve"><value>Nhập email để nhận mã xác minh 6 chữ số.</value></data>
+  <data name="Auth_Forgot_SendOtp" xml:space="preserve"><value>Gửi mã xác minh</value></data>
+  <data name="Auth_Forgot_BackToLogin" xml:space="preserve"><value>Quay lại đăng nhập</value></data>
+  <data name="Auth_Forgot_OtpTitle" xml:space="preserve"><value>Nhập mã xác minh</value></data>
+  <data name="Auth_Forgot_OtpSubtitle" xml:space="preserve"><value>Chúng tôi đã gửi mã 6 chữ số đến email của bạn.</value></data>
+  <data name="Auth_Forgot_OtpSent" xml:space="preserve"><value>Nếu {0} tồn tại, hãy nhập mã 6 chữ số chúng tôi đã gửi.</value></data>
+  <data name="Auth_Forgot_OtpLabel" xml:space="preserve"><value>Mã xác minh</value></data>
+  <data name="Auth_Forgot_OtpDigit" xml:space="preserve"><value>Chữ số {0}</value></data>
+  <data name="Auth_Forgot_VerifyOtp" xml:space="preserve"><value>Xác minh mã</value></data>
+  <data name="Auth_Forgot_ChangeEmail" xml:space="preserve"><value>Dùng email khác</value></data>
+  <data name="Auth_Forgot_ResetTitle" xml:space="preserve"><value>Tạo mật khẩu mới</value></data>
+  <data name="Auth_Forgot_ResetSubtitle" xml:space="preserve"><value>Chọn mật khẩu mới cho tài khoản RareCard của bạn.</value></data>
+  <data name="Auth_Forgot_NewPassword" xml:space="preserve"><value>Mật khẩu mới</value></data>
+  <data name="Auth_Forgot_ResetSubmit" xml:space="preserve"><value>Đặt lại mật khẩu</value></data>
+  <data name="Auth_Forgot_BackToOtp" xml:space="preserve"><value>Quay lại mã xác minh</value></data>
+  <data name="Auth_Forgot_DevOtpTitle" xml:space="preserve"><value>Mã OTP môi trường Development</value></data>
+  <data name="Auth_Forgot_DevOtpDesc" xml:space="preserve"><value>Email chưa được cấu hình, nên Development hiển thị mã tại đây.</value></data>
+  <data name="Auth_Forgot_InvalidEmail" xml:space="preserve"><value>Vui lòng nhập địa chỉ email hợp lệ.</value></data>
+  <data name="Auth_Forgot_InvalidOtp" xml:space="preserve"><value>Mã xác minh không hợp lệ hoặc đã hết hạn.</value></data>
+  <data name="Auth_Forgot_ResetFailed" xml:space="preserve"><value>Không thể đặt lại mật khẩu. Vui lòng thử lại.</value></data>
+  <data name="Auth_Forgot_SessionExpired" xml:space="preserve"><value>Phiên xác minh đã hết hạn. Vui lòng bắt đầu lại.</value></data>
+  <data name="Auth_Forgot_ResetSuccess" xml:space="preserve"><value>Đặt lại mật khẩu thành công. Vui lòng đăng nhập bằng mật khẩu mới.</value></data>
   <data name="Layout_Footer_AboutUs" xml:space="preserve"><value>Về chúng tôi</value></data>
   <data name="Layout_Footer_ContactUs" xml:space="preserve"><value>Liên hệ</value></data>
   <data name="Layout_Footer_PolicyTerms" xml:space="preserve"><value>Chính sách &amp; Điều khoản</value></data>
