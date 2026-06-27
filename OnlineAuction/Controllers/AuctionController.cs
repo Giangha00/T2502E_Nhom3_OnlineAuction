@@ -46,6 +46,34 @@ public class AuctionController : Controller
         return View(product);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> BidState(int id, CancellationToken cancellationToken)
+    {
+        var state = await _bidService.GetBidStateAsync(id, cancellationToken);
+        if (state is null)
+        {
+            return NotFound();
+        }
+
+        return Json(new
+        {
+            auctionId = state.AuctionId,
+            currentPrice = state.CurrentPrice,
+            bidCount = state.BidCount,
+            minNextBid = state.MinNextBid,
+            endDate = DateTimeUtilities.AsUtc(state.EndDate).ToString("o"),
+            isEnded = state.IsEnded,
+            bidHistory = state.BidHistory.Select(bid => new
+            {
+                bidderName = bid.BidderName,
+                amount = bid.Amount,
+                bidTime = bid.BidTime,
+                isWinning = bid.IsWinning,
+                status = bid.Status
+            })
+        });
+    }
+
     [HttpPost]
     [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     [ValidateAntiForgeryToken]
