@@ -1,6 +1,7 @@
 @{
     var modalReturnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
     var authError = TempData["AuthError"] as string;
+    var authSuccess = TempData["AuthSuccess"] as string;
 }
 
 <div id="authModalOverlay" class="home-auth-overlay home-auth-overlay--hidden" aria-hidden="true">
@@ -46,6 +47,10 @@
         @if (!string.IsNullOrWhiteSpace(authError))
         {
           <p id="authModalError" class="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">@authError</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(authSuccess))
+        {
+          <p id="authModalSuccess" class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">@authSuccess</p>
         }
 
         <div class="home-auth-tabs" role="tablist">
