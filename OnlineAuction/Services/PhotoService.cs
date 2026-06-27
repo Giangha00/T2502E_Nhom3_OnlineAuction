@@ -8,12 +8,17 @@ namespace OnlineAuction.Services;
 
 public class PhotoService : IPhotoService
 {
-    private static readonly string[] AllowedExtensions =
+    private static readonly string[] AllowedImageExtensions =
     [
         ".jpg",
         ".jpeg",
         ".png",
         ".webp"
+    ];
+
+    private static readonly string[] AllowedDocumentExtensions =
+    [
+        ".pdf"
     ];
 
     private const long MaxFileSize = 5 * 1024 * 1024;
@@ -47,7 +52,19 @@ public class PhotoService : IPhotoService
         }
 
         var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-        if (!AllowedExtensions.Contains(extension))
+        var isDocumentFolder = folder.Contains("documents", StringComparison.OrdinalIgnoreCase);
+
+        if (isDocumentFolder)
+        {
+            if (!AllowedDocumentExtensions.Contains(extension))
+            {
+                throw new InvalidOperationException("Document must be a PDF file.");
+            }
+
+            return await UploadRawAsync(file, folder);
+        }
+
+        if (!AllowedImageExtensions.Contains(extension))
         {
             throw new InvalidOperationException("Image must be a JPG, PNG, or WEBP file.");
         }
@@ -65,6 +82,25 @@ public class PhotoService : IPhotoService
                 .Crop("fill")
                 .Quality("auto")
                 .FetchFormat("auto")
+        };
+
+        var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+        if (uploadResult.Error is not null)
+        {
+            throw new InvalidOperationException(uploadResult.Error.Message);
+        }
+
+        return uploadResult.SecureUrl.AbsoluteUri;
+    }
+
+    private async Task<string> UploadRawAsync(IFormFile file, string folder)
+    {
+        await using var stream = file.OpenReadStream();
+
+        var uploadParams = new RawUploadParams
+        {
+            File = new FileDescription(file.FileName, stream),
+            Folder = folder
         };
 
         var uploadResult = await _cloudinary.UploadAsync(uploadParams);
