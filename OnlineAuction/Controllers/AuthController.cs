@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Localization;
 using OnlineAuction.Configurations;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
@@ -24,15 +25,24 @@ public class AuthController : Controller
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IEmailVerificationService _emailVerificationService;
+    private readonly IPasswordResetOtpService _passwordResetOtpService;
+    private readonly IWebHostEnvironment _environment;
+    private readonly IStringLocalizer<SharedResource> _localizer;
 
     public AuthController(
         SignInManager<ApplicationUser> signInManager,
         UserManager<ApplicationUser> userManager,
-        IEmailVerificationService emailVerificationService)
+        IEmailVerificationService emailVerificationService,
+        IPasswordResetOtpService passwordResetOtpService,
+        IWebHostEnvironment environment,
+        IStringLocalizer<SharedResource> localizer)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _emailVerificationService = emailVerificationService;
+        _passwordResetOtpService = passwordResetOtpService;
+        _environment = environment;
+        _localizer = localizer;
     }
 
     [HttpGet]
@@ -44,7 +54,8 @@ public class AuthController : Controller
             return Redirect(AuthRedirectHelper.ResolveReturnUrl(Url, returnUrl));
         }
 
-        return View(new LoginViewModel { ReturnUrl = returnUrl });
+        TempData["OpenAuthModal"] = "login";
+        return RedirectToHomeWithReturnUrl(returnUrl);
     }
 
     [HttpPost]
@@ -119,7 +130,171 @@ public class AuthController : Controller
             return Redirect(AuthRedirectHelper.ResolveReturnUrl(Url, returnUrl));
         }
 
-        return View(new SignUpViewModel { ReturnUrl = returnUrl });
+        TempData["OpenAuthModal"] = "signup";
+        return RedirectToHomeWithReturnUrl(returnUrl);
+    }
+
+    [HttpGet]
+    public IActionResult ForgotPassword()
+    {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        TempData["OpenAuthModal"] = "forgot";
+        return RedirectToAction("Index", "Home");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model, string? fromModal = null, string? returnUrl = null)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ForgotPasswordFailure(
+                ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .FirstOrDefault(message => !string.IsNullOrWhiteSpace(message))
+                ?? _localizer["Auth_Forgot_InvalidEmail"].Value,
+                fromModal,
+                returnUrl);
+        }
+
+        var normalizedEmail = model.Email.Trim();
+        TempData["ResetPasswordEmail"] = normalizedEmail;
+        TempData["PasswordResetEmailMasked"] = MaskEmail(normalizedEmail);
+
+        var user = await _userManager.FindByEmailAsync(normalizedEmail);
+        if (user is not null && user.Status == UserStatus.Active && !await _userManager.IsInRoleAsync(user, UserRole.Admin.ToString()))
+        {
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var otp = _passwordResetOtpService.CreateOtp(normalizedEmail, resetToken);
+
+            if (_environment.IsDevelopment())
+            {
+                TempData["PasswordResetOtp"] = otp;
+            }
+
+            // Connect a Gmail API / Google Cloud Function mail sender here and send otp to the user.
+        }
+
+        TempData["OpenAuthModal"] = "forgot-otp";
+
+        if (IsFromModal(fromModal))
+        {
+            return RedirectToSafeReturnUrl(returnUrl);
+        }
+
+        return RedirectToAction("Index", "Home");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult VerifyPasswordOtp(VerifyPasswordOtpViewModel model, string? fromModal = null, string? returnUrl = null)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ForgotPasswordFailure(
+                ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .FirstOrDefault(message => !string.IsNullOrWhiteSpace(message))
+                ?? _localizer["Auth_Forgot_InvalidOtp"].Value,
+                fromModal,
+                returnUrl,
+                "forgot-otp");
+        }
+
+        var normalizedEmail = model.Email.Trim();
+        TempData["ResetPasswordEmail"] = normalizedEmail;
+        TempData["PasswordResetEmailMasked"] = MaskEmail(normalizedEmail);
+
+        if (!_passwordResetOtpService.VerifyOtp(normalizedEmail, model.Otp.Trim()))
+        {
+            return ForgotPasswordFailure(
+                _localizer["Auth_Forgot_InvalidOtp"].Value,
+                fromModal,
+                returnUrl,
+                "forgot-otp");
+        }
+
+        TempData["OpenAuthModal"] = "forgot-reset";
+
+        if (IsFromModal(fromModal))
+        {
+            return RedirectToSafeReturnUrl(returnUrl);
+        }
+
+        return RedirectToAction("Index", "Home");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model, string? fromModal = null, string? returnUrl = null)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ForgotPasswordFailure(
+                ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .FirstOrDefault(message => !string.IsNullOrWhiteSpace(message))
+                ?? _localizer["Auth_Forgot_ResetFailed"].Value,
+                fromModal,
+                returnUrl,
+                "forgot-reset");
+        }
+
+        var normalizedEmail = model.Email.Trim();
+        TempData["ResetPasswordEmail"] = normalizedEmail;
+
+        if (!_passwordResetOtpService.TryConsumeVerifiedToken(normalizedEmail, out var resetToken) || string.IsNullOrWhiteSpace(resetToken))
+        {
+            return ForgotPasswordFailure(
+                _localizer["Auth_Forgot_SessionExpired"].Value,
+                fromModal,
+                returnUrl,
+                "forgot");
+        }
+
+        var user = await _userManager.FindByEmailAsync(normalizedEmail);
+        if (user is null)
+        {
+            _passwordResetOtpService.Clear(normalizedEmail);
+            return ForgotPasswordFailure(
+                _localizer["Auth_Forgot_ResetFailed"].Value,
+                fromModal,
+                returnUrl,
+                "forgot");
+        }
+
+        var result = await _userManager.ResetPasswordAsync(user, resetToken, model.Password);
+        if (result.Succeeded)
+        {
+            _passwordResetOtpService.Clear(normalizedEmail);
+            TempData["AuthSuccess"] = _localizer["Auth_Forgot_ResetSuccess"].Value;
+            TempData["OpenAuthModal"] = "login";
+
+            if (IsFromModal(fromModal))
+            {
+                return RedirectToSafeReturnUrl(returnUrl);
+            }
+
+            return RedirectToAction(nameof(Login));
+        }
+
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);
+        }
+
+        return ForgotPasswordFailure(
+            result.Errors.FirstOrDefault()?.Description ?? _localizer["Auth_Forgot_ResetFailed"].Value,
+            fromModal,
+            returnUrl,
+            "forgot-reset");
     }
 
     [HttpPost]
@@ -250,6 +425,19 @@ public class AuthController : Controller
         return RedirectToAction("Index", "Home");
     }
 
+    private IActionResult ForgotPasswordFailure(string errorMessage, string? fromModal, string? returnUrl, string step = "forgot")
+    {
+        TempData["AuthError"] = errorMessage;
+        TempData["OpenAuthModal"] = step;
+
+        if (IsFromModal(fromModal))
+        {
+            return RedirectToSafeReturnUrl(returnUrl);
+        }
+
+        return RedirectToAction("Index", "Home");
+    }
+
     private IActionResult AuthFailureView(object model, string tab, string? fromModal)
     {
         var errorMessage = ModelState.Values
@@ -258,7 +446,7 @@ public class AuthController : Controller
             .FirstOrDefault(message => !string.IsNullOrWhiteSpace(message))
             ?? "Unable to complete the request.";
 
-        if (string.Equals(fromModal, "true", StringComparison.OrdinalIgnoreCase))
+        if (IsFromModal(fromModal))
         {
             TempData["AuthError"] = errorMessage;
             TempData["OpenAuthModal"] = tab;
@@ -285,6 +473,29 @@ public class AuthController : Controller
             _ => RedirectToAction("Login")
         };
     }
+
+    private IActionResult RedirectToSafeReturnUrl(string? returnUrl)
+    {
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+
+        return RedirectToAction("Index", "Home");
+    }
+
+    private IActionResult RedirectToHomeWithReturnUrl(string? returnUrl)
+    {
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect($"{returnUrl}{(returnUrl.Contains('?') ? "&" : "?")}auth=1");
+        }
+
+        return RedirectToAction("Index", "Home");
+    }
+
+    private static bool IsFromModal(string? fromModal) =>
+        string.Equals(fromModal, "true", StringComparison.OrdinalIgnoreCase);
 
     private void ClearLegacySession()
     {
@@ -359,5 +570,16 @@ public class AuthController : Controller
         }
 
         return candidate;
+    }
+
+    private static string MaskEmail(string email)
+    {
+        var parts = email.Split('@', 2);
+        if (parts.Length != 2 || parts[0].Length <= 2)
+        {
+            return email;
+        }
+
+        return $"{parts[0][0]}***{parts[0][^1]}@{parts[1]}";
     }
 }
