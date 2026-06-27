@@ -769,10 +769,6 @@ footer .footer-link--active:visited {
   max-width: 78rem;
 }
 
-.home-auth-modal--auth-page {
-  max-width: 78rem;
-}
-
 .home-auth-modal__grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -786,11 +782,6 @@ footer .footer-link--active:visited {
   }
 
   .home-auth-modal--compact .home-auth-modal__grid {
-    grid-template-columns: 1.03fr 0.94fr;
-    min-height: min(44rem, calc(100vh - 2rem));
-  }
-
-  .home-auth-modal--auth-page .home-auth-modal__grid {
     grid-template-columns: 1.03fr 0.94fr;
     min-height: min(44rem, calc(100vh - 2rem));
   }
