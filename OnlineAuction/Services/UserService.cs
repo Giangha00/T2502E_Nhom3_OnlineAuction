@@ -329,6 +329,7 @@ public class UserService : IUserService
             PhoneNumber = model.PhoneNumber.Trim(),
             Role = model.Role,
             Status = model.Status,
+            EmailConfirmed = true,
             AvatarUrl = avatarUrl,
             CreatedAt = DateTime.UtcNow
         };
