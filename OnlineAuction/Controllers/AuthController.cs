@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
 using OnlineAuction.Helpers;
 using OnlineAuction.Models;
+using System.Text;
 
 namespace OnlineAuction.Controllers;
 
@@ -16,13 +18,16 @@ public class AuthController : Controller
 
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IWebHostEnvironment _environment;
 
     public AuthController(
         SignInManager<ApplicationUser> signInManager,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        IWebHostEnvironment environment)
     {
         _signInManager = signInManager;
         _userManager = userManager;
+        _environment = environment;
     }
 
     [HttpGet]
@@ -107,6 +112,135 @@ public class AuthController : Controller
         return View(new SignUpViewModel { ReturnUrl = returnUrl });
     }
 
+    [HttpGet]
+    public IActionResult ForgotPassword()
+    {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        return View(new ForgotPasswordViewModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model, string? fromModal = null, string? returnUrl = null)
+    {
+        if (!ModelState.IsValid)
+        {
+            if (IsFromModal(fromModal))
+            {
+                TempData["AuthError"] = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .FirstOrDefault(message => !string.IsNullOrWhiteSpace(message))
+                    ?? "Enter a valid email address.";
+                TempData["OpenAuthModal"] = "forgot";
+
+                return RedirectToSafeReturnUrl(returnUrl);
+            }
+
+            return View(model);
+        }
+
+        var normalizedEmail = model.Email.Trim();
+        TempData["PasswordResetEmail"] = MaskEmail(normalizedEmail);
+
+        var user = await _userManager.FindByEmailAsync(normalizedEmail);
+        if (user is not null && user.Status == UserStatus.Active && !await _userManager.IsInRoleAsync(user, UserRole.Admin.ToString()))
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+            var resetLink = Url.Action(
+                nameof(ResetPassword),
+                "Auth",
+                new { email = normalizedEmail, code = encodedToken },
+                Request.Scheme);
+
+            if (_environment.IsDevelopment() && !string.IsNullOrWhiteSpace(resetLink))
+            {
+                TempData["PasswordResetLink"] = resetLink;
+            }
+
+            // Connect a Gmail API / Google Cloud Function mail sender here and send resetLink to the user.
+        }
+
+        if (IsFromModal(fromModal))
+        {
+            TempData["AuthSuccess"] = $"Nếu email {MaskEmail(normalizedEmail)} tồn tại, chúng tôi đã gửi liên kết đặt lại mật khẩu.";
+            TempData["OpenAuthModal"] = "forgot";
+
+            return RedirectToSafeReturnUrl(returnUrl);
+        }
+
+        return RedirectToAction(nameof(CheckEmail));
+    }
+
+    [HttpGet]
+    public IActionResult CheckEmail()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    public IActionResult ResetPassword(string? email = null, string? code = null)
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(code))
+        {
+            TempData["AuthError"] = "Password reset link is invalid or expired.";
+            return RedirectToAction(nameof(ForgotPassword));
+        }
+
+        return View(new ResetPasswordViewModel
+        {
+            Email = email,
+            Code = code
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var user = await _userManager.FindByEmailAsync(model.Email.Trim());
+        if (user is null)
+        {
+            ModelState.AddModelError(string.Empty, "Unable to reset password. Please request a new link.");
+            return View(model);
+        }
+
+        string token;
+        try
+        {
+            token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Code));
+        }
+        catch (FormatException)
+        {
+            ModelState.AddModelError(string.Empty, "Password reset link is invalid or expired.");
+            return View(model);
+        }
+
+        var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
+        if (result.Succeeded)
+        {
+            TempData["AuthSuccess"] = "Password reset successfully. Please log in with your new password.";
+            return RedirectToAction(nameof(Login));
+        }
+
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);
+        }
+
+        return View(model);
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SignUp(SignUpViewModel model, string? fromModal = null)
@@ -170,7 +304,7 @@ public class AuthController : Controller
             .FirstOrDefault(message => !string.IsNullOrWhiteSpace(message))
             ?? "Unable to complete the request.";
 
-        if (string.Equals(fromModal, "true", StringComparison.OrdinalIgnoreCase))
+        if (IsFromModal(fromModal))
         {
             TempData["AuthError"] = errorMessage;
             TempData["OpenAuthModal"] = tab;
@@ -197,6 +331,19 @@ public class AuthController : Controller
             _ => RedirectToAction("Login")
         };
     }
+
+    private IActionResult RedirectToSafeReturnUrl(string? returnUrl)
+    {
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+
+        return RedirectToAction("Index", "Home");
+    }
+
+    private static bool IsFromModal(string? fromModal) =>
+        string.Equals(fromModal, "true", StringComparison.OrdinalIgnoreCase);
 
     private void ClearLegacySession()
     {
@@ -226,5 +373,16 @@ public class AuthController : Controller
         }
 
         return candidate;
+    }
+
+    private static string MaskEmail(string email)
+    {
+        var parts = email.Split('@', 2);
+        if (parts.Length != 2 || parts[0].Length <= 2)
+        {
+            return email;
+        }
+
+        return $"{parts[0][0]}***{parts[0][^1]}@{parts[1]}";
     }
 }

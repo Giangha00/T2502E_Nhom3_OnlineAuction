@@ -1,0 +1,62 @@
+@{
+    ViewData["Title"] = "Kiểm tra email";
+    var maskedEmail = TempData["PasswordResetEmail"] as string;
+    var resetLink = TempData["PasswordResetLink"] as string;
+}
+
+<div class="home-auth-overlay" aria-hidden="false">
+  <div class="home-auth-backdrop"></div>
+  <div class="home-auth-modal" role="dialog" aria-modal="true" aria-labelledby="checkEmailTitle">
+    <div class="home-auth-modal__grid">
+      <aside class="home-auth-visual" aria-hidden="true">
+        <div class="home-auth-visual__slides">
+          <div class="home-auth-visual__slide is-active"
+               style="background-image: url('https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=900&h=1100&fit=crop&q=80');"></div>
+        </div>
+        <div class="home-auth-visual__overlay"></div>
+        <div class="home-auth-visual__content">
+          <p class="home-auth-visual__eyebrow">RareCard Vault</p>
+          <h3 class="home-auth-visual__title">Welcome to RareCard</h3>
+          <p class="home-auth-visual__desc">Bid on authenticated graded cards from PSA, BGS and CGC vaults.</p>
+        </div>
+      </aside>
+
+      <div class="home-auth-form-col">
+        <a asp-controller="Home" asp-action="Index" class="home-auth-close" aria-label="Đóng">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </a>
+
+        <div class="home-auth-brand">
+          <span class="home-auth-logo">RareCard</span>
+        </div>
+
+        <h1 id="checkEmailTitle" class="home-auth-heading">Kiểm tra email</h1>
+        <p class="home-auth-subheading">
+          Nếu @(string.IsNullOrWhiteSpace(maskedEmail) ? "email bạn vừa nhập" : maskedEmail) tồn tại, liên kết reset đã được tạo.
+        </p>
+
+        @if (!string.IsNullOrWhiteSpace(resetLink))
+        {
+          <div class="mt-6 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-left text-sm text-blue-900">
+            <p class="font-bold">Development reset link</p>
+            <p class="mt-1 leading-6">Chưa cấu hình Gmail API/GCF, nên môi trường Development hiển thị link để test.</p>
+            <a href="@resetLink" class="mt-3 block break-all font-semibold text-blue-700 hover:text-blue-900">@resetLink</a>
+          </div>
+        }
+
+        <div class="mt-8 grid gap-3">
+          <a asp-controller="Auth" asp-action="Login" class="home-auth-submit flex items-center justify-center">Đăng nhập</a>
+          <a asp-controller="Auth" asp-action="ForgotPassword" class="flex min-h-12 items-center justify-center rounded-full border border-slate-200 px-4 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
+            Gửi lại email
+          </a>
+        </div>
+
+        <p class="home-auth-legal">
+          Vui lòng kiểm tra hộp thư đến hoặc thư mục spam.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
