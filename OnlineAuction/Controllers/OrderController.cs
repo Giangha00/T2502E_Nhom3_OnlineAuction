@@ -77,6 +77,7 @@ public class OrderController : Controller
             var cancelUrl = Url.Action("PayPalCancel", "Payment", null, Request.Scheme)!;
             var paypalResult = await _orderPaymentService.InitiatePayPalCheckoutAsync(
                 userId.Value,
+                request.SelectedOrderIds,
                 returnUrl,
                 cancelUrl);
 
