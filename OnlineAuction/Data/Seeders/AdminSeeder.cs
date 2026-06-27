@@ -49,10 +49,11 @@ public static class AdminSeeder
             await userManager.AddToRoleAsync(adminUser, AdminRoleName);
         }
 
-        if (adminUser.Role != UserRole.Admin)
+        if (adminUser.Role != UserRole.Admin || !adminUser.EmailConfirmed)
         {
             adminUser.Role = UserRole.Admin;
             adminUser.Status = UserStatus.Active;
+            adminUser.EmailConfirmed = true;
             await userManager.UpdateAsync(adminUser);
         }
 
