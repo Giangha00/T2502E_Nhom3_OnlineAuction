@@ -92,7 +92,10 @@ builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
 {
     if (dbProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
     {
-        options.UseSqlite(connectionString);
+        options.UseSqlite(connectionString, sqlite =>
+        {
+            sqlite.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+        });
     }
     else
     {
@@ -101,6 +104,7 @@ builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
         {
             mySql.MigrationsHistoryTable("__ef_migrations_history");
             mySql.EnableRetryOnFailure();
+            mySql.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
         });
     }
 });
