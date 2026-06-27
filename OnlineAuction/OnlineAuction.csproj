@@ -78,6 +78,14 @@
       <Content Include="Documents\.DS_Store" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Views\Auth\CheckEmail.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\ForgotPassword.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\Login.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\ResetPassword.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\SignUp.cshtml" />
+    </ItemGroup>
+
     <Target Name="BuildTailwindCss" BeforeTargets="Build">
         <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="npm install" Condition="Exists('$(MSBuildProjectDirectory)/package.json') AND !Exists('$(MSBuildProjectDirectory)/node_modules')" />
         <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="npm run build:css" Condition="Exists('$(MSBuildProjectDirectory)/package.json') AND Exists('$(MSBuildProjectDirectory)/node_modules')" />

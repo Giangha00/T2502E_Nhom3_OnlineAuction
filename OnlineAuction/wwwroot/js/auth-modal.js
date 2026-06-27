@@ -3,8 +3,14 @@
   var backdrop = document.getElementById('authModalBackdrop');
   var closeBtn = document.getElementById('authModalClose');
   var tabs = document.querySelectorAll('.home-auth-tab');
+  var modal = overlay ? overlay.querySelector('.home-auth-modal') : null;
+  var modalTitle = document.getElementById('authModalTitle');
+  var modalSubtitle = document.getElementById('authModalSubtitle');
   var loginPanel = document.getElementById('authPanelLogin');
   var signupPanel = document.getElementById('authPanelSignup');
+  var forgotPanel = document.getElementById('authPanelForgot');
+  var forgotPasswordBtn = document.getElementById('authForgotPasswordBtn');
+  var backToLoginBtn = document.getElementById('authBackToLoginBtn');
   var triggers = document.querySelectorAll('[data-auth-tab]');
   var mobileNav = document.getElementById('mobileNav');
   var mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -20,19 +26,19 @@
     var i18n = (window.authModalConfig && window.authModalConfig.i18n) || {};
     return [
       {
-        eyebrow: i18n.slide1Eyebrow || 'RareCard Vault',
-        title: i18n.slide1Title || 'Welcome to RareCard',
-        desc: i18n.slide1Desc || 'Bid on authenticated graded cards from PSA, BGS & CGC vaults.'
+        eyebrow: i18n.slide2Eyebrow || 'Pokemon & TCG',
+        title: i18n.slide2Title || 'Discover Rare Holos',
+        desc: i18n.slide2Desc || 'Base Set Charizards, Illustrator promos and manga rare parallels.'
       },
       {
-        eyebrow: i18n.slide2Eyebrow || 'Pokémon & TCG',
-        title: i18n.slide2Title || 'Discover Rare Holos',
-        desc: i18n.slide2Desc || 'Base Set Charizards, Illustrator promos & manga rare parallels.'
+        eyebrow: i18n.slide1Eyebrow || 'RareCard Vault',
+        title: i18n.slide1Title || 'Welcome to RareCard',
+        desc: i18n.slide1Desc || 'Bid on authenticated graded cards from PSA, BGS and CGC vaults.'
       },
       {
         eyebrow: i18n.slide3Eyebrow || 'Sports & MTG',
         title: i18n.slide3Title || 'Legends on Auction',
-        desc: i18n.slide3Desc || 'From Mickey Mantle rookies to Alpha Black Lotus — curated daily.'
+        desc: i18n.slide3Desc || 'From Mickey Mantle rookies to Alpha Black Lotus, curated daily.'
       }
     ];
   })();
@@ -52,19 +58,41 @@
   }
 
   function switchTab(tabName) {
+    var nextTab = tabName === 'signup' || tabName === 'forgot' ? tabName : 'login';
+    var isForgot = nextTab === 'forgot';
+
     tabs.forEach(function (tab) {
-      var isActive = tab.dataset.tab === tabName;
+      var isActive = !isForgot && tab.dataset.tab === nextTab;
       tab.classList.toggle('home-auth-tab--active', isActive);
       tab.setAttribute('aria-selected', String(isActive));
+      tab.setAttribute('tabindex', isActive ? '0' : '-1');
     });
 
     if (!loginPanel || !signupPanel) return;
 
-    var showLogin = tabName === 'login';
+    var showLogin = nextTab === 'login';
+    var showSignup = nextTab === 'signup';
     loginPanel.classList.toggle('hidden', !showLogin);
     loginPanel.hidden = !showLogin;
-    signupPanel.classList.toggle('hidden', showLogin);
-    signupPanel.hidden = showLogin;
+    signupPanel.classList.toggle('hidden', !showSignup);
+    signupPanel.hidden = !showSignup;
+
+    if (forgotPanel) {
+      forgotPanel.classList.toggle('hidden', !isForgot);
+      forgotPanel.hidden = !isForgot;
+    }
+
+    if (modal) modal.classList.toggle('home-auth-modal--compact', showLogin || isForgot);
+    if (modalTitle) {
+      modalTitle.textContent = isForgot
+        ? modalTitle.getAttribute('data-forgot-title') || 'Quên mật khẩu?'
+        : modalTitle.getAttribute('data-default-title') || modalTitle.textContent;
+    }
+    if (modalSubtitle) {
+      modalSubtitle.textContent = isForgot
+        ? modalSubtitle.getAttribute('data-forgot-subtitle') || 'Nhập email để nhận liên kết đặt lại mật khẩu.'
+        : modalSubtitle.getAttribute('data-default-subtitle') || modalSubtitle.textContent;
+    }
   }
 
   function showSlide(index) {
@@ -102,8 +130,9 @@
   }
 
   function openModal(tabName, returnUrl) {
+    var nextTab = tabName === 'signup' || tabName === 'forgot' ? tabName : 'login';
     setReturnUrl(returnUrl);
-    switchTab(tabName || 'login');
+    switchTab(nextTab);
     overlay.classList.remove('home-auth-overlay--hidden');
     overlay.setAttribute('aria-hidden', 'false');
     document.body.classList.add('home-auth-open');
@@ -115,9 +144,8 @@
       if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
     }
 
-    var focusTarget = tabName === 'signup'
-      ? signupPanel && signupPanel.querySelector('input')
-      : document.getElementById('modalEmail');
+    var panel = nextTab === 'signup' ? signupPanel : (nextTab === 'forgot' ? forgotPanel : loginPanel);
+    var focusTarget = panel && panel.querySelector('input:not([type="hidden"])');
     if (focusTarget) {
       window.setTimeout(function () { focusTarget.focus(); }, 120);
     }
@@ -146,6 +174,22 @@
       switchTab(tab.dataset.tab);
     });
   });
+
+  if (forgotPasswordBtn) {
+    forgotPasswordBtn.addEventListener('click', function () {
+      switchTab('forgot');
+      var focusTarget = forgotPanel && forgotPanel.querySelector('input:not([type="hidden"])');
+      if (focusTarget) focusTarget.focus();
+    });
+  }
+
+  if (backToLoginBtn) {
+    backToLoginBtn.addEventListener('click', function () {
+      switchTab('login');
+      var focusTarget = loginPanel && loginPanel.querySelector('input:not([type="hidden"])');
+      if (focusTarget) focusTarget.focus();
+    });
+  }
 
   dots.forEach(function (dot) {
     dot.addEventListener('click', function () {
