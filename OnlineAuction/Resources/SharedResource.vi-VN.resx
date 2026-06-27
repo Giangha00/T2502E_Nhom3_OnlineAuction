@@ -841,5 +841,22 @@
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>Giá phải lớn hơn 0</value></data>
   <data name="User_YourBuyNowList" xml:space="preserve"><value>Danh sách Mua ngay của bạn</value></data>
   <data name="User_SellerBuyNowList" xml:space="preserve"><value>Danh sách Mua ngay</value></data>
+  <data name="User_Stat_TotalListings" xml:space="preserve"><value>Tin đang hiển thị</value></data>
+  <data name="User_ViewBuyNowList" xml:space="preserve"><value>Xem Mua ngay</value></data>
+  <data name="User_CreateBuyNowListing" xml:space="preserve"><value>Tạo tin Mua ngay</value></data>
+  <data name="User_AuctionListingCount" xml:space="preserve"><value>{0} tin đấu giá đang hiển thị</value></data>
+  <data name="User_BuyNowListingCount" xml:space="preserve"><value>{0} tin Mua ngay đang hiển thị</value></data>
+  <data name="User_NoAuctions_OwnerTitle" xml:space="preserve"><value>Chưa có tin đấu giá</value></data>
+  <data name="User_NoAuctions_VisitorTitle" xml:space="preserve"><value>Chưa có đấu giá</value></data>
+  <data name="User_NoAuctions_OwnerDesc" xml:space="preserve"><value>Tạo tin đấu giá đầu tiên để bắt đầu bán.</value></data>
+  <data name="User_NoAuctions_VisitorDesc" xml:space="preserve"><value>Người bán này hiện chưa có tin đấu giá đang hiển thị.</value></data>
+  <data name="User_NoBuyNow_OwnerTitle" xml:space="preserve"><value>Chưa có tin Mua ngay</value></data>
+  <data name="User_NoBuyNow_VisitorTitle" xml:space="preserve"><value>Chưa có Mua ngay</value></data>
+  <data name="User_NoBuyNow_OwnerDesc" xml:space="preserve"><value>Tạo tin giá cố định để khách mua ngay.</value></data>
+  <data name="User_NoBuyNow_VisitorDesc" xml:space="preserve"><value>Người bán này hiện chưa có tin Mua ngay đang hiển thị.</value></data>
+  <data name="User_Time_Ended" xml:space="preserve"><value>Đã kết thúc</value></data>
+  <data name="User_Time_DaysLeft" xml:space="preserve"><value>Còn {0} ngày</value></data>
+  <data name="User_Time_HoursLeft" xml:space="preserve"><value>Còn {0} giờ</value></data>
+  <data name="User_Time_MinutesLeft" xml:space="preserve"><value>Còn {0} phút</value></data>
   <data name="Account_Selling_CreateListing" xml:space="preserve"><value>Đăng bán sản phẩm</value></data>
 </root>

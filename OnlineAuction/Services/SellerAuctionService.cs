@@ -29,11 +29,15 @@ public class SellerAuctionService : ISellerAuctionService
         _photoService = photoService;
     }
 
-    public async Task<List<AuctionItemViewModel>> GetSellerAuctionsAsync(int sellerId, string? channel = null)
+    public async Task<List<AuctionItemViewModel>> GetSellerAuctionsAsync(
+        int sellerId,
+        string? channel = null,
+        bool forPublicProfile = false,
+        bool includeOwnerDrafts = false)
     {
         var normalizedChannel = channel?.ToLowerInvariant();
 
-        var rows = await _db.Auctions
+        var query = _db.Auctions
             .AsNoTracking()
             .Where(auction =>
                 auction.Product.SellerId == sellerId &&
@@ -41,7 +45,18 @@ public class SellerAuctionService : ISellerAuctionService
                 (normalizedChannel == null ||
                  (normalizedChannel == ListingTypes.BuyNow
                      ? auction.ListingType == ListingTypes.BuyNow
-                     : auction.ListingType == ListingTypes.Auction)))
+                     : auction.ListingType == ListingTypes.Auction)));
+
+        if (forPublicProfile)
+        {
+            var visibleStatuses = includeOwnerDrafts
+                ? ProfileOwnerVisibleStatuses
+                : ProfilePublicVisibleStatuses;
+
+            query = query.Where(auction => visibleStatuses.Contains(auction.Status));
+        }
+
+        var rows = await query
             .OrderByDescending(auction => auction.CreatedAt)
             .Select(auction => new
             {
@@ -75,11 +90,27 @@ public class SellerAuctionService : ISellerAuctionService
             Condition = auction.Condition,
             Year = auction.Year ?? 0,
             ListingType = auction.ListingType,
+            EndDate = auction.EndDate,
             TimeRemaining = auction.ListingType == ListingTypes.BuyNow
-                ? "In stock"
+                ? string.Empty
                 : FormatAuctionTimeRemaining(auction.EndDate)
         }).ToList();
     }
+
+    private static readonly string[] ProfilePublicVisibleStatuses =
+    [
+        AuctionStatuses.Live,
+        AuctionStatuses.EndingSoon
+    ];
+
+    private static readonly string[] ProfileOwnerVisibleStatuses =
+    [
+        AuctionStatuses.Live,
+        AuctionStatuses.EndingSoon,
+        AuctionStatuses.PendingReview,
+        AuctionStatuses.Rejected,
+        AuctionStatuses.Scheduled
+    ];
 
     public async Task<(bool Success, string Message, int? AuctionId)> CreateAsync(
         CreateAuctionViewModel model,
@@ -254,7 +285,7 @@ public class SellerAuctionService : ISellerAuctionService
         }
     }
 
-    public async Task<(bool Success, string Message, int? ProductId)> CreateBuyNowAsync(
+    public async Task<(bool Success, string Message, int? AuctionId)> CreateBuyNowAsync(
         CreateBuyNowViewModel model,
         int sellerId)
     {
@@ -282,7 +313,7 @@ public class SellerAuctionService : ISellerAuctionService
         return await strategy.ExecuteAsync(() => CreateBuyNowCoreAsync(model, sellerId, galleryFiles));
     }
 
-    private async Task<(bool Success, string Message, int? ProductId)> CreateBuyNowCoreAsync(
+    private async Task<(bool Success, string Message, int? AuctionId)> CreateBuyNowCoreAsync(
         CreateBuyNowViewModel model,
         int sellerId,
         IReadOnlyList<IFormFile> galleryFiles)
@@ -411,7 +442,7 @@ public class SellerAuctionService : ISellerAuctionService
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return (true, "Listing submitted for review.", product.Id);
+            return (true, "Listing submitted for review.", auction.Id);
         }
         catch
         {

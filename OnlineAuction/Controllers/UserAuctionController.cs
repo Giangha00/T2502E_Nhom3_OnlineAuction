@@ -81,7 +81,7 @@ public class UserAuctionController : Controller
         }
 
         TempData["SuccessMessage"] = result.Message;
-        return RedirectToAction("Detail", "User", new { id = sellerId.Value });
+        return await RedirectToProfileAsync(sellerId.Value, auctionId);
     }
 
     [HttpPost("Delete/{auctionId:int}")]
@@ -104,7 +104,21 @@ public class UserAuctionController : Controller
 
         TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
 
-        return RedirectToAction("Detail", "User", new { id = sellerId.Value });
+        return await RedirectToProfileAsync(sellerId.Value, auctionId);
+    }
+
+    private async Task<IActionResult> RedirectToProfileAsync(int sellerId, int auctionId)
+    {
+        var listingType = await _db.Auctions.AsNoTracking()
+            .Where(auction => auction.Id == auctionId)
+            .Select(auction => auction.ListingType)
+            .FirstOrDefaultAsync();
+
+        var fragment = string.Equals(listingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase)
+            ? "seller-buynow"
+            : "seller-auctions";
+
+        return RedirectToAction("Detail", "User", new { id = sellerId }, fragment);
     }
 
     private async Task<int?> GetCurrentSellerIdAsync()

@@ -26,12 +26,6 @@ public class UserProfileViewModel
     public int MemberSince { get; set; }
 }
 
-public class SellerAuctionCardViewModel
-{
-    public AuctionItemViewModel Auction { get; set; } = new();
-    public bool IsOwner { get; set; }
-}
-
 public class SellerListingListViewModel
 {
     public bool IsOwner { get; set; }
@@ -49,10 +43,31 @@ public class UserBasicInfoViewModel
 
 public class SellerStatisticsViewModel
 {
+    public int TotalListings { get; set; }
+
     public int TotalAuctions { get; set; }
+
+    public int TotalBuyNowListings { get; set; }
+
     public int CompletedAuctions { get; set; }
+
     public int TotalSales { get; set; }
+
     public double Rating { get; set; }
+}
+
+public class SellerListingCardViewModel
+{
+    public AuctionItemViewModel Auction { get; set; } = new();
+
+    public bool IsOwner { get; set; }
+}
+
+public class EmptyListingStateViewModel
+{
+    public bool IsOwner { get; set; }
+
+    public string Channel { get; set; } = ListingTypes.Auction;
 }
 
 public class SellerRatingViewModel
