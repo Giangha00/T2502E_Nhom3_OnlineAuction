@@ -405,6 +405,13 @@
   <data name="Auth_Forgot_DevOtpDesc" xml:space="preserve"><value>이메일이 아직 설정되지 않아 개발 환경에서 코드를 표시합니다.</value></data>
   <data name="Auth_Forgot_InvalidEmail" xml:space="preserve"><value>유효한 이메일 주소를 입력하세요.</value></data>
   <data name="Auth_Forgot_InvalidOtp" xml:space="preserve"><value>인증 코드가 올바르지 않거나 만료되었습니다.</value></data>
+  <data name="Auth_Otp_Invalid" xml:space="preserve"><value>인증 코드가 올바르지 않습니다.</value></data>
+  <data name="Auth_Otp_Expired" xml:space="preserve"><value>인증 코드가 만료되었습니다. 새 코드를 요청하세요.</value></data>
+  <data name="Auth_Otp_MaxAttempts" xml:space="preserve"><value>잘못 입력한 횟수가 너무 많습니다. 새 코드를 요청하세요.</value></data>
+  <data name="Auth_Otp_Resend" xml:space="preserve"><value>코드 다시 보내기</value></data>
+  <data name="Auth_Otp_ResendCooldown" xml:space="preserve"><value>새 코드를 요청하기 전에 {0}초 기다려 주세요.</value></data>
+  <data name="Auth_Otp_TooManyResends" xml:space="preserve"><value>코드를 너무 많이 요청했습니다. 나중에 다시 시도하세요.</value></data>
+  <data name="Auth_Otp_Sent" xml:space="preserve"><value>이메일이 대상이면 인증 코드를 보냈습니다.</value></data>
   <data name="Auth_Forgot_ResetFailed" xml:space="preserve"><value>비밀번호를 재설정할 수 없습니다. 다시 시도하세요.</value></data>
   <data name="Auth_Forgot_SessionExpired" xml:space="preserve"><value>인증 세션이 만료되었습니다. 처음부터 다시 진행하세요.</value></data>
   <data name="Auth_Forgot_ResetSuccess" xml:space="preserve"><value>비밀번호가 재설정되었습니다. 새 비밀번호로 로그인하세요.</value></data>

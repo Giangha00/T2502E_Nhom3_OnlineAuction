@@ -39,6 +39,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<UserDeviceToken> UserDeviceTokens => Set<UserDeviceToken>();
 
+    public DbSet<UserOtpCode> UserOtpCodes => Set<UserOtpCode>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         
@@ -58,6 +60,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigurePayments(builder);
         ConfigureNotifications(builder);
         ConfigureUserDeviceTokens(builder);
+        ConfigureUserOtpCodes(builder);
     }
     private static void ConfigureAuctionRegistrationDeposits(ModelBuilder builder)
 {
@@ -608,6 +611,34 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
                 .WithMany()
                 .HasForeignKey(t => t.UserId)
                 .HasConstraintName("fk_user_device_tokens_user")
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
+    private static void ConfigureUserOtpCodes(ModelBuilder builder)
+    {
+        builder.Entity<UserOtpCode>(entity =>
+        {
+            entity.ToTable("user_otp_codes");
+
+            entity.Property(otp => otp.Id).HasColumnName("id");
+            entity.Property(otp => otp.UserId).HasColumnName("user_id");
+            entity.Property(otp => otp.CodeHash).HasColumnName("code_hash").HasMaxLength(128).IsRequired();
+            entity.Property(otp => otp.Salt).HasColumnName("salt").HasMaxLength(64).IsRequired();
+            entity.Property(otp => otp.Purpose).HasColumnName("purpose").HasMaxLength(40).IsRequired();
+            entity.Property(otp => otp.ExpiresAt).HasColumnName("expires_at");
+            entity.Property(otp => otp.AttemptCount).HasColumnName("attempt_count");
+            entity.Property(otp => otp.MaxAttempts).HasColumnName("max_attempts");
+            entity.Property(otp => otp.IsUsed).HasColumnName("is_used");
+            entity.Property(otp => otp.CreatedAt).HasColumnName("created_at");
+
+            entity.HasIndex(otp => new { otp.UserId, otp.Purpose, otp.IsUsed, otp.ExpiresAt })
+                .HasDatabaseName("ix_user_otp_codes_active_lookup");
+
+            entity.HasOne(otp => otp.User)
+                .WithMany()
+                .HasForeignKey(otp => otp.UserId)
+                .HasConstraintName("fk_user_otp_codes_user")
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

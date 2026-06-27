@@ -1,12 +1,26 @@
+using OnlineAuction.Services.Results;
+
 namespace OnlineAuction.Services.Interfaces;
 
 public interface IPasswordResetOtpService
 {
-    string CreateOtp(string email, string resetToken);
+    Task<PasswordResetOtpSendResult> GenerateAndSendAsync(
+        string email,
+        string locale,
+        CancellationToken cancellationToken = default);
 
-    bool VerifyOtp(string email, string otp);
+    Task<PasswordResetOtpVerifyResult> VerifyAsync(
+        string email,
+        string otpCode,
+        CancellationToken cancellationToken = default);
 
-    bool TryConsumeVerifiedToken(string email, out string? resetToken);
+    Task<bool> IsVerifiedOtpStillUsableAsync(
+        int userId,
+        int otpId,
+        CancellationToken cancellationToken = default);
 
-    void Clear(string email);
+    Task InvalidateAsync(
+        int userId,
+        int otpId,
+        CancellationToken cancellationToken = default);
 }
