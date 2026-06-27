@@ -405,6 +405,13 @@
   <data name="Auth_Forgot_DevOtpDesc" xml:space="preserve"><value>Email chưa được cấu hình, nên Development hiển thị mã tại đây.</value></data>
   <data name="Auth_Forgot_InvalidEmail" xml:space="preserve"><value>Vui lòng nhập địa chỉ email hợp lệ.</value></data>
   <data name="Auth_Forgot_InvalidOtp" xml:space="preserve"><value>Mã xác minh không hợp lệ hoặc đã hết hạn.</value></data>
+  <data name="Auth_Otp_Invalid" xml:space="preserve"><value>Mã xác minh không hợp lệ.</value></data>
+  <data name="Auth_Otp_Expired" xml:space="preserve"><value>Mã xác minh đã hết hạn. Vui lòng yêu cầu mã mới.</value></data>
+  <data name="Auth_Otp_MaxAttempts" xml:space="preserve"><value>Bạn đã nhập sai quá nhiều lần. Vui lòng yêu cầu mã mới.</value></data>
+  <data name="Auth_Otp_Resend" xml:space="preserve"><value>Gửi lại mã</value></data>
+  <data name="Auth_Otp_ResendCooldown" xml:space="preserve"><value>Vui lòng đợi {0} giây trước khi yêu cầu mã mới.</value></data>
+  <data name="Auth_Otp_TooManyResends" xml:space="preserve"><value>Bạn đã yêu cầu quá nhiều mã. Vui lòng thử lại sau.</value></data>
+  <data name="Auth_Otp_Sent" xml:space="preserve"><value>Nếu email đủ điều kiện, mã xác minh đã được gửi.</value></data>
   <data name="Auth_Forgot_ResetFailed" xml:space="preserve"><value>Không thể đặt lại mật khẩu. Vui lòng thử lại.</value></data>
   <data name="Auth_Forgot_SessionExpired" xml:space="preserve"><value>Phiên xác minh đã hết hạn. Vui lòng bắt đầu lại.</value></data>
   <data name="Auth_Forgot_ResetSuccess" xml:space="preserve"><value>Đặt lại mật khẩu thành công. Vui lòng đăng nhập bằng mật khẩu mới.</value></data>

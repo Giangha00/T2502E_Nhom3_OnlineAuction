@@ -211,8 +211,11 @@ builder.Services.Configure<PayPalSettings>(
     builder.Configuration.GetSection(PayPalSettings.SectionName));
 builder.Services.Configure<FirebaseSettings>(
     builder.Configuration.GetSection(FirebaseSettings.SectionName));
+builder.Services.Configure<PasswordResetOtpSettings>(
+    builder.Configuration.GetSection(PasswordResetOtpSettings.SectionName));
 
 builder.Services.AddHttpClient<IPayPalService, PayPalService>();
+builder.Services.AddHttpClient<IEmailSender, GmailEmailSender>();
 builder.Services.AddHttpClient<IEmailVerificationService, EmailVerificationService>();
 
 builder.Services.AddScoped<IAvatarStorageService, CloudinaryAvatarStorageService>();
@@ -235,7 +238,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
 builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
 builder.Services.AddScoped<IRegistrationDepositRefundService, RegistrationDepositRefundService>();
-builder.Services.AddSingleton<IPasswordResetOtpService, PasswordResetOtpService>();
+builder.Services.AddScoped<IPasswordResetOtpService, PasswordResetOtpService>();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IRealtimePublisher, RealtimePublisher>();
 #endregion

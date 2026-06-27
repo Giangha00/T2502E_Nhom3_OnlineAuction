@@ -7,12 +7,14 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using OnlineAuction.Configurations;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
 using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
+using OnlineAuction.Services.Results;
 
 namespace OnlineAuction.Controllers;
 
@@ -21,12 +23,17 @@ public class AuthController : Controller
 {
     private const string LegacySessionLoggedInKey = "IsLoggedIn";
     private const string LegacySessionUserNameKey = "UserName";
+    private const string PasswordResetEmailSessionKey = "PasswordReset:Email";
+    private const string PasswordResetUserIdSessionKey = "PasswordReset:UserId";
+    private const string PasswordResetOtpIdSessionKey = "PasswordReset:OtpId";
+    private const string PasswordResetVerifiedSessionKey = "PasswordReset:Verified";
+    private const string PasswordResetVerifiedAtSessionKey = "PasswordReset:VerifiedAtUtc";
 
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IEmailVerificationService _emailVerificationService;
     private readonly IPasswordResetOtpService _passwordResetOtpService;
-    private readonly IWebHostEnvironment _environment;
+    private readonly PasswordResetOtpSettings _otpSettings;
     private readonly IStringLocalizer<SharedResource> _localizer;
 
     public AuthController(
@@ -34,14 +41,14 @@ public class AuthController : Controller
         UserManager<ApplicationUser> userManager,
         IEmailVerificationService emailVerificationService,
         IPasswordResetOtpService passwordResetOtpService,
-        IWebHostEnvironment environment,
+        IOptions<PasswordResetOtpSettings> otpOptions,
         IStringLocalizer<SharedResource> localizer)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _emailVerificationService = emailVerificationService;
         _passwordResetOtpService = passwordResetOtpService;
-        _environment = environment;
+        _otpSettings = otpOptions.Value;
         _localizer = localizer;
     }
 
@@ -148,7 +155,11 @@ public class AuthController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model, string? fromModal = null, string? returnUrl = null)
+    public async Task<IActionResult> ForgotPassword(
+        ForgotPasswordViewModel model,
+        string? fromModal = null,
+        string? returnUrl = null,
+        CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
         {
@@ -163,21 +174,46 @@ public class AuthController : Controller
         }
 
         var normalizedEmail = model.Email.Trim();
-        TempData["ResetPasswordEmail"] = normalizedEmail;
-        TempData["PasswordResetEmailMasked"] = MaskEmail(normalizedEmail);
+        var locale = HttpContext.Features.Get<Microsoft.AspNetCore.Localization.IRequestCultureFeature>()
+            ?.RequestCulture.Culture.Name ?? System.Globalization.CultureInfo.CurrentUICulture.Name;
+        var sendResult = await _passwordResetOtpService.GenerateAndSendAsync(
+            normalizedEmail,
+            locale,
+            cancellationToken);
 
-        var user = await _userManager.FindByEmailAsync(normalizedEmail);
-        if (user is not null && user.Status == UserStatus.Active && !await _userManager.IsInRoleAsync(user, UserRole.Admin.ToString()))
+        if (sendResult.Status == PasswordResetOtpSendStatus.Cooldown)
         {
-            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var otp = _passwordResetOtpService.CreateOtp(normalizedEmail, resetToken);
+            return ForgotPasswordFailure(
+                _localizer["Auth_Otp_ResendCooldown", sendResult.RetryAfterSeconds ?? _otpSettings.ResendCooldownSeconds].Value,
+                fromModal,
+                returnUrl);
+        }
 
-            if (_environment.IsDevelopment())
-            {
-                TempData["PasswordResetOtp"] = otp;
-            }
+        if (sendResult.Status == PasswordResetOtpSendStatus.RateLimited)
+        {
+            return ForgotPasswordFailure(
+                _localizer["Auth_Otp_TooManyResends"].Value,
+                fromModal,
+                returnUrl);
+        }
 
-            // Connect a Gmail API / Google Cloud Function mail sender here and send otp to the user.
+        if (sendResult.Status == PasswordResetOtpSendStatus.Failed)
+        {
+            return ForgotPasswordFailure(
+                _localizer["Auth_Forgot_ResetFailed"].Value,
+                fromModal,
+                returnUrl);
+        }
+
+        // From this point forward, the email used by Verify/Reset comes from server-side session.
+        // Hidden email fields in the modal are only for UI convenience and are not trusted.
+        SetPasswordResetEmailSession(normalizedEmail);
+        TempData["ResetPasswordEmail"] = normalizedEmail;
+        TempData["PasswordResetEmailMasked"] = sendResult.MaskedEmail;
+        TempData["AuthSuccess"] = _localizer["Auth_Otp_Sent"].Value;
+        if (!string.IsNullOrWhiteSpace(sendResult.DevelopmentOtp))
+        {
+            TempData["PasswordResetOtp"] = sendResult.DevelopmentOtp;
         }
 
         TempData["OpenAuthModal"] = "forgot-otp";
@@ -192,7 +228,11 @@ public class AuthController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult VerifyPasswordOtp(VerifyPasswordOtpViewModel model, string? fromModal = null, string? returnUrl = null)
+    public async Task<IActionResult> VerifyPasswordOtp(
+        VerifyPasswordOtpViewModel model,
+        string? fromModal = null,
+        string? returnUrl = null,
+        CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
         {
@@ -207,19 +247,57 @@ public class AuthController : Controller
                 "forgot-otp");
         }
 
-        var normalizedEmail = model.Email.Trim();
+        var normalizedEmail = GetPasswordResetEmailFromSession();
+        if (string.IsNullOrWhiteSpace(normalizedEmail))
+        {
+            return ForgotPasswordFailure(
+                _localizer["Auth_Forgot_SessionExpired"].Value,
+                fromModal,
+                returnUrl,
+                "forgot");
+        }
+
         TempData["ResetPasswordEmail"] = normalizedEmail;
         TempData["PasswordResetEmailMasked"] = MaskEmail(normalizedEmail);
 
-        if (!_passwordResetOtpService.VerifyOtp(normalizedEmail, model.Otp.Trim()))
+        var verifyResult = await _passwordResetOtpService.VerifyAsync(
+            normalizedEmail,
+            model.Otp.Trim(),
+            cancellationToken);
+
+        if (verifyResult.Status == PasswordResetOtpVerifyStatus.Expired)
         {
             return ForgotPasswordFailure(
-                _localizer["Auth_Forgot_InvalidOtp"].Value,
+                _localizer["Auth_Otp_Expired"].Value,
                 fromModal,
                 returnUrl,
                 "forgot-otp");
         }
 
+        if (verifyResult.Status == PasswordResetOtpVerifyStatus.MaxAttemptsReached)
+        {
+            ClearPasswordResetSession();
+            return ForgotPasswordFailure(
+                _localizer["Auth_Otp_MaxAttempts"].Value,
+                fromModal,
+                returnUrl,
+                "forgot");
+        }
+
+        if (verifyResult.Status != PasswordResetOtpVerifyStatus.Valid ||
+            !verifyResult.UserId.HasValue ||
+            !verifyResult.OtpId.HasValue)
+        {
+            return ForgotPasswordFailure(
+                _localizer["Auth_Otp_Invalid"].Value,
+                fromModal,
+                returnUrl,
+                "forgot-otp");
+        }
+
+        // Store both UserId and OtpId. OtpId prevents an old verified session from being reused
+        // after the user requests a newer OTP in another tab/device.
+        SetPasswordResetVerifiedSession(verifyResult.UserId.Value, verifyResult.OtpId.Value);
         TempData["OpenAuthModal"] = "forgot-reset";
 
         if (IsFromModal(fromModal))
@@ -232,7 +310,80 @@ public class AuthController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model, string? fromModal = null, string? returnUrl = null)
+    public async Task<IActionResult> ResendPasswordOtp(
+        string? fromModal = null,
+        string? returnUrl = null,
+        CancellationToken cancellationToken = default)
+    {
+        var email = GetPasswordResetEmailFromSession();
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return ForgotPasswordFailure(
+                _localizer["Auth_Forgot_SessionExpired"].Value,
+                fromModal,
+                returnUrl,
+                "forgot");
+        }
+
+        var locale = HttpContext.Features.Get<Microsoft.AspNetCore.Localization.IRequestCultureFeature>()
+            ?.RequestCulture.Culture.Name ?? System.Globalization.CultureInfo.CurrentUICulture.Name;
+        var sendResult = await _passwordResetOtpService.GenerateAndSendAsync(
+            email,
+            locale,
+            cancellationToken);
+
+        if (sendResult.Status == PasswordResetOtpSendStatus.Cooldown)
+        {
+            return ForgotPasswordFailure(
+                _localizer["Auth_Otp_ResendCooldown", sendResult.RetryAfterSeconds ?? _otpSettings.ResendCooldownSeconds].Value,
+                fromModal,
+                returnUrl,
+                "forgot-otp");
+        }
+
+        if (sendResult.Status == PasswordResetOtpSendStatus.RateLimited)
+        {
+            return ForgotPasswordFailure(
+                _localizer["Auth_Otp_TooManyResends"].Value,
+                fromModal,
+                returnUrl,
+                "forgot-otp");
+        }
+
+        if (sendResult.Status == PasswordResetOtpSendStatus.Failed)
+        {
+            return ForgotPasswordFailure(
+                _localizer["Auth_Forgot_ResetFailed"].Value,
+                fromModal,
+                returnUrl,
+                "forgot-otp");
+        }
+
+        SetPasswordResetEmailSession(email);
+        TempData["ResetPasswordEmail"] = email;
+        TempData["PasswordResetEmailMasked"] = sendResult.MaskedEmail;
+        TempData["AuthSuccess"] = _localizer["Auth_Otp_Sent"].Value;
+        TempData["OpenAuthModal"] = "forgot-otp";
+        if (!string.IsNullOrWhiteSpace(sendResult.DevelopmentOtp))
+        {
+            TempData["PasswordResetOtp"] = sendResult.DevelopmentOtp;
+        }
+
+        if (IsFromModal(fromModal))
+        {
+            return RedirectToSafeReturnUrl(returnUrl);
+        }
+
+        return RedirectToAction("Index", "Home");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(
+        ResetPasswordViewModel model,
+        string? fromModal = null,
+        string? returnUrl = null,
+        CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
         {
@@ -247,10 +398,8 @@ public class AuthController : Controller
                 "forgot-reset");
         }
 
-        var normalizedEmail = model.Email.Trim();
-        TempData["ResetPasswordEmail"] = normalizedEmail;
-
-        if (!_passwordResetOtpService.TryConsumeVerifiedToken(normalizedEmail, out var resetToken) || string.IsNullOrWhiteSpace(resetToken))
+        var session = GetVerifiedPasswordResetSession();
+        if (session is null)
         {
             return ForgotPasswordFailure(
                 _localizer["Auth_Forgot_SessionExpired"].Value,
@@ -259,10 +408,24 @@ public class AuthController : Controller
                 "forgot");
         }
 
-        var user = await _userManager.FindByEmailAsync(normalizedEmail);
+        var isOtpStillUsable = await _passwordResetOtpService.IsVerifiedOtpStillUsableAsync(
+            session.Value.UserId,
+            session.Value.OtpId,
+            cancellationToken);
+        if (!isOtpStillUsable)
+        {
+            ClearPasswordResetSession();
+            return ForgotPasswordFailure(
+                _localizer["Auth_Forgot_SessionExpired"].Value,
+                fromModal,
+                returnUrl,
+                "forgot");
+        }
+
+        var user = await _userManager.FindByIdAsync(session.Value.UserId.ToString());
         if (user is null)
         {
-            _passwordResetOtpService.Clear(normalizedEmail);
+            ClearPasswordResetSession();
             return ForgotPasswordFailure(
                 _localizer["Auth_Forgot_ResetFailed"].Value,
                 fromModal,
@@ -270,10 +433,17 @@ public class AuthController : Controller
                 "forgot");
         }
 
+        // Identity's reset token is generated only now, inside this request, after OTP session checks pass.
+        // This keeps the long reset token out of email and out of session.
+        var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
         var result = await _userManager.ResetPasswordAsync(user, resetToken, model.Password);
         if (result.Succeeded)
         {
-            _passwordResetOtpService.Clear(normalizedEmail);
+            await _passwordResetOtpService.InvalidateAsync(
+                session.Value.UserId,
+                session.Value.OtpId,
+                cancellationToken);
+            ClearPasswordResetSession();
             TempData["AuthSuccess"] = _localizer["Auth_Forgot_ResetSuccess"].Value;
             TempData["OpenAuthModal"] = "login";
 
@@ -290,6 +460,7 @@ public class AuthController : Controller
             ModelState.AddModelError(string.Empty, error.Description);
         }
 
+        TempData["ResetPasswordEmail"] = GetPasswordResetEmailFromSession() ?? string.Empty;
         return ForgotPasswordFailure(
             result.Errors.FirstOrDefault()?.Description ?? _localizer["Auth_Forgot_ResetFailed"].Value,
             fromModal,
@@ -429,6 +600,12 @@ public class AuthController : Controller
     {
         TempData["AuthError"] = errorMessage;
         TempData["OpenAuthModal"] = step;
+        var resetEmail = GetPasswordResetEmailFromSession();
+        if (!string.IsNullOrWhiteSpace(resetEmail))
+        {
+            TempData["ResetPasswordEmail"] = resetEmail;
+            TempData["PasswordResetEmailMasked"] = MaskEmail(resetEmail);
+        }
 
         if (IsFromModal(fromModal))
         {
@@ -501,6 +678,65 @@ public class AuthController : Controller
     {
         HttpContext.Session.Remove(LegacySessionLoggedInKey);
         HttpContext.Session.Remove(LegacySessionUserNameKey);
+    }
+
+    private void SetPasswordResetEmailSession(string email)
+    {
+        HttpContext.Session.SetString(PasswordResetEmailSessionKey, email);
+        HttpContext.Session.Remove(PasswordResetUserIdSessionKey);
+        HttpContext.Session.Remove(PasswordResetOtpIdSessionKey);
+        HttpContext.Session.Remove(PasswordResetVerifiedSessionKey);
+        HttpContext.Session.Remove(PasswordResetVerifiedAtSessionKey);
+    }
+
+    private string? GetPasswordResetEmailFromSession() =>
+        HttpContext.Session.GetString(PasswordResetEmailSessionKey);
+
+    private void SetPasswordResetVerifiedSession(int userId, int otpId)
+    {
+        HttpContext.Session.SetInt32(PasswordResetUserIdSessionKey, userId);
+        HttpContext.Session.SetInt32(PasswordResetOtpIdSessionKey, otpId);
+        HttpContext.Session.SetString(PasswordResetVerifiedSessionKey, bool.TrueString);
+        HttpContext.Session.SetString(PasswordResetVerifiedAtSessionKey, DateTime.UtcNow.ToString("O"));
+    }
+
+    private (int UserId, int OtpId)? GetVerifiedPasswordResetSession()
+    {
+        var userId = HttpContext.Session.GetInt32(PasswordResetUserIdSessionKey);
+        var otpId = HttpContext.Session.GetInt32(PasswordResetOtpIdSessionKey);
+        var isVerified = string.Equals(
+            HttpContext.Session.GetString(PasswordResetVerifiedSessionKey),
+            bool.TrueString,
+            StringComparison.Ordinal);
+        var verifiedAtRaw = HttpContext.Session.GetString(PasswordResetVerifiedAtSessionKey);
+
+        if (!userId.HasValue ||
+            !otpId.HasValue ||
+            !isVerified ||
+            !DateTime.TryParse(
+                verifiedAtRaw,
+                null,
+                System.Globalization.DateTimeStyles.RoundtripKind,
+                out var verifiedAtUtc))
+        {
+            return null;
+        }
+
+        if (DateTime.UtcNow - verifiedAtUtc.ToUniversalTime() > TimeSpan.FromMinutes(_otpSettings.VerifiedSessionMinutes))
+        {
+            return null;
+        }
+
+        return (userId.Value, otpId.Value);
+    }
+
+    private void ClearPasswordResetSession()
+    {
+        HttpContext.Session.Remove(PasswordResetEmailSessionKey);
+        HttpContext.Session.Remove(PasswordResetUserIdSessionKey);
+        HttpContext.Session.Remove(PasswordResetOtpIdSessionKey);
+        HttpContext.Session.Remove(PasswordResetVerifiedSessionKey);
+        HttpContext.Session.Remove(PasswordResetVerifiedAtSessionKey);
     }
 
     private async Task<bool> SendEmailConfirmationAsync(
