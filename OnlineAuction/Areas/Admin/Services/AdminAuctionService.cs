@@ -128,7 +128,7 @@ public class AdminAuctionService
                 Description = auction.Product.DescriptionHtml ?? auction.Product.ShortDescription ?? string.Empty,
                 CategoryName = auction.Product.Category.Name,
                 SellerName = auction.Product.Seller.FullName,
-                SellerEmail = auction.Product.Seller.Email,
+                SellerEmail = auction.Product.Seller.Email ?? string.Empty,
                 StartingPrice = auction.StartingPrice,
                 BidStep = auction.BidStep,
                 CurrentPrice = auction.CurrentPrice,

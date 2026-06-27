@@ -1,0 +1,101 @@
+@model OnlineAuction.Models.SignUpViewModel
+@{
+    ViewData["Title"] = "Đăng ký";
+}
+
+<div class="home-auth-overlay" aria-hidden="false">
+  <div class="home-auth-backdrop"></div>
+  <div class="home-auth-modal" role="dialog" aria-modal="true" aria-labelledby="authSignupTitle">
+    <div class="home-auth-modal__grid">
+      <aside class="home-auth-visual" aria-hidden="true">
+        <div class="home-auth-visual__slides">
+          <div class="home-auth-visual__slide is-active"
+               style="background-image: url('https://images.unsplash.com/photo-1546519638-68e109498ffc?w=900&h=1100&fit=crop&q=80');"></div>
+        </div>
+        <div class="home-auth-visual__overlay"></div>
+        <div class="home-auth-visual__content">
+          <p class="home-auth-visual__eyebrow">Pokemon &amp; TCG</p>
+          <h3 class="home-auth-visual__title">Discover Rare Holos</h3>
+          <p class="home-auth-visual__desc">Base Set Charizards, Illustrator promos and manga rare parallels.</p>
+        </div>
+        <div class="home-auth-visual__dots" aria-hidden="true">
+          <span class="auth-visual-dot is-active"></span>
+          <span class="auth-visual-dot"></span>
+          <span class="auth-visual-dot"></span>
+        </div>
+      </aside>
+
+      <div class="home-auth-form-col">
+        <a asp-controller="Home" asp-action="Index" class="home-auth-close" aria-label="Đóng">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </a>
+
+        <div class="home-auth-brand">
+          <span class="home-auth-logo">RareCard</span>
+        </div>
+
+        <h1 id="authSignupTitle" class="home-auth-heading">Sign up or log in</h1>
+        <p class="home-auth-subheading">Join the world's premier trading card auction vault</p>
+
+        @if (TempData["AuthError"] is string signUpError)
+        {
+          <p class="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">@signUpError</p>
+        }
+
+        <div class="home-auth-tabs" role="tablist" aria-label="Auth">
+          <a asp-controller="Auth" asp-action="Login" class="home-auth-tab" role="tab" aria-selected="false">Log in</a>
+          <button type="button" class="home-auth-tab home-auth-tab--active" role="tab" aria-selected="true">Sign up</button>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="mb-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+
+        <form method="post" asp-action="SignUp" class="home-auth-form">
+          @Html.AntiForgeryToken()
+          <input type="hidden" asp-for="ReturnUrl" />
+
+          <div class="home-auth-field">
+            <label asp-for="FullName" class="home-auth-field__label">Full name</label>
+            <input asp-for="FullName" placeholder="Enter your full name" autocomplete="name" class="home-auth-input" />
+            <span asp-validation-for="FullName" class="mt-1 block text-xs text-red-600"></span>
+          </div>
+
+          <div class="home-auth-field">
+            <label asp-for="Email" class="home-auth-field__label">Email</label>
+            <input asp-for="Email" placeholder="Enter your email address" autocomplete="email" class="home-auth-input" />
+            <span asp-validation-for="Email" class="mt-1 block text-xs text-red-600"></span>
+          </div>
+
+          <div class="home-auth-field">
+            <label asp-for="PhoneNumber" class="home-auth-field__label">Phone</label>
+            <input asp-for="PhoneNumber" placeholder="Enter your phone number" autocomplete="tel" class="home-auth-input" />
+            <span asp-validation-for="PhoneNumber" class="mt-1 block text-xs text-red-600"></span>
+          </div>
+
+          <div class="home-auth-field">
+            <label asp-for="Password" class="home-auth-field__label">Password</label>
+            <input asp-for="Password" placeholder="Create a password" autocomplete="new-password" class="home-auth-input" />
+            <span asp-validation-for="Password" class="mt-1 block text-xs text-red-600"></span>
+          </div>
+
+          <div class="home-auth-field">
+            <label asp-for="ConfirmPassword" class="home-auth-field__label">Confirm password</label>
+            <input asp-for="ConfirmPassword" placeholder="Confirm your password" autocomplete="new-password" class="home-auth-input" />
+            <span asp-validation-for="ConfirmPassword" class="mt-1 block text-xs text-red-600"></span>
+          </div>
+
+          <button type="submit" class="home-auth-submit">Create Account</button>
+        </form>
+
+        <p class="home-auth-legal">
+          By continuing, you agree to RareCard's Terms of Service and Privacy Policy.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+}
