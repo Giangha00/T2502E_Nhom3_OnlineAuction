@@ -1,6 +1,8 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OnlineAuction.Configurations;
 using OnlineAuction.Helpers;
 using OnlineAuction.Services.Interfaces;
 
@@ -44,8 +46,36 @@ public class AuctionController : Controller
         return View(product);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> BidState(int id, CancellationToken cancellationToken)
+    {
+        var state = await _bidService.GetBidStateAsync(id, cancellationToken);
+        if (state is null)
+        {
+            return NotFound();
+        }
+
+        return Json(new
+        {
+            auctionId = state.AuctionId,
+            currentPrice = state.CurrentPrice,
+            bidCount = state.BidCount,
+            minNextBid = state.MinNextBid,
+            endDate = DateTimeUtilities.AsUtc(state.EndDate).ToString("o"),
+            isEnded = state.IsEnded,
+            bidHistory = state.BidHistory.Select(bid => new
+            {
+                bidderName = bid.BidderName,
+                amount = bid.Amount,
+                bidTime = bid.BidTime,
+                isWinning = bid.IsWinning,
+                status = bid.Status
+            })
+        });
+    }
+
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(int auctionId)
     {
@@ -76,7 +106,7 @@ public class AuctionController : Controller
     }
     
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RefundDeposit(long depositId)
     {
@@ -228,7 +258,7 @@ public async Task<IActionResult> DepositPayPalCancel(string token)
     });
 }
     [HttpPost]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CancelRegistration(int auctionId)
     {
@@ -257,12 +287,13 @@ public async Task<IActionResult> DepositPayPalCancel(string token)
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> PlaceBid(int auctionId, decimal amount)
     {
-        if (User.Identity?.IsAuthenticated != true)
+        var userAuth = await HttpContext.AuthenticateAsync(AuthSchemes.User);
+        if (!userAuth.Succeeded)
         {
             return Unauthorized(new { success = false, message = "Please sign in to place a bid." });
         }
 
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userIdClaim = userAuth.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!int.TryParse(userIdClaim, out var bidderId))
         {
             return Unauthorized(new { success = false, message = "Please sign in to place a bid." });

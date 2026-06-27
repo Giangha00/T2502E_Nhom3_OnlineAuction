@@ -57,6 +57,9 @@
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Status</label>
                 <select name="Status" class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                     <option value="">All</option>
+                    <option value="pending_review" selected="@(Model.Filter.Status == "pending_review")">Pending review</option>
+                    <option value="rejected" selected="@(Model.Filter.Status == "rejected")">Rejected</option>
+                    <option value="scheduled" selected="@(Model.Filter.Status == "scheduled")">Scheduled</option>
                     <option value="live" selected="@(Model.Filter.Status == "live")">Live</option>
                     <option value="ending_soon" selected="@(Model.Filter.Status == "ending_soon")">Ending soon</option>
                     <option value="ended" selected="@(Model.Filter.Status == "ended")">Ended</option>

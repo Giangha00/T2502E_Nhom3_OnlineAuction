@@ -28,6 +28,13 @@
   </div>
   <div class="mt-6 flex items-start gap-3 rounded-xl bg-slate-50 px-4 py-3">
     <svg class="mt-0.5 h-5 w-5 shrink-0 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-    <p class="text-sm text-slate-700">@Localizer["Product_VerifiedAuthentic"]</p>
+    @if (Model.IsVerifiedAuthentic)
+    {
+      <p class="text-sm text-slate-700">@Localizer["Product_VerifiedAuthentic"]</p>
+    }
+    else
+    {
+      <p class="text-sm text-slate-500">@Localizer["Product_PendingVerification"]</p>
+    }
   </div>
 </div>

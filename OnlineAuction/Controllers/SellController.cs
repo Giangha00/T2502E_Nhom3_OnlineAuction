@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using OnlineAuction.Configurations;
 using OnlineAuction.Entities;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = AuthSchemes.User)]
 public class SellController : Controller
 {
     private readonly ISellService _sellService;

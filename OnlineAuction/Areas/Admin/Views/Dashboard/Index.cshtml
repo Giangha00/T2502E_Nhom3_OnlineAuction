@@ -58,13 +58,25 @@
 
     @if (Model.SecondaryKpiCards.Count > 0)
     {
-        <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
+        <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 md:gap-6">
             @foreach (var card in Model.SecondaryKpiCards)
             {
-                <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                    <span class="text-sm text-gray-500 dark:text-gray-400">@card.Label</span>
-                    <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">@card.DisplayValue</h4>
-                </div>
+                var cardTag = string.IsNullOrWhiteSpace(card.LinkUrl) ? "div" : "a";
+                @if (string.IsNullOrWhiteSpace(card.LinkUrl))
+                {
+                    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">@card.Label</span>
+                        <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">@card.DisplayValue</h4>
+                    </div>
+                }
+                else
+                {
+                    <a href="@card.LinkUrl"
+                       class="rounded-2xl border border-gray-200 bg-white p-5 transition hover:border-brand-300 hover:shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">@card.Label</span>
+                        <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">@card.DisplayValue</h4>
+                    </a>
+                }
             }
         </div>
     }

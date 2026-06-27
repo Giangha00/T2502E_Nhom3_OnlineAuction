@@ -221,6 +221,7 @@
   </data>
   <data name="Sell_PageTitle" xml:space="preserve"><value>カードを出品</value></data>
   <data name="Sell_SuccessMessage" xml:space="preserve"><value>オークションが正常に作成されました！</value></data>
+  <data name="Sell_SubmittedForReview" xml:space="preserve"><value>出品は審査に提出されました。公開前に専門家が確認します。</value></data>
   <data name="Sell_ViewAuctions" xml:space="preserve"><value>オークションを見る →</value></data>
   <data name="Sell_DraftSaved" xml:space="preserve"><value>下書きをローカルに保存しました。いつでも編集を続けられます。</value></data>
   <data name="Sell_Heading" xml:space="preserve"><value>レアコレクションを出品</value></data>
@@ -494,6 +495,7 @@
   <data name="Product_Edges" xml:space="preserve"><value>エッジ</value></data>
   <data name="Product_Surface" xml:space="preserve"><value>サーフェス</value></data>
   <data name="Product_VerifiedAuthentic" xml:space="preserve"><value>認証済みスラブ — 出品前にRareCardキュレーションチームが検査。</value></data>
+  <data name="Product_PendingVerification" xml:space="preserve"><value>この出品はまだ専門家による審査が完了していません。</value></data>
   <data name="Product_Bidder" xml:space="preserve"><value>入札者</value></data>
   <data name="Product_BidAmount" xml:space="preserve"><value>入札額</value></data>
   <data name="Product_DateTime" xml:space="preserve"><value>日時</value></data>
@@ -545,6 +547,8 @@
   <data name="Product_BidAmountLabel" xml:space="preserve"><value>入札額</value></data>
   <data name="Product_MinBid" xml:space="preserve"><value>最低入札:</value></data>
   <data name="Product_Step" xml:space="preserve"><value>単位:</value></data>
+  <data name="Product_DecreaseBid" xml:space="preserve"><value>入札額を下げる</value></data>
+  <data name="Product_IncreaseBid" xml:space="preserve"><value>入札額を上げる</value></data>
   <data name="Product_CertPrefix" xml:space="preserve"><value>証明書 {0}</value></data>
   <data name="BuyNow_Price" xml:space="preserve"><value>価格</value></data>
   <data name="BuyNow_FixedPrice" xml:space="preserve"><value>即購入固定価格</value></data>
@@ -815,6 +819,10 @@
   <data name="User_Stat_SuccessRate" xml:space="preserve"><value>成功率</value></data>
   <data name="User_NotUpdated" xml:space="preserve"><value>未更新</value></data>
   <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
+  <data name="User_Status_PendingReview" xml:space="preserve"><value>審査待ち</value></data>
+  <data name="User_Status_Rejected" xml:space="preserve"><value>却下</value></data>
+  <data name="User_Status_Scheduled" xml:space="preserve"><value>予定</value></data>
+  <data name="User_RejectReason" xml:space="preserve"><value>却下理由: {0}</value></data>
   <data name="SellBuyNow_PageTitle" xml:space="preserve"><value>即購入出品</value></data>
   <data name="SellBuyNow_Heading" xml:space="preserve"><value>即購入商品を出品</value></data>
   <data name="SellBuyNow_Subheading" xml:space="preserve"><value>固定価格で出品。入札なしで即購入できます。</value></data>
@@ -828,6 +836,7 @@
   <data name="SellBuyNow_ReadyToPublish" xml:space="preserve"><value>出品は即購入にすぐ表示されます。</value></data>
   <data name="SellBuyNow_CreateListing" xml:space="preserve"><value>出品する</value></data>
   <data name="SellBuyNow_SuccessMessage" xml:space="preserve"><value>即購入出品を作成しました。</value></data>
+  <data name="SellBuyNow_SubmittedForReview" xml:space="preserve"><value>出品は審査に提出されました。公開前に専門家が確認します。</value></data>
   <data name="SellBuyNow_Success_Created" xml:space="preserve"><value>出品「{0}」を作成しました！</value></data>
   <data name="SellBuyNow_Error_CreateFailed" xml:space="preserve"><value>出品を作成できませんでした。</value></data>
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>価格は0より大きい必要があります</value></data>

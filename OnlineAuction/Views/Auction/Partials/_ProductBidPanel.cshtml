@@ -1,15 +1,17 @@
 @model OnlineAuction.Models.ProductDetailViewModel
+@using Microsoft.AspNetCore.Authentication
+@using OnlineAuction.Configurations
 @using OnlineAuction.Entities
 @using OnlineAuction.Helpers
 @{
     var minBid = Model.CurrentPrice + Model.BidStep;
-    const int bidOptionCount = 35;
     var specs = new List<string>();
     if (!string.IsNullOrEmpty(Model.Grade)) specs.Add(Model.Grade);
     if (!string.IsNullOrEmpty(Model.SetName)) specs.Add(Model.SetName);
     if (!string.IsNullOrEmpty(Model.Condition)) specs.Add(Model.Condition);
     if (!string.IsNullOrEmpty(Model.CertificateNumber)) specs.Add(Localizer["Product_CertPrefix", Model.CertificateNumber].Value);
-    var isLoggedIn = User.Identity?.IsAuthenticated == true;
+    var userAuth = await Context.AuthenticateAsync(AuthSchemes.User);
+    var isLoggedIn = userAuth.Succeeded;
     var endDateIso = DateTimeUtilities.ToUtcIsoString(Model.EndDate);
     var showRegistrationFlow = Model.RequiresRegistration && Model.CanPlaceBid && !Model.IsSeller;
     var showBidForm = !Model.IsSeller && Model.CanPlaceBid &&
@@ -133,20 +135,32 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"/>
             </svg>
           </label>
-          <div class="relative mt-2">
-            <select id="bidAmount" name="bidAmount"
-                    class="w-full appearance-none rounded-md border border-slate-300 bg-white py-3 pl-4 pr-10 text-sm font-medium text-slate-800 outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900">
-              @for (var i = 0; i < bidOptionCount; i++)
-              {
-                var amount = minBid + Model.BidStep * i;
-                <option value="@amount.ToString("0.##")">$@amount.ToString("N0")</option>
-              }
-            </select>
-            <svg class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
-            </svg>
+          <div class="mt-2 flex items-stretch overflow-hidden rounded-md border border-slate-300 bg-white focus-within:border-slate-900 focus-within:ring-1 focus-within:ring-slate-900">
+            <button type="button"
+                    id="bidAmountDecrease"
+                    class="flex w-11 shrink-0 items-center justify-center border-r border-slate-200 text-lg font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:text-slate-300"
+                    aria-label="@Localizer["Product_DecreaseBid"]">
+              −
+            </button>
+            <div class="relative min-w-0 flex-1">
+              <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500">$</span>
+              <input type="text"
+                     inputmode="numeric"
+                     id="bidAmount"
+                     name="bidAmount"
+                     value="@minBid.ToString("0.##")"
+                     autocomplete="off"
+                     class="w-full border-0 bg-transparent py-3 pl-7 pr-3 text-center text-sm font-semibold tabular-nums text-slate-800 outline-none"
+                     aria-describedby="minBidHint" />
+            </div>
+            <button type="button"
+                    id="bidAmountIncrease"
+                    class="flex w-11 shrink-0 items-center justify-center border-l border-slate-200 text-lg font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:text-slate-300"
+                    aria-label="@Localizer["Product_IncreaseBid"]">
+              +
+            </button>
           </div>
-          <p class="mt-2 text-xs text-slate-400">
+          <p id="minBidHint" class="mt-2 text-xs text-slate-400">
             @Localizer["Product_MinBid"] <span id="minBidDisplay" class="font-semibold text-slate-600">$@minBid.ToString("N0")</span>
             · @Localizer["Product_Step"] <span class="font-semibold text-slate-600">$@Model.BidStep.ToString("N0")</span>
           </p>

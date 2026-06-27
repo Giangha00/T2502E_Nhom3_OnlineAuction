@@ -87,6 +87,13 @@ public class AdminDashboardService : IAdminDashboardService
                                 && registration.Status == AuctionRegistrationStatuses.Pending,
                 cancellationToken);
 
+        var pendingVerifications = await _dbContext.Auctions.AsNoTracking()
+            .CountAsync(
+                auction => auction.DeletedAt == null
+                           && auction.Product.DeletedAt == null
+                           && auction.Status == AuctionStatuses.PendingReview,
+                cancellationToken);
+
         var completedOrdersThisMonth = await _dbContext.Orders.AsNoTracking()
             .CountAsync(
                 order => order.DeletedAt == null
@@ -104,6 +111,7 @@ public class AdminDashboardService : IAdminDashboardService
 
         var secondaryKpiCards = new List<DashboardKpiCardViewModel>
         {
+            BuildKpiCard("Pending Verifications", FormatInteger(pendingVerifications), pendingVerifications, 0, includeChange: false, linkUrl: "/Admin/AuctionVerification"),
             BuildKpiCard("Pending Payments", FormatInteger(pendingPayments), pendingPayments, 0, includeChange: false),
             BuildKpiCard("Pending Registrations", FormatInteger(pendingRegistrations), pendingRegistrations, 0, includeChange: false),
             BuildKpiCard("Completed Orders (Month)", FormatInteger(completedOrdersThisMonth), completedOrdersThisMonth, 0, includeChange: false)
@@ -331,12 +339,14 @@ public class AdminDashboardService : IAdminDashboardService
         string displayValue,
         decimal currentValue,
         decimal previousValue,
-        bool includeChange = true)
+        bool includeChange = true,
+        string? linkUrl = null)
     {
         var card = new DashboardKpiCardViewModel
         {
             Label = label,
-            DisplayValue = displayValue
+            DisplayValue = displayValue,
+            LinkUrl = linkUrl
         };
 
         if (!includeChange)
@@ -381,6 +391,9 @@ public class AdminDashboardService : IAdminDashboardService
 
     private static string GetStatusBadgeClass(string status) => status switch
     {
+        AuctionStatuses.PendingReview => "bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-400",
+        AuctionStatuses.Rejected => "bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500",
+        AuctionStatuses.Scheduled => "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400",
         AuctionStatuses.Live => "bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500",
         AuctionStatuses.EndingSoon => "bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-400",
         AuctionStatuses.AwaitingPayment => "bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-warning-400",

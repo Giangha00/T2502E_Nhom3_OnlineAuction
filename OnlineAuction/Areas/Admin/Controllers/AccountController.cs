@@ -1,7 +1,9 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OnlineAuction.Configurations;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
 using OnlineAuction.Models;
@@ -12,21 +14,18 @@ namespace OnlineAuction.Areas.Admin.Controllers;
 [AllowAnonymous]
 public class AccountController : Controller
 {
-    private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public AccountController(
-        SignInManager<ApplicationUser> signInManager,
-        UserManager<ApplicationUser> userManager)
+    public AccountController(UserManager<ApplicationUser> userManager)
     {
-        _signInManager = signInManager;
         _userManager = userManager;
     }
 
     [HttpGet]
-    public IActionResult Login(string? returnUrl = null)
+    public async Task<IActionResult> Login(string? returnUrl = null)
     {
-        if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+        var adminAuth = await HttpContext.AuthenticateAsync(AuthSchemes.Admin);
+        if (adminAuth.Succeeded && adminAuth.Principal?.IsInRole("Admin") == true)
         {
             return RedirectToAction("Index", "Dashboard");
         }
@@ -50,20 +49,22 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var result = await _signInManager.CheckPasswordSignInAsync(
-            user,
-            model.Password,
-            lockoutOnFailure: true);
-
-        if (result.IsLockedOut)
+        if (!await _userManager.CheckPasswordAsync(user, model.Password))
         {
-            ModelState.AddModelError(string.Empty, "Account locked");
+            if (await _userManager.IsLockedOutAsync(user))
+            {
+                ModelState.AddModelError(string.Empty, "Account locked");
+                return View(model);
+            }
+
+            await _userManager.AccessFailedAsync(user);
+            ModelState.AddModelError(string.Empty, "Invalid email or password.");
             return View(model);
         }
 
-        if (!result.Succeeded)
+        if (await _userManager.IsLockedOutAsync(user))
         {
-            ModelState.AddModelError(string.Empty, "Invalid email or password.");
+            ModelState.AddModelError(string.Empty, "Account locked");
             return View(model);
         }
 
@@ -79,13 +80,8 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var additionalClaims = new[]
-        {
-            new Claim("FullName", user.FullName),
-            new Claim(ClaimTypes.Email, user.Email ?? model.Email.Trim())
-        };
-
-        await _signInManager.SignInWithClaimsAsync(user, model.RememberMe, additionalClaims);
+        await _userManager.ResetAccessFailedCountAsync(user);
+        await SignInAdminAsync(user, model.RememberMe);
 
         if (!string.IsNullOrWhiteSpace(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
         {
@@ -99,7 +95,7 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        await _signInManager.SignOutAsync();
+        await HttpContext.SignOutAsync(AuthSchemes.Admin);
         return RedirectToAction(nameof(Login));
     }
 
@@ -107,5 +103,29 @@ public class AccountController : Controller
     public IActionResult AccessDenied()
     {
         return View();
+    }
+
+    private async Task SignInAdminAsync(ApplicationUser user, bool rememberMe)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name, user.UserName ?? user.Email ?? string.Empty),
+            new(ClaimTypes.Email, user.Email ?? string.Empty),
+            new("FullName", user.FullName)
+        };
+
+        var roles = await _userManager.GetRolesAsync(user);
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+        var identity = new ClaimsIdentity(claims, AuthSchemes.Admin);
+        var principal = new ClaimsPrincipal(identity);
+        var properties = new AuthenticationProperties
+        {
+            IsPersistent = rememberMe,
+            ExpiresUtc = rememberMe ? DateTimeOffset.UtcNow.AddHours(8) : null
+        };
+
+        await HttpContext.SignInAsync(AuthSchemes.Admin, principal, properties);
     }
 }

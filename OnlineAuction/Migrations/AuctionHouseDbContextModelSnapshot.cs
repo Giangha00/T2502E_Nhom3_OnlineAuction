@@ -367,6 +367,11 @@ namespace OnlineAuction.Migrations
                         .HasColumnType("int")
                         .HasColumnName("product_id");
 
+                    b.Property<string>("RejectReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("reject_reason");
+
                     b.Property<bool>("RequiresRegistration")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
@@ -390,6 +395,10 @@ namespace OnlineAuction.Migrations
                         .HasDefaultValue("live")
                         .HasColumnName("status");
 
+                    b.Property<DateTime?>("SubmittedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("submitted_at");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
@@ -397,6 +406,14 @@ namespace OnlineAuction.Migrations
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("int")
                         .HasColumnName("updated_by");
+
+                    b.Property<DateTime?>("VerifiedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("verified_at");
+
+                    b.Property<int?>("VerifiedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("verified_by");
 
                     b.Property<int?>("WinnerId")
                         .HasColumnType("int")
@@ -419,6 +436,8 @@ namespace OnlineAuction.Migrations
 
                     b.HasIndex("UpdatedBy");
 
+                    b.HasIndex("VerifiedBy");
+
                     b.HasIndex("WinnerId");
 
                     b.HasIndex("Status", "EndDate")
@@ -431,6 +450,8 @@ namespace OnlineAuction.Migrations
                             t.HasCheckConstraint("chk_auctions_listing_type", "`listing_type` IN ('auction', 'buynow')");
 
                             t.HasCheckConstraint("chk_auctions_prices", "`starting_price` > 0 AND `bid_step` > 0 AND `current_price` >= 0 AND (`buy_now_price` IS NULL OR `buy_now_price` > `starting_price`)");
+
+                            t.HasCheckConstraint("chk_auctions_status", "`status` IN ('pending_review','rejected','scheduled','live','ending_soon','ended','awaiting_payment','completed','cancelled')");
                         });
                 });
 
@@ -462,6 +483,11 @@ namespace OnlineAuction.Migrations
                     b.Property<int?>("DeletedBy")
                         .HasColumnType("int")
                         .HasColumnName("deleted_by");
+
+                    b.Property<decimal>("DepositApplied")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("deposit_applied");
 
                     b.Property<string>("OrderReference")
                         .IsRequired()
@@ -1640,6 +1666,12 @@ namespace OnlineAuction.Migrations
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_auctions_updated_by");
 
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "Verifier")
+                        .WithMany()
+                        .HasForeignKey("VerifiedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_auctions_verified_by");
+
                     b.HasOne("OnlineAuction.Entities.ApplicationUser", "Winner")
                         .WithMany("WonAuctions")
                         .HasForeignKey("WinnerId")
@@ -1647,6 +1679,8 @@ namespace OnlineAuction.Migrations
                         .HasConstraintName("fk_auctions_winner");
 
                     b.Navigation("Product");
+
+                    b.Navigation("Verifier");
 
                     b.Navigation("Winner");
                 });

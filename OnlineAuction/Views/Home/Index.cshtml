@@ -1,9 +1,12 @@
 ﻿@model OnlineAuction.Models.HomeViewModel
+@using Microsoft.AspNetCore.Authentication
+@using OnlineAuction.Configurations
 @inject IStringLocalizer<SharedResource> Localizer
 @{
     ViewData["Title"] = Localizer["Home_PageTitle"];
     var heroImage = PageBannerImages.Home;
-    var isLoggedIn = User.Identity?.IsAuthenticated == true;
+    var userAuth = await Context.AuthenticateAsync(AuthSchemes.User);
+    var isLoggedIn = userAuth.Succeeded;
 }
 
 <div id="homePageContent" class="rarecard-page">
@@ -123,4 +126,5 @@
 
 @section Scripts {
   <script src="~/js/home-carousel.js" asp-append-version="true"></script>
+  <script src="~/js/buy-now-cart.js" asp-append-version="true"></script>
 }

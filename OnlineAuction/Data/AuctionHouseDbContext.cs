@@ -73,7 +73,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
         entity.Property(d => d.AuctionRegistrationId)
             .HasColumnName("auction_registration_id");
-
+        
         // Tiền nên set precision để tránh lỗi làm tròn trong database
         entity.Property(d => d.Amount)
             .HasColumnName("amount")
@@ -83,7 +83,6 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             .HasColumnName("status")
             .HasMaxLength(30)
             .IsRequired();
-
         entity.Property(d => d.PayPalOrderId)
             .HasColumnName("paypal_order_id")
             .HasMaxLength(120);
@@ -311,6 +310,10 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(a => a.ListingType).HasColumnName("listing_type").HasMaxLength(20).IsRequired().HasDefaultValue(ListingTypes.Auction);
             entity.Property(a => a.RequiresRegistration).HasColumnName("requires_registration").HasDefaultValue(true);
             entity.Property(a => a.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(AuctionStatuses.Live);
+            entity.Property(a => a.SubmittedAt).HasColumnName("submitted_at");
+            entity.Property(a => a.VerifiedAt).HasColumnName("verified_at");
+            entity.Property(a => a.VerifiedBy).HasColumnName("verified_by");
+            entity.Property(a => a.RejectReason).HasColumnName("reject_reason").HasMaxLength(500);
             entity.Property(a => a.StartDate).HasColumnName("start_date");
             entity.Property(a => a.EndDate).HasColumnName("end_date");
             entity.Property(a => a.AuctionEventName).HasColumnName("auction_event_name").HasMaxLength(160);
@@ -332,6 +335,12 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
                 .HasConstraintName("fk_auctions_winner")
                 .OnDelete(DeleteBehavior.SetNull);
 
+            entity.HasOne(a => a.Verifier)
+                .WithMany()
+                .HasForeignKey(a => a.VerifiedBy)
+                .HasConstraintName("fk_auctions_verified_by")
+                .OnDelete(DeleteBehavior.SetNull);
+
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_auctions_prices",
                 "`starting_price` > 0 AND `bid_step` > 0 AND `current_price` >= 0 AND (`buy_now_price` IS NULL OR `buy_now_price` > `starting_price`)"));
@@ -343,6 +352,10 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_auctions_listing_type",
                 "`listing_type` IN ('auction', 'buynow')"));
+
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_auctions_status",
+                "`status` IN ('pending_review','rejected','scheduled','live','ending_soon','ended','awaiting_payment','completed','cancelled')"));
 
             ConfigureAuditableEntity(entity, "auctions");
         });
@@ -449,6 +462,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(o => o.TotalAmount).HasColumnName("total_amount").HasPrecision(18, 2);
             entity.Property(o => o.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(OrderStatuses.PendingPayment);
             entity.Property(o => o.PaymentDeadline).HasColumnName("payment_deadline");
+            entity.Property(o => o.DepositApplied).HasColumnName("deposit_applied").HasPrecision(18, 2);
+
             entity.Property(o => o.ShippingFullName).HasColumnName("shipping_full_name").HasMaxLength(120);
             entity.Property(o => o.ShippingAddress).HasColumnName("shipping_address").HasMaxLength(300);
             entity.Property(o => o.ShippingCity).HasColumnName("shipping_city").HasMaxLength(100);

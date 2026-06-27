@@ -1,8 +1,10 @@
 @using Microsoft.Extensions.Localization
 @using OnlineAuction
 @using OnlineAuction.Resources
+@using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Localization
 @using Microsoft.AspNetCore.Identity
+@using OnlineAuction.Configurations
 @using OnlineAuction.Entities
 @using OnlineAuction.Models
 @inject IStringLocalizer<SharedResource> Localizer
@@ -32,9 +34,12 @@
     var isRareCardTheme = !isStandalonePage && !isAdminArea;
 
     var currentCulture = Context.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name ?? "en-US";
-    var isLoggedIn = User.Identity?.IsAuthenticated == true;
-    ApplicationUser? currentUser = isLoggedIn ? await UserManager.GetUserAsync(User) : null;
-    var displayName = currentUser?.FullName ?? User.Identity?.Name ?? "User";
+    var userAuth = await Context.AuthenticateAsync(AuthSchemes.User);
+    var isLoggedIn = userAuth.Succeeded;
+    ApplicationUser? currentUser = isLoggedIn && userAuth.Principal is not null
+        ? await UserManager.GetUserAsync(userAuth.Principal)
+        : null;
+    var displayName = currentUser?.FullName ?? userAuth.Principal?.Identity?.Name ?? "User";
     var currentUserId = currentUser?.Id ?? 0;
     var orderCount = currentUser is not null ? await OrderService.CountPendingPaymentOrdersAsync(currentUser.Id) : 0;
     var headerNotifications = currentUser is not null
@@ -130,17 +135,17 @@
                     {
                         @await Html.PartialAsync("Partials/_HeaderNotifications", headerNotifications)
                         <a asp-controller="Order" asp-action="Index"
+                           id="orderNavLink"
+                           data-order-count="@orderCount"
                            class="relative flex h-10 w-10 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-blue-700 @(isOrderPage ? "bg-blue-50 text-blue-700" : "")"
                            aria-label="@Localizer["Layout_WonAuctions"]">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
                             </svg>
-                            @if (orderCount > 0)
-                            {
-                                <span class="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-700 px-1 text-[10px] font-bold text-white">
-                                    @(orderCount > 9 ? "9+" : orderCount.ToString())
-                                </span>
-                            }
+                            <span id="orderCountBadge"
+                                  class="@(orderCount > 0 ? "" : "hidden") absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-700 px-1 text-[10px] font-bold text-white">
+                                @(orderCount > 9 ? "9+" : orderCount.ToString())
+                            </span>
                         </a>
                     }
                     @await Html.PartialAsync("_LanguageSwitcher")
@@ -336,6 +341,7 @@
         </script>
         <script src="~/js/auth-modal.js" asp-append-version="true"></script>
         <script src="~/js/language-switcher.js" asp-append-version="true"></script>
+        <script src="~/js/realtime-hub.js" asp-append-version="true"></script>
         @if (isLoggedIn)
         {
             <script src="~/js/header-notifications.js" asp-append-version="true"></script>
