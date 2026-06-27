@@ -75,7 +75,7 @@ dotnet run --launch-profile http
 | HTTPS redirect warning | Fixed — HTTPS redirect only runs in Production |
 | Seeder crash on startup | Fixed — FK cleanup before delete; set `RefreshTestAuctionsInDevelopment` to `false` to disable |
 
-In **Development**, Pokémon test auctions (`RareCard Vault Test Auctions`) **auto-refresh on every app start** by default (`RefreshTestAuctionsInDevelopment: true`). Restart Rider to see fresh auctions with new countdown.
+In **Development**, sample auction listings (`RareCard Vault Test Auctions`) **auto-refresh on every app start** by default (`RefreshTestAuctionsInDevelopment: true`). Restart the app to load fresh auctions (7-day countdown). Some auctions also have `buy_now_price` set for the Buy Now catalog.
 
 To keep orders while testing PayPal, add to `appsettings.Local.json`:
 
@@ -165,7 +165,9 @@ Username is generated from the email local-part (e.g. `john@gmail.com` → `john
 - **URL `id` = Auction ID** (not Product ID).
 - Data source: `AuctionService.GetProductDetailAsync` → `AuctionHouseDbContext` (`auctions`, `products`, `users`, `bids`).
 - `MockProductDetailData` is no longer used for the public detail page.
-- On first run with an empty catalog, `AuctionCatalogSeeder` creates 5 sample auctions (requires `UserSeeder` first).
+- On first run, `AuctionCatalogSeeder` creates **~60 auction listings** from `SpreadsheetAuctionCatalog` (requires `UserSeeder` first). **15** of them get a `buy_now_price` for instant purchase.
+- **Auction** list: `/Auction` — live auctions.
+- **Buy Now** list: `/BuyNow` — auctions where `buy_now_price IS NOT NULL` (same listing can appear in both auction bidding and buy now).
 
 ### UI fields without DB columns (temporary defaults)
 
@@ -193,7 +195,7 @@ Username is generated from the email local-part (e.g. `john@gmail.com` → `john
 
 Migration: `AddProductDetailSellFields`.
 
-Test URLs after seed: `/Auction/Detail/1` … `/Auction/Detail/5`.
+Test URLs after seed: `/Auction`, `/BuyNow`, `/Auction/Detail/{id}`.
 
 ## Order flow (Task 1 — DB-backed)
 
@@ -340,3 +342,43 @@ Tables: `notifications`, `user_device_tokens`. Migration: `AddNotificationsAndDe
 | Auction won | Winner | Winning |
 | Payment captured (PayPal) | Buyer | Payment |
 | Refund confirmation page | Buyer | Refund |
+
+## Realtime (SignalR)
+
+The app uses **ASP.NET Core SignalR** for instant in-app updates when a browser tab is open. FCM still handles push when the tab is in the background.
+
+### Hub
+
+| Item | Value |
+|------|-------|
+| Endpoint | `/hubs/app` |
+| Hub class | `Hubs/AppHub.cs` |
+| Publisher | `Services/RealtimePublisher.cs` |
+
+### Client events
+
+| Event | Who receives | UI effect |
+|-------|--------------|-----------|
+| `BidUpdated` | Viewers on auction detail (`JoinAuction`) | Price, bid count, history update without refresh |
+| `NotificationReceived` | Logged-in user (`user:{id}` group) | Header dropdown + unread badge |
+| `OrderCountUpdated` | Logged-in user | Won-auctions nav badge |
+
+### Fallback
+
+If SignalR disconnects, `header-notifications.js` polls `/Notification/List` every 60 seconds. When the tab becomes visible and the hub is offline, it refreshes once.
+
+### Test realtime (two browsers)
+
+1. Run: `dotnet run --launch-profile http`
+2. Open the same auction detail in two windows (can be different users).
+3. Place a bid in one window → the other updates price/history immediately.
+4. Log in as outbid user → notification badge updates without refresh.
+5. Let auction end (background worker ~15s) → detail page shows ended state; winner sees order badge update.
+
+### Files
+
+| File | Role |
+|------|------|
+| `wwwroot/js/realtime-hub.js` | SignalR client, order badge, dispatches `auction:bid-updated` |
+| `wwwroot/js/product-detail.js` | Listens for `auction:bid-updated` |
+| `GET /Auction/BidState/{id}` | JSON fallback for bid state |
