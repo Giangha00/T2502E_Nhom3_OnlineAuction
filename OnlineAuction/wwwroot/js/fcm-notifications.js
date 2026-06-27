@@ -74,7 +74,7 @@
                     isRead: false
                 });
                 window.headerNotifications.refreshBadge();
-            } else {
+            } else if (window.realtimeHub && !window.realtimeHub.isConnected()) {
                 window.headerNotifications.refresh();
             }
         }

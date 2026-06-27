@@ -135,17 +135,17 @@
                     {
                         @await Html.PartialAsync("Partials/_HeaderNotifications", headerNotifications)
                         <a asp-controller="Order" asp-action="Index"
+                           id="orderNavLink"
+                           data-order-count="@orderCount"
                            class="relative flex h-10 w-10 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-blue-700 @(isOrderPage ? "bg-blue-50 text-blue-700" : "")"
                            aria-label="@Localizer["Layout_WonAuctions"]">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
                             </svg>
-                            @if (orderCount > 0)
-                            {
-                                <span class="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-700 px-1 text-[10px] font-bold text-white">
-                                    @(orderCount > 9 ? "9+" : orderCount.ToString())
-                                </span>
-                            }
+                            <span id="orderCountBadge"
+                                  class="@(orderCount > 0 ? "" : "hidden") absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-700 px-1 text-[10px] font-bold text-white">
+                                @(orderCount > 9 ? "9+" : orderCount.ToString())
+                            </span>
                         </a>
                     }
                     @await Html.PartialAsync("_LanguageSwitcher")
@@ -327,6 +327,14 @@
         <script>
             window.authModalConfig = {
                 i18n: {
+                    defaultTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Modal_Title"].Value)),
+                    defaultSubtitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Modal_Subtitle"].Value)),
+                    forgotTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Forgot_Title"].Value)),
+                    forgotSubtitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Forgot_Subtitle"].Value)),
+                    forgotOtpTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Forgot_OtpTitle"].Value)),
+                    forgotOtpSubtitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Forgot_OtpSubtitle"].Value)),
+                    forgotResetTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Forgot_ResetTitle"].Value)),
+                    forgotResetSubtitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Forgot_ResetSubtitle"].Value)),
                     slide1Eyebrow: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Slide1_Eyebrow"].Value)),
                     slide1Title: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Slide1_Title"].Value)),
                     slide1Desc: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Slide1_Desc"].Value)),
@@ -341,6 +349,7 @@
         </script>
         <script src="~/js/auth-modal.js" asp-append-version="true"></script>
         <script src="~/js/language-switcher.js" asp-append-version="true"></script>
+        <script src="~/js/realtime-hub.js" asp-append-version="true"></script>
         @if (isLoggedIn)
         {
             <script src="~/js/header-notifications.js" asp-append-version="true"></script>
