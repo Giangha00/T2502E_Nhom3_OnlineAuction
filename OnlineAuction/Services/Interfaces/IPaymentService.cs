@@ -13,6 +13,4 @@ public interface IPaymentService
         string? auctionName,
         decimal? total,
         string? method);
-
-    List<RefundEligibleOrderViewModel> GetRefundEligibleOrders();
 }

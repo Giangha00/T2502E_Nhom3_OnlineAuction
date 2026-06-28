@@ -34,4 +34,6 @@ public static class NotificationReferenceTypes
     public const string AuctionWon = "auction_won";
     public const string PaymentSuccess = "payment_success";
     public const string RefundApproved = "refund_approved";
+    public const string RefundRequested = "refund_requested";
+    public const string RefundRejected = "refund_rejected";
 }
