@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using OnlineAuction.Areas.Admin.ViewModels.Users;
 using OnlineAuction.Data;
+using OnlineAuction.Data.Seeders;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
 using OnlineAuction.Helpers;
@@ -33,7 +34,7 @@ public class UserService : IUserService
         _sellerAuctionService = sellerAuctionService;
     }
 
-    public async Task<PublicUserDetailViewModel?> GetPublicProfileAsync(int id)
+    public async Task<PublicUserDetailViewModel?> GetPublicProfileAsync(int id, int? viewerUserId = null)
     {
         // User Detail bay gio doc seller tu bang users trong MySQL thay vi mock data.
         var seller = await _dbContext.Users
@@ -57,15 +58,32 @@ public class UserService : IUserService
             return null;
         }
 
+        var isOwner = viewerUserId.HasValue && viewerUserId.Value == id;
+
         // Lay danh sach tin dang theo loai: dau gia va mua ngay.
-        var auctions = await _sellerAuctionService.GetSellerAuctionsAsync(id, ListingTypes.Auction);
-        var buyNowListings = await _sellerAuctionService.GetSellerAuctionsAsync(id, ListingTypes.BuyNow);
+        var auctions = await _sellerAuctionService.GetSellerAuctionsAsync(
+            id,
+            ListingTypes.Auction,
+            forPublicProfile: true,
+            includeOwnerDrafts: isOwner);
+        var buyNowListings = await _sellerAuctionService.GetSellerAuctionsAsync(
+            id,
+            ListingTypes.BuyNow,
+            forPublicProfile: true,
+            includeOwnerDrafts: isOwner);
 
         var completedAuctions = await _dbContext.Auctions
             .AsNoTracking()
             .CountAsync(auction =>
                 auction.Product.SellerId == id &&
                 auction.Status == AuctionStatuses.Completed);
+
+        var totalAuctionHistory = await _dbContext.Auctions
+            .AsNoTracking()
+            .CountAsync(auction =>
+                auction.Product.SellerId == id &&
+                auction.ListingType == ListingTypes.Auction &&
+                auction.Status != AuctionStatuses.Cancelled);
 
         var relatedRows = await _dbContext.Auctions
             .AsNoTracking()
@@ -110,9 +128,11 @@ public class UserService : IUserService
 
         return new PublicUserDetailViewModel
         {
+            IsOwner = isOwner,
             Profile = new UserProfileViewModel
             {
                 Id = seller.Id,
+                IsOwner = isOwner,
                 Username = seller.UserName ?? string.Empty,
                 FullName = seller.FullName,
                 AvatarUrl = seller.AvatarUrl ?? "/admin/images/user/user-01.jpg",
@@ -127,7 +147,9 @@ public class UserService : IUserService
             },
             Statistics = new SellerStatisticsViewModel
             {
-                TotalAuctions = auctions.Count + buyNowListings.Count,
+                TotalListings = auctions.Count + buyNowListings.Count,
+                TotalAuctions = totalAuctionHistory,
+                TotalBuyNowListings = buyNowListings.Count,
                 CompletedAuctions = completedAuctions,
                 TotalSales = completedAuctions,
                 Rating = 0
@@ -336,9 +358,13 @@ public class UserService : IUserService
 
         var result = await _userManager.CreateAsync(user, model.InitialPassword);
 
-        return result.Succeeded
-            ? (true, "User created successfully.")
-            : (false, string.Join(" ", result.Errors.Select(error => error.Description)));
+        if (!result.Succeeded)
+        {
+            return (false, string.Join(" ", result.Errors.Select(error => error.Description)));
+        }
+
+        await IdentityRoleSyncService.SyncUserRoleAsync(_userManager, user, model.Role);
+        return (true, "User created successfully.");
     }
 
     public async Task<(bool Success, string Message)> UpdateAsync(UserFormViewModel model)
@@ -403,6 +429,7 @@ public class UserService : IUserService
             }
         }
 
+        await IdentityRoleSyncService.SyncUserRoleAsync(_userManager, user, model.Role);
         return (true, "User updated successfully.");
     }
 
@@ -481,6 +508,7 @@ public class UserService : IUserService
             {
                 user.Role = model.Role.Value;
                 user.UpdatedAt = DateTime.UtcNow;
+                await IdentityRoleSyncService.SyncUserRoleAsync(_userManager, user, model.Role.Value);
             }
 
             await _dbContext.SaveChangesAsync();

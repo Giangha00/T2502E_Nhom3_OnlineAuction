@@ -87,10 +87,13 @@ public class AuthController : Controller
             return AuthFailureView(model, "login", fromModal);
         }
 
-        if (await _userManager.IsInRoleAsync(user, UserRole.Admin.ToString()))
+        foreach (var staffRole in StaffRoleNames.All)
         {
-            ModelState.AddModelError(string.Empty, "Please use the admin login page.");
-            return AuthFailureView(model, "login", fromModal);
+            if (await _userManager.IsInRoleAsync(user, staffRole))
+            {
+                ModelState.AddModelError(string.Empty, "Please use the admin login page.");
+                return AuthFailureView(model, "login", fromModal);
+            }
         }
 
         var result = await _signInManager.PasswordSignInAsync(

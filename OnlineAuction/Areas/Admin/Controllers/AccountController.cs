@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Configurations;
+using OnlineAuction.Data.Seeders;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
 using OnlineAuction.Models;
+using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Areas.Admin.Controllers;
 
@@ -15,19 +17,31 @@ namespace OnlineAuction.Areas.Admin.Controllers;
 public class AccountController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IPermissionService _permissionService;
 
-    public AccountController(UserManager<ApplicationUser> userManager)
+    public AccountController(
+        UserManager<ApplicationUser> userManager,
+        IPermissionService permissionService)
     {
         _userManager = userManager;
+        _permissionService = permissionService;
     }
 
     [HttpGet]
     public async Task<IActionResult> Login(string? returnUrl = null)
     {
         var adminAuth = await HttpContext.AuthenticateAsync(AuthSchemes.Admin);
-        if (adminAuth.Succeeded && adminAuth.Principal?.IsInRole("Admin") == true)
+        if (adminAuth.Succeeded)
         {
-            return RedirectToAction("Index", "Dashboard");
+            var userIdValue = adminAuth.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdValue, out var userId))
+            {
+                var existingUser = await _userManager.FindByIdAsync(userId.ToString());
+                if (existingUser is not null && await IdentityRoleSyncService.HasAdminAccessAsync(_userManager, existingUser))
+                {
+                    return RedirectToAction("Index", "Dashboard");
+                }
+            }
         }
 
         return View(new LoginViewModel { ReturnUrl = returnUrl });
@@ -68,9 +82,9 @@ public class AccountController : Controller
             return View(model);
         }
 
-        if (!await _userManager.IsInRoleAsync(user, "Admin"))
+        if (!await IdentityRoleSyncService.HasAdminAccessAsync(_userManager, user))
         {
-            ModelState.AddModelError(string.Empty, "Admin access required");
+            ModelState.AddModelError(string.Empty, "Admin access required.");
             return View(model);
         }
 
@@ -117,6 +131,10 @@ public class AccountController : Controller
 
         var roles = await _userManager.GetRolesAsync(user);
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+        var permissions = await _permissionService.GetPermissionsForUserAsync(user.Id);
+        claims.AddRange(permissions.Select(permission =>
+            new Claim(PermissionClaimTypes.Permission, permission)));
 
         var identity = new ClaimsIdentity(claims, AuthSchemes.Admin);
         var principal = new ClaimsPrincipal(identity);

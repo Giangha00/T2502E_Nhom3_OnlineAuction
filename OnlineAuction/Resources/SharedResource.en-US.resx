@@ -873,5 +873,22 @@
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>Price must be greater than 0</value></data>
   <data name="User_YourBuyNowList" xml:space="preserve"><value>Your Buy Now Listings</value></data>
   <data name="User_SellerBuyNowList" xml:space="preserve"><value>Buy Now Listings</value></data>
+  <data name="User_Stat_TotalListings" xml:space="preserve"><value>Active Listings</value></data>
+  <data name="User_ViewBuyNowList" xml:space="preserve"><value>View Buy Now</value></data>
+  <data name="User_CreateBuyNowListing" xml:space="preserve"><value>Create Buy Now Listing</value></data>
+  <data name="User_AuctionListingCount" xml:space="preserve"><value>{0} auction listing(s) shown</value></data>
+  <data name="User_BuyNowListingCount" xml:space="preserve"><value>{0} buy now listing(s) shown</value></data>
+  <data name="User_NoAuctions_OwnerTitle" xml:space="preserve"><value>No auction listings yet</value></data>
+  <data name="User_NoAuctions_VisitorTitle" xml:space="preserve"><value>No auction listings</value></data>
+  <data name="User_NoAuctions_OwnerDesc" xml:space="preserve"><value>Create your first auction listing to start selling.</value></data>
+  <data name="User_NoAuctions_VisitorDesc" xml:space="preserve"><value>This seller has no active auction listings right now.</value></data>
+  <data name="User_NoBuyNow_OwnerTitle" xml:space="preserve"><value>No buy now listings yet</value></data>
+  <data name="User_NoBuyNow_VisitorTitle" xml:space="preserve"><value>No buy now listings</value></data>
+  <data name="User_NoBuyNow_OwnerDesc" xml:space="preserve"><value>Create a fixed-price listing for instant purchase.</value></data>
+  <data name="User_NoBuyNow_VisitorDesc" xml:space="preserve"><value>This seller has no buy now listings right now.</value></data>
+  <data name="User_Time_Ended" xml:space="preserve"><value>Ended</value></data>
+  <data name="User_Time_DaysLeft" xml:space="preserve"><value>{0} days left</value></data>
+  <data name="User_Time_HoursLeft" xml:space="preserve"><value>{0} hours left</value></data>
+  <data name="User_Time_MinutesLeft" xml:space="preserve"><value>{0} minutes left</value></data>
   <data name="Account_Selling_CreateListing" xml:space="preserve"><value>Post for sale</value></data>
 </root>

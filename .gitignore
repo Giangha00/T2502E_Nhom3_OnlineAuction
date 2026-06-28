@@ -59,6 +59,9 @@ OnlineAuction/wwwroot/css/output.css
 _build_check/
 _build_check26/
 
+# Local run logs (dotnet watch / dev scripts)
+onlineauction-*.log
+
 # OS
 .DS_Store
 .DS_Store?
