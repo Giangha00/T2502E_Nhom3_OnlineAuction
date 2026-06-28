@@ -1,4 +1,4 @@
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -34,11 +34,11 @@ public class EmailVerificationService : IEmailVerificationService
         string locale,
         CancellationToken cancellationToken = default)
     {
-        var clientId = GetSetting("EmailVerification:Gmail:ClientId", "GMAIL_CLIENT_ID");
-        var clientSecret = GetSetting("EmailVerification:Gmail:ClientSecret", "GMAIL_CLIENT_SECRET");
-        var refreshToken = GetSetting("EmailVerification:Gmail:RefreshToken", "GMAIL_REFRESH_TOKEN");
-        var senderEmail = GetSetting("EmailVerification:Gmail:SenderEmail", "SENDER_EMAIL");
-        var senderName = GetSetting("EmailVerification:Gmail:SenderName", "SENDER_NAME")
+        var clientId = GetSetting("Email:Gmail:ClientId", "EmailVerification:Gmail:ClientId", "GMAIL_CLIENT_ID");
+        var clientSecret = GetSetting("Email:Gmail:ClientSecret", "EmailVerification:Gmail:ClientSecret", "GMAIL_CLIENT_SECRET");
+        var refreshToken = GetSetting("Email:Gmail:RefreshToken", "EmailVerification:Gmail:RefreshToken", "GMAIL_REFRESH_TOKEN");
+        var senderEmail = GetSetting("Email:Gmail:SenderEmail", "EmailVerification:Gmail:SenderEmail", "SENDER_EMAIL");
+        var senderName = GetSetting("Email:Gmail:SenderName", "EmailVerification:Gmail:SenderName", "SENDER_NAME")
             ?? "RareCard Auction House";
 
         if (string.IsNullOrWhiteSpace(clientId) ||
@@ -204,9 +204,15 @@ public class EmailVerificationService : IEmailVerificationService
             """;
     }
 
-    private string? GetSetting(string configKey, string environmentKey)
+    private string? GetSetting(string primaryConfigKey, string legacyConfigKey, string environmentKey)
     {
-        var value = _configuration[configKey];
+        var value = _configuration[primaryConfigKey];
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            return value.Trim();
+        }
+
+        value = _configuration[legacyConfigKey];
         if (!string.IsNullOrWhiteSpace(value))
         {
             return value.Trim();
