@@ -20,7 +20,10 @@
           @Localizer["Auction_LiveNow"]
         </span>
         <button type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-slate-700">@Localizer["Auction_ActiveBids", 2]</button>
-        <button type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-slate-700">@Localizer["Auction_WatchlistCount", 0]</button>
+        <a asp-controller="Account" asp-action="Watchlist" data-watchlist-count
+           class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-800">
+          @Localizer["Auction_WatchlistCount", 0]
+        </a>
       </div>
     </div>
   </section>
@@ -96,7 +99,7 @@
         @foreach (var item in Model.Auctions)
         {
           <partial name="Partials/_TradingCardAuctionCard"
-                   model="@(new AuctionCardViewModel { Item = item, EnableFiltering = true, Variant = "grid" })"/>
+                   model="@(new AuctionCardViewModel { Item = item, EnableFiltering = true, Variant = "grid", ShowWatchlistButton = true })"/>
         }
       </div>
 
@@ -307,4 +310,5 @@
       applyFilters();
     })();
   </script>
+  <script src="~/js/watchlist.js" asp-append-version="true"></script>
 }

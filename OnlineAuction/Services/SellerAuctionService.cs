@@ -33,7 +33,8 @@ public class SellerAuctionService : ISellerAuctionService
         int sellerId,
         string? channel = null,
         bool forPublicProfile = false,
-        bool includeOwnerDrafts = false)
+        bool includeOwnerDrafts = false,
+        string? tab = null)
     {
         var normalizedChannel = channel?.ToLowerInvariant();
 
@@ -54,6 +55,10 @@ public class SellerAuctionService : ISellerAuctionService
                 : ProfilePublicVisibleStatuses;
 
             query = query.Where(auction => visibleStatuses.Contains(auction.Status));
+        }
+        else if (!string.IsNullOrWhiteSpace(tab))
+        {
+            query = ApplySellerTabFilter(query, tab);
         }
 
         var rows = await query
@@ -112,6 +117,22 @@ public class SellerAuctionService : ISellerAuctionService
         AuctionStatuses.Scheduled
     ];
 
+    private static IQueryable<Auction> ApplySellerTabFilter(IQueryable<Auction> query, string tab) =>
+        tab.ToLowerInvariant() switch
+        {
+            "sold" => query.Where(a => a.Status == AuctionStatuses.Completed),
+            "unsold" => query.Where(a =>
+                a.Status == AuctionStatuses.Ended ||
+                a.Status == AuctionStatuses.Rejected),
+            "scheduled" => query.Where(a =>
+                a.Status == AuctionStatuses.Scheduled ||
+                a.Status == AuctionStatuses.PendingReview),
+            _ => query.Where(a =>
+                a.Status == AuctionStatuses.Live ||
+                a.Status == AuctionStatuses.EndingSoon ||
+                a.Status == AuctionStatuses.AwaitingPayment)
+        };
+
     public async Task<(bool Success, string Message, int? AuctionId)> CreateAsync(
         CreateAuctionViewModel model,
         int sellerId)
@@ -130,6 +151,8 @@ public class SellerAuctionService : ISellerAuctionService
         {
             return (false, "Please enter a valid year between 1800 and 2100.", null);
         }
+
+        SellService.NormalizeGradingFields(model);
 
         var galleryFiles = model.GalleryImageFiles
             .Where(file => file is { Length: > 0 })
@@ -180,17 +203,12 @@ public class SellerAuctionService : ISellerAuctionService
                 Subtitle = TrimOrNull(model.Subtitle),
                 DescriptionHtml = model.ProductDescription,
                 Condition = model.Condition,
-                ProductOrigin = TrimOrNull(model.ProductOrigin),
                 Year = model.Year,
                 SetName = TrimOrNull(model.SetName),
                 Language = TrimOrNull(model.Language),
                 CardNumber = TrimOrNull(model.CardNumber),
                 GradeLabel = TrimOrNull(model.Grade),
                 CertNumber = TrimOrNull(model.CertificateNumber),
-                GradingCentering = TrimOrNull(model.GradingCentering),
-                GradingCorners = TrimOrNull(model.GradingCorners),
-                GradingEdges = TrimOrNull(model.GradingEdges),
-                GradingSurface = TrimOrNull(model.GradingSurface),
                 PrimaryImage = imageUrl,
                 Category = category,
                 CreatedAt = now
@@ -299,6 +317,8 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "Please enter a valid year between 1800 and 2100.", null);
         }
 
+        SellService.NormalizeGradingFields(model);
+
         var galleryFiles = model.GalleryImageFiles
             .Where(file => file is { Length: > 0 })
             .Take(4)
@@ -348,17 +368,12 @@ public class SellerAuctionService : ISellerAuctionService
                 Subtitle = TrimOrNull(model.Subtitle),
                 DescriptionHtml = model.ProductDescription,
                 Condition = model.Condition,
-                ProductOrigin = TrimOrNull(model.ProductOrigin),
                 Year = model.Year,
                 SetName = TrimOrNull(model.SetName),
                 Language = TrimOrNull(model.Language),
                 CardNumber = TrimOrNull(model.CardNumber),
                 GradeLabel = TrimOrNull(model.Grade),
                 CertNumber = TrimOrNull(model.CertificateNumber),
-                GradingCentering = TrimOrNull(model.GradingCentering),
-                GradingCorners = TrimOrNull(model.GradingCorners),
-                GradingEdges = TrimOrNull(model.GradingEdges),
-                GradingSurface = TrimOrNull(model.GradingSurface),
                 PrimaryImage = imageUrl,
                 Category = category,
                 CreatedAt = now

@@ -1787,6 +1787,39 @@ namespace OnlineAuction.Migrations
                     b.ToTable("user_device_tokens", (string)null);
                 });
 
+            modelBuilder.Entity("OnlineAuction.Entities.WatchlistItem", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("AuctionId")
+                        .HasColumnType("int")
+                        .HasColumnName("auction_id");
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("added_at");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_watchlist_user_id");
+
+                    b.HasIndex("UserId", "AuctionId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_watchlist_user_auction");
+
+                    b.ToTable("watchlist_items", (string)null);
+                });
+
             modelBuilder.Entity("OnlineAuction.Entities.UserOtpCode", b =>
                 {
                     b.Property<int>("Id")
@@ -2435,6 +2468,27 @@ namespace OnlineAuction.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("OnlineAuction.Entities.WatchlistItem", b =>
+                {
+                    b.HasOne("OnlineAuction.Entities.Auction", "Auction")
+                        .WithMany("WatchlistItems")
+                        .HasForeignKey("AuctionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_watchlist_auction");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
+                        .WithMany("WatchlistItems")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_watchlist_user");
+
+                    b.Navigation("Auction");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("OnlineAuction.Entities.ApplicationUser", b =>
                 {
                     b.Navigation("AuctionRegistrations");
@@ -2444,6 +2498,8 @@ namespace OnlineAuction.Migrations
                     b.Navigation("Orders");
 
                     b.Navigation("Products");
+
+                    b.Navigation("WatchlistItems");
 
                     b.Navigation("WonAuctions");
                 });
@@ -2455,6 +2511,8 @@ namespace OnlineAuction.Migrations
                     b.Navigation("OrderItems");
 
                     b.Navigation("Registrations");
+
+                    b.Navigation("WatchlistItems");
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.AuctionOrder", b =>
