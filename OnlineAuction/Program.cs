@@ -1,8 +1,10 @@
 using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using OnlineAuction.Authorization;
 using OnlineAuction.Configurations;
 using OnlineAuction.Areas.Admin.Services;
 using OnlineAuction.Data;
@@ -92,7 +94,10 @@ builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
 {
     if (dbProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
     {
-        options.UseSqlite(connectionString);
+        options.UseSqlite(connectionString, sqlite =>
+        {
+            sqlite.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+        });
     }
     else
     {
@@ -101,6 +106,7 @@ builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
         {
             mySql.MigrationsHistoryTable("__ef_migrations_history");
             mySql.EnableRetryOnFailure();
+            mySql.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
         });
     }
 });
@@ -119,6 +125,7 @@ builder.Services
         options.Password.RequireNonAlphanumeric = false;
 
         options.User.RequireUniqueEmail = true;
+        options.SignIn.RequireConfirmedEmail = true;
 
         options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
         options.Lockout.MaxFailedAccessAttempts = 5;
@@ -126,6 +133,11 @@ builder.Services
     })
     .AddEntityFrameworkStores<AuctionHouseDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+{
+    options.TokenLifespan = TimeSpan.FromHours(24);
+});
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -188,6 +200,25 @@ builder.Services.AddAuthentication()
         };
     });
 
+builder.Services.AddAuthorization(options =>
+{
+    foreach (var permissionCode in PermissionCodes.All)
+    {
+        options.AddPolicy(
+            PermissionCodes.ToPolicyName(permissionCode),
+            policy => policy.Requirements.Add(new PermissionRequirement(permissionCode)));
+    }
+
+    options.AddPolicy("ListingOwner", policy =>
+    {
+        policy.AddAuthenticationSchemes(AuthSchemes.User);
+        policy.Requirements.Add(new ListingOwnerRequirement());
+    });
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ListingOwnerAuthorizationHandler>();
+
 #endregion
 
 builder.Services.AddHttpContextAccessor();
@@ -201,8 +232,12 @@ builder.Services.Configure<PayPalSettings>(
     builder.Configuration.GetSection(PayPalSettings.SectionName));
 builder.Services.Configure<FirebaseSettings>(
     builder.Configuration.GetSection(FirebaseSettings.SectionName));
+builder.Services.Configure<PasswordResetOtpSettings>(
+    builder.Configuration.GetSection(PasswordResetOtpSettings.SectionName));
 
 builder.Services.AddHttpClient<IPayPalService, PayPalService>();
+builder.Services.AddHttpClient<IEmailSender, GmailEmailSender>();
+builder.Services.AddHttpClient<IEmailVerificationService, EmailVerificationService>();
 
 builder.Services.AddScoped<IAvatarStorageService, CloudinaryAvatarStorageService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
@@ -220,10 +255,13 @@ builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<IAdminAuctionVerificationService, AdminAuctionVerificationService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IAdminProductService, AdminProductService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
 builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
 builder.Services.AddScoped<IRegistrationDepositRefundService, RegistrationDepositRefundService>();
+builder.Services.AddScoped<IPasswordResetOtpService, PasswordResetOtpService>();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IRealtimePublisher, RealtimePublisher>();
 #endregion
@@ -262,6 +300,7 @@ using (var scope = app.Services.CreateScope())
 
     await UserSeeder.SeedAsync(db, userManager);
     await AdminSeeder.SeedAsync(db, userManager, roleManager);
+    await PermissionSeeder.SeedAsync(db, roleManager, userManager);
     await AuctionCatalogSeeder.SeedAsync(db, refreshTestAuctions);
 }
 

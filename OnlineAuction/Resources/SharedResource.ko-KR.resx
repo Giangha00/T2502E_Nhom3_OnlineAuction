@@ -384,6 +384,37 @@
   <data name="Auth_Slide3_Eyebrow" xml:space="preserve"><value>스포츠 &amp; MTG</value></data>
   <data name="Auth_Slide3_Title" xml:space="preserve"><value>경매의 전설</value></data>
   <data name="Auth_Slide3_Desc" xml:space="preserve"><value>Mickey Mantle부터 Alpha Black Lotus까지 매일 엄선.</value></data>
+  <data name="Auth_ForgotPassword" xml:space="preserve"><value>비밀번호를 잊으셨나요?</value></data>
+  <data name="Auth_Forgot_Title" xml:space="preserve"><value>비밀번호를 잊으셨나요?</value></data>
+  <data name="Auth_Forgot_Subtitle" xml:space="preserve"><value>이메일을 입력하면 6자리 인증 코드를 받을 수 있습니다.</value></data>
+  <data name="Auth_Forgot_SendOtp" xml:space="preserve"><value>인증 코드 보내기</value></data>
+  <data name="Auth_Forgot_BackToLogin" xml:space="preserve"><value>로그인으로 돌아가기</value></data>
+  <data name="Auth_Forgot_OtpTitle" xml:space="preserve"><value>인증 코드 입력</value></data>
+  <data name="Auth_Forgot_OtpSubtitle" xml:space="preserve"><value>이메일로 6자리 코드를 보냈습니다.</value></data>
+  <data name="Auth_Forgot_OtpSent" xml:space="preserve"><value>{0} 계정이 존재하면 보낸 6자리 코드를 입력하세요.</value></data>
+  <data name="Auth_Forgot_OtpLabel" xml:space="preserve"><value>인증 코드</value></data>
+  <data name="Auth_Forgot_OtpDigit" xml:space="preserve"><value>{0}번째 숫자</value></data>
+  <data name="Auth_Forgot_VerifyOtp" xml:space="preserve"><value>코드 확인</value></data>
+  <data name="Auth_Forgot_ChangeEmail" xml:space="preserve"><value>다른 이메일 사용</value></data>
+  <data name="Auth_Forgot_ResetTitle" xml:space="preserve"><value>새 비밀번호 만들기</value></data>
+  <data name="Auth_Forgot_ResetSubtitle" xml:space="preserve"><value>RareCard 계정의 새 비밀번호를 설정하세요.</value></data>
+  <data name="Auth_Forgot_NewPassword" xml:space="preserve"><value>새 비밀번호</value></data>
+  <data name="Auth_Forgot_ResetSubmit" xml:space="preserve"><value>비밀번호 재설정</value></data>
+  <data name="Auth_Forgot_BackToOtp" xml:space="preserve"><value>인증 코드로 돌아가기</value></data>
+  <data name="Auth_Forgot_DevOtpTitle" xml:space="preserve"><value>개발용 OTP</value></data>
+  <data name="Auth_Forgot_DevOtpDesc" xml:space="preserve"><value>이메일이 아직 설정되지 않아 개발 환경에서 코드를 표시합니다.</value></data>
+  <data name="Auth_Forgot_InvalidEmail" xml:space="preserve"><value>유효한 이메일 주소를 입력하세요.</value></data>
+  <data name="Auth_Forgot_InvalidOtp" xml:space="preserve"><value>인증 코드가 올바르지 않거나 만료되었습니다.</value></data>
+  <data name="Auth_Otp_Invalid" xml:space="preserve"><value>인증 코드가 올바르지 않습니다.</value></data>
+  <data name="Auth_Otp_Expired" xml:space="preserve"><value>인증 코드가 만료되었습니다. 새 코드를 요청하세요.</value></data>
+  <data name="Auth_Otp_MaxAttempts" xml:space="preserve"><value>잘못 입력한 횟수가 너무 많습니다. 새 코드를 요청하세요.</value></data>
+  <data name="Auth_Otp_Resend" xml:space="preserve"><value>코드 다시 보내기</value></data>
+  <data name="Auth_Otp_ResendCooldown" xml:space="preserve"><value>새 코드를 요청하기 전에 {0}초 기다려 주세요.</value></data>
+  <data name="Auth_Otp_TooManyResends" xml:space="preserve"><value>코드를 너무 많이 요청했습니다. 나중에 다시 시도하세요.</value></data>
+  <data name="Auth_Otp_Sent" xml:space="preserve"><value>이메일이 대상이면 인증 코드를 보냈습니다.</value></data>
+  <data name="Auth_Forgot_ResetFailed" xml:space="preserve"><value>비밀번호를 재설정할 수 없습니다. 다시 시도하세요.</value></data>
+  <data name="Auth_Forgot_SessionExpired" xml:space="preserve"><value>인증 세션이 만료되었습니다. 처음부터 다시 진행하세요.</value></data>
+  <data name="Auth_Forgot_ResetSuccess" xml:space="preserve"><value>비밀번호가 재설정되었습니다. 새 비밀번호로 로그인하세요.</value></data>
   <data name="Layout_Footer_AboutUs" xml:space="preserve"><value>회사 소개</value></data>
   <data name="Layout_Footer_ContactUs" xml:space="preserve"><value>문의하기</value></data>
   <data name="Layout_Footer_PolicyTerms" xml:space="preserve"><value>정책 및 이용약관</value></data>
@@ -842,5 +873,22 @@
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>가격은 0보다 커야 합니다</value></data>
   <data name="User_YourBuyNowList" xml:space="preserve"><value>내 즉시 구매 목록</value></data>
   <data name="User_SellerBuyNowList" xml:space="preserve"><value>즉시 구매 목록</value></data>
+  <data name="User_Stat_TotalListings" xml:space="preserve"><value>표시 중인 등록</value></data>
+  <data name="User_ViewBuyNowList" xml:space="preserve"><value>즉시 구매 보기</value></data>
+  <data name="User_CreateBuyNowListing" xml:space="preserve"><value>즉시 구매 등록 만들기</value></data>
+  <data name="User_AuctionListingCount" xml:space="preserve"><value>표시 중인 경매 {0}건</value></data>
+  <data name="User_BuyNowListingCount" xml:space="preserve"><value>표시 중인 즉시 구매 {0}건</value></data>
+  <data name="User_NoAuctions_OwnerTitle" xml:space="preserve"><value>아직 경매 등록이 없습니다</value></data>
+  <data name="User_NoAuctions_VisitorTitle" xml:space="preserve"><value>경매 등록 없음</value></data>
+  <data name="User_NoAuctions_OwnerDesc" xml:space="preserve"><value>첫 경매 등록을 만들어 판매를 시작하세요.</value></data>
+  <data name="User_NoAuctions_VisitorDesc" xml:space="preserve"><value>이 판매자에게 현재 표시 중인 경매가 없습니다.</value></data>
+  <data name="User_NoBuyNow_OwnerTitle" xml:space="preserve"><value>아직 즉시 구매 등록이 없습니다</value></data>
+  <data name="User_NoBuyNow_VisitorTitle" xml:space="preserve"><value>즉시 구매 등록 없음</value></data>
+  <data name="User_NoBuyNow_OwnerDesc" xml:space="preserve"><value>고정가 즉시 구매 등록을 만들 수 있습니다.</value></data>
+  <data name="User_NoBuyNow_VisitorDesc" xml:space="preserve"><value>이 판매자에게 현재 표시 중인 즉시 구매가 없습니다.</value></data>
+  <data name="User_Time_Ended" xml:space="preserve"><value>종료됨</value></data>
+  <data name="User_Time_DaysLeft" xml:space="preserve"><value>{0}일 남음</value></data>
+  <data name="User_Time_HoursLeft" xml:space="preserve"><value>{0}시간 남음</value></data>
+  <data name="User_Time_MinutesLeft" xml:space="preserve"><value>{0}분 남음</value></data>
   <data name="Account_Selling_CreateListing" xml:space="preserve"><value>상품 등록</value></data>
 </root>

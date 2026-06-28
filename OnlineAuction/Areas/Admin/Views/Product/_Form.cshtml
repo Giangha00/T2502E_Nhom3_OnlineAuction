@@ -1,0 +1,232 @@
+@model ProductFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="mb-4 text-theme-sm text-error-600"></div>
+
+@if (Model.IsSellerLocked)
+{
+    <div class="mb-4 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-theme-sm text-warning-700">
+        This product has a live or ending soon auction. Seller cannot be changed.
+    </div>
+}
+
+<div class="space-y-8">
+    <section>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Basic Information</h3>
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div class="md:col-span-2">
+                <label asp-for="Name" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="Name" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="Name" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div class="md:col-span-2">
+                <label asp-for="ShortDescription" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <textarea asp-for="ShortDescription" rows="2" class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></textarea>
+                <span asp-validation-for="ShortDescription" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div class="md:col-span-2">
+                <label asp-for="Subtitle" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="Subtitle" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="Subtitle" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div class="md:col-span-2">
+                <label asp-for="DescriptionHtml" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <textarea asp-for="DescriptionHtml" rows="6" class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></textarea>
+                <span asp-validation-for="DescriptionHtml" class="text-theme-xs text-error-600"></span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Classification</h3>
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div>
+                <label asp-for="CategoryId" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                    <option value="">Select category</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div>
+                <label asp-for="SellerId" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                @if (Model.IsSellerLocked)
+                {
+                    <select asp-for="SellerId" asp-items="Model.SellerOptions" disabled class="h-11 w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white/90"></select>
+                    <input type="hidden" asp-for="SellerId" />
+                }
+                else
+                {
+                    <select asp-for="SellerId" asp-items="Model.SellerOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                        <option value="">Select seller</option>
+                    </select>
+                }
+                <span asp-validation-for="SellerId" class="text-theme-xs text-error-600"></span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Card Metadata</h3>
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div>
+                <label asp-for="Condition" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <select asp-for="Condition" asp-items="Model.ConditionOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></select>
+                <span asp-validation-for="Condition" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div>
+                <label asp-for="ProductOrigin" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="ProductOrigin" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            </div>
+
+            <div>
+                <label asp-for="Year" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="Year" type="number" min="1800" max="2100" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="Year" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div>
+                <label asp-for="SetName" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="SetName" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="SetName" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div>
+                <label asp-for="Language" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <select asp-for="Language" asp-items="Model.LanguageOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></select>
+            </div>
+
+            <div>
+                <label asp-for="CardNumber" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="CardNumber" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Grading</h3>
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div>
+                <label asp-for="GradeLabel" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <select asp-for="GradeLabel" asp-items="Model.GradeOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></select>
+            </div>
+
+            <div>
+                <label asp-for="CertNumber" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="CertNumber" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            </div>
+
+            <div>
+                <label asp-for="GradingCentering" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="GradingCentering" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            </div>
+
+            <div>
+                <label asp-for="GradingCorners" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="GradingCorners" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            </div>
+
+            <div>
+                <label asp-for="GradingEdges" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="GradingEdges" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            </div>
+
+            <div>
+                <label asp-for="GradingSurface" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="GradingSurface" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Value</h3>
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div>
+                <label asp-for="EstimatedValue" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="EstimatedValue" type="number" step="0.01" min="0" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="EstimatedValue" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div>
+                <label asp-for="ImportPrice" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="ImportPrice" type="number" step="0.01" min="0" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="ImportPrice" class="text-theme-xs text-error-600"></span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Media</h3>
+        <div class="grid grid-cols-1 gap-5">
+            <div>
+                <label asp-for="PrimaryImageFile" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                @if (!string.IsNullOrWhiteSpace(Model.PrimaryImageUrl))
+                {
+                    <div class="mb-3">
+                        <img src="@Model.PrimaryImageUrl" alt="Primary image" class="h-24 w-24 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
+                    </div>
+                }
+                <input asp-for="PrimaryImageFile" type="file" accept=".jpg,.jpeg,.png,.webp" class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
+                <p class="mt-1 text-theme-xs text-gray-500">JPG, PNG, or WEBP. Max 5MB.</p>
+            </div>
+
+            @if (Model.ExistingGalleryImages.Count > 0)
+            {
+                <div>
+                    <p class="mb-2 text-theme-sm font-medium text-gray-700 dark:text-gray-400">Current Gallery</p>
+                    <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                        @foreach (var image in Model.ExistingGalleryImages)
+                        {
+                            <label class="relative block cursor-pointer rounded-lg border border-gray-200 p-2 dark:border-gray-700">
+                                <img src="@image.ImageUrl" alt="Gallery image" class="h-20 w-full rounded object-cover" />
+                                <div class="mt-2 flex items-center gap-2">
+                                    <input type="checkbox" name="RemoveGalleryImageIds" value="@image.Id" class="h-4 w-4 rounded border-gray-300 text-brand-500" />
+                                    <span class="text-theme-xs text-gray-500">Remove</span>
+                                </div>
+                            </label>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div>
+                <label class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400">Gallery Images</label>
+                <input name="GalleryImageFiles" type="file" accept=".jpg,.jpeg,.png,.webp" multiple class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
+                <p class="mt-1 text-theme-xs text-gray-500">Up to 4 gallery images (plus primary). JPG, PNG, or WEBP. Max 5MB each.</p>
+            </div>
+
+            @if (Model.ExistingDocuments.Count > 0)
+            {
+                <div>
+                    <p class="mb-2 text-theme-sm font-medium text-gray-700 dark:text-gray-400">Current Documents</p>
+                    <div class="space-y-2">
+                        @foreach (var document in Model.ExistingDocuments)
+                        {
+                            <label class="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-700">
+                                <div>
+                                    <p class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@document.Name</p>
+                                    <a href="@document.FileUrl" target="_blank" rel="noopener" class="text-theme-xs text-brand-500 hover:underline">View file</a>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" name="RemoveDocumentIds" value="@document.Id" class="h-4 w-4 rounded border-gray-300 text-brand-500" />
+                                    <span class="text-theme-xs text-gray-500">Remove</span>
+                                </div>
+                            </label>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div>
+                <label class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400">Documents (PDF)</label>
+                <input name="DocumentFiles" type="file" accept=".pdf" multiple class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
+                <p class="mt-1 text-theme-xs text-gray-500">PDF only. Max 5MB each.</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<input type="hidden" asp-for="Id" />

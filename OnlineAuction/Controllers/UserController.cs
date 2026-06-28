@@ -20,15 +20,14 @@ public class UserController : Controller
 
     public async Task<IActionResult> Detail(int id)
     {
-        var model = await _userService.GetPublicProfileAsync(id);
+        var currentUserIdText = _userManager.GetUserId(User);
+        int? viewerUserId = int.TryParse(currentUserIdText, out var currentUserId) ? currentUserId : null;
+
+        var model = await _userService.GetPublicProfileAsync(id, viewerUserId);
         if (model is null)
         {
             return NotFound();
         }
-
-        var currentUserIdText = _userManager.GetUserId(User);
-        model.IsOwner = int.TryParse(currentUserIdText, out var currentUserId) && currentUserId == id;
-        model.Profile.IsOwner = model.IsOwner;
 
         return View(model);
     }

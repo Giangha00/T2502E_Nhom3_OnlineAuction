@@ -327,6 +327,14 @@
         <script>
             window.authModalConfig = {
                 i18n: {
+                    defaultTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Modal_Title"].Value)),
+                    defaultSubtitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Modal_Subtitle"].Value)),
+                    forgotTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Forgot_Title"].Value)),
+                    forgotSubtitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Forgot_Subtitle"].Value)),
+                    forgotOtpTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Forgot_OtpTitle"].Value)),
+                    forgotOtpSubtitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Forgot_OtpSubtitle"].Value)),
+                    forgotResetTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Forgot_ResetTitle"].Value)),
+                    forgotResetSubtitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Forgot_ResetSubtitle"].Value)),
                     slide1Eyebrow: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Slide1_Eyebrow"].Value)),
                     slide1Title: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Slide1_Title"].Value)),
                     slide1Desc: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Auth_Slide1_Desc"].Value)),

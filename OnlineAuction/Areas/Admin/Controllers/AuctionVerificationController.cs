@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Areas.Admin.Services;
 using OnlineAuction.Areas.Admin.ViewModels.AuctionVerification;
-using OnlineAuction.Entities;
+using OnlineAuction.Authorization;
+using OnlineAuction.Configurations;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Areas.Admin.Controllers;
@@ -20,6 +21,7 @@ public class AuctionVerificationController : BaseAdminController
     }
 
     [HttpGet]
+    [RequirePermission(PermissionCodes.AuctionsVerify)]
     public async Task<IActionResult> Index(AuctionVerificationFilterViewModel filter, CancellationToken cancellationToken)
     {
         var model = await _verificationService.GetPendingVerificationsAsync(filter, cancellationToken);
@@ -27,6 +29,7 @@ public class AuctionVerificationController : BaseAdminController
     }
 
     [HttpGet]
+    [RequirePermission(PermissionCodes.AuctionsVerify)]
     public async Task<IActionResult> Details(int id, CancellationToken cancellationToken)
     {
         var model = await _verificationService.GetVerificationDetailAsync(id, cancellationToken);
@@ -41,6 +44,7 @@ public class AuctionVerificationController : BaseAdminController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsVerify)]
     public async Task<IActionResult> Approve(int id, CancellationToken cancellationToken)
     {
         var adminId = await _currentUserContext.GetAdminIdAsync(cancellationToken);
@@ -59,6 +63,7 @@ public class AuctionVerificationController : BaseAdminController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsVerify)]
     public async Task<IActionResult> Reject(int id, string rejectReason, CancellationToken cancellationToken)
     {
         var adminId = await _currentUserContext.GetAdminIdAsync(cancellationToken);

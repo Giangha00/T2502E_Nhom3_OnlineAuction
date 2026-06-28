@@ -44,6 +44,9 @@ ScaffoldingReadMe.txt
 # App settings — commit base config; keep secrets/local overrides out of git
 **/appsettings.Local.json
 **/appsettings.*.local.json
+**/.env
+**/.env.*
+!**/.env.example
 
 # Node
 node_modules/
@@ -55,6 +58,9 @@ yarn-error.log*
 OnlineAuction/wwwroot/css/output.css
 _build_check/
 _build_check26/
+
+# Local run logs (dotnet watch / dev scripts)
+onlineauction-*.log
 
 # OS
 .DS_Store
@@ -78,3 +84,4 @@ Thumbs.db
 
 # JetBrains Rider
 *.sln.iml
+
