@@ -45,6 +45,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<UserOtpCode> UserOtpCodes => Set<UserOtpCode>();
 
+    public DbSet<Complaint> Complaints => Set<Complaint>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         
@@ -66,6 +68,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureUserDeviceTokens(builder);
         ConfigurePermissions(builder);
         ConfigureUserOtpCodes(builder);
+        ConfigureComplaints(builder);
     }
 
     private static void ConfigurePermissions(ModelBuilder builder)
@@ -688,6 +691,65 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
                 .HasForeignKey(otp => otp.UserId)
                 .HasConstraintName("fk_user_otp_codes_user")
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
+    private static void ConfigureComplaints(ModelBuilder builder)
+    {
+        builder.Entity<Complaint>(entity =>
+        {
+            entity.ToTable("complaints");
+
+            entity.Property(c => c.Id).HasColumnName("id");
+            entity.Property(c => c.RequestReference).HasColumnName("request_reference").HasMaxLength(40).IsRequired();
+            entity.Property(c => c.OrderId).HasColumnName("order_id");
+            entity.Property(c => c.OrderReference).HasColumnName("order_reference").HasMaxLength(30);
+            entity.Property(c => c.BuyerId).HasColumnName("buyer_id");
+            entity.Property(c => c.ComplaintType).HasColumnName("complaint_type").HasMaxLength(20).IsRequired().HasDefaultValue(ComplaintTypes.Refund);
+            entity.Property(c => c.ReasonCode).HasColumnName("reason_code").HasMaxLength(40).IsRequired();
+            entity.Property(c => c.Description).HasColumnName("description").HasColumnType("text").IsRequired();
+            entity.Property(c => c.RequestedAmount).HasColumnName("requested_amount").HasPrecision(18, 2);
+            entity.Property(c => c.ContactName).HasColumnName("contact_name").HasMaxLength(120).IsRequired();
+            entity.Property(c => c.ContactEmail).HasColumnName("contact_email").HasMaxLength(256).IsRequired();
+            entity.Property(c => c.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(ComplaintStatuses.Pending);
+            entity.Property(c => c.AdminNotes).HasColumnName("admin_notes").HasColumnType("text");
+            entity.Property(c => c.ResolutionNote).HasColumnName("resolution_note").HasColumnType("text");
+            entity.Property(c => c.ReviewedBy).HasColumnName("reviewed_by");
+            entity.Property(c => c.ReviewedAt).HasColumnName("reviewed_at");
+            entity.Property(c => c.EvidenceUrlsJson).HasColumnName("evidence_urls").HasColumnType("text");
+
+            entity.HasIndex(c => c.RequestReference).IsUnique().HasDatabaseName("uk_complaints_request_reference");
+            entity.HasIndex(c => c.BuyerId).HasDatabaseName("ix_complaints_buyer_id");
+            entity.HasIndex(c => c.OrderId).HasDatabaseName("ix_complaints_order_id");
+            entity.HasIndex(c => new { c.Status, c.CreatedAt }).HasDatabaseName("ix_complaints_status_created_at");
+
+            entity.HasOne(c => c.Order)
+                .WithMany()
+                .HasForeignKey(c => c.OrderId)
+                .HasConstraintName("fk_complaints_order")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(c => c.Buyer)
+                .WithMany()
+                .HasForeignKey(c => c.BuyerId)
+                .HasConstraintName("fk_complaints_buyer")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(c => c.Reviewer)
+                .WithMany()
+                .HasForeignKey(c => c.ReviewedBy)
+                .HasConstraintName("fk_complaints_reviewer")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_complaints_status",
+                "`status` IN ('pending','under_review','approved','rejected','closed')"));
+
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_complaints_type",
+                "`complaint_type` IN ('refund','dispute','authenticity','other')"));
+
+            ConfigureAuditableEntity(entity, "complaints");
         });
     }
 

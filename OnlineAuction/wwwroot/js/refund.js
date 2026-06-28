@@ -2,11 +2,13 @@
     const form = document.getElementById('refundForm');
     if (!form) return;
 
-    const i18n = (window.refundConfig && window.refundConfig.i18n) || {};
+    const config = window.refundConfig || {};
+    const i18n = config.i18n || {};
 
     const orderSelect = document.getElementById('orderReference');
     const manualOrderField = document.getElementById('manualOrderField');
     const refundAmount = document.getElementById('refundAmount');
+    const formError = document.getElementById('formError');
 
     function setError(id, message) {
         const el = document.getElementById(id);
@@ -14,7 +16,7 @@
     }
 
     function clearErrors() {
-        ['orderReferenceError', 'fullNameError', 'emailError', 'refundReasonError', 'descriptionError', 'agreePolicyError']
+        ['orderReferenceError', 'fullNameError', 'emailError', 'refundReasonError', 'descriptionError', 'agreePolicyError', 'formError']
             .forEach(function (id) { setError(id, ''); });
     }
 
@@ -40,6 +42,14 @@
         event.preventDefault();
         clearErrors();
 
+        if (config.isAuthenticated === false) {
+            setError('formError', i18n.loginRequired || 'Please log in to submit a refund request.');
+            if (config.loginUrl) {
+                window.location.href = config.loginUrl;
+            }
+            return;
+        }
+
         let valid = true;
         const orderValue = orderSelect?.value || '';
         const manualRef = document.getElementById('manualOrderRef')?.value.trim() || '';
@@ -48,8 +58,11 @@
         const reason = document.getElementById('refundReason')?.value || '';
         const description = document.getElementById('description')?.value.trim() || '';
         const agreePolicy = document.getElementById('agreePolicy')?.checked;
+        const amountValue = refundAmount?.value.trim() || '';
 
         let orderRef = orderValue;
+        let orderId = null;
+
         if (!orderValue) {
             setError('orderReferenceError', i18n.orderRequired || 'Please select an order.');
             valid = false;
@@ -58,6 +71,11 @@
             valid = false;
         } else if (orderValue === 'other') {
             orderRef = manualRef;
+        } else if (orderSelect?.selectedOptions[0]) {
+            const selectedOrderId = orderSelect.selectedOptions[0].getAttribute('data-order-id');
+            if (selectedOrderId) {
+                orderId = selectedOrderId;
+            }
         }
 
         if (!fullName) {
@@ -83,13 +101,59 @@
 
         if (!valid) return;
 
-        const requestId = 'RF-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '-' + String(Math.floor(Math.random() * 9000) + 1000);
-        const params = new URLSearchParams({
-            requestId: requestId,
-            orderRef: orderRef,
-            reason: reason
-        });
+        const token = form.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        const body = new URLSearchParams();
+        body.append('__RequestVerificationToken', token);
+        if (orderId) body.append('OrderId', orderId);
+        if (orderRef) body.append('OrderReference', orderRef);
+        body.append('ContactName', fullName);
+        body.append('ContactEmail', email);
+        body.append('ReasonCode', reason);
+        body.append('Description', description);
+        if (amountValue) body.append('RequestedAmount', amountValue);
 
-        window.location.href = '/Refund/Confirmation?' + params.toString();
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) submitButton.disabled = true;
+
+        fetch(config.submitUrl || '/Refund/Submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: body.toString(),
+            credentials: 'same-origin'
+        })
+            .then(function (response) {
+                if (response.status === 401 || response.status === 403) {
+                    window.location.href = config.loginUrl || '/Auth/Login?returnUrl=/Refund';
+                    return null;
+                }
+
+                return response.json().then(function (data) {
+                    return { ok: response.ok, data: data };
+                }).catch(function () {
+                    return { ok: response.ok, data: null };
+                });
+            })
+            .then(function (result) {
+                if (!result) return;
+
+                if (result.ok && result.data && result.data.redirectUrl) {
+                    window.location.href = result.data.redirectUrl;
+                    return;
+                }
+
+                const message = (result.data && result.data.message)
+                    || i18n.submitFailed
+                    || 'Unable to submit your refund request. Please try again.';
+                setError('formError', message);
+            })
+            .catch(function () {
+                setError('formError', i18n.submitFailed || 'Unable to submit your refund request. Please try again.');
+            })
+            .finally(function () {
+                if (submitButton) submitButton.disabled = config.isAuthenticated === false;
+            });
     });
 })();
