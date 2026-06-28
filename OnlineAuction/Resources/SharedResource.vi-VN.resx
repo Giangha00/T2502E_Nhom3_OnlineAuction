@@ -448,10 +448,10 @@
   <data name="Card_PlaceBid" xml:space="preserve"><value>Đặt giá</value></data>
   <data name="Card_EndingSoon" xml:space="preserve"><value>Sắp kết thúc</value></data>
   <data name="Card_Hot" xml:space="preserve"><value>Hot</value></data>
-  <data name="Order_PageTitle" xml:space="preserve"><value>Phiên đấu giá đã thắng</value></data>
-  <data name="Order_ItemsWon" xml:space="preserve"><value>Đã thắng {0} mục</value></data>
-  <data name="Order_Empty_Title" xml:space="preserve"><value>Chưa có phiên đấu giá thắng</value></data>
-  <data name="Order_Empty_Desc" xml:space="preserve"><value>Thắng một phiên đấu giá và sản phẩm sẽ xuất hiện tại đây để thanh toán.</value></data>
+  <data name="Order_PageTitle" xml:space="preserve"><value>Trung tâm thanh toán</value></data>
+  <data name="Order_ItemsWon" xml:space="preserve"><value>{0} hóa đơn chờ thanh toán</value></data>
+  <data name="Order_Empty_Title" xml:space="preserve"><value>Không có hóa đơn chờ thanh toán</value></data>
+  <data name="Order_Empty_Desc" xml:space="preserve"><value>Thắng đấu giá hoặc mua sản phẩm để thấy hóa đơn tại đây.</value></data>
   <data name="Order_BrowseAuctions" xml:space="preserve"><value>Xem đấu giá</value></data>
   <data name="Order_PaymentDeadline" xml:space="preserve"><value>Hạn thanh toán:</value></data>
   <data name="Order_PaymentExpired" xml:space="preserve"><value>Đã hết hạn thanh toán</value></data>
@@ -799,6 +799,14 @@
   <data name="Order_SslSecure" xml:space="preserve"><value>Giao dịch mã hóa SSL an toàn</value></data>
   <data name="Order_AuthenticityTitle" xml:space="preserve"><value>Cam kết xác thực RareCard</value></data>
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Sản phẩm được bảo vệ bởi bảo mật vault. Mọi phiên thắng đều được xác minh kép trước khi giao hàng.</value></data>
+  <data name="Order_Source_AuctionWin" xml:space="preserve"><value>Đấu giá thắng</value></data>
+  <data name="Order_Source_BuyNow" xml:space="preserve"><value>Mua ngay</value></data>
+  <data name="Order_MandatoryPayment" xml:space="preserve"><value>Bắt buộc thanh toán</value></data>
+  <data name="Order_OptionalPayment" xml:space="preserve"><value>Thanh toán ngay hoặc để sau</value></data>
+  <data name="Order_DepositApplied" xml:space="preserve"><value>Tiền cọc đã trừ</value></data>
+  <data name="Order_SelectInvoices" xml:space="preserve"><value>Chọn hóa đơn cần thanh toán</value></data>
+  <data name="Order_ItemAdded" xml:space="preserve"><value>Đã thêm vào Trung tâm thanh toán. Chọn hóa đơn bên dưới để thanh toán.</value></data>
+  <data name="Js_Order_NoSelection" xml:space="preserve"><value>Vui lòng chọn ít nhất một sản phẩm để thanh toán.</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Đang đặt giá…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Không thể đặt giá. Vui lòng thử lại.</value></data>
   <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Đặt giá thành công!</value></data>

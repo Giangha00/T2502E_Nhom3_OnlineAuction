@@ -35,19 +35,30 @@ public class OrderPaymentService : IOrderPaymentService
 
     public async Task<PayPalCheckoutResult> InitiatePayPalCheckoutAsync(
         int buyerId,
+        IReadOnlyList<int> selectedOrderIds,
         string returnUrl,
         string cancelUrl,
         CancellationToken cancellationToken = default)
     {
-        var orders = await GetPayableOrdersAsync(buyerId, cancellationToken);
-        if (orders.Count == 0)
+        var now = DateTime.UtcNow;
+        var pendingOrders = await _dbContext.Orders
+            .Where(order =>
+                order.BuyerId == buyerId &&
+                order.Status == OrderStatuses.PendingPayment &&
+                order.DeletedAt == null)
+            .ToListAsync(cancellationToken);
+
+        var selection = OrderCheckoutSelection.Resolve(pendingOrders, selectedOrderIds, now);
+        if (!selection.Success)
         {
-            return PayPalCheckoutResult.Fail("No pending payment orders were found.");
+            return PayPalCheckoutResult.Fail(selection.Message);
         }
+
+        var orders = selection.Orders;
 
         if (orders.Any(order => string.IsNullOrWhiteSpace(order.ShippingAddress)))
         {
-            return PayPalCheckoutResult.Fail("Please complete shipping information before paying with PayPal.");
+            return PayPalCheckoutResult.Fail("Vui lòng điền đầy đủ thông tin giao hàng trước khi thanh toán PayPal.");
         }
 
         var totalAmount = orders.Sum(order => order.TotalAmount);
@@ -216,6 +227,13 @@ public class OrderPaymentService : IOrderPaymentService
                 payment.UpdatedAt = now;
             }
 
+            var paidOrders = orders.Where(order => paidOrderIds.Contains(order.Id)).ToList();
+            await OrderCancellationHelper.MarkAuctionsCompletedAfterPaymentAsync(
+                _dbContext,
+                paidOrders,
+                now,
+                cancellationToken);
+
             await _dbContext.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
         });
@@ -344,21 +362,6 @@ public class OrderPaymentService : IOrderPaymentService
         };
     }
 
-    private async Task<List<AuctionOrder>> GetPayableOrdersAsync(
-        int buyerId,
-        CancellationToken cancellationToken)
-    {
-        var now = DateTime.UtcNow;
-
-        return await _dbContext.Orders
-            .Where(order =>
-                order.BuyerId == buyerId &&
-                order.Status == OrderStatuses.PendingPayment &&
-                order.DeletedAt == null &&
-                order.PaymentDeadline > now)
-            .OrderBy(order => order.PaymentDeadline)
-            .ToListAsync(cancellationToken);
-    }
 public async Task<string> TestProcessIpnAsync(
     string payPalOrderId,
     string transactionId,
@@ -537,5 +540,4 @@ public async Task<string> TestProcessIpnAsync(
 }
     private static bool AmountsMatch(decimal expected, decimal actual) =>
         Math.Abs(expected - actual) < 0.01m;
-    
 }
