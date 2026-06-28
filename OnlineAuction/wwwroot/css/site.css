@@ -39,6 +39,61 @@ footer a {
   text-decoration: none;
 }
 
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  text-decoration: none;
+}
+
+.site-brand__logo {
+  display: block;
+  height: 3.5rem;
+  width: auto;
+  max-width: min(11.5rem, 40vw);
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.site-brand__name {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.site-brand__name-accent {
+  color: #1d4ed8;
+}
+
+.site-brand__name-rest {
+  color: #0f172a;
+}
+
+.site-brand--footer .site-brand__logo {
+  height: 3.75rem;
+  max-width: 12.5rem;
+}
+
+.site-brand--footer .site-brand__name {
+  font-size: 1.5rem;
+}
+
+@media (max-width: 480px) {
+  .site-brand__logo {
+    height: 2.875rem;
+    max-width: min(8.5rem, 36vw);
+  }
+
+  .site-brand__name {
+    font-size: 1.125rem;
+  }
+}
+
 .site-nav-link {
   display: block;
   white-space: nowrap;

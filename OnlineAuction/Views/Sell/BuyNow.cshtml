@@ -2,7 +2,7 @@
 @model OnlineAuction.Models.CreateBuyNowViewModel
 @{
     ViewData["Title"] = Localizer["SellBuyNow_PageTitle"];
-    ViewData["DocumentSectionNumber"] = 6;
+    ViewData["DocumentSectionNumber"] = 5;
     var successMessage = TempData["SuccessMessage"] as string;
     var buyNowI18n = new Dictionary<string, string>
     {
@@ -20,9 +20,9 @@
         ["errorDocInvalidFormat"] = Localizer["Sell_Error_DocInvalidFormat"].Value,
         ["errorDocSizeLimit"] = Localizer["Sell_Error_DocSizeLimit"].Value,
         ["errorYearInvalid"] = Localizer["Sell_Error_YearInvalid"].Value,
-        ["conditionNew"] = Localizer["Sell_Condition_New"].Value,
-        ["conditionLikeNew"] = Localizer["Sell_Condition_LikeNew"].Value,
-        ["conditionUsed"] = Localizer["Sell_Condition_Used"].Value
+        ["errorYearRequired"] = Localizer["Sell_Error_YearRequired"].Value,
+        ["errorAuthenticatorRequired"] = Localizer["Sell_Error_AuthenticatorRequired"].Value,
+        ["errorGradeRequired"] = Localizer["Sell_Error_GradeRequired"].Value,
     };
 }
 
@@ -60,7 +60,6 @@
         <div class="space-y-6">
           @await Html.PartialAsync("Partials/_ProductForm", Model)
           @await Html.PartialAsync("Partials/_ImageUploader")
-          @await Html.PartialAsync("Partials/_GradingForm", Model)
           @await Html.PartialAsync("Partials/_CardSpecsForm", Model)
           @await Html.PartialAsync("Partials/_BuyNowPricing", Model)
           @await Html.PartialAsync("Partials/_DocumentUploader")
