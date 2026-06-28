@@ -39,6 +39,10 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<UserDeviceToken> UserDeviceTokens => Set<UserDeviceToken>();
 
+    public DbSet<Permission> Permissions => Set<Permission>();
+
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+
     public DbSet<UserOtpCode> UserOtpCodes => Set<UserOtpCode>();
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -60,7 +64,50 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigurePayments(builder);
         ConfigureNotifications(builder);
         ConfigureUserDeviceTokens(builder);
+        ConfigurePermissions(builder);
         ConfigureUserOtpCodes(builder);
+    }
+
+    private static void ConfigurePermissions(ModelBuilder builder)
+    {
+        builder.Entity<Permission>(entity =>
+        {
+            entity.ToTable("permissions");
+
+            entity.Property(p => p.Id).HasColumnName("id");
+            entity.Property(p => p.Code).HasColumnName("code").HasMaxLength(100).IsRequired();
+            entity.Property(p => p.Name).HasColumnName("name").HasMaxLength(150).IsRequired();
+            entity.Property(p => p.Module).HasColumnName("module").HasMaxLength(50).IsRequired();
+            entity.Property(p => p.Description).HasColumnName("description").HasMaxLength(500);
+
+            entity.HasIndex(p => p.Code).IsUnique().HasDatabaseName("ux_permissions_code");
+        });
+
+        builder.Entity<RolePermission>(entity =>
+        {
+            entity.ToTable("role_permissions");
+
+            entity.HasKey(rp => new { rp.RoleId, rp.PermissionId });
+
+            entity.Property(rp => rp.RoleId).HasColumnName("role_id");
+            entity.Property(rp => rp.PermissionId).HasColumnName("permission_id");
+
+            entity.HasOne(rp => rp.Role)
+                .WithMany()
+                .HasForeignKey(rp => rp.RoleId)
+                .HasConstraintName("fk_role_permissions_role")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(rp => rp.Permission)
+                .WithMany(p => p.RolePermissions)
+                .HasForeignKey(rp => rp.PermissionId)
+                .HasConstraintName("fk_role_permissions_permission")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(rp => new { rp.RoleId, rp.PermissionId })
+                .IsUnique()
+                .HasDatabaseName("ux_role_permissions_role_permission");
+        });
     }
     private static void ConfigureAuctionRegistrationDeposits(ModelBuilder builder)
 {

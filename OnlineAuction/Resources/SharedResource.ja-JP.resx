@@ -873,5 +873,22 @@
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>価格は0より大きい必要があります</value></data>
   <data name="User_YourBuyNowList" xml:space="preserve"><value>あなたの即購入一覧</value></data>
   <data name="User_SellerBuyNowList" xml:space="preserve"><value>即購入一覧</value></data>
+  <data name="User_Stat_TotalListings" xml:space="preserve"><value>表示中の出品</value></data>
+  <data name="User_ViewBuyNowList" xml:space="preserve"><value>即購入を見る</value></data>
+  <data name="User_CreateBuyNowListing" xml:space="preserve"><value>即購入出品を作成</value></data>
+  <data name="User_AuctionListingCount" xml:space="preserve"><value>表示中のオークション {0} 件</value></data>
+  <data name="User_BuyNowListingCount" xml:space="preserve"><value>表示中の即購入 {0} 件</value></data>
+  <data name="User_NoAuctions_OwnerTitle" xml:space="preserve"><value>オークション出品はまだありません</value></data>
+  <data name="User_NoAuctions_VisitorTitle" xml:space="preserve"><value>オークション出品なし</value></data>
+  <data name="User_NoAuctions_OwnerDesc" xml:space="preserve"><value>最初のオークション出品を作成して販売を始めましょう。</value></data>
+  <data name="User_NoAuctions_VisitorDesc" xml:space="preserve"><value>この出品者には現在表示中のオークションがありません。</value></data>
+  <data name="User_NoBuyNow_OwnerTitle" xml:space="preserve"><value>即購入出品はまだありません</value></data>
+  <data name="User_NoBuyNow_VisitorTitle" xml:space="preserve"><value>即購入出品なし</value></data>
+  <data name="User_NoBuyNow_OwnerDesc" xml:space="preserve"><value>固定価格の即購入出品を作成できます。</value></data>
+  <data name="User_NoBuyNow_VisitorDesc" xml:space="preserve"><value>この出品者には現在表示中の即購入出品がありません。</value></data>
+  <data name="User_Time_Ended" xml:space="preserve"><value>終了</value></data>
+  <data name="User_Time_DaysLeft" xml:space="preserve"><value>残り {0} 日</value></data>
+  <data name="User_Time_HoursLeft" xml:space="preserve"><value>残り {0} 時間</value></data>
+  <data name="User_Time_MinutesLeft" xml:space="preserve"><value>残り {0} 分</value></data>
   <data name="Account_Selling_CreateListing" xml:space="preserve"><value>出品する</value></data>
 </root>

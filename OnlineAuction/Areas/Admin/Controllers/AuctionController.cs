@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Areas.Admin.Services;
 using OnlineAuction.Areas.Admin.ViewModels.Auctions;
+using OnlineAuction.Authorization;
+using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Services.Interfaces;
 
@@ -15,23 +17,23 @@ public class AuctionController : BaseAdminController
         _auctionService = new AdminAuctionService(dbContext, photoService);
     }
 
-
+    [RequirePermission(PermissionCodes.AuctionsView)]
     public async Task<IActionResult> Index(AuctionFilterViewModel filter)
     {
         var model = await _auctionService.GetAuctionsAsync(filter);
         return View(model);
-
     }
 
     [HttpGet]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
     public async Task<IActionResult> Create()
     {
         return View(await _auctionService.BuildCreateFormAsync());
     }
 
-
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
     public async Task<IActionResult> Create(AuctionFormViewModel model)
     {
         if (!ModelState.IsValid)
@@ -51,10 +53,10 @@ public class AuctionController : BaseAdminController
 
         TempData["SuccessMessage"] = result.Message;
         return RedirectToAction(nameof(Index));
-
     }
 
     [HttpGet]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
     public async Task<IActionResult> Edit(int id)
     {
         var model = await _auctionService.GetEditFormAsync(id);
@@ -69,6 +71,7 @@ public class AuctionController : BaseAdminController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
     public async Task<IActionResult> Edit(AuctionFormViewModel model)
     {
         if (!ModelState.IsValid)
@@ -91,6 +94,7 @@ public class AuctionController : BaseAdminController
     }
 
     [HttpGet]
+    [RequirePermission(PermissionCodes.AuctionsView)]
     public async Task<IActionResult> Details(int id)
     {
         var model = await _auctionService.GetDetailsAsync(id);
@@ -105,6 +109,7 @@ public class AuctionController : BaseAdminController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
     public async Task<IActionResult> Delete(int id)
     {
         var result = await _auctionService.DeleteAsync(id);

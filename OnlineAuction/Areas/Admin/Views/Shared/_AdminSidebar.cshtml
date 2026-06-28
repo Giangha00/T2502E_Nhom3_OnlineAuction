@@ -20,6 +20,8 @@
                 </h3>
 
                 <ul class="mb-6 flex flex-col gap-4">
+                    @if (AdminPermissionHelper.Can(User, PermissionCodes.DashboardView))
+                    {
                     <li>
                         <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
                             class="menu-item group menu-item-active">
@@ -32,6 +34,9 @@
                             <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Dashboard</span>
                         </a>
                     </li>
+                    }
+                    @if (AdminPermissionHelper.Can(User, PermissionCodes.AuctionsView))
+                    {
                     <li>
                         <a asp-area="Admin" asp-controller="Auction" asp-action="Index" class="menu-item group menu-item-inactive">
                             <svg class="menu-item-icon-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -43,6 +48,9 @@
                             <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Auctions</span>
                         </a>
                     </li>
+                    }
+                    @if (AdminPermissionHelper.Can(User, PermissionCodes.AuctionsVerify))
+                    {
                     <li>
                         <a asp-area="Admin" asp-controller="AuctionVerification" asp-action="Index"
                            class="menu-item group menu-item-inactive flex items-center">
@@ -58,6 +66,9 @@
                             </span>
                         </a>
                     </li>
+                    }
+                    @if (AdminPermissionHelper.Can(User, PermissionCodes.UsersView))
+                    {
                     <li>
                         <a asp-area="Admin" asp-controller="User" asp-action="Index" class="menu-item group menu-item-inactive">
                             <svg class="menu-item-icon-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -69,6 +80,9 @@
                             <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Users</span>
                         </a>
                     </li>
+                    }
+                    @if (AdminPermissionHelper.Can(User, PermissionCodes.CategoriesManage))
+                    {
                     <li>
                         <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="menu-item group menu-item-inactive">
                             <svg class="menu-item-icon-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -80,6 +94,9 @@
                             <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Categories</span>
                         </a>
                     </li>
+                    }
+                    @if (AdminPermissionHelper.Can(User, PermissionCodes.ProductsManage))
+                    {
                     <li>
                         <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="menu-item group menu-item-inactive">
                             <svg class="menu-item-icon-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -91,6 +108,7 @@
                             <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Products</span>
                         </a>
                     </li>
+                    }
                 </ul>
             </div>
         </nav>

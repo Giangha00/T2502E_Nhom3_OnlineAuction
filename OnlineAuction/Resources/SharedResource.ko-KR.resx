@@ -873,5 +873,22 @@
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>가격은 0보다 커야 합니다</value></data>
   <data name="User_YourBuyNowList" xml:space="preserve"><value>내 즉시 구매 목록</value></data>
   <data name="User_SellerBuyNowList" xml:space="preserve"><value>즉시 구매 목록</value></data>
+  <data name="User_Stat_TotalListings" xml:space="preserve"><value>표시 중인 등록</value></data>
+  <data name="User_ViewBuyNowList" xml:space="preserve"><value>즉시 구매 보기</value></data>
+  <data name="User_CreateBuyNowListing" xml:space="preserve"><value>즉시 구매 등록 만들기</value></data>
+  <data name="User_AuctionListingCount" xml:space="preserve"><value>표시 중인 경매 {0}건</value></data>
+  <data name="User_BuyNowListingCount" xml:space="preserve"><value>표시 중인 즉시 구매 {0}건</value></data>
+  <data name="User_NoAuctions_OwnerTitle" xml:space="preserve"><value>아직 경매 등록이 없습니다</value></data>
+  <data name="User_NoAuctions_VisitorTitle" xml:space="preserve"><value>경매 등록 없음</value></data>
+  <data name="User_NoAuctions_OwnerDesc" xml:space="preserve"><value>첫 경매 등록을 만들어 판매를 시작하세요.</value></data>
+  <data name="User_NoAuctions_VisitorDesc" xml:space="preserve"><value>이 판매자에게 현재 표시 중인 경매가 없습니다.</value></data>
+  <data name="User_NoBuyNow_OwnerTitle" xml:space="preserve"><value>아직 즉시 구매 등록이 없습니다</value></data>
+  <data name="User_NoBuyNow_VisitorTitle" xml:space="preserve"><value>즉시 구매 등록 없음</value></data>
+  <data name="User_NoBuyNow_OwnerDesc" xml:space="preserve"><value>고정가 즉시 구매 등록을 만들 수 있습니다.</value></data>
+  <data name="User_NoBuyNow_VisitorDesc" xml:space="preserve"><value>이 판매자에게 현재 표시 중인 즉시 구매가 없습니다.</value></data>
+  <data name="User_Time_Ended" xml:space="preserve"><value>종료됨</value></data>
+  <data name="User_Time_DaysLeft" xml:space="preserve"><value>{0}일 남음</value></data>
+  <data name="User_Time_HoursLeft" xml:space="preserve"><value>{0}시간 남음</value></data>
+  <data name="User_Time_MinutesLeft" xml:space="preserve"><value>{0}분 남음</value></data>
   <data name="Account_Selling_CreateListing" xml:space="preserve"><value>상품 등록</value></data>
 </root>

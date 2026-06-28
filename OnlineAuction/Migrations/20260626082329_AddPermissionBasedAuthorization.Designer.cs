@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineAuction.Data;
 
@@ -11,9 +12,11 @@ using OnlineAuction.Data;
 namespace OnlineAuction.Migrations
 {
     [DbContext(typeof(AuctionHouseDbContext))]
-    partial class AuctionHouseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260626082329_AddPermissionBasedAuthorization")]
+    partial class AddPermissionBasedAuthorization
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -483,11 +486,6 @@ namespace OnlineAuction.Migrations
                     b.Property<int?>("DeletedBy")
                         .HasColumnType("int")
                         .HasColumnName("deleted_by");
-
-                    b.Property<decimal>("DepositApplied")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("deposit_applied");
 
                     b.Property<string>("OrderReference")
                         .IsRequired()
@@ -1629,65 +1627,6 @@ namespace OnlineAuction.Migrations
                     b.ToTable("user_device_tokens", (string)null);
                 });
 
-            modelBuilder.Entity("OnlineAuction.Entities.UserOtpCode", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AttemptCount")
-                        .HasColumnType("int")
-                        .HasColumnName("attempt_count");
-
-                    b.Property<string>("CodeHash")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)")
-                        .HasColumnName("code_hash");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("expires_at");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_used");
-
-                    b.Property<int>("MaxAttempts")
-                        .HasColumnType("int")
-                        .HasColumnName("max_attempts");
-
-                    b.Property<string>("Purpose")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("purpose");
-
-                    b.Property<string>("Salt")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("salt");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId", "Purpose", "IsUsed", "ExpiresAt")
-                        .HasDatabaseName("ix_user_otp_codes_active_lookup");
-
-                    b.ToTable("user_otp_codes", (string)null);
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
@@ -2215,18 +2154,6 @@ namespace OnlineAuction.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_device_tokens_user");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("OnlineAuction.Entities.UserOtpCode", b =>
-                {
-                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_otp_codes_user");
 
                     b.Navigation("User");
                 });

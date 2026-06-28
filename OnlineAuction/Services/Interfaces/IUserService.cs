@@ -6,7 +6,7 @@ namespace OnlineAuction.Services.Interfaces;
 
 public interface IUserService
 {
-    Task<PublicUserDetailViewModel?> GetPublicProfileAsync(int id);
+    Task<PublicUserDetailViewModel?> GetPublicProfileAsync(int id, int? viewerUserId = null);
 
     Task<UserListViewModel> GetUsersAsync(UserFilterViewModel filter);
 

@@ -35,6 +35,7 @@ public class AuctionItemViewModel
     public string Status { get; set; } = string.Empty;
     public string? RejectReason { get; set; }
     public string TimeRemaining { get; set; } = string.Empty;
+    public DateTime? EndDate { get; set; }
     public string ListingType { get; set; } = ListingTypes.Auction;
     public string Grade { get; set; } = string.Empty;
     public string Authenticator { get; set; } = string.Empty;
