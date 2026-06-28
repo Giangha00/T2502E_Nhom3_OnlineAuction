@@ -109,9 +109,15 @@ public class AdminDashboardService : IAdminDashboardService
             BuildKpiCard("Revenue (USD)", FormatCurrency(revenueCurrentPeriod), revenueCurrentPeriod, revenuePreviousPeriod)
         };
 
+        var pendingComplaints = await _dbContext.Complaints.AsNoTracking()
+            .CountAsync(
+                complaint => complaint.DeletedAt == null && complaint.Status == ComplaintStatuses.Pending,
+                cancellationToken);
+
         var secondaryKpiCards = new List<DashboardKpiCardViewModel>
         {
             BuildKpiCard("Pending Verifications", FormatInteger(pendingVerifications), pendingVerifications, 0, includeChange: false, linkUrl: "/Admin/AuctionVerification"),
+            BuildKpiCard("Pending Complaints", FormatInteger(pendingComplaints), pendingComplaints, 0, includeChange: false, linkUrl: "/Admin/Complaint?Status=pending"),
             BuildKpiCard("Pending Payments", FormatInteger(pendingPayments), pendingPayments, 0, includeChange: false),
             BuildKpiCard("Pending Registrations", FormatInteger(pendingRegistrations), pendingRegistrations, 0, includeChange: false),
             BuildKpiCard("Completed Orders (Month)", FormatInteger(completedOrdersThisMonth), completedOrdersThisMonth, 0, includeChange: false)

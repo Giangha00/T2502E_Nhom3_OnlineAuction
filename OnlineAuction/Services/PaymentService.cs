@@ -85,33 +85,6 @@ public class PaymentService : IPaymentService
         };
     }
 
-    public List<RefundEligibleOrderViewModel> GetRefundEligibleOrders()
-    {
-        var orderIds = new[] { 3, 12 };
-
-        return orderIds
-            .Select(id => _auctionService.GetAuctionById(id))
-            .Where(a => a is not null)
-            .Select(a =>
-            {
-                var platformFee = Math.Round(a!.CurrentPrice * 0.025m, 2);
-                var shipping = a.Category switch
-                {
-                    "Sports" => 22m,
-                    _ => 18m
-                };
-
-                return new RefundEligibleOrderViewModel
-                {
-                    OrderReference = $"AH-20260310-{a.Id:D4}",
-                    AuctionName = a.Name,
-                    AmountPaid = a.CurrentPrice + platformFee + shipping,
-                    PaidOn = DateTime.UtcNow.AddDays(-a.Id % 5)
-                };
-            })
-            .ToList();
-    }
-
     private static decimal GetShippingFee(string category) =>
         category switch
         {
