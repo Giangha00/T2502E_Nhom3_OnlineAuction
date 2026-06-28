@@ -22,7 +22,7 @@ public class ProductController : BaseAdminController
     public async Task<IActionResult> Index(ProductCategoryFilterViewModel filter)
     {
         var model = await _productService.GetCategoryTemplatesAsync(filter);
-        return View(model);
+        return ListOrDefaultView(model, "_ProductCategoryList");
     }
 
     [HttpGet]
@@ -35,7 +35,7 @@ public class ProductController : BaseAdminController
             return NotFound();
         }
 
-        return View(model);
+        return ListOrDefaultView(model, "_ProductList");
     }
 
     [HttpGet]
