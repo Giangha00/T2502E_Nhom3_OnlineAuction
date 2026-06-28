@@ -3,11 +3,6 @@
 @{
     ViewData["Title"] = "Complaints";
     ViewData["AdminPage"] = "complaints";
-
-    var currentPage = Model.Filter.Page <= 0 ? 1 : Model.Filter.Page;
-    var totalPages = Model.TotalPages <= 0 ? 1 : Model.TotalPages;
-    var startPage = Math.Max(1, currentPage - 2);
-    var endPage = Math.Min(totalPages, currentPage + 2);
 }
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
@@ -35,20 +30,22 @@
     }
 
     <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
-        <form method="get" class="flex flex-wrap items-end gap-3">
-            <input type="hidden" name="Page" value="1" />
+        <form id="complaintFilterForm" method="get" class="flex flex-wrap items-end gap-3 2xl:flex-nowrap">
+            <input type="hidden" name="Page" value="@(Model.Filter.Page <= 0 ? 1 : Model.Filter.Page)" />
 
             <div class="min-w-[220px] flex-1">
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Search</label>
-                <input name="Search"
+                <input id="complaintSearchInput"
+                       name="Search"
                        value="@Model.Filter.Search"
                        placeholder="Request ID, order ref, buyer"
+                       autocomplete="off"
                        class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
             </div>
 
             <div class="w-[150px]">
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Status</label>
-                <select name="Status" class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                <select name="Status" class="admin-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                     <option value="">All</option>
                     @foreach (var status in ComplaintStatuses.All)
                     {
@@ -59,7 +56,7 @@
 
             <div class="w-[170px]">
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Type</label>
-                <select name="ComplaintType" class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                <select name="ComplaintType" class="admin-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                     <option value="">All</option>
                     @foreach (var type in ComplaintTypes.All)
                     {
@@ -70,7 +67,7 @@
 
             <div class="w-[200px]">
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Reason</label>
-                <select name="ReasonCode" class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                <select name="ReasonCode" class="admin-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                     <option value="">All</option>
                     @foreach (var reason in ComplaintReasonCodes.Labels)
                     {
@@ -81,7 +78,7 @@
 
             <div class="w-[220px]">
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Date range</label>
-                <input id="dateRangePicker"
+                <input id="complaintDateRangePicker"
                        name="DateRange"
                        value="@Model.Filter.DateRange"
                        placeholder="MM/DD/YYYY - MM/DD/YYYY"
@@ -91,148 +88,16 @@
 
             <div class="w-[140px]">
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Sort</label>
-                <select name="SortOrder" class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                <select name="SortOrder" class="admin-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                     <option value="" selected="@(string.IsNullOrWhiteSpace(Model.Filter.SortOrder))">Newest</option>
                     <option value="date_asc" selected="@(Model.Filter.SortOrder == "date_asc")">Oldest</option>
                 </select>
             </div>
-
-            <div class="flex gap-2">
-                <button type="submit" class="h-10 rounded-lg bg-brand-500 px-4 text-theme-sm font-medium text-white hover:bg-brand-600">
-                    Filter
-                </button>
-                <a asp-area="Admin"
-                   asp-controller="Complaint"
-                   asp-action="Index"
-                   class="inline-flex h-10 items-center rounded-lg border border-gray-300 bg-white px-4 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                    Reset
-                </a>
-            </div>
         </form>
     </div>
 
-    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-        @if (Model.Items.Count == 0)
-        {
-            <div class="px-6 py-16 text-center">
-                <p class="text-theme-sm font-medium text-gray-700 dark:text-white/80">No complaints found</p>
-                <p class="mt-1 text-theme-xs text-gray-500 dark:text-gray-400">Buyer refund requests will appear here once submitted.</p>
-            </div>
-        }
-        else
-        {
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-                    <thead class="bg-gray-50 dark:bg-white/[0.02]">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Request ID</th>
-                            <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Order ref</th>
-                            <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Buyer</th>
-                            <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Product</th>
-                            <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Reason</th>
-                            <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Amount</th>
-                            <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Status</th>
-                            <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Submitted</th>
-                            <th class="px-4 py-3 text-right text-theme-xs font-semibold uppercase text-gray-500">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
-                        @foreach (var item in Model.Items)
-                        {
-                            <tr>
-                                <td class="px-4 py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">@item.RequestReference</td>
-                                <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@(item.OrderReference ?? "—")</td>
-                                <td class="px-4 py-3">
-                                    <p class="text-theme-sm text-gray-800 dark:text-white/90">@item.BuyerName</p>
-                                    <p class="text-theme-xs text-gray-500">@item.BuyerEmail</p>
-                                </td>
-                                <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@item.ProductName</td>
-                                <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@item.ReasonLabel</td>
-                                <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">
-                                    @(item.RequestedAmount.HasValue ? $"${item.RequestedAmount.Value:N2}" : "Full refund")
-                                </td>
-                                <td class="px-4 py-3">
-                                    <span class="inline-flex rounded-full border px-2.5 py-0.5 text-theme-xs font-medium @ComplaintDisplayHelper.GetStatusBadgeClass(item.Status)">
-                                        @item.StatusLabel
-                                    </span>
-                                </td>
-                                <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">
-                                    @item.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
-                                </td>
-                                <td class="px-4 py-3 text-right">
-                                    <a asp-action="Details"
-                                       asp-route-id="@item.Id"
-                                       class="inline-flex rounded-lg bg-brand-500 px-3 py-1.5 text-theme-xs font-medium text-white hover:bg-brand-600">
-                                        Review
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            @if (totalPages > 1)
-            {
-                <div class="flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-800">
-                    <p class="text-theme-xs text-gray-500">
-                        Showing @Model.Items.Count of @Model.TotalItems complaints
-                    </p>
-                    <div class="flex items-center gap-1">
-                        @if (currentPage > 1)
-                        {
-                            <a asp-action="Index"
-                               asp-all-route-data="@(new Dictionary<string, string?> {
-                                   ["Search"] = Model.Filter.Search,
-                                   ["Status"] = Model.Filter.Status,
-                                   ["ReasonCode"] = Model.Filter.ReasonCode,
-                                   ["ComplaintType"] = Model.Filter.ComplaintType,
-                                   ["DateRange"] = Model.Filter.DateRange,
-                                   ["SortOrder"] = Model.Filter.SortOrder,
-                                   ["Page"] = (currentPage - 1).ToString()
-                               })"
-                               class="rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300">
-                                Prev
-                            </a>
-                        }
-
-                        @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
-                        {
-                            <a asp-action="Index"
-                               asp-all-route-data="@(new Dictionary<string, string?> {
-                                   ["Search"] = Model.Filter.Search,
-                                   ["Status"] = Model.Filter.Status,
-                                   ["ReasonCode"] = Model.Filter.ReasonCode,
-                                   ["ComplaintType"] = Model.Filter.ComplaintType,
-                                   ["DateRange"] = Model.Filter.DateRange,
-                                   ["SortOrder"] = Model.Filter.SortOrder,
-                                   ["Page"] = pageNumber.ToString()
-                               })"
-                               class="rounded-lg px-3 py-1.5 text-theme-xs @(pageNumber == currentPage ? "bg-brand-500 text-white" : "border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300")">
-                                @pageNumber
-                            </a>
-                        }
-
-                        @if (currentPage < totalPages)
-                        {
-                            <a asp-action="Index"
-                               asp-all-route-data="@(new Dictionary<string, string?> {
-                                   ["Search"] = Model.Filter.Search,
-                                   ["Status"] = Model.Filter.Status,
-                                   ["ReasonCode"] = Model.Filter.ReasonCode,
-                                   ["ComplaintType"] = Model.Filter.ComplaintType,
-                                   ["DateRange"] = Model.Filter.DateRange,
-                                   ["SortOrder"] = Model.Filter.SortOrder,
-                                   ["Page"] = (currentPage + 1).ToString()
-                               })"
-                               class="rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300">
-                                Next
-                            </a>
-                        }
-                    </div>
-                </div>
-            }
-        }
+    <div id="complaintListResults" class="transition-opacity duration-200">
+        <partial name="_ComplaintList" model="Model" />
     </div>
 </div>
 
@@ -240,23 +105,16 @@
     <script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="~/admin/js/admin-list-filter.js" asp-append-version="true"></script>
     <script>
-        $(function () {
-            $('#dateRangePicker').daterangepicker({
-                autoUpdateInput: false,
-                locale: {
-                    cancelLabel: 'Clear',
-                    format: 'MM/DD/YYYY'
-                }
-            });
-
-            $('#dateRangePicker').on('apply.daterangepicker', function (event, picker) {
-                $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
-            });
-
-            $('#dateRangePicker').on('cancel.daterangepicker', function () {
-                $(this).val('');
-            });
+        AdminListFilter.init({
+            formId: 'complaintFilterForm',
+            resultsId: 'complaintListResults',
+            searchInputId: 'complaintSearchInput',
+            listUrl: '@Url.Action("Index", "Complaint", new { area = "Admin" })',
+            setupDateRange: function (submitCallback) {
+                AdminListFilter.setupDateRangePicker('#complaintDateRangePicker', submitCallback);
+            }
         });
     </script>
 }

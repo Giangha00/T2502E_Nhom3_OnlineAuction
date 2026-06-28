@@ -8,4 +8,9 @@ namespace OnlineAuction.Areas.Admin.Controllers;
 [Authorize(AuthenticationSchemes = AuthSchemes.Admin)]
 public abstract class BaseAdminController : Controller
 {
+    protected bool IsAjaxListRequest()
+        => string.Equals(Request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+
+    protected IActionResult ListOrDefaultView(object model, string partialViewName)
+        => IsAjaxListRequest() ? PartialView(partialViewName, model) : View(model);
 }

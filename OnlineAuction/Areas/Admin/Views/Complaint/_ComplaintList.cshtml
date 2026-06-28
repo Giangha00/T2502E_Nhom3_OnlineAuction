@@ -1,0 +1,132 @@
+@model ComplaintListViewModel
+
+@{
+    var currentPage = Model.Filter.Page <= 0 ? 1 : Model.Filter.Page;
+    var totalPages = Model.TotalPages <= 0 ? 1 : Model.TotalPages;
+    var startPage = Math.Max(1, currentPage - 2);
+    var endPage = Math.Min(totalPages, currentPage + 2);
+}
+
+<div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+    @if (Model.Items.Count == 0)
+    {
+        <div class="px-6 py-16 text-center">
+            <p class="text-theme-sm font-medium text-gray-700 dark:text-white/80">No complaints found</p>
+            <p class="mt-1 text-theme-xs text-gray-500 dark:text-gray-400">Buyer refund requests will appear here once submitted.</p>
+        </div>
+    }
+    else
+    {
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                <thead class="bg-gray-50 dark:bg-white/[0.02]">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Request ID</th>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Order ref</th>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Buyer</th>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Product</th>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Reason</th>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Amount</th>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Status</th>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Submitted</th>
+                        <th class="px-4 py-3 text-right text-theme-xs font-semibold uppercase text-gray-500">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="px-4 py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">@item.RequestReference</td>
+                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@(item.OrderReference ?? "—")</td>
+                            <td class="px-4 py-3">
+                                <p class="text-theme-sm text-gray-800 dark:text-white/90">@item.BuyerName</p>
+                                <p class="text-theme-xs text-gray-500">@item.BuyerEmail</p>
+                            </td>
+                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@item.ProductName</td>
+                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@item.ReasonLabel</td>
+                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">
+                                @(item.RequestedAmount.HasValue ? $"${item.RequestedAmount.Value:N2}" : "Full refund")
+                            </td>
+                            <td class="px-4 py-3">
+                                <span class="inline-flex rounded-full border px-2.5 py-0.5 text-theme-xs font-medium @ComplaintDisplayHelper.GetStatusBadgeClass(item.Status)">
+                                    @item.StatusLabel
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">
+                                @item.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <a asp-action="Details"
+                                   asp-route-id="@item.Id"
+                                   class="inline-flex rounded-lg bg-brand-500 px-3 py-1.5 text-theme-xs font-medium text-white hover:bg-brand-600">
+                                    Review
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <div class="flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-800">
+                <p class="text-theme-xs text-gray-500">
+                    Showing @Model.Items.Count of @Model.TotalItems complaints
+                </p>
+                <div class="flex items-center gap-1">
+                    @if (currentPage > 1)
+                    {
+                        <a asp-action="Index"
+                           asp-all-route-data="@(new Dictionary<string, string?> {
+                               ["Search"] = Model.Filter.Search,
+                               ["Status"] = Model.Filter.Status,
+                               ["ReasonCode"] = Model.Filter.ReasonCode,
+                               ["ComplaintType"] = Model.Filter.ComplaintType,
+                               ["DateRange"] = Model.Filter.DateRange,
+                               ["SortOrder"] = Model.Filter.SortOrder,
+                               ["Page"] = (currentPage - 1).ToString()
+                           })"
+                           class="js-admin-page rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300">
+                            Prev
+                        </a>
+                    }
+
+                    @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
+                    {
+                        <a asp-action="Index"
+                           asp-all-route-data="@(new Dictionary<string, string?> {
+                               ["Search"] = Model.Filter.Search,
+                               ["Status"] = Model.Filter.Status,
+                               ["ReasonCode"] = Model.Filter.ReasonCode,
+                               ["ComplaintType"] = Model.Filter.ComplaintType,
+                               ["DateRange"] = Model.Filter.DateRange,
+                               ["SortOrder"] = Model.Filter.SortOrder,
+                               ["Page"] = pageNumber.ToString()
+                           })"
+                           class="js-admin-page rounded-lg px-3 py-1.5 text-theme-xs @(pageNumber == currentPage ? "bg-brand-500 text-white" : "border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300")">
+                            @pageNumber
+                        </a>
+                    }
+
+                    @if (currentPage < totalPages)
+                    {
+                        <a asp-action="Index"
+                           asp-all-route-data="@(new Dictionary<string, string?> {
+                               ["Search"] = Model.Filter.Search,
+                               ["Status"] = Model.Filter.Status,
+                               ["ReasonCode"] = Model.Filter.ReasonCode,
+                               ["ComplaintType"] = Model.Filter.ComplaintType,
+                               ["DateRange"] = Model.Filter.DateRange,
+                               ["SortOrder"] = Model.Filter.SortOrder,
+                               ["Page"] = (currentPage + 1).ToString()
+                           })"
+                           class="js-admin-page rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300">
+                            Next
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>

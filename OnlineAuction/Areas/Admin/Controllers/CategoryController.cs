@@ -19,7 +19,7 @@ public class CategoryController : BaseAdminController
     public async Task<IActionResult> Index(CategoryFilterViewModel filter)
     {
         var model = await _categoryService.GetCategoriesAsync(filter);
-        return View(model);
+        return ListOrDefaultView(model, "_CategoryList");
     }
 
     [HttpGet]
