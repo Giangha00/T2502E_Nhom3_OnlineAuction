@@ -1,6 +1,10 @@
 @{
     var modalReturnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
     var authError = TempData["AuthError"] as string;
+    var authSuccess = TempData["AuthSuccess"] as string;
+    var resetEmail = TempData["ResetPasswordEmail"] as string ?? string.Empty;
+    var maskedEmail = TempData["PasswordResetEmailMasked"] as string ?? string.Empty;
+    var devOtp = TempData["PasswordResetOtp"] as string;
 }
 
 <div id="authModalOverlay" class="home-auth-overlay home-auth-overlay--hidden" aria-hidden="true">
@@ -10,17 +14,17 @@
       <aside class="home-auth-visual" aria-hidden="true">
         <div class="home-auth-visual__slides">
           <div class="home-auth-visual__slide auth-visual-slide is-active" data-slide="0"
-               style="background-image: url('https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=900&h=1100&fit=crop&q=80');"></div>
-          <div class="home-auth-visual__slide auth-visual-slide" data-slide="1"
                style="background-image: url('https://images.unsplash.com/photo-1546519638-68e109498ffc?w=900&h=1100&fit=crop&q=80');"></div>
+          <div class="home-auth-visual__slide auth-visual-slide" data-slide="1"
+               style="background-image: url('https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=900&h=1100&fit=crop&q=80');"></div>
           <div class="home-auth-visual__slide auth-visual-slide" data-slide="2"
                style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=900&h=1100&fit=crop&q=80');"></div>
         </div>
         <div class="home-auth-visual__overlay"></div>
         <div class="home-auth-visual__content">
-          <p class="home-auth-visual__eyebrow" id="authVisualEyebrow">@Localizer["Auth_Slide1_Eyebrow"]</p>
-          <h3 class="home-auth-visual__title" id="authVisualTitle">@Localizer["Auth_Slide1_Title"]</h3>
-          <p class="home-auth-visual__desc" id="authVisualDesc">@Localizer["Auth_Slide1_Desc"]</p>
+          <p class="home-auth-visual__eyebrow" id="authVisualEyebrow">@Localizer["Auth_Slide2_Eyebrow"]</p>
+          <h3 class="home-auth-visual__title" id="authVisualTitle">@Localizer["Auth_Slide2_Title"]</h3>
+          <p class="home-auth-visual__desc" id="authVisualDesc">@Localizer["Auth_Slide2_Desc"]</p>
         </div>
         <div class="home-auth-visual__dots" role="tablist" aria-label="Gallery">
           <button type="button" class="auth-visual-dot is-active" data-slide="0" aria-label="Slide 1"></button>
@@ -41,19 +45,24 @@
         </div>
 
         <h2 id="authModalTitle" class="home-auth-heading">@Localizer["Auth_Modal_Title"]</h2>
-        <p class="home-auth-subheading">@Localizer["Auth_Modal_Subtitle"]</p>
+        <p id="authModalSubtitle" class="home-auth-subheading">@Localizer["Auth_Modal_Subtitle"]</p>
 
         @if (!string.IsNullOrWhiteSpace(authError))
         {
           <p id="authModalError" class="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">@authError</p>
         }
+        @if (!string.IsNullOrWhiteSpace(authSuccess))
+        {
+          <p id="authModalSuccess" class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">@authSuccess</p>
+        }
 
-        <div class="home-auth-tabs" role="tablist">
-          <button type="button" class="home-auth-tab home-auth-tab--active" data-tab="login" role="tab" aria-selected="true">@Localizer["Auth_LogIn"]</button>
-          <button type="button" class="home-auth-tab" data-tab="signup" role="tab" aria-selected="false">@Localizer["Auth_SignUp"]</button>
+        <div id="authTabs" class="home-auth-tabs" role="tablist" aria-label="@Localizer["Auth_Modal_Title"]">
+          <button type="button" id="authTabLogin" class="home-auth-tab home-auth-tab--active" data-tab="login" role="tab" aria-selected="true" aria-controls="authPanelLogin">@Localizer["Auth_LogIn"]</button>
+          <button type="button" id="authTabSignup" class="home-auth-tab" data-tab="signup" role="tab" aria-selected="false" aria-controls="authPanelSignup">@Localizer["Auth_SignUp"]</button>
         </div>
 
-        <div id="authPanelLogin" class="home-auth-panel" role="tabpanel">
+        <div class="home-auth-panels">
+        <div id="authPanelLogin" class="home-auth-panel home-auth-panel--active" role="tabpanel" aria-labelledby="authTabLogin">
           <form method="post" asp-controller="Auth" asp-action="Login" class="home-auth-form">
             @Html.AntiForgeryToken()
             <input type="hidden" name="returnUrl" value="@modalReturnUrl" />
@@ -66,15 +75,102 @@
               <label class="home-auth-field__label" for="modalPassword">@Localizer["Auth_Password"]</label>
               <input name="password" id="modalPassword" type="password" placeholder="@Localizer["Auth_Placeholder_Password"]" required class="home-auth-input"/>
             </div>
-            <label class="mb-4 flex items-center gap-2 text-sm text-slate-600">
-              <input name="rememberMe" type="checkbox" value="true" class="rounded border-slate-300 text-blue-700 focus:ring-blue-500" />
-              @Localizer["Auth_RememberMe"]
-            </label>
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <label class="flex items-center gap-2 text-sm text-slate-600">
+                <input name="rememberMe" type="checkbox" value="true" class="rounded border-slate-300 text-blue-700 focus:ring-blue-500" />
+                @Localizer["Auth_RememberMe"]
+              </label>
+              <button type="button" id="authForgotPasswordBtn" class="text-sm font-semibold text-blue-700 hover:text-blue-900">
+                @Localizer["Auth_ForgotPassword"]
+              </button>
+            </div>
             <button type="submit" class="home-auth-submit">@Localizer["Auth_Continue"]</button>
           </form>
         </div>
 
-        <div id="authPanelSignup" class="home-auth-panel hidden" role="tabpanel" hidden>
+        <div id="authPanelForgot" class="home-auth-panel" role="tabpanel" aria-labelledby="authForgotPasswordBtn" hidden>
+          <form method="post" asp-controller="Auth" asp-action="ForgotPassword" class="home-auth-form home-auth-form--compact">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@modalReturnUrl" />
+            <input type="hidden" name="fromModal" value="true" />
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalForgotEmail">@Localizer["Auth_Email"]</label>
+              <input name="email" id="modalForgotEmail" type="email" value="@resetEmail" placeholder="@Localizer["Auth_Placeholder_Email"]" required class="home-auth-input"/>
+            </div>
+            <button type="submit" class="home-auth-submit">@Localizer["Auth_Forgot_SendOtp"]</button>
+            <button type="button" id="authBackToLoginBtn" class="home-auth-secondary-action">@Localizer["Auth_Forgot_BackToLogin"]</button>
+          </form>
+        </div>
+
+        <div id="authPanelForgotOtp" class="home-auth-panel" role="tabpanel" hidden>
+          <form method="post" asp-controller="Auth" asp-action="VerifyPasswordOtp" class="home-auth-form home-auth-form--compact" id="authForgotOtpForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@modalReturnUrl" />
+            <input type="hidden" name="fromModal" value="true" />
+            <input type="hidden" name="email" id="modalOtpEmail" value="@resetEmail" />
+            <input type="hidden" name="otp" id="modalOtpValue" value="" />
+
+            @if (!string.IsNullOrWhiteSpace(maskedEmail))
+            {
+              <p class="home-auth-otp-hint">@Localizer["Auth_Forgot_OtpSent", maskedEmail]</p>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(devOtp))
+            {
+              <div class="home-auth-dev-otp">
+                <p class="font-bold">@Localizer["Auth_Forgot_DevOtpTitle"]</p>
+                <p class="mt-1">@Localizer["Auth_Forgot_DevOtpDesc"]</p>
+                <p class="mt-2 text-lg font-extrabold tracking-[0.35em]">@devOtp</p>
+              </div>
+            }
+
+            <div class="home-auth-otp-group" role="group" aria-label="@Localizer["Auth_Forgot_OtpLabel"]">
+              @for (var i = 0; i < 6; i++)
+              {
+                <input type="text"
+                       class="home-auth-otp-input"
+                       inputmode="numeric"
+                       pattern="[0-9]*"
+                       maxlength="1"
+                       autocomplete="one-time-code"
+                       aria-label="@Localizer["Auth_Forgot_OtpDigit", i + 1]"
+                       data-otp-index="@i" />
+              }
+            </div>
+
+            <button type="submit" class="home-auth-submit">@Localizer["Auth_Forgot_VerifyOtp"]</button>
+          </form>
+          <form method="post" asp-controller="Auth" asp-action="ResendPasswordOtp" class="home-auth-form home-auth-form--compact">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@modalReturnUrl" />
+            <input type="hidden" name="fromModal" value="true" />
+            <button type="submit" class="home-auth-secondary-action">@Localizer["Auth_Otp_Resend"]</button>
+          </form>
+          <button type="button" id="authBackToForgotEmailBtn" class="home-auth-secondary-action">@Localizer["Auth_Forgot_ChangeEmail"]</button>
+        </div>
+
+        <div id="authPanelForgotReset" class="home-auth-panel" role="tabpanel" hidden>
+          <form method="post" asp-controller="Auth" asp-action="ResetPassword" class="home-auth-form home-auth-form--compact">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@modalReturnUrl" />
+            <input type="hidden" name="fromModal" value="true" />
+            <input type="hidden" name="email" value="@resetEmail" />
+
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalResetPassword">@Localizer["Auth_Forgot_NewPassword"]</label>
+              <input name="password" id="modalResetPassword" type="password" placeholder="@Localizer["Auth_Placeholder_SignupPassword"]" required class="home-auth-input" autocomplete="new-password" />
+            </div>
+            <div class="home-auth-field">
+              <label class="home-auth-field__label" for="modalResetConfirmPassword">@Localizer["Auth_ConfirmPassword"]</label>
+              <input name="confirmPassword" id="modalResetConfirmPassword" type="password" placeholder="@Localizer["Auth_Placeholder_ConfirmPassword"]" required class="home-auth-input" autocomplete="new-password" />
+            </div>
+
+            <button type="submit" class="home-auth-submit">@Localizer["Auth_Forgot_ResetSubmit"]</button>
+            <button type="button" id="authBackToForgotOtpBtn" class="home-auth-secondary-action">@Localizer["Auth_Forgot_BackToOtp"]</button>
+          </form>
+        </div>
+
+        <div id="authPanelSignup" class="home-auth-panel" role="tabpanel" aria-labelledby="authTabSignup" hidden>
           <form method="post" asp-controller="Auth" asp-action="SignUp" class="home-auth-form">
             @Html.AntiForgeryToken()
             <input type="hidden" name="returnUrl" value="@modalReturnUrl" />
@@ -102,8 +198,9 @@
             <button type="submit" class="home-auth-submit">@Localizer["Auth_CreateAccount"]</button>
           </form>
         </div>
+        </div>
 
-        <p class="home-auth-legal">
+        <p id="authLegalText" class="home-auth-legal">
           @Localizer["Auth_Legal"]
         </p>
       </div>

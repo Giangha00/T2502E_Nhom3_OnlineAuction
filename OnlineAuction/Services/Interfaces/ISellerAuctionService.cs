@@ -4,13 +4,17 @@ namespace OnlineAuction.Services.Interfaces;
 
 public interface ISellerAuctionService
 {
-    Task<List<AuctionItemViewModel>> GetSellerAuctionsAsync(int sellerId, string? channel = null);
+    Task<List<AuctionItemViewModel>> GetSellerAuctionsAsync(
+        int sellerId,
+        string? channel = null,
+        bool forPublicProfile = false,
+        bool includeOwnerDrafts = false);
 
     Task<(bool Success, string Message, int? AuctionId)> CreateAsync(
         CreateAuctionViewModel model,
         int sellerId);
 
-    Task<(bool Success, string Message, int? ProductId)> CreateBuyNowAsync(
+    Task<(bool Success, string Message, int? AuctionId)> CreateBuyNowAsync(
         CreateBuyNowViewModel model,
         int sellerId);
 

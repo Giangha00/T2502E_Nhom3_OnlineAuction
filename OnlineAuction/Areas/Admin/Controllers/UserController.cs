@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Areas.Admin.ViewModels.Users;
+using OnlineAuction.Authorization;
+using OnlineAuction.Configurations;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Areas.Admin.Controllers;
@@ -13,6 +15,7 @@ public class UserController : BaseAdminController
         _userService = userService;
     }
 
+    [RequirePermission(PermissionCodes.UsersView)]
     public async Task<IActionResult> Index(UserFilterViewModel filter)
     {
         var model = await _userService.GetUsersAsync(filter);
@@ -20,6 +23,7 @@ public class UserController : BaseAdminController
     }
 
     [HttpGet]
+    [RequirePermission(PermissionCodes.UsersManage)]
     public IActionResult Create()
     {
         var model = _userService.BuildCreateForm();
@@ -28,6 +32,7 @@ public class UserController : BaseAdminController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.UsersManage)]
     public async Task<IActionResult> Create(UserFormViewModel model)
     {
         if (!ModelState.IsValid)
@@ -48,6 +53,7 @@ public class UserController : BaseAdminController
     }
 
     [HttpGet]
+    [RequirePermission(PermissionCodes.UsersManage)]
     public async Task<IActionResult> Edit(int id)
     {
         var model = await _userService.GetEditFormAsync(id);
@@ -62,6 +68,7 @@ public class UserController : BaseAdminController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.UsersManage)]
     public async Task<IActionResult> Edit(UserFormViewModel model)
     {
         if (!ModelState.IsValid)
@@ -85,6 +92,7 @@ public class UserController : BaseAdminController
     }
 
     [HttpGet]
+    [RequirePermission(PermissionCodes.UsersView)]
     public async Task<IActionResult> Details(int id)
     {
         var model = await _userService.GetDetailsAsync(id);
@@ -99,6 +107,7 @@ public class UserController : BaseAdminController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.UsersManage)]
     public async Task<IActionResult> Delete(int id)
     {
         var result = await _userService.DeleteAsync(id);
@@ -117,6 +126,7 @@ public class UserController : BaseAdminController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.UsersManage)]
     public async Task<IActionResult> BulkAction(UserBulkActionViewModel model)
     {
         var result = await _userService.ExecuteBulkActionAsync(model);

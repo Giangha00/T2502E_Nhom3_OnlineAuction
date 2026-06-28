@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Areas.Admin.Services;
+using OnlineAuction.Authorization;
+using OnlineAuction.Configurations;
 
 namespace OnlineAuction.Areas.Admin.Controllers;
 
@@ -12,6 +14,7 @@ public class DashboardController : BaseAdminController
         _dashboardService = dashboardService;
     }
 
+    [RequirePermission(PermissionCodes.DashboardView)]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
         var model = await _dashboardService.GetDashboardAsync(cancellationToken);
@@ -19,6 +22,7 @@ public class DashboardController : BaseAdminController
     }
 
     [HttpGet]
+    [RequirePermission(PermissionCodes.DashboardView)]
     public async Task<IActionResult> Export(int period = 30, CancellationToken cancellationToken = default)
     {
         var csvBytes = await _dashboardService.ExportSummaryCsvAsync(period, cancellationToken);

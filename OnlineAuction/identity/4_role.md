@@ -1,5 +1,7 @@
 # Hướng dẫn chi tiết về quản lý quyền và kiểm tra quyền truy cập.
 
+> **Triển khai thực tế trong repo:** xem [8_dynamic_permissions.md](8_dynamic_permissions.md) — permission DB, `PermissionAuthorizationHandler`, claims trên Admin login. Chỉ hai role: **User** và **Admin**.
+
 ---
 
 ### 1. Tạo quyền mới (Role) và Gán quyền cho tài khoản
