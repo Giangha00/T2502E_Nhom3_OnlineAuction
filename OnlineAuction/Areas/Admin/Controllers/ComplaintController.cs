@@ -26,7 +26,8 @@ public class ComplaintController : BaseAdminController
     public async Task<IActionResult> Index(ComplaintFilterViewModel filter, CancellationToken cancellationToken)
     {
         var model = await _complaintService.GetComplaintsAsync(filter, cancellationToken);
-        return View(model);
+
+        return ListOrDefaultView(model, "_ComplaintList");
     }
 
     [HttpGet]

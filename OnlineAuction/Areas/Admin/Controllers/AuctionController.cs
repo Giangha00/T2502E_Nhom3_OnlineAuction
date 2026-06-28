@@ -21,7 +21,7 @@ public class AuctionController : BaseAdminController
     public async Task<IActionResult> Index(AuctionFilterViewModel filter)
     {
         var model = await _auctionService.GetAuctionsAsync(filter);
-        return View(model);
+        return ListOrDefaultView(model, "_AuctionList");
     }
 
     [HttpGet]

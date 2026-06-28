@@ -1,0 +1,194 @@
+@model ProductListViewModel
+
+@{
+    var currentPage = Model.Filter.Page <= 0 ? 1 : Model.Filter.Page;
+    var totalPages = Model.TotalPages <= 0 ? 1 : Model.TotalPages;
+    var startPage = Math.Max(1, currentPage - 2);
+    var endPage = Math.Min(totalPages, currentPage + 2);
+    var categoryId = Model.ContextCategoryId ?? 0;
+}
+
+<form id="productBulkDeleteForm"
+      asp-area="Admin"
+      asp-controller="Product"
+      asp-action="BulkDelete"
+      method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="ReturnCategoryId" value="@categoryId" />
+
+    <div class="mb-4 flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03] sm:flex-row sm:items-center sm:justify-between">
+        <button type="submit"
+                data-bulk-delete="true"
+                class="h-10 rounded-lg border border-error-300 bg-white px-4 text-theme-sm font-medium text-error-600 hover:bg-error-50 dark:border-error-500/30 dark:bg-gray-800">
+            Delete selected
+        </button>
+
+        <div class="text-theme-sm text-gray-500">
+            Total: <span class="font-medium text-gray-800 dark:text-white/90">@Model.TotalItems</span>
+        </div>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="max-w-full overflow-x-auto">
+            <table class="w-full min-w-[1200px]">
+                <thead>
+                <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
+                    <th class="w-12 px-5 py-3 text-left">
+                        <input id="selectAllProducts" type="checkbox" aria-label="Select all products" />
+                    </th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Product</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Seller</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Condition</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Price</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Qty</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Card / Cert</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Auctions</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Created</th>
+                    <th class="px-5 py-3 text-right text-theme-xs font-medium uppercase text-gray-500">Actions</th>
+                </tr>
+                </thead>
+
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                @if (Model.Products.Count == 0)
+                {
+                    <tr>
+                        <td colspan="10" class="px-5 py-10 text-center text-theme-sm text-gray-500">
+                            No products found in this category.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var product in Model.Products)
+                    {
+                        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                            <td class="px-5 py-4">
+                                <input class="product-checkbox" type="checkbox" name="SelectedProductIds" value="@product.Id" />
+                            </td>
+                            <td class="px-5 py-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="@product.ThumbnailUrl"
+                                         alt="@product.Name"
+                                         class="h-12 w-12 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
+                                    <div>
+                                        <p class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@product.Name</p>
+                                        <p class="text-theme-xs text-gray-500">Product #: @product.ProductCode</p>
+                                        <p class="text-theme-xs text-gray-500">ID: @product.Id</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-5 py-4">
+                                <p class="text-theme-sm text-gray-800 dark:text-white/90">@product.SellerName</p>
+                                <p class="text-theme-xs text-gray-500">Seller ID: @product.SellerId</p>
+                            </td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">
+                                @product.Condition
+                                @if (!string.IsNullOrWhiteSpace(product.GradeLabel))
+                                {
+                                    <span class="text-theme-xs text-gray-500"> / @product.GradeLabel</span>
+                                }
+                            </td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">
+                                @(product.EstimatedValue?.ToString("C") ?? "—")
+                            </td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">1</td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">
+                                @(string.IsNullOrWhiteSpace(product.CardNumber) ? "—" : product.CardNumber)
+                                @if (!string.IsNullOrWhiteSpace(product.CertNumber))
+                                {
+                                    <span class="text-theme-xs text-gray-500"> · @product.CertNumber</span>
+                                }
+                            </td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@product.AuctionCount</td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@product.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            <td class="px-5 py-4">
+                                <div class="flex justify-end gap-3">
+                                    <a asp-area="Admin"
+                                       asp-controller="Product"
+                                       asp-action="Details"
+                                       asp-route-id="@product.Id"
+                                       class="text-theme-sm font-medium text-brand-500 hover:underline">
+                                        Details
+                                    </a>
+
+                                    <a asp-area="Admin"
+                                       asp-controller="Product"
+                                       asp-action="Edit"
+                                       asp-route-id="@product.Id"
+                                       class="text-theme-sm font-medium text-warning-600 hover:underline">
+                                        Edit
+                                    </a>
+
+                                    @if (product.CanDelete)
+                                    {
+                                        <button type="submit"
+                                                formaction="@Url.Action("Delete", "Product", new { area = "Admin", id = product.Id, returnCategoryId = categoryId })"
+                                                class="text-theme-sm font-medium text-error-600 hover:underline"
+                                                onclick="return confirm('Are you sure you want to delete this product?');">
+                                            Delete
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</form>
+
+<div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-theme-sm text-gray-500">
+        Page <span class="font-medium text-gray-800 dark:text-white/90">@currentPage</span>
+        of <span class="font-medium text-gray-800 dark:text-white/90">@totalPages</span>
+    </p>
+
+    <nav class="flex flex-wrap items-center gap-2">
+        <a asp-area="Admin"
+           asp-controller="Product"
+           asp-action="Category"
+           asp-route-id="@categoryId"
+           asp-route-Search="@Model.Filter.Search"
+           asp-route-SellerId="@Model.Filter.SellerId"
+           asp-route-Condition="@Model.Filter.Condition"
+           asp-route-DateRange="@Model.Filter.DateRange"
+           asp-route-SortOrder="@Model.Filter.SortOrder"
+           asp-route-Page="@(currentPage - 1)"
+           class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage <= 1 ? "pointer-events-none opacity-50" : "js-admin-page")">
+            Previous
+        </a>
+
+        @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
+        {
+            <a asp-area="Admin"
+               asp-controller="Product"
+               asp-action="Category"
+               asp-route-id="@categoryId"
+               asp-route-Search="@Model.Filter.Search"
+               asp-route-SellerId="@Model.Filter.SellerId"
+               asp-route-Condition="@Model.Filter.Condition"
+               asp-route-DateRange="@Model.Filter.DateRange"
+               asp-route-SortOrder="@Model.Filter.SortOrder"
+               asp-route-Page="@pageNumber"
+               class="js-admin-page rounded-lg border px-3 py-2 text-theme-sm font-medium @(pageNumber == currentPage ? "border-brand-500 bg-brand-500 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50")">
+                @pageNumber
+            </a>
+        }
+
+        <a asp-area="Admin"
+           asp-controller="Product"
+           asp-action="Category"
+           asp-route-id="@categoryId"
+           asp-route-Search="@Model.Filter.Search"
+           asp-route-SellerId="@Model.Filter.SellerId"
+           asp-route-Condition="@Model.Filter.Condition"
+           asp-route-DateRange="@Model.Filter.DateRange"
+           asp-route-SortOrder="@Model.Filter.SortOrder"
+           asp-route-Page="@(currentPage + 1)"
+           class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage >= totalPages ? "pointer-events-none opacity-50" : "js-admin-page")">
+            Next
+        </a>
+    </nav>
+</div>

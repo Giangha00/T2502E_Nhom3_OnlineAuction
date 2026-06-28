@@ -19,7 +19,7 @@ public class UserController : BaseAdminController
     public async Task<IActionResult> Index(UserFilterViewModel filter)
     {
         var model = await _userService.GetUsersAsync(filter);
-        return View(model);
+        return ListOrDefaultView(model, "_UserList");
     }
 
     [HttpGet]
