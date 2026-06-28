@@ -276,6 +276,39 @@
     return authTab;
   }
 
+  var alertDismissTimers = [];
+
+  function clearAlertDismissTimers() {
+    alertDismissTimers.forEach(function (timerId) {
+      window.clearTimeout(timerId);
+    });
+    alertDismissTimers = [];
+  }
+
+  function dismissAuthAlert(alert) {
+    if (!alert || alert.classList.contains('is-hiding')) {
+      return;
+    }
+
+    alert.classList.add('is-hiding');
+    window.setTimeout(function () {
+      if (alert.parentNode) {
+        alert.parentNode.removeChild(alert);
+      }
+    }, 300);
+  }
+
+  function initAuthAlerts() {
+    clearAlertDismissTimers();
+    overlay.querySelectorAll('[data-auth-auto-dismiss]').forEach(function (alert) {
+      var delay = Number(alert.getAttribute('data-auth-auto-dismiss')) || 5000;
+      var timerId = window.setTimeout(function () {
+        dismissAuthAlert(alert);
+      }, delay);
+      alertDismissTimers.push(timerId);
+    });
+  }
+
   function openModal(tabName, returnUrl) {
     var nextTab = tabName || 'login';
     if (nextTab !== 'signup' && !isForgotStep(nextTab)) {
@@ -301,9 +334,12 @@
     if (focusTarget) {
       window.setTimeout(function () { focusTarget.focus(); }, 120);
     }
+
+    initAuthAlerts();
   }
 
   function closeModal() {
+    clearAlertDismissTimers();
     overlay.hidden = true;
     overlay.classList.add('home-auth-overlay--hidden');
     overlay.setAttribute('aria-hidden', 'true');
@@ -324,6 +360,8 @@
   var authTabFromUrl = stripAuthTabFromUrl();
   if (authTabFromUrl) {
     openModal(authTabFromUrl, queryReturnUrl);
+  } else {
+    initAuthAlerts();
   }
 
   triggers.forEach(function (trigger) {
