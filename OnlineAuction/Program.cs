@@ -125,6 +125,7 @@ builder.Services
         options.Password.RequireNonAlphanumeric = false;
 
         options.User.RequireUniqueEmail = true;
+        options.SignIn.RequireConfirmedEmail = true;
 
         options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
         options.Lockout.MaxFailedAccessAttempts = 5;
@@ -132,6 +133,11 @@ builder.Services
     })
     .AddEntityFrameworkStores<AuctionHouseDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+{
+    options.TokenLifespan = TimeSpan.FromHours(24);
+});
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -226,8 +232,12 @@ builder.Services.Configure<PayPalSettings>(
     builder.Configuration.GetSection(PayPalSettings.SectionName));
 builder.Services.Configure<FirebaseSettings>(
     builder.Configuration.GetSection(FirebaseSettings.SectionName));
+builder.Services.Configure<PasswordResetOtpSettings>(
+    builder.Configuration.GetSection(PasswordResetOtpSettings.SectionName));
 
 builder.Services.AddHttpClient<IPayPalService, PayPalService>();
+builder.Services.AddHttpClient<IEmailSender, GmailEmailSender>();
+builder.Services.AddHttpClient<IEmailVerificationService, EmailVerificationService>();
 
 builder.Services.AddScoped<IAvatarStorageService, CloudinaryAvatarStorageService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
@@ -246,11 +256,12 @@ builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<IAdminAuctionVerificationService, AdminAuctionVerificationService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IAdminProductService, AdminProductService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
 builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
 builder.Services.AddScoped<IRegistrationDepositRefundService, RegistrationDepositRefundService>();
-builder.Services.AddSingleton<IPasswordResetOtpService, PasswordResetOtpService>();
+builder.Services.AddScoped<IPasswordResetOtpService, PasswordResetOtpService>();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IRealtimePublisher, RealtimePublisher>();
 #endregion

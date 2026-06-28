@@ -139,8 +139,14 @@
             </div>
 
             <button type="submit" class="home-auth-submit">@Localizer["Auth_Forgot_VerifyOtp"]</button>
-            <button type="button" id="authBackToForgotEmailBtn" class="home-auth-secondary-action">@Localizer["Auth_Forgot_ChangeEmail"]</button>
           </form>
+          <form method="post" asp-controller="Auth" asp-action="ResendPasswordOtp" class="home-auth-form home-auth-form--compact">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@modalReturnUrl" />
+            <input type="hidden" name="fromModal" value="true" />
+            <button type="submit" class="home-auth-secondary-action">@Localizer["Auth_Otp_Resend"]</button>
+          </form>
+          <button type="button" id="authBackToForgotEmailBtn" class="home-auth-secondary-action">@Localizer["Auth_Forgot_ChangeEmail"]</button>
         </div>
 
         <div id="authPanelForgotReset" class="home-auth-panel" role="tabpanel" hidden>
