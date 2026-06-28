@@ -109,6 +109,24 @@
                         </a>
                     </li>
                     }
+                    @if (AdminPermissionHelper.Can(User, PermissionCodes.ComplaintsReview))
+                    {
+                    <li>
+                        <a asp-area="Admin" asp-controller="Complaint" asp-action="Index"
+                           class="menu-item group menu-item-inactive flex items-center">
+                            <svg class="menu-item-icon-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM10.125 8.25a1.875 1.875 0 1 1 3.75 0 1.875 1.875 0 0 1-3.75 0Zm1.875 3.375a.75.75 0 0 0-.75.75v4.125a.75.75 0 0 0 1.5 0v-4.125a.75.75 0 0 0-.75-.75Z"
+                                    fill="" />
+                            </svg>
+                            <span class="menu-item-text flex flex-1 items-center gap-2" :class="sidebarToggle ? 'lg:hidden' : ''">
+                                Complaints
+                                @await Component.InvokeAsync("PendingComplaintsBadge")
+                            </span>
+                        </a>
+                    </li>
+                    }
                 </ul>
             </div>
         </nav>

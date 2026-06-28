@@ -10,7 +10,9 @@
         ["emailInvalid"] = Localizer["Js_Refund_EmailInvalid"].Value,
         ["reasonRequired"] = Localizer["Js_Refund_ReasonRequired"].Value,
         ["descriptionRequired"] = Localizer["Js_Refund_DescriptionRequired"].Value,
-        ["policyRequired"] = Localizer["Js_Refund_PolicyRequired"].Value
+        ["policyRequired"] = Localizer["Js_Refund_PolicyRequired"].Value,
+        ["submitFailed"] = Localizer["Js_Refund_SubmitFailed"].Value,
+        ["loginRequired"] = Localizer["Js_Refund_LoginRequired"].Value
     };
 }
 
@@ -85,7 +87,16 @@
                 <h2 class="text-xl font-semibold text-slate-900">@Localizer["Refund_FormTitle"]</h2>
                 <p class="mt-1 text-sm text-slate-500">@Localizer["Refund_FormDesc"] <span class="text-red-500">*</span>.</p>
 
+                @if (!Model.IsAuthenticated)
+                {
+                    <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                        @Localizer["Refund_LoginRequired"]
+                        <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="/Refund" class="font-semibold underline">@Localizer["Login"]</a>
+                    </div>
+                }
+
                 <form id="refundForm" class="mt-6 space-y-5">
+                    @Html.AntiForgeryToken()
                     <div>
                         <label for="orderReference" class="block text-sm font-medium text-slate-900">@Localizer["Refund_OrderReference"] <span class="text-red-500">*</span></label>
                         <select id="orderReference"
@@ -93,7 +104,10 @@
                             <option value="">@Localizer["Refund_SelectOrder"]</option>
                             @foreach (var order in Model.RecentOrders)
                             {
-                                <option value="@order.OrderReference" data-amount="@order.AmountPaid" data-name="@order.AuctionName">
+                                <option value="@order.OrderReference"
+                                        data-order-id="@order.OrderId"
+                                        data-amount="@order.AmountPaid"
+                                        data-name="@order.AuctionName">
                                     @order.OrderReference — @order.AuctionName ($@order.AmountPaid.ToString("N2"))
                                 </option>
                             }
@@ -129,7 +143,7 @@
                             <option value="">@Localizer["Refund_SelectReason"]</option>
                             @foreach (var reason in Model.RefundReasons)
                             {
-                                <option value="@reason.Label">@reason.Label</option>
+                                <option value="@reason.Id">@reason.Label</option>
                             }
                         </select>
                         <span id="refundReasonError" class="mt-1 block text-sm text-red-600"></span>
@@ -158,9 +172,11 @@
                         </span>
                     </label>
                     <span id="agreePolicyError" class="block text-sm text-red-600"></span>
+                    <span id="formError" class="block text-sm text-red-600"></span>
 
                     <button type="submit"
-                            class="w-full rounded-xl bg-blue-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800 focus:ring-2 focus:ring-blue-700 focus:ring-offset-2">
+                            @(!Model.IsAuthenticated ? "disabled" : null)
+                            class="w-full rounded-xl bg-blue-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800 focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60">
                         @Localizer["Refund_Submit"]
                     </button>
                 </form>
@@ -172,6 +188,9 @@
 @section Scripts {
     <script>
         window.refundConfig = {
+            submitUrl: '@Url.Action("Submit", "Refund")',
+            loginUrl: '@Url.Action("Login", "Auth", new { returnUrl = "/Refund" })',
+            isAuthenticated: @(Model.IsAuthenticated ? "true" : "false"),
             i18n: @Html.Raw(JsonSerializer.Serialize(refundI18n))
         };
     </script>
