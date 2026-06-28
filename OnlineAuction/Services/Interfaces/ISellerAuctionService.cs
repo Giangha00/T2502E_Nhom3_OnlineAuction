@@ -8,7 +8,8 @@ public interface ISellerAuctionService
         int sellerId,
         string? channel = null,
         bool forPublicProfile = false,
-        bool includeOwnerDrafts = false);
+        bool includeOwnerDrafts = false,
+        string? tab = null);
 
     Task<(bool Success, string Message, int? AuctionId)> CreateAsync(
         CreateAuctionViewModel model,

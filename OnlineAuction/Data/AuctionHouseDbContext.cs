@@ -45,6 +45,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<UserOtpCode> UserOtpCodes => Set<UserOtpCode>();
 
+    public DbSet<WatchlistItem> WatchlistItems => Set<WatchlistItem>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         
@@ -66,6 +68,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureUserDeviceTokens(builder);
         ConfigurePermissions(builder);
         ConfigureUserOtpCodes(builder);
+        ConfigureWatchlistItems(builder);
     }
 
     private static void ConfigurePermissions(ModelBuilder builder)
@@ -728,5 +731,36 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             .HasForeignKey(nameof(AuditableEntity.DeletedBy))
             .HasConstraintName($"fk_{tableName}_deleted_by")
             .OnDelete(DeleteBehavior.SetNull);
+    }
+
+    private static void ConfigureWatchlistItems(ModelBuilder builder)
+    {
+        builder.Entity<WatchlistItem>(entity =>
+        {
+            entity.ToTable("watchlist_items");
+
+            entity.Property(w => w.Id).HasColumnName("id");
+            entity.Property(w => w.UserId).HasColumnName("user_id");
+            entity.Property(w => w.AuctionId).HasColumnName("auction_id");
+            entity.Property(w => w.AddedAt).HasColumnName("added_at");
+
+            entity.HasIndex(w => new { w.UserId, w.AuctionId })
+                .IsUnique()
+                .HasDatabaseName("ux_watchlist_user_auction");
+
+            entity.HasIndex(w => w.UserId).HasDatabaseName("ix_watchlist_user_id");
+
+            entity.HasOne(w => w.User)
+                .WithMany(u => u.WatchlistItems)
+                .HasForeignKey(w => w.UserId)
+                .HasConstraintName("fk_watchlist_user")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(w => w.Auction)
+                .WithMany(a => a.WatchlistItems)
+                .HasForeignKey(w => w.AuctionId)
+                .HasConstraintName("fk_watchlist_auction")
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 }

@@ -1,10 +1,12 @@
+@using OnlineAuction.Helpers
+
 <div class="border-b border-stone-200 pb-6">
-  <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">Authenticator</h3>
+  <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">@Localizer["Auction_Filter_Authenticator"]</h3>
   <div class="mt-3 space-y-2">
-    @foreach (var authenticator in new[] { "PSA", "BGS", "CGC" })
+    @foreach (var authenticator in GradeLabelHelper.Authenticators.Where(item => item != GradeLabelHelper.Ungraded))
     {
       <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
-        <input type="checkbox" name="authenticator" value="@authenticator" class="filter-authenticator rounded border-stone-300 text-blue-700 focus:ring-blue-600"/>
+        <input type="checkbox" value="@authenticator" class="filter-authenticator rounded border-stone-300 text-blue-700 focus:ring-blue-600"/>
         @authenticator
       </label>
     }

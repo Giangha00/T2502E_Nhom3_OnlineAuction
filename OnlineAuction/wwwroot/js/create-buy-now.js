@@ -47,25 +47,46 @@
     return checked ? checked.value : '';
   }
 
+  function composeGradeLabel(authenticator, gradeValue) {
+    if (!authenticator || authenticator === 'Ungraded') return 'Ungraded';
+    if (!gradeValue) return authenticator;
+    return authenticator + ' ' + gradeValue;
+  }
+
+  function syncGradeHidden() {
+    var authenticator = $('authenticator')?.value || '';
+    var gradeValue = $('gradeValue')?.value || '';
+    var gradeInput = $('grade');
+    if (gradeInput) {
+      gradeInput.value = composeGradeLabel(authenticator, gradeValue);
+    }
+  }
+
+  function toggleGradeValueField() {
+    var authenticator = $('authenticator')?.value || '';
+    var gradeField = $('gradeValue');
+    if (!gradeField) return;
+    var isUngraded = authenticator === 'Ungraded';
+    gradeField.disabled = isUngraded;
+    gradeField.classList.toggle('opacity-50', isUngraded);
+  }
+
   function getFormData() {
+    syncGradeHidden();
     return {
       productName: $('productName')?.value.trim() || '',
       shortDescription: $('shortDescription')?.value.trim() || '',
       subtitle: $('subtitle')?.value.trim() || '',
       category: $('category')?.value || '',
       productDescription: state.editor ? state.editor.getData() : ($('productDescription')?.value || ''),
-      condition: getSelectedRadio('Condition'),
-      productOrigin: $('productOrigin')?.value.trim() || '',
+      authenticator: $('authenticator')?.value || '',
+      gradeValue: $('gradeValue')?.value || '',
       year: $('year')?.value || '',
       setName: $('setName')?.value.trim() || '',
       language: $('language')?.value || '',
       cardNumber: $('cardNumber')?.value.trim() || '',
       grade: $('grade')?.value || '',
       certificateNumber: $('certificateNumber')?.value.trim() || '',
-      gradingCentering: $('gradingCentering')?.value.trim() || '',
-      gradingCorners: $('gradingCorners')?.value.trim() || '',
-      gradingEdges: $('gradingEdges')?.value.trim() || '',
-      gradingSurface: $('gradingSurface')?.value.trim() || '',
       price: $('price')?.value || '',
       imageCount: state.images.length,
       documentCount: state.documents.length
@@ -77,23 +98,13 @@
     return '$' + Number(value).toLocaleString('en-US', { maximumFractionDigits: 0 });
   }
 
-  function localizeCondition(value) {
-    switch (value) {
-      case 'New': return t('conditionNew', value);
-      case 'Like New': return t('conditionLikeNew', value);
-      case 'Used': return t('conditionUsed', value);
-      default: return value;
-    }
-  }
-
   function buildPreviewSubtitle(data) {
     if (data.subtitle) return data.subtitle;
-    if (data.shortDescription) return data.shortDescription;
     var parts = [];
-    if (data.category) parts.push(data.category);
     if (data.setName) parts.push(data.setName);
-    if (data.productOrigin) parts.push(data.productOrigin);
-    if (data.condition) parts.push(localizeCondition(data.condition));
+    var grade = data.grade || composeGradeLabel(data.authenticator, data.gradeValue);
+    if (grade) parts.push(grade);
+    if (data.year) parts.push(data.year);
     return parts.length ? parts.join(' · ') : '—';
   }
 
@@ -341,18 +352,27 @@
       valid = false;
     }
 
-    if (!data.condition) {
-      showError('Condition', t('errorConditionRequired', 'Please select a condition'));
+    if (!data.year) {
+      showError('year', t('errorYearRequired', 'Year is required'));
+      markInvalid($('year'));
       valid = false;
-    }
-
-    if (data.year) {
+    } else {
       var year = Number(data.year);
       if (isNaN(year) || year < 1800 || year > 2100) {
         showError('year', t('errorYearInvalid', 'Please enter a valid year between 1800 and 2100.'));
         markInvalid($('year'));
         valid = false;
       }
+    }
+
+    if (!data.authenticator) {
+      showError('authenticator', t('errorAuthenticatorRequired', 'Please select an authenticator'));
+      markInvalid($('authenticator'));
+      valid = false;
+    } else if (data.authenticator !== 'Ungraded' && !data.gradeValue) {
+      showError('gradeValue', t('errorGradeRequired', 'Please select a grade'));
+      markInvalid($('gradeValue'));
+      valid = false;
     }
 
     var price = Number(data.price);
@@ -389,23 +409,18 @@
       if ($('shortDescription') && data.shortDescription) $('shortDescription').value = data.shortDescription;
       if ($('subtitle') && data.subtitle) $('subtitle').value = data.subtitle;
       if ($('category') && data.category) $('category').value = data.category;
-      if ($('productOrigin') && data.productOrigin) $('productOrigin').value = data.productOrigin;
       if ($('year') && data.year) $('year').value = data.year;
       if ($('setName') && data.setName) $('setName').value = data.setName;
       if ($('language') && data.language) $('language').value = data.language;
       if ($('cardNumber') && data.cardNumber) $('cardNumber').value = data.cardNumber;
+      if ($('authenticator') && data.authenticator) $('authenticator').value = data.authenticator;
+      if ($('gradeValue') && data.gradeValue) $('gradeValue').value = data.gradeValue;
       if ($('grade') && data.grade) $('grade').value = data.grade;
       if ($('certificateNumber') && data.certificateNumber) $('certificateNumber').value = data.certificateNumber;
-      if ($('gradingCentering') && data.gradingCentering) $('gradingCentering').value = data.gradingCentering;
-      if ($('gradingCorners') && data.gradingCorners) $('gradingCorners').value = data.gradingCorners;
-      if ($('gradingEdges') && data.gradingEdges) $('gradingEdges').value = data.gradingEdges;
-      if ($('gradingSurface') && data.gradingSurface) $('gradingSurface').value = data.gradingSurface;
       if ($('price') && data.price) $('price').value = data.price;
 
-      if (data.condition) {
-        var radio = form.querySelector('input[name="Condition"][value="' + data.condition + '"]');
-        if (radio) radio.checked = true;
-      }
+      toggleGradeValueField();
+      syncGradeHidden();
 
       if (state.editor && data.productDescription) {
         state.editor.setData(data.productDescription);
@@ -477,9 +492,8 @@
 
   function bindEvents() {
     var fields = [
-      'productName', 'shortDescription', 'subtitle', 'category', 'productOrigin',
-      'year', 'setName', 'language', 'cardNumber', 'grade', 'certificateNumber',
-      'gradingCentering', 'gradingCorners', 'gradingEdges', 'gradingSurface',
+      'productName', 'shortDescription', 'subtitle', 'category',
+      'year', 'setName', 'language', 'cardNumber', 'authenticator', 'gradeValue', 'grade', 'certificateNumber',
       'price'
     ];
 
@@ -490,9 +504,14 @@
       el.addEventListener('change', updatePreview);
     });
 
-    form.querySelectorAll('input[name="Condition"]').forEach(function (el) {
-      el.addEventListener('change', updatePreview);
-    });
+    var authenticatorField = $('authenticator');
+    if (authenticatorField) {
+      authenticatorField.addEventListener('change', function () {
+        toggleGradeValueField();
+        updatePreview();
+      });
+      toggleGradeValueField();
+    }
 
     setupDropZone('imageDropZone', 'imageInput', addImages, false);
     setupDropZone('documentDropZone', 'documentInput', addDocuments, true);

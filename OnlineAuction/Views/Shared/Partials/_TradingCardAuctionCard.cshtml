@@ -160,11 +160,16 @@ else
                     {
                         <span class="absolute left-3 top-3 rounded-md bg-slate-900 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">@item.Grade</span>
                     }
-                    @if (Model.ShowWatchlistButton && !isBuyNow)
+                    @if (Model.ShowWatchlistButton)
                     {
-                        <button type="button" aria-label="Add to watchlist" onclick="event.preventDefault();"
-                                class="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-stone-400 shadow transition hover:text-red-500">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <button type="button"
+                                data-watchlist-toggle
+                                data-auction-id="@item.Id"
+                                data-watched="@(Model.IsWatched ? "true" : "false")"
+                                aria-pressed="@(Model.IsWatched ? "true" : "false")"
+                                aria-label="@(Model.IsWatched ? "Remove from watchlist" : "Add to watchlist")"
+                                class="watchlist-btn absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 shadow transition @(Model.IsWatched ? "text-red-500" : "text-stone-400 hover:text-red-500")">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="@(Model.IsWatched ? "currentColor" : "none")" stroke="currentColor" stroke-width="2">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                             </svg>
                         </button>

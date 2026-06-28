@@ -259,6 +259,8 @@ builder.Services.AddHostedService<AuctionFinalizationWorker>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISellService, SellService>();
 builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
+builder.Services.AddScoped<IWatchlistService, WatchlistService>();
+builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<IAdminAuctionVerificationService, AdminAuctionVerificationService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();

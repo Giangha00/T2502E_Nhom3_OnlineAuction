@@ -1,0 +1,80 @@
+@model OnlineAuction.Models.AccountListingsViewModel
+@{
+    ViewData["Title"] = Model.PageTitle;
+    var hasListings = Model.Listings.Count > 0;
+    var hasTabs = Model.Tabs is { Count: > 0 };
+}
+
+<div class="account-dashboard min-h-screen bg-slate-50">
+  <div class="site-shell account-dashboard__layout px-4 py-8 sm:px-6 lg:py-10">
+    <partial name="Partials/_AccountSidebar" model="Model.Shell"/>
+
+    <div class="account-dashboard__main">
+      <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">@Model.PageTitle</h1>
+      <p class="mt-2 text-sm text-slate-500">@Model.PageDescription</p>
+
+      @if (hasTabs)
+      {
+        <div class="mt-8 border-b border-stone-200">
+          <div class="flex flex-wrap gap-6">
+            @foreach (var (key, label) in Model.Tabs!)
+            {
+              var isActive = string.Equals(Model.ActiveTab, key, StringComparison.OrdinalIgnoreCase);
+              <a asp-controller="Account" asp-action="@ViewContext.RouteData.Values["action"]" asp-route-tab="@key"
+                 class="account-tab @(isActive ? "is-active" : "")">@label</a>
+            }
+          </div>
+        </div>
+      }
+
+      @if (hasListings && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Offers", StringComparison.OrdinalIgnoreCase))
+      {
+        <div class="mt-6 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+          <a asp-controller="Order" asp-action="Index" class="font-semibold underline hover:text-blue-900">
+            @Localizer["Card_CompletePaymentArrow"]
+          </a>
+        </div>
+      }
+
+      @if (!hasListings)
+      {
+        <div class="account-empty mt-16">
+          <div class="account-empty__art" aria-hidden="true">
+            <svg viewBox="0 0 80 80" fill="none" class="h-16 w-16 text-slate-300">
+              <circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+              <path d="M28 40h24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h2 class="mt-6 text-xl font-bold text-slate-900">@Localizer[Model.EmptyTitleKey]</h2>
+          <p class="mt-2 max-w-md text-sm text-slate-500">
+            @(Model.EmptyDesc ?? Localizer["Account_Empty_Desc", Model.PageTitle.ToString().ToLowerInvariant()])
+          </p>
+        </div>
+      }
+      else
+      {
+        <div class="rarecard-auction-grid mt-10" data-watchlist-grid>
+          @foreach (var item in Model.Listings)
+          {
+            var isBuyNow = string.Equals(item.ListingType, "buynow", StringComparison.OrdinalIgnoreCase);
+            <partial name="~/Views/Shared/Partials/_TradingCardAuctionCard.cshtml"
+                     model="@(new AuctionCardViewModel
+                     {
+                       Item = item,
+                       Variant = "grid",
+                       CardMode = isBuyNow ? "buynow" : Model.CardMode,
+                       ShowWatchlistButton = Model.ShowWatchlistButton,
+                       IsWatched = Model.WatchedAuctionIds.Contains(item.Id),
+                       ShowBidLink = Model.ShowBidLink,
+                       ShowTimeRemaining = Model.ShowTimeRemaining
+                     })"/>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+  <script src="~/js/watchlist.js" asp-append-version="true"></script>
+}

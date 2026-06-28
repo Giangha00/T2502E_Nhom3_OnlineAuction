@@ -243,6 +243,7 @@
   <data name="Sell_ShortDescription_Placeholder" xml:space="preserve"><value>Tóm tắt hiển thị ở header (tối đa 300 ký tự)</value></data>
   <data name="Sell_Subtitle" xml:space="preserve"><value>Phụ đề</value></data>
   <data name="Sell_Subtitle_Placeholder" xml:space="preserve"><value>Dòng tagline dưới tên sản phẩm</value></data>
+  <data name="Sell_Subtitle_Hint" xml:space="preserve"><value>Để trống sẽ tự tạo theo Bộ · Grade · Năm (giống thẻ trên trang đấu giá/mua ngay).</value></data>
   <data name="Sell_Section4_CardSpecs_Title" xml:space="preserve"><value>Thông số thẻ</value></data>
   <data name="Sell_Section4_CardSpecs_Desc" xml:space="preserve"><value>Năm, bộ, ngôn ngữ, grade và số chứng nhận</value></data>
   <data name="Sell_SetName_Placeholder" xml:space="preserve"><value>vd. Base Set</value></data>
@@ -252,6 +253,9 @@
   <data name="Sell_AuctionEventName" xml:space="preserve"><value>Tên sự kiện đấu giá</value></data>
   <data name="Sell_AuctionEventName_Placeholder" xml:space="preserve"><value>vd. RareCard Vault: Premium Trading Card Auction</value></data>
   <data name="Sell_Error_YearInvalid" xml:space="preserve"><value>Vui lòng nhập năm hợp lệ từ 1800 đến 2100.</value></data>
+  <data name="Sell_Error_YearRequired" xml:space="preserve"><value>Vui lòng nhập năm sản xuất.</value></data>
+  <data name="Sell_Error_AuthenticatorRequired" xml:space="preserve"><value>Vui lòng chọn đơn vị xác thực.</value></data>
+  <data name="Sell_Error_GradeRequired" xml:space="preserve"><value>Vui lòng chọn điểm grade.</value></data>
   <data name="Sell_Section2_Title" xml:space="preserve"><value>Hình ảnh sản phẩm</value></data>
   <data name="Sell_Section2_Desc" xml:space="preserve"><value>Tải lên nhiều hình — JPG, PNG, WEBP (tối đa 5MB mỗi ảnh)</value></data>
   <data name="Sell_UploadImages_Title" xml:space="preserve"><value>Tải lên hình ảnh sản phẩm</value></data>
@@ -347,6 +351,12 @@
   <data name="Account_Preferences" xml:space="preserve"><value>Tùy chọn</value></data>
   <data name="Account_Orders_Desc" xml:space="preserve"><value>Theo dõi và xem các giao dịch mua</value></data>
   <data name="Account_Bids_Desc" xml:space="preserve"><value>Xem các phiên đấu giá đang tham gia và đã qua</value></data>
+  <data name="Account_Bids_Tab_Active" xml:space="preserve"><value>Đang diễn ra</value></data>
+  <data name="Account_Bids_Tab_Past" xml:space="preserve"><value>Đã kết thúc</value></data>
+  <data name="Account_Bids_Empty" xml:space="preserve"><value>Bạn chưa có phiên đấu giá nào trong mục này.</value></data>
+  <data name="Account_Watchlist_Empty" xml:space="preserve"><value>Chưa có mục nào trong danh sách theo dõi. Nhấn biểu tượng trái tim trên thẻ đấu giá để lưu.</value></data>
+  <data name="Account_Offers_Empty" xml:space="preserve"><value>Chưa có đề nghị mua nào đang chờ thanh toán.</value></data>
+  <data name="Account_Submissions_Empty" xml:space="preserve"><value>Chưa có hồ sơ nào đang chờ xét duyệt. Tạo tin đăng mới để gửi tới Vault.</value></data>
   <data name="Account_Watchlist_Desc" xml:space="preserve"><value>Theo dõi các mục đã lưu</value></data>
   <data name="Account_Offers_Desc" xml:space="preserve"><value>Theo dõi đề nghị bạn đã gửi hoặc nhận</value></data>
   <data name="Account_Summary_Desc" xml:space="preserve"><value>Tổng quan tài khoản của bạn</value></data>

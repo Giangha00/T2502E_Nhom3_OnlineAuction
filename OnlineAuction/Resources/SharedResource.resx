@@ -243,6 +243,7 @@
   <data name="Sell_ShortDescription_Placeholder" xml:space="preserve"><value>Brief summary shown in the listing header (max 300 characters)</value></data>
   <data name="Sell_Subtitle" xml:space="preserve"><value>Subtitle</value></data>
   <data name="Sell_Subtitle_Placeholder" xml:space="preserve"><value>Tagline shown under the product name</value></data>
+  <data name="Sell_Subtitle_Hint" xml:space="preserve"><value>Leave blank to auto-generate from Set · Grade · Year (same as listing cards).</value></data>
   <data name="Sell_Section4_CardSpecs_Title" xml:space="preserve"><value>Card Specifications</value></data>
   <data name="Sell_Section4_CardSpecs_Desc" xml:space="preserve"><value>Year, set, language, grade, and certificate details</value></data>
   <data name="Sell_SetName_Placeholder" xml:space="preserve"><value>e.g. Base Set</value></data>
@@ -252,6 +253,9 @@
   <data name="Sell_AuctionEventName" xml:space="preserve"><value>Auction Event Name</value></data>
   <data name="Sell_AuctionEventName_Placeholder" xml:space="preserve"><value>e.g. RareCard Vault: Premium Trading Card Auction</value></data>
   <data name="Sell_Error_YearInvalid" xml:space="preserve"><value>Please enter a valid year between 1800 and 2100.</value></data>
+  <data name="Sell_Error_YearRequired" xml:space="preserve"><value>Year is required.</value></data>
+  <data name="Sell_Error_AuthenticatorRequired" xml:space="preserve"><value>Please select an authenticator.</value></data>
+  <data name="Sell_Error_GradeRequired" xml:space="preserve"><value>Please select a grade.</value></data>
   <data name="Sell_Section2_Title" xml:space="preserve"><value>Product Images</value></data>
   <data name="Sell_Section2_Desc" xml:space="preserve"><value>Upload multiple images — JPG, PNG, WEBP (max 5MB each)</value></data>
   <data name="Sell_UploadImages_Title" xml:space="preserve"><value>Upload Product Images</value></data>
@@ -347,6 +351,12 @@
   <data name="Account_Preferences" xml:space="preserve"><value>Preferences</value></data>
   <data name="Account_Orders_Desc" xml:space="preserve"><value>Track and view your purchases</value></data>
   <data name="Account_Bids_Desc" xml:space="preserve"><value>View your active and past auction bids</value></data>
+  <data name="Account_Bids_Tab_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="Account_Bids_Tab_Past" xml:space="preserve"><value>Past</value></data>
+  <data name="Account_Bids_Empty" xml:space="preserve"><value>You have no bids in this section yet.</value></data>
+  <data name="Account_Watchlist_Empty" xml:space="preserve"><value>Your watchlist is empty. Tap the heart on an auction card to save items here.</value></data>
+  <data name="Account_Offers_Empty" xml:space="preserve"><value>No pending buy-now offers awaiting payment.</value></data>
+  <data name="Account_Submissions_Empty" xml:space="preserve"><value>No submissions awaiting review. Create a new listing to submit to the Vault.</value></data>
   <data name="Account_Watchlist_Desc" xml:space="preserve"><value>Keep tabs on saved items</value></data>
   <data name="Account_Offers_Desc" xml:space="preserve"><value>Track offers you've made or received</value></data>
   <data name="Account_Summary_Desc" xml:space="preserve"><value>An overall view of your account</value></data>
