@@ -5,6 +5,7 @@ using OnlineAuction.Areas.Admin.ViewModels.Products;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
+using OnlineAuction.Helpers;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Areas.Admin.Services;
@@ -982,7 +983,7 @@ public class AdminProductService : IAdminProductService
 
     private static List<SelectListItem> BuildConditionOptions(string? selected = null)
     {
-        return CreateAuctionMockData.Conditions
+        return new[] { "Graded", "Ungraded" }
             .Select(condition => new SelectListItem
             {
                 Value = condition,
@@ -994,7 +995,7 @@ public class AdminProductService : IAdminProductService
 
     private static List<SelectListItem> BuildGradeOptions(string? selected = null)
     {
-        return CreateAuctionMockData.Grades
+        return GradeLabelHelper.GetAllGradeLabels()
             .Select(grade => new SelectListItem
             {
                 Value = grade,

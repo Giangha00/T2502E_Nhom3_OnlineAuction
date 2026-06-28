@@ -6,6 +6,7 @@ public class AuctionCardViewModel
     public bool EnableFiltering { get; set; }
     public bool ShowBidLink { get; set; } = true;
     public bool ShowWatchlistButton { get; set; } = true;
+    public bool IsWatched { get; set; }
     public bool ShowTimeRemaining { get; set; } = true;
     public bool ShowProductMeta { get; set; }
     public string Variant { get; set; } = "grid";

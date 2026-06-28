@@ -16,12 +16,8 @@ public class SellProductFormViewModel
     [Display(Name = "Description")]
     public string? ProductDescription { get; set; }
 
-    [Required(ErrorMessage = "Please select a condition.")]
     [Display(Name = "Condition")]
-    public string Condition { get; set; } = "New";
-
-    [Display(Name = "Product Origin")]
-    public string? ProductOrigin { get; set; }
+    public string Condition { get; set; } = "Graded";
 
     [StringLength(300, ErrorMessage = "Short description cannot exceed 300 characters.")]
     [Display(Name = "Short Description")]
@@ -31,9 +27,17 @@ public class SellProductFormViewModel
     [Display(Name = "Subtitle")]
     public string? Subtitle { get; set; }
 
+    [Required(ErrorMessage = "Year is required.")]
     [Range(1800, 2100, ErrorMessage = "Please enter a valid year.")]
     [Display(Name = "Year")]
     public int? Year { get; set; }
+
+    [Required(ErrorMessage = "Please select an authenticator.")]
+    [Display(Name = "Authenticator")]
+    public string Authenticator { get; set; } = "PSA";
+
+    [Display(Name = "Grade")]
+    public string GradeValue { get; set; } = "10";
 
     [Display(Name = "Grade")]
     public string Grade { get; set; } = "PSA 10";
@@ -60,20 +64,8 @@ public class SellProductFormViewModel
 
     public List<string> DocumentNames { get; set; } = [];
 
-    [Display(Name = "Grading — Centering")]
-    public string GradingCentering { get; set; } = "10";
-
-    [Display(Name = "Grading — Corners")]
-    public string GradingCorners { get; set; } = "10";
-
-    [Display(Name = "Grading — Edges")]
-    public string GradingEdges { get; set; } = "10";
-
-    [Display(Name = "Grading — Surface")]
-    public string GradingSurface { get; set; } = "10";
-
     public List<string> Categories { get; set; } = [];
-    public List<string> Conditions { get; set; } = [];
-    public List<string> Grades { get; set; } = [];
+    public List<string> Authenticators { get; set; } = [];
+    public List<string> GradeValues { get; set; } = [];
     public List<string> Languages { get; set; } = [];
 }

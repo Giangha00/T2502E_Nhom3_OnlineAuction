@@ -1,33 +1,24 @@
 @{
-    var title = (string)ViewData["RangeTitle"]!;
-    var key = (string)ViewData["RangeKey"]!;
-    var keyLower = key.ToLowerInvariant();
+    var rangeTitle = ViewData["RangeTitle"]?.ToString() ?? "Range";
+    var rangeKey = ViewData["RangeKey"]?.ToString() ?? "Range";
 }
+
 <div class="border-b border-stone-200 pb-6">
-  <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">@title</h3>
-  <div class="mt-3 flex items-end gap-2">
-    <div class="min-w-0 flex-1">
-      <label for="filter@(key)Min" class="mb-1 block text-xs text-slate-500">From:</label>
-      <input type="number"
-             id="filter@(key)Min"
-             inputmode="decimal"
-             step="any"
-             placeholder="Enter min"
-             class="filter-@keyLower-min w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-600"/>
-    </div>
-    <div class="min-w-0 flex-1">
-      <label for="filter@(key)Max" class="mb-1 block text-xs text-slate-500">To:</label>
-      <input type="number"
-             id="filter@(key)Max"
-             inputmode="decimal"
-             step="any"
-             placeholder="Enter max"
-             class="filter-@keyLower-max w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-600"/>
-    </div>
+  <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">@rangeTitle</h3>
+  <div class="mt-3 flex items-center gap-2">
+    <input type="number"
+           id="filter@(rangeKey)Min"
+           placeholder="Min"
+           class="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"/>
+    <span class="text-slate-400">—</span>
+    <input type="number"
+           id="filter@(rangeKey)Max"
+           placeholder="Max"
+           class="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"/>
     <button type="button"
-            id="filter@(key)Apply"
-            aria-label="Apply @title filter"
-            class="filter-@keyLower-apply mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-stone-300 bg-white text-lg text-slate-600 hover:bg-stone-50 hover:text-slate-900">
+            id="filter@(rangeKey)Apply"
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-white text-slate-600 transition hover:border-blue-500 hover:text-blue-700"
+            aria-label="Apply @rangeTitle filter">
       →
     </button>
   </div>
