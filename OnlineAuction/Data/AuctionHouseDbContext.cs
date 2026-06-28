@@ -511,6 +511,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(o => o.VaultInsurance).HasColumnName("vault_insurance").HasPrecision(18, 2);
             entity.Property(o => o.TotalAmount).HasColumnName("total_amount").HasPrecision(18, 2);
             entity.Property(o => o.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(OrderStatuses.PendingPayment);
+            entity.Property(o => o.OrderSource).HasColumnName("order_source").HasMaxLength(20).IsRequired().HasDefaultValue(OrderSources.AuctionWin);
             entity.Property(o => o.PaymentDeadline).HasColumnName("payment_deadline");
             entity.Property(o => o.DepositApplied).HasColumnName("deposit_applied").HasPrecision(18, 2);
 

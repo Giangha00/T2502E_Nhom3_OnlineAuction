@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineAuction.Data;
 
@@ -11,9 +12,11 @@ using OnlineAuction.Data;
 namespace OnlineAuction.Migrations
 {
     [DbContext(typeof(AuctionHouseDbContext))]
-    partial class AuctionHouseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260627112518_AddOrderSourceToOrders")]
+    partial class AddOrderSourceToOrders
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1231,47 +1234,6 @@ namespace OnlineAuction.Migrations
                         });
                 });
 
-            modelBuilder.Entity("OnlineAuction.Entities.Permission", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("code");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)")
-                        .HasColumnName("description");
-
-                    b.Property<string>("Module")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("module");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("varchar(150)")
-                        .HasColumnName("name");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique()
-                        .HasDatabaseName("ux_permissions_code");
-
-                    b.ToTable("permissions", (string)null);
-                });
-
             modelBuilder.Entity("OnlineAuction.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -1572,27 +1534,6 @@ namespace OnlineAuction.Migrations
                     b.ToTable("product_images", (string)null);
                 });
 
-            modelBuilder.Entity("OnlineAuction.Entities.RolePermission", b =>
-                {
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int")
-                        .HasColumnName("role_id");
-
-                    b.Property<int>("PermissionId")
-                        .HasColumnType("int")
-                        .HasColumnName("permission_id");
-
-                    b.HasKey("RoleId", "PermissionId");
-
-                    b.HasIndex("PermissionId");
-
-                    b.HasIndex("RoleId", "PermissionId")
-                        .IsUnique()
-                        .HasDatabaseName("ux_role_permissions_role_permission");
-
-                    b.ToTable("role_permissions", (string)null);
-                });
-
             modelBuilder.Entity("OnlineAuction.Entities.UserDeviceToken", b =>
                 {
                     b.Property<int>("Id")
@@ -1635,65 +1576,6 @@ namespace OnlineAuction.Migrations
                         .HasDatabaseName("ix_user_device_tokens_user_id");
 
                     b.ToTable("user_device_tokens", (string)null);
-                });
-
-            modelBuilder.Entity("OnlineAuction.Entities.UserOtpCode", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AttemptCount")
-                        .HasColumnType("int")
-                        .HasColumnName("attempt_count");
-
-                    b.Property<string>("CodeHash")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)")
-                        .HasColumnName("code_hash");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("expires_at");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_used");
-
-                    b.Property<int>("MaxAttempts")
-                        .HasColumnType("int")
-                        .HasColumnName("max_attempts");
-
-                    b.Property<string>("Purpose")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("purpose");
-
-                    b.Property<string>("Salt")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("salt");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId", "Purpose", "IsUsed", "ExpiresAt")
-                        .HasDatabaseName("ix_user_otp_codes_active_lookup");
-
-                    b.ToTable("user_otp_codes", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -2194,27 +2076,6 @@ namespace OnlineAuction.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("OnlineAuction.Entities.RolePermission", b =>
-                {
-                    b.HasOne("OnlineAuction.Entities.Permission", "Permission")
-                        .WithMany("RolePermissions")
-                        .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_role_permissions_permission");
-
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_role_permissions_role");
-
-                    b.Navigation("Permission");
-
-                    b.Navigation("Role");
-                });
-
             modelBuilder.Entity("OnlineAuction.Entities.UserDeviceToken", b =>
                 {
                     b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
@@ -2223,18 +2084,6 @@ namespace OnlineAuction.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_device_tokens_user");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("OnlineAuction.Entities.UserOtpCode", b =>
-                {
-                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_otp_codes_user");
 
                     b.Navigation("User");
                 });
@@ -2276,11 +2125,6 @@ namespace OnlineAuction.Migrations
             modelBuilder.Entity("OnlineAuction.Entities.Category", b =>
                 {
                     b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("OnlineAuction.Entities.Permission", b =>
-                {
-                    b.Navigation("RolePermissions");
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.Product", b =>
