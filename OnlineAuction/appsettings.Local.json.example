@@ -18,15 +18,6 @@
       "SenderName": "RareCard Auction House"
     }
   },
-  "EmailVerification": {
-    "Gmail": {
-      "ClientId": "YOUR_GOOGLE_OAUTH_CLIENT_ID",
-      "ClientSecret": "YOUR_GOOGLE_OAUTH_CLIENT_SECRET",
-      "RefreshToken": "YOUR_GMAIL_REFRESH_TOKEN",
-      "SenderEmail": "your-sender@gmail.com",
-      "SenderName": "RareCard Auction House"
-    }
-  },
   "FirebaseSettings": {
     "ProjectId": "YOUR_FIREBASE_PROJECT_ID",
     "ClientEmail": "firebase-adminsdk-xxxxx@YOUR_FIREBASE_PROJECT_ID.iam.gserviceaccount.com",
