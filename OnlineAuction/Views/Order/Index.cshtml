@@ -237,16 +237,16 @@
                 <dt>@Localizer["Order_VaultInsurance"]</dt>
                 <dd id="orderSummaryInsurance">$@Model.VaultInsurance.ToString("N2")</dd>
               </div>
-              <div class="order-checkout__summary-row @(Model.DepositApplied > 0 ? "" : "hidden")" id="orderSummaryDepositRow">
+              <div class="order-checkout__summary-row" id="orderSummaryDepositRow">
                 <dt>@Localizer["Order_DepositApplied"]</dt>
-                <dd class="order-checkout__summary-deposit" id="orderSummaryDeposit">-$@Model.DepositApplied.ToString("N2")</dd>
+                <dd class="order-checkout__summary-deposit" id="orderSummaryDeposit">@(Model.DepositApplied > 0 ? $"-${Model.DepositApplied:N2}" : "—")</dd>
               </div>
               <div class="order-checkout__summary-row order-checkout__summary-row--total">
                 <dt>@Localizer["Checkout_Total"]</dt>
                 <dd id="orderSummaryTotal">$@Model.TotalAmount.ToString("N2")</dd>
               </div>
             </dl>
-            <p id="orderSelectionError" class="order-checkout__selection-error hidden"></p>
+            <p id="orderSelectionError" class="order-checkout__selection-error" role="alert" aria-live="polite"></p>
             <button type="submit" id="orderCompleteButton" class="order-checkout__submit">
               @Localizer["Order_CompleteOrder"]
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

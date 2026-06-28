@@ -107,7 +107,6 @@
         var subtotalEl = document.getElementById('orderSummarySubtotal');
         var shippingEl = document.getElementById('orderSummaryShipping');
         var insuranceEl = document.getElementById('orderSummaryInsurance');
-        var depositRow = document.getElementById('orderSummaryDepositRow');
         var depositEl = document.getElementById('orderSummaryDeposit');
         var totalEl = document.getElementById('orderSummaryTotal');
         var completeButton = document.getElementById('orderCompleteButton');
@@ -121,12 +120,10 @@
         if (subtotalEl) subtotalEl.textContent = formatMoney(subtotal);
         if (shippingEl) shippingEl.textContent = formatMoney(shipping);
         if (insuranceEl) insuranceEl.textContent = formatMoney(insurance);
-        if (depositEl) depositEl.textContent = '-' + formatMoney(deposit);
-        if (totalEl) totalEl.textContent = formatMoney(total);
-
-        if (depositRow) {
-            depositRow.classList.toggle('hidden', deposit <= 0);
+        if (depositEl) {
+            depositEl.textContent = deposit > 0 ? '-' + formatMoney(deposit) : '—';
         }
+        if (totalEl) totalEl.textContent = formatMoney(total);
 
         document.querySelectorAll('.order-invoice-card').forEach(function (card) {
             var checkbox = card.querySelector('.order-invoice-select');
@@ -142,10 +139,10 @@
         }
 
         if (selectionError) {
-            selectionError.classList.toggle('hidden', hasSelection);
-            if (!hasSelection) {
-                selectionError.textContent = i18n.noSelection || 'Please select at least one product to pay.';
-            }
+            selectionError.classList.toggle('is-visible', !hasSelection);
+            selectionError.textContent = hasSelection
+                ? ''
+                : (i18n.noSelection || 'Please select at least one product to pay.');
         }
     }
 
@@ -167,10 +164,10 @@
                 if (getSelectedCards().length === 0) {
                     event.preventDefault();
                     var selectionError = document.getElementById('orderSelectionError');
-                    if (selectionError) {
-                        selectionError.classList.remove('hidden');
-                        selectionError.textContent = i18n.noSelection || 'Please select at least one product to pay.';
-                    }
+                if (selectionError) {
+                    selectionError.classList.add('is-visible');
+                    selectionError.textContent = i18n.noSelection || 'Please select at least one product to pay.';
+                }
                 }
             });
         }
