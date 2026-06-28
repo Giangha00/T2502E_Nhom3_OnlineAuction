@@ -158,7 +158,13 @@ builder.Services.ConfigureApplicationCookie(options =>
         }
 
         var returnUrl = context.Request.Path + context.Request.QueryString;
-        var loginUrl = $"/Auth/Login?returnUrl={Uri.EscapeDataString(returnUrl)}";
+        if (string.IsNullOrWhiteSpace(returnUrl) || returnUrl == "/")
+        {
+            context.Response.Redirect("/");
+            return Task.CompletedTask;
+        }
+
+        var loginUrl = $"/?returnUrl={Uri.EscapeDataString(returnUrl)}";
         context.Response.Redirect(loginUrl);
         return Task.CompletedTask;
     };
@@ -171,7 +177,7 @@ builder.Services.ConfigureApplicationCookie(options =>
             return Task.CompletedTask;
         }
 
-        context.Response.Redirect("/Auth/Login");
+        context.Response.Redirect("/");
         return Task.CompletedTask;
     };
 });

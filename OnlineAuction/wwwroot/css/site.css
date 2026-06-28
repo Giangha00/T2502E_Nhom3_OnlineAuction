@@ -755,7 +755,11 @@ footer .footer-link--active:visited {
 }
 
 /* Home auth modal overlay */
-.home-auth-overlay {
+.home-auth-overlay[hidden] {
+  display: none !important;
+}
+
+.home-auth-overlay:not([hidden]) {
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -769,7 +773,7 @@ footer .footer-link--active:visited {
 }
 
 @media (min-width: 768px) {
-  .home-auth-overlay {
+  .home-auth-overlay:not([hidden]) {
     padding: 1.5rem;
   }
 }

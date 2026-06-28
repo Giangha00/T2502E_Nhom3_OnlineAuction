@@ -372,16 +372,6 @@
             }
             <script src="~/js/user-menu.js" asp-append-version="true"></script>
         }
-        @if (TempData["OpenAuthModal"] is string openAuthTab)
-        {
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    if (typeof window.openAuthModal === 'function') {
-                        window.openAuthModal(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(openAuthTab)));
-                    }
-                });
-            </script>
-        }
         <script>
             (function () {
                 var btn = document.getElementById('mobileMenuBtn');
