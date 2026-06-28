@@ -1,0 +1,216 @@
+@model ProductCategoryListViewModel
+
+@{
+    ViewData["Title"] = "Product Management";
+    ViewData["AdminPage"] = "products";
+
+    var currentPage = Model.Filter.Page <= 0 ? 1 : Model.Filter.Page;
+    var totalPages = Model.TotalPages <= 0 ? 1 : Model.TotalPages;
+    var startPage = Math.Max(1, currentPage - 2);
+    var endPage = Math.Min(totalPages, currentPage + 2);
+}
+
+<div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Product Management</h2>
+            <p class="text-theme-sm text-gray-500 dark:text-gray-400">Browse card categories and manage product instances inside each template.</p>
+        </div>
+
+        <a asp-area="Admin"
+           asp-controller="Product"
+           asp-action="Create"
+           class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
+            Create Product
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] is not null)
+    {
+        <div class="mb-4 rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-theme-sm text-success-700">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] is not null)
+    {
+        <div class="mb-4 rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-theme-sm text-error-700">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+        <form id="categoryFilterForm" method="get" class="flex flex-wrap items-end gap-3">
+            <input type="hidden" name="Page" value="1" />
+
+            <div class="min-w-[220px] flex-1">
+                <label class="mb-1 block text-theme-xs font-medium text-gray-500">Search</label>
+                <input id="categorySearchInput"
+                       name="Search"
+                       value="@Model.Filter.Search"
+                       placeholder="Category name"
+                       autocomplete="off"
+                       class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            </div>
+
+            <div class="w-[170px]">
+                <label class="mb-1 block text-theme-xs font-medium text-gray-500">Sort</label>
+                <select name="SortOrder" class="category-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                    <option value="" selected="@(string.IsNullOrWhiteSpace(Model.Filter.SortOrder))">Name A-Z</option>
+                    <option value="name_desc" selected="@(Model.Filter.SortOrder == "name_desc")">Name Z-A</option>
+                    <option value="count_desc" selected="@(Model.Filter.SortOrder == "count_desc")">Most products</option>
+                    <option value="count_asc" selected="@(Model.Filter.SortOrder == "count_asc")">Fewest products</option>
+                    <option value="date_desc" selected="@(Model.Filter.SortOrder == "date_desc")">Recently updated</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="max-w-full overflow-x-auto">
+            <table class="w-full min-w-[900px]">
+                <thead>
+                <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Preview</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Category</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Products</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Last Added</th>
+                    <th class="px-5 py-3 text-right text-theme-xs font-medium uppercase text-gray-500">Actions</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                @if (Model.Categories.Count == 0)
+                {
+                    <tr>
+                        <td colspan="5" class="px-5 py-10 text-center text-theme-sm text-gray-500">
+                            No categories with products found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var category in Model.Categories)
+                    {
+                        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                            <td class="px-5 py-4">
+                                <img src="@category.ThumbnailUrl"
+                                     alt="@category.CategoryName"
+                                     class="h-12 w-12 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
+                            </td>
+                            <td class="px-5 py-4">
+                                <p class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@category.CategoryName</p>
+                                <p class="text-theme-xs text-gray-500">Category ID: @category.CategoryId</p>
+                            </td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">
+                                @category.ProductCount instance@(category.ProductCount == 1 ? "" : "s")
+                            </td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">
+                                @(category.LatestProductCreatedAt?.ToString("dd/MM/yyyy") ?? "—")
+                            </td>
+                            <td class="px-5 py-4">
+                                <div class="flex justify-end gap-3">
+                                    <a asp-area="Admin"
+                                       asp-controller="Product"
+                                       asp-action="Category"
+                                       asp-route-id="@category.CategoryId"
+                                       class="text-theme-sm font-medium text-brand-500 hover:underline">
+                                        Open template
+                                    </a>
+
+                                    <a asp-area="Admin"
+                                       asp-controller="Product"
+                                       asp-action="Create"
+                                       asp-route-categoryId="@category.CategoryId"
+                                       class="text-theme-sm font-medium text-warning-600 hover:underline">
+                                        Add product
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-theme-sm text-gray-500">
+            Total: <span class="font-medium text-gray-800 dark:text-white/90">@Model.TotalItems</span>
+            · Page <span class="font-medium text-gray-800 dark:text-white/90">@currentPage</span>
+            of <span class="font-medium text-gray-800 dark:text-white/90">@totalPages</span>
+        </p>
+
+        <nav class="flex flex-wrap items-center gap-2">
+            <a asp-area="Admin"
+               asp-controller="Product"
+               asp-action="Index"
+               asp-route-Search="@Model.Filter.Search"
+               asp-route-SortOrder="@Model.Filter.SortOrder"
+               asp-route-Page="@(currentPage - 1)"
+               class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage <= 1 ? "pointer-events-none opacity-50" : "")">
+                Previous
+            </a>
+
+            @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
+            {
+                <a asp-area="Admin"
+                   asp-controller="Product"
+                   asp-action="Index"
+                   asp-route-Search="@Model.Filter.Search"
+                   asp-route-SortOrder="@Model.Filter.SortOrder"
+                   asp-route-Page="@pageNumber"
+                   class="rounded-lg border px-3 py-2 text-theme-sm font-medium @(pageNumber == currentPage ? "border-brand-500 bg-brand-500 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50")">
+                    @pageNumber
+                </a>
+            }
+
+            <a asp-area="Admin"
+               asp-controller="Product"
+               asp-action="Index"
+               asp-route-Search="@Model.Filter.Search"
+               asp-route-SortOrder="@Model.Filter.SortOrder"
+               asp-route-Page="@(currentPage + 1)"
+               class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage >= totalPages ? "pointer-events-none opacity-50" : "")">
+                Next
+            </a>
+        </nav>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const filterForm = document.getElementById('categoryFilterForm');
+            const searchInput = document.getElementById('categorySearchInput');
+            const filterControls = document.querySelectorAll('.category-filter-control');
+            let searchDebounceTimer = null;
+
+            function submitFilterForm() {
+                if (!filterForm) {
+                    return;
+                }
+
+                filterForm.querySelector('input[name="Page"]').value = '1';
+                filterForm.requestSubmit();
+            }
+
+            filterControls.forEach(function (control) {
+                control.addEventListener('change', submitFilterForm);
+            });
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    clearTimeout(searchDebounceTimer);
+
+                    if (searchInput.value.trim() === '') {
+                        submitFilterForm();
+                        return;
+                    }
+
+                    searchDebounceTimer = setTimeout(submitFilterForm, 400);
+                });
+            }
+        })();
+    </script>
+}

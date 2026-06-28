@@ -44,6 +44,9 @@ ScaffoldingReadMe.txt
 # App settings — commit base config; keep secrets/local overrides out of git
 **/appsettings.Local.json
 **/appsettings.*.local.json
+**/.env
+**/.env.*
+!**/.env.example
 
 # Node
 node_modules/
@@ -81,3 +84,4 @@ Thumbs.db
 
 # JetBrains Rider
 *.sln.iml
+
