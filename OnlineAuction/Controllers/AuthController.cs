@@ -61,7 +61,6 @@ public class AuthController : Controller
             return Redirect(AuthRedirectHelper.ResolveReturnUrl(Url, returnUrl));
         }
 
-        TempData["OpenAuthModal"] = "login";
         return RedirectToHomeWithReturnUrl(returnUrl);
     }
 
@@ -140,7 +139,6 @@ public class AuthController : Controller
             return Redirect(AuthRedirectHelper.ResolveReturnUrl(Url, returnUrl));
         }
 
-        TempData["OpenAuthModal"] = "signup";
         return RedirectToHomeWithReturnUrl(returnUrl);
     }
 
@@ -152,7 +150,6 @@ public class AuthController : Controller
             return RedirectToAction("Index", "Home");
         }
 
-        TempData["OpenAuthModal"] = "forgot";
         return RedirectToAction("Index", "Home");
     }
 
@@ -219,14 +216,9 @@ public class AuthController : Controller
             TempData["PasswordResetOtp"] = sendResult.DevelopmentOtp;
         }
 
-        TempData["OpenAuthModal"] = "forgot-otp";
-
-        if (IsFromModal(fromModal))
-        {
-            return RedirectToSafeReturnUrl(returnUrl);
-        }
-
-        return RedirectToAction("Index", "Home");
+        return IsFromModal(fromModal)
+            ? RedirectWithAuthTab("forgot-otp", returnUrl)
+            : RedirectWithAuthTab("forgot-otp", null);
     }
 
     [HttpPost]
@@ -301,14 +293,10 @@ public class AuthController : Controller
         // Store both UserId and OtpId. OtpId prevents an old verified session from being reused
         // after the user requests a newer OTP in another tab/device.
         SetPasswordResetVerifiedSession(verifyResult.UserId.Value, verifyResult.OtpId.Value);
-        TempData["OpenAuthModal"] = "forgot-reset";
 
-        if (IsFromModal(fromModal))
-        {
-            return RedirectToSafeReturnUrl(returnUrl);
-        }
-
-        return RedirectToAction("Index", "Home");
+        return IsFromModal(fromModal)
+            ? RedirectWithAuthTab("forgot-reset", returnUrl)
+            : RedirectWithAuthTab("forgot-reset", null);
     }
 
     [HttpPost]
@@ -366,18 +354,14 @@ public class AuthController : Controller
         TempData["ResetPasswordEmail"] = email;
         TempData["PasswordResetEmailMasked"] = sendResult.MaskedEmail;
         TempData["AuthSuccess"] = _localizer["Auth_Otp_Sent"].Value;
-        TempData["OpenAuthModal"] = "forgot-otp";
         if (!string.IsNullOrWhiteSpace(sendResult.DevelopmentOtp))
         {
             TempData["PasswordResetOtp"] = sendResult.DevelopmentOtp;
         }
 
-        if (IsFromModal(fromModal))
-        {
-            return RedirectToSafeReturnUrl(returnUrl);
-        }
-
-        return RedirectToAction("Index", "Home");
+        return IsFromModal(fromModal)
+            ? RedirectWithAuthTab("forgot-otp", returnUrl)
+            : RedirectWithAuthTab("forgot-otp", null);
     }
 
     [HttpPost]
@@ -448,14 +432,10 @@ public class AuthController : Controller
                 cancellationToken);
             ClearPasswordResetSession();
             TempData["AuthSuccess"] = _localizer["Auth_Forgot_ResetSuccess"].Value;
-            TempData["OpenAuthModal"] = "login";
 
-            if (IsFromModal(fromModal))
-            {
-                return RedirectToSafeReturnUrl(returnUrl);
-            }
-
-            return RedirectToAction(nameof(Login));
+            return IsFromModal(fromModal)
+                ? RedirectWithAuthTab("login", returnUrl)
+                : RedirectWithAuthTab("login", null);
         }
 
         foreach (var error in result.Errors)
@@ -602,7 +582,6 @@ public class AuthController : Controller
     private IActionResult ForgotPasswordFailure(string errorMessage, string? fromModal, string? returnUrl, string step = "forgot")
     {
         TempData["AuthError"] = errorMessage;
-        TempData["OpenAuthModal"] = step;
         var resetEmail = GetPasswordResetEmailFromSession();
         if (!string.IsNullOrWhiteSpace(resetEmail))
         {
@@ -612,7 +591,7 @@ public class AuthController : Controller
 
         if (IsFromModal(fromModal))
         {
-            return RedirectToSafeReturnUrl(returnUrl);
+            return RedirectWithAuthTab(step, returnUrl);
         }
 
         return RedirectToAction("Index", "Home");
@@ -629,7 +608,6 @@ public class AuthController : Controller
         if (IsFromModal(fromModal))
         {
             TempData["AuthError"] = errorMessage;
-            TempData["OpenAuthModal"] = tab;
 
             var returnUrl = model switch
             {
@@ -638,12 +616,7 @@ public class AuthController : Controller
                 _ => null
             };
 
-            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-
-            return RedirectToAction("Index", "Home");
+            return RedirectWithAuthTab(tab, returnUrl);
         }
 
         return model switch
@@ -668,7 +641,7 @@ public class AuthController : Controller
     {
         if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
         {
-            return Redirect($"{returnUrl}{(returnUrl.Contains('?') ? "&" : "?")}auth=1");
+            return Redirect(returnUrl);
         }
 
         return RedirectToAction("Index", "Home");
@@ -775,16 +748,17 @@ public class AuthController : Controller
             cancellationToken);
     }
 
-    private IActionResult RedirectAfterAuthSuccess(string? returnUrl, string openAuthTab)
+    private IActionResult RedirectAfterAuthSuccess(string? returnUrl, string openAuthTab) =>
+        RedirectWithAuthTab(openAuthTab, returnUrl);
+
+    private IActionResult RedirectWithAuthTab(string authTab, string? returnUrl = null)
     {
-        TempData["OpenAuthModal"] = openAuthTab;
+        var path = !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
+            ? returnUrl
+            : Url.Action("Index", "Home") ?? "/";
 
-        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
-        {
-            return Redirect(returnUrl);
-        }
-
-        return RedirectToAction("Index", "Home");
+        var separator = path.Contains('?', StringComparison.Ordinal) ? "&" : "?";
+        return Redirect($"{path}{separator}authTab={Uri.EscapeDataString(authTab)}");
     }
 
     private async Task<string> GenerateUniqueUsernameAsync(string email)

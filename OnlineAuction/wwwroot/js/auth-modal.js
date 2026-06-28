@@ -252,6 +252,30 @@
     }
   }
 
+  function getReturnUrlFromQuery() {
+    var params = new URLSearchParams(window.location.search);
+    var returnUrl = params.get('returnUrl');
+    if (returnUrl && returnUrl.charAt(0) === '/') {
+      return returnUrl;
+    }
+
+    return null;
+  }
+
+  function stripAuthTabFromUrl() {
+    var params = new URLSearchParams(window.location.search);
+    if (!params.has('authTab')) {
+      return null;
+    }
+
+    var authTab = params.get('authTab');
+    params.delete('authTab');
+    var newSearch = params.toString();
+    var newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
+    history.replaceState(null, '', newUrl);
+    return authTab;
+  }
+
   function openModal(tabName, returnUrl) {
     var nextTab = tabName || 'login';
     if (nextTab !== 'signup' && !isForgotStep(nextTab)) {
@@ -260,6 +284,7 @@
 
     setReturnUrl(returnUrl);
     switchTab(nextTab);
+    overlay.hidden = false;
     overlay.classList.remove('home-auth-overlay--hidden');
     overlay.setAttribute('aria-hidden', 'false');
     document.body.classList.add('home-auth-open');
@@ -279,6 +304,7 @@
   }
 
   function closeModal() {
+    overlay.hidden = true;
     overlay.classList.add('home-auth-overlay--hidden');
     overlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('home-auth-open');
@@ -289,6 +315,16 @@
   }
 
   setupOtpInputs();
+
+  var queryReturnUrl = getReturnUrlFromQuery();
+  if (queryReturnUrl) {
+    setReturnUrl(queryReturnUrl);
+  }
+
+  var authTabFromUrl = stripAuthTabFromUrl();
+  if (authTabFromUrl) {
+    openModal(authTabFromUrl, queryReturnUrl);
+  }
 
   triggers.forEach(function (trigger) {
     trigger.addEventListener('click', function (e) {
@@ -349,7 +385,7 @@
   if (backdrop) backdrop.addEventListener('click', closeModal);
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && !overlay.classList.contains('home-auth-overlay--hidden')) {
+    if (e.key === 'Escape' && !overlay.hidden) {
       closeModal();
     }
   });
