@@ -280,7 +280,7 @@
   <data name="Sell_DocType_Invoice" xml:space="preserve"><value>영수증</value></data>
   <data name="Sell_DocType_Verification" xml:space="preserve"><value>확인서</value></data>
   <data name="Sell_UploadDocuments" xml:space="preserve"><value>서류 업로드</value></data>
-  <data name="Sell_UploadDocuments_Hint" xml:space="preserve"><value>PDF, JPG, PNG — 파일당 최대 10MB</value></data>
+  <data name="Sell_UploadDocuments_Hint" xml:space="preserve"><value>PDF만 — 파일당 최대 5MB, 최대 5개</value></data>
   <data name="Sell_ReadyToPublish_Highlight" xml:space="preserve"><value>게시할 준비가 되셨나요?</value></data>
   <data name="Sell_ReadyToPublish" xml:space="preserve"><value>미리보기를 확인한 후 경매를 생성하세요.</value></data>
   <data name="Sell_SaveDraft" xml:space="preserve"><value>임시 저장</value></data>
@@ -542,6 +542,13 @@
   <data name="Product_Shipping_International" xml:space="preserve"><value>국제 우선 배송 가능</value></data>
   <data name="Product_Documents_Title" xml:space="preserve"><value>상품 서류</value></data>
   <data name="Product_Documents_Desc" xml:space="preserve"><value>인증서, 보증서 및 검증 파일</value></data>
+  <data name="Product_Certificates_Tab" xml:space="preserve"><value>인증서 및 서류</value></data>
+  <data name="Product_Documents_Empty" xml:space="preserve"><value>인증서가 없습니다</value></data>
+  <data name="Product_Documents_EmptyHint" xml:space="preserve"><value>인증서 확인이 필요하면 고객 지원에 문의하세요.</value></data>
+  <data name="Product_DownloadCertificate" xml:space="preserve"><value>인증서 다운로드</value></data>
+  <data name="Product_CertificateNumber" xml:space="preserve"><value>인증서 번호</value></data>
+  <data name="Admin_Documents_Preview" xml:space="preserve"><value>미리보기</value></data>
+  <data name="Admin_Documents_Section" xml:space="preserve"><value>인증서 및 서류</value></data>
   <data name="Common_View" xml:space="preserve"><value>보기</value></data>
   <data name="Common_Download" xml:space="preserve"><value>다운로드</value></data>
   <data name="Product_Seller" xml:space="preserve"><value>판매자</value></data>

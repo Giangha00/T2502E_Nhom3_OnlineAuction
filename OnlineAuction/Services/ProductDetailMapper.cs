@@ -355,13 +355,16 @@ internal static class ProductDetailMapper
 
     private static List<ProductDocumentViewModel> MapDocuments(Product product) =>
         product.Documents
+            .Where(document => document.DeletedAt == null)
             .OrderBy(document => document.Name)
             .Select(document => new ProductDocumentViewModel
             {
+                Id = document.Id,
                 Name = document.Name,
                 FileName = document.Name,
                 FileType = document.FileType,
-                FileUrl = document.FileUrl
+                FileUrl = document.FileUrl,
+                ShowCertificateNumber = document.Name.Contains("certificate", StringComparison.OrdinalIgnoreCase)
             })
             .ToList();
 

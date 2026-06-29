@@ -177,11 +177,14 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
                 .ToList(),
             Documents = product.Documents
                 .Where(document => document.DeletedAt == null)
+                .OrderBy(document => document.Name)
                 .Select(document => new VerificationDocumentViewModel
                 {
+                    Id = document.Id,
                     Name = document.Name,
                     FileUrl = document.FileUrl,
-                    FileType = document.FileType
+                    FileType = document.FileType,
+                    CreatedAt = document.CreatedAt
                 })
                 .ToList(),
             StartingPrice = auction.StartingPrice,

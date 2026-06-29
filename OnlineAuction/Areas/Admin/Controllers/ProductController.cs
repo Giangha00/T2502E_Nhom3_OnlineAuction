@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Areas.Admin.Services;
 using OnlineAuction.Areas.Admin.ViewModels.Products;
+using OnlineAuction.Authorization;
+using OnlineAuction.Configurations;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Areas.Admin.Controllers;
@@ -9,13 +11,16 @@ public class ProductController : BaseAdminController
 {
     private readonly IAdminProductService _productService;
     private readonly ICurrentUserContext _currentUserContext;
+    private readonly IProductDocumentDownloadService _documentDownloadService;
 
     public ProductController(
         IAdminProductService productService,
-        ICurrentUserContext currentUserContext)
+        ICurrentUserContext currentUserContext,
+        IProductDocumentDownloadService documentDownloadService)
     {
         _productService = productService;
         _currentUserContext = currentUserContext;
+        _documentDownloadService = documentDownloadService;
     }
 
     [HttpGet]
@@ -140,6 +145,25 @@ public class ProductController : BaseAdminController
         }
 
         return View(model);
+    }
+
+    [HttpGet]
+    [RequirePermission(PermissionCodes.ProductsManage)]
+    public async Task<IActionResult> DownloadDocument(int id, CancellationToken cancellationToken)
+    {
+        var result = await _documentDownloadService.GetDownloadAsync(id, isAdminRequest: true, cancellationToken);
+
+        if (result is null)
+        {
+            return NotFound();
+        }
+
+        return result.Status switch
+        {
+            ProductDocumentDownloadStatus.NotFound => NotFound(),
+            ProductDocumentDownloadStatus.Success => Redirect(result.FileUrl),
+            _ => NotFound()
+        };
     }
 
     [HttpPost]
