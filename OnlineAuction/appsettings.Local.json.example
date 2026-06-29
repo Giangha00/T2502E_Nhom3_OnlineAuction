@@ -26,5 +26,15 @@
     "MessagingSenderId": "YOUR_MESSAGING_SENDER_ID",
     "AppId": "1:YOUR_MESSAGING_SENDER_ID:web:YOUR_APP_HASH",
     "VapidKey": "YOUR_WEB_PUSH_VAPID_KEY"
+  },
+  "RabbitMq": {
+    "Enabled": true,
+    "HostName": "localhost",
+    "Port": 5672,
+    "UserName": "guest",
+    "Password": "guest",
+    "VirtualHost": "/",
+    "ExchangeName": "online-auction.direct",
+    "PrefetchCount": 10
   }
 }
