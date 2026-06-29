@@ -34,4 +34,6 @@ public class ApplicationUser : IdentityUser<int>
     public ICollection<AuctionOrder> Orders { get; set; } = [];
 
     public ICollection<AuctionRegistration> AuctionRegistrations { get; set; } = [];
+
+    public ICollection<WatchlistItem> WatchlistItems { get; set; } = [];
 }

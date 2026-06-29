@@ -7,6 +7,7 @@ public interface IOrderPaymentService
 {
     Task<PayPalCheckoutResult> InitiatePayPalCheckoutAsync(
         int buyerId,
+        IReadOnlyList<int> selectedOrderIds,
         string returnUrl,
         string cancelUrl,
         CancellationToken cancellationToken = default);

@@ -22,6 +22,8 @@ public class AuctionOrder : AuditableEntity
 
     public string Status { get; set; } = OrderStatuses.PendingPayment;
 
+    public string OrderSource { get; set; } = OrderSources.AuctionWin;
+
     public DateTime PaymentDeadline { get; set; }
 
     public string? ShippingFullName { get; set; }
@@ -48,4 +50,10 @@ public static class OrderStatuses
     public const string Shipped = "shipped";
     public const string Delivered = "delivered";
     public const string Cancelled = "cancelled";
+}
+
+public static class OrderSources
+{
+    public const string AuctionWin = "auction_win";
+    public const string BuyNow = "buy_now";
 }

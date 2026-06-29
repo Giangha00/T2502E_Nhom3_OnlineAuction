@@ -1,5 +1,6 @@
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -14,13 +15,15 @@ public class SellService : ISellService
             StartDate = DateTime.Now.AddHours(1),
             EndDate = DateTime.Now.AddDays(7),
             BidStep = 50,
-            Condition = "New",
-            AuctionType = "Normal",
+            Authenticator = "PSA",
+            GradeValue = "10",
             Language = "English",
+            AuctionType = "Normal",
             AuctionEventName = "RareCard Vault: Premium Trading Card Auction 2026"
         };
 
         PopulateOptions(model);
+        NormalizeGradingFields(model);
         return model;
     }
 
@@ -28,19 +31,21 @@ public class SellService : ISellService
     {
         var model = new CreateBuyNowViewModel
         {
-            Condition = "New",
+            Authenticator = "PSA",
+            GradeValue = "10",
             Language = "English"
         };
 
         PopulateOptions(model);
+        NormalizeGradingFields(model);
         return model;
     }
 
     public void PopulateOptions(SellProductFormViewModel model)
     {
         model.Categories = MockAuctionData.GetCategoryNames().ToList();
-        model.Conditions = CreateAuctionMockData.Conditions.ToList();
-        model.Grades = CreateAuctionMockData.Grades.ToList();
+        model.Authenticators = GradeLabelHelper.Authenticators.ToList();
+        model.GradeValues = GradeLabelHelper.GradeValues.ToList();
         model.Languages = CreateAuctionMockData.Languages.ToList();
     }
 
@@ -51,6 +56,12 @@ public class SellService : ISellService
     public IEnumerable<(string Key, string Message)> ValidateCreateAuction(CreateAuctionViewModel model)
     {
         PopulateOptions(model);
+        NormalizeGradingFields(model);
+
+        foreach (var error in ValidateSharedProductFields(model))
+        {
+            yield return error;
+        }
 
         if (model.StartDate < DateTime.Now.AddMinutes(-1))
         {
@@ -66,25 +77,49 @@ public class SellService : ISellService
         {
             yield return (nameof(model.BuyNowPrice), "Buy now price must be greater than the starting price.");
         }
-
-        if (model.Year is < 1800 or > 2100)
-        {
-            yield return (nameof(model.Year), "Please enter a valid year between 1800 and 2100.");
-        }
     }
 
     public IEnumerable<(string Key, string Message)> ValidateCreateBuyNow(CreateBuyNowViewModel model)
     {
         PopulateOptions(model);
+        NormalizeGradingFields(model);
+
+        foreach (var error in ValidateSharedProductFields(model))
+        {
+            yield return error;
+        }
 
         if (model.Price <= 0)
         {
             yield return (nameof(model.Price), "Price must be greater than 0.");
         }
+    }
 
-        if (model.Year is < 1800 or > 2100)
+    public static void NormalizeGradingFields(SellProductFormViewModel model)
+    {
+        model.Grade = GradeLabelHelper.Compose(model.Authenticator, model.GradeValue);
+        model.Condition = GradeLabelHelper.ResolveCondition(model.Authenticator);
+    }
+
+    private static IEnumerable<(string Key, string Message)> ValidateSharedProductFields(SellProductFormViewModel model)
+    {
+        if (!model.Year.HasValue)
+        {
+            yield return (nameof(model.Year), "Year is required.");
+        }
+        else if (model.Year is < 1800 or > 2100)
         {
             yield return (nameof(model.Year), "Please enter a valid year between 1800 and 2100.");
+        }
+
+        if (string.IsNullOrWhiteSpace(model.Authenticator))
+        {
+            yield return (nameof(model.Authenticator), "Please select an authenticator.");
+        }
+        else if (!string.Equals(model.Authenticator, GradeLabelHelper.Ungraded, StringComparison.OrdinalIgnoreCase)
+                 && string.IsNullOrWhiteSpace(model.GradeValue))
+        {
+            yield return (nameof(model.GradeValue), "Please select a grade.");
         }
     }
 }

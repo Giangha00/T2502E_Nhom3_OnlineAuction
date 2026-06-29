@@ -139,6 +139,19 @@ dotnet ef database update
 
 ---
 
+## Dynamic permissions (Admin)
+
+Admin actions use **permission policies** (`[RequirePermission("auctions.verify")]`) instead of only `Roles = Admin`. Permissions are stored in DB and loaded into the Admin cookie at login.
+
+| Area | Details |
+|------|---------|
+| Superuser | Identity role **Admin** bypasses all permission checks |
+| Roles | **User** (public site) and **Admin** (admin panel only) |
+
+See [identity/8_dynamic_permissions.md](identity/8_dynamic_permissions.md).
+
+---
+
 ### Test accounts (after `UserSeeder` runs on empty DB)
 
 | Email | Password | Notes |
@@ -147,6 +160,7 @@ dotnet ef database update
 | `user3@auctionhouse.local` | `User@123` | Active regular user |
 | `user4@auctionhouse.local` | `User@123` | **Inactive** — login rejected |
 | `user12@auctionhouse.local` | `User@123` | Admin role — use `/Admin/Account/Login`, not `/Auth/Login` |
+| `admin@auctionhouse.com` | `User@123` | System admin (full permissions) |
 
 Seeder creates `user1` … `user150@auctionhouse.local`, all with password **`User@123`**.
 
@@ -197,20 +211,48 @@ Migration: `AddProductDetailSellFields`.
 
 Test URLs after seed: `/Auction`, `/BuyNow`, `/Auction/Detail/{id}`.
 
-## Order flow (Task 1 — DB-backed)
+## Payment Center (`/Order`)
+
+Each payable transaction is an independent invoice (`orders` row + `order_items`).
+
+### Invoice sources (`order_source`)
+
+| Source | Created when | Payment deadline | Checkout rule |
+|--------|----------------|------------------|---------------|
+| `auction_win` | Auction ends with a winner | 48 hours | **Mandatory** — always included in checkout |
+| `buy_now` | Buyer clicks Buy Now / Add to cart | 7 days | **Optional** — buyer selects which invoices to pay now |
+
+### Business rules
+
+1. `/Order` lists all non-expired `pending_payment` invoices for the logged-in buyer.
+2. Auction-win invoices show a disabled, checked checkbox (cannot be deselected).
+3. Buy-now invoices can be checked/unchecked; summary totals update to selected invoices only.
+4. `POST /Order/Complete` validates shipping, resolves checkout selection server-side, then:
+   - **PayPal:** creates checkout for the selected total only; capture marks only those invoices `paid`.
+   - **COD:** marks selected invoices `paid` immediately and shows success message.
+5. Expired invoices are auto-cancelled:
+   - `buy_now` → listing returns to `live` if `end_date` is still in the future.
+   - `auction_win` → auction moves to `ended` (no payment).
+6. Paid invoices → related auction status becomes `completed`.
+
+Migration: `AddOrderSourceToOrders` (backfills `BN-*` references to `buy_now`).
+
+Unit tests: `dotnet test` in `OnlineAuction.Tests` (`OrderCheckoutSelectionTests`).
+
+## Order flow (legacy notes)
 
 1. Auction ends → `AuctionFinalizationWorker` creates `orders` + `order_items` for winners
-2. `/Order` loads `pending_payment` orders from DB (not session)
-3. Shipping form: Full Name, Address, City, Phone — validated server-side, saved on `orders`
-4. Complete Order saves shipping + payment method; PayPal redirect/capture in Task 2
+2. `/Order` (Payment Center) loads `pending_payment` orders from DB (not session)
+3. Shipping form: Full Name, Address, City, Phone — validated server-side, saved on selected `orders` only
+4. Complete Order saves shipping + payment method; PayPal redirect/capture for selected invoices
 5. Header badge = pending payment count from DB
-6. Expired deadlines → order `cancelled` automatically
+6. Expired deadlines → order `cancelled` automatically with auction side-effects above
 
 Migration: `AddOrderShippingFields`. `WonOrderStore` removed.
 
 ## PayPal checkout (Task 2)
 
-Flow: `/Order` → shipping + PayPal → PayPal Sandbox approve → capture → `/Payment/Confirmation?orderId={id}` (DB-backed).
+Flow: `/Order` → select invoices + shipping + PayPal → PayPal Sandbox approve → capture → `/Payment/Confirmation?orderId={id}` (DB-backed).
 
 ### Configuration
 
