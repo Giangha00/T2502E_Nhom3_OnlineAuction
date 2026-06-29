@@ -921,4 +921,21 @@
   <data name="User_Time_HoursLeft" xml:space="preserve"><value>Còn {0} giờ</value></data>
   <data name="User_Time_MinutesLeft" xml:space="preserve"><value>Còn {0} phút</value></data>
   <data name="Account_Selling_CreateListing" xml:space="preserve"><value>Đăng bán sản phẩm</value></data>
+  <data name="Admin_BidHistory_Title" xml:space="preserve"><value>Lịch sử đấu giá</value></data>
+  <data name="Admin_BidHistory_TotalBids" xml:space="preserve"><value>Tổng {0} lượt đấu giá</value></data>
+  <data name="Admin_BidHistory_Empty" xml:space="preserve"><value>Chưa có lượt đấu giá nào.</value></data>
+  <data name="Admin_BidHistory_Col_Row" xml:space="preserve"><value>STT</value></data>
+  <data name="Admin_BidHistory_Col_Bidder" xml:space="preserve"><value>Người đấu giá</value></data>
+  <data name="Admin_BidHistory_Col_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Admin_BidHistory_Col_Amount" xml:space="preserve"><value>Số tiền bid</value></data>
+  <data name="Admin_BidHistory_Col_Time" xml:space="preserve"><value>Thời gian</value></data>
+  <data name="Admin_BidHistory_Col_Type" xml:space="preserve"><value>Loại</value></data>
+  <data name="Admin_BidHistory_Col_Status" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="Admin_BidHistory_Type_Manual" xml:space="preserve"><value>Thủ công</value></data>
+  <data name="Admin_BidHistory_Type_BuyNow" xml:space="preserve"><value>Mua ngay</value></data>
+  <data name="Admin_BidHistory_Status_Winning" xml:space="preserve"><value>Đang thắng</value></data>
+  <data name="Admin_BidHistory_Status_Outbid" xml:space="preserve"><value>Bị vượt giá</value></data>
+  <data name="Admin_BidHistory_Pagination_PageOf" xml:space="preserve"><value>Trang {0} / {1}</value></data>
+  <data name="Admin_BidHistory_Pagination_Previous" xml:space="preserve"><value>Trước</value></data>
+  <data name="Admin_BidHistory_Pagination_Next" xml:space="preserve"><value>Sau</value></data>
 </root>

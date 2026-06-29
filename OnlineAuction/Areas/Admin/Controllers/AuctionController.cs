@@ -95,9 +95,9 @@ public class AuctionController : BaseAdminController
 
     [HttpGet]
     [RequirePermission(PermissionCodes.AuctionsView)]
-    public async Task<IActionResult> Details(int id)
+    public async Task<IActionResult> Details(int id, int bidPage = 1)
     {
-        var model = await _auctionService.GetDetailsAsync(id);
+        var model = await _auctionService.GetDetailsAsync(id, bidPage);
 
         if (model is null)
         {
