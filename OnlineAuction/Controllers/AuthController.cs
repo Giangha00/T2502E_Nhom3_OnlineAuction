@@ -13,6 +13,7 @@ using OnlineAuction.Entities;
 using OnlineAuction.Enums;
 using OnlineAuction.Helpers;
 using OnlineAuction.Models;
+using OnlineAuction.Services;
 using OnlineAuction.Services.Interfaces;
 using OnlineAuction.Services.Results;
 
@@ -31,7 +32,7 @@ public class AuthController : Controller
 
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IEmailVerificationService _emailVerificationService;
+    private readonly IEmailQueueService _emailQueueService;
     private readonly IPasswordResetOtpService _passwordResetOtpService;
     private readonly PasswordResetOtpSettings _otpSettings;
     private readonly IStringLocalizer<SharedResource> _localizer;
@@ -39,14 +40,14 @@ public class AuthController : Controller
     public AuthController(
         SignInManager<ApplicationUser> signInManager,
         UserManager<ApplicationUser> userManager,
-        IEmailVerificationService emailVerificationService,
+        IEmailQueueService emailQueueService,
         IPasswordResetOtpService passwordResetOtpService,
         IOptions<PasswordResetOtpSettings> otpOptions,
         IStringLocalizer<SharedResource> localizer)
     {
         _signInManager = signInManager;
         _userManager = userManager;
-        _emailVerificationService = emailVerificationService;
+        _emailQueueService = emailQueueService;
         _passwordResetOtpService = passwordResetOtpService;
         _otpSettings = otpOptions.Value;
         _localizer = localizer;
@@ -61,7 +62,7 @@ public class AuthController : Controller
             return Redirect(AuthRedirectHelper.ResolveReturnUrl(Url, returnUrl));
         }
 
-        return RedirectToHomeWithReturnUrl(returnUrl);
+        return RedirectWithAuthTab("login", returnUrl);
     }
 
     [HttpPost]
@@ -139,7 +140,7 @@ public class AuthController : Controller
             return Redirect(AuthRedirectHelper.ResolveReturnUrl(Url, returnUrl));
         }
 
-        return RedirectToHomeWithReturnUrl(returnUrl);
+        return RedirectWithAuthTab("signup", returnUrl);
     }
 
     [HttpGet]
@@ -458,6 +459,14 @@ public class AuthController : Controller
         string? fromModal = null,
         CancellationToken cancellationToken = default)
     {
+        model.PhoneNumber = new string(model.PhoneNumber.Where(char.IsDigit).ToArray());
+        if (model.PhoneNumber.Length != 11)
+        {
+            ModelState.AddModelError(
+                nameof(model.PhoneNumber),
+                "Số điện thoại phải gồm đúng 11 chữ số.");
+        }
+
         if (!ModelState.IsValid)
         {
             return AuthFailureView(model, "signup", fromModal);
@@ -605,43 +614,23 @@ public class AuthController : Controller
             .FirstOrDefault(message => !string.IsNullOrWhiteSpace(message))
             ?? "Unable to complete the request.";
 
-        if (IsFromModal(fromModal))
+        var returnUrl = model switch
         {
-            TempData["AuthError"] = errorMessage;
-
-            var returnUrl = model switch
-            {
-                LoginViewModel login => login.ReturnUrl,
-                SignUpViewModel signUp => signUp.ReturnUrl,
-                _ => null
-            };
-
-            return RedirectWithAuthTab(tab, returnUrl);
-        }
-
-        return model switch
-        {
-            LoginViewModel login => View("Login", login),
-            SignUpViewModel signUp => View("SignUp", signUp),
-            _ => RedirectToAction("Login")
+            LoginViewModel login => login.ReturnUrl,
+            SignUpViewModel signUp => signUp.ReturnUrl,
+            _ => null
         };
+
+        TempData["AuthError"] = errorMessage;
+        return RedirectWithAuthTab(tab, returnUrl);
     }
 
     private IActionResult RedirectToSafeReturnUrl(string? returnUrl)
     {
-        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+        var sanitized = AuthRedirectHelper.SanitizeReturnUrl(Url, returnUrl);
+        if (!string.IsNullOrWhiteSpace(sanitized))
         {
-            return Redirect(returnUrl);
-        }
-
-        return RedirectToAction("Index", "Home");
-    }
-
-    private IActionResult RedirectToHomeWithReturnUrl(string? returnUrl)
-    {
-        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
-        {
-            return Redirect(returnUrl);
+            return Redirect(sanitized);
         }
 
         return RedirectToAction("Index", "Home");
@@ -740,7 +729,7 @@ public class AuthController : Controller
         var locale = HttpContext.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name
             ?? CultureInfo.CurrentUICulture.Name;
 
-        return await _emailVerificationService.SendConfirmationAsync(
+        return await _emailQueueService.QueueEmailConfirmationAsync(
             user.Email,
             user.FullName,
             confirmUrl,
@@ -753,9 +742,9 @@ public class AuthController : Controller
 
     private IActionResult RedirectWithAuthTab(string authTab, string? returnUrl = null)
     {
-        var path = !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
-            ? returnUrl
-            : Url.Action("Index", "Home") ?? "/";
+        var path = AuthRedirectHelper.SanitizeReturnUrl(Url, returnUrl)
+            ?? Url.Action("Index", "Home")
+            ?? "/";
 
         var separator = path.Contains('?', StringComparison.Ordinal) ? "&" : "?";
         return Redirect($"{path}{separator}authTab={Uri.EscapeDataString(authTab)}");
