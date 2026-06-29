@@ -495,6 +495,14 @@ namespace OnlineAuction.Migrations
                         .HasColumnType("varchar(30)")
                         .HasColumnName("order_reference");
 
+                    b.Property<string>("OrderSource")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasDefaultValue("auction_win")
+                        .HasColumnName("order_source");
+
                     b.Property<DateTime>("PaymentDeadline")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("payment_deadline");
@@ -945,6 +953,156 @@ namespace OnlineAuction.Migrations
                     b.ToTable("categories", (string)null);
                 });
 
+            modelBuilder.Entity("OnlineAuction.Entities.Complaint", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminNotes")
+                        .HasColumnType("text")
+                        .HasColumnName("admin_notes");
+
+                    b.Property<int>("BuyerId")
+                        .HasColumnType("int")
+                        .HasColumnName("buyer_id");
+
+                    b.Property<string>("ComplaintType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasDefaultValue("refund")
+                        .HasColumnName("complaint_type");
+
+                    b.Property<string>("ContactEmail")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("contact_email");
+
+                    b.Property<string>("ContactName")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("contact_name");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<string>("EvidenceUrlsJson")
+                        .HasColumnType("text")
+                        .HasColumnName("evidence_urls");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int")
+                        .HasColumnName("order_id");
+
+                    b.Property<string>("OrderReference")
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("order_reference");
+
+                    b.Property<string>("ReasonCode")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("reason_code");
+
+                    b.Property<string>("RequestReference")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("request_reference");
+
+                    b.Property<decimal?>("RequestedAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("requested_amount");
+
+                    b.Property<string>("ResolutionNote")
+                        .HasColumnType("text")
+                        .HasColumnName("resolution_note");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("reviewed_at");
+
+                    b.Property<int?>("ReviewedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("reviewed_by");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasDefaultValue("pending")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuyerId")
+                        .HasDatabaseName("ix_complaints_buyer_id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("DeletedAt")
+                        .HasDatabaseName("ix_complaints_deleted_at");
+
+                    b.HasIndex("DeletedBy");
+
+                    b.HasIndex("OrderId")
+                        .HasDatabaseName("ix_complaints_order_id");
+
+                    b.HasIndex("RequestReference")
+                        .IsUnique()
+                        .HasDatabaseName("uk_complaints_request_reference");
+
+                    b.HasIndex("ReviewedBy");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.HasIndex("Status", "CreatedAt")
+                        .HasDatabaseName("ix_complaints_status_created_at");
+
+                    b.ToTable("complaints", null, t =>
+                        {
+                            t.HasCheckConstraint("chk_complaints_status", "`status` IN ('pending','under_review','approved','rejected','closed')");
+
+                            t.HasCheckConstraint("chk_complaints_type", "`complaint_type` IN ('refund','dispute','authenticity','other')");
+                        });
+                });
+
             modelBuilder.Entity("OnlineAuction.Entities.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -1221,6 +1379,47 @@ namespace OnlineAuction.Migrations
                         {
                             t.HasCheckConstraint("chk_payments_amount", "`amount` > 0");
                         });
+                });
+
+            modelBuilder.Entity("OnlineAuction.Entities.Permission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("code");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Module")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("module");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("ux_permissions_code");
+
+                    b.ToTable("permissions", (string)null);
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.Product", b =>
@@ -1523,6 +1722,27 @@ namespace OnlineAuction.Migrations
                     b.ToTable("product_images", (string)null);
                 });
 
+            modelBuilder.Entity("OnlineAuction.Entities.RolePermission", b =>
+                {
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int")
+                        .HasColumnName("role_id");
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int")
+                        .HasColumnName("permission_id");
+
+                    b.HasKey("RoleId", "PermissionId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("RoleId", "PermissionId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_role_permissions_role_permission");
+
+                    b.ToTable("role_permissions", (string)null);
+                });
+
             modelBuilder.Entity("OnlineAuction.Entities.UserDeviceToken", b =>
                 {
                     b.Property<int>("Id")
@@ -1565,6 +1785,98 @@ namespace OnlineAuction.Migrations
                         .HasDatabaseName("ix_user_device_tokens_user_id");
 
                     b.ToTable("user_device_tokens", (string)null);
+                });
+
+            modelBuilder.Entity("OnlineAuction.Entities.WatchlistItem", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("AuctionId")
+                        .HasColumnType("int")
+                        .HasColumnName("auction_id");
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("added_at");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_watchlist_user_id");
+
+                    b.HasIndex("UserId", "AuctionId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_watchlist_user_auction");
+
+                    b.ToTable("watchlist_items", (string)null);
+                });
+
+            modelBuilder.Entity("OnlineAuction.Entities.UserOtpCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("int")
+                        .HasColumnName("attempt_count");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("code_hash");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("expires_at");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_used");
+
+                    b.Property<int>("MaxAttempts")
+                        .HasColumnType("int")
+                        .HasColumnName("max_attempts");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("purpose");
+
+                    b.Property<string>("Salt")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("salt");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Purpose", "IsUsed", "ExpiresAt")
+                        .HasDatabaseName("ix_user_otp_codes_active_lookup");
+
+                    b.ToTable("user_otp_codes", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -1867,6 +2179,52 @@ namespace OnlineAuction.Migrations
                         .HasConstraintName("fk_categories_updated_by");
                 });
 
+            modelBuilder.Entity("OnlineAuction.Entities.Complaint", b =>
+                {
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "Buyer")
+                        .WithMany()
+                        .HasForeignKey("BuyerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_complaints_buyer");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_complaints_created_by");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("DeletedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_complaints_deleted_by");
+
+                    b.HasOne("OnlineAuction.Entities.AuctionOrder", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_complaints_order");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "Reviewer")
+                        .WithMany()
+                        .HasForeignKey("ReviewedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_complaints_reviewer");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_complaints_updated_by");
+
+                    b.Navigation("Buyer");
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Reviewer");
+                });
+
             modelBuilder.Entity("OnlineAuction.Entities.Notification", b =>
                 {
                     b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
@@ -2065,6 +2423,27 @@ namespace OnlineAuction.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("OnlineAuction.Entities.RolePermission", b =>
+                {
+                    b.HasOne("OnlineAuction.Entities.Permission", "Permission")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_role_permissions_permission");
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_role_permissions_role");
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("OnlineAuction.Entities.UserDeviceToken", b =>
                 {
                     b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
@@ -2073,6 +2452,39 @@ namespace OnlineAuction.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_device_tokens_user");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("OnlineAuction.Entities.UserOtpCode", b =>
+                {
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_otp_codes_user");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("OnlineAuction.Entities.WatchlistItem", b =>
+                {
+                    b.HasOne("OnlineAuction.Entities.Auction", "Auction")
+                        .WithMany("WatchlistItems")
+                        .HasForeignKey("AuctionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_watchlist_auction");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
+                        .WithMany("WatchlistItems")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_watchlist_user");
+
+                    b.Navigation("Auction");
 
                     b.Navigation("User");
                 });
@@ -2087,6 +2499,8 @@ namespace OnlineAuction.Migrations
 
                     b.Navigation("Products");
 
+                    b.Navigation("WatchlistItems");
+
                     b.Navigation("WonAuctions");
                 });
 
@@ -2097,6 +2511,8 @@ namespace OnlineAuction.Migrations
                     b.Navigation("OrderItems");
 
                     b.Navigation("Registrations");
+
+                    b.Navigation("WatchlistItems");
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.AuctionOrder", b =>
@@ -2114,6 +2530,11 @@ namespace OnlineAuction.Migrations
             modelBuilder.Entity("OnlineAuction.Entities.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("OnlineAuction.Entities.Permission", b =>
+                {
+                    b.Navigation("RolePermissions");
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.Product", b =>

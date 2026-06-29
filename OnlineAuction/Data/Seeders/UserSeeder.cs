@@ -36,6 +36,7 @@ public static class UserSeeder
                 PhoneNumber = faker.Phone.PhoneNumber("09########"),
                 Role = i % 12 == 0 ? UserRole.Admin : UserRole.User,
                 Status = i % 4 == 0 ? UserStatus.Inactive : UserStatus.Active,
+                EmailConfirmed = true,
                 AvatarUrl = $"/admin/images/user/user-{((i - 1) % 37) + 1:D2}.jpg",
                 CreatedAt = faker.Date.Past(2, DateTime.UtcNow)
             };

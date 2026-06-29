@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OnlineAuction.Models;
 using OnlineAuction.Entities;
+using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 using System.Security.Claims;
 
@@ -9,30 +9,33 @@ namespace OnlineAuction.Controllers;
 
 public class RefundController : Controller
 {
-    private readonly IPaymentService _paymentService;
-    private readonly INotificationService _notificationService;
+    private readonly IRefundComplaintService _refundComplaintService;
 
-    public RefundController(
-        IPaymentService paymentService,
-        INotificationService notificationService)
+    public RefundController(IRefundComplaintService refundComplaintService)
     {
-        _paymentService = paymentService;
-        _notificationService = notificationService;
+        _refundComplaintService = refundComplaintService;
     }
 
-    public IActionResult Index()
+    [HttpGet]
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
+        var userId = GetCurrentUserId();
+        var recentOrders = userId.HasValue
+            ? await _refundComplaintService.GetEligibleOrdersAsync(userId.Value, cancellationToken)
+            : [];
+
         var model = new RefundPageViewModel
         {
-            RecentOrders = _paymentService.GetRefundEligibleOrders(),
+            RecentOrders = recentOrders.ToList(),
+            IsAuthenticated = userId.HasValue,
             RefundReasons =
             [
-                new RefundReasonOption { Id = "not-as-described", Label = "Item not as described in listing" },
-                new RefundReasonOption { Id = "damaged", Label = "Item arrived damaged" },
-                new RefundReasonOption { Id = "not-received", Label = "Item not received within delivery window" },
-                new RefundReasonOption { Id = "counterfeit", Label = "Suspected counterfeit or misrepresented item" },
-                new RefundReasonOption { Id = "duplicate-payment", Label = "Duplicate or incorrect payment" },
-                new RefundReasonOption { Id = "other", Label = "Other (please describe)" }
+                new RefundReasonOption { Id = ComplaintReasonCodes.NotAsDescribed, Label = ComplaintReasonCodes.Labels[ComplaintReasonCodes.NotAsDescribed] },
+                new RefundReasonOption { Id = ComplaintReasonCodes.Damaged, Label = ComplaintReasonCodes.Labels[ComplaintReasonCodes.Damaged] },
+                new RefundReasonOption { Id = ComplaintReasonCodes.NotReceived, Label = ComplaintReasonCodes.Labels[ComplaintReasonCodes.NotReceived] },
+                new RefundReasonOption { Id = ComplaintReasonCodes.Counterfeit, Label = ComplaintReasonCodes.Labels[ComplaintReasonCodes.Counterfeit] },
+                new RefundReasonOption { Id = ComplaintReasonCodes.DuplicatePayment, Label = ComplaintReasonCodes.Labels[ComplaintReasonCodes.DuplicatePayment] },
+                new RefundReasonOption { Id = ComplaintReasonCodes.Other, Label = ComplaintReasonCodes.Labels[ComplaintReasonCodes.Other] }
             ],
             PolicyItems =
             [
@@ -62,29 +65,48 @@ public class RefundController : Controller
         return View(model);
     }
 
+    [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Confirmation(string? requestId, string? orderRef, string? reason, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Submit(RefundSubmitViewModel model, CancellationToken cancellationToken)
     {
-        var model = new RefundConfirmationViewModel
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
         {
-            RequestId = requestId ?? $"RF-{DateTime.UtcNow:yyyyMMdd}-0000",
-            OrderReference = orderRef ?? "N/A",
-            Reason = reason ?? "Not specified"
-        };
+            return Forbid();
+        }
+
+        var result = await _refundComplaintService.SubmitAsync(userId.Value, model, cancellationToken);
+        if (!result.Success)
+        {
+            return BadRequest(new { message = result.Message });
+        }
+
+        return Ok(new
+        {
+            requestId = result.RequestReference,
+            redirectUrl = Url.Action(nameof(Confirmation), new { requestId = result.RequestReference })
+        });
+    }
+
+    [Authorize]
+    public async Task<IActionResult> Confirmation(string? requestId, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(requestId))
+        {
+            return RedirectToAction(nameof(Index));
+        }
 
         var userId = GetCurrentUserId();
-        if (userId.HasValue)
+        if (!userId.HasValue)
         {
-            var referenceId = Math.Abs((requestId ?? model.RequestId).GetHashCode());
-            await _notificationService.CreateAndPushAsync(
-                userId.Value,
-                "Refund approved",
-                $"Your refund request for order {model.OrderReference} has been approved.",
-                NotificationType.Refund,
-                $"/Refund/Confirmation?requestId={Uri.EscapeDataString(model.RequestId)}&orderRef={Uri.EscapeDataString(model.OrderReference)}",
-                NotificationReferenceTypes.RefundApproved,
-                referenceId,
-                cancellationToken: cancellationToken);
+            return Forbid();
+        }
+
+        var model = await _refundComplaintService.GetConfirmationAsync(userId.Value, requestId, cancellationToken);
+        if (model is null)
+        {
+            return NotFound();
         }
 
         return View(model);

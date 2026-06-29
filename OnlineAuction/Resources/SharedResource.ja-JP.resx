@@ -384,6 +384,37 @@
   <data name="Auth_Slide3_Eyebrow" xml:space="preserve"><value>スポーツ &amp; MTG</value></data>
   <data name="Auth_Slide3_Title" xml:space="preserve"><value>伝説のオークション</value></data>
   <data name="Auth_Slide3_Desc" xml:space="preserve"><value>ミッキーマンテルからAlpha Black Lotusまで毎日厳選。</value></data>
+  <data name="Auth_ForgotPassword" xml:space="preserve"><value>パスワードをお忘れですか？</value></data>
+  <data name="Auth_Forgot_Title" xml:space="preserve"><value>パスワードをお忘れですか？</value></data>
+  <data name="Auth_Forgot_Subtitle" xml:space="preserve"><value>メールアドレスを入力して6桁の認証コードを受け取ってください。</value></data>
+  <data name="Auth_Forgot_SendOtp" xml:space="preserve"><value>認証コードを送信</value></data>
+  <data name="Auth_Forgot_BackToLogin" xml:space="preserve"><value>ログインに戻る</value></data>
+  <data name="Auth_Forgot_OtpTitle" xml:space="preserve"><value>認証コードを入力</value></data>
+  <data name="Auth_Forgot_OtpSubtitle" xml:space="preserve"><value>6桁のコードをメールで送信しました。</value></data>
+  <data name="Auth_Forgot_OtpSent" xml:space="preserve"><value>{0} が存在する場合、送信した6桁のコードを入力してください。</value></data>
+  <data name="Auth_Forgot_OtpLabel" xml:space="preserve"><value>認証コード</value></data>
+  <data name="Auth_Forgot_OtpDigit" xml:space="preserve"><value>桁 {0}</value></data>
+  <data name="Auth_Forgot_VerifyOtp" xml:space="preserve"><value>コードを確認</value></data>
+  <data name="Auth_Forgot_ChangeEmail" xml:space="preserve"><value>別のメールを使用</value></data>
+  <data name="Auth_Forgot_ResetTitle" xml:space="preserve"><value>新しいパスワードを作成</value></data>
+  <data name="Auth_Forgot_ResetSubtitle" xml:space="preserve"><value>RareCardアカウントの新しいパスワードを設定してください。</value></data>
+  <data name="Auth_Forgot_NewPassword" xml:space="preserve"><value>新しいパスワード</value></data>
+  <data name="Auth_Forgot_ResetSubmit" xml:space="preserve"><value>パスワードをリセット</value></data>
+  <data name="Auth_Forgot_BackToOtp" xml:space="preserve"><value>認証コードに戻る</value></data>
+  <data name="Auth_Forgot_DevOtpTitle" xml:space="preserve"><value>開発用OTP</value></data>
+  <data name="Auth_Forgot_DevOtpDesc" xml:space="preserve"><value>メールが未設定のため、開発環境ではここにコードを表示します。</value></data>
+  <data name="Auth_Forgot_InvalidEmail" xml:space="preserve"><value>有効なメールアドレスを入力してください。</value></data>
+  <data name="Auth_Forgot_InvalidOtp" xml:space="preserve"><value>認証コードが無効または期限切れです。</value></data>
+  <data name="Auth_Otp_Invalid" xml:space="preserve"><value>認証コードが正しくありません。</value></data>
+  <data name="Auth_Otp_Expired" xml:space="preserve"><value>認証コードの有効期限が切れました。新しいコードをリクエストしてください。</value></data>
+  <data name="Auth_Otp_MaxAttempts" xml:space="preserve"><value>入力を間違えた回数が多すぎます。新しいコードをリクエストしてください。</value></data>
+  <data name="Auth_Otp_Resend" xml:space="preserve"><value>コードを再送信</value></data>
+  <data name="Auth_Otp_ResendCooldown" xml:space="preserve"><value>新しいコードをリクエストする前に {0} 秒お待ちください。</value></data>
+  <data name="Auth_Otp_TooManyResends" xml:space="preserve"><value>コードのリクエストが多すぎます。後でもう一度お試しください。</value></data>
+  <data name="Auth_Otp_Sent" xml:space="preserve"><value>対象のメールであれば、認証コードを送信しました。</value></data>
+  <data name="Auth_Forgot_ResetFailed" xml:space="preserve"><value>パスワードをリセットできませんでした。もう一度お試しください。</value></data>
+  <data name="Auth_Forgot_SessionExpired" xml:space="preserve"><value>認証セッションの有効期限が切れました。最初からやり直してください。</value></data>
+  <data name="Auth_Forgot_ResetSuccess" xml:space="preserve"><value>パスワードをリセットしました。新しいパスワードでログインしてください。</value></data>
   <data name="Layout_Footer_AboutUs" xml:space="preserve"><value>会社概要</value></data>
   <data name="Layout_Footer_ContactUs" xml:space="preserve"><value>お問い合わせ</value></data>
   <data name="Layout_Footer_PolicyTerms" xml:space="preserve"><value>ポリシーと利用規約</value></data>
@@ -842,5 +873,22 @@
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>価格は0より大きい必要があります</value></data>
   <data name="User_YourBuyNowList" xml:space="preserve"><value>あなたの即購入一覧</value></data>
   <data name="User_SellerBuyNowList" xml:space="preserve"><value>即購入一覧</value></data>
+  <data name="User_Stat_TotalListings" xml:space="preserve"><value>表示中の出品</value></data>
+  <data name="User_ViewBuyNowList" xml:space="preserve"><value>即購入を見る</value></data>
+  <data name="User_CreateBuyNowListing" xml:space="preserve"><value>即購入出品を作成</value></data>
+  <data name="User_AuctionListingCount" xml:space="preserve"><value>表示中のオークション {0} 件</value></data>
+  <data name="User_BuyNowListingCount" xml:space="preserve"><value>表示中の即購入 {0} 件</value></data>
+  <data name="User_NoAuctions_OwnerTitle" xml:space="preserve"><value>オークション出品はまだありません</value></data>
+  <data name="User_NoAuctions_VisitorTitle" xml:space="preserve"><value>オークション出品なし</value></data>
+  <data name="User_NoAuctions_OwnerDesc" xml:space="preserve"><value>最初のオークション出品を作成して販売を始めましょう。</value></data>
+  <data name="User_NoAuctions_VisitorDesc" xml:space="preserve"><value>この出品者には現在表示中のオークションがありません。</value></data>
+  <data name="User_NoBuyNow_OwnerTitle" xml:space="preserve"><value>即購入出品はまだありません</value></data>
+  <data name="User_NoBuyNow_VisitorTitle" xml:space="preserve"><value>即購入出品なし</value></data>
+  <data name="User_NoBuyNow_OwnerDesc" xml:space="preserve"><value>固定価格の即購入出品を作成できます。</value></data>
+  <data name="User_NoBuyNow_VisitorDesc" xml:space="preserve"><value>この出品者には現在表示中の即購入出品がありません。</value></data>
+  <data name="User_Time_Ended" xml:space="preserve"><value>終了</value></data>
+  <data name="User_Time_DaysLeft" xml:space="preserve"><value>残り {0} 日</value></data>
+  <data name="User_Time_HoursLeft" xml:space="preserve"><value>残り {0} 時間</value></data>
+  <data name="User_Time_MinutesLeft" xml:space="preserve"><value>残り {0} 分</value></data>
   <data name="Account_Selling_CreateListing" xml:space="preserve"><value>出品する</value></data>
 </root>

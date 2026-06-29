@@ -1,9 +1,10 @@
 @model OnlineAuction.Models.SellProductFormViewModel
+@using OnlineAuction.Helpers
 
 <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
   <div class="border-b border-slate-100 px-6 py-5">
     <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
-      <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">4</span>
+      <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">3</span>
       @Localizer["Sell_Section4_CardSpecs_Title"]
     </h2>
     <p class="mt-1 pl-10 text-sm text-slate-500">@Localizer["Sell_Section4_CardSpecs_Desc"]</p>
@@ -14,12 +15,13 @@
       <label for="subtitle" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_Subtitle"]</label>
       <input type="text" id="subtitle" name="Subtitle" value="@Model.Subtitle" maxlength="160" placeholder="@Localizer["Sell_Subtitle_Placeholder"]"
              class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
+      <p class="mt-1 text-xs text-slate-500">@Localizer["Sell_Subtitle_Hint"]</p>
     </div>
 
     <div class="grid gap-5 sm:grid-cols-2">
       <div>
-        <label for="year" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Product_Year"]</label>
-        <input type="number" id="year" name="Year" value="@(Model.Year.HasValue ? Model.Year : "")" min="1800" max="2100" placeholder="1999"
+        <label for="year" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Product_Year"] <span class="text-red-500">*</span></label>
+        <input type="number" id="year" name="Year" value="@(Model.Year.HasValue ? Model.Year : "")" min="1800" max="2100" placeholder="1999" required
                class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
         <p class="field-error mt-1 hidden text-xs text-red-600" data-for="year"></p>
       </div>
@@ -29,6 +31,47 @@
                class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
       </div>
     </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="authenticator" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Auction_Filter_Authenticator"] <span class="text-red-500">*</span></label>
+        <select id="authenticator" name="Authenticator" required
+                class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+          @foreach (var authenticator in Model.Authenticators)
+          {
+            if (Model.Authenticator == authenticator)
+            {
+              <option value="@authenticator" selected="selected">@authenticator</option>
+            }
+            else
+            {
+              <option value="@authenticator">@authenticator</option>
+            }
+          }
+        </select>
+        <p class="field-error mt-1 hidden text-xs text-red-600" data-for="authenticator"></p>
+      </div>
+      <div>
+        <label for="gradeValue" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_Grade"] <span class="text-red-500">*</span></label>
+        <select id="gradeValue" name="GradeValue"
+                class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+          @foreach (var gradeValue in Model.GradeValues)
+          {
+            if (Model.GradeValue == gradeValue)
+            {
+              <option value="@gradeValue" selected="selected">@gradeValue</option>
+            }
+            else
+            {
+              <option value="@gradeValue">@gradeValue</option>
+            }
+          }
+        </select>
+        <p class="field-error mt-1 hidden text-xs text-red-600" data-for="gradeValue"></p>
+      </div>
+    </div>
+
+    <input type="hidden" id="grade" name="Grade" value="@GradeLabelHelper.Compose(Model.Authenticator, Model.GradeValue)"/>
 
     <div class="grid gap-5 sm:grid-cols-2">
       <div>
@@ -55,29 +98,10 @@
       </div>
     </div>
 
-    <div class="grid gap-5 sm:grid-cols-2">
-      <div>
-        <label for="grade" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_Grade"]</label>
-        <select id="grade" name="Grade"
-                class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
-          @foreach (var grade in Model.Grades)
-          {
-            if (Model.Grade == grade)
-            {
-              <option value="@grade" selected="selected">@grade</option>
-            }
-            else
-            {
-              <option value="@grade">@grade</option>
-            }
-          }
-        </select>
-      </div>
-      <div>
-        <label for="certificateNumber" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_CertificateNumber"]</label>
-        <input type="text" id="certificateNumber" name="CertificateNumber" value="@Model.CertificateNumber" maxlength="50" placeholder="PSA-48000137"
-               class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
-      </div>
+    <div>
+      <label for="certificateNumber" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_CertificateNumber"]</label>
+      <input type="text" id="certificateNumber" name="CertificateNumber" value="@Model.CertificateNumber" maxlength="50" placeholder="PSA-48000137"
+             class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
     </div>
   </div>
 </div>

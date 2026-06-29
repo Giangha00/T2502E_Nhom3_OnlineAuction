@@ -9,8 +9,15 @@ public class WonOrderItem
     public string Grade { get; set; } = string.Empty;
     public string ImageUrl { get; set; } = string.Empty;
     public decimal WinningBid { get; set; }
+    public decimal ShippingFee { get; set; }
+    public decimal VaultInsurance { get; set; }
+    public decimal DepositApplied { get; set; }
+    public decimal TotalAmount { get; set; }
     public DateTime PaymentDeadline { get; set; }
     public string OrderReference { get; set; } = string.Empty;
+    public string OrderSource { get; set; } = string.Empty;
+    public bool IsMandatory { get; set; }
+    public bool IsSelectedByDefault { get; set; }
     public bool IsExpired => PaymentDeadline <= DateTime.UtcNow;
 }
 
@@ -27,6 +34,8 @@ public class OrderPageViewModel
     public decimal Subtotal { get; set; }
     public decimal ShippingFee { get; set; }
     public decimal VaultInsurance { get; set; }
+    public decimal DepositApplied { get; set; }
     public decimal TotalAmount { get; set; }
+    public int SelectedItemCount { get; set; }
     public List<PaymentMethodOption> PaymentMethods { get; set; } = [];
 }

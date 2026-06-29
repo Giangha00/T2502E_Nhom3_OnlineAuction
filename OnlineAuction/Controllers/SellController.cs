@@ -190,11 +190,11 @@ public class SellController : Controller
             {
                 success = true,
                 message = result.Message,
-                redirectUrl = Url.Action("Selling", "Account", new { tab = "active", channel = "buynow" })
+                redirectUrl = Url.Action("Detail", "User", new { id = sellerId.Value }) + "#seller-buynow"
             });
         }
 
-        return RedirectToAction("Selling", "Account", new { tab = "active", channel = "buynow" });
+        return RedirectToAction("Detail", "User", new { id = sellerId.Value }, fragment: "seller-buynow");
     }
 
     private async Task<int?> GetCurrentSellerIdAsync()

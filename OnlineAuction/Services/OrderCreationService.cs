@@ -221,6 +221,7 @@ public class OrderCreationService : IOrderCreationService
             TotalAmount = total,
 
             Status = OrderStatuses.PendingPayment,
+            OrderSource = OrderSources.AuctionWin,
             PaymentDeadline = now.AddHours(48),
             CreatedAt = now,
             Items =
@@ -372,7 +373,8 @@ public class OrderCreationService : IOrderCreationService
             DepositApplied = 0m,
             TotalAmount = total,
             Status = OrderStatuses.PendingPayment,
-            PaymentDeadline = now.AddHours(48),
+            OrderSource = OrderSources.BuyNow,
+            PaymentDeadline = now.AddDays(7),
             CreatedAt = now,
             Items =
             [

@@ -243,6 +243,7 @@
   <data name="Sell_ShortDescription_Placeholder" xml:space="preserve"><value>Brief summary shown in the listing header (max 300 characters)</value></data>
   <data name="Sell_Subtitle" xml:space="preserve"><value>Subtitle</value></data>
   <data name="Sell_Subtitle_Placeholder" xml:space="preserve"><value>Tagline shown under the product name</value></data>
+  <data name="Sell_Subtitle_Hint" xml:space="preserve"><value>Leave blank to auto-generate from Set · Grade · Year (same as listing cards).</value></data>
   <data name="Sell_Section4_CardSpecs_Title" xml:space="preserve"><value>Card Specifications</value></data>
   <data name="Sell_Section4_CardSpecs_Desc" xml:space="preserve"><value>Year, set, language, grade, and certificate details</value></data>
   <data name="Sell_SetName_Placeholder" xml:space="preserve"><value>e.g. Base Set</value></data>
@@ -252,6 +253,9 @@
   <data name="Sell_AuctionEventName" xml:space="preserve"><value>Auction Event Name</value></data>
   <data name="Sell_AuctionEventName_Placeholder" xml:space="preserve"><value>e.g. RareCard Vault: Premium Trading Card Auction</value></data>
   <data name="Sell_Error_YearInvalid" xml:space="preserve"><value>Please enter a valid year between 1800 and 2100.</value></data>
+  <data name="Sell_Error_YearRequired" xml:space="preserve"><value>Year is required.</value></data>
+  <data name="Sell_Error_AuthenticatorRequired" xml:space="preserve"><value>Please select an authenticator.</value></data>
+  <data name="Sell_Error_GradeRequired" xml:space="preserve"><value>Please select a grade.</value></data>
   <data name="Sell_Section2_Title" xml:space="preserve"><value>Product Images</value></data>
   <data name="Sell_Section2_Desc" xml:space="preserve"><value>Upload multiple images — JPG, PNG, WEBP (max 5MB each)</value></data>
   <data name="Sell_UploadImages_Title" xml:space="preserve"><value>Upload Product Images</value></data>
@@ -347,6 +351,12 @@
   <data name="Account_Preferences" xml:space="preserve"><value>Preferences</value></data>
   <data name="Account_Orders_Desc" xml:space="preserve"><value>Track and view your purchases</value></data>
   <data name="Account_Bids_Desc" xml:space="preserve"><value>View your active and past auction bids</value></data>
+  <data name="Account_Bids_Tab_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="Account_Bids_Tab_Past" xml:space="preserve"><value>Past</value></data>
+  <data name="Account_Bids_Empty" xml:space="preserve"><value>You have no bids in this section yet.</value></data>
+  <data name="Account_Watchlist_Empty" xml:space="preserve"><value>Your watchlist is empty. Tap the heart on an auction card to save items here.</value></data>
+  <data name="Account_Offers_Empty" xml:space="preserve"><value>No pending buy-now offers awaiting payment.</value></data>
+  <data name="Account_Submissions_Empty" xml:space="preserve"><value>No submissions awaiting review. Create a new listing to submit to the Vault.</value></data>
   <data name="Account_Watchlist_Desc" xml:space="preserve"><value>Keep tabs on saved items</value></data>
   <data name="Account_Offers_Desc" xml:space="preserve"><value>Track offers you've made or received</value></data>
   <data name="Account_Summary_Desc" xml:space="preserve"><value>An overall view of your account</value></data>
@@ -384,6 +394,37 @@
   <data name="Auth_Slide3_Eyebrow" xml:space="preserve"><value>Sports &amp; MTG</value></data>
   <data name="Auth_Slide3_Title" xml:space="preserve"><value>Legends on Auction</value></data>
   <data name="Auth_Slide3_Desc" xml:space="preserve"><value>From Mickey Mantle rookies to Alpha Black Lotus — curated daily.</value></data>
+  <data name="Auth_ForgotPassword" xml:space="preserve"><value>Forgot password?</value></data>
+  <data name="Auth_Forgot_Title" xml:space="preserve"><value>Forgot password?</value></data>
+  <data name="Auth_Forgot_Subtitle" xml:space="preserve"><value>Enter your email to receive a 6-digit verification code.</value></data>
+  <data name="Auth_Forgot_SendOtp" xml:space="preserve"><value>Send verification code</value></data>
+  <data name="Auth_Forgot_BackToLogin" xml:space="preserve"><value>Back to log in</value></data>
+  <data name="Auth_Forgot_OtpTitle" xml:space="preserve"><value>Enter verification code</value></data>
+  <data name="Auth_Forgot_OtpSubtitle" xml:space="preserve"><value>We sent a 6-digit code to your email.</value></data>
+  <data name="Auth_Forgot_OtpSent" xml:space="preserve"><value>If {0} exists, enter the 6-digit code we sent.</value></data>
+  <data name="Auth_Forgot_OtpLabel" xml:space="preserve"><value>Verification code</value></data>
+  <data name="Auth_Forgot_OtpDigit" xml:space="preserve"><value>Digit {0}</value></data>
+  <data name="Auth_Forgot_VerifyOtp" xml:space="preserve"><value>Verify code</value></data>
+  <data name="Auth_Forgot_ChangeEmail" xml:space="preserve"><value>Use a different email</value></data>
+  <data name="Auth_Forgot_ResetTitle" xml:space="preserve"><value>Create new password</value></data>
+  <data name="Auth_Forgot_ResetSubtitle" xml:space="preserve"><value>Choose a new password for your RareCard account.</value></data>
+  <data name="Auth_Forgot_NewPassword" xml:space="preserve"><value>New password</value></data>
+  <data name="Auth_Forgot_ResetSubmit" xml:space="preserve"><value>Reset password</value></data>
+  <data name="Auth_Forgot_BackToOtp" xml:space="preserve"><value>Back to verification code</value></data>
+  <data name="Auth_Forgot_DevOtpTitle" xml:space="preserve"><value>Development OTP</value></data>
+  <data name="Auth_Forgot_DevOtpDesc" xml:space="preserve"><value>Email is not configured yet, so Development shows the code here.</value></data>
+  <data name="Auth_Forgot_InvalidEmail" xml:space="preserve"><value>Enter a valid email address.</value></data>
+  <data name="Auth_Forgot_InvalidOtp" xml:space="preserve"><value>Invalid or expired verification code.</value></data>
+  <data name="Auth_Otp_Invalid" xml:space="preserve"><value>Invalid verification code.</value></data>
+  <data name="Auth_Otp_Expired" xml:space="preserve"><value>The verification code expired. Please request a new one.</value></data>
+  <data name="Auth_Otp_MaxAttempts" xml:space="preserve"><value>Too many incorrect attempts. Please request a new code.</value></data>
+  <data name="Auth_Otp_Resend" xml:space="preserve"><value>Resend code</value></data>
+  <data name="Auth_Otp_ResendCooldown" xml:space="preserve"><value>Please wait {0} seconds before requesting another code.</value></data>
+  <data name="Auth_Otp_TooManyResends" xml:space="preserve"><value>You requested too many codes. Please try again later.</value></data>
+  <data name="Auth_Otp_Sent" xml:space="preserve"><value>If the email is eligible, a verification code has been sent.</value></data>
+  <data name="Auth_Forgot_ResetFailed" xml:space="preserve"><value>Unable to reset password. Please try again.</value></data>
+  <data name="Auth_Forgot_SessionExpired" xml:space="preserve"><value>Your verification session expired. Please start again.</value></data>
+  <data name="Auth_Forgot_ResetSuccess" xml:space="preserve"><value>Password reset successfully. Please log in with your new password.</value></data>
   <data name="Layout_Footer_AboutUs" xml:space="preserve"><value>About Us</value></data>
   <data name="Layout_Footer_ContactUs" xml:space="preserve"><value>Contact Us</value></data>
   <data name="Layout_Footer_PolicyTerms" xml:space="preserve"><value>Policy &amp; Term of Use</value></data>
@@ -417,10 +458,10 @@
   <data name="Card_PlaceBid" xml:space="preserve"><value>Place Bid</value></data>
   <data name="Card_EndingSoon" xml:space="preserve"><value>Ending Soon</value></data>
   <data name="Card_Hot" xml:space="preserve"><value>Hot</value></data>
-  <data name="Order_PageTitle" xml:space="preserve"><value>Won Auctions</value></data>
-  <data name="Order_ItemsWon" xml:space="preserve"><value>{0} Item(s) Won</value></data>
-  <data name="Order_Empty_Title" xml:space="preserve"><value>No won auctions yet</value></data>
-  <data name="Order_Empty_Desc" xml:space="preserve"><value>Place a winning bid on any live auction and your item will appear here for checkout.</value></data>
+  <data name="Order_PageTitle" xml:space="preserve"><value>Payment Center</value></data>
+  <data name="Order_ItemsWon" xml:space="preserve"><value>{0} pending invoice(s)</value></data>
+  <data name="Order_Empty_Title" xml:space="preserve"><value>No pending payments</value></data>
+  <data name="Order_Empty_Desc" xml:space="preserve"><value>Win an auction or buy a product to see invoices here.</value></data>
   <data name="Order_BrowseAuctions" xml:space="preserve"><value>Browse Auctions</value></data>
   <data name="Order_PaymentDeadline" xml:space="preserve"><value>Payment Deadline:</value></data>
   <data name="Order_PaymentExpired" xml:space="preserve"><value>Payment expired</value></data>
@@ -768,6 +809,14 @@
   <data name="Order_SslSecure" xml:space="preserve"><value>SSL Encrypted Secure Transaction</value></data>
   <data name="Order_AuthenticityTitle" xml:space="preserve"><value>RareCard Authenticity Guarantee</value></data>
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Your items are protected by our vault security. All won auctions are double-verified before shipment to ensure grading integrity.</value></data>
+  <data name="Order_Source_AuctionWin" xml:space="preserve"><value>Auction Win</value></data>
+  <data name="Order_Source_BuyNow" xml:space="preserve"><value>Buy Now</value></data>
+  <data name="Order_MandatoryPayment" xml:space="preserve"><value>Required payment</value></data>
+  <data name="Order_OptionalPayment" xml:space="preserve"><value>Pay now or later</value></data>
+  <data name="Order_DepositApplied" xml:space="preserve"><value>Deposit applied</value></data>
+  <data name="Order_SelectInvoices" xml:space="preserve"><value>Select invoices to pay</value></data>
+  <data name="Order_ItemAdded" xml:space="preserve"><value>Item added to Payment Center. Select invoices below to checkout.</value></data>
+  <data name="Js_Order_NoSelection" xml:space="preserve"><value>Please select at least one product to pay.</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Placing bid…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Unable to place bid. Please try again.</value></data>
   <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Bid placed successfully!</value></data>
@@ -812,6 +861,9 @@
   <data name="Js_Refund_ReasonRequired" xml:space="preserve"><value>Please select a refund reason.</value></data>
   <data name="Js_Refund_DescriptionRequired" xml:space="preserve"><value>Please provide a detailed description (at least 20 characters).</value></data>
   <data name="Js_Refund_PolicyRequired" xml:space="preserve"><value>You must agree to the refund policy.</value></data>
+  <data name="Js_Refund_SubmitFailed" xml:space="preserve"><value>Unable to submit your refund request. Please try again.</value></data>
+  <data name="Js_Refund_LoginRequired" xml:space="preserve"><value>Please log in to submit a refund request.</value></data>
+  <data name="Refund_LoginRequired" xml:space="preserve"><value>You must be logged in to submit a refund request.</value></data>
   <data name="User_Verified" xml:space="preserve"><value>Verified</value></data>
   <data name="User_YourAuctionList" xml:space="preserve"><value>Your Auction List</value></data>
   <data name="User_Stat_TotalAuctions" xml:space="preserve"><value>Total Auctions</value></data>
@@ -843,5 +895,22 @@
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>Price must be greater than 0</value></data>
   <data name="User_YourBuyNowList" xml:space="preserve"><value>Your Buy Now Listings</value></data>
   <data name="User_SellerBuyNowList" xml:space="preserve"><value>Buy Now Listings</value></data>
+  <data name="User_Stat_TotalListings" xml:space="preserve"><value>Active Listings</value></data>
+  <data name="User_ViewBuyNowList" xml:space="preserve"><value>View Buy Now</value></data>
+  <data name="User_CreateBuyNowListing" xml:space="preserve"><value>Create Buy Now Listing</value></data>
+  <data name="User_AuctionListingCount" xml:space="preserve"><value>{0} auction listing(s) shown</value></data>
+  <data name="User_BuyNowListingCount" xml:space="preserve"><value>{0} buy now listing(s) shown</value></data>
+  <data name="User_NoAuctions_OwnerTitle" xml:space="preserve"><value>No auction listings yet</value></data>
+  <data name="User_NoAuctions_VisitorTitle" xml:space="preserve"><value>No auction listings</value></data>
+  <data name="User_NoAuctions_OwnerDesc" xml:space="preserve"><value>Create your first auction listing to start selling.</value></data>
+  <data name="User_NoAuctions_VisitorDesc" xml:space="preserve"><value>This seller has no active auction listings right now.</value></data>
+  <data name="User_NoBuyNow_OwnerTitle" xml:space="preserve"><value>No buy now listings yet</value></data>
+  <data name="User_NoBuyNow_VisitorTitle" xml:space="preserve"><value>No buy now listings</value></data>
+  <data name="User_NoBuyNow_OwnerDesc" xml:space="preserve"><value>Create a fixed-price listing for instant purchase.</value></data>
+  <data name="User_NoBuyNow_VisitorDesc" xml:space="preserve"><value>This seller has no buy now listings right now.</value></data>
+  <data name="User_Time_Ended" xml:space="preserve"><value>Ended</value></data>
+  <data name="User_Time_DaysLeft" xml:space="preserve"><value>{0} days left</value></data>
+  <data name="User_Time_HoursLeft" xml:space="preserve"><value>{0} hours left</value></data>
+  <data name="User_Time_MinutesLeft" xml:space="preserve"><value>{0} minutes left</value></data>
   <data name="Account_Selling_CreateListing" xml:space="preserve"><value>Post for sale</value></data>
 </root>

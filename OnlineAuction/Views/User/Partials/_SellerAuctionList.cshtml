@@ -6,6 +6,10 @@
         ? (isBuyNow ? Localizer["User_YourBuyNowList"] : Localizer["User_YourAuctionList"])
         : (isBuyNow ? Localizer["User_SellerBuyNowList"] : Localizer["User_SellerAuctions"]);
     var createAction = isBuyNow ? "BuyNow" : "Create";
+    var createLabel = isBuyNow ? Localizer["User_CreateBuyNowListing"] : Localizer["User_CreateListing"];
+    var listingCountLabel = isBuyNow
+        ? Localizer["User_BuyNowListingCount", Model.Listings.Count]
+        : Localizer["User_AuctionListingCount", Model.Listings.Count];
 }
 
 <section id="@Model.SectionId" class="scroll-mt-header p-6 sm:p-8">
@@ -27,7 +31,7 @@
       </div>
       <div>
         <h2 class="text-base font-bold text-slate-900">@title</h2>
-        <p class="text-xs text-slate-500">@Localizer["User_ListingCount", Model.Listings.Count]</p>
+        <p class="text-xs text-slate-500">@listingCountLabel</p>
       </div>
     </div>
 
@@ -35,19 +39,19 @@
     {
       <a asp-controller="Sell" asp-action="@createAction"
          class="inline-flex cursor-pointer items-center justify-center rounded-lg bg-blue-700 px-4 py-2 text-xs font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-blue-800 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300">
-        @Localizer["User_CreateListing"]
+        @createLabel
       </a>
     }
   </div>
 
   @if (Model.Listings.Count > 0)
   {
-    <div class="space-y-4">
-      @foreach (var auction in Model.Listings)
+    <div class="rarecard-auction-grid">
+      @foreach (var listing in Model.Listings)
       {
-        @await Html.PartialAsync("Partials/_AuctionCard", new SellerAuctionCardViewModel
+        @await Html.PartialAsync("Partials/_SellerListingCard", new SellerListingCardViewModel
         {
-          Auction = auction,
+          Auction = listing,
           IsOwner = Model.IsOwner
         })
       }
@@ -55,6 +59,10 @@
   }
   else
   {
-    @await Html.PartialAsync("Partials/_EmptyAuctionState")
+    @await Html.PartialAsync("Partials/_EmptyAuctionState", new EmptyListingStateViewModel
+    {
+      IsOwner = Model.IsOwner,
+      Channel = Model.Channel
+    })
   }
 </section>

@@ -243,6 +243,7 @@
   <data name="Sell_ShortDescription_Placeholder" xml:space="preserve"><value>Tóm tắt hiển thị ở header (tối đa 300 ký tự)</value></data>
   <data name="Sell_Subtitle" xml:space="preserve"><value>Phụ đề</value></data>
   <data name="Sell_Subtitle_Placeholder" xml:space="preserve"><value>Dòng tagline dưới tên sản phẩm</value></data>
+  <data name="Sell_Subtitle_Hint" xml:space="preserve"><value>Để trống sẽ tự tạo theo Bộ · Grade · Năm (giống thẻ trên trang đấu giá/mua ngay).</value></data>
   <data name="Sell_Section4_CardSpecs_Title" xml:space="preserve"><value>Thông số thẻ</value></data>
   <data name="Sell_Section4_CardSpecs_Desc" xml:space="preserve"><value>Năm, bộ, ngôn ngữ, grade và số chứng nhận</value></data>
   <data name="Sell_SetName_Placeholder" xml:space="preserve"><value>vd. Base Set</value></data>
@@ -252,6 +253,9 @@
   <data name="Sell_AuctionEventName" xml:space="preserve"><value>Tên sự kiện đấu giá</value></data>
   <data name="Sell_AuctionEventName_Placeholder" xml:space="preserve"><value>vd. RareCard Vault: Premium Trading Card Auction</value></data>
   <data name="Sell_Error_YearInvalid" xml:space="preserve"><value>Vui lòng nhập năm hợp lệ từ 1800 đến 2100.</value></data>
+  <data name="Sell_Error_YearRequired" xml:space="preserve"><value>Vui lòng nhập năm sản xuất.</value></data>
+  <data name="Sell_Error_AuthenticatorRequired" xml:space="preserve"><value>Vui lòng chọn đơn vị xác thực.</value></data>
+  <data name="Sell_Error_GradeRequired" xml:space="preserve"><value>Vui lòng chọn điểm grade.</value></data>
   <data name="Sell_Section2_Title" xml:space="preserve"><value>Hình ảnh sản phẩm</value></data>
   <data name="Sell_Section2_Desc" xml:space="preserve"><value>Tải lên nhiều hình — JPG, PNG, WEBP (tối đa 5MB mỗi ảnh)</value></data>
   <data name="Sell_UploadImages_Title" xml:space="preserve"><value>Tải lên hình ảnh sản phẩm</value></data>
@@ -347,6 +351,12 @@
   <data name="Account_Preferences" xml:space="preserve"><value>Tùy chọn</value></data>
   <data name="Account_Orders_Desc" xml:space="preserve"><value>Theo dõi và xem các giao dịch mua</value></data>
   <data name="Account_Bids_Desc" xml:space="preserve"><value>Xem các phiên đấu giá đang tham gia và đã qua</value></data>
+  <data name="Account_Bids_Tab_Active" xml:space="preserve"><value>Đang diễn ra</value></data>
+  <data name="Account_Bids_Tab_Past" xml:space="preserve"><value>Đã kết thúc</value></data>
+  <data name="Account_Bids_Empty" xml:space="preserve"><value>Bạn chưa có phiên đấu giá nào trong mục này.</value></data>
+  <data name="Account_Watchlist_Empty" xml:space="preserve"><value>Chưa có mục nào trong danh sách theo dõi. Nhấn biểu tượng trái tim trên thẻ đấu giá để lưu.</value></data>
+  <data name="Account_Offers_Empty" xml:space="preserve"><value>Chưa có đề nghị mua nào đang chờ thanh toán.</value></data>
+  <data name="Account_Submissions_Empty" xml:space="preserve"><value>Chưa có hồ sơ nào đang chờ xét duyệt. Tạo tin đăng mới để gửi tới Vault.</value></data>
   <data name="Account_Watchlist_Desc" xml:space="preserve"><value>Theo dõi các mục đã lưu</value></data>
   <data name="Account_Offers_Desc" xml:space="preserve"><value>Theo dõi đề nghị bạn đã gửi hoặc nhận</value></data>
   <data name="Account_Summary_Desc" xml:space="preserve"><value>Tổng quan tài khoản của bạn</value></data>
@@ -384,6 +394,37 @@
   <data name="Auth_Slide3_Eyebrow" xml:space="preserve"><value>Thể thao &amp; MTG</value></data>
   <data name="Auth_Slide3_Title" xml:space="preserve"><value>Huyền thoại trên đấu giá</value></data>
   <data name="Auth_Slide3_Desc" xml:space="preserve"><value>Từ Mickey Mantle rookie đến Alpha Black Lotus — tuyển chọn mỗi ngày.</value></data>
+  <data name="Auth_ForgotPassword" xml:space="preserve"><value>Quên mật khẩu?</value></data>
+  <data name="Auth_Forgot_Title" xml:space="preserve"><value>Quên mật khẩu?</value></data>
+  <data name="Auth_Forgot_Subtitle" xml:space="preserve"><value>Nhập email để nhận mã xác minh 6 chữ số.</value></data>
+  <data name="Auth_Forgot_SendOtp" xml:space="preserve"><value>Gửi mã xác minh</value></data>
+  <data name="Auth_Forgot_BackToLogin" xml:space="preserve"><value>Quay lại đăng nhập</value></data>
+  <data name="Auth_Forgot_OtpTitle" xml:space="preserve"><value>Nhập mã xác minh</value></data>
+  <data name="Auth_Forgot_OtpSubtitle" xml:space="preserve"><value>Chúng tôi đã gửi mã 6 chữ số đến email của bạn.</value></data>
+  <data name="Auth_Forgot_OtpSent" xml:space="preserve"><value>Nếu {0} tồn tại, hãy nhập mã 6 chữ số chúng tôi đã gửi.</value></data>
+  <data name="Auth_Forgot_OtpLabel" xml:space="preserve"><value>Mã xác minh</value></data>
+  <data name="Auth_Forgot_OtpDigit" xml:space="preserve"><value>Chữ số {0}</value></data>
+  <data name="Auth_Forgot_VerifyOtp" xml:space="preserve"><value>Xác minh mã</value></data>
+  <data name="Auth_Forgot_ChangeEmail" xml:space="preserve"><value>Dùng email khác</value></data>
+  <data name="Auth_Forgot_ResetTitle" xml:space="preserve"><value>Tạo mật khẩu mới</value></data>
+  <data name="Auth_Forgot_ResetSubtitle" xml:space="preserve"><value>Chọn mật khẩu mới cho tài khoản RareCard của bạn.</value></data>
+  <data name="Auth_Forgot_NewPassword" xml:space="preserve"><value>Mật khẩu mới</value></data>
+  <data name="Auth_Forgot_ResetSubmit" xml:space="preserve"><value>Đặt lại mật khẩu</value></data>
+  <data name="Auth_Forgot_BackToOtp" xml:space="preserve"><value>Quay lại mã xác minh</value></data>
+  <data name="Auth_Forgot_DevOtpTitle" xml:space="preserve"><value>Mã OTP môi trường Development</value></data>
+  <data name="Auth_Forgot_DevOtpDesc" xml:space="preserve"><value>Email chưa được cấu hình, nên Development hiển thị mã tại đây.</value></data>
+  <data name="Auth_Forgot_InvalidEmail" xml:space="preserve"><value>Vui lòng nhập địa chỉ email hợp lệ.</value></data>
+  <data name="Auth_Forgot_InvalidOtp" xml:space="preserve"><value>Mã xác minh không hợp lệ hoặc đã hết hạn.</value></data>
+  <data name="Auth_Otp_Invalid" xml:space="preserve"><value>Mã xác minh không hợp lệ.</value></data>
+  <data name="Auth_Otp_Expired" xml:space="preserve"><value>Mã xác minh đã hết hạn. Vui lòng yêu cầu mã mới.</value></data>
+  <data name="Auth_Otp_MaxAttempts" xml:space="preserve"><value>Bạn đã nhập sai quá nhiều lần. Vui lòng yêu cầu mã mới.</value></data>
+  <data name="Auth_Otp_Resend" xml:space="preserve"><value>Gửi lại mã</value></data>
+  <data name="Auth_Otp_ResendCooldown" xml:space="preserve"><value>Vui lòng đợi {0} giây trước khi yêu cầu mã mới.</value></data>
+  <data name="Auth_Otp_TooManyResends" xml:space="preserve"><value>Bạn đã yêu cầu quá nhiều mã. Vui lòng thử lại sau.</value></data>
+  <data name="Auth_Otp_Sent" xml:space="preserve"><value>Nếu email đủ điều kiện, mã xác minh đã được gửi.</value></data>
+  <data name="Auth_Forgot_ResetFailed" xml:space="preserve"><value>Không thể đặt lại mật khẩu. Vui lòng thử lại.</value></data>
+  <data name="Auth_Forgot_SessionExpired" xml:space="preserve"><value>Phiên xác minh đã hết hạn. Vui lòng bắt đầu lại.</value></data>
+  <data name="Auth_Forgot_ResetSuccess" xml:space="preserve"><value>Đặt lại mật khẩu thành công. Vui lòng đăng nhập bằng mật khẩu mới.</value></data>
   <data name="Layout_Footer_AboutUs" xml:space="preserve"><value>Về chúng tôi</value></data>
   <data name="Layout_Footer_ContactUs" xml:space="preserve"><value>Liên hệ</value></data>
   <data name="Layout_Footer_PolicyTerms" xml:space="preserve"><value>Chính sách &amp; Điều khoản</value></data>
@@ -417,10 +458,10 @@
   <data name="Card_PlaceBid" xml:space="preserve"><value>Đặt giá</value></data>
   <data name="Card_EndingSoon" xml:space="preserve"><value>Sắp kết thúc</value></data>
   <data name="Card_Hot" xml:space="preserve"><value>Hot</value></data>
-  <data name="Order_PageTitle" xml:space="preserve"><value>Phiên đấu giá đã thắng</value></data>
-  <data name="Order_ItemsWon" xml:space="preserve"><value>Đã thắng {0} mục</value></data>
-  <data name="Order_Empty_Title" xml:space="preserve"><value>Chưa có phiên đấu giá thắng</value></data>
-  <data name="Order_Empty_Desc" xml:space="preserve"><value>Thắng một phiên đấu giá và sản phẩm sẽ xuất hiện tại đây để thanh toán.</value></data>
+  <data name="Order_PageTitle" xml:space="preserve"><value>Trung tâm thanh toán</value></data>
+  <data name="Order_ItemsWon" xml:space="preserve"><value>{0} hóa đơn chờ thanh toán</value></data>
+  <data name="Order_Empty_Title" xml:space="preserve"><value>Không có hóa đơn chờ thanh toán</value></data>
+  <data name="Order_Empty_Desc" xml:space="preserve"><value>Thắng đấu giá hoặc mua sản phẩm để thấy hóa đơn tại đây.</value></data>
   <data name="Order_BrowseAuctions" xml:space="preserve"><value>Xem đấu giá</value></data>
   <data name="Order_PaymentDeadline" xml:space="preserve"><value>Hạn thanh toán:</value></data>
   <data name="Order_PaymentExpired" xml:space="preserve"><value>Đã hết hạn thanh toán</value></data>
@@ -768,6 +809,14 @@
   <data name="Order_SslSecure" xml:space="preserve"><value>Giao dịch mã hóa SSL an toàn</value></data>
   <data name="Order_AuthenticityTitle" xml:space="preserve"><value>Cam kết xác thực RareCard</value></data>
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Sản phẩm được bảo vệ bởi bảo mật vault. Mọi phiên thắng đều được xác minh kép trước khi giao hàng.</value></data>
+  <data name="Order_Source_AuctionWin" xml:space="preserve"><value>Đấu giá thắng</value></data>
+  <data name="Order_Source_BuyNow" xml:space="preserve"><value>Mua ngay</value></data>
+  <data name="Order_MandatoryPayment" xml:space="preserve"><value>Bắt buộc thanh toán</value></data>
+  <data name="Order_OptionalPayment" xml:space="preserve"><value>Thanh toán ngay hoặc để sau</value></data>
+  <data name="Order_DepositApplied" xml:space="preserve"><value>Tiền cọc đã trừ</value></data>
+  <data name="Order_SelectInvoices" xml:space="preserve"><value>Chọn hóa đơn cần thanh toán</value></data>
+  <data name="Order_ItemAdded" xml:space="preserve"><value>Đã thêm vào Trung tâm thanh toán. Chọn hóa đơn bên dưới để thanh toán.</value></data>
+  <data name="Js_Order_NoSelection" xml:space="preserve"><value>Vui lòng chọn ít nhất một sản phẩm để thanh toán.</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Đang đặt giá…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Không thể đặt giá. Vui lòng thử lại.</value></data>
   <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Đặt giá thành công!</value></data>
@@ -812,6 +861,9 @@
   <data name="Js_Refund_ReasonRequired" xml:space="preserve"><value>Vui lòng chọn lý do hoàn tiền.</value></data>
   <data name="Js_Refund_DescriptionRequired" xml:space="preserve"><value>Vui lòng mô tả chi tiết (ít nhất 20 ký tự).</value></data>
   <data name="Js_Refund_PolicyRequired" xml:space="preserve"><value>Bạn phải đồng ý chính sách hoàn tiền.</value></data>
+  <data name="Js_Refund_SubmitFailed" xml:space="preserve"><value>Không thể gửi yêu cầu hoàn tiền. Vui lòng thử lại.</value></data>
+  <data name="Js_Refund_LoginRequired" xml:space="preserve"><value>Vui lòng đăng nhập để gửi yêu cầu hoàn tiền.</value></data>
+  <data name="Refund_LoginRequired" xml:space="preserve"><value>Bạn cần đăng nhập để gửi yêu cầu hoàn tiền.</value></data>
   <data name="User_Verified" xml:space="preserve"><value>Đã xác minh</value></data>
   <data name="User_YourAuctionList" xml:space="preserve"><value>Danh sách đấu giá của bạn</value></data>
   <data name="User_Stat_TotalAuctions" xml:space="preserve"><value>Tổng đấu giá</value></data>
@@ -843,5 +895,22 @@
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>Giá phải lớn hơn 0</value></data>
   <data name="User_YourBuyNowList" xml:space="preserve"><value>Danh sách Mua ngay của bạn</value></data>
   <data name="User_SellerBuyNowList" xml:space="preserve"><value>Danh sách Mua ngay</value></data>
+  <data name="User_Stat_TotalListings" xml:space="preserve"><value>Tin đang hiển thị</value></data>
+  <data name="User_ViewBuyNowList" xml:space="preserve"><value>Xem Mua ngay</value></data>
+  <data name="User_CreateBuyNowListing" xml:space="preserve"><value>Tạo tin Mua ngay</value></data>
+  <data name="User_AuctionListingCount" xml:space="preserve"><value>{0} tin đấu giá đang hiển thị</value></data>
+  <data name="User_BuyNowListingCount" xml:space="preserve"><value>{0} tin Mua ngay đang hiển thị</value></data>
+  <data name="User_NoAuctions_OwnerTitle" xml:space="preserve"><value>Chưa có tin đấu giá</value></data>
+  <data name="User_NoAuctions_VisitorTitle" xml:space="preserve"><value>Chưa có đấu giá</value></data>
+  <data name="User_NoAuctions_OwnerDesc" xml:space="preserve"><value>Tạo tin đấu giá đầu tiên để bắt đầu bán.</value></data>
+  <data name="User_NoAuctions_VisitorDesc" xml:space="preserve"><value>Người bán này hiện chưa có tin đấu giá đang hiển thị.</value></data>
+  <data name="User_NoBuyNow_OwnerTitle" xml:space="preserve"><value>Chưa có tin Mua ngay</value></data>
+  <data name="User_NoBuyNow_VisitorTitle" xml:space="preserve"><value>Chưa có Mua ngay</value></data>
+  <data name="User_NoBuyNow_OwnerDesc" xml:space="preserve"><value>Tạo tin giá cố định để khách mua ngay.</value></data>
+  <data name="User_NoBuyNow_VisitorDesc" xml:space="preserve"><value>Người bán này hiện chưa có tin Mua ngay đang hiển thị.</value></data>
+  <data name="User_Time_Ended" xml:space="preserve"><value>Đã kết thúc</value></data>
+  <data name="User_Time_DaysLeft" xml:space="preserve"><value>Còn {0} ngày</value></data>
+  <data name="User_Time_HoursLeft" xml:space="preserve"><value>Còn {0} giờ</value></data>
+  <data name="User_Time_MinutesLeft" xml:space="preserve"><value>Còn {0} phút</value></data>
   <data name="Account_Selling_CreateListing" xml:space="preserve"><value>Đăng bán sản phẩm</value></data>
 </root>

@@ -1,3 +1,4 @@
+@using OnlineAuction.Entities
 @using OnlineAuction.Helpers
 @using System.Text.Json
 @model OnlineAuction.Models.OrderPageViewModel
@@ -6,14 +7,19 @@
     var orderI18n = new Dictionary<string, string>
     {
         ["remainingHours"] = Localizer["Js_Order_RemainingHours"].Value,
-        ["remainingMinutes"] = Localizer["Js_Order_RemainingMinutes"].Value
+        ["remainingMinutes"] = Localizer["Js_Order_RemainingMinutes"].Value,
+        ["noSelection"] = Localizer["Js_Order_NoSelection"].Value,
+        ["subtotalTemplate"] = Localizer["Order_Subtotal"].Value
     };
 }
 
 <div class="order-page min-h-screen bg-slate-50">
   <section class="site-shell px-4 py-8 sm:px-6 lg:py-10">
     <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
-      <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">@Localizer["Order_PageTitle"]</h1>
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">@Localizer["Order_PageTitle"]</h1>
+        <p class="mt-2 max-w-2xl text-sm text-slate-500">@Localizer["Order_SelectInvoices"]</p>
+      </div>
       @if (Model.Items.Count > 0)
       {
         <span class="inline-flex rounded-full bg-slate-200/80 px-4 py-1.5 text-sm font-medium text-slate-600">
@@ -48,178 +54,228 @@
     {
       @if (TempData["OrderMessage"] is string orderMessage)
       {
-        <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+        <div class="order-checkout__alert order-checkout__alert--success">
           @orderMessage
         </div>
       }
       @if (TempData["OrderError"] is string orderError)
       {
-        <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+        <div class="order-checkout__alert order-checkout__alert--error">
           @orderError
         </div>
       }
-      <div class="space-y-4">
-        @foreach (var item in Model.Items)
-        {
-          <article class="order-won-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
-                   data-deadline="@DateTimeUtilities.ToUtcIsoString(item.PaymentDeadline)">
-            <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-              <div class="flex min-w-0 flex-1 items-center gap-4">
-                <div class="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-slate-50 sm:h-24 sm:w-24">
-                  <img src="@item.ImageUrl" alt="@item.Name" class="h-full w-full object-cover"/>
-                </div>
-                <div class="min-w-0">
-                  <h2 class="text-lg font-bold text-slate-900 sm:text-xl">@item.Name</h2>
-                  <p class="mt-1 text-sm text-slate-500">@item.Subtitle</p>
-                </div>
-              </div>
-              <p class="shrink-0 text-2xl font-bold tabular-nums text-blue-700 sm:text-3xl">
-                $@item.WinningBid.ToString("N2")
-              </p>
-            </div>
-            <div class="order-won-card__deadline flex items-center gap-2 border-t border-red-100 bg-red-50 px-5 py-2.5 sm:px-6">
-              <svg class="h-4 w-4 shrink-0 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-              </svg>
-              <p class="text-xs font-bold uppercase tracking-wide text-red-600">
-                @(item.IsExpired ? Localizer["Order_PaymentExpired"].Value : Localizer["Order_PaymentDeadline"].Value)
-                <span class="order-deadline-countdown tabular-nums">—</span>
-              </p>
-            </div>
-          </article>
-        }
-      </div>
 
-      <form id="orderCheckoutForm" asp-controller="Order" asp-action="Complete" method="post"
-            class="mt-10 grid gap-8 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] xl:gap-10">
+      <form id="orderCheckoutForm" asp-controller="Order" asp-action="Complete" method="post" class="order-checkout">
         @Html.AntiForgeryToken()
-        <div class="space-y-6">
-          <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <div class="flex items-center gap-3">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-700 text-sm font-bold text-white">1</span>
-              <h2 class="text-lg font-bold text-slate-900">@Localizer["Order_ShippingInfo"]</h2>
-            </div>
-            <div class="mt-6 space-y-4">
-              <div>
-                <label for="fullName" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["User_FullName"]</label>
-                <input type="text" id="fullName" name="fullName" value="@Model.FullName" required maxlength="120"
-                       class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
-              </div>
-              <div>
-                <label for="address" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Order_ShippingAddress"]</label>
-                <input type="text" id="address" name="address" value="@Model.Address" required maxlength="300"
-                       class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
-              </div>
-              <div class="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label for="city" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Checkout_City"]</label>
-                  <input type="text" id="city" name="city" value="@Model.City" required maxlength="100"
-                         class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
-                </div>
-                <div>
-                  <label for="phone" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Checkout_Phone"]</label>
-                  <input type="tel" id="phone" name="phone" value="@Model.Phone" required maxlength="20"
-                         class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
-                </div>
-              </div>
-              @if (Model.ShippingSaved)
-              {
-                <p class="text-xs font-medium text-emerald-600">@Localizer["Order_ShippingSaved"]</p>
-              }
-            </div>
-          </section>
+        <div id="selectedOrderIdsContainer" class="order-checkout__hidden-inputs" aria-hidden="true"></div>
 
-          <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <div class="flex items-center gap-3">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-700 text-sm font-bold text-white">2</span>
-              <h2 class="text-lg font-bold text-slate-900">@Localizer["Order_PaymentMethod"]</h2>
-            </div>
-            <div class="mt-6 space-y-3">
-              @foreach (var method in Model.PaymentMethods)
-              {
-                var isSelected = string.Equals(Model.SelectedPaymentMethod, method.Id, StringComparison.OrdinalIgnoreCase)
-                    || (string.IsNullOrWhiteSpace(Model.SelectedPaymentMethod) && method.Id == "paypal");
-                <label class="order-payment-option flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition @(isSelected ? "border-blue-600 bg-blue-50/30" : "border-slate-200 hover:border-slate-300")">
-                  <input type="radio" name="paymentMethod" value="@method.Id"
-                         class="h-4 w-4 border-slate-300 text-blue-700 focus:ring-blue-500"
-                         @(isSelected ? "checked" : null)/>
-                  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white text-slate-600 shadow-sm ring-1 ring-slate-100">
-                    @if (method.Id == "paypal")
-                    {
-                      <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m6 0h3m-9 3H7.5m0 0h.008v.008H7.5V17.25Zm0 0h.008v.008H7.5V17.25Z"/>
-                      </svg>
-                    }
-                    else
-                    {
-                      <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375M15 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/>
-                      </svg>
-                    }
-                  </div>
-                  <div class="min-w-0 flex-1">
-                    <p class="font-semibold text-slate-900">@method.Name</p>
-                    <p class="text-sm text-slate-500">@method.Description</p>
-                  </div>
+        @if (Context.Request.Query["added"] == "1")
+        {
+          <div class="order-checkout__alert order-checkout__alert--success">
+            @Localizer["Order_ItemAdded"]
+          </div>
+        }
+
+        <div class="order-checkout__layout">
+          <div class="order-checkout__main">
+            <div class="order-invoice-list">
+          @foreach (var item in Model.Items)
+          {
+            var isAuctionWin = item.OrderSource == OrderSources.AuctionWin;
+            var sourceLabel = isAuctionWin
+                ? Localizer["Order_Source_AuctionWin"].Value
+                : Localizer["Order_Source_BuyNow"].Value;
+            var paymentNote = isAuctionWin
+                ? Localizer["Order_MandatoryPayment"].Value
+                : Localizer["Order_OptionalPayment"].Value;
+
+            <article class="order-invoice-card order-won-card @(item.IsSelectedByDefault ? "order-invoice-card--selected" : "")"
+                     data-order-id="@item.OrderId"
+                     data-subtotal="@item.WinningBid.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-shipping="@item.ShippingFee.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-insurance="@item.VaultInsurance.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-deposit="@item.DepositApplied.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-total="@item.TotalAmount.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-mandatory="@(item.IsMandatory ? "true" : "false")"
+                     data-deadline="@DateTimeUtilities.ToUtcIsoString(item.PaymentDeadline)">
+              <div class="order-invoice-card__body">
+                <label class="order-invoice-card__check">
+                  <input type="checkbox"
+                         class="order-invoice-select"
+                         value="@item.OrderId"
+                         @(item.IsSelectedByDefault ? "checked" : null)
+                         @(item.IsMandatory ? "disabled" : null)/>
                 </label>
-              }
+                <div class="order-invoice-card__media">
+                  <img src="@item.ImageUrl" alt="@item.Name"/>
+                </div>
+                <div class="order-invoice-card__info">
+                  <div class="order-invoice-card__meta">
+                    <span class="order-invoice-card__badge @(isAuctionWin ? "order-invoice-card__badge--auction" : "order-invoice-card__badge--buynow")">
+                      @sourceLabel
+                    </span>
+                    <span class="order-invoice-card__ref">@item.OrderReference</span>
+                  </div>
+                  <h2 class="order-invoice-card__title">@item.Name</h2>
+                  @if (!string.IsNullOrWhiteSpace(item.Subtitle))
+                  {
+                    <p class="order-invoice-card__subtitle">@item.Subtitle</p>
+                  }
+                  <p class="order-invoice-card__note">@paymentNote</p>
+                </div>
+                <div class="order-invoice-card__price">
+                  <p class="order-invoice-card__amount">$@item.TotalAmount.ToString("N2")</p>
+                  @if (item.DepositApplied > 0)
+                  {
+                    <p class="order-invoice-card__deposit">
+                      @Localizer["Order_DepositApplied"]: -$@item.DepositApplied.ToString("N2")
+                    </p>
+                  }
+                </div>
+              </div>
+              <div class="order-invoice-card__deadline order-won-card__deadline">
+                <svg class="order-invoice-card__deadline-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+                <p class="order-invoice-card__deadline-text">
+                  @Localizer["Order_PaymentDeadline"]
+                  <span class="order-deadline-countdown">—</span>
+                </p>
+              </div>
+            </article>
+          }
             </div>
-          </section>
-        </div>
 
-        <aside class="space-y-6">
-          <div class="sticky-below-header rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 class="text-lg font-bold text-slate-900">@Localizer["Order_Summary"]</h2>
-            <dl class="mt-5 space-y-3 text-sm">
-              <div class="flex justify-between gap-4">
-                <dt class="text-slate-500">@Localizer["Order_Subtotal", Model.Items.Count]</dt>
-                <dd class="font-medium tabular-nums text-slate-900">$@Model.Subtotal.ToString("N2")</dd>
+            <div class="order-checkout__sections">
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+              <div class="flex items-center gap-3">
+                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-700 text-sm font-bold text-white">1</span>
+                <h2 class="text-lg font-bold text-slate-900">@Localizer["Order_ShippingInfo"]</h2>
               </div>
-              <div class="flex justify-between gap-4">
-                <dt class="text-slate-500">@Localizer["Order_SecuredShipping"]</dt>
-                <dd class="font-medium tabular-nums text-slate-900">$@Model.ShippingFee.ToString("N2")</dd>
+              <div class="mt-6 space-y-4">
+                <div>
+                  <label for="fullName" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["User_FullName"]</label>
+                  <input type="text" id="fullName" name="fullName" value="@Model.FullName" required maxlength="120"
+                         class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
+                </div>
+                <div>
+                  <label for="address" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Order_ShippingAddress"]</label>
+                  <input type="text" id="address" name="address" value="@Model.Address" required maxlength="300"
+                         class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
+                </div>
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label for="city" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Checkout_City"]</label>
+                    <input type="text" id="city" name="city" value="@Model.City" required maxlength="100"
+                           class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
+                  </div>
+                  <div>
+                    <label for="phone" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Checkout_Phone"]</label>
+                    <input type="tel" id="phone" name="phone" value="@Model.Phone" required maxlength="20"
+                           class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
+                  </div>
+                </div>
+                @if (Model.ShippingSaved)
+                {
+                  <p class="text-xs font-medium text-emerald-600">@Localizer["Order_ShippingSaved"]</p>
+                }
               </div>
-              <div class="flex justify-between gap-4">
-                <dt class="text-slate-500">@Localizer["Order_VaultInsurance"]</dt>
-                <dd class="font-medium tabular-nums text-slate-900">$@Model.VaultInsurance.ToString("N2")</dd>
+            </section>
+
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+              <div class="flex items-center gap-3">
+                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-700 text-sm font-bold text-white">2</span>
+                <h2 class="text-lg font-bold text-slate-900">@Localizer["Order_PaymentMethod"]</h2>
               </div>
-              <div class="flex justify-between gap-4 border-t border-slate-100 pt-4">
-                <dt class="text-base font-bold text-slate-900">@Localizer["Checkout_Total"]</dt>
-                <dd class="text-2xl font-bold tabular-nums text-blue-700">$@Model.TotalAmount.ToString("N2")</dd>
+              <div class="mt-6 space-y-3">
+                @foreach (var method in Model.PaymentMethods)
+                {
+                  var isSelected = string.Equals(Model.SelectedPaymentMethod, method.Id, StringComparison.OrdinalIgnoreCase)
+                      || (string.IsNullOrWhiteSpace(Model.SelectedPaymentMethod) && method.Id == "paypal");
+                  <label class="order-payment-option flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition @(isSelected ? "border-blue-600 bg-blue-50/30" : "border-slate-200 hover:border-slate-300")">
+                    <input type="radio" name="paymentMethod" value="@method.Id"
+                           class="h-4 w-4 border-slate-300 text-blue-700 focus:ring-blue-500"
+                           @(isSelected ? "checked" : null)/>
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white text-slate-600 shadow-sm ring-1 ring-slate-100">
+                      @if (method.Id == "paypal")
+                      {
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m6 0h3m-9 3H7.5m0 0h.008v.008H7.5V17.25Zm0 0h.008v.008H7.5V17.25Z"/>
+                        </svg>
+                      }
+                      else
+                      {
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375M15 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/>
+                        </svg>
+                      }
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <p class="font-semibold text-slate-900">@method.Name</p>
+                      <p class="text-sm text-slate-500">@method.Description</p>
+                    </div>
+                  </label>
+                }
+              </div>
+            </section>
+            </div>
+          </div>
+
+          <aside class="order-checkout__aside">
+            <div class="order-checkout__summary sticky-below-header">
+            <h2 class="order-checkout__summary-title">@Localizer["Order_Summary"]</h2>
+            <dl class="order-checkout__summary-list">
+              <div class="order-checkout__summary-row">
+                <dt id="orderSummarySubtotalLabel">@Localizer["Order_Subtotal", Model.SelectedItemCount]</dt>
+                <dd id="orderSummarySubtotal">$@Model.Subtotal.ToString("N2")</dd>
+              </div>
+              <div class="order-checkout__summary-row">
+                <dt>@Localizer["Order_SecuredShipping"]</dt>
+                <dd id="orderSummaryShipping">$@Model.ShippingFee.ToString("N2")</dd>
+              </div>
+              <div class="order-checkout__summary-row">
+                <dt>@Localizer["Order_VaultInsurance"]</dt>
+                <dd id="orderSummaryInsurance">$@Model.VaultInsurance.ToString("N2")</dd>
+              </div>
+              <div class="order-checkout__summary-row" id="orderSummaryDepositRow">
+                <dt>@Localizer["Order_DepositApplied"]</dt>
+                <dd class="order-checkout__summary-deposit" id="orderSummaryDeposit">@(Model.DepositApplied > 0 ? $"-${Model.DepositApplied:N2}" : "—")</dd>
+              </div>
+              <div class="order-checkout__summary-row order-checkout__summary-row--total">
+                <dt>@Localizer["Checkout_Total"]</dt>
+                <dd id="orderSummaryTotal">$@Model.TotalAmount.ToString("N2")</dd>
               </div>
             </dl>
-            <button type="submit"
-                    class="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-slate-400"
-                    @(Model.HasExpiredOrder ? "disabled" : null)>
+            <p id="orderSelectionError" class="order-checkout__selection-error" role="alert" aria-live="polite"></p>
+            <button type="submit" id="orderCompleteButton" class="order-checkout__submit">
               @Localizer["Order_CompleteOrder"]
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
               </svg>
             </button>
-            <p class="mt-4 flex items-center justify-center gap-1.5 text-xs text-slate-500">
-              <svg class="h-3.5 w-3.5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <p class="order-checkout__secure-note">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/>
               </svg>
               @Localizer["Order_SslSecure"]
             </p>
           </div>
 
-          <div class="rounded-2xl border border-blue-100 bg-blue-50/60 p-6">
-            <div class="flex gap-4">
-              <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-700">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <div class="order-checkout__guarantee">
+            <div class="order-checkout__guarantee-icon">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>
               </div>
               <div>
-                <h3 class="font-bold text-slate-900">@Localizer["Order_AuthenticityTitle"]</h3>
-                <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                <h3 class="order-checkout__guarantee-title">@Localizer["Order_AuthenticityTitle"]</h3>
+                <p class="order-checkout__guarantee-text">
                   @Localizer["Order_AuthenticityDesc"]
                 </p>
               </div>
             </div>
-          </div>
-        </aside>
+          </aside>
+        </div>
       </form>
     }
   </section>

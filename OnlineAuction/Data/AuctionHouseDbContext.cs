@@ -39,6 +39,16 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<UserDeviceToken> UserDeviceTokens => Set<UserDeviceToken>();
 
+    public DbSet<Permission> Permissions => Set<Permission>();
+
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+
+    public DbSet<UserOtpCode> UserOtpCodes => Set<UserOtpCode>();
+
+    public DbSet<WatchlistItem> WatchlistItems => Set<WatchlistItem>();
+
+    public DbSet<Complaint> Complaints => Set<Complaint>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         
@@ -58,6 +68,52 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigurePayments(builder);
         ConfigureNotifications(builder);
         ConfigureUserDeviceTokens(builder);
+        ConfigurePermissions(builder);
+        ConfigureUserOtpCodes(builder);
+        ConfigureWatchlistItems(builder);
+        ConfigureComplaints(builder);
+    }
+
+    private static void ConfigurePermissions(ModelBuilder builder)
+    {
+        builder.Entity<Permission>(entity =>
+        {
+            entity.ToTable("permissions");
+
+            entity.Property(p => p.Id).HasColumnName("id");
+            entity.Property(p => p.Code).HasColumnName("code").HasMaxLength(100).IsRequired();
+            entity.Property(p => p.Name).HasColumnName("name").HasMaxLength(150).IsRequired();
+            entity.Property(p => p.Module).HasColumnName("module").HasMaxLength(50).IsRequired();
+            entity.Property(p => p.Description).HasColumnName("description").HasMaxLength(500);
+
+            entity.HasIndex(p => p.Code).IsUnique().HasDatabaseName("ux_permissions_code");
+        });
+
+        builder.Entity<RolePermission>(entity =>
+        {
+            entity.ToTable("role_permissions");
+
+            entity.HasKey(rp => new { rp.RoleId, rp.PermissionId });
+
+            entity.Property(rp => rp.RoleId).HasColumnName("role_id");
+            entity.Property(rp => rp.PermissionId).HasColumnName("permission_id");
+
+            entity.HasOne(rp => rp.Role)
+                .WithMany()
+                .HasForeignKey(rp => rp.RoleId)
+                .HasConstraintName("fk_role_permissions_role")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(rp => rp.Permission)
+                .WithMany(p => p.RolePermissions)
+                .HasForeignKey(rp => rp.PermissionId)
+                .HasConstraintName("fk_role_permissions_permission")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(rp => new { rp.RoleId, rp.PermissionId })
+                .IsUnique()
+                .HasDatabaseName("ux_role_permissions_role_permission");
+        });
     }
     private static void ConfigureAuctionRegistrationDeposits(ModelBuilder builder)
 {
@@ -461,6 +517,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(o => o.VaultInsurance).HasColumnName("vault_insurance").HasPrecision(18, 2);
             entity.Property(o => o.TotalAmount).HasColumnName("total_amount").HasPrecision(18, 2);
             entity.Property(o => o.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(OrderStatuses.PendingPayment);
+            entity.Property(o => o.OrderSource).HasColumnName("order_source").HasMaxLength(20).IsRequired().HasDefaultValue(OrderSources.AuctionWin);
             entity.Property(o => o.PaymentDeadline).HasColumnName("payment_deadline");
             entity.Property(o => o.DepositApplied).HasColumnName("deposit_applied").HasPrecision(18, 2);
 
@@ -612,6 +669,93 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         });
     }
 
+    private static void ConfigureUserOtpCodes(ModelBuilder builder)
+    {
+        builder.Entity<UserOtpCode>(entity =>
+        {
+            entity.ToTable("user_otp_codes");
+
+            entity.Property(otp => otp.Id).HasColumnName("id");
+            entity.Property(otp => otp.UserId).HasColumnName("user_id");
+            entity.Property(otp => otp.CodeHash).HasColumnName("code_hash").HasMaxLength(128).IsRequired();
+            entity.Property(otp => otp.Salt).HasColumnName("salt").HasMaxLength(64).IsRequired();
+            entity.Property(otp => otp.Purpose).HasColumnName("purpose").HasMaxLength(40).IsRequired();
+            entity.Property(otp => otp.ExpiresAt).HasColumnName("expires_at");
+            entity.Property(otp => otp.AttemptCount).HasColumnName("attempt_count");
+            entity.Property(otp => otp.MaxAttempts).HasColumnName("max_attempts");
+            entity.Property(otp => otp.IsUsed).HasColumnName("is_used");
+            entity.Property(otp => otp.CreatedAt).HasColumnName("created_at");
+
+            entity.HasIndex(otp => new { otp.UserId, otp.Purpose, otp.IsUsed, otp.ExpiresAt })
+                .HasDatabaseName("ix_user_otp_codes_active_lookup");
+
+            entity.HasOne(otp => otp.User)
+                .WithMany()
+                .HasForeignKey(otp => otp.UserId)
+                .HasConstraintName("fk_user_otp_codes_user")
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
+    private static void ConfigureComplaints(ModelBuilder builder)
+    {
+        builder.Entity<Complaint>(entity =>
+        {
+            entity.ToTable("complaints");
+
+            entity.Property(c => c.Id).HasColumnName("id");
+            entity.Property(c => c.RequestReference).HasColumnName("request_reference").HasMaxLength(40).IsRequired();
+            entity.Property(c => c.OrderId).HasColumnName("order_id");
+            entity.Property(c => c.OrderReference).HasColumnName("order_reference").HasMaxLength(30);
+            entity.Property(c => c.BuyerId).HasColumnName("buyer_id");
+            entity.Property(c => c.ComplaintType).HasColumnName("complaint_type").HasMaxLength(20).IsRequired().HasDefaultValue(ComplaintTypes.Refund);
+            entity.Property(c => c.ReasonCode).HasColumnName("reason_code").HasMaxLength(40).IsRequired();
+            entity.Property(c => c.Description).HasColumnName("description").HasColumnType("text").IsRequired();
+            entity.Property(c => c.RequestedAmount).HasColumnName("requested_amount").HasPrecision(18, 2);
+            entity.Property(c => c.ContactName).HasColumnName("contact_name").HasMaxLength(120).IsRequired();
+            entity.Property(c => c.ContactEmail).HasColumnName("contact_email").HasMaxLength(256).IsRequired();
+            entity.Property(c => c.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(ComplaintStatuses.Pending);
+            entity.Property(c => c.AdminNotes).HasColumnName("admin_notes").HasColumnType("text");
+            entity.Property(c => c.ResolutionNote).HasColumnName("resolution_note").HasColumnType("text");
+            entity.Property(c => c.ReviewedBy).HasColumnName("reviewed_by");
+            entity.Property(c => c.ReviewedAt).HasColumnName("reviewed_at");
+            entity.Property(c => c.EvidenceUrlsJson).HasColumnName("evidence_urls").HasColumnType("text");
+
+            entity.HasIndex(c => c.RequestReference).IsUnique().HasDatabaseName("uk_complaints_request_reference");
+            entity.HasIndex(c => c.BuyerId).HasDatabaseName("ix_complaints_buyer_id");
+            entity.HasIndex(c => c.OrderId).HasDatabaseName("ix_complaints_order_id");
+            entity.HasIndex(c => new { c.Status, c.CreatedAt }).HasDatabaseName("ix_complaints_status_created_at");
+
+            entity.HasOne(c => c.Order)
+                .WithMany()
+                .HasForeignKey(c => c.OrderId)
+                .HasConstraintName("fk_complaints_order")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(c => c.Buyer)
+                .WithMany()
+                .HasForeignKey(c => c.BuyerId)
+                .HasConstraintName("fk_complaints_buyer")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(c => c.Reviewer)
+                .WithMany()
+                .HasForeignKey(c => c.ReviewedBy)
+                .HasConstraintName("fk_complaints_reviewer")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_complaints_status",
+                "`status` IN ('pending','under_review','approved','rejected','closed')"));
+
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_complaints_type",
+                "`complaint_type` IN ('refund','dispute','authenticity','other')"));
+
+            ConfigureAuditableEntity(entity, "complaints");
+        });
+    }
+
     private static void ConfigureAuditableEntity<TEntity>(
         EntityTypeBuilder<TEntity> entity,
         string tableName) where TEntity : AuditableEntity
@@ -649,5 +793,36 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             .HasForeignKey(nameof(AuditableEntity.DeletedBy))
             .HasConstraintName($"fk_{tableName}_deleted_by")
             .OnDelete(DeleteBehavior.SetNull);
+    }
+
+    private static void ConfigureWatchlistItems(ModelBuilder builder)
+    {
+        builder.Entity<WatchlistItem>(entity =>
+        {
+            entity.ToTable("watchlist_items");
+
+            entity.Property(w => w.Id).HasColumnName("id");
+            entity.Property(w => w.UserId).HasColumnName("user_id");
+            entity.Property(w => w.AuctionId).HasColumnName("auction_id");
+            entity.Property(w => w.AddedAt).HasColumnName("added_at");
+
+            entity.HasIndex(w => new { w.UserId, w.AuctionId })
+                .IsUnique()
+                .HasDatabaseName("ux_watchlist_user_auction");
+
+            entity.HasIndex(w => w.UserId).HasDatabaseName("ix_watchlist_user_id");
+
+            entity.HasOne(w => w.User)
+                .WithMany(u => u.WatchlistItems)
+                .HasForeignKey(w => w.UserId)
+                .HasConstraintName("fk_watchlist_user")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(w => w.Auction)
+                .WithMany(a => a.WatchlistItems)
+                .HasForeignKey(w => w.AuctionId)
+                .HasConstraintName("fk_watchlist_auction")
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 }
