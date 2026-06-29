@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Helpers;
+using OnlineAuction.Messaging;
+using OnlineAuction.Messaging.Messages;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -13,19 +15,19 @@ public class NotificationService : INotificationService
     private const int EndingSoonThresholdMinutes = 60;
 
     private readonly AuctionHouseDbContext _dbContext;
-    private readonly IFcmService _fcmService;
-    private readonly IRealtimePublisher _realtimePublisher;
+    private readonly IRabbitMqPublisher _publisher;
+    private readonly INotificationDeliveryService _deliveryService;
     private readonly ILogger<NotificationService> _logger;
 
     public NotificationService(
         AuctionHouseDbContext dbContext,
-        IFcmService fcmService,
-        IRealtimePublisher realtimePublisher,
+        IRabbitMqPublisher publisher,
+        INotificationDeliveryService deliveryService,
         ILogger<NotificationService> logger)
     {
         _dbContext = dbContext;
-        _fcmService = fcmService;
-        _realtimePublisher = realtimePublisher;
+        _publisher = publisher;
+        _deliveryService = deliveryService;
         _logger = logger;
     }
 
@@ -97,30 +99,28 @@ public class NotificationService : INotificationService
         _dbContext.Notifications.Add(notification);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        var dataPayload = new Dictionary<string, string>
+        var viewModel = MapToViewModel(notification);
+        var deliverMessage = new NotificationDeliverMessage
         {
-            ["notificationId"] = notification.Id.ToString(),
-            ["type"] = notification.Type,
-            ["relatedUrl"] = relatedUrl ?? "/"
+            NotificationId = notification.Id,
+            UserId = userId
         };
 
-        try
+        if (!_publisher.TryPublish(RabbitMqQueueNames.NotificationsDeliver, deliverMessage))
         {
-            await _fcmService.SendToUserAsync(
-                userId,
-                notification.Title,
-                notification.Message,
-                dataPayload,
-                cancellationToken);
+            try
+            {
+                await _deliveryService.DeliverAsync(notification.Id, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Inline notification delivery failed for user {UserId}, notification {NotificationId}.",
+                    userId,
+                    notification.Id);
+            }
         }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "FCM push failed for user {UserId}, notification {NotificationId} was saved.", userId, notification.Id);
-        }
-
-        var viewModel = MapToViewModel(notification);
-        var unreadCount = await GetUnreadCountAsync(userId, cancellationToken);
-        await _realtimePublisher.SendNotificationToUserAsync(userId, viewModel, unreadCount, cancellationToken);
 
         return viewModel;
     }

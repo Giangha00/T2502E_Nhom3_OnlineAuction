@@ -375,6 +375,7 @@
   <data name="Auth_Continue" xml:space="preserve"><value>Continue</value></data>
   <data name="Auth_FullName" xml:space="preserve"><value>Full name</value></data>
   <data name="Auth_Phone" xml:space="preserve"><value>Phone</value></data>
+  <data name="Auth_Phone_InvalidLength" xml:space="preserve"><value>Phone number must be exactly 11 digits.</value></data>
   <data name="Auth_ConfirmPassword" xml:space="preserve"><value>Confirm password</value></data>
   <data name="Auth_CreateAccount" xml:space="preserve"><value>Create Account</value></data>
   <data name="Auth_Legal" xml:space="preserve"><value>By continuing, you agree to RareCard's Terms of Service and Privacy Policy.</value></data>

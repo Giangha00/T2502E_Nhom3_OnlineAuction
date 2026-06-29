@@ -365,6 +365,7 @@
   <data name="Auth_Continue" xml:space="preserve"><value>続ける</value></data>
   <data name="Auth_FullName" xml:space="preserve"><value>氏名</value></data>
   <data name="Auth_Phone" xml:space="preserve"><value>電話番号</value></data>
+  <data name="Auth_Phone_InvalidLength" xml:space="preserve"><value>電話番号は11桁で入力してください。</value></data>
   <data name="Auth_ConfirmPassword" xml:space="preserve"><value>パスワード確認</value></data>
   <data name="Auth_CreateAccount" xml:space="preserve"><value>アカウント作成</value></data>
   <data name="Auth_Legal" xml:space="preserve"><value>続行することで、RareCardの利用規約とプライバシーポリシーに同意したものとみなされます。</value></data>
