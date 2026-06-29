@@ -164,6 +164,12 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "You can upload up to 5 images.", null);
         }
 
+        var documentValidation = ValidateDocumentFiles(model.DocumentFiles);
+        if (documentValidation is not null)
+        {
+            return (false, documentValidation, null);
+        }
+
         var strategy = _db.Database.CreateExecutionStrategy();
         return await strategy.ExecuteAsync(() => CreateAuctionCoreAsync(model, sellerId, galleryFiles));
     }
@@ -327,6 +333,12 @@ public class SellerAuctionService : ISellerAuctionService
         if (1 + galleryFiles.Count > 5)
         {
             return (false, "You can upload up to 5 images.", null);
+        }
+
+        var documentValidation = ValidateDocumentFiles(model.DocumentFiles);
+        if (documentValidation is not null)
+        {
+            return (false, documentValidation, null);
         }
 
         var strategy = _db.Database.CreateExecutionStrategy();
@@ -701,9 +713,35 @@ public class SellerAuctionService : ISellerAuctionService
         return extension switch
         {
             ".pdf" => "PDF",
-            ".jpg" or ".jpeg" => "JPG",
-            ".png" => "PNG",
             _ => "FILE"
         };
+    }
+
+    private const int MaxDocumentsPerProduct = 5;
+
+    private static string? ValidateDocumentFiles(IEnumerable<IFormFile> files)
+    {
+        const long maxFileSize = 5 * 1024 * 1024;
+        var uploadCount = files.Count(file => file is { Length: > 0 });
+        if (uploadCount > MaxDocumentsPerProduct)
+        {
+            return $"You can upload up to {MaxDocumentsPerProduct} documents per product.";
+        }
+
+        foreach (var file in files.Where(file => file is { Length: > 0 }))
+        {
+            if (file.Length > maxFileSize)
+            {
+                return "Document file size must not exceed 5MB.";
+            }
+
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (extension != ".pdf")
+            {
+                return "Documents must be PDF files.";
+            }
+        }
+
+        return null;
     }
 }
