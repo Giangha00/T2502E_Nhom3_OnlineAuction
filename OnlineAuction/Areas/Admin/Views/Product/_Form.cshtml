@@ -201,14 +201,19 @@
             @if (Model.ExistingDocuments.Count > 0)
             {
                 <div>
-                    <p class="mb-2 text-theme-sm font-medium text-gray-700 dark:text-gray-400">Current Documents</p>
+                    <p class="mb-2 text-theme-sm font-medium text-gray-700 dark:text-gray-400">Current certificate documents</p>
                     <div class="space-y-2">
                         @foreach (var document in Model.ExistingDocuments)
                         {
-                            <label class="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-700">
-                                <div>
+                            <label class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-700">
+                                <div class="min-w-0">
                                     <p class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@document.Name</p>
-                                    <a href="@document.FileUrl" target="_blank" rel="noopener" class="text-theme-xs text-brand-500 hover:underline">View file</a>
+                                    <p class="text-theme-xs text-gray-500">@document.FileType · @document.CreatedAt.ToString("yyyy-MM-dd")</p>
+                                    <div class="mt-2 flex flex-wrap gap-2">
+                                        <a href="@document.FileUrl" target="_blank" rel="noopener" class="text-theme-xs font-medium text-brand-500 hover:underline">View</a>
+                                        <a asp-area="Admin" asp-controller="Product" asp-action="DownloadDocument" asp-route-id="@document.Id"
+                                           class="text-theme-xs font-medium text-brand-500 hover:underline">Download</a>
+                                    </div>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <input type="checkbox" name="RemoveDocumentIds" value="@document.Id" class="h-4 w-4 rounded border-gray-300 text-brand-500" />
@@ -221,12 +226,61 @@
             }
 
             <div>
-                <label class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400">Documents (PDF)</label>
-                <input name="DocumentFiles" type="file" accept=".pdf" multiple class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
-                <p class="mt-1 text-theme-xs text-gray-500">PDF only. Max 5MB each.</p>
+                <label class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400">Certificate / Verification Documents (PDF)</label>
+                <input id="adminDocumentFiles" name="DocumentFiles" type="file" accept=".pdf,application/pdf" multiple class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
+                <p class="mt-1 text-theme-xs text-gray-500">Upload PSA certificate, grading report, or verification PDF. Max 5MB per file. Up to 5 documents per product.</p>
+                <div id="adminDocumentNameFields" class="mt-3 space-y-2"></div>
             </div>
         </div>
     </section>
 </div>
 
 <input type="hidden" asp-for="Id" />
+
+<script>
+  (function () {
+    var fileInput = document.getElementById('adminDocumentFiles');
+    var nameFields = document.getElementById('adminDocumentNameFields');
+    if (!fileInput || !nameFields) return;
+
+    var docTypeOptions = [
+      'PSA Certificate',
+      'BGS Certificate',
+      'Product Verification',
+      'Warranty'
+    ];
+
+    fileInput.addEventListener('change', function () {
+      nameFields.innerHTML = '';
+      Array.from(fileInput.files || []).forEach(function (file, index) {
+        var row = document.createElement('div');
+        row.className = 'flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 px-3 py-2 dark:border-gray-700';
+
+        var label = document.createElement('span');
+        label.className = 'min-w-0 flex-1 truncate text-theme-xs text-gray-600 dark:text-gray-300';
+        label.textContent = file.name;
+
+        var select = document.createElement('select');
+        select.name = 'DocumentNames';
+        select.className = 'rounded-lg border border-gray-300 px-2 py-1 text-theme-xs dark:border-gray-700 dark:bg-gray-900';
+        docTypeOptions.forEach(function (optionValue) {
+          var option = document.createElement('option');
+          option.value = optionValue;
+          option.textContent = optionValue;
+          select.appendChild(option);
+        });
+        if (file.name.toLowerCase().includes('bgs')) {
+          select.value = 'BGS Certificate';
+        } else if (file.name.toLowerCase().includes('warranty')) {
+          select.value = 'Warranty';
+        } else if (file.name.toLowerCase().includes('verification')) {
+          select.value = 'Product Verification';
+        }
+
+        row.appendChild(label);
+        row.appendChild(select);
+        nameFields.appendChild(row);
+      });
+    });
+  })();
+</script>

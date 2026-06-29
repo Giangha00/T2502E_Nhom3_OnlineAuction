@@ -298,7 +298,8 @@ public class AdminProductService : IAdminProductService
                         Id = document.Id,
                         Name = document.Name,
                         FileUrl = document.FileUrl,
-                        FileType = document.FileType
+                        FileType = document.FileType,
+                        CreatedAt = document.CreatedAt
                     })
                     .ToList(),
                 LinkedAuctions = item.Auctions
@@ -425,7 +426,8 @@ public class AdminProductService : IAdminProductService
                     Id = document.Id,
                     Name = document.Name,
                     FileUrl = document.FileUrl,
-                    FileType = document.FileType
+                    FileType = document.FileType,
+                    CreatedAt = document.CreatedAt
                 })
                 .ToList(),
             IsSellerLocked = product.Auctions.Any(auction =>
@@ -611,6 +613,14 @@ public class AdminProductService : IAdminProductService
         if (documentValidation is not null)
         {
             return (false, documentValidation);
+        }
+
+        var remainingDocumentCount = product.Documents.Count(document =>
+            document.DeletedAt == null && !model.RemoveDocumentIds.Contains(document.Id));
+        var newDocumentCount = model.DocumentFiles.Count(file => file is { Length: > 0 });
+        if (remainingDocumentCount + newDocumentCount > MaxDocumentsPerProduct)
+        {
+            return (false, $"A product can have at most {MaxDocumentsPerProduct} documents.");
         }
 
         string? newImageUrl = null;
@@ -906,9 +916,16 @@ public class AdminProductService : IAdminProductService
         return null;
     }
 
+    private const int MaxDocumentsPerProduct = 5;
+
     private static string? ValidateDocumentFiles(IEnumerable<IFormFile> files)
     {
         const long maxFileSize = 5 * 1024 * 1024;
+        var uploadCount = files.Count(file => file is { Length: > 0 });
+        if (uploadCount > MaxDocumentsPerProduct)
+        {
+            return $"You can upload up to {MaxDocumentsPerProduct} documents per product.";
+        }
 
         foreach (var file in files.Where(file => file is { Length: > 0 }))
         {
