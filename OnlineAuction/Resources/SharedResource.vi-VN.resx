@@ -375,6 +375,7 @@
   <data name="Auth_Continue" xml:space="preserve"><value>Tiếp tục</value></data>
   <data name="Auth_FullName" xml:space="preserve"><value>Họ và tên</value></data>
   <data name="Auth_Phone" xml:space="preserve"><value>Số điện thoại</value></data>
+  <data name="Auth_Phone_InvalidLength" xml:space="preserve"><value>Số điện thoại phải gồm đúng 11 chữ số.</value></data>
   <data name="Auth_ConfirmPassword" xml:space="preserve"><value>Xác nhận mật khẩu</value></data>
   <data name="Auth_CreateAccount" xml:space="preserve"><value>Tạo tài khoản</value></data>
   <data name="Auth_Legal" xml:space="preserve"><value>Tiếp tục nghĩa là bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của RareCard.</value></data>

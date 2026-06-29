@@ -12,6 +12,9 @@ using OnlineAuction.Data.Seeders;
 using OnlineAuction.Entities;
 using OnlineAuction.Services;
 using OnlineAuction.Services.Interfaces;
+using OnlineAuction.Messaging;
+using OnlineAuction.Messaging.Consumers;
+using OnlineAuction.Messaging.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -240,6 +243,8 @@ builder.Services.Configure<FirebaseSettings>(
     builder.Configuration.GetSection(FirebaseSettings.SectionName));
 builder.Services.Configure<PasswordResetOtpSettings>(
     builder.Configuration.GetSection(PasswordResetOtpSettings.SectionName));
+builder.Services.Configure<RabbitMqSettings>(
+    builder.Configuration.GetSection(RabbitMqSettings.SectionName));
 
 builder.Services.AddHttpClient<IPayPalService, PayPalService>();
 builder.Services.AddHttpClient<IEmailSender, GmailEmailSender>();
@@ -273,6 +278,14 @@ builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
 builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
 builder.Services.AddScoped<IRegistrationDepositRefundService, RegistrationDepositRefundService>();
 builder.Services.AddScoped<IPasswordResetOtpService, PasswordResetOtpService>();
+builder.Services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
+builder.Services.AddScoped<INotificationDeliveryService, NotificationDeliveryService>();
+builder.Services.AddScoped<IEmailQueueService, EmailQueueService>();
+builder.Services.AddScoped<IAuctionLifecycleQueueService, AuctionLifecycleQueueService>();
+builder.Services.AddScoped<IBidPlacedMessageHandler, BidPlacedMessageHandler>();
+builder.Services.AddScoped<IEmailSendMessageHandler, EmailSendMessageHandler>();
+builder.Services.AddScoped<IAuctionLifecycleMessageHandler, AuctionLifecycleMessageHandler>();
+builder.Services.AddHostedService<RabbitMqConsumerHostedService>();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IRealtimePublisher, RealtimePublisher>();
 #endregion
