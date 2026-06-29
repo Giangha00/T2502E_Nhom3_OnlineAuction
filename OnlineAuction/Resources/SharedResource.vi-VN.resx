@@ -284,7 +284,7 @@
   <data name="Sell_DocType_Invoice" xml:space="preserve"><value>Hóa đơn</value></data>
   <data name="Sell_DocType_Verification" xml:space="preserve"><value>Xác minh</value></data>
   <data name="Sell_UploadDocuments" xml:space="preserve"><value>Tải lên tài liệu</value></data>
-  <data name="Sell_UploadDocuments_Hint" xml:space="preserve"><value>PDF, JPG, PNG — tối đa 10MB mỗi file</value></data>
+  <data name="Sell_UploadDocuments_Hint" xml:space="preserve"><value>Chỉ PDF — tối đa 5MB mỗi file, tối đa 5 file</value></data>
   <data name="Sell_ReadyToPublish_Highlight" xml:space="preserve"><value>Sẵn sàng đăng?</value></data>
   <data name="Sell_ReadyToPublish" xml:space="preserve"><value>Xem lại phần xem trước, sau đó tạo phiên đấu giá.</value></data>
   <data name="Sell_SaveDraft" xml:space="preserve"><value>Lưu nháp</value></data>
@@ -553,6 +553,13 @@
   <data name="Product_Shipping_International" xml:space="preserve"><value>Hỗ trợ vận chuyển quốc tế ưu tiên</value></data>
   <data name="Product_Documents_Title" xml:space="preserve"><value>Tài liệu sản phẩm</value></data>
   <data name="Product_Documents_Desc" xml:space="preserve"><value>Chứng nhận, bảo hành và tệp xác minh</value></data>
+  <data name="Product_Certificates_Tab" xml:space="preserve"><value>Chứng nhận &amp; Tài liệu</value></data>
+  <data name="Product_Documents_Empty" xml:space="preserve"><value>Chưa có chứng nhận</value></data>
+  <data name="Product_Documents_EmptyHint" xml:space="preserve"><value>Liên hệ hỗ trợ nếu bạn cần xác minh chứng nhận.</value></data>
+  <data name="Product_DownloadCertificate" xml:space="preserve"><value>Tải chứng nhận</value></data>
+  <data name="Product_CertificateNumber" xml:space="preserve"><value>Số chứng nhận</value></data>
+  <data name="Admin_Documents_Preview" xml:space="preserve"><value>Xem trước</value></data>
+  <data name="Admin_Documents_Section" xml:space="preserve"><value>Chứng nhận &amp; Tài liệu</value></data>
   <data name="Common_View" xml:space="preserve"><value>Xem</value></data>
   <data name="Common_Download" xml:space="preserve"><value>Tải xuống</value></data>
   <data name="Product_Seller" xml:space="preserve"><value>Người bán</value></data>
