@@ -45,4 +45,14 @@ public class AuctionDetailViewModel
     public DateTime CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+
+    public IReadOnlyList<AdminBidHistoryItemViewModel> BidHistory { get; set; } = [];
+
+    public int BidHistoryTotalCount { get; set; }
+
+    public int BidHistoryPage { get; set; } = 1;
+
+    public int BidHistoryPageSize { get; set; } = 20;
+
+    public int BidHistoryTotalPages { get; set; } = 1;
 }

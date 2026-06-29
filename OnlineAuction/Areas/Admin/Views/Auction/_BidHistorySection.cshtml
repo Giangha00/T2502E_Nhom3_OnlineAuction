@@ -1,0 +1,129 @@
+@model AuctionDetailViewModel
+@using OnlineAuction.Entities
+
+@{
+    var currentPage = Model.BidHistoryPage <= 0 ? 1 : Model.BidHistoryPage;
+    var totalPages = Model.BidHistoryTotalPages <= 0 ? 1 : Model.BidHistoryTotalPages;
+    var startPage = Math.Max(1, currentPage - 2);
+    var endPage = Math.Min(totalPages, currentPage + 2);
+
+    string FormatBidType(string bidType) => bidType switch
+    {
+        BidTypes.BuyNow => Localizer["Admin_BidHistory_Type_BuyNow"].Value,
+        _ => Localizer["Admin_BidHistory_Type_Manual"].Value
+    };
+}
+
+<section class="mt-6 rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+    <div class="border-b border-gray-100 px-6 py-4 dark:border-gray-800">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["Admin_BidHistory_Title"]</h3>
+                <p class="text-theme-sm text-gray-500 dark:text-gray-400">
+                    @Localizer["Admin_BidHistory_TotalBids", Model.BidHistoryTotalCount]
+                </p>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.BidHistory.Count == 0)
+    {
+        <div class="px-6 py-12 text-center">
+            <p class="text-theme-sm font-medium text-gray-600 dark:text-gray-300">@Localizer["Admin_BidHistory_Empty"]</p>
+        </div>
+    }
+    else
+    {
+        <div class="max-w-full overflow-x-auto">
+            <table class="w-full min-w-[960px]">
+                <thead>
+                <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["Admin_BidHistory_Col_Row"]</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["Admin_BidHistory_Col_Bidder"]</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["Admin_BidHistory_Col_Email"]</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["Admin_BidHistory_Col_Amount"]</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["Admin_BidHistory_Col_Time"]</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["Admin_BidHistory_Col_Type"]</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["Admin_BidHistory_Col_Status"]</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                @foreach (var bid in Model.BidHistory)
+                {
+                    <tr class="@(bid.IsWinning ? "bg-emerald-50/70 dark:bg-emerald-500/10" : "hover:bg-gray-50 dark:hover:bg-white/[0.02]")">
+                        <td class="px-5 py-4 text-theme-sm text-gray-600 dark:text-gray-300">@bid.RowNumber</td>
+                        <td class="px-5 py-4 text-theme-sm font-medium text-gray-800 dark:text-white/90">
+                            <a asp-area="Admin"
+                               asp-controller="User"
+                               asp-action="Details"
+                               asp-route-id="@bid.BidderId"
+                               class="text-brand-600 hover:text-brand-700 hover:underline">
+                                @bid.BidderName
+                            </a>
+                        </td>
+                        <td class="px-5 py-4 text-theme-sm text-gray-600 dark:text-gray-300">@bid.BidderEmail</td>
+                        <td class="px-5 py-4 text-theme-sm font-semibold tabular-nums text-gray-900 dark:text-white/90">$@bid.Amount.ToString("N2")</td>
+                        <td class="px-5 py-4 text-theme-sm text-gray-600 dark:text-gray-300">@bid.PlacedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td class="px-5 py-4 text-theme-sm capitalize text-gray-600 dark:text-gray-300">@FormatBidType(bid.BidType)</td>
+                        <td class="px-5 py-4">
+                            @if (bid.IsWinning)
+                            {
+                                <span class="inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
+                                    @Localizer["Admin_BidHistory_Status_Winning"]
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:bg-white/10 dark:text-gray-300">
+                                    @Localizer["Admin_BidHistory_Status_Outbid"]
+                                </span>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <div class="flex flex-col gap-3 border-t border-gray-100 px-6 py-4 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between">
+                <p class="text-theme-sm text-gray-500">
+                    @Localizer["Admin_BidHistory_Pagination_PageOf", currentPage, totalPages]
+                </p>
+
+                <nav class="flex flex-wrap items-center gap-2">
+                    <a asp-area="Admin"
+                       asp-controller="Auction"
+                       asp-action="Details"
+                       asp-route-id="@Model.Id"
+                       asp-route-bidPage="@(currentPage - 1)"
+                       class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 @(currentPage <= 1 ? "pointer-events-none opacity-50" : string.Empty)">
+                        @Localizer["Admin_BidHistory_Pagination_Previous"]
+                    </a>
+
+                    @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
+                    {
+                        <a asp-area="Admin"
+                           asp-controller="Auction"
+                           asp-action="Details"
+                           asp-route-id="@Model.Id"
+                           asp-route-bidPage="@pageNumber"
+                           class="rounded-lg border px-3 py-2 text-theme-sm font-medium @(pageNumber == currentPage ? "border-brand-500 bg-brand-500 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300")">
+                            @pageNumber
+                        </a>
+                    }
+
+                    <a asp-area="Admin"
+                       asp-controller="Auction"
+                       asp-action="Details"
+                       asp-route-id="@Model.Id"
+                       asp-route-bidPage="@(currentPage + 1)"
+                       class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 @(currentPage >= totalPages ? "pointer-events-none opacity-50" : string.Empty)">
+                        @Localizer["Admin_BidHistory_Pagination_Next"]
+                    </a>
+                </nav>
+            </div>
+        }
+    }
+</section>
