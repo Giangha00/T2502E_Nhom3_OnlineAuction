@@ -10,6 +10,8 @@ namespace OnlineAuction.Areas.Admin.Services;
 
 public class AdminAuctionService
 {
+    public const int BidHistoryPageSize = 20;
+
     private const string ProductImageFolder = "auction-house/products";
 
     private const string DefaultProductImageUrl =
@@ -115,37 +117,86 @@ public class AdminAuctionService
         };
     }
 
-    public async Task<AuctionDetailViewModel?> GetDetailsAsync(int id)
+    public async Task<AuctionDetailViewModel?> GetDetailsAsync(int id, int bidPage = 1)
     {
-        return await _dbContext.Auctions
+        var auction = await _dbContext.Auctions
             .AsNoTracking()
-            .Where(auction => auction.Id == id && auction.DeletedAt == null && auction.Product.DeletedAt == null)
-            .Select(auction => new AuctionDetailViewModel
+            .Where(item => item.Id == id && item.DeletedAt == null && item.Product.DeletedAt == null)
+            .Select(item => new AuctionDetailViewModel
             {
-                Id = auction.Id,
-                ProductId = auction.ProductId,
-                ProductName = auction.Product.Name,
-                Description = auction.Product.DescriptionHtml ?? auction.Product.ShortDescription ?? string.Empty,
-                CategoryName = auction.Product.Category.Name,
-                SellerName = auction.Product.Seller.FullName,
-                SellerEmail = auction.Product.Seller.Email ?? string.Empty,
-                StartingPrice = auction.StartingPrice,
-                BidStep = auction.BidStep,
-                CurrentPrice = auction.CurrentPrice,
-                BuyNowPrice = auction.BuyNowPrice,
-                Status = auction.Status,
-                ListingType = auction.ListingType,
-                RequiresRegistration = auction.RequiresRegistration,
-                StartDate = auction.StartDate,
-                EndDate = auction.EndDate,
-                ImageUrl = auction.Product.PrimaryImage,
-                BidCount = auction.Bids.Count(bid => bid.DeletedAt == null),
-                RegistrationCount = auction.Registrations.Count(registration => registration.DeletedAt == null),
-                WinnerName = auction.Winner != null ? auction.Winner.FullName : null,
-                CreatedAt = auction.CreatedAt,
-                UpdatedAt = auction.UpdatedAt
+                Id = item.Id,
+                ProductId = item.ProductId,
+                ProductName = item.Product.Name,
+                Description = item.Product.DescriptionHtml ?? item.Product.ShortDescription ?? string.Empty,
+                CategoryName = item.Product.Category.Name,
+                SellerName = item.Product.Seller.FullName,
+                SellerEmail = item.Product.Seller.Email ?? string.Empty,
+                StartingPrice = item.StartingPrice,
+                BidStep = item.BidStep,
+                CurrentPrice = item.CurrentPrice,
+                BuyNowPrice = item.BuyNowPrice,
+                Status = item.Status,
+                ListingType = item.ListingType,
+                RequiresRegistration = item.RequiresRegistration,
+                StartDate = item.StartDate,
+                EndDate = item.EndDate,
+                ImageUrl = item.Product.PrimaryImage,
+                BidCount = item.Bids.Count(bid => bid.DeletedAt == null),
+                RegistrationCount = item.Registrations.Count(registration => registration.DeletedAt == null),
+                WinnerName = item.Winner != null ? item.Winner.FullName : null,
+                CreatedAt = item.CreatedAt,
+                UpdatedAt = item.UpdatedAt
             })
             .FirstOrDefaultAsync();
+
+        if (auction is null)
+        {
+            return null;
+        }
+
+        var bidHistoryTotalCount = await _dbContext.Bids
+            .AsNoTracking()
+            .CountAsync(bid => bid.AuctionId == id && bid.DeletedAt == null);
+
+        auction.BidHistoryTotalCount = bidHistoryTotalCount;
+        auction.BidCount = bidHistoryTotalCount;
+        auction.BidHistoryPageSize = BidHistoryPageSize;
+
+        if (bidPage <= 0)
+        {
+            bidPage = 1;
+        }
+
+        auction.BidHistoryTotalPages = bidHistoryTotalCount == 0
+            ? 1
+            : (int)Math.Ceiling(bidHistoryTotalCount / (double)BidHistoryPageSize);
+
+        if (bidPage > auction.BidHistoryTotalPages)
+        {
+            bidPage = auction.BidHistoryTotalPages;
+        }
+
+        auction.BidHistoryPage = bidPage;
+
+        if (bidHistoryTotalCount == 0)
+        {
+            auction.BidHistory = [];
+            return auction;
+        }
+
+        var skip = (bidPage - 1) * BidHistoryPageSize;
+        var bids = await _dbContext.Bids
+            .AsNoTracking()
+            .Include(bid => bid.Bidder)
+            .Where(bid => bid.AuctionId == id && bid.DeletedAt == null)
+            .OrderByDescending(bid => bid.PlacedAt)
+            .Skip(skip)
+            .Take(BidHistoryPageSize)
+            .ToListAsync();
+
+        auction.BidHistory = AdminBidHistoryMapper.Map(bids, skip);
+
+        return auction;
     }
 
     public async Task<AuctionFormViewModel> BuildCreateFormAsync()

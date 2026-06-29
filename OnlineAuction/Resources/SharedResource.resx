@@ -913,4 +913,21 @@
   <data name="User_Time_HoursLeft" xml:space="preserve"><value>{0} hours left</value></data>
   <data name="User_Time_MinutesLeft" xml:space="preserve"><value>{0} minutes left</value></data>
   <data name="Account_Selling_CreateListing" xml:space="preserve"><value>Post for sale</value></data>
+  <data name="Admin_BidHistory_Title" xml:space="preserve"><value>Bid History</value></data>
+  <data name="Admin_BidHistory_TotalBids" xml:space="preserve"><value>{0} bid(s) total</value></data>
+  <data name="Admin_BidHistory_Empty" xml:space="preserve"><value>No bids have been placed yet.</value></data>
+  <data name="Admin_BidHistory_Col_Row" xml:space="preserve"><value>#</value></data>
+  <data name="Admin_BidHistory_Col_Bidder" xml:space="preserve"><value>Bidder</value></data>
+  <data name="Admin_BidHistory_Col_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Admin_BidHistory_Col_Amount" xml:space="preserve"><value>Amount</value></data>
+  <data name="Admin_BidHistory_Col_Time" xml:space="preserve"><value>Time</value></data>
+  <data name="Admin_BidHistory_Col_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="Admin_BidHistory_Col_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Admin_BidHistory_Type_Manual" xml:space="preserve"><value>Manual</value></data>
+  <data name="Admin_BidHistory_Type_BuyNow" xml:space="preserve"><value>Buy Now</value></data>
+  <data name="Admin_BidHistory_Status_Winning" xml:space="preserve"><value>Winning</value></data>
+  <data name="Admin_BidHistory_Status_Outbid" xml:space="preserve"><value>Outbid</value></data>
+  <data name="Admin_BidHistory_Pagination_PageOf" xml:space="preserve"><value>Page {0} of {1}</value></data>
+  <data name="Admin_BidHistory_Pagination_Previous" xml:space="preserve"><value>Previous</value></data>
+  <data name="Admin_BidHistory_Pagination_Next" xml:space="preserve"><value>Next</value></data>
 </root>
