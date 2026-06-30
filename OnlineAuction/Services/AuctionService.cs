@@ -248,16 +248,24 @@ public class AuctionService : IAuctionService
     {
         var now = DateTime.UtcNow;
 
-        return await _dbContext.Auctions
+        var auctions = await _dbContext.Auctions
             .AsNoTracking()
             .Include(a => a.Product)
                 .ThenInclude(p => p.Category)
             .Include(a => a.Bids)
             .Where(a =>
                 a.ListingType == listingType &&
-                (a.Status == AuctionStatuses.Live || a.Status == AuctionStatuses.EndingSoon) &&
-                a.EndDate > now)
+                (
+                    (a.Status == AuctionStatuses.Live || a.Status == AuctionStatuses.EndingSoon) &&
+                    a.EndDate > now
+                    ||
+                    a.Status == AuctionStatuses.Scheduled &&
+                    a.RegistrationStartDate <= now &&
+                    a.StartDate > now
+                ))
             .ToListAsync();
+
+        return auctions;
     }
 
     private async Task<List<SellerViewModel>> QueryBestSellersAsync(int count = 5)

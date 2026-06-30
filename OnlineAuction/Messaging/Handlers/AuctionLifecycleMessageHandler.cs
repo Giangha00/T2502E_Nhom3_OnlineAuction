@@ -57,6 +57,10 @@ public sealed class AuctionLifecycleMessageHandler : IAuctionLifecycleMessageHan
                 await _notificationService.ProcessAuctionEndingSoonNotificationsAsync(cancellationToken);
                 break;
 
+            case AuctionLifecycleAction.ProcessStartingSoonNotifications:
+                await _notificationService.ProcessAuctionStartingSoonNotificationsAsync(cancellationToken);
+                break;
+
             case AuctionLifecycleAction.ActivateScheduledAuctions:
                 await _verificationService.ActivateScheduledAuctionsAsync(cancellationToken);
                 break;

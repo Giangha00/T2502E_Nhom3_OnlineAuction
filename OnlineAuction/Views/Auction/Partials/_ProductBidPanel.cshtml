@@ -12,8 +12,14 @@
     if (!string.IsNullOrEmpty(Model.CertificateNumber)) specs.Add(Localizer["Product_CertPrefix", Model.CertificateNumber].Value);
     var userAuth = await Context.AuthenticateAsync(AuthSchemes.User);
     var isLoggedIn = userAuth.Succeeded;
-    var endDateIso = DateTimeUtilities.ToUtcIsoString(Model.EndDate);
-    var showRegistrationFlow = Model.RequiresRegistration && Model.CanPlaceBid && !Model.IsSeller;
+    var endDateIso = DateTimeUtilities.ToUtcIsoString(Model.CountdownTargetDate);
+    var showRegistrationFlow = Model.RequiresRegistration && Model.CanRegister && !Model.IsSeller;
+    var showCancelRegistration = Model.RequiresRegistration && !Model.IsSeller && Model.IsRegistered &&
+        Model.RegistrationStatus is AuctionRegistrationStatuses.Pending or AuctionRegistrationStatuses.Approved;
+    var showRegistrationUi = Model.RequiresRegistration && !Model.IsSeller &&
+        (showRegistrationFlow || showCancelRegistration ||
+         Model.RegistrationStatus == AuctionRegistrationStatuses.Pending ||
+         Model.RegistrationStatus == AuctionRegistrationStatuses.Rejected);
     var showBidForm = !Model.IsSeller && Model.CanPlaceBid &&
         (!Model.RequiresRegistration || Model.RegistrationStatus == AuctionRegistrationStatuses.Approved);
     var registrationStatus = Model.RegistrationStatus ?? string.Empty;
@@ -27,6 +33,8 @@
      data-current-price="@Model.CurrentPrice.ToString("0.##")"
      data-can-bid="@(Model.CanBid ? "true" : "false")"
      data-can-place-bid="@(Model.CanPlaceBid ? "true" : "false")"
+     data-can-register="@(Model.CanRegister ? "true" : "false")"
+     data-countdown-kind="@Model.PhaseCountdownKind"
      data-requires-registration="@(Model.RequiresRegistration ? "true" : "false")"
      data-is-seller="@(Model.IsSeller ? "true" : "false")"
      data-registration-status="@registrationStatus">
@@ -76,15 +84,30 @@
       @Localizer["Product_YouAreTheSeller"]
     </div>
   }
-  else if (!Model.CanPlaceBid)
+  else if (!Model.CanPlaceBid && !Model.CanRegister)
   {
     <div class="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-      @Localizer["Product_AuctionEnded"]
+      @if (Model.RequiresRegistration && DateTime.UtcNow < Model.RegistrationStartDate.ToUniversalTime())
+      {
+        @Localizer["Product_RegistrationNotOpen"]
+      }
+      else if (DateTime.UtcNow >= Model.EndDate.ToUniversalTime())
+      {
+        @Localizer["Product_AuctionEnded"]
+      }
+      else if (Model.RequiresRegistration && !Model.CanPlaceBid)
+      {
+        @Localizer["Product_LiveNotStarted"]
+      }
+      else
+      {
+        @Localizer["Product_AuctionEnded"]
+      }
     </div>
   }
   else
   {
-    @if (showRegistrationFlow)
+    @if (showRegistrationUi)
     {
       <div id="registrationSection">
         @if (Model.RegistrationStatus == AuctionRegistrationStatuses.Pending)
@@ -103,7 +126,7 @@
             }
           </div>
         }
-        else if (!Model.IsRegistered)
+        else if (!Model.IsRegistered && showRegistrationFlow)
         {
           <p class="mb-3 text-sm text-slate-600">@Localizer["Product_MustRegisterToBid"]</p>
           <button type="button" id="registerAuctionBtn"
@@ -112,13 +135,18 @@
           </button>
         }
 
-        @if (Model.IsRegistered &&
-             Model.RegistrationStatus is AuctionRegistrationStatuses.Pending or AuctionRegistrationStatuses.Approved)
+        @if (showCancelRegistration)
         {
-          <button type="button" id="cancelRegistrationBtn"
-                  class="mt-3 w-full text-sm font-medium text-slate-500 underline-offset-2 hover:text-slate-700 hover:underline">
-            @Localizer["Product_CancelRegistration"]
-          </button>
+          <div class="mt-4 rounded-lg border border-red-200 bg-red-50/80 p-4">
+            <p class="text-xs text-red-700">@Localizer["Product_CancelRegistrationHint"]</p>
+            <button type="button" id="cancelRegistrationBtn"
+                    class="mt-3 flex w-full items-center justify-center gap-2 rounded-md border border-red-300 bg-white px-4 py-3 text-sm font-semibold text-red-700 shadow-sm transition hover:border-red-400 hover:bg-red-50">
+              <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+              </svg>
+              @Localizer["Product_CancelRegistration"]
+            </button>
+          </div>
         }
       </div>
     }
@@ -127,7 +155,7 @@
 
     @if (showBidForm)
     {
-      <div id="bidFormSection" class="@(showRegistrationFlow ? "mt-4" : string.Empty)">
+      <div id="bidFormSection" class="@(showRegistrationUi ? "mt-4" : string.Empty)">
         <div>
           <label for="bidAmount" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-800">
             @Localizer["Product_PlaceMaxBid"]
@@ -196,10 +224,23 @@
         <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">@Localizer["Product_Seconds"]</p>
       </div>
     </div>
-    <p id="countdownSummary" class="font-medium text-blue-700">
+    <p id="countdownSummary" class="font-medium text-blue-700" data-countdown-label="@Model.PhaseCountdownKind">
       @Localizer["Product_CountdownIn", Model.CountdownDays, Model.CountdownHours]
     </p>
-    <p id="endsAtLabel" class="text-slate-600">@Localizer["Product_EndsAt", DateTimeUtilities.AsUtc(Model.EndDate).ToLocalTime().ToString("MMM dd 'at' h:mmtt")]</p>
+    <p id="endsAtLabel" class="text-slate-600">
+      @switch (Model.PhaseCountdownKind)
+      {
+        case "registration_end":
+          @Localizer["Product_RegistrationClosesAt", DateTimeUtilities.AsUtc(Model.CountdownTargetDate).ToLocalTime().ToString("dd/MM/yyyy HH:mm")]
+          break;
+        case "live_start":
+          @Localizer["Product_LiveStartsAt", DateTimeUtilities.AsUtc(Model.CountdownTargetDate).ToLocalTime().ToString("dd/MM/yyyy HH:mm")]
+          break;
+        default:
+          @Localizer["Product_EndsAt", DateTimeUtilities.AsUtc(Model.CountdownTargetDate).ToLocalTime().ToString("MMM dd 'at' h:mmtt")]
+          break;
+      }
+    </p>
     <p class="text-xs text-slate-400">@Localizer["Product_ClosureNote"]</p>
   </div>
 

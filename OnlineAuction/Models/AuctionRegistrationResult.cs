@@ -12,17 +12,21 @@ public sealed class AuctionRegistrationResult
 
     public int? RegistrationCount { get; init; }
 
+    public decimal? RefundedAmount { get; init; }
+
     public static AuctionRegistrationResult Ok(
         string message,
         string status,
-        int registrationCount) =>
+        int registrationCount,
+        decimal? refundedAmount = null) =>
         new()
         {
             Success = true,
             Message = message,
             StatusCode = 200,
             Status = status,
-            RegistrationCount = registrationCount
+            RegistrationCount = registrationCount,
+            RefundedAmount = refundedAmount
         };
 
     public static AuctionRegistrationResult Fail(string message, int statusCode = 400) =>

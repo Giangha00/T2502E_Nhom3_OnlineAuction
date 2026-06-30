@@ -32,6 +32,7 @@ public sealed class AuctionLifecycleQueueService : IAuctionLifecycleQueueService
             AuctionLifecycleAction.FinalizeExpiredAuctions,
             AuctionLifecycleAction.CancelExpiredOrders,
             AuctionLifecycleAction.ProcessEndingSoonNotifications,
+            AuctionLifecycleAction.ProcessStartingSoonNotifications,
             AuctionLifecycleAction.ActivateScheduledAuctions
         };
 

@@ -10,23 +10,29 @@ public class RegistrationDepositRefundService : IRegistrationDepositRefundServic
 {
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IPayPalService _payPalService;
+    private readonly INotificationService _notificationService;
     private readonly ILogger<RegistrationDepositRefundService> _logger;
 
     public RegistrationDepositRefundService(
         AuctionHouseDbContext dbContext,
         IPayPalService payPalService,
+        INotificationService notificationService,
         ILogger<RegistrationDepositRefundService> logger)
     {
         _dbContext = dbContext;
         _payPalService = payPalService;
+        _notificationService = notificationService;
         _logger = logger;
     }
 
     public async Task<RegistrationDepositResult> RefundDepositAsync(
         long depositId,
+        bool pushNotification = true,
         CancellationToken cancellationToken = default)
     {
         var deposit = await _dbContext.AuctionRegistrationDeposits
+            .Include(d => d.Auction)
+                .ThenInclude(a => a.Product)
             .FirstOrDefaultAsync(d => d.Id == depositId, cancellationToken);
 
         if (deposit == null)
@@ -78,6 +84,20 @@ public class RegistrationDepositRefundService : IRegistrationDepositRefundServic
         deposit.UpdatedAt = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        if (pushNotification)
+        {
+            var productName = deposit.Auction?.Product?.Name ?? "the auction";
+            await _notificationService.CreateAndPushAsync(
+                deposit.UserId,
+                "Deposit refunded",
+                $"Your deposit of ${deposit.Amount:N0} for {productName} has been refunded.",
+                NotificationType.Refund,
+                $"/Auction/Detail/{deposit.AuctionId}",
+                NotificationReferenceTypes.AuctionDepositRefunded,
+                deposit.AuctionId,
+                cancellationToken: cancellationToken);
+        }
 
         return RegistrationDepositResult.Ok(
             "Hoàn tiền cọc thành công.",
@@ -136,7 +156,7 @@ public class RegistrationDepositRefundService : IRegistrationDepositRefundServic
         // - lưu paypal_refund_id
         // - chuyển status = refunded
         // - idempotency nếu đã refund rồi
-        var result = await RefundDepositAsync(depositId, cancellationToken);
+        var result = await RefundDepositAsync(depositId, cancellationToken: cancellationToken);
 
         if (result.Success)
         {
