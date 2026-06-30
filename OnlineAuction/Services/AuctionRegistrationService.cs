@@ -147,6 +147,20 @@ public class AuctionRegistrationService : IAuctionRegistrationService
             return Fail("No active registration found to cancel.");
         }
 
+        var auction = await _dbContext.Auctions
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == auctionId);
+
+        if (auction is null)
+        {
+            return Fail("Auction not found.", 404);
+        }
+
+        if (!AuctionScheduleHelper.IsRegistrationOpen(auction))
+        {
+            return Fail("Registration is closed. You can no longer cancel your registration.");
+        }
+
         var hasBid = await _dbContext.Bids
             .AnyAsync(b => b.AuctionId == auctionId && b.BidderId == userId);
 
@@ -206,12 +220,12 @@ public class AuctionRegistrationService : IAuctionRegistrationService
             auctionId,
             refundedAmount);
 
-        var auction = await _dbContext.Auctions
+        var auctionForNotification = await _dbContext.Auctions
             .AsNoTracking()
             .Include(a => a.Product)
             .FirstOrDefaultAsync(a => a.Id == auctionId);
 
-        var productName = auction?.Product?.Name ?? "the auction";
+        var productName = auctionForNotification?.Product?.Name ?? "the auction";
         var notificationMessage = refundedAmount.HasValue
             ? $"Your registration for {productName} was cancelled. Deposit of ${refundedAmount.Value:N0} has been refunded."
             : $"Your registration for {productName} was cancelled.";

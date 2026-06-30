@@ -28,7 +28,7 @@
   var cdSeconds = document.getElementById('cdSeconds');
 
   var bidStep = parseFloat((bidPanel && bidPanel.getAttribute('data-bid-step')) || config.bidStep || '0');
-  var endDateMs = Date.parse((bidPanel && bidPanel.getAttribute('data-end-date')) || config.endDate || '');
+  var endDateMs = parseUtcDateMs((bidPanel && bidPanel.getAttribute('data-end-date')) || config.endDate || '');
   var canBid = (bidPanel && bidPanel.getAttribute('data-can-bid') === 'true') || config.canBid === true;
   var canPlaceBid = bidPanel && bidPanel.getAttribute('data-can-place-bid') === 'true';
   var canRegister = bidPanel && bidPanel.getAttribute('data-can-register') === 'true';
@@ -64,6 +64,23 @@
 
   function pad(value) {
     return String(value).padStart(2, '0');
+  }
+
+  function parseUtcDateMs(value) {
+    if (!value) {
+      return NaN;
+    }
+
+    var text = String(value).trim();
+    if (!text) {
+      return NaN;
+    }
+
+    if (!/[zZ]$|[+-]\d{2}:\d{2}$/.test(text)) {
+      text += 'Z';
+    }
+
+    return Date.parse(text);
   }
 
   function getCsrfToken() {
@@ -358,7 +375,7 @@
       countdownSummary.textContent = i18n.auctionEnded || 'Auction ended';
     }
 
-    if (canPlaceBid) {
+    if (countdownKind === 'live_end' && canPlaceBid) {
       disableBidding(i18n.auctionEnded || 'Auction ended');
       return;
     }
@@ -437,9 +454,16 @@
     }
 
     if (data.endDate) {
-      endDateMs = Date.parse(data.endDate);
-      if (bidPanel) {
-        bidPanel.setAttribute('data-end-date', data.endDate);
+      var parsedEnd = parseUtcDateMs(data.endDate);
+      if (!Number.isNaN(parsedEnd)) {
+        endDateMs = parsedEnd;
+        countdownKind = 'live_end';
+        countdownReloadScheduled = false;
+        if (bidPanel) {
+          bidPanel.setAttribute('data-end-date', data.endDate);
+          bidPanel.setAttribute('data-countdown-kind', 'live_end');
+        }
+        startCountdown();
       }
     }
 
@@ -731,7 +755,7 @@
       return;
     }
 
-    if (data.isEnded) {
+    if (data.isEnded && countdownKind === 'live_end') {
       disableBidding(i18n.auctionEnded || 'Auction ended');
     }
 
