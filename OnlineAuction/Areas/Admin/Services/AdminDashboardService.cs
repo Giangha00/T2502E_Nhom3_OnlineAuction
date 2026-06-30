@@ -6,6 +6,7 @@ using OnlineAuction.Areas.Admin.ViewModels.Dashboard;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
+using OnlineAuction.Helpers;
 
 namespace OnlineAuction.Areas.Admin.Services;
 
@@ -69,11 +70,22 @@ public class AdminDashboardService : IAdminDashboardService
     public DashboardFilterViewModel NormalizeFilter(
         DateTime? dateFrom,
         DateTime? dateTo,
+        string? dateRange = null,
         string? statusFilter = null,
         int? categoryIdFilter = null,
         DateTime? registrationDateFilter = null,
         string? registrationGranularity = null)
     {
+        if (!string.IsNullOrWhiteSpace(dateRange))
+        {
+            var parsed = AdminDateRangeHelper.Parse(dateRange);
+            if (parsed.StartDate.HasValue && parsed.EndDateExclusive.HasValue)
+            {
+                dateFrom = parsed.StartDate;
+                dateTo = parsed.EndDateExclusive.Value.AddDays(-1);
+            }
+        }
+
         var endDate = (dateTo ?? DateTime.UtcNow).Date;
         var startDate = (dateFrom ?? endDate.AddDays(-(DefaultFilterDays - 1))).Date;
 
