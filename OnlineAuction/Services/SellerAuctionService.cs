@@ -139,7 +139,18 @@ public class SellerAuctionService : ISellerAuctionService
     {
         if (model.EndDate <= model.StartDate)
         {
-            return (false, "End date must be greater than start date.", null);
+            return (false, "Live end must be greater than live start.", null);
+        }
+
+        var scheduleError = AuctionScheduleHelper.ValidateSchedule(
+            model.RegistrationStartDate,
+            model.RegistrationEndDate,
+            model.StartDate,
+            model.EndDate);
+
+        if (scheduleError is not null)
+        {
+            return (false, scheduleError, null);
         }
 
         if (model.StartingPrice <= 0 || model.BidStep <= 0)
@@ -287,6 +298,8 @@ public class SellerAuctionService : ISellerAuctionService
                 BidStep = model.BidStep,
                 CurrentPrice = model.StartingPrice,
                 BuyNowPrice = model.BuyNowPrice,
+                RegistrationStartDate = model.RegistrationStartDate,
+                RegistrationEndDate = model.RegistrationEndDate,
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
                 AuctionEventName = TrimOrNull(model.AuctionEventName),
@@ -451,13 +464,18 @@ public class SellerAuctionService : ISellerAuctionService
                 }
             }
 
+            var buyNowScheduleStart = now;
+            var buyNowLiveStart = buyNowScheduleStart.AddMinutes(1);
+
             var auction = new Auction
             {
                 Product = product,
                 StartingPrice = model.Price,
                 BidStep = 0.01m,
                 CurrentPrice = model.Price,
-                StartDate = now,
+                RegistrationStartDate = buyNowScheduleStart,
+                RegistrationEndDate = buyNowLiveStart,
+                StartDate = buyNowLiveStart,
                 EndDate = now.AddYears(1),
                 ListingType = ListingTypes.BuyNow,
                 Status = AuctionStatuses.PendingReview,
@@ -508,7 +526,9 @@ public class SellerAuctionService : ISellerAuctionService
             StartingPrice = auction.StartingPrice,
             BidStep = auction.BidStep,
             StartDate = auction.StartDate,
-            EndDate = auction.EndDate
+            EndDate = auction.EndDate,
+            RegistrationStartDate = auction.RegistrationStartDate,
+            RegistrationEndDate = auction.RegistrationEndDate
         };
     }
 
@@ -577,6 +597,9 @@ public class SellerAuctionService : ISellerAuctionService
         auction.StartingPrice = model.StartingPrice;
         auction.CurrentPrice = model.StartingPrice;
         auction.BidStep = model.BidStep;
+        auction.RegistrationStartDate = model.RegistrationStartDate;
+        auction.RegistrationEndDate = model.RegistrationEndDate;
+        auction.StartDate = model.StartDate;
         auction.EndDate = model.EndDate;
 
         if (auction.Status == AuctionStatuses.Rejected)

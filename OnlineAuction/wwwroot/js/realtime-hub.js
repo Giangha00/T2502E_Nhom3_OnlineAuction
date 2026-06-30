@@ -48,6 +48,25 @@
                 window.headerNotifications.refreshBadge();
             }
         }
+
+        if (payload.notification) {
+            showNotificationToast(payload.notification.title, payload.notification.message);
+        }
+    }
+
+    function showNotificationToast(title, message) {
+        var text = [title, message].filter(Boolean).join(' — ');
+        if (!text) {
+            return;
+        }
+
+        var toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 z-[100] max-w-sm rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-lg';
+        toast.innerHTML = '<p class="text-sm font-semibold text-slate-900"></p><p class="mt-1 text-xs text-slate-600"></p>';
+        toast.querySelector('p').textContent = title || 'Notification';
+        toast.querySelectorAll('p')[1].textContent = message || '';
+        document.body.appendChild(toast);
+        window.setTimeout(function () { toast.remove(); }, 5000);
     }
 
     function handleBidUpdated(payload) {

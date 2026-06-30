@@ -9,6 +9,13 @@ public static class SpreadsheetAuctionCatalog
 {
     public const string TestAuctionEventName = "RareCard Vault Test Auctions";
 
+    public const string FullFlowDemoProductName =
+        "PSA 10 Pikachu VMAX Rainbow Rare #188 Vivid Voltage 2020";
+
+    public static bool IsFullFlowDemoProduct(string? productName) =>
+        !string.IsNullOrWhiteSpace(productName) &&
+        productName.Trim().StartsWith(FullFlowDemoProductName, StringComparison.OrdinalIgnoreCase);
+
     public sealed record Entry(
         string CategoryName,
         string Name,

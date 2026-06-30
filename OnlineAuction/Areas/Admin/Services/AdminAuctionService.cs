@@ -4,6 +4,7 @@ using OnlineAuction.Areas.Admin.ViewModels.Auctions;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
+using OnlineAuction.Helpers;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Areas.Admin.Services;
@@ -201,12 +202,15 @@ public class AdminAuctionService
 
     public async Task<AuctionFormViewModel> BuildCreateFormAsync()
     {
-        var now = DateTime.Now;
+        var (registrationStart, registrationEnd, liveStart, liveEnd) =
+            AuctionScheduleHelper.CreateDefaultSchedule();
 
         return new AuctionFormViewModel
         {
-            StartDate = now,
-            EndDate = now.AddDays(7),
+            RegistrationStartDate = registrationStart,
+            RegistrationEndDate = registrationEnd,
+            StartDate = liveStart,
+            EndDate = liveEnd,
             BidStep = 50,
             Status = AuctionStatuses.Live,
             ListingType = ListingTypes.Auction,
@@ -239,6 +243,8 @@ public class AdminAuctionService
             StartingPrice = auction.StartingPrice,
             BidStep = auction.BidStep,
             CurrentPrice = auction.CurrentPrice,
+            RegistrationStartDate = auction.RegistrationStartDate,
+            RegistrationEndDate = auction.RegistrationEndDate,
             StartDate = auction.StartDate,
             EndDate = auction.EndDate,
             Status = auction.Status,
@@ -300,6 +306,8 @@ public class AdminAuctionService
             RequiresRegistration = model.RequiresRegistration,
             // Admin-created listings bypass seller review and can go live immediately.
             Status = model.Status,
+            RegistrationStartDate = model.RegistrationStartDate,
+            RegistrationEndDate = model.RegistrationEndDate,
             StartDate = model.StartDate,
             EndDate = model.EndDate,
             VerifiedAt = model.Status is AuctionStatuses.Live or AuctionStatuses.Scheduled or AuctionStatuses.EndingSoon
@@ -383,6 +391,8 @@ public class AdminAuctionService
         auction.ListingType = model.ListingType;
         auction.RequiresRegistration = model.RequiresRegistration;
         auction.Status = model.Status;
+        auction.RegistrationStartDate = model.RegistrationStartDate;
+        auction.RegistrationEndDate = model.RegistrationEndDate;
         auction.StartDate = model.StartDate;
         auction.EndDate = model.EndDate;
         auction.UpdatedAt = DateTime.UtcNow;

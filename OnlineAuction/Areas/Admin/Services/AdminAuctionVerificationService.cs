@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Areas.Admin.ViewModels.AuctionVerification;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -320,6 +321,7 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
         var now = DateTime.UtcNow;
 
         var scheduledAuctions = await _dbContext.Auctions
+            .Include(a => a.Product)
             .Where(auction =>
                 auction.DeletedAt == null
                 && auction.Status == AuctionStatuses.Scheduled
@@ -339,14 +341,52 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        foreach (var auction in scheduledAuctions)
+        {
+            var registrantIds = await _dbContext.AuctionRegistrations
+                .AsNoTracking()
+                .Where(r => r.AuctionId == auction.Id && r.Status == AuctionRegistrationStatuses.Approved)
+                .Select(r => r.UserId)
+                .Distinct()
+                .ToListAsync(cancellationToken);
+
+            if (registrantIds.Count == 0)
+            {
+                continue;
+            }
+
+            var productName = auction.Product?.Name ?? "an auction";
+            var relatedUrl = $"/Auction/Detail/{auction.Id}";
+
+            foreach (var userId in registrantIds)
+            {
+                await _notificationService.CreateAndPushAsync(
+                    userId,
+                    "Auction is now live",
+                    $"{productName} is now open for bidding.",
+                    NotificationType.Auction,
+                    relatedUrl,
+                    NotificationReferenceTypes.AuctionNowLive,
+                    auction.Id,
+                    cancellationToken: cancellationToken);
+            }
+        }
+
         return scheduledAuctions.Count;
     }
 
     private static string? ValidateForApproval(Auction auction)
     {
-        if (auction.EndDate <= auction.StartDate)
+        var scheduleError = AuctionScheduleHelper.ValidateSchedule(
+            auction.RegistrationStartDate,
+            auction.RegistrationEndDate,
+            auction.StartDate,
+            auction.EndDate);
+
+        if (scheduleError is not null)
         {
-            return "End date must be greater than start date.";
+            return scheduleError;
         }
 
         if (auction.StartingPrice <= 0)

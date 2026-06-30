@@ -33,6 +33,8 @@ public class AuctionItemViewModel
     public decimal StartingPrice { get; set; }
     public decimal CurrentPrice { get; set; }
     public string Status { get; set; } = string.Empty;
+    public string ListingPhase { get; set; } = string.Empty;
+    public string PhaseCountdownKind { get; set; } = string.Empty;
     public string? RejectReason { get; set; }
     public string TimeRemaining { get; set; } = string.Empty;
     public DateTime? EndDate { get; set; }

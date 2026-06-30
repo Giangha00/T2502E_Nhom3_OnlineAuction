@@ -6,6 +6,7 @@
   var MAX_DOC_SIZE = 5 * 1024 * 1024;
   var MAX_IMAGES = 5;
   var MAX_DOCUMENTS = 5;
+  var DEFAULT_LIVE_DURATION_MS = 60 * 60 * 1000;
   var IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
   var DOC_TYPES = ['application/pdf'];
   var DOC_NAME_OPTIONS = [
@@ -153,6 +154,8 @@
       bidStep: $('bidStep')?.value || '',
       buyNowPrice: $('buyNowPrice')?.value || '',
       auctionEventName: $('auctionEventName')?.value.trim() || '',
+      registrationStartDate: $('registrationStartDate')?.value || '',
+      registrationEndDate: $('registrationEndDate')?.value || '',
       startDate: $('startDate')?.value || '',
       endDate: $('endDate')?.value || '',
       imageCount: state.images.length,
@@ -226,7 +229,7 @@
     setPreviewText('previewName', data.productName || t('productNameDefault', 'Product Name'));
     setPreviewText('previewSubtitle', buildPreviewSubtitle(data));
     setPreviewText('previewCurrentBid', formatCardMoney(data.startingPrice));
-    setPreviewText('previewTimeRemaining', formatTimeRemaining(data.endDate));
+    setPreviewText('previewTimeRemaining', formatTimeRemaining(data.endDate || data.startDate));
     setPreviewGradeBadge(data.grade);
     setPreviewMainImage(state.images.length > 0 ? state.images[0].url : '');
   }
@@ -418,6 +421,29 @@
     });
   }
 
+  function toLocalDateTimeValue(date) {
+    var pad = function (n) { return String(n).padStart(2, '0'); };
+    return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) +
+      'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
+  }
+
+  function syncLiveEndFromStart() {
+    var startInput = $('startDate');
+    var endInput = $('endDate');
+    if (!startInput || !endInput || !startInput.value) return;
+    var start = new Date(startInput.value);
+    if (isNaN(start.getTime())) return;
+    endInput.value = toLocalDateTimeValue(new Date(start.getTime() + DEFAULT_LIVE_DURATION_MS));
+  }
+
+  function syncLiveStartFromRegistrationEnd() {
+    var registrationEndInput = $('registrationEndDate');
+    var startInput = $('startDate');
+    if (!registrationEndInput || !startInput || !registrationEndInput.value) return;
+    startInput.value = registrationEndInput.value;
+    syncLiveEndFromStart();
+  }
+
   function validateForm() {
     clearErrors();
     var valid = true;
@@ -491,28 +517,56 @@
       valid = false;
     }
 
-    if (!data.startDate) {
-      showError('startDate', t('errorStartDateRequired', 'Start date is required'));
-      markInvalid($('startDate'));
+    if (!data.registrationStartDate) {
+      showError('registrationStartDate', t('errorRegistrationStartRequired', 'Registration start is required'));
+      markInvalid($('registrationStartDate'));
       valid = false;
     } else {
-      var start = new Date(data.startDate);
-      if (start < now) {
-        showError('startDate', t('errorStartDatePast', 'Start date cannot be in the past'));
+      var registrationStart = new Date(data.registrationStartDate);
+      if (registrationStart < now) {
+        showError('registrationStartDate', t('errorRegistrationStartPast', 'Registration start cannot be in the past'));
+        markInvalid($('registrationStartDate'));
+        valid = false;
+      }
+    }
+
+    if (!data.registrationEndDate) {
+      showError('registrationEndDate', t('errorRegistrationEndRequired', 'Registration end is required'));
+      markInvalid($('registrationEndDate'));
+      valid = false;
+    } else if (data.registrationStartDate) {
+      var regStart = new Date(data.registrationStartDate);
+      var regEnd = new Date(data.registrationEndDate);
+      if (regEnd <= regStart) {
+        showError('registrationEndDate', t('errorRegistrationEndAfterStart', 'Registration end must be after registration start'));
+        markInvalid($('registrationEndDate'));
+        valid = false;
+      }
+    }
+
+    if (!data.startDate) {
+      showError('startDate', t('errorLiveStartRequired', 'Live start is required'));
+      markInvalid($('startDate'));
+      valid = false;
+    } else if (data.registrationEndDate) {
+      var liveStart = new Date(data.startDate);
+      var registrationEnd = new Date(data.registrationEndDate);
+      if (liveStart < registrationEnd) {
+        showError('startDate', t('errorLiveStartAfterRegistration', 'Live start must be after registration ends'));
         markInvalid($('startDate'));
         valid = false;
       }
     }
 
     if (!data.endDate) {
-      showError('endDate', t('errorEndDateRequired', 'End date is required'));
+      showError('endDate', t('errorLiveEndRequired', 'Live end is required'));
       markInvalid($('endDate'));
       valid = false;
     } else if (data.startDate) {
-      var startD = new Date(data.startDate);
-      var endD = new Date(data.endDate);
-      if (endD <= startD) {
-        showError('endDate', t('errorEndDateAfterStart', 'End date must be greater than start date'));
+      var liveStartD = new Date(data.startDate);
+      var liveEndD = new Date(data.endDate);
+      if (liveEndD <= liveStartD) {
+        showError('endDate', t('errorLiveEndAfterStart', 'Live end must be after live start'));
         markInvalid($('endDate'));
         valid = false;
       }
@@ -557,6 +611,8 @@
       if ($('bidStep') && data.bidStep) $('bidStep').value = data.bidStep;
       if ($('buyNowPrice') && data.buyNowPrice) $('buyNowPrice').value = data.buyNowPrice;
       if ($('auctionEventName') && data.auctionEventName) $('auctionEventName').value = data.auctionEventName;
+      if ($('registrationStartDate') && data.registrationStartDate) $('registrationStartDate').value = data.registrationStartDate;
+      if ($('registrationEndDate') && data.registrationEndDate) $('registrationEndDate').value = data.registrationEndDate;
       if ($('startDate') && data.startDate) $('startDate').value = data.startDate;
       if ($('endDate') && data.endDate) $('endDate').value = data.endDate;
 
@@ -644,7 +700,7 @@
       'productName', 'shortDescription', 'subtitle', 'category',
       'year', 'setName', 'language', 'cardNumber', 'authenticator', 'gradeValue', 'grade', 'certificateNumber',
       'startingPrice', 'bidStep', 'buyNowPrice', 'auctionEventName',
-      'startDate', 'endDate'
+      'registrationStartDate', 'registrationEndDate', 'startDate', 'endDate'
     ];
 
     fields.forEach(function (id) {
@@ -653,6 +709,22 @@
       el.addEventListener('input', updatePreview);
       el.addEventListener('change', updatePreview);
     });
+
+    var registrationEndField = $('registrationEndDate');
+    if (registrationEndField) {
+      registrationEndField.addEventListener('change', function () {
+        syncLiveStartFromRegistrationEnd();
+        updatePreview();
+      });
+    }
+
+    var liveStartField = $('startDate');
+    if (liveStartField) {
+      liveStartField.addEventListener('change', function () {
+        syncLiveEndFromStart();
+        updatePreview();
+      });
+    }
 
     form.querySelectorAll('input[name="AuctionType"]').forEach(function (el) {
       el.addEventListener('change', updatePreview);

@@ -370,6 +370,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(a => a.VerifiedAt).HasColumnName("verified_at");
             entity.Property(a => a.VerifiedBy).HasColumnName("verified_by");
             entity.Property(a => a.RejectReason).HasColumnName("reject_reason").HasMaxLength(500);
+            entity.Property(a => a.RegistrationStartDate).HasColumnName("registration_start_date");
+            entity.Property(a => a.RegistrationEndDate).HasColumnName("registration_end_date");
             entity.Property(a => a.StartDate).HasColumnName("start_date");
             entity.Property(a => a.EndDate).HasColumnName("end_date");
             entity.Property(a => a.AuctionEventName).HasColumnName("auction_event_name").HasMaxLength(160);

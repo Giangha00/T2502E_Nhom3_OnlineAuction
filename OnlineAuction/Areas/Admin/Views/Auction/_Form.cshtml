@@ -59,6 +59,18 @@
     }
 
     <div>
+        <label asp-for="RegistrationStartDate" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+        <input asp-for="RegistrationStartDate" type="datetime-local" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+        <span asp-validation-for="RegistrationStartDate" class="text-theme-xs text-error-600"></span>
+    </div>
+
+    <div>
+        <label asp-for="RegistrationEndDate" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+        <input asp-for="RegistrationEndDate" type="datetime-local" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+        <span asp-validation-for="RegistrationEndDate" class="text-theme-xs text-error-600"></span>
+    </div>
+
+    <div>
         <label asp-for="StartDate" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
         <input asp-for="StartDate" type="datetime-local" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
         <span asp-validation-for="StartDate" class="text-theme-xs text-error-600"></span>
