@@ -1,0 +1,88 @@
+@model ProductTemplateFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="mb-4 text-theme-sm text-error-600"></div>
+
+@if (Model.HasInstances)
+{
+    <div class="mb-4 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-theme-sm text-warning-700">
+        Thay doi chi ap dung cho thong tin mau; cert va gia cua tung san pham seller van duoc giu rieng.
+    </div>
+}
+
+<div class="space-y-8">
+    <section>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Thong tin mau</h3>
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div class="md:col-span-2">
+                <label asp-for="Name" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="Name" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="Name" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div>
+                <label asp-for="CategoryId" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                    <option value="">Select category</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div>
+                <label asp-for="GradeLabel" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <select asp-for="GradeLabel" asp-items="Model.GradeOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></select>
+            </div>
+
+            <div>
+                <label asp-for="SetName" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="SetName" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="SetName" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div>
+                <label asp-for="CardNumber" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="CardNumber" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="CardNumber" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div>
+                <label asp-for="Year" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <input asp-for="Year" type="number" min="1800" max="2100" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <span asp-validation-for="Year" class="text-theme-xs text-error-600"></span>
+            </div>
+
+            <div>
+                <label asp-for="Language" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <select asp-for="Language" asp-items="Model.LanguageOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></select>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Description</h3>
+        <div class="grid grid-cols-1 gap-5">
+            <div>
+                <label asp-for="ShortDescription" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <textarea asp-for="ShortDescription" rows="2" class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></textarea>
+            </div>
+
+            <div>
+                <label asp-for="DescriptionHtml" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                <textarea asp-for="DescriptionHtml" rows="6" class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></textarea>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Media</h3>
+        @if (!string.IsNullOrWhiteSpace(Model.PrimaryImageUrl))
+        {
+            <div class="mb-3">
+                <img src="@Model.PrimaryImageUrl" alt="Anh mau san pham" class="h-24 w-24 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
+            </div>
+        }
+        <input asp-for="PrimaryImageFile" type="file" accept=".jpg,.jpeg,.png" class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
+        <p class="mt-1 text-theme-xs text-gray-500">JPG or PNG. Max 2MB.</p>
+    </section>
+</div>
+
+<input type="hidden" asp-for="Id" />

@@ -8,6 +8,8 @@ public class Product : AuditableEntity
 
     public int CategoryId { get; set; }
 
+    public int? ProductTemplateId { get; set; }
+
     public string Name { get; set; } = string.Empty;
 
     public string? ShortDescription { get; set; }
@@ -49,6 +51,8 @@ public class Product : AuditableEntity
     public ApplicationUser Seller { get; set; } = null!;
 
     public Category Category { get; set; } = null!;
+
+    public ProductTemplate? ProductTemplate { get; set; }
 
     public ICollection<Auction> Auctions { get; set; } = [];
 

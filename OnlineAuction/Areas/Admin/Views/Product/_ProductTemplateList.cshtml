@@ -1,0 +1,87 @@
+@model ProductTemplateListViewModel
+
+@{
+    var currentPage = Model.Filter.Page <= 0 ? 1 : Model.Filter.Page;
+    var totalPages = Model.TotalPages <= 0 ? 1 : Model.TotalPages;
+    var startPage = Math.Max(1, currentPage - 2);
+    var endPage = Math.Min(totalPages, currentPage + 2);
+}
+
+<div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+    <div class="max-w-full overflow-x-auto">
+        <table class="w-full min-w-[1100px]">
+            <thead>
+            <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
+                <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Preview</th>
+                <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Ten mau</th>
+                <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Category</th>
+                <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Set / Card #</th>
+                <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Grade</th>
+                <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">San pham</th>
+                <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Last Added</th>
+                <th class="px-5 py-3 text-right text-theme-xs font-medium uppercase text-gray-500">Actions</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+            @if (Model.Templates.Count == 0)
+            {
+                <tr>
+                    <td colspan="8" class="px-5 py-10 text-center text-theme-sm text-gray-500">
+                        Chua co mau san pham.
+                        <a asp-area="Admin" asp-controller="Product" asp-action="CreateTemplate" class="ml-2 font-medium text-brand-500 hover:underline">Tao mau san pham</a>
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var template in Model.Templates)
+                {
+                    <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                        <td class="px-5 py-4">
+                            <img src="@template.ThumbnailUrl" alt="@template.Name" class="h-12 w-12 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
+                        </td>
+                        <td class="px-5 py-4">
+                            <p class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@template.Name</p>
+                            <p class="text-theme-xs text-gray-500">Ma mau: @template.Id</p>
+                        </td>
+                        <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@template.CategoryName</td>
+                        <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">
+                            @(template.SetName ?? "—")
+                            <span class="text-theme-xs text-gray-500"> · @(template.CardNumber ?? "—")</span>
+                        </td>
+                        <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@(template.GradeLabel ?? "—")</td>
+                        <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@template.InstanceCount</td>
+                        <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@(template.LastAddedAt?.ToString("dd/MM/yyyy") ?? "—")</td>
+                        <td class="px-5 py-4">
+                            <div class="flex justify-end gap-3">
+                                <a asp-area="Admin" asp-controller="Product" asp-action="Template" asp-route-id="@template.Id" class="text-theme-sm font-medium text-brand-500 hover:underline">Xem san pham</a>
+                                <a asp-area="Admin" asp-controller="Product" asp-action="EditTemplate" asp-route-id="@template.Id" class="text-theme-sm font-medium text-warning-600 hover:underline">Sua mau</a>
+                                <a asp-area="Admin" asp-controller="Product" asp-action="Create" asp-route-templateId="@template.Id" class="text-theme-sm font-medium text-success-600 hover:underline">Tao san pham</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-theme-sm text-gray-500">
+        Total: <span class="font-medium text-gray-800 dark:text-white/90">@Model.TotalItems</span>
+        · Page <span class="font-medium text-gray-800 dark:text-white/90">@currentPage</span>
+        of <span class="font-medium text-gray-800 dark:text-white/90">@totalPages</span>
+    </p>
+
+    <nav class="flex flex-wrap items-center gap-2">
+        <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-Search="@Model.Filter.Search" asp-route-SortOrder="@Model.Filter.SortOrder" asp-route-Page="@(currentPage - 1)" class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage <= 1 ? "pointer-events-none opacity-50" : "js-admin-page")">Previous</a>
+
+        @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
+        {
+            <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-Search="@Model.Filter.Search" asp-route-SortOrder="@Model.Filter.SortOrder" asp-route-Page="@pageNumber" class="js-admin-page rounded-lg border px-3 py-2 text-theme-sm font-medium @(pageNumber == currentPage ? "border-brand-500 bg-brand-500 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50")">@pageNumber</a>
+        }
+
+        <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-Search="@Model.Filter.Search" asp-route-SortOrder="@Model.Filter.SortOrder" asp-route-Page="@(currentPage + 1)" class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage >= totalPages ? "pointer-events-none opacity-50" : "js-admin-page")">Next</a>
+    </nav>
+</div>

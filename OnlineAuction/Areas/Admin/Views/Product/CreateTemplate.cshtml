@@ -1,0 +1,27 @@
+@model ProductTemplateFormViewModel
+
+@{
+    ViewData["Title"] = "Tao mau san pham";
+    ViewData["AdminPage"] = "products";
+}
+
+<div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+    <div class="mb-6">
+        <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Tao mau san pham</h2>
+        <p class="text-theme-sm text-gray-500 dark:text-gray-400">Tao thong tin mau dung chung cho cac san pham cua seller.</p>
+    </div>
+
+    <form asp-area="Admin" asp-controller="Product" asp-action="CreateTemplate" method="post" enctype="multipart/form-data" class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        @Html.AntiForgeryToken()
+        <partial name="_TemplateForm" model="Model" />
+
+        <div class="mt-6 flex justify-end gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
+            <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">Cancel</a>
+            <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">Tao mau</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

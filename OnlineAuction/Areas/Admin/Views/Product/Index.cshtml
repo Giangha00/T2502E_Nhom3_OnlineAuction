@@ -1,4 +1,4 @@
-@model ProductCategoryListViewModel
+@model ProductTemplateListViewModel
 
 @{
     ViewData["Title"] = "Product Management";
@@ -8,15 +8,15 @@
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Product Management</h2>
-            <p class="text-theme-sm text-gray-500 dark:text-gray-400">Browse card categories and manage product instances inside each template.</p>
+            <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Quan ly mau san pham</h2>
+            <p class="text-theme-sm text-gray-500 dark:text-gray-400">Xem danh sach mau san pham va quan ly cac san pham cua seller trong tung mau.</p>
         </div>
 
         <a asp-area="Admin"
            asp-controller="Product"
-           asp-action="Create"
+           asp-action="CreateTemplate"
            class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
-            Create Product
+            Tao mau san pham
         </a>
     </div>
 
@@ -35,15 +35,15 @@
     }
 
     <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
-        <form id="productCategoryFilterForm" method="get" class="flex flex-wrap items-end gap-3 2xl:flex-nowrap">
+        <form id="productTemplateFilterForm" method="get" class="flex flex-wrap items-end gap-3 2xl:flex-nowrap">
             <input type="hidden" name="Page" value="@(Model.Filter.Page <= 0 ? 1 : Model.Filter.Page)" />
 
             <div class="min-w-[220px] flex-1">
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Search</label>
-                <input id="productCategorySearchInput"
+                <input id="productTemplateSearchInput"
                        name="Search"
                        value="@Model.Filter.Search"
-                       placeholder="Category name"
+                       placeholder="Ten mau, set, card #, danh muc"
                        autocomplete="off"
                        class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
             </div>
@@ -53,16 +53,15 @@
                 <select name="SortOrder" class="admin-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                     <option value="" selected="@(string.IsNullOrWhiteSpace(Model.Filter.SortOrder))">Name A-Z</option>
                     <option value="name_desc" selected="@(Model.Filter.SortOrder == "name_desc")">Name Z-A</option>
-                    <option value="count_desc" selected="@(Model.Filter.SortOrder == "count_desc")">Most products</option>
-                    <option value="count_asc" selected="@(Model.Filter.SortOrder == "count_asc")">Fewest products</option>
-                    <option value="date_desc" selected="@(Model.Filter.SortOrder == "date_desc")">Recently updated</option>
+                    <option value="count_desc" selected="@(Model.Filter.SortOrder == "count_desc")">Nhieu san pham nhat</option>
+                    <option value="date_desc" selected="@(Model.Filter.SortOrder == "date_desc")">Moi cap nhat</option>
                 </select>
             </div>
         </form>
     </div>
 
-    <div id="productCategoryListResults" class="transition-opacity duration-200">
-        <partial name="_ProductCategoryList" model="Model" />
+    <div id="productTemplateListResults" class="transition-opacity duration-200">
+        <partial name="_ProductTemplateList" model="Model" />
     </div>
 </div>
 
@@ -70,9 +69,9 @@
     <script src="~/admin/js/admin-list-filter.js" asp-append-version="true"></script>
     <script>
         AdminListFilter.init({
-            formId: 'productCategoryFilterForm',
-            resultsId: 'productCategoryListResults',
-            searchInputId: 'productCategorySearchInput',
+            formId: 'productTemplateFilterForm',
+            resultsId: 'productTemplateListResults',
+            searchInputId: 'productTemplateSearchInput',
             listUrl: '@Url.Action("Index", "Product", new { area = "Admin" })'
         });
     </script>
