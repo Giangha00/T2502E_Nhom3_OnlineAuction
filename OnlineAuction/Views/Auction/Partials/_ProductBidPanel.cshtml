@@ -14,7 +14,7 @@
     var isLoggedIn = userAuth.Succeeded;
     var endDateIso = DateTimeUtilities.ToUtcIsoString(Model.CountdownTargetDate);
     var showRegistrationFlow = Model.RequiresRegistration && Model.CanRegister && !Model.IsSeller;
-    var showCancelRegistration = Model.RequiresRegistration && !Model.IsSeller && Model.IsRegistered &&
+    var showCancelRegistration = Model.RequiresRegistration && Model.CanRegister && !Model.IsSeller && Model.IsRegistered &&
         Model.RegistrationStatus is AuctionRegistrationStatuses.Pending or AuctionRegistrationStatuses.Approved;
     var showRegistrationUi = Model.RequiresRegistration && !Model.IsSeller &&
         (showRegistrationFlow || showCancelRegistration ||
