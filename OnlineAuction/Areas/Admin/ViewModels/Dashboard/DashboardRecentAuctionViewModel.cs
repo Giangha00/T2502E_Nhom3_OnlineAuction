@@ -8,6 +8,10 @@ public class DashboardRecentAuctionViewModel
 
     public string SellerName { get; set; } = string.Empty;
 
+    public int CategoryId { get; set; }
+
+    public string CategoryName { get; set; } = string.Empty;
+
     public decimal CurrentPrice { get; set; }
 
     public string Status { get; set; } = string.Empty;

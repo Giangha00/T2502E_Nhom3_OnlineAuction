@@ -312,6 +312,11 @@ using (var scope = app.Services.CreateScope())
     }
     else
     {
+        var migrationLogger = scope.ServiceProvider
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("DatabaseMigration");
+
+        await MigrationHistoryReconciler.ReconcileAsync(db, migrationLogger);
         await db.Database.MigrateAsync();
     }
 
