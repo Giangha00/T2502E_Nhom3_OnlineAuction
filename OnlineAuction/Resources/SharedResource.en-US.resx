@@ -919,4 +919,64 @@
   <data name="Admin_BidHistory_Pagination_PageOf" xml:space="preserve"><value>Page {0} of {1}</value></data>
   <data name="Admin_BidHistory_Pagination_Previous" xml:space="preserve"><value>Previous</value></data>
   <data name="Admin_BidHistory_Pagination_Next" xml:space="preserve"><value>Next</value></data>
+  <data name="Admin_Dashboard_Title" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Admin_Dashboard_Subtitle" xml:space="preserve"><value>Monitor platform performance and analytics.</value></data>
+  <data name="Admin_Dashboard_Section1_Title" xml:space="preserve"><value>Overview</value></data>
+  <data name="Admin_Dashboard_Section2_Title" xml:space="preserve"><value>User Statistics</value></data>
+  <data name="Admin_Dashboard_Section2_Description" xml:space="preserve"><value>Registration trends, active users, and top buyers/sellers.</value></data>
+  <data name="Admin_Dashboard_Section3_Title" xml:space="preserve"><value>Auction &amp; Product Statistics</value></data>
+  <data name="Admin_Dashboard_Section3_Description" xml:space="preserve"><value>Auction status, success rate, and category bid volume.</value></data>
+  <data name="Admin_Dashboard_Filter_Title" xml:space="preserve"><value>Date Range Filter</value></data>
+  <data name="Admin_Dashboard_Filter_Description" xml:space="preserve"><value>Apply a shared date range for time-based metrics and export.</value></data>
+  <data name="Admin_Dashboard_Filter_From" xml:space="preserve"><value>From</value></data>
+  <data name="Admin_Dashboard_Filter_To" xml:space="preserve"><value>To</value></data>
+  <data name="Admin_Dashboard_Filter_Apply" xml:space="preserve"><value>Apply</value></data>
+  <data name="Admin_Dashboard_Filter_Export" xml:space="preserve"><value>Export Excel</value></data>
+  <data name="Admin_Dashboard_Snapshot_Note" xml:space="preserve"><value>At current time</value></data>
+  <data name="Admin_Dashboard_FilteredPeriod_Note" xml:space="preserve"><value>Within selected date range</value></data>
+  <data name="Admin_Dashboard_ChangeVsPrevious" xml:space="preserve"><value>vs previous period</value></data>
+  <data name="Admin_Dashboard_NoData" xml:space="preserve"><value>No data for selected period</value></data>
+  <data name="Admin_Dashboard_Kpi_NewRegistrations" xml:space="preserve"><value>New Registrations</value></data>
+  <data name="Admin_Dashboard_Kpi_ActiveUsers" xml:space="preserve"><value>Active Users</value></data>
+  <data name="Admin_Dashboard_Kpi_TotalUsers" xml:space="preserve"><value>Total Users</value></data>
+  <data name="Admin_Dashboard_Kpi_OngoingAuctions" xml:space="preserve"><value>Ongoing Auctions</value></data>
+  <data name="Admin_Dashboard_Kpi_EndedAuctions" xml:space="preserve"><value>Ended Auctions</value></data>
+  <data name="Admin_Dashboard_Kpi_CancelledAuctions" xml:space="preserve"><value>Cancelled Auctions</value></data>
+  <data name="Admin_Dashboard_Kpi_PendingReview" xml:space="preserve"><value>Pending Review</value></data>
+  <data name="Admin_Dashboard_Kpi_SuccessRate" xml:space="preserve"><value>Success Rate</value></data>
+  <data name="Admin_Dashboard_SuccessRate_Tooltip" xml:space="preserve"><value>Sold listings / total listed auctions × 100. Paid or delivered orders only.</value></data>
+  <data name="Admin_Dashboard_SuccessRate_Hint" xml:space="preserve"><value>Sold listings / total listed</value></data>
+  <data name="Admin_Dashboard_RegistrationChart_Title" xml:space="preserve"><value>New Registrations</value></data>
+  <data name="Admin_Dashboard_RegistrationChart_Description" xml:space="preserve"><value>Click a bar to filter the registration table.</value></data>
+  <data name="Admin_Dashboard_Granularity_Day" xml:space="preserve"><value>Day</value></data>
+  <data name="Admin_Dashboard_Granularity_Week" xml:space="preserve"><value>Week</value></data>
+  <data name="Admin_Dashboard_Granularity_Month" xml:space="preserve"><value>Month</value></data>
+  <data name="Admin_Dashboard_TopBuyers_Title" xml:space="preserve"><value>Top 10 Buyers</value></data>
+  <data name="Admin_Dashboard_TopSellers_Title" xml:space="preserve"><value>Top 10 Sellers</value></data>
+  <data name="Admin_Dashboard_NewUsers_Title" xml:space="preserve"><value>New Registrations</value></data>
+  <data name="Admin_Dashboard_NewUsers_Filtered" xml:space="preserve"><value>Filtered by {0}</value></data>
+  <data name="Admin_Dashboard_StatusChart_Title" xml:space="preserve"><value>Auctions by Status</value></data>
+  <data name="Admin_Dashboard_CategoryChart_Title" xml:space="preserve"><value>Category Bid Volume</value></data>
+  <data name="Admin_Dashboard_CategoryChart_Description" xml:space="preserve"><value>Total bid amount by category in selected period.</value></data>
+  <data name="Admin_Dashboard_RevenueChart_Title" xml:space="preserve"><value>Revenue</value></data>
+  <data name="Admin_Dashboard_RevenueChart_Description" xml:space="preserve"><value>Successful payments in selected period</value></data>
+  <data name="Admin_Dashboard_BidsChart_Title" xml:space="preserve"><value>Bids</value></data>
+  <data name="Admin_Dashboard_BidsChart_Description" xml:space="preserve"><value>Daily bid activity in selected period</value></data>
+  <data name="Admin_Dashboard_RecentAuctions_Title" xml:space="preserve"><value>Recent Auctions</value></data>
+  <data name="Admin_Dashboard_RecentAuctions_Description" xml:space="preserve"><value>Latest 10 listings system-wide.</value></data>
+  <data name="Admin_Dashboard_RecentAuctions_Filtered" xml:space="preserve"><value>Filtered</value></data>
+  <data name="Admin_Dashboard_ViewAll" xml:space="preserve"><value>View All</value></data>
+  <data name="Admin_Dashboard_Col_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Admin_Dashboard_Col_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Admin_Dashboard_Col_RegisteredAt" xml:space="preserve"><value>Registered At</value></data>
+  <data name="Admin_Dashboard_Col_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Admin_Dashboard_Col_BidCount" xml:space="preserve"><value>Bid Count</value></data>
+  <data name="Admin_Dashboard_Col_TotalBid" xml:space="preserve"><value>Total Bid</value></data>
+  <data name="Admin_Dashboard_Col_Listings" xml:space="preserve"><value>Listings</value></data>
+  <data name="Admin_Dashboard_Col_Sales" xml:space="preserve"><value>Sales</value></data>
+  <data name="Admin_Dashboard_Col_Product" xml:space="preserve"><value>Product</value></data>
+  <data name="Admin_Dashboard_Col_Seller" xml:space="preserve"><value>Seller</value></data>
+  <data name="Admin_Dashboard_Col_Category" xml:space="preserve"><value>Category</value></data>
+  <data name="Admin_Dashboard_Col_CurrentBid" xml:space="preserve"><value>Current Bid</value></data>
+  <data name="Admin_Dashboard_Col_EndsIn" xml:space="preserve"><value>Ends In</value></data>
 </root>

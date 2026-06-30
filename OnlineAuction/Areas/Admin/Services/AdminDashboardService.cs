@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using ClosedXML.Excel;
 using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Areas.Admin.ViewModels.Dashboard;
 using OnlineAuction.Data;
@@ -10,14 +11,52 @@ namespace OnlineAuction.Areas.Admin.Services;
 
 public class AdminDashboardService : IAdminDashboardService
 {
-    private const int ChartDays = 7;
     private const int RecentAuctionCount = 10;
-    private const int ComparisonDays = 7;
+    private const int TopUserCount = 10;
+    private const int CategoryTopCount = 5;
+    private const int DefaultFilterDays = 30;
 
     private static readonly string[] ActiveAuctionStatuses =
     [
         AuctionStatuses.Live,
         AuctionStatuses.EndingSoon
+    ];
+
+    private static readonly string[] OngoingAuctionStatuses =
+    [
+        AuctionStatuses.Live,
+        AuctionStatuses.EndingSoon,
+        AuctionStatuses.Scheduled
+    ];
+
+    private static readonly string[] EndedAuctionStatuses =
+    [
+        AuctionStatuses.Ended,
+        AuctionStatuses.AwaitingPayment,
+        AuctionStatuses.Completed
+    ];
+
+    private static readonly string[] CancelledAuctionStatuses =
+    [
+        AuctionStatuses.Cancelled,
+        AuctionStatuses.Rejected
+    ];
+
+    private static readonly string[] SuccessRateDenominatorStatuses =
+    [
+        AuctionStatuses.Scheduled,
+        AuctionStatuses.Live,
+        AuctionStatuses.EndingSoon,
+        AuctionStatuses.Ended,
+        AuctionStatuses.AwaitingPayment,
+        AuctionStatuses.Completed,
+        AuctionStatuses.Cancelled
+    ];
+
+    private static readonly string[] PaidOrderStatuses =
+    [
+        OrderStatuses.Paid,
+        OrderStatuses.Delivered
     ];
 
     private readonly AuctionHouseDbContext _dbContext;
@@ -27,54 +66,84 @@ public class AdminDashboardService : IAdminDashboardService
         _dbContext = dbContext;
     }
 
-    public async Task<AdminDashboardViewModel> GetDashboardAsync(CancellationToken cancellationToken = default)
+    public DashboardFilterViewModel NormalizeFilter(
+        DateTime? dateFrom,
+        DateTime? dateTo,
+        string? statusFilter = null,
+        int? categoryIdFilter = null,
+        DateTime? registrationDateFilter = null,
+        string? registrationGranularity = null)
+    {
+        var endDate = (dateTo ?? DateTime.UtcNow).Date;
+        var startDate = (dateFrom ?? endDate.AddDays(-(DefaultFilterDays - 1))).Date;
+
+        if (startDate > endDate)
+        {
+            (startDate, endDate) = (endDate, startDate);
+        }
+
+        var granularity = string.IsNullOrWhiteSpace(registrationGranularity)
+            ? "day"
+            : registrationGranularity.Trim().ToLowerInvariant();
+
+        if (granularity is not ("day" or "week" or "month"))
+        {
+            granularity = "day";
+        }
+
+        return new DashboardFilterViewModel
+        {
+            DateFrom = startDate,
+            DateTo = endDate,
+            StatusFilter = string.IsNullOrWhiteSpace(statusFilter) ? null : statusFilter.Trim(),
+            CategoryIdFilter = categoryIdFilter,
+            RegistrationDateFilter = registrationDateFilter?.Date,
+            RegistrationGranularity = granularity
+        };
+    }
+
+    public async Task<AdminDashboardViewModel> GetDashboardAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default)
     {
         var utcNow = DateTime.UtcNow;
-        var todayStart = utcNow.Date;
-        var yesterdayStart = todayStart.AddDays(-1);
-        var comparisonStart = todayStart.AddDays(-ComparisonDays);
-        var previousComparisonStart = todayStart.AddDays(-ComparisonDays * 2);
-        var chartStart = todayStart.AddDays(-(ChartDays - 1));
-        var monthStart = new DateTime(utcNow.Year, utcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-        var comparisonPoint = todayStart.AddDays(-ComparisonDays);
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+        var previousRange = BuildPreviousRange(filter);
 
-        var activeAuctionsNow = await CountActiveAuctionsAsync(utcNow, cancellationToken);
-        var activeAuctionsPrevious = await CountActiveAuctionsAtAsync(comparisonPoint, cancellationToken);
+        var activeAuctionsNow = await CountActiveAuctionsAsync(cancellationToken);
+        var activeAuctionsPrevious = await CountActiveAuctionsAtAsync(
+            utcNow.Date.AddDays(-filter.PeriodDays),
+            cancellationToken);
 
-        var usersCurrentPeriod = await _dbContext.Users.AsNoTracking()
-            .CountAsync(
-                user => user.DeletedAt == null
-                        && user.Status == UserStatus.Active
-                        && user.CreatedAt >= comparisonStart,
-                cancellationToken);
-
-        var usersPreviousPeriod = await _dbContext.Users.AsNoTracking()
-            .CountAsync(
-                user => user.DeletedAt == null
-                        && user.Status == UserStatus.Active
-                        && user.CreatedAt >= previousComparisonStart
-                        && user.CreatedAt < comparisonStart,
-                cancellationToken);
-
+        var newRegistrationsCurrent = await GetNewUserRegistrationsCountAsync(filter, cancellationToken);
+        var newRegistrationsPrevious = await GetNewUserRegistrationsCountAsync(previousRange, cancellationToken);
         var totalActiveUsers = await _dbContext.Users.AsNoTracking()
             .CountAsync(
                 user => user.DeletedAt == null && user.Status == UserStatus.Active,
                 cancellationToken);
 
-        var bidsToday = await _dbContext.Bids.AsNoTracking()
-            .CountAsync(
-                bid => bid.DeletedAt == null && bid.PlacedAt >= todayStart,
-                cancellationToken);
+        var activeUsersCount = await GetActiveUsersCountAsync(filter, cancellationToken);
 
-        var bidsYesterday = await _dbContext.Bids.AsNoTracking()
+        var bidsInRange = await _dbContext.Bids.AsNoTracking()
             .CountAsync(
                 bid => bid.DeletedAt == null
-                       && bid.PlacedAt >= yesterdayStart
-                       && bid.PlacedAt < todayStart,
+                       && bid.PlacedAt >= rangeStart
+                       && bid.PlacedAt < rangeEndExclusive,
                 cancellationToken);
 
-        var revenueCurrentPeriod = await SumSuccessfulPaymentsAsync(comparisonStart, utcNow, cancellationToken);
-        var revenuePreviousPeriod = await SumSuccessfulPaymentsAsync(previousComparisonStart, comparisonStart, cancellationToken);
+        var bidsPreviousRange = await _dbContext.Bids.AsNoTracking()
+            .CountAsync(
+                bid => bid.DeletedAt == null
+                       && bid.PlacedAt >= previousRange.DateFrom
+                       && bid.PlacedAt < previousRange.DateTo.AddDays(1),
+                cancellationToken);
+
+        var revenueCurrentPeriod = await SumSuccessfulPaymentsAsync(rangeStart, rangeEndExclusive, cancellationToken);
+        var revenuePreviousPeriod = await SumSuccessfulPaymentsAsync(
+            previousRange.DateFrom,
+            previousRange.DateTo.AddDays(1),
+            cancellationToken);
 
         var pendingPayments = await _dbContext.Orders.AsNoTracking()
             .CountAsync(
@@ -94,25 +163,29 @@ public class AdminDashboardService : IAdminDashboardService
                            && auction.Status == AuctionStatuses.PendingReview,
                 cancellationToken);
 
+        var monthStart = new DateTime(utcNow.Year, utcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
         var completedOrdersThisMonth = await _dbContext.Orders.AsNoTracking()
             .CountAsync(
                 order => order.DeletedAt == null
-                         && (order.Status == OrderStatuses.Paid || order.Status == OrderStatuses.Delivered)
+                         && PaidOrderStatuses.Contains(order.Status)
                          && order.CreatedAt >= monthStart,
                 cancellationToken);
-
-        var kpiCards = new List<DashboardKpiCardViewModel>
-        {
-            BuildKpiCard("Active Auctions", FormatInteger(activeAuctionsNow), activeAuctionsNow, activeAuctionsPrevious),
-            BuildKpiCard("Registered Users", FormatInteger(totalActiveUsers), usersCurrentPeriod, usersPreviousPeriod),
-            BuildKpiCard("Total Bids Today", FormatInteger(bidsToday), bidsToday, bidsYesterday),
-            BuildKpiCard("Revenue (USD)", FormatCurrency(revenueCurrentPeriod), revenueCurrentPeriod, revenuePreviousPeriod)
-        };
 
         var pendingComplaints = await _dbContext.Complaints.AsNoTracking()
             .CountAsync(
                 complaint => complaint.DeletedAt == null && complaint.Status == ComplaintStatuses.Pending,
                 cancellationToken);
+
+        var statusCounts = await GetAuctionStatusCountsAsync(cancellationToken);
+        var successRate = await GetAuctionSuccessRateAsync(cancellationToken);
+
+        var kpiCards = new List<DashboardKpiCardViewModel>
+        {
+            BuildKpiCard("Active Auctions", FormatInteger(activeAuctionsNow), activeAuctionsNow, activeAuctionsPrevious),
+            BuildKpiCard("Registered Users", FormatInteger(totalActiveUsers), newRegistrationsCurrent, newRegistrationsPrevious),
+            BuildKpiCard("Total Bids", FormatInteger(bidsInRange), bidsInRange, bidsPreviousRange),
+            BuildKpiCard("Revenue (USD)", FormatCurrency(revenueCurrentPeriod), revenueCurrentPeriod, revenuePreviousPeriod)
+        };
 
         var secondaryKpiCards = new List<DashboardKpiCardViewModel>
         {
@@ -123,8 +196,57 @@ public class AdminDashboardService : IAdminDashboardService
             BuildKpiCard("Completed Orders (Month)", FormatInteger(completedOrdersThisMonth), completedOrdersThisMonth, 0, includeChange: false)
         };
 
-        var recentAuctions = await _dbContext.Auctions.AsNoTracking()
-            .Where(auction => auction.DeletedAt == null && auction.Product.DeletedAt == null)
+        var registrationDates = await GetRegistrationDatesAsync(filter, cancellationToken);
+        var newUsers = await GetNewUsersAsync(filter, cancellationToken);
+        var filteredNewUsers = ApplyRegistrationChartFilter(newUsers, filter);
+
+        var userSection = new DashboardUserSectionViewModel
+        {
+            NewRegistrationsKpi = BuildKpiCard(
+                "New Registrations",
+                FormatInteger(newRegistrationsCurrent),
+                newRegistrationsCurrent,
+                newRegistrationsPrevious),
+            ActiveUsersKpi = BuildSnapshotKpi("Active Users", FormatInteger(activeUsersCount)),
+            TotalUsersKpi = BuildSnapshotKpi("Total Users", FormatInteger(totalActiveUsers)),
+            RegistrationByDay = BuildRegistrationSeries(registrationDates, "day", filter),
+            RegistrationByWeek = BuildRegistrationSeries(registrationDates, "week", filter),
+            RegistrationByMonth = BuildRegistrationSeries(registrationDates, "month", filter),
+            TopBuyers = await GetTopBuyersAsync(filter, cancellationToken),
+            TopSellers = await GetTopSellersAsync(filter, cancellationToken),
+            NewUsers = filteredNewUsers
+        };
+
+        var auctionSection = new DashboardAuctionSectionViewModel
+        {
+            OngoingKpi = BuildSnapshotKpi("Ongoing Auctions", FormatInteger(statusCounts.Ongoing)),
+            EndedKpi = BuildSnapshotKpi("Ended Auctions", FormatInteger(statusCounts.Ended)),
+            CancelledKpi = BuildSnapshotKpi("Cancelled Auctions", FormatInteger(statusCounts.Cancelled)),
+            PendingReviewKpi = BuildSnapshotKpi(
+                "Pending Review",
+                FormatInteger(statusCounts.PendingReview),
+                "/Admin/AuctionVerification"),
+            SuccessRateKpi = BuildSnapshotKpi(
+                "Success Rate",
+                successRate.HasValue ? $"{successRate.Value:0.0}%" : "N/A"),
+            CategoryBreakdown = await GetCategoryBidBreakdownAsync(filter, cancellationToken)
+        };
+
+        var recentAuctionsQuery = _dbContext.Auctions.AsNoTracking()
+            .Where(auction => auction.DeletedAt == null && auction.Product.DeletedAt == null);
+
+        if (!string.IsNullOrWhiteSpace(filter.StatusFilter))
+        {
+            recentAuctionsQuery = recentAuctionsQuery.Where(auction => auction.Status == filter.StatusFilter);
+        }
+
+        if (filter.CategoryIdFilter.HasValue)
+        {
+            recentAuctionsQuery = recentAuctionsQuery.Where(
+                auction => auction.Product.CategoryId == filter.CategoryIdFilter.Value);
+        }
+
+        var recentAuctions = await recentAuctionsQuery
             .OrderByDescending(auction => auction.CreatedAt)
             .Take(RecentAuctionCount)
             .Select(auction => new
@@ -132,26 +254,33 @@ public class AdminDashboardService : IAdminDashboardService
                 auction.Id,
                 auction.Product.Name,
                 SellerName = auction.Product.Seller.FullName,
+                CategoryId = auction.Product.CategoryId,
+                CategoryName = auction.Product.Category.Name,
                 auction.CurrentPrice,
                 auction.Status,
                 auction.EndDate
             })
             .ToListAsync(cancellationToken);
 
-        var revenueChart = await BuildDailyPaymentSeriesAsync(chartStart, utcNow, cancellationToken);
-        var bidsChart = await BuildDailyBidSeriesAsync(chartStart, utcNow, cancellationToken);
+        var revenueChart = await BuildDailyPaymentSeriesAsync(rangeStart, rangeEndExclusive, cancellationToken);
+        var bidsChart = await BuildDailyBidSeriesAsync(rangeStart, rangeEndExclusive, cancellationToken);
         var statusBreakdown = await BuildStatusBreakdownAsync(cancellationToken);
 
         return new AdminDashboardViewModel
         {
+            Filter = filter,
             KpiCards = kpiCards,
             SecondaryKpiCards = secondaryKpiCards,
+            UserSection = userSection,
+            AuctionSection = auctionSection,
             RecentAuctions = recentAuctions
                 .Select(auction => new DashboardRecentAuctionViewModel
                 {
                     Id = auction.Id,
                     ProductName = auction.Name,
                     SellerName = auction.SellerName,
+                    CategoryId = auction.CategoryId,
+                    CategoryName = auction.CategoryName,
                     CurrentPrice = auction.CurrentPrice,
                     Status = auction.Status,
                     StatusLabel = FormatStatusLabel(auction.Status),
@@ -165,69 +294,543 @@ public class AdminDashboardService : IAdminDashboardService
         };
     }
 
-    public async Task<byte[]> ExportSummaryCsvAsync(int periodDays = 30, CancellationToken cancellationToken = default)
+    public Task<int> GetNewUserRegistrationsCountAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default)
     {
-        if (periodDays <= 0)
-        {
-            periodDays = 30;
-        }
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
 
-        var utcNow = DateTime.UtcNow;
-        var periodStart = utcNow.Date.AddDays(-(periodDays - 1));
-        var dashboard = await GetDashboardAsync(cancellationToken);
-
-        var revenueTotal = await SumSuccessfulPaymentsAsync(periodStart, utcNow, cancellationToken);
-        var bidCount = await _dbContext.Bids.AsNoTracking()
+        return _dbContext.Users.AsNoTracking()
             .CountAsync(
-                bid => bid.DeletedAt == null && bid.PlacedAt >= periodStart,
+                user => user.DeletedAt == null
+                        && user.Status == UserStatus.Active
+                        && user.CreatedAt >= rangeStart
+                        && user.CreatedAt < rangeEndExclusive,
                 cancellationToken);
-
-        var auctionsInPeriod = await _dbContext.Auctions.AsNoTracking()
-            .Where(auction => auction.DeletedAt == null
-                              && auction.Product.DeletedAt == null
-                              && auction.CreatedAt >= periodStart)
-            .OrderByDescending(auction => auction.CreatedAt)
-            .Select(auction => new
-            {
-                auction.Id,
-                auction.Product.Name,
-                SellerName = auction.Product.Seller.FullName,
-                auction.CurrentPrice,
-                auction.Status,
-                auction.EndDate
-            })
-            .ToListAsync(cancellationToken);
-
-        var builder = new StringBuilder();
-        builder.AppendLine("Section,Metric,Value");
-        builder.AppendLine($"Summary,Period Days,{periodDays}");
-        builder.AppendLine($"Summary,Generated At (UTC),{utcNow:O}");
-
-        foreach (var card in dashboard.KpiCards.Concat(dashboard.SecondaryKpiCards))
-        {
-            builder.AppendLine($"KPI,{EscapeCsv(card.Label)},{EscapeCsv(card.DisplayValue)}");
-        }
-
-        builder.AppendLine($"Summary,Revenue ({periodDays}d),{revenueTotal:F2}");
-        builder.AppendLine($"Summary,Bid Count ({periodDays}d),{bidCount}");
-        builder.AppendLine();
-        builder.AppendLine("Auction ID,Product,Seller,Current Price,Status,End Date (UTC)");
-
-        foreach (var auction in auctionsInPeriod)
-        {
-            builder.AppendLine(string.Join(',',
-                auction.Id,
-                EscapeCsv(auction.Name),
-                EscapeCsv(auction.SellerName),
-                auction.CurrentPrice.ToString("F2", CultureInfo.InvariantCulture),
-                EscapeCsv(auction.Status),
-                auction.EndDate.ToString("O", CultureInfo.InvariantCulture)));
-        }
-
-        return Encoding.UTF8.GetBytes(builder.ToString());
     }
 
-    private async Task<int> CountActiveAuctionsAsync(DateTime utcNow, CancellationToken cancellationToken)
+    public async Task<int> GetActiveUsersCountAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default)
+    {
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+
+        var bidderIds = await _dbContext.Bids.AsNoTracking()
+            .Where(bid => bid.DeletedAt == null
+                          && bid.PlacedAt >= rangeStart
+                          && bid.PlacedAt < rangeEndExclusive)
+            .Select(bid => bid.BidderId)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+
+        var buyerIds = await _dbContext.Orders.AsNoTracking()
+            .Where(order => order.DeletedAt == null
+                            && order.CreatedAt >= rangeStart
+                            && order.CreatedAt < rangeEndExclusive)
+            .Select(order => order.BuyerId)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+
+        return bidderIds.Union(buyerIds).Distinct().Count();
+    }
+
+    public async Task<IReadOnlyList<DashboardTopUserViewModel>> GetTopBuyersAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default)
+    {
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+
+        return await _dbContext.Bids.AsNoTracking()
+            .Where(bid => bid.DeletedAt == null
+                          && bid.PlacedAt >= rangeStart
+                          && bid.PlacedAt < rangeEndExclusive)
+            .GroupBy(bid => new { bid.BidderId, bid.Bidder.FullName })
+            .Select(group => new DashboardTopUserViewModel
+            {
+                UserId = group.Key.BidderId,
+                FullName = group.Key.FullName,
+                BidCount = group.Count(),
+                TotalBidAmount = group.Sum(bid => bid.Amount)
+            })
+            .OrderByDescending(item => item.TotalBidAmount)
+            .ThenByDescending(item => item.BidCount)
+            .Take(TopUserCount)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<DashboardTopUserViewModel>> GetTopSellersAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default)
+    {
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+
+        var listingCounts = await _dbContext.Auctions.AsNoTracking()
+            .Where(auction => auction.DeletedAt == null
+                              && auction.Product.DeletedAt == null
+                              && auction.CreatedAt >= rangeStart
+                              && auction.CreatedAt < rangeEndExclusive)
+            .GroupBy(auction => auction.Product.SellerId)
+            .Select(group => new { SellerId = group.Key, ListingCount = group.Count() })
+            .ToListAsync(cancellationToken);
+
+        var salesTotals = await _dbContext.OrderItems.AsNoTracking()
+            .Where(item => item.DeletedAt == null
+                           && item.Order.DeletedAt == null
+                           && PaidOrderStatuses.Contains(item.Order.Status)
+                           && item.Order.CreatedAt >= rangeStart
+                           && item.Order.CreatedAt < rangeEndExclusive)
+            .GroupBy(item => item.Auction.Product.SellerId)
+            .Select(group => new { SellerId = group.Key, TotalSales = group.Sum(item => item.WinningBid) })
+            .ToListAsync(cancellationToken);
+
+        var sellerIds = listingCounts.Select(item => item.SellerId)
+            .Union(salesTotals.Select(item => item.SellerId))
+            .Distinct()
+            .ToList();
+
+        if (sellerIds.Count == 0)
+        {
+            return [];
+        }
+
+        var sellerNames = await _dbContext.Users.AsNoTracking()
+            .Where(user => sellerIds.Contains(user.Id))
+            .Select(user => new { user.Id, user.FullName })
+            .ToDictionaryAsync(user => user.Id, user => user.FullName, cancellationToken);
+
+        var listingLookup = listingCounts.ToDictionary(item => item.SellerId, item => item.ListingCount);
+        var salesLookup = salesTotals.ToDictionary(item => item.SellerId, item => item.TotalSales);
+
+        return sellerIds
+            .Select(sellerId => new DashboardTopUserViewModel
+            {
+                UserId = sellerId,
+                FullName = sellerNames.GetValueOrDefault(sellerId, "Unknown"),
+                ListingCount = listingLookup.GetValueOrDefault(sellerId),
+                TotalSales = salesLookup.GetValueOrDefault(sellerId)
+            })
+            .OrderByDescending(item => item.TotalSales)
+            .ThenByDescending(item => item.ListingCount)
+            .Take(TopUserCount)
+            .ToList();
+    }
+
+    public async Task<(int Ongoing, int Ended, int Cancelled, int PendingReview)> GetAuctionStatusCountsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var grouped = await _dbContext.Auctions.AsNoTracking()
+            .Where(auction => auction.DeletedAt == null && auction.Product.DeletedAt == null)
+            .GroupBy(auction => auction.Status)
+            .Select(group => new { Status = group.Key, Count = group.Count() })
+            .ToListAsync(cancellationToken);
+
+        var lookup = grouped.ToDictionary(item => item.Status, item => item.Count);
+
+        var ongoing = OngoingAuctionStatuses.Sum(status => lookup.GetValueOrDefault(status));
+        var ended = EndedAuctionStatuses.Sum(status => lookup.GetValueOrDefault(status));
+        var cancelled = CancelledAuctionStatuses.Sum(status => lookup.GetValueOrDefault(status));
+        var pendingReview = lookup.GetValueOrDefault(AuctionStatuses.PendingReview);
+
+        return (ongoing, ended, cancelled, pendingReview);
+    }
+
+    public async Task<decimal?> GetAuctionSuccessRateAsync(CancellationToken cancellationToken = default)
+    {
+        var denominator = await _dbContext.Auctions.AsNoTracking()
+            .CountAsync(
+                auction => auction.DeletedAt == null
+                           && SuccessRateDenominatorStatuses.Contains(auction.Status),
+                cancellationToken);
+
+        if (denominator == 0)
+        {
+            return null;
+        }
+
+        var numerator = await _dbContext.Auctions.AsNoTracking()
+            .CountAsync(
+                auction => auction.DeletedAt == null
+                           && SuccessRateDenominatorStatuses.Contains(auction.Status)
+                           && auction.OrderItems.Any(item =>
+                               item.DeletedAt == null
+                               && item.Order.DeletedAt == null
+                               && PaidOrderStatuses.Contains(item.Order.Status)),
+                cancellationToken);
+
+        return Math.Round(numerator / (decimal)denominator * 100m, 1);
+    }
+
+    public async Task<IReadOnlyList<DashboardCategoryBreakdownViewModel>> GetCategoryBidBreakdownAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default)
+    {
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+
+        var grouped = await _dbContext.Bids.AsNoTracking()
+            .Where(bid => bid.DeletedAt == null
+                          && bid.PlacedAt >= rangeStart
+                          && bid.PlacedAt < rangeEndExclusive)
+            .GroupBy(bid => new
+            {
+                bid.Auction.Product.CategoryId,
+                bid.Auction.Product.Category.Name
+            })
+            .Select(group => new
+            {
+                group.Key.CategoryId,
+                group.Key.Name,
+                BidCount = group.Count(),
+                BidVolume = group.Sum(bid => bid.Amount)
+            })
+            .OrderByDescending(item => item.BidVolume)
+            .ToListAsync(cancellationToken);
+
+        if (grouped.Count == 0)
+        {
+            return [];
+        }
+
+        var totalVolume = grouped.Sum(item => item.BidVolume);
+        var topCategories = grouped.Take(CategoryTopCount).ToList();
+        var otherCategories = grouped.Skip(CategoryTopCount).ToList();
+
+        var result = topCategories
+            .Select(item => new DashboardCategoryBreakdownViewModel
+            {
+                CategoryId = item.CategoryId,
+                CategoryName = item.Name,
+                BidCount = item.BidCount,
+                BidVolume = item.BidVolume,
+                Percentage = totalVolume == 0
+                    ? 0
+                    : Math.Round(item.BidVolume / totalVolume * 100m, 1)
+            })
+            .ToList();
+
+        if (otherCategories.Count > 0)
+        {
+            var otherVolume = otherCategories.Sum(item => item.BidVolume);
+            result.Add(new DashboardCategoryBreakdownViewModel
+            {
+                CategoryId = null,
+                CategoryName = "Other",
+                BidCount = otherCategories.Sum(item => item.BidCount),
+                BidVolume = otherVolume,
+                Percentage = totalVolume == 0
+                    ? 0
+                    : Math.Round(otherVolume / totalVolume * 100m, 1)
+            });
+        }
+
+        return result;
+    }
+
+    public async Task<byte[]> ExportExcelAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default)
+    {
+        var dashboard = await GetDashboardAsync(filter, cancellationToken);
+
+        using var workbook = new XLWorkbook();
+
+        var usersSheet = workbook.Worksheets.Add("Users");
+        usersSheet.Cell(1, 1).Value = "Metric";
+        usersSheet.Cell(1, 2).Value = "Value";
+        usersSheet.Cell(2, 1).Value = "New Registrations";
+        usersSheet.Cell(2, 2).Value = dashboard.UserSection.NewRegistrationsKpi.DisplayValue;
+        usersSheet.Cell(3, 1).Value = "Active Users";
+        usersSheet.Cell(3, 2).Value = dashboard.UserSection.ActiveUsersKpi.DisplayValue;
+        usersSheet.Cell(4, 1).Value = "Total Users";
+        usersSheet.Cell(4, 2).Value = dashboard.UserSection.TotalUsersKpi.DisplayValue;
+
+        var buyersStartRow = 6;
+        usersSheet.Cell(buyersStartRow, 1).Value = "Top Buyers";
+        usersSheet.Cell(buyersStartRow + 1, 1).Value = "Name";
+        usersSheet.Cell(buyersStartRow + 1, 2).Value = "Bid Count";
+        usersSheet.Cell(buyersStartRow + 1, 3).Value = "Total Bid Amount";
+
+        var buyerRow = buyersStartRow + 2;
+        foreach (var buyer in dashboard.UserSection.TopBuyers)
+        {
+            usersSheet.Cell(buyerRow, 1).Value = buyer.FullName;
+            usersSheet.Cell(buyerRow, 2).Value = buyer.BidCount;
+            usersSheet.Cell(buyerRow, 3).Value = buyer.TotalBidAmount;
+            buyerRow++;
+        }
+
+        var sellersHeaderRow = buyerRow + 1;
+        usersSheet.Cell(sellersHeaderRow, 1).Value = "Top Sellers";
+        usersSheet.Cell(sellersHeaderRow + 1, 1).Value = "Name";
+        usersSheet.Cell(sellersHeaderRow + 1, 2).Value = "Listing Count";
+        usersSheet.Cell(sellersHeaderRow + 1, 3).Value = "Total Sales";
+
+        var sellerRow = sellersHeaderRow + 2;
+        foreach (var seller in dashboard.UserSection.TopSellers)
+        {
+            usersSheet.Cell(sellerRow, 1).Value = seller.FullName;
+            usersSheet.Cell(sellerRow, 2).Value = seller.ListingCount;
+            usersSheet.Cell(sellerRow, 3).Value = seller.TotalSales;
+            sellerRow++;
+        }
+
+        var newUsersHeaderRow = sellerRow + 1;
+        usersSheet.Cell(newUsersHeaderRow, 1).Value = "New Registrations";
+        usersSheet.Cell(newUsersHeaderRow + 1, 1).Value = "Name";
+        usersSheet.Cell(newUsersHeaderRow + 1, 2).Value = "Email";
+        usersSheet.Cell(newUsersHeaderRow + 1, 3).Value = "Registered At";
+        usersSheet.Cell(newUsersHeaderRow + 1, 4).Value = "Status";
+
+        var newUserRow = newUsersHeaderRow + 2;
+        foreach (var user in dashboard.UserSection.NewUsers)
+        {
+            usersSheet.Cell(newUserRow, 1).Value = user.FullName;
+            usersSheet.Cell(newUserRow, 2).Value = user.Email;
+            usersSheet.Cell(newUserRow, 3).Value = user.CreatedAt;
+            usersSheet.Cell(newUserRow, 4).Value = user.Status;
+            newUserRow++;
+        }
+
+        var auctionsSheet = workbook.Worksheets.Add("Auctions");
+        auctionsSheet.Cell(1, 1).Value = "Metric";
+        auctionsSheet.Cell(1, 2).Value = "Value";
+        auctionsSheet.Cell(2, 1).Value = "Ongoing Auctions";
+        auctionsSheet.Cell(2, 2).Value = dashboard.AuctionSection.OngoingKpi.DisplayValue;
+        auctionsSheet.Cell(3, 1).Value = "Ended Auctions";
+        auctionsSheet.Cell(3, 2).Value = dashboard.AuctionSection.EndedKpi.DisplayValue;
+        auctionsSheet.Cell(4, 1).Value = "Cancelled Auctions";
+        auctionsSheet.Cell(4, 2).Value = dashboard.AuctionSection.CancelledKpi.DisplayValue;
+        auctionsSheet.Cell(5, 1).Value = "Success Rate";
+        auctionsSheet.Cell(5, 2).Value = dashboard.AuctionSection.SuccessRateKpi.DisplayValue;
+
+        var categoryHeaderRow = 7;
+        auctionsSheet.Cell(categoryHeaderRow, 1).Value = "Category Breakdown";
+        auctionsSheet.Cell(categoryHeaderRow + 1, 1).Value = "Category";
+        auctionsSheet.Cell(categoryHeaderRow + 1, 2).Value = "Bid Count";
+        auctionsSheet.Cell(categoryHeaderRow + 1, 3).Value = "Bid Volume";
+        auctionsSheet.Cell(categoryHeaderRow + 1, 4).Value = "Percentage";
+
+        var categoryRow = categoryHeaderRow + 2;
+        foreach (var category in dashboard.AuctionSection.CategoryBreakdown)
+        {
+            auctionsSheet.Cell(categoryRow, 1).Value = category.CategoryName;
+            auctionsSheet.Cell(categoryRow, 2).Value = category.BidCount;
+            auctionsSheet.Cell(categoryRow, 3).Value = category.BidVolume;
+            auctionsSheet.Cell(categoryRow, 4).Value = category.Percentage;
+            categoryRow++;
+        }
+
+        var recentHeaderRow = categoryRow + 1;
+        auctionsSheet.Cell(recentHeaderRow, 1).Value = "Recent Auctions";
+        auctionsSheet.Cell(recentHeaderRow + 1, 1).Value = "Product";
+        auctionsSheet.Cell(recentHeaderRow + 1, 2).Value = "Seller";
+        auctionsSheet.Cell(recentHeaderRow + 1, 3).Value = "Category";
+        auctionsSheet.Cell(recentHeaderRow + 1, 4).Value = "Current Bid";
+        auctionsSheet.Cell(recentHeaderRow + 1, 5).Value = "Status";
+        auctionsSheet.Cell(recentHeaderRow + 1, 6).Value = "Ends In";
+
+        var recentRow = recentHeaderRow + 2;
+        foreach (var auction in dashboard.RecentAuctions)
+        {
+            auctionsSheet.Cell(recentRow, 1).Value = auction.ProductName;
+            auctionsSheet.Cell(recentRow, 2).Value = auction.SellerName;
+            auctionsSheet.Cell(recentRow, 3).Value = auction.CategoryName;
+            auctionsSheet.Cell(recentRow, 4).Value = auction.CurrentPrice;
+            auctionsSheet.Cell(recentRow, 5).Value = auction.StatusLabel;
+            auctionsSheet.Cell(recentRow, 6).Value = auction.EndsIn;
+            recentRow++;
+        }
+
+        usersSheet.Columns().AdjustToContents();
+        auctionsSheet.Columns().AdjustToContents();
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        return stream.ToArray();
+    }
+
+    public async Task<byte[]> ExportSummaryCsvAsync(int periodDays = 30, CancellationToken cancellationToken = default)
+    {
+        var filter = NormalizeFilter(
+            DateTime.UtcNow.Date.AddDays(-(periodDays - 1)),
+            DateTime.UtcNow.Date);
+
+        return await ExportExcelAsync(filter, cancellationToken);
+    }
+
+    private async Task<List<DateTime>> GetRegistrationDatesAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken)
+    {
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+
+        return await _dbContext.Users.AsNoTracking()
+            .Where(user => user.DeletedAt == null
+                           && user.Status == UserStatus.Active
+                           && user.CreatedAt >= rangeStart
+                           && user.CreatedAt < rangeEndExclusive)
+            .Select(user => user.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
+    private async Task<List<DashboardNewUserViewModel>> GetNewUsersAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken)
+    {
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+
+        return await _dbContext.Users.AsNoTracking()
+            .Where(user => user.DeletedAt == null
+                           && user.Status == UserStatus.Active
+                           && user.CreatedAt >= rangeStart
+                           && user.CreatedAt < rangeEndExclusive)
+            .OrderByDescending(user => user.CreatedAt)
+            .Select(user => new DashboardNewUserViewModel
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email ?? string.Empty,
+                CreatedAt = user.CreatedAt,
+                Status = user.Status.ToString()
+            })
+            .ToListAsync(cancellationToken);
+    }
+
+    private static List<DashboardNewUserViewModel> ApplyRegistrationChartFilter(
+        IReadOnlyList<DashboardNewUserViewModel> users,
+        DashboardFilterViewModel filter)
+    {
+        if (!filter.RegistrationDateFilter.HasValue)
+        {
+            return users.ToList();
+        }
+
+        var target = filter.RegistrationDateFilter.Value.Date;
+        var granularity = filter.RegistrationGranularity;
+
+        return users
+            .Where(user => MatchesRegistrationFilter(user.CreatedAt, target, granularity))
+            .ToList();
+    }
+
+    private static bool MatchesRegistrationFilter(DateTime createdAt, DateTime target, string granularity)
+    {
+        var date = createdAt.Date;
+
+        return granularity switch
+        {
+            "week" => ISOWeek.GetYear(date) == ISOWeek.GetYear(target)
+                      && ISOWeek.GetWeekOfYear(date) == ISOWeek.GetWeekOfYear(target),
+            "month" => date.Year == target.Year && date.Month == target.Month,
+            _ => date == target
+        };
+    }
+
+    private static List<DashboardRegistrationChartPointViewModel> BuildRegistrationSeries(
+        IReadOnlyList<DateTime> registrationDates,
+        string granularity,
+        DashboardFilterViewModel filter)
+    {
+        if (registrationDates.Count == 0)
+        {
+            return [];
+        }
+
+        var grouped = registrationDates
+            .GroupBy(date => GetRegistrationBucket(date, granularity))
+            .ToDictionary(group => group.Key, group => group.Count());
+
+        var buckets = BuildRegistrationBuckets(filter.DateFrom, filter.DateTo, granularity).ToList();
+        var series = new List<DashboardRegistrationChartPointViewModel>(buckets.Count);
+
+        foreach (var bucket in buckets)
+        {
+            grouped.TryGetValue(bucket.Key, out var count);
+
+            series.Add(new DashboardRegistrationChartPointViewModel
+            {
+                Label = bucket.Label,
+                Value = count,
+                FilterKey = bucket.FilterKey
+            });
+        }
+
+        return series;
+    }
+
+    private static IEnumerable<(string Key, string Label, string FilterKey)> BuildRegistrationBuckets(
+        DateTime dateFrom,
+        DateTime dateTo,
+        string granularity)
+    {
+        if (granularity == "month")
+        {
+            var cursor = new DateTime(dateFrom.Year, dateFrom.Month, 1);
+            var end = new DateTime(dateTo.Year, dateTo.Month, 1);
+
+            while (cursor <= end)
+            {
+                var key = $"{cursor:yyyy-MM}";
+                yield return (key, cursor.ToString("MMM yyyy", CultureInfo.InvariantCulture), cursor.ToString("yyyy-MM-dd"));
+                cursor = cursor.AddMonths(1);
+            }
+
+            yield break;
+        }
+
+        if (granularity == "week")
+        {
+            var cursor = dateFrom.Date;
+            while (cursor <= dateTo.Date)
+            {
+                var key = $"{ISOWeek.GetYear(cursor):0000}-W{ISOWeek.GetWeekOfYear(cursor):00}";
+                var weekStart = ISOWeek.ToDateTime(ISOWeek.GetYear(cursor), ISOWeek.GetWeekOfYear(cursor), DayOfWeek.Monday);
+                yield return (key, $"W{ISOWeek.GetWeekOfYear(cursor):00}", weekStart.ToString("yyyy-MM-dd"));
+                cursor = cursor.AddDays(7);
+            }
+
+            yield break;
+        }
+
+        for (var cursor = dateFrom.Date; cursor <= dateTo.Date; cursor = cursor.AddDays(1))
+        {
+            var key = cursor.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            yield return (key, cursor.ToString("MMM d", CultureInfo.InvariantCulture), key);
+        }
+    }
+
+    private static string GetRegistrationBucket(DateTime createdAt, string granularity)
+    {
+        var date = createdAt.Date;
+
+        return granularity switch
+        {
+            "week" => $"{ISOWeek.GetYear(date):0000}-W{ISOWeek.GetWeekOfYear(date):00}",
+            "month" => date.ToString("yyyy-MM", CultureInfo.InvariantCulture),
+            _ => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+        };
+    }
+
+    private static DashboardFilterViewModel BuildPreviousRange(DashboardFilterViewModel filter)
+    {
+        var periodDays = filter.PeriodDays;
+        var previousEnd = filter.DateFrom.AddDays(-1);
+        var previousStart = previousEnd.AddDays(-(periodDays - 1));
+
+        return new DashboardFilterViewModel
+        {
+            DateFrom = previousStart,
+            DateTo = previousEnd
+        };
+    }
+
+    private async Task<int> CountActiveAuctionsAsync(CancellationToken cancellationToken)
     {
         return await _dbContext.Auctions.AsNoTracking()
             .CountAsync(
@@ -264,37 +867,37 @@ public class AdminDashboardService : IAdminDashboardService
 
     private async Task<List<DashboardChartPointViewModel>> BuildDailyPaymentSeriesAsync(
         DateTime startDate,
-        DateTime utcNow,
+        DateTime endExclusive,
         CancellationToken cancellationToken)
     {
         var grouped = await _dbContext.Payments.AsNoTracking()
             .Where(payment => payment.DeletedAt == null
                               && payment.Status == PaymentStatuses.Success
                               && payment.PaidAt >= startDate
-                              && payment.PaidAt <= utcNow)
+                              && payment.PaidAt < endExclusive)
             .GroupBy(payment => payment.PaidAt!.Value.Date)
             .Select(group => new { Date = group.Key, Total = group.Sum(payment => payment.Amount) })
             .ToListAsync(cancellationToken);
 
-        return BuildDailySeries(startDate, ChartDays, grouped.ToDictionary(item => item.Date, item => item.Total));
+        return BuildDailySeries(startDate, endExclusive, grouped.ToDictionary(item => item.Date, item => item.Total));
     }
 
     private async Task<List<DashboardChartPointViewModel>> BuildDailyBidSeriesAsync(
         DateTime startDate,
-        DateTime utcNow,
+        DateTime endExclusive,
         CancellationToken cancellationToken)
     {
         var grouped = await _dbContext.Bids.AsNoTracking()
             .Where(bid => bid.DeletedAt == null
                           && bid.PlacedAt >= startDate
-                          && bid.PlacedAt <= utcNow)
+                          && bid.PlacedAt < endExclusive)
             .GroupBy(bid => bid.PlacedAt.Date)
             .Select(group => new { Date = group.Key, Total = group.Count() })
             .ToListAsync(cancellationToken);
 
         return BuildDailySeries(
             startDate,
-            ChartDays,
+            endExclusive,
             grouped.ToDictionary(item => item.Date, item => (decimal)item.Total));
     }
 
@@ -302,7 +905,7 @@ public class AdminDashboardService : IAdminDashboardService
         CancellationToken cancellationToken)
     {
         var grouped = await _dbContext.Auctions.AsNoTracking()
-            .Where(auction => auction.DeletedAt == null)
+            .Where(auction => auction.DeletedAt == null && auction.Product.DeletedAt == null)
             .GroupBy(auction => auction.Status)
             .Select(group => new { Status = group.Key, Count = group.Count() })
             .ToListAsync(cancellationToken);
@@ -320,24 +923,38 @@ public class AdminDashboardService : IAdminDashboardService
 
     private static List<DashboardChartPointViewModel> BuildDailySeries(
         DateTime startDate,
-        int dayCount,
+        DateTime endExclusive,
         Dictionary<DateTime, decimal> valuesByDate)
     {
-        var series = new List<DashboardChartPointViewModel>(dayCount);
+        var series = new List<DashboardChartPointViewModel>();
+        var endDate = endExclusive.AddDays(-1).Date;
 
-        for (var offset = 0; offset < dayCount; offset++)
+        for (var cursor = startDate.Date; cursor <= endDate; cursor = cursor.AddDays(1))
         {
-            var date = startDate.AddDays(offset).Date;
-            valuesByDate.TryGetValue(date, out var value);
+            valuesByDate.TryGetValue(cursor, out var value);
 
             series.Add(new DashboardChartPointViewModel
             {
-                Label = date.ToString("MMM d", CultureInfo.InvariantCulture),
+                Label = cursor.ToString("MMM d", CultureInfo.InvariantCulture),
                 Value = value
             });
         }
 
         return series;
+    }
+
+    private static DashboardKpiCardViewModel BuildSnapshotKpi(
+        string label,
+        string displayValue,
+        string? linkUrl = null)
+    {
+        return new DashboardKpiCardViewModel
+        {
+            Label = label,
+            DisplayValue = displayValue,
+            LinkUrl = linkUrl,
+            ChangeDisplay = string.Empty
+        };
     }
 
     private static DashboardKpiCardViewModel BuildKpiCard(
@@ -435,17 +1052,5 @@ public class AdminDashboardService : IAdminDashboardService
         }
 
         return $"{Math.Max(remaining.Minutes, 1)}m";
-    }
-
-    private static string EscapeCsv(string? value)
-    {
-        value ??= string.Empty;
-
-        if (value.Contains('"') || value.Contains(',') || value.Contains('\n'))
-        {
-            return $"\"{value.Replace("\"", "\"\"")}\"";
-        }
-
-        return value;
     }
 }

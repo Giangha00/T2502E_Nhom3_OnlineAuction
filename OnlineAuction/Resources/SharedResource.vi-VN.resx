@@ -972,4 +972,64 @@
   <data name="Admin_BidHistory_Pagination_PageOf" xml:space="preserve"><value>Trang {0} / {1}</value></data>
   <data name="Admin_BidHistory_Pagination_Previous" xml:space="preserve"><value>Trước</value></data>
   <data name="Admin_BidHistory_Pagination_Next" xml:space="preserve"><value>Sau</value></data>
+  <data name="Admin_Dashboard_Title" xml:space="preserve"><value>Bảng điều khiển</value></data>
+  <data name="Admin_Dashboard_Subtitle" xml:space="preserve"><value>Theo dõi hiệu suất nền tảng và thống kê.</value></data>
+  <data name="Admin_Dashboard_Section1_Title" xml:space="preserve"><value>Tổng quan</value></data>
+  <data name="Admin_Dashboard_Section2_Title" xml:space="preserve"><value>Thống kê người dùng</value></data>
+  <data name="Admin_Dashboard_Section2_Description" xml:space="preserve"><value>Xu hướng đăng ký, user active, top buyer/seller.</value></data>
+  <data name="Admin_Dashboard_Section3_Title" xml:space="preserve"><value>Thống kê hàng hóa &amp; đấu giá</value></data>
+  <data name="Admin_Dashboard_Section3_Description" xml:space="preserve"><value>Trạng thái đấu giá, tỷ lệ thành công, bid theo danh mục.</value></data>
+  <data name="Admin_Dashboard_Filter_Title" xml:space="preserve"><value>Bộ lọc thời gian</value></data>
+  <data name="Admin_Dashboard_Filter_Description" xml:space="preserve"><value>Áp dụng khoảng ngày chung cho metric theo thời gian và export.</value></data>
+  <data name="Admin_Dashboard_Filter_From" xml:space="preserve"><value>Từ ngày</value></data>
+  <data name="Admin_Dashboard_Filter_To" xml:space="preserve"><value>Đến ngày</value></data>
+  <data name="Admin_Dashboard_Filter_Apply" xml:space="preserve"><value>Áp dụng</value></data>
+  <data name="Admin_Dashboard_Filter_Export" xml:space="preserve"><value>Xuất Excel</value></data>
+  <data name="Admin_Dashboard_Snapshot_Note" xml:space="preserve"><value>Tại thời điểm hiện tại</value></data>
+  <data name="Admin_Dashboard_FilteredPeriod_Note" xml:space="preserve"><value>Trong khoảng ngày đã chọn</value></data>
+  <data name="Admin_Dashboard_ChangeVsPrevious" xml:space="preserve"><value>so với kỳ trước</value></data>
+  <data name="Admin_Dashboard_NoData" xml:space="preserve"><value>Không có dữ liệu trong khoảng đã chọn</value></data>
+  <data name="Admin_Dashboard_Kpi_NewRegistrations" xml:space="preserve"><value>Đăng ký mới</value></data>
+  <data name="Admin_Dashboard_Kpi_ActiveUsers" xml:space="preserve"><value>User active</value></data>
+  <data name="Admin_Dashboard_Kpi_TotalUsers" xml:space="preserve"><value>Tổng user</value></data>
+  <data name="Admin_Dashboard_Kpi_OngoingAuctions" xml:space="preserve"><value>Đang diễn ra</value></data>
+  <data name="Admin_Dashboard_Kpi_EndedAuctions" xml:space="preserve"><value>Đã kết thúc</value></data>
+  <data name="Admin_Dashboard_Kpi_CancelledAuctions" xml:space="preserve"><value>Bị hủy</value></data>
+  <data name="Admin_Dashboard_Kpi_PendingReview" xml:space="preserve"><value>Chờ duyệt</value></data>
+  <data name="Admin_Dashboard_Kpi_SuccessRate" xml:space="preserve"><value>Tỷ lệ thành công</value></data>
+  <data name="Admin_Dashboard_SuccessRate_Tooltip" xml:space="preserve"><value>Số SP bán được / Tổng SP đăng bán × 100. Chỉ tính order paid hoặc delivered.</value></data>
+  <data name="Admin_Dashboard_SuccessRate_Hint" xml:space="preserve"><value>SP bán được / tổng đăng bán</value></data>
+  <data name="Admin_Dashboard_RegistrationChart_Title" xml:space="preserve"><value>Đăng ký mới</value></data>
+  <data name="Admin_Dashboard_RegistrationChart_Description" xml:space="preserve"><value>Click cột để lọc bảng user mới đăng ký.</value></data>
+  <data name="Admin_Dashboard_Granularity_Day" xml:space="preserve"><value>Ngày</value></data>
+  <data name="Admin_Dashboard_Granularity_Week" xml:space="preserve"><value>Tuần</value></data>
+  <data name="Admin_Dashboard_Granularity_Month" xml:space="preserve"><value>Tháng</value></data>
+  <data name="Admin_Dashboard_TopBuyers_Title" xml:space="preserve"><value>Top 10 Buyers</value></data>
+  <data name="Admin_Dashboard_TopSellers_Title" xml:space="preserve"><value>Top 10 Sellers</value></data>
+  <data name="Admin_Dashboard_NewUsers_Title" xml:space="preserve"><value>User mới đăng ký</value></data>
+  <data name="Admin_Dashboard_NewUsers_Filtered" xml:space="preserve"><value>Đang lọc theo {0}</value></data>
+  <data name="Admin_Dashboard_StatusChart_Title" xml:space="preserve"><value>Đấu giá theo trạng thái</value></data>
+  <data name="Admin_Dashboard_CategoryChart_Title" xml:space="preserve"><value>Danh mục theo tổng tiền bid</value></data>
+  <data name="Admin_Dashboard_CategoryChart_Description" xml:space="preserve"><value>Tổng tiền bid theo category trong khoảng đã chọn.</value></data>
+  <data name="Admin_Dashboard_RevenueChart_Title" xml:space="preserve"><value>Doanh thu</value></data>
+  <data name="Admin_Dashboard_RevenueChart_Description" xml:space="preserve"><value>Thanh toán thành công trong khoảng đã chọn</value></data>
+  <data name="Admin_Dashboard_BidsChart_Title" xml:space="preserve"><value>Lượt bid</value></data>
+  <data name="Admin_Dashboard_BidsChart_Description" xml:space="preserve"><value>Hoạt động bid theo ngày trong khoảng đã chọn</value></data>
+  <data name="Admin_Dashboard_RecentAuctions_Title" xml:space="preserve"><value>Đấu giá gần đây</value></data>
+  <data name="Admin_Dashboard_RecentAuctions_Description" xml:space="preserve"><value>10 tin mới nhất toàn hệ thống.</value></data>
+  <data name="Admin_Dashboard_RecentAuctions_Filtered" xml:space="preserve"><value>Đang lọc</value></data>
+  <data name="Admin_Dashboard_ViewAll" xml:space="preserve"><value>Xem tất cả</value></data>
+  <data name="Admin_Dashboard_Col_Name" xml:space="preserve"><value>Tên</value></data>
+  <data name="Admin_Dashboard_Col_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Admin_Dashboard_Col_RegisteredAt" xml:space="preserve"><value>Ngày đăng ký</value></data>
+  <data name="Admin_Dashboard_Col_Status" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="Admin_Dashboard_Col_BidCount" xml:space="preserve"><value>Số lượt bid</value></data>
+  <data name="Admin_Dashboard_Col_TotalBid" xml:space="preserve"><value>Tổng tiền bid</value></data>
+  <data name="Admin_Dashboard_Col_Listings" xml:space="preserve"><value>Số listing</value></data>
+  <data name="Admin_Dashboard_Col_Sales" xml:space="preserve"><value>Doanh số</value></data>
+  <data name="Admin_Dashboard_Col_Product" xml:space="preserve"><value>Sản phẩm</value></data>
+  <data name="Admin_Dashboard_Col_Seller" xml:space="preserve"><value>Người bán</value></data>
+  <data name="Admin_Dashboard_Col_Category" xml:space="preserve"><value>Danh mục</value></data>
+  <data name="Admin_Dashboard_Col_CurrentBid" xml:space="preserve"><value>Giá hiện tại</value></data>
+  <data name="Admin_Dashboard_Col_EndsIn" xml:space="preserve"><value>Còn lại</value></data>
 </root>
