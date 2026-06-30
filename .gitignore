@@ -58,6 +58,7 @@ yarn-error.log*
 OnlineAuction/wwwroot/css/output.css
 _build_check/
 _build_check26/
+build-check-out*/
 
 # Local run logs (dotnet watch / dev scripts)
 onlineauction-*.log

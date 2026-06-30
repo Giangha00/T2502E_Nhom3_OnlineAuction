@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Configurations;
-using OnlineAuction.Entities;
+using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
@@ -28,8 +28,9 @@ public class BuyNowController : Controller
 
     public async Task<IActionResult> Detail(int id)
     {
-        var product = await _auctionService.GetProductDetailAsync(id);
-        if (product is null || !product.HasBuyNow)
+        var currentUserId = GetCurrentUserId();
+        var product = await _auctionService.GetProductDetailAsync(id, currentUserId);
+        if (product is null || !product.HasBuyNow || !CanViewBuyNowDetail(product))
         {
             return NotFound();
         }
@@ -48,8 +49,8 @@ public class BuyNowController : Controller
             return Unauthorized(new { success = false, message = "Please sign in to continue." });
         }
 
-        var listing = await _auctionService.GetAuctionByIdAsync(auctionId);
-        if (listing is null || !listing.HasBuyNow)
+        var product = await _auctionService.GetProductDetailAsync(auctionId, userId);
+        if (product is null || !product.HasBuyNow || !product.CanPurchaseBuyNow)
         {
             return NotFound(new { success = false, message = "Product not found." });
         }
@@ -71,6 +72,9 @@ public class BuyNowController : Controller
             redirectUrl = Url.Action("Index", "Order", new { added = 1 })
         });
     }
+
+    private static bool CanViewBuyNowDetail(ProductDetailViewModel product) =>
+        product.IsSeller || product.CanPurchaseBuyNow;
 
     private int? GetCurrentUserId()
     {

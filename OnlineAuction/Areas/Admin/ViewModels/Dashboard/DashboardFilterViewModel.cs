@@ -6,6 +6,9 @@ public class DashboardFilterViewModel
 
     public DateTime DateTo { get; set; }
 
+    public string DateRange =>
+        OnlineAuction.Helpers.AdminDateRangeHelper.Format(DateFrom, DateTo);
+
     public string? StatusFilter { get; set; }
 
     public int? CategoryIdFilter { get; set; }

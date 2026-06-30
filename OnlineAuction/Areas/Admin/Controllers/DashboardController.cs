@@ -17,6 +17,7 @@ public class DashboardController : BaseAdminController
 
     [RequirePermission(PermissionCodes.DashboardView)]
     public async Task<IActionResult> Index(
+        string? dateRange,
         DateTime? dateFrom,
         DateTime? dateTo,
         string? status,
@@ -28,6 +29,7 @@ public class DashboardController : BaseAdminController
         var filter = _dashboardService.NormalizeFilter(
             dateFrom,
             dateTo,
+            dateRange,
             status,
             categoryId,
             registrationDate,
@@ -40,11 +42,12 @@ public class DashboardController : BaseAdminController
     [HttpGet]
     [RequirePermission(PermissionCodes.DashboardView)]
     public async Task<IActionResult> Export(
+        string? dateRange,
         DateTime? dateFrom,
         DateTime? dateTo,
         CancellationToken cancellationToken = default)
     {
-        var filter = _dashboardService.NormalizeFilter(dateFrom, dateTo);
+        var filter = _dashboardService.NormalizeFilter(dateFrom, dateTo, dateRange);
         var fileBytes = await _dashboardService.ExportExcelAsync(filter, cancellationToken);
         var fileName = $"dashboard-report-{filter.DateFrom:yyyyMMdd}-{filter.DateTo:yyyyMMdd}.xlsx";
         return File(
