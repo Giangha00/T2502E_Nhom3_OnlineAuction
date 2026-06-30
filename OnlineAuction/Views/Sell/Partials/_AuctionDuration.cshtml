@@ -1,7 +1,9 @@
 @model OnlineAuction.Models.CreateAuctionViewModel
 @{
-    var startValue = Model.StartDate.ToString("yyyy-MM-ddTHH:mm");
-    var endValue = Model.EndDate.ToString("yyyy-MM-ddTHH:mm");
+    var registrationStartValue = Model.RegistrationStartDate.ToString("yyyy-MM-ddTHH:mm");
+    var registrationEndValue = Model.RegistrationEndDate.ToString("yyyy-MM-ddTHH:mm");
+    var liveStartValue = Model.StartDate.ToString("yyyy-MM-ddTHH:mm");
+    var liveEndValue = Model.EndDate.ToString("yyyy-MM-ddTHH:mm");
 }
 
 <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -13,18 +15,42 @@
     <p class="mt-1 pl-10 text-sm text-slate-500">@Localizer["Sell_Section4_Desc"]</p>
   </div>
 
-  <div class="grid gap-5 p-6 sm:grid-cols-2">
+  <div class="space-y-6 p-6">
     <div>
-      <label for="startDate" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_StartDate"] <span class="text-red-500">*</span></label>
-      <input type="datetime-local" id="startDate" name="StartDate" value="@startValue"
-             class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
-      <p class="field-error mt-1 hidden text-xs text-red-600" data-for="startDate"></p>
+      <h3 class="mb-3 text-sm font-semibold text-slate-800">@Localizer["Sell_RegistrationPeriodTitle"]</h3>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="registrationStartDate" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_RegistrationStartDate"] <span class="text-red-500">*</span></label>
+          <input type="datetime-local" id="registrationStartDate" name="RegistrationStartDate" value="@registrationStartValue"
+                 class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
+          <p class="field-error mt-1 hidden text-xs text-red-600" data-for="registrationStartDate"></p>
+        </div>
+        <div>
+          <label for="registrationEndDate" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_RegistrationEndDate"] <span class="text-red-500">*</span></label>
+          <input type="datetime-local" id="registrationEndDate" name="RegistrationEndDate" value="@registrationEndValue"
+                 class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
+          <p class="field-error mt-1 hidden text-xs text-red-600" data-for="registrationEndDate"></p>
+        </div>
+      </div>
     </div>
+
     <div>
-      <label for="endDate" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_EndDate"] <span class="text-red-500">*</span></label>
-      <input type="datetime-local" id="endDate" name="EndDate" value="@endValue"
-             class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
-      <p class="field-error mt-1 hidden text-xs text-red-600" data-for="endDate"></p>
+      <h3 class="mb-3 text-sm font-semibold text-slate-800">@Localizer["Sell_LivePeriodTitle"]</h3>
+      <p class="mb-3 text-xs text-slate-500">@Localizer["Sell_LivePeriodDesc"]</p>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="startDate" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_LiveStartDate"] <span class="text-red-500">*</span></label>
+          <input type="datetime-local" id="startDate" name="StartDate" value="@liveStartValue"
+                 class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
+          <p class="field-error mt-1 hidden text-xs text-red-600" data-for="startDate"></p>
+        </div>
+        <div>
+          <label for="endDate" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_LiveEndDate"] <span class="text-red-500">*</span></label>
+          <input type="datetime-local" id="endDate" name="EndDate" value="@liveEndValue"
+                 class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
+          <p class="field-error mt-1 hidden text-xs text-red-600" data-for="endDate"></p>
+        </div>
+      </div>
     </div>
   </div>
 </div>

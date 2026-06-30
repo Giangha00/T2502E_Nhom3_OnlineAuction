@@ -17,6 +17,12 @@ public static class AuctionCatalogSeeder
 
     private const int SeededAuctionDurationDays = 7;
 
+    private static bool IsExpiredSeededListing(Auction auction, DateTime now) =>
+        auction.EndDate <= now
+        || auction.Status is AuctionStatuses.Ended
+            or AuctionStatuses.AwaitingPayment
+            or AuctionStatuses.Completed;
+
     public static async Task SeedAsync(AuctionHouseDbContext dbContext, bool refreshInDevelopment = false)
     {
         if (refreshInDevelopment)
@@ -41,6 +47,7 @@ public static class AuctionCatalogSeeder
         var now = DateTime.UtcNow;
         var categoryCache = new Dictionary<string, Category>(StringComparer.OrdinalIgnoreCase);
 
+        var seedIndex = 0;
         foreach (var entry in SpreadsheetAuctionCatalog.GetEntries())
         {
             if (existingProductNames.Contains(entry.Name))
@@ -48,11 +55,13 @@ public static class AuctionCatalogSeeder
                 continue;
             }
 
-            await SeedEntryAsync(dbContext, entry, seller.Id, bidder?.Id, categoryCache, now);
+            await SeedEntryAsync(dbContext, entry, seller.Id, bidder?.Id, categoryCache, now, seedIndex);
             existingProductNames.Add(entry.Name);
+            seedIndex++;
         }
 
         await BackfillBuyNowPricesAsync(dbContext);
+        await EnsureFullFlowDemoScheduleAsync(dbContext, DateTime.UtcNow);
 
         if (!refreshInDevelopment)
         {
@@ -80,7 +89,8 @@ public static class AuctionCatalogSeeder
         int sellerId,
         int? bidderId,
         Dictionary<string, Category> categoryCache,
-        DateTime now)
+        DateTime now,
+        int seedIndex)
     {
         var category = await GetOrCreateCategoryAsync(dbContext, entry.CategoryName, categoryCache);
         var bidStep = SpreadsheetAuctionCatalog.ComputeBidStep(entry.StartingPrice);
@@ -110,9 +120,6 @@ public static class AuctionCatalogSeeder
         dbContext.Products.Add(product);
         await dbContext.SaveChangesAsync();
 
-        var startDate = DateTimeUtilities.AsUtc(now.AddSeconds(-30));
-        var endDate = DateTimeUtilities.AsUtc(now.AddDays(SeededAuctionDurationDays));
-
         var auction = new Auction
         {
             ProductId = product.Id,
@@ -120,19 +127,27 @@ public static class AuctionCatalogSeeder
             BidStep = bidStep,
             CurrentPrice = entry.StartingPrice,
             BuyNowPrice = buyNowPrice,
-            Status = AuctionStatuses.Live,
             ListingType = ListingTypes.Auction,
             RequiresRegistration = true,
             AuctionEventName = SpreadsheetAuctionCatalog.TestAuctionEventName,
-            StartDate = startDate,
-            EndDate = endDate,
             CreatedAt = now
         };
+
+        if (SpreadsheetAuctionCatalog.IsFullFlowDemoProduct(entry.Name))
+        {
+            AuctionScheduleHelper.ApplyFullFlowDemoSchedule(auction, now);
+        }
+        else
+        {
+            AuctionScheduleHelper.ApplyTestAuctionSchedule(auction, seedIndex, now);
+        }
 
         dbContext.Auctions.Add(auction);
         await dbContext.SaveChangesAsync();
 
-        if (bidderId is null || entry.ExistingBidCount <= 0)
+        var isLivePhase = seedIndex % 4 is 2 or 3
+            && !SpreadsheetAuctionCatalog.IsFullFlowDemoProduct(entry.Name);
+        if (bidderId is null || entry.ExistingBidCount <= 0 || !isLivePhase)
         {
             return;
         }
@@ -197,9 +212,33 @@ public static class AuctionCatalogSeeder
         }
     }
 
+    private static async Task EnsureFullFlowDemoScheduleAsync(AuctionHouseDbContext dbContext, DateTime now)
+    {
+        var demoProductName = SpreadsheetAuctionCatalog.FullFlowDemoProductName;
+
+        var auction = await dbContext.Auctions
+            .Include(a => a.Product)
+            .FirstOrDefaultAsync(a =>
+                a.DeletedAt == null &&
+                a.AuctionEventName == SpreadsheetAuctionCatalog.TestAuctionEventName &&
+                a.Product.DeletedAt == null &&
+                a.Product.Name != null &&
+                (a.Product.Name == demoProductName || a.Product.Name.StartsWith(demoProductName)));
+
+        if (auction is null)
+        {
+            return;
+        }
+
+        AuctionScheduleHelper.ApplyFullFlowDemoSchedule(auction, now);
+        auction.UpdatedAt = now;
+        await dbContext.SaveChangesAsync();
+    }
+
     private static async Task ReactivateExpiredSeededListingsAsync(AuctionHouseDbContext dbContext, DateTime now)
     {
         var seededListings = await dbContext.Auctions
+            .Include(auction => auction.Product)
             .Where(auction =>
                 auction.AuctionEventName != null &&
                 LegacySeedEventNames.Contains(auction.AuctionEventName))
@@ -214,19 +253,22 @@ public static class AuctionCatalogSeeder
 
         foreach (var auction in seededListings)
         {
-            var shouldReactivate = auction.EndDate <= now
-                || auction.Status is AuctionStatuses.Ended
-                    or AuctionStatuses.AwaitingPayment
-                    or AuctionStatuses.Completed;
+            var shouldReactivate = IsExpiredSeededListing(auction, now);
 
             if (!shouldReactivate)
             {
                 continue;
             }
 
-            auction.Status = AuctionStatuses.Live;
-            auction.StartDate = DateTimeUtilities.AsUtc(now.AddSeconds(-30));
-            auction.EndDate = DateTimeUtilities.AsUtc(now.AddDays(SeededAuctionDurationDays));
+            if (SpreadsheetAuctionCatalog.IsFullFlowDemoProduct(auction.Product?.Name))
+            {
+                AuctionScheduleHelper.ApplyFullFlowDemoSchedule(auction, now);
+            }
+            else
+            {
+                AuctionScheduleHelper.ApplyTestAuctionSchedule(auction, auction.Id, now);
+            }
+
             auction.WinnerId = null;
             auction.UpdatedAt = now;
             changed = true;

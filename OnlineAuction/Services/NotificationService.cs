@@ -320,6 +320,56 @@ public class NotificationService : INotificationService
         }
     }
 
+    public async Task ProcessAuctionStartingSoonNotificationsAsync(CancellationToken cancellationToken = default)
+    {
+        var now = DateTime.UtcNow;
+        var threshold = now.AddMinutes(EndingSoonThresholdMinutes);
+
+        var startingSoonAuctions = await _dbContext.Auctions
+            .AsNoTracking()
+            .Include(a => a.Product)
+            .Where(a =>
+                a.ListingType == ListingTypes.Auction
+                && a.RequiresRegistration
+                && a.DeletedAt == null
+                && a.Status == AuctionStatuses.Scheduled
+                && a.StartDate > now
+                && a.StartDate <= threshold)
+            .ToListAsync(cancellationToken);
+
+        foreach (var auction in startingSoonAuctions)
+        {
+            var registrantIds = await _dbContext.AuctionRegistrations
+                .AsNoTracking()
+                .Where(r => r.AuctionId == auction.Id && r.Status == AuctionRegistrationStatuses.Approved)
+                .Select(r => r.UserId)
+                .Distinct()
+                .ToListAsync(cancellationToken);
+
+            if (registrantIds.Count == 0)
+            {
+                continue;
+            }
+
+            var productName = auction.Product?.Name ?? "an auction";
+            var relatedUrl = $"/Auction/Detail/{auction.Id}";
+            var startLocal = DateTimeUtilities.AsUtc(auction.StartDate).ToLocalTime().ToString("dd/MM/yyyy HH:mm");
+
+            foreach (var userId in registrantIds)
+            {
+                await CreateAndPushAsync(
+                    userId,
+                    "Auction starting soon",
+                    $"{productName} goes live at {startLocal}. Get ready to bid.",
+                    NotificationType.Auction,
+                    relatedUrl,
+                    NotificationReferenceTypes.AuctionStartingSoon,
+                    auction.Id,
+                    cancellationToken: cancellationToken);
+            }
+        }
+    }
+
     private static NotificationItemViewModel MapToViewModel(Notification notification) =>
         new()
         {

@@ -22,10 +22,13 @@ internal static class ProductDetailMapper
     {
         var product = auction.Product;
         var bids = auction.Bids.OrderByDescending(b => b.PlacedAt).ToList();
-        var (days, hours, minutes, seconds) = CalculateCountdown(auction.EndDate);
+        var phaseInfo = AuctionScheduleHelper.ResolveListingPhase(auction);
+        var countdownTarget = phaseInfo.CountdownTarget;
+        var (days, hours, minutes, seconds) = CalculateCountdown(countdownTarget);
         var (auctionStatus, badgeClass) = MapAuctionStatus(auction.Status, auction.EndDate);
         var isSeller = currentUserId.HasValue && product.SellerId == currentUserId.Value;
         var auctionAcceptsBids = CanAcceptBids(auction);
+        var canRegister = AuctionScheduleHelper.IsRegistrationOpen(auction);
         var canBid = ComputeCanBid(
             auction,
             currentUserId,
@@ -64,6 +67,11 @@ internal static class ProductDetailMapper
             QuickBidAmounts = BuildQuickBidAmounts(auction.CurrentPrice, auction.BidStep),
             StartDate = auction.StartDate,
             EndDate = auction.EndDate,
+            RegistrationStartDate = auction.RegistrationStartDate,
+            RegistrationEndDate = auction.RegistrationEndDate,
+            CountdownTargetDate = countdownTarget,
+            ListingPhase = phaseInfo.Phase,
+            PhaseCountdownKind = phaseInfo.CountdownKind,
             CountdownDays = days,
             CountdownHours = hours,
             CountdownMinutes = minutes,
@@ -71,6 +79,7 @@ internal static class ProductDetailMapper
             AuctionStatus = auctionStatus,
             StatusBadgeClass = badgeClass,
             CanPlaceBid = auctionAcceptsBids,
+            CanRegister = canRegister,
             RequiresRegistration = auction.RequiresRegistration,
             IsRegistered = isRegistered,
             RegistrationStatus = userRegistrationStatus,
@@ -123,8 +132,12 @@ internal static class ProductDetailMapper
     {
         var product = auction.Product;
         var bidCount = auction.Bids?.Count ?? 0;
-        var status = MapCardStatus(auction);
+        var phaseInfo = AuctionScheduleHelper.ResolveListingPhase(auction);
+        var status = MapListingStatus(auction, phaseInfo);
         var hasBuyNow = auction.BuyNowPrice.HasValue && auction.BuyNowPrice.Value > 0;
+        var countdownTarget = forBuyNowCatalog || auction.ListingType == ListingTypes.BuyNow
+            ? auction.EndDate
+            : phaseInfo.CountdownTarget;
 
         var item = new AuctionItemViewModel
         {
@@ -137,11 +150,14 @@ internal static class ProductDetailMapper
                 ? auction.BuyNowPrice!.Value
                 : auction.CurrentPrice,
             Status = status,
+            ListingPhase = phaseInfo.Phase,
+            PhaseCountdownKind = phaseInfo.CountdownKind,
             TimeRemaining = forBuyNowCatalog && hasBuyNow
                 ? "In stock"
                 : auction.ListingType == ListingTypes.BuyNow
                     ? "In stock"
-                    : FormatTimeRemaining(auction.EndDate),
+                    : FormatTimeRemaining(countdownTarget),
+            EndDate = countdownTarget,
             ListingType = auction.ListingType,
             BuyNowPrice = auction.BuyNowPrice,
             Grade = product.GradeLabel ?? string.Empty,
@@ -156,6 +172,18 @@ internal static class ProductDetailMapper
         ApplyDealInfo(item);
         return item;
     }
+
+    private static string MapListingStatus(Auction auction, AuctionListingPhaseInfo phaseInfo) =>
+        phaseInfo.Phase switch
+        {
+            AuctionListingPhases.LiveEndingSoon => "Ending Soon",
+            AuctionListingPhases.LiveAuction => "Live",
+            AuctionListingPhases.RegistrationOpen => "Registration Open",
+            AuctionListingPhases.RegistrationClosed => "Awaiting Live",
+            AuctionListingPhases.Upcoming => "Upcoming",
+            AuctionListingPhases.Ended => "Ended",
+            _ => MapCardStatus(auction)
+        };
 
     public static void ApplyDealInfo(AuctionItemViewModel item)
     {
@@ -391,8 +419,7 @@ internal static class ProductDetailMapper
     }
 
     public static bool CanAcceptBids(Auction auction) =>
-        auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon &&
-        DateTimeUtilities.IsInFutureUtc(auction.EndDate);
+        AuctionScheduleHelper.IsLiveOpen(auction);
 
     private static (string Status, string BadgeClass) MapAuctionStatus(string status, DateTime endDate)
     {

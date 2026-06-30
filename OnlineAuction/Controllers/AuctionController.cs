@@ -279,7 +279,8 @@ public async Task<IActionResult> DepositPayPalCancel(string token)
             success = true,
             message = result.Message,
             status = result.Status,
-            registrationCount = result.RegistrationCount
+            registrationCount = result.RegistrationCount,
+            refundedAmount = result.RefundedAmount
         });
     }
 

@@ -50,8 +50,14 @@ public class SellerAuctionFormViewModel
     public decimal BidStep { get; set; }
 
     [Required]
-    public DateTime StartDate { get; set; } = DateTime.UtcNow.AddHours(1);
+    public DateTime RegistrationStartDate { get; set; } = DateTime.UtcNow.AddHours(1);
 
     [Required]
-    public DateTime EndDate { get; set; } = DateTime.UtcNow.AddDays(7);
+    public DateTime RegistrationEndDate { get; set; } = DateTime.UtcNow.AddDays(7);
+
+    [Required]
+    public DateTime StartDate { get; set; } = DateTime.UtcNow.AddDays(7);
+
+    [Required]
+    public DateTime EndDate { get; set; } = DateTime.UtcNow.AddDays(7).AddHours(1);
 }
