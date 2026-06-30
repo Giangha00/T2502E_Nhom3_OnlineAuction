@@ -19,16 +19,22 @@ public class ProductController : BaseAdminController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index(ProductCategoryFilterViewModel filter)
+    public async Task<IActionResult> Index(ProductTemplateFilterViewModel filter)
     {
-        var model = await _productService.GetCategoryTemplatesAsync(filter);
-        return ListOrDefaultView(model, "_ProductCategoryList");
+        var model = await _productService.GetProductTemplatesAsync(filter);
+        return ListOrDefaultView(model, "_ProductTemplateList");
     }
 
     [HttpGet]
-    public async Task<IActionResult> Category(int id, ProductFilterViewModel filter)
+    public IActionResult Category(int id)
     {
-        var model = await _productService.GetCategoryProductsAsync(id, filter);
+        return RedirectToActionPermanent(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Template(int id, ProductFilterViewModel filter)
+    {
+        var model = await _productService.GetTemplateInstancesAsync(id, filter);
 
         if (model is null)
         {
@@ -39,15 +45,99 @@ public class ProductController : BaseAdminController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Create(int? categoryId = null)
+    public async Task<IActionResult> CreateTemplate()
     {
-        var model = await _productService.BuildCreateFormAsync();
+        var model = await _productService.BuildCreateTemplateFormAsync();
+        return View(model);
+    }
 
-        if (categoryId.HasValue)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateTemplate(ProductTemplateFormViewModel model)
+    {
+        if (!ModelState.IsValid)
         {
-            model.CategoryId = categoryId.Value;
-            await RepopulateOptionsAsync(model);
+            await RepopulateTemplateOptionsAsync(model);
+            return View(model);
         }
+
+        var result = await _productService.CreateTemplateAsync(model);
+
+        if (!result.Success)
+        {
+            ModelState.AddModelError(string.Empty, result.Message);
+            await RepopulateTemplateOptionsAsync(model);
+            return View(model);
+        }
+
+        TempData["SuccessMessage"] = result.Message;
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditTemplate(int id)
+    {
+        var model = await _productService.BuildEditTemplateFormAsync(id);
+
+        if (model is null)
+        {
+            return NotFound();
+        }
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditTemplate(ProductTemplateFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await RepopulateTemplateOptionsAsync(model);
+            return View(model);
+        }
+
+        var result = await _productService.UpdateTemplateAsync(model);
+
+        if (!result.Success)
+        {
+            ModelState.AddModelError(string.Empty, result.Message);
+            await RepopulateTemplateOptionsAsync(model);
+            return View(model);
+        }
+
+        TempData["SuccessMessage"] = result.Message;
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteTemplate(int id)
+    {
+        var adminId = await _currentUserContext.GetAdminIdAsync();
+        if (!adminId.HasValue)
+        {
+            return Forbid();
+        }
+
+        var result = await _productService.DeleteTemplateAsync(id, adminId.Value);
+
+        if (result.Success)
+        {
+            TempData["SuccessMessage"] = result.Message;
+        }
+        else
+        {
+            TempData["ErrorMessage"] = result.Message;
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Create(int? templateId = null)
+    {
+        var model = await _productService.BuildCreateFormAsync(templateId);
 
         return View(model);
     }
@@ -72,7 +162,7 @@ public class ProductController : BaseAdminController
         }
 
         TempData["SuccessMessage"] = result.Message;
-        return RedirectToAction(nameof(Index));
+        return RedirectAfterMutation(model.ContextTemplateId ?? model.ProductTemplateId);
     }
 
     [HttpGet]
@@ -126,7 +216,7 @@ public class ProductController : BaseAdminController
         }
 
         TempData["SuccessMessage"] = result.Message;
-        return RedirectToAction(nameof(Index));
+        return RedirectAfterMutation(model.ContextTemplateId ?? model.ProductTemplateId);
     }
 
     [HttpGet]
@@ -144,7 +234,7 @@ public class ProductController : BaseAdminController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id, int? returnCategoryId)
+    public async Task<IActionResult> Delete(int id, int? returnTemplateId, int? returnCategoryId)
     {
         var adminId = await _currentUserContext.GetAdminIdAsync();
         if (!adminId.HasValue)
@@ -163,7 +253,7 @@ public class ProductController : BaseAdminController
             TempData["ErrorMessage"] = result.Message;
         }
 
-        return RedirectAfterMutation(returnCategoryId);
+        return RedirectAfterMutation(returnTemplateId);
     }
 
     [HttpPost]
@@ -187,14 +277,14 @@ public class ProductController : BaseAdminController
             TempData["ErrorMessage"] = result.Message;
         }
 
-        return RedirectAfterMutation(model.ReturnCategoryId);
+        return RedirectAfterMutation(model.ReturnTemplateId);
     }
 
-    private IActionResult RedirectAfterMutation(int? returnCategoryId)
+    private IActionResult RedirectAfterMutation(int? returnTemplateId)
     {
-        if (returnCategoryId.HasValue)
+        if (returnTemplateId.HasValue)
         {
-            return RedirectToAction(nameof(Category), new { id = returnCategoryId.Value });
+            return RedirectToAction(nameof(Template), new { id = returnTemplateId.Value });
         }
 
         return RedirectToAction(nameof(Index));
@@ -216,6 +306,25 @@ public class ProductController : BaseAdminController
         model.CategoryOptions = fresh.CategoryOptions;
         model.SellerOptions = fresh.SellerOptions;
         model.ConditionOptions = fresh.ConditionOptions;
+        model.GradeOptions = fresh.GradeOptions;
+        model.LanguageOptions = fresh.LanguageOptions;
+        model.ProductTemplateOptions = fresh.ProductTemplateOptions;
+    }
+
+    private async Task RepopulateTemplateOptionsAsync(ProductTemplateFormViewModel model)
+    {
+        ProductTemplateFormViewModel fresh;
+        if (model.Id.HasValue)
+        {
+            fresh = await _productService.BuildEditTemplateFormAsync(model.Id.Value)
+                    ?? await _productService.BuildCreateTemplateFormAsync();
+        }
+        else
+        {
+            fresh = await _productService.BuildCreateTemplateFormAsync();
+        }
+
+        model.CategoryOptions = fresh.CategoryOptions;
         model.GradeOptions = fresh.GradeOptions;
         model.LanguageOptions = fresh.LanguageOptions;
     }

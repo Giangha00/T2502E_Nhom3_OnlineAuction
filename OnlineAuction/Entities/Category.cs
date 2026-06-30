@@ -13,4 +13,6 @@ public class Category : AuditableEntity
     public bool IsActive { get; set; } = true;
 
     public ICollection<Product> Products { get; set; } = [];
+
+    public ICollection<ProductTemplate> ProductTemplates { get; set; } = [];
 }
