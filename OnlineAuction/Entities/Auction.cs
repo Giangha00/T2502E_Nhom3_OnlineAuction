@@ -28,6 +28,10 @@ public class Auction : AuditableEntity
 
     public string? RejectReason { get; set; }
 
+    public DateTime RegistrationStartDate { get; set; }
+
+    public DateTime RegistrationEndDate { get; set; }
+
     public DateTime StartDate { get; set; }
 
     public DateTime EndDate { get; set; }

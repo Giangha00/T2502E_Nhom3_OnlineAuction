@@ -27,6 +27,11 @@ public class ProductDetailViewModel
     public List<decimal> QuickBidAmounts { get; set; } = [];
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
+    public DateTime RegistrationStartDate { get; set; }
+    public DateTime RegistrationEndDate { get; set; }
+    public DateTime CountdownTargetDate { get; set; }
+    public string ListingPhase { get; set; } = string.Empty;
+    public string PhaseCountdownKind { get; set; } = string.Empty;
     public int CountdownDays { get; set; }
     public int CountdownHours { get; set; }
     public int CountdownMinutes { get; set; }
@@ -34,6 +39,7 @@ public class ProductDetailViewModel
     public string AuctionStatus { get; set; } = "Active Auction";
     public string StatusBadgeClass { get; set; } = "bg-emerald-600";
     public bool CanPlaceBid { get; set; }
+    public bool CanRegister { get; set; }
     public bool RequiresRegistration { get; set; } = true;
     public bool IsRegistered { get; set; }
     public string? RegistrationStatus { get; set; }

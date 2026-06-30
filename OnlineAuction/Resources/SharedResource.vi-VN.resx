@@ -274,7 +274,14 @@
   <data name="Sell_AuctionType_Featured" xml:space="preserve"><value>Đấu giá nổi bật</value></data>
   <data name="Sell_AuctionType_Featured_Desc" xml:space="preserve"><value>Ưu tiên hiển thị trên trang chủ và danh mục. Phí bổ sung có thể áp dụng.</value></data>
   <data name="Sell_Section4_Title" xml:space="preserve"><value>Thời gian đấu giá</value></data>
-  <data name="Sell_Section4_Desc" xml:space="preserve"><value>Thời điểm bắt đầu và kết thúc phiên đấu giá</value></data>
+  <data name="Sell_Section4_Desc" xml:space="preserve"><value>Thiết lập thời gian đăng ký và phiên live đấu giá</value></data>
+  <data name="Sell_RegistrationPeriodTitle" xml:space="preserve"><value>Thời gian đăng ký đấu giá</value></data>
+  <data name="Sell_RegistrationStartDate" xml:space="preserve"><value>Bắt đầu đăng ký</value></data>
+  <data name="Sell_RegistrationEndDate" xml:space="preserve"><value>Kết thúc đăng ký</value></data>
+  <data name="Sell_LivePeriodTitle" xml:space="preserve"><value>Thời gian live đấu giá</value></data>
+  <data name="Sell_LivePeriodDesc" xml:space="preserve"><value>Phiên live mặc định kéo dài 1 giờ</value></data>
+  <data name="Sell_LiveStartDate" xml:space="preserve"><value>Bắt đầu live</value></data>
+  <data name="Sell_LiveEndDate" xml:space="preserve"><value>Kết thúc live</value></data>
   <data name="Sell_StartDate" xml:space="preserve"><value>Ngày bắt đầu</value></data>
   <data name="Sell_EndDate" xml:space="preserve"><value>Ngày kết thúc</value></data>
   <data name="Sell_Section5_Title" xml:space="preserve"><value>Tài liệu sản phẩm</value></data>
@@ -315,6 +322,14 @@
   <data name="Sell_Error_StartDatePast" xml:space="preserve"><value>Ngày bắt đầu không được ở quá khứ</value></data>
   <data name="Sell_Error_EndDateRequired" xml:space="preserve"><value>Vui lòng chọn ngày kết thúc</value></data>
   <data name="Sell_Error_EndDateAfterStart" xml:space="preserve"><value>Ngày kết thúc phải sau ngày bắt đầu</value></data>
+  <data name="Sell_Error_RegistrationStartRequired" xml:space="preserve"><value>Vui lòng chọn thời gian bắt đầu đăng ký</value></data>
+  <data name="Sell_Error_RegistrationStartPast" xml:space="preserve"><value>Thời gian bắt đầu đăng ký không được ở quá khứ</value></data>
+  <data name="Sell_Error_RegistrationEndRequired" xml:space="preserve"><value>Vui lòng chọn thời gian kết thúc đăng ký</value></data>
+  <data name="Sell_Error_RegistrationEndAfterStart" xml:space="preserve"><value>Thời gian kết thúc đăng ký phải sau thời gian bắt đầu</value></data>
+  <data name="Sell_Error_LiveStartRequired" xml:space="preserve"><value>Vui lòng chọn thời gian bắt đầu live</value></data>
+  <data name="Sell_Error_LiveStartAfterRegistration" xml:space="preserve"><value>Thời gian live phải bắt đầu sau khi kết thúc đăng ký</value></data>
+  <data name="Sell_Error_LiveEndRequired" xml:space="preserve"><value>Vui lòng chọn thời gian kết thúc live</value></data>
+  <data name="Sell_Error_LiveEndAfterStart" xml:space="preserve"><value>Thời gian kết thúc live phải sau thời gian bắt đầu live</value></data>
   <data name="Sell_Error_ImageInvalidFormat" xml:space="preserve"><value>{0}: định dạng không hợp lệ (chỉ JPG, PNG, WEBP)</value></data>
   <data name="Sell_Error_ImageSizeLimit" xml:space="preserve"><value>{0}: vượt quá giới hạn 5MB</value></data>
   <data name="Sell_Error_DocInvalidFormat" xml:space="preserve"><value>{0}: định dạng không hợp lệ (chỉ PDF, JPG, PNG)</value></data>
@@ -431,6 +446,14 @@
   <data name="Layout_Footer_PolicyTerms" xml:space="preserve"><value>Chính sách &amp; Điều khoản</value></data>
   <data name="Layout_Copyright" xml:space="preserve"><value>© {0} RareCard. Bảo lưu mọi quyền.</value></data>
   <data name="Auction_PageTitle" xml:space="preserve"><value>Đấu giá trực tiếp</value></data>
+  <data name="Auction_Phase_registration_open" xml:space="preserve"><value>Đang mở đăng ký</value></data>
+  <data name="Auction_Phase_registration_closed" xml:space="preserve"><value>Chờ live</value></data>
+  <data name="Auction_Phase_live_auction" xml:space="preserve"><value>Đang live</value></data>
+  <data name="Auction_Phase_live_ending_soon" xml:space="preserve"><value>Sắp kết thúc</value></data>
+  <data name="Auction_Countdown_RegistrationStart" xml:space="preserve"><value>Mở đăng ký sau</value></data>
+  <data name="Auction_Countdown_RegistrationEnd" xml:space="preserve"><value>Đóng đăng ký sau</value></data>
+  <data name="Auction_Countdown_LiveStart" xml:space="preserve"><value>Bắt đầu live sau</value></data>
+  <data name="Auction_Countdown_LiveEnd" xml:space="preserve"><value>Kết thúc live sau</value></data>
   <data name="Auction_Subtitle" xml:space="preserve"><value>Khám phá vật phẩm sưu tầm đã xác thực, chất lượng cao dành cho nhà sưu tầm khó tính.</value></data>
   <data name="Auction_LiveNow" xml:space="preserve"><value>Đang diễn ra</value></data>
   <data name="Auction_ActiveBids" xml:space="preserve"><value>Đấu giá đang tham gia ({0})</value></data>
@@ -583,6 +606,9 @@
   <data name="Product_RegisteredCount" xml:space="preserve"><value>{0} người đã đăng ký</value></data>
   <data name="Product_YouAreTheSeller" xml:space="preserve"><value>Bạn là người bán sản phẩm này.</value></data>
   <data name="Product_CancelRegistration" xml:space="preserve"><value>Hủy đăng ký</value></data>
+  <data name="Product_CancelRegistrationHint" xml:space="preserve"><value>Bạn có thể hủy đăng ký trước khi phiên live bắt đầu.</value></data>
+  <data name="Product_RegistrationClosesAt" xml:space="preserve"><value>Đóng đăng ký: {0}</value></data>
+  <data name="Product_LiveStartsAt" xml:space="preserve"><value>Bắt đầu live: {0}</value></data>
   <data name="Product_CountdownPreview" xml:space="preserve"><value>Xem trước tĩnh — đếm ngược chưa hoạt động</value></data>
   <data name="Product_AuctionInfo" xml:space="preserve"><value>Thông tin đấu giá</value></data>
   <data name="Product_StartingPrice" xml:space="preserve"><value>Giá khởi điểm</value></data>
@@ -590,6 +616,10 @@
   <data name="Product_MinBidStep" xml:space="preserve"><value>Bước giá tối thiểu</value></data>
   <data name="Product_Condition" xml:space="preserve"><value>Tình trạng</value></data>
   <data name="Product_AuctionTime" xml:space="preserve"><value>Thời gian đấu giá</value></data>
+  <data name="Product_RegistrationTime" xml:space="preserve"><value>Thời gian đăng ký</value></data>
+  <data name="Product_LiveAuctionTime" xml:space="preserve"><value>Thời gian live đấu giá</value></data>
+  <data name="Product_RegistrationNotOpen" xml:space="preserve"><value>Thời gian đăng ký chưa bắt đầu.</value></data>
+  <data name="Product_LiveNotStarted" xml:space="preserve"><value>Phiên live chưa bắt đầu. Vui lòng quay lại khi đến giờ đấu giá.</value></data>
   <data name="Product_StartLabel" xml:space="preserve"><value>Bắt đầu:</value></data>
   <data name="Product_EndLabel" xml:space="preserve"><value>Kết thúc:</value></data>
   <data name="Product_PlaceBidTitle" xml:space="preserve"><value>Đặt giá đấu</value></data>
@@ -833,7 +863,11 @@
   <data name="Js_ProductDetail_RegistrationSuccess" xml:space="preserve"><value>Đăng ký thành công!</value></data>
   <data name="Js_ProductDetail_RegistrationFailed" xml:space="preserve"><value>Không thể đăng ký. Vui lòng thử lại.</value></data>
   <data name="Js_ProductDetail_RegistrationCancelled" xml:space="preserve"><value>Đã hủy đăng ký.</value></data>
+  <data name="Js_ProductDetail_RegistrationCancelledWithRefund" xml:space="preserve"><value>Đã hủy đăng ký. Tiền cọc {0} đã được hoàn lại.</value></data>
   <data name="Js_ProductDetail_CancelRegistrationFailed" xml:space="preserve"><value>Không thể hủy đăng ký.</value></data>
+  <data name="Js_ProductDetail_CountdownRegistrationEnd" xml:space="preserve"><value>Đóng đăng ký sau {0} ngày {1} giờ {2} phút {3} giây</value></data>
+  <data name="Js_ProductDetail_CountdownLiveStart" xml:space="preserve"><value>Live bắt đầu sau {0} ngày {1} giờ {2} phút {3} giây</value></data>
+  <data name="Js_ProductDetail_CountdownLiveEnd" xml:space="preserve"><value>Còn {0} ngày {1} giờ {2} phút {3} giây</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>Đang thêm…</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>Đã thêm vào giỏ.</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>Không thể thêm vào giỏ. Vui lòng thử lại.</value></data>

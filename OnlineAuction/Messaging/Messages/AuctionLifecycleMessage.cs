@@ -7,7 +7,8 @@ public enum AuctionLifecycleAction
     ProcessEndingSoonNotifications = 3,
     ActivateScheduledAuctions = 4,
     AuctionEnded = 5,
-    AuctionEndingSoon = 6
+    AuctionEndingSoon = 6,
+    ProcessStartingSoonNotifications = 7
 }
 
 public sealed class AuctionLifecycleMessage

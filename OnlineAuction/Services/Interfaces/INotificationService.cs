@@ -38,4 +38,6 @@ public interface INotificationService
         CancellationToken cancellationToken = default);
 
     Task ProcessAuctionEndingSoonNotificationsAsync(CancellationToken cancellationToken = default);
+
+    Task ProcessAuctionStartingSoonNotificationsAsync(CancellationToken cancellationToken = default);
 }

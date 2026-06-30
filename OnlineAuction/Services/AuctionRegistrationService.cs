@@ -18,13 +18,19 @@ public class AuctionRegistrationService : IAuctionRegistrationService
     ];
 
     private readonly AuctionHouseDbContext _dbContext;
+    private readonly IRegistrationDepositRefundService _depositRefundService;
+    private readonly INotificationService _notificationService;
     private readonly ILogger<AuctionRegistrationService> _logger;
 
     public AuctionRegistrationService(
         AuctionHouseDbContext dbContext,
+        IRegistrationDepositRefundService depositRefundService,
+        INotificationService notificationService,
         ILogger<AuctionRegistrationService> logger)
     {
         _dbContext = dbContext;
+        _depositRefundService = depositRefundService;
+        _notificationService = notificationService;
         _logger = logger;
     }
 
@@ -132,6 +138,7 @@ public class AuctionRegistrationService : IAuctionRegistrationService
         }
 
         var registration = await _dbContext.AuctionRegistrations
+            .Include(r => r.Deposits)
             .FirstOrDefaultAsync(r => r.AuctionId == auctionId && r.UserId == userId);
 
         if (registration is null ||
@@ -148,16 +155,80 @@ public class AuctionRegistrationService : IAuctionRegistrationService
             return Fail("You cannot cancel registration after placing a bid.");
         }
 
+        var now = DateTime.UtcNow;
+        decimal? refundedAmount = null;
+
+        var paidDeposit = registration.Deposits
+            .Where(d => d.Status == AuctionRegistrationDepositStatuses.Paid)
+            .OrderByDescending(d => d.PaidAt)
+            .FirstOrDefault();
+
+        if (paidDeposit is not null)
+        {
+            var refundResult = await _depositRefundService.RefundDepositAsync(
+                paidDeposit.Id,
+                pushNotification: false);
+            if (!refundResult.Success)
+            {
+                _logger.LogWarning(
+                    "Cancel registration refund failed. AuctionId={AuctionId}, UserId={UserId}, DepositId={DepositId}, Message={Message}",
+                    auctionId,
+                    userId,
+                    paidDeposit.Id,
+                    refundResult.Message);
+
+                return Fail(refundResult.Message, refundResult.StatusCode);
+            }
+
+            refundedAmount = refundResult.DepositAmount;
+        }
+
+        foreach (var pendingDeposit in registration.Deposits
+                     .Where(d => d.Status == AuctionRegistrationDepositStatuses.Pending))
+        {
+            pendingDeposit.Status = AuctionRegistrationDepositStatuses.Cancelled;
+            pendingDeposit.UpdatedAt = now;
+        }
+
         registration.Status = AuctionRegistrationStatuses.Cancelled;
-        registration.UpdatedAt = DateTime.UtcNow;
+        registration.UpdatedAt = now;
         await _dbContext.SaveChangesAsync();
 
         var registrationCount = await CountApprovedRegistrationsAsync(auctionId);
 
+        var message = refundedAmount.HasValue
+            ? $"Registration cancelled. Your deposit of ${refundedAmount.Value:N0} has been refunded."
+            : "Registration cancelled.";
+
+        _logger.LogInformation(
+            "User {UserId} cancelled registration for auction {AuctionId}. RefundedAmount={RefundedAmount}",
+            userId,
+            auctionId,
+            refundedAmount);
+
+        var auction = await _dbContext.Auctions
+            .AsNoTracking()
+            .Include(a => a.Product)
+            .FirstOrDefaultAsync(a => a.Id == auctionId);
+
+        var productName = auction?.Product?.Name ?? "the auction";
+        var notificationMessage = refundedAmount.HasValue
+            ? $"Your registration for {productName} was cancelled. Deposit of ${refundedAmount.Value:N0} has been refunded."
+            : $"Your registration for {productName} was cancelled.";
+
+        await _notificationService.CreateAndPushAsync(
+            userId,
+            "Registration cancelled",
+            notificationMessage,
+            NotificationType.Auction,
+            $"/Auction/Detail/{auctionId}",
+            cancellationToken: default);
+
         return AuctionRegistrationResult.Ok(
-            "Registration cancelled.",
+            message,
             AuctionRegistrationStatuses.Cancelled,
-            registrationCount);
+            registrationCount,
+            refundedAmount);
     }
 
     public async Task<string?> GetBidBlockMessageAsync(int auctionId, int userId, bool requiresRegistration)
@@ -200,29 +271,41 @@ public class AuctionRegistrationService : IAuctionRegistrationService
 
     private static string? ValidateRegistrationWindow(Auction auction)
     {
-        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.EndingSoon))
+        if (!auction.RequiresRegistration)
+        {
+            return "This auction does not require registration. You can place a bid directly.";
+        }
+
+        if (auction.Status is AuctionStatuses.PendingReview or AuctionStatuses.Rejected or AuctionStatuses.Cancelled)
         {
             return auction.Status switch
             {
                 AuctionStatuses.PendingReview => "This auction is pending review.",
                 AuctionStatuses.Rejected => "This auction listing was rejected.",
-                AuctionStatuses.Scheduled => "This auction has not started yet.",
-                AuctionStatuses.Ended or AuctionStatuses.AwaitingPayment => "This auction has ended.",
                 AuctionStatuses.Cancelled => "This auction has been cancelled.",
-                AuctionStatuses.Completed => "This auction is completed.",
                 _ => "This auction is not open for registration."
             };
         }
 
         var now = DateTime.UtcNow;
-        if (now < DateTimeUtilities.AsUtc(auction.StartDate))
+        var registrationStart = DateTimeUtilities.AsUtc(auction.RegistrationStartDate);
+        var registrationEnd = DateTimeUtilities.AsUtc(auction.RegistrationEndDate);
+
+        if (now < registrationStart)
         {
-            return "This auction has not started yet.";
+            return "Registration for this auction has not opened yet.";
         }
 
-        if (!DateTimeUtilities.IsInFutureUtc(auction.EndDate))
+        if (now >= registrationEnd)
         {
-            return "This auction has ended.";
+            return auction.Status is AuctionStatuses.Ended or AuctionStatuses.AwaitingPayment or AuctionStatuses.Completed
+                ? "This auction has ended."
+                : "Registration for this auction is closed.";
+        }
+
+        if (!AuctionScheduleHelper.IsRegistrationOpen(auction, now))
+        {
+            return "This auction is not open for registration.";
         }
 
         return null;

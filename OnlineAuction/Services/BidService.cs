@@ -197,12 +197,18 @@ public class BidService : IBidService
             {
                 AuctionStatuses.PendingReview => "This auction is pending review and not yet open for bidding.",
                 AuctionStatuses.Rejected => "This auction listing was rejected.",
-                AuctionStatuses.Scheduled => "This auction has not started yet.",
+                AuctionStatuses.Scheduled => "The live auction has not started yet.",
                 AuctionStatuses.Ended or AuctionStatuses.AwaitingPayment => "This auction has ended.",
                 AuctionStatuses.Cancelled => "This auction has been cancelled.",
                 AuctionStatuses.Completed => "This auction is completed.",
                 _ => "This auction is not accepting bids."
             };
+        }
+
+        var now = DateTime.UtcNow;
+        if (now < DateTimeUtilities.AsUtc(auction.StartDate))
+        {
+            return "The live auction has not started yet.";
         }
 
         if (!DateTimeUtilities.IsInFutureUtc(auction.EndDate))

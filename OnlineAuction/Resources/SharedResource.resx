@@ -274,7 +274,14 @@
   <data name="Sell_AuctionType_Featured" xml:space="preserve"><value>Featured Auction</value></data>
   <data name="Sell_AuctionType_Featured_Desc" xml:space="preserve"><value>High-priority placement on homepage and category pages. Additional fee applies.</value></data>
   <data name="Sell_Section4_Title" xml:space="preserve"><value>Auction Duration</value></data>
-  <data name="Sell_Section4_Desc" xml:space="preserve"><value>When your auction starts and ends</value></data>
+  <data name="Sell_Section4_Desc" xml:space="preserve"><value>Set registration and live auction schedules</value></data>
+  <data name="Sell_RegistrationPeriodTitle" xml:space="preserve"><value>Registration period</value></data>
+  <data name="Sell_RegistrationStartDate" xml:space="preserve"><value>Registration start</value></data>
+  <data name="Sell_RegistrationEndDate" xml:space="preserve"><value>Registration end</value></data>
+  <data name="Sell_LivePeriodTitle" xml:space="preserve"><value>Live auction period</value></data>
+  <data name="Sell_LivePeriodDesc" xml:space="preserve"><value>Live sessions default to 1 hour</value></data>
+  <data name="Sell_LiveStartDate" xml:space="preserve"><value>Live start</value></data>
+  <data name="Sell_LiveEndDate" xml:space="preserve"><value>Live end</value></data>
   <data name="Sell_StartDate" xml:space="preserve"><value>Start Date</value></data>
   <data name="Sell_EndDate" xml:space="preserve"><value>End Date</value></data>
   <data name="Sell_Section5_Title" xml:space="preserve"><value>Product Documents</value></data>
@@ -315,6 +322,14 @@
   <data name="Sell_Error_StartDatePast" xml:space="preserve"><value>Start date cannot be in the past</value></data>
   <data name="Sell_Error_EndDateRequired" xml:space="preserve"><value>End date is required</value></data>
   <data name="Sell_Error_EndDateAfterStart" xml:space="preserve"><value>End date must be greater than start date</value></data>
+  <data name="Sell_Error_RegistrationStartRequired" xml:space="preserve"><value>Registration start is required</value></data>
+  <data name="Sell_Error_RegistrationStartPast" xml:space="preserve"><value>Registration start cannot be in the past</value></data>
+  <data name="Sell_Error_RegistrationEndRequired" xml:space="preserve"><value>Registration end is required</value></data>
+  <data name="Sell_Error_RegistrationEndAfterStart" xml:space="preserve"><value>Registration end must be after registration start</value></data>
+  <data name="Sell_Error_LiveStartRequired" xml:space="preserve"><value>Live start is required</value></data>
+  <data name="Sell_Error_LiveStartAfterRegistration" xml:space="preserve"><value>Live start must be after registration ends</value></data>
+  <data name="Sell_Error_LiveEndRequired" xml:space="preserve"><value>Live end is required</value></data>
+  <data name="Sell_Error_LiveEndAfterStart" xml:space="preserve"><value>Live end must be after live start</value></data>
   <data name="Sell_Error_ImageInvalidFormat" xml:space="preserve"><value>{0}: invalid format (JPG, PNG, WEBP only)</value></data>
   <data name="Sell_Error_ImageSizeLimit" xml:space="preserve"><value>{0}: exceeds 5MB limit</value></data>
   <data name="Sell_Error_DocInvalidFormat" xml:space="preserve"><value>{0}: invalid format (PDF, JPG, PNG only)</value></data>
@@ -431,6 +446,14 @@
   <data name="Layout_Footer_PolicyTerms" xml:space="preserve"><value>Policy &amp; Term of Use</value></data>
   <data name="Layout_Copyright" xml:space="preserve"><value>© {0} RareCard. All rights reserved.</value></data>
   <data name="Auction_PageTitle" xml:space="preserve"><value>Live Auctions</value></data>
+  <data name="Auction_Phase_registration_open" xml:space="preserve"><value>Registration Open</value></data>
+  <data name="Auction_Phase_registration_closed" xml:space="preserve"><value>Awaiting Live</value></data>
+  <data name="Auction_Phase_live_auction" xml:space="preserve"><value>Live Now</value></data>
+  <data name="Auction_Phase_live_ending_soon" xml:space="preserve"><value>Ending Soon</value></data>
+  <data name="Auction_Countdown_RegistrationStart" xml:space="preserve"><value>Registration opens in</value></data>
+  <data name="Auction_Countdown_RegistrationEnd" xml:space="preserve"><value>Registration closes in</value></data>
+  <data name="Auction_Countdown_LiveStart" xml:space="preserve"><value>Live starts in</value></data>
+  <data name="Auction_Countdown_LiveEnd" xml:space="preserve"><value>Live ends in</value></data>
   <data name="Auction_Subtitle" xml:space="preserve"><value>Discover authenticated, high-grade collectibles curated for the world's most discerning collectors.</value></data>
   <data name="Auction_LiveNow" xml:space="preserve"><value>Live now</value></data>
   <data name="Auction_ActiveBids" xml:space="preserve"><value>Active Bids ({0})</value></data>
@@ -583,6 +606,9 @@
   <data name="Product_RegisteredCount" xml:space="preserve"><value>{0} registered</value></data>
   <data name="Product_YouAreTheSeller" xml:space="preserve"><value>You are the seller of this listing.</value></data>
   <data name="Product_CancelRegistration" xml:space="preserve"><value>Cancel registration</value></data>
+  <data name="Product_CancelRegistrationHint" xml:space="preserve"><value>You can cancel your registration before the live session starts.</value></data>
+  <data name="Product_RegistrationClosesAt" xml:space="preserve"><value>Registration closes: {0}</value></data>
+  <data name="Product_LiveStartsAt" xml:space="preserve"><value>Live starts: {0}</value></data>
   <data name="Product_CountdownPreview" xml:space="preserve"><value>Static preview — countdown is not live</value></data>
   <data name="Product_AuctionInfo" xml:space="preserve"><value>Auction Information</value></data>
   <data name="Product_StartingPrice" xml:space="preserve"><value>Starting Price</value></data>
@@ -590,6 +616,10 @@
   <data name="Product_MinBidStep" xml:space="preserve"><value>Minimum Bid Step</value></data>
   <data name="Product_Condition" xml:space="preserve"><value>Condition</value></data>
   <data name="Product_AuctionTime" xml:space="preserve"><value>Auction Time</value></data>
+  <data name="Product_RegistrationTime" xml:space="preserve"><value>Registration Time</value></data>
+  <data name="Product_LiveAuctionTime" xml:space="preserve"><value>Live Auction Time</value></data>
+  <data name="Product_RegistrationNotOpen" xml:space="preserve"><value>Registration has not opened yet.</value></data>
+  <data name="Product_LiveNotStarted" xml:space="preserve"><value>The live auction has not started yet. Please check back when bidding opens.</value></data>
   <data name="Product_StartLabel" xml:space="preserve"><value>Start:</value></data>
   <data name="Product_EndLabel" xml:space="preserve"><value>End:</value></data>
   <data name="Product_PlaceBidTitle" xml:space="preserve"><value>Place Your Bid</value></data>
@@ -833,7 +863,11 @@
   <data name="Js_ProductDetail_RegistrationSuccess" xml:space="preserve"><value>Registration successful!</value></data>
   <data name="Js_ProductDetail_RegistrationFailed" xml:space="preserve"><value>Unable to register. Please try again.</value></data>
   <data name="Js_ProductDetail_RegistrationCancelled" xml:space="preserve"><value>Registration cancelled.</value></data>
+  <data name="Js_ProductDetail_RegistrationCancelledWithRefund" xml:space="preserve"><value>Registration cancelled. Your deposit of {0} has been refunded.</value></data>
   <data name="Js_ProductDetail_CancelRegistrationFailed" xml:space="preserve"><value>Unable to cancel registration.</value></data>
+  <data name="Js_ProductDetail_CountdownRegistrationEnd" xml:space="preserve"><value>Registration closes in {0}d {1}h {2}m {3}s</value></data>
+  <data name="Js_ProductDetail_CountdownLiveStart" xml:space="preserve"><value>Live starts in {0}d {1}h {2}m {3}s</value></data>
+  <data name="Js_ProductDetail_CountdownLiveEnd" xml:space="preserve"><value>{0}d {1}h {2}m {3}s remaining</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>Adding…</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>Added to cart.</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>Unable to add to cart. Please try again.</value></data>
