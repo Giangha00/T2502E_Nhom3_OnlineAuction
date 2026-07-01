@@ -280,7 +280,7 @@
   <data name="Sell_DocType_Invoice" xml:space="preserve"><value>請求書</value></data>
   <data name="Sell_DocType_Verification" xml:space="preserve"><value>確認書</value></data>
   <data name="Sell_UploadDocuments" xml:space="preserve"><value>書類をアップロード</value></data>
-  <data name="Sell_UploadDocuments_Hint" xml:space="preserve"><value>PDF, JPG, PNG — 各ファイル最大10MB</value></data>
+  <data name="Sell_UploadDocuments_Hint" xml:space="preserve"><value>PDFのみ — 1ファイル最大5MB、最大5ファイル</value></data>
   <data name="Sell_ReadyToPublish_Highlight" xml:space="preserve"><value>公開の準備はできましたか？</value></data>
   <data name="Sell_ReadyToPublish" xml:space="preserve"><value>プレビューを確認してからオークションを作成してください。</value></data>
   <data name="Sell_SaveDraft" xml:space="preserve"><value>下書き保存</value></data>
@@ -365,6 +365,7 @@
   <data name="Auth_Continue" xml:space="preserve"><value>続ける</value></data>
   <data name="Auth_FullName" xml:space="preserve"><value>氏名</value></data>
   <data name="Auth_Phone" xml:space="preserve"><value>電話番号</value></data>
+  <data name="Auth_Phone_InvalidLength" xml:space="preserve"><value>電話番号は11桁で入力してください。</value></data>
   <data name="Auth_ConfirmPassword" xml:space="preserve"><value>パスワード確認</value></data>
   <data name="Auth_CreateAccount" xml:space="preserve"><value>アカウント作成</value></data>
   <data name="Auth_Legal" xml:space="preserve"><value>続行することで、RareCardの利用規約とプライバシーポリシーに同意したものとみなされます。</value></data>
@@ -542,6 +543,13 @@
   <data name="Product_Shipping_International" xml:space="preserve"><value>国際優先配送対応</value></data>
   <data name="Product_Documents_Title" xml:space="preserve"><value>商品書類</value></data>
   <data name="Product_Documents_Desc" xml:space="preserve"><value>証明書、保証書、検証ファイル</value></data>
+  <data name="Product_Certificates_Tab" xml:space="preserve"><value>証明書と書類</value></data>
+  <data name="Product_Documents_Empty" xml:space="preserve"><value>証明書はありません</value></data>
+  <data name="Product_Documents_EmptyHint" xml:space="preserve"><value>証明書の確認が必要な場合はサポートにお問い合わせください。</value></data>
+  <data name="Product_DownloadCertificate" xml:space="preserve"><value>証明書をダウンロード</value></data>
+  <data name="Product_CertificateNumber" xml:space="preserve"><value>証明書番号</value></data>
+  <data name="Admin_Documents_Preview" xml:space="preserve"><value>プレビュー</value></data>
+  <data name="Admin_Documents_Section" xml:space="preserve"><value>証明書と書類</value></data>
   <data name="Common_View" xml:space="preserve"><value>表示</value></data>
   <data name="Common_Download" xml:space="preserve"><value>ダウンロード</value></data>
   <data name="Product_Seller" xml:space="preserve"><value>出品者</value></data>

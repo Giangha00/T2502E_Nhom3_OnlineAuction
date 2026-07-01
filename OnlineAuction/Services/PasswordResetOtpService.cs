@@ -19,7 +19,7 @@ public sealed class PasswordResetOtpService : IPasswordResetOtpService
 
     private readonly AuctionHouseDbContext _dbContext;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IEmailSender _emailSender;
+    private readonly IEmailQueueService _emailQueueService;
     private readonly IMemoryCache _cache;
     private readonly PasswordResetOtpSettings _settings;
     private readonly IdentityOptions _identityOptions;
@@ -29,7 +29,7 @@ public sealed class PasswordResetOtpService : IPasswordResetOtpService
     public PasswordResetOtpService(
         AuctionHouseDbContext dbContext,
         UserManager<ApplicationUser> userManager,
-        IEmailSender emailSender,
+        IEmailQueueService emailQueueService,
         IMemoryCache cache,
         IOptions<PasswordResetOtpSettings> options,
         IOptions<IdentityOptions> identityOptions,
@@ -38,7 +38,7 @@ public sealed class PasswordResetOtpService : IPasswordResetOtpService
     {
         _dbContext = dbContext;
         _userManager = userManager;
-        _emailSender = emailSender;
+        _emailQueueService = emailQueueService;
         _cache = cache;
         _settings = options.Value;
         _identityOptions = identityOptions.Value;
@@ -98,7 +98,7 @@ public sealed class PasswordResetOtpService : IPasswordResetOtpService
         _dbContext.UserOtpCodes.Add(otp);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        var sent = await _emailSender.SendPasswordResetOtpAsync(
+        var sent = await _emailQueueService.QueuePasswordResetOtpAsync(
             user.Email ?? normalizedEmail,
             user.FullName,
             otpCode,

@@ -37,10 +37,24 @@
     <div>
       <p class="text-sm text-slate-700">@Localizer["BuyNow_Price"]</p>
       <p class="mt-1 text-xs text-slate-500">@Localizer["BuyNow_FixedPrice"]</p>
-      <p class="mt-0.5 text-xs font-medium text-emerald-700">@Localizer["BuyNow_InStock"]</p>
+      @if (Model.CanPurchaseBuyNow)
+      {
+        <p class="mt-0.5 text-xs font-medium text-emerald-700">@Localizer["BuyNow_InStock"]</p>
+      }
+      else
+      {
+        <p class="mt-2 inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium @Model.StatusBadgeClass">@Model.AuctionStatus</p>
+      }
     </div>
     <p class="text-3xl font-bold tabular-nums text-slate-900 sm:text-4xl">$@((Model.BuyNowPrice ?? Model.CurrentPrice).ToString("N0"))</p>
   </div>
+
+  @if (!string.IsNullOrWhiteSpace(Model.ListingRejectReason))
+  {
+    <p class="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+      @Localizer["User_RejectReason", Model.ListingRejectReason]
+    </p>
+  }
 
   <p class="mt-4 text-xs leading-relaxed text-slate-500">
     @Localizer["Product_BuyersPremium"]
@@ -48,12 +62,15 @@
 
   <div class="product-bid-panel__divider"></div>
 
-  <button type="button" id="addToCartBtn"
-          class="flex w-full items-center justify-center rounded-md bg-slate-900 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800">
-    @Localizer["Card_AddToCart"]
-  </button>
+  @if (Model.CanPurchaseBuyNow)
+  {
+    <button type="button" id="addToCartBtn"
+            class="flex w-full items-center justify-center rounded-md bg-slate-900 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800">
+      @Localizer["Card_AddToCart"]
+    </button>
 
-  <p id="addToCartMessage" class="mt-3 hidden text-center text-sm font-medium text-emerald-700" role="status"></p>
+    <p id="addToCartMessage" class="mt-3 hidden text-center text-sm font-medium text-emerald-700" role="status"></p>
+  }
 
   <div class="mt-6">
     @await Html.PartialAsync("~/Views/Auction/Partials/_SellerInfo.cshtml", Model.Seller)

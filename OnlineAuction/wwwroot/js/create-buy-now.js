@@ -3,10 +3,17 @@
 
   var DRAFT_KEY = 'auctionHouse_createBuyNow_draft';
   var MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-  var MAX_DOC_SIZE = 10 * 1024 * 1024;
+  var MAX_DOC_SIZE = 5 * 1024 * 1024;
   var MAX_IMAGES = 5;
+  var MAX_DOCUMENTS = 5;
   var IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-  var DOC_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
+  var DOC_TYPES = ['application/pdf'];
+  var DOC_NAME_OPTIONS = [
+    'PSA Certificate',
+    'BGS Certificate',
+    'Product Verification',
+    'Warranty'
+  ];
 
   var state = {
     images: [],
@@ -266,15 +273,29 @@
 
     state.documents.forEach(function (doc) {
       var li = document.createElement('li');
-      li.className = 'flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-3';
+      li.className = 'flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between';
+      var selectHtml = '<select data-doc-name="' + doc.id + '" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 sm:w-52">';
+      DOC_NAME_OPTIONS.forEach(function (option) {
+        var selected = option === doc.displayName ? ' selected' : '';
+        selectHtml += '<option value="' + option + '"' + selected + '>' + option + '</option>';
+      });
+      selectHtml += '</select>';
       li.innerHTML =
         '<div class="flex min-w-0 items-center gap-3">' +
-        '<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-xs font-bold text-blue-800">' +
-        doc.name.split('.').pop().toUpperCase().slice(0, 3) + '</span>' +
-        '<div class="min-w-0"><p class="truncate text-sm font-medium text-slate-800">' + doc.name + '</p>' +
-        '<p class="text-xs text-slate-400">' + (doc.size / 1024).toFixed(1) + ' KB</p></div></div>' +
-        '<button type="button" data-remove-doc="' + doc.id + '" class="shrink-0 cursor-pointer text-xs font-semibold text-red-600 hover:text-red-700">' + t('remove', 'Remove') + '</button>';
+        '<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-100 text-xs font-bold text-red-800">PDF</span>' +
+        '<div class="min-w-0"><p class="truncate text-sm font-medium text-slate-800">' + doc.file.name + '</p>' +
+        '<p class="text-xs text-slate-400">' + (doc.file.size / 1024).toFixed(1) + ' KB</p></div></div>' +
+        '<div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">' + selectHtml +
+        '<button type="button" data-remove-doc="' + doc.id + '" class="shrink-0 cursor-pointer text-xs font-semibold text-red-600 hover:text-red-700">' + t('remove', 'Remove') + '</button></div>';
       list.appendChild(li);
+    });
+
+    list.querySelectorAll('[data-doc-name]').forEach(function (select) {
+      select.addEventListener('change', function () {
+        var id = select.getAttribute('data-doc-name');
+        var doc = state.documents.find(function (d) { return d.id === id; });
+        if (doc) doc.displayName = select.value;
+      });
     });
 
     list.querySelectorAll('[data-remove-doc]').forEach(function (btn) {
@@ -291,19 +312,23 @@
   function addDocuments(files) {
     var errors = [];
     Array.from(files).forEach(function (file) {
-      if (!DOC_TYPES.includes(file.type)) {
-        errors.push(tf(t('errorDocInvalidFormat', '{0}: invalid format (PDF, JPG, PNG only)'), file.name));
+      if (state.documents.length >= MAX_DOCUMENTS) {
+        errors.push(t('errorDocMaxCount', 'You can upload up to 5 documents per product.'));
+        return;
+      }
+      var isPdf = DOC_TYPES.includes(file.type) || file.name.toLowerCase().endsWith('.pdf');
+      if (!isPdf) {
+        errors.push(tf(t('errorDocInvalidFormat', '{0}: invalid format (PDF only)'), file.name));
         return;
       }
       if (file.size > MAX_DOC_SIZE) {
-        errors.push(tf(t('errorDocSizeLimit', '{0}: exceeds 10MB limit'), file.name));
+        errors.push(tf(t('errorDocSizeLimit', '{0}: exceeds 5MB limit'), file.name));
         return;
       }
       state.documents.push({
         id: 'doc_' + Date.now() + '_' + Math.random().toString(36).slice(2),
-        name: file.name,
-        size: file.size,
-        file: file
+        file: file,
+        displayName: 'PSA Certificate'
       });
     });
 
@@ -552,7 +577,7 @@
       }
       state.documents.forEach(function (doc) {
         formData.append('DocumentFiles', doc.file);
-        formData.append('DocumentNames', doc.name);
+        formData.append('DocumentNames', doc.displayName || 'PSA Certificate');
       });
 
       fetch(form.action, {

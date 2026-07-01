@@ -25,7 +25,7 @@ public class AuctionVerificationController : BaseAdminController
     public async Task<IActionResult> Index(AuctionVerificationFilterViewModel filter, CancellationToken cancellationToken)
     {
         var model = await _verificationService.GetPendingVerificationsAsync(filter, cancellationToken);
-        return View(model);
+        return ListOrDefaultView(model, "_AuctionVerificationList");
     }
 
     [HttpGet]

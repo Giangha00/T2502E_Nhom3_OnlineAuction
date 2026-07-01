@@ -1,28 +1,58 @@
 @model OnlineAuction.Models.ProductDetailViewModel
+@{
+    var hasDocuments = Model.Documents.Count > 0;
+}
 
 <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
   <div class="border-b border-slate-100 bg-gradient-to-r from-slate-50 to-blue-50/50 px-6 py-4">
-    <h2 class="text-lg font-semibold text-slate-900">@Localizer["Product_Documents_Title"]</h2>
+    <h2 class="text-lg font-semibold text-slate-900">@Localizer["Product_Certificates_Tab"]</h2>
     <p class="mt-1 text-sm text-slate-500">@Localizer["Product_Documents_Desc"]</p>
   </div>
-  <ul class="divide-y divide-slate-100">
-    @foreach (var doc in Model.Documents)
-    {
-      <li class="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex min-w-0 items-center gap-3">
-          <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-50 text-lg">📄</span>
-          <div class="min-w-0">
-            <p class="font-semibold text-slate-900">@doc.Name</p>
-            <p class="truncate text-sm text-slate-500">@doc.FileType</p>
+
+  @if (!hasDocuments)
+  {
+    <div class="px-6 py-10 text-center">
+      <p class="text-sm font-medium text-slate-700">@Localizer["Product_Documents_Empty"]</p>
+      <p class="mt-2 text-sm text-slate-500">@Localizer["Product_Documents_EmptyHint"]</p>
+    </div>
+  }
+  else
+  {
+    <ul class="divide-y divide-slate-100">
+      @foreach (var doc in Model.Documents)
+      {
+        <li class="flex flex-col gap-4 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex min-w-0 items-start gap-3">
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600" aria-hidden="true">
+              <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14 3v5h5M9 13h6M9 17h4"/>
+              </svg>
+            </span>
+            <div class="min-w-0">
+              <p class="font-semibold text-slate-900">@doc.Name</p>
+              <p class="mt-0.5 text-sm text-slate-500">@doc.FileType</p>
+              @if (doc.ShowCertificateNumber && !string.IsNullOrWhiteSpace(Model.CertificateNumber))
+              {
+                <p class="mt-1 text-xs font-medium text-blue-700">
+                  @Localizer["Product_CertificateNumber"]: @Model.CertificateNumber
+                </p>
+              }
+            </div>
           </div>
-        </div>
-        <div class="flex gap-2 sm:shrink-0">
-          <a href="@doc.FileUrl" target="_blank" rel="noopener noreferrer"
-             class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">@Localizer["Common_View"]</a>
-          <a href="@doc.FileUrl" download
-             class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-800">@Localizer["Common_Download"]</a>
-        </div>
-      </li>
-    }
-  </ul>
+          <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:shrink-0">
+            <a href="@doc.FileUrl" target="_blank" rel="noopener noreferrer"
+               class="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto">
+              @Localizer["Common_View"]
+            </a>
+            <a asp-controller="ProductDocument" asp-action="Download" asp-route-id="@doc.Id"
+               title="@Localizer["Product_DownloadCertificate"]"
+               class="w-full rounded-lg bg-blue-700 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-blue-800 sm:w-auto">
+              @Localizer["Product_DownloadCertificate"]
+            </a>
+          </div>
+        </li>
+      }
+    </ul>
+  }
 </div>
