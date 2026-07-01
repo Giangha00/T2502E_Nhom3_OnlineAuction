@@ -1222,6 +1222,95 @@ namespace OnlineAuction.Migrations
                         });
                 });
 
+            modelBuilder.Entity("OnlineAuction.Entities.ListingFee", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("AuctionId")
+                        .HasColumnType("int")
+                        .HasColumnName("auction_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("created_by");
+
+                    b.Property<int?>("CreatedByAdminId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<decimal>("FeeAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("fee_amount");
+
+                    b.Property<string>("FeeType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("fee_type");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("paid_at");
+
+                    b.Property<int>("SellerId")
+                        .HasColumnType("int")
+                        .HasColumnName("seller_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuctionId")
+                        .HasDatabaseName("ix_listing_fees_auction_id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("CreatedByAdminId");
+
+                    b.HasIndex("DeletedAt")
+                        .HasDatabaseName("ix_listing_fees_deleted_at");
+
+                    b.HasIndex("DeletedBy");
+
+                    b.HasIndex("SellerId");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.HasIndex("AuctionId", "Status")
+                        .HasDatabaseName("ix_listing_fees_auction_status");
+
+                    b.ToTable("listing_fees", (string)null);
+                });
+
             modelBuilder.Entity("OnlineAuction.Entities.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -1649,6 +1738,10 @@ namespace OnlineAuction.Migrations
                         .HasColumnType("varchar(120)")
                         .HasColumnName("product_origin");
 
+                    b.Property<int?>("ProductTemplateId")
+                        .HasColumnType("int")
+                        .HasColumnName("product_template_id");
+
                     b.Property<int>("SellerId")
                         .HasColumnType("int")
                         .HasColumnName("seller_id");
@@ -1691,6 +1784,9 @@ namespace OnlineAuction.Migrations
                         .HasDatabaseName("ix_products_deleted_at");
 
                     b.HasIndex("DeletedBy");
+
+                    b.HasIndex("ProductTemplateId")
+                        .HasDatabaseName("ix_products_product_template_id");
 
                     b.HasIndex("SellerId")
                         .HasDatabaseName("ix_products_seller_id");
@@ -1839,6 +1935,113 @@ namespace OnlineAuction.Migrations
                     b.HasIndex("UpdatedBy");
 
                     b.ToTable("product_images", (string)null);
+                });
+
+            modelBuilder.Entity("OnlineAuction.Entities.ProductTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CardNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("card_number");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int")
+                        .HasColumnName("category_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<string>("DescriptionHtml")
+                        .HasColumnType("text")
+                        .HasColumnName("description_html");
+
+                    b.Property<string>("GradeLabel")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("grade_label");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Language")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("language");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("PrimaryImage")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("primary_image");
+
+                    b.Property<string>("SetName")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("set_name");
+
+                    b.Property<string>("ShortDescription")
+                        .HasColumnType("text")
+                        .HasColumnName("short_description");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("updated_by");
+
+                    b.Property<int?>("Year")
+                        .HasColumnType("int")
+                        .HasColumnName("year");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("ix_product_templates_category_id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("DeletedAt")
+                        .HasDatabaseName("ix_product_templates_deleted_at");
+
+                    b.HasIndex("DeletedBy");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.HasIndex("CategoryId", "Name", "SetName", "CardNumber", "GradeLabel")
+                        .HasDatabaseName("ix_product_templates_lookup");
+
+                    b.ToTable("product_templates", (string)null);
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.RolePermission", b =>
@@ -2382,6 +2585,49 @@ namespace OnlineAuction.Migrations
                     b.Navigation("Reviewer");
                 });
 
+            modelBuilder.Entity("OnlineAuction.Entities.ListingFee", b =>
+                {
+                    b.HasOne("OnlineAuction.Entities.Auction", "Auction")
+                        .WithMany("ListingFees")
+                        .HasForeignKey("AuctionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_listing_fees_created_by");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "CreatedByAdmin")
+                        .WithMany()
+                        .HasForeignKey("CreatedByAdminId");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("DeletedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_listing_fees_deleted_by");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "Seller")
+                        .WithMany()
+                        .HasForeignKey("SellerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_listing_fees_updated_by");
+
+                    b.Navigation("Auction");
+
+                    b.Navigation("CreatedByAdmin");
+
+                    b.Navigation("Seller");
+                });
+
             modelBuilder.Entity("OnlineAuction.Entities.Notification", b =>
                 {
                     b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
@@ -2502,6 +2748,12 @@ namespace OnlineAuction.Migrations
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_products_deleted_by");
 
+                    b.HasOne("OnlineAuction.Entities.ProductTemplate", "ProductTemplate")
+                        .WithMany("Products")
+                        .HasForeignKey("ProductTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_products_product_template");
+
                     b.HasOne("OnlineAuction.Entities.ApplicationUser", "Seller")
                         .WithMany("Products")
                         .HasForeignKey("SellerId")
@@ -2516,6 +2768,8 @@ namespace OnlineAuction.Migrations
                         .HasConstraintName("fk_products_updated_by");
 
                     b.Navigation("Category");
+
+                    b.Navigation("ProductTemplate");
 
                     b.Navigation("Seller");
                 });
@@ -2578,6 +2832,36 @@ namespace OnlineAuction.Migrations
                         .HasConstraintName("fk_product_images_updated_by");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("OnlineAuction.Entities.ProductTemplate", b =>
+                {
+                    b.HasOne("OnlineAuction.Entities.Category", "Category")
+                        .WithMany("ProductTemplates")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_product_templates_category");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_product_templates_created_by");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("DeletedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_product_templates_deleted_by");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_product_templates_updated_by");
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.RolePermission", b =>
@@ -2665,6 +2949,8 @@ namespace OnlineAuction.Migrations
                 {
                     b.Navigation("Bids");
 
+                    b.Navigation("ListingFees");
+
                     b.Navigation("OrderItems");
 
                     b.Navigation("Registrations");
@@ -2691,6 +2977,8 @@ namespace OnlineAuction.Migrations
 
             modelBuilder.Entity("OnlineAuction.Entities.Category", b =>
                 {
+                    b.Navigation("ProductTemplates");
+
                     b.Navigation("Products");
                 });
 
@@ -2706,6 +2994,11 @@ namespace OnlineAuction.Migrations
                     b.Navigation("Documents");
 
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("OnlineAuction.Entities.ProductTemplate", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

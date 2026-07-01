@@ -1061,4 +1061,30 @@
   <data name="Admin_Dashboard_Col_Category" xml:space="preserve"><value>Danh mục</value></data>
   <data name="Admin_Dashboard_Col_CurrentBid" xml:space="preserve"><value>Giá hiện tại</value></data>
   <data name="Admin_Dashboard_Col_EndsIn" xml:space="preserve"><value>Còn lại</value></data>
+  <data name="Admin_Dashboard_Kpi_Gmv" xml:space="preserve"><value>Tổng giao dịch (GMV)</value></data>
+  <data name="Admin_Dashboard_Kpi_PlatformRevenue" xml:space="preserve"><value>Doanh thu sàn</value></data>
+  <data name="Admin_Dashboard_Kpi_ListingFees" xml:space="preserve"><value>Phí niêm yết</value></data>
+  <data name="Admin_Dashboard_Kpi_CompletedOrders" xml:space="preserve"><value>Đơn hoàn tất</value></data>
+  <data name="Admin_Dashboard_RevenueSection_Title" xml:space="preserve"><value>Doanh thu</value></data>
+  <data name="Admin_Dashboard_RevenueSection_Description" xml:space="preserve"><value>GMV và doanh thu sàn kèm bảng chi tiết giao dịch.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Tiền cọc đăng ký đấu giá không tính vào GMV và doanh thu sàn.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>Tiền cọc đăng ký đấu giá (10%) không tính vào GMV hay doanh thu sàn. Phí ship/bảo hiểm trong tổng đơn vẫn nằm trong GMV (pass-through).</value></data>
+  <data name="Admin_Dashboard_Revenue_NoListingFeeData" xml:space="preserve"><value>Chưa có dữ liệu</value></data>
+  <data name="Admin_Dashboard_RevenueLineChart_Title" xml:space="preserve"><value>GMV vs Doanh thu sàn</value></data>
+  <data name="Admin_Dashboard_RevenueLineChart_Description" xml:space="preserve"><value>Click điểm trên biểu đồ để lọc bảng theo ngày.</value></data>
+  <data name="Admin_Dashboard_RevenueDonutChart_Title" xml:space="preserve"><value>Cơ cấu doanh thu sàn</value></data>
+  <data name="Admin_Dashboard_RevenueDonutChart_Description" xml:space="preserve"><value>Phí niêm yết và hoa hồng giao dịch.</value></data>
+  <data name="Admin_Dashboard_Revenue_Donut_ListingFees" xml:space="preserve"><value>Phí niêm yết</value></data>
+  <data name="Admin_Dashboard_Revenue_Donut_Commission" xml:space="preserve"><value>Hoa hồng giao dịch</value></data>
+  <data name="Admin_Dashboard_RevenueDetail_Title" xml:space="preserve"><value>Chi tiết giao dịch</value></data>
+  <data name="Admin_Dashboard_RevenueDetail_Description" xml:space="preserve"><value>Thanh toán đơn hàng và phí niêm yết trong khoảng đã chọn.</value></data>
+  <data name="Admin_Dashboard_Revenue_Col_Date" xml:space="preserve"><value>Ngày</value></data>
+  <data name="Admin_Dashboard_Revenue_Col_Type" xml:space="preserve"><value>Loại</value></data>
+  <data name="Admin_Dashboard_Revenue_Col_Reference" xml:space="preserve"><value>Mã tham chiếu</value></data>
+  <data name="Admin_Dashboard_Revenue_Col_Gmv" xml:space="preserve"><value>GMV</value></data>
+  <data name="Admin_Dashboard_Revenue_Col_PlatformRevenue" xml:space="preserve"><value>Doanh thu sàn</value></data>
+  <data name="Admin_Dashboard_Revenue_Type_OrderPayment" xml:space="preserve"><value>Thanh toán đơn</value></data>
+  <data name="Admin_Dashboard_Revenue_Type_ListingFee" xml:space="preserve"><value>Phí niêm yết</value></data>
+  <data name="Admin_Dashboard_Revenue_Status_Success" xml:space="preserve"><value>Thành công</value></data>
+  <data name="Admin_Dashboard_Revenue_Status_Paid" xml:space="preserve"><value>Đã thanh toán</value></data>
 </root>

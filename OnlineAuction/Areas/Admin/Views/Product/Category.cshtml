@@ -120,36 +120,13 @@
     <script src="~/admin/js/admin-list-filter.js" asp-append-version="true"></script>
     <script>
         function bindProductBulkActions(container) {
-            const selectAllProducts = container.querySelector('#selectAllProducts');
-            const bulkDeleteForm = container.querySelector('#productBulkDeleteForm');
-            const productCheckboxes = container.querySelectorAll('.product-checkbox');
-
-            if (selectAllProducts) {
-                selectAllProducts.onchange = function () {
-                    productCheckboxes.forEach(function (checkbox) {
-                        checkbox.checked = selectAllProducts.checked;
-                    });
-                };
-            }
-
-            if (bulkDeleteForm) {
-                bulkDeleteForm.onsubmit = function (event) {
-                    if (event.submitter?.dataset.bulkDelete !== 'true') {
-                        return;
-                    }
-
-                    const selectedCount = bulkDeleteForm.querySelectorAll('.product-checkbox:checked').length;
-                    if (selectedCount === 0) {
-                        event.preventDefault();
-                        alert('Please select at least one product.');
-                        return;
-                    }
-
-                    if (!confirm('Are you sure you want to delete selected products?')) {
-                        event.preventDefault();
-                    }
-                };
-            }
+            AdminListFilter.bindBulkDelete(container, {
+                formId: 'productBulkDeleteForm',
+                selectAllId: 'selectAllProducts',
+                checkboxClass: 'product-checkbox',
+                emptyMessage: 'Please select at least one product.',
+                confirmMessage: 'Are you sure you want to delete selected products?'
+            });
         }
 
         AdminListFilter.init({

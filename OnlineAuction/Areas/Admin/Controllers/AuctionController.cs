@@ -159,4 +159,23 @@ public class AuctionController : BaseAdminController
         var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
         return int.TryParse(value, out var userId) ? userId : 0;
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
+    public async Task<IActionResult> BulkDelete(AuctionBulkDeleteViewModel model)
+    {
+        var result = await _auctionService.BulkDeleteAsync(model.SelectedAuctionIds);
+
+        if (result.Success)
+        {
+            TempData["SuccessMessage"] = result.Message;
+        }
+        else
+        {
+            TempData["ErrorMessage"] = result.Message;
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
 }

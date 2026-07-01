@@ -1,5 +1,7 @@
 namespace OnlineAuction.Models;
 
+using OnlineAuction.Entities;
+
 public class ProductDetailViewModel
 {
     public int Id { get; set; }
@@ -54,7 +56,13 @@ public class ProductDetailViewModel
     public List<ProductDocumentViewModel> Documents { get; set; } = [];
     public List<AuctionItemViewModel> RelatedProducts { get; set; } = [];
     public decimal? BuyNowPrice { get; set; }
-    public bool HasBuyNow => BuyNowPrice.HasValue && BuyNowPrice.Value > 0;
+    public string ListingType { get; set; } = ListingTypes.Auction;
+    public string? ListingRejectReason { get; set; }
+    public bool HasBuyNow =>
+        string.Equals(ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase)
+        || (BuyNowPrice.HasValue && BuyNowPrice.Value > 0);
+    public bool CanPurchaseBuyNow =>
+        !IsSeller && AuctionStatus is "Active Auction" or "Ending Soon";
 }
 
 public class ProductDocumentViewModel

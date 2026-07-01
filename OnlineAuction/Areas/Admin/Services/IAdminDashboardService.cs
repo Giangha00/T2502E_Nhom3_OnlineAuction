@@ -7,10 +7,25 @@ public interface IAdminDashboardService
     DashboardFilterViewModel NormalizeFilter(
         DateTime? dateFrom,
         DateTime? dateTo,
+        string? dateRange = null,
         string? statusFilter = null,
         int? categoryIdFilter = null,
         DateTime? registrationDateFilter = null,
-        string? registrationGranularity = null);
+        string? registrationGranularity = null,
+        string? sectionFilter = null,
+        string? revenueTypeFilter = null);
+
+    Task<decimal> SumGmvAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default);
+
+    Task<decimal> SumPlatformRevenueAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<DashboardRevenueDetailViewModel>> BuildRevenueDetailTableAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default);
 
     Task<AdminDashboardViewModel> GetDashboardAsync(
         DashboardFilterViewModel filter,
