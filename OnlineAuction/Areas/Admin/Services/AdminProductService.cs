@@ -42,29 +42,31 @@ public class AdminProductService : IAdminProductService
         _photoService = photoService;
     }
 
-    public async Task<ProductCategoryListViewModel> GetCategoryTemplatesAsync(ProductCategoryFilterViewModel filter)
+    public async Task<ProductTemplateListViewModel> GetProductTemplatesAsync(ProductTemplateFilterViewModel filter)
     {
-        NormalizeCategoryFilter(filter);
+        NormalizeTemplateFilter(filter);
 
-        var query = _dbContext.Categories
+        var query = _dbContext.ProductTemplates
             .AsNoTracking()
-            .Where(category => category.DeletedAt == null)
-            .Where(category => category.Products.Any(product => product.DeletedAt == null));
+            .Where(template => template.DeletedAt == null && template.IsActive);
 
         if (!string.IsNullOrWhiteSpace(filter.Search))
         {
             var keyword = filter.Search.Trim();
-            query = query.Where(category => category.Name.Contains(keyword));
+            query = query.Where(template =>
+                template.Name.Contains(keyword) ||
+                template.Category.Name.Contains(keyword) ||
+                (template.SetName != null && template.SetName.Contains(keyword)) ||
+                (template.CardNumber != null && template.CardNumber.Contains(keyword)));
         }
 
         query = filter.SortOrder switch
         {
-            "name_desc" => query.OrderByDescending(category => category.Name),
-            "count_asc" => query.OrderBy(category => category.Products.Count(product => product.DeletedAt == null)),
-            "count_desc" => query.OrderByDescending(category => category.Products.Count(product => product.DeletedAt == null)),
-            "date_desc" => query.OrderByDescending(category =>
-                category.Products.Where(product => product.DeletedAt == null).Max(product => product.CreatedAt)),
-            _ => query.OrderBy(category => category.SortOrder).ThenBy(category => category.Name)
+            "name_desc" => query.OrderByDescending(template => template.Name),
+            "count_desc" => query.OrderByDescending(template => template.Products.Count(product => product.DeletedAt == null)),
+            "date_desc" => query.OrderByDescending(template =>
+                template.Products.Where(product => product.DeletedAt == null).Max(product => (DateTime?)product.CreatedAt) ?? template.UpdatedAt ?? template.CreatedAt),
+            _ => query.OrderBy(template => template.Name)
         };
 
         var totalItems = await query.CountAsync();
@@ -75,50 +77,213 @@ public class AdminProductService : IAdminProductService
             filter.Page = totalPages;
         }
 
-        var categories = await query
+        var templates = await query
             .Skip((filter.Page - 1) * filter.PageSize)
             .Take(filter.PageSize)
-            .Select(category => new ProductCategoryTemplateViewModel
+            .Select(template => new ProductTemplateListItemViewModel
             {
-                CategoryId = category.Id,
-                CategoryName = category.Name,
-                ProductCount = category.Products.Count(product => product.DeletedAt == null),
-                ThumbnailUrl = category.Products
-                    .Where(product => product.DeletedAt == null)
-                    .OrderByDescending(product => product.CreatedAt)
-                    .Select(product => product.PrimaryImage)
-                    .FirstOrDefault() ?? DefaultProductImageUrl,
-                LatestProductCreatedAt = category.Products
+                Id = template.Id,
+                Name = template.Name,
+                CategoryName = template.Category.Name,
+                SetName = template.SetName,
+                CardNumber = template.CardNumber,
+                GradeLabel = template.GradeLabel,
+                ThumbnailUrl = template.PrimaryImage,
+                InstanceCount = template.Products.Count(product => product.DeletedAt == null),
+                LastAddedAt = template.Products
                     .Where(product => product.DeletedAt == null)
                     .Max(product => (DateTime?)product.CreatedAt)
             })
             .ToListAsync();
 
-        return new ProductCategoryListViewModel
+        return new ProductTemplateListViewModel
         {
-            Categories = categories,
+            Templates = templates,
             Filter = filter,
             TotalItems = totalItems,
             TotalPages = totalPages
         };
     }
 
-    public async Task<ProductListViewModel?> GetCategoryProductsAsync(int categoryId, ProductFilterViewModel filter)
+    public async Task<ProductListViewModel?> GetTemplateInstancesAsync(int templateId, ProductFilterViewModel filter)
     {
-        var category = await _dbContext.Categories
-            .AsNoTracking()
-            .FirstOrDefaultAsync(item => item.Id == categoryId && item.DeletedAt == null);
+        var template = await GetTemplateDetailsAsync(templateId);
 
-        if (category is null)
+        if (template is null)
         {
             return null;
         }
 
-        filter.CategoryId = categoryId;
+        filter.ProductTemplateId = templateId;
+        filter.SortOrder = string.IsNullOrWhiteSpace(filter.SortOrder) ? "price_asc" : filter.SortOrder;
         var model = await GetProductsAsync(filter);
-        model.ContextCategoryId = categoryId;
-        model.ContextCategoryName = category.Name;
+        model.ContextTemplateId = templateId;
+        model.ContextTemplateName = template.Name;
+        model.ContextTemplate = template;
+        model.SellerOptions = await BuildSellerOptionsAsync(filter.SellerId, templateId);
         return model;
+    }
+
+    public async Task<ProductTemplateFormViewModel> BuildCreateTemplateFormAsync()
+    {
+        var model = new ProductTemplateFormViewModel();
+        await PopulateTemplateFormOptionsAsync(model);
+        return model;
+    }
+
+    public async Task<ProductTemplateFormViewModel?> BuildEditTemplateFormAsync(int id)
+    {
+        var template = await _dbContext.ProductTemplates
+            .AsNoTracking()
+            .Where(item => item.Id == id && item.DeletedAt == null)
+            .Select(item => new ProductTemplateFormViewModel
+            {
+                Id = item.Id,
+                Name = item.Name,
+                CategoryId = item.CategoryId,
+                SetName = item.SetName,
+                CardNumber = item.CardNumber,
+                GradeLabel = item.GradeLabel,
+                Year = item.Year,
+                Language = item.Language,
+                ShortDescription = item.ShortDescription,
+                DescriptionHtml = item.DescriptionHtml,
+                PrimaryImageUrl = item.PrimaryImage,
+                HasInstances = item.Products.Any(product => product.DeletedAt == null)
+            })
+            .FirstOrDefaultAsync();
+
+        if (template is null)
+        {
+            return null;
+        }
+
+        await PopulateTemplateFormOptionsAsync(template);
+        return template;
+    }
+
+    public async Task<(bool Success, string Message)> CreateTemplateAsync(ProductTemplateFormViewModel model)
+    {
+        var validationError = await ValidateTemplateAsync(model);
+        if (validationError is not null)
+        {
+            return (false, validationError);
+        }
+
+        string? imageUrl;
+        try
+        {
+            imageUrl = await _photoService.AddPhotoAsync(model.PrimaryImageFile, ProductImageFolder);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return (false, ex.Message);
+        }
+
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            return (false, "Primary image is required for mau san pham.");
+        }
+
+        var template = new ProductTemplate
+        {
+            Name = model.Name.Trim(),
+            CategoryId = model.CategoryId,
+            SetName = TrimOrNull(model.SetName),
+            CardNumber = TrimOrNull(model.CardNumber),
+            GradeLabel = TrimOrNull(model.GradeLabel),
+            Year = model.Year,
+            Language = TrimOrNull(model.Language),
+            ShortDescription = TrimOrNull(model.ShortDescription),
+            DescriptionHtml = model.DescriptionHtml,
+            PrimaryImage = imageUrl,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _dbContext.ProductTemplates.Add(template);
+        await _dbContext.SaveChangesAsync();
+
+        return (true, "Mau san pham created successfully.");
+    }
+
+    public async Task<(bool Success, string Message)> UpdateTemplateAsync(ProductTemplateFormViewModel model)
+    {
+        if (!model.Id.HasValue)
+        {
+            return (false, "Mau san pham id is required.");
+        }
+
+        var template = await _dbContext.ProductTemplates
+            .FirstOrDefaultAsync(item => item.Id == model.Id.Value && item.DeletedAt == null);
+
+        if (template is null)
+        {
+            return (false, "Mau san pham not found.");
+        }
+
+        var validationError = await ValidateTemplateAsync(model);
+        if (validationError is not null)
+        {
+            return (false, validationError);
+        }
+
+        if (model.PrimaryImageFile is { Length: > 0 })
+        {
+            try
+            {
+                var imageUrl = await _photoService.AddPhotoAsync(model.PrimaryImageFile, ProductImageFolder);
+                if (!string.IsNullOrWhiteSpace(imageUrl))
+                {
+                    template.PrimaryImage = imageUrl;
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
+        template.Name = model.Name.Trim();
+        template.CategoryId = model.CategoryId;
+        template.SetName = TrimOrNull(model.SetName);
+        template.CardNumber = TrimOrNull(model.CardNumber);
+        template.GradeLabel = TrimOrNull(model.GradeLabel);
+        template.Year = model.Year;
+        template.Language = TrimOrNull(model.Language);
+        template.ShortDescription = TrimOrNull(model.ShortDescription);
+        template.DescriptionHtml = model.DescriptionHtml;
+        template.UpdatedAt = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync();
+
+        return (true, "Mau san pham updated successfully.");
+    }
+
+    public async Task<(bool Success, string Message)> DeleteTemplateAsync(int id, int adminUserId)
+    {
+        var template = await _dbContext.ProductTemplates
+            .Include(item => item.Products)
+            .FirstOrDefaultAsync(item => item.Id == id && item.DeletedAt == null);
+
+        if (template is null)
+        {
+            return (false, "Mau san pham not found.");
+        }
+
+        if (template.Products.Any(product => product.DeletedAt == null))
+        {
+            return (false, "Cannot delete a mau san pham that still has seller products.");
+        }
+
+        var now = DateTime.UtcNow;
+        template.DeletedAt = now;
+        template.DeletedBy = adminUserId;
+        template.UpdatedAt = now;
+
+        await _dbContext.SaveChangesAsync();
+
+        return (true, "Mau san pham deleted successfully.");
     }
 
     public async Task<ProductListViewModel> GetProductsAsync(ProductFilterViewModel filter)
@@ -153,6 +318,11 @@ public class AdminProductService : IAdminProductService
             query = query.Where(product => product.CategoryId == filter.CategoryId.Value);
         }
 
+        if (filter.ProductTemplateId.HasValue)
+        {
+            query = query.Where(product => product.ProductTemplateId == filter.ProductTemplateId.Value);
+        }
+
         if (filter.SellerId.HasValue)
         {
             query = query.Where(product => product.SellerId == filter.SellerId.Value);
@@ -185,11 +355,29 @@ public class AdminProductService : IAdminProductService
             }
         }
 
+        if (filter.MinEstimatedValue.HasValue)
+        {
+            query = query.Where(product =>
+                product.EstimatedValue.HasValue &&
+                product.EstimatedValue.Value >= filter.MinEstimatedValue.Value);
+        }
+
+        if (filter.MaxEstimatedValue.HasValue)
+        {
+            query = query.Where(product =>
+                product.EstimatedValue.HasValue &&
+                product.EstimatedValue.Value <= filter.MaxEstimatedValue.Value);
+        }
+
         query = filter.SortOrder switch
         {
             "name_asc" => query.OrderBy(product => product.Name),
             "name_desc" => query.OrderByDescending(product => product.Name),
             "date_asc" => query.OrderBy(product => product.CreatedAt),
+            "date_desc" => query.OrderByDescending(product => product.CreatedAt),
+            "price_desc" => query.OrderByDescending(product => product.EstimatedValue ?? product.ImportPrice ?? decimal.MaxValue),
+            "seller_asc" => query.OrderBy(product => product.Seller.FullName),
+            "price_asc" => query.OrderBy(product => product.EstimatedValue ?? product.ImportPrice ?? decimal.MaxValue),
             _ => query.OrderByDescending(product => product.CreatedAt)
         };
 
@@ -212,11 +400,13 @@ public class AdminProductService : IAdminProductService
                 CategoryName = product.Category.Name,
                 SellerId = product.SellerId,
                 SellerName = product.Seller.FullName,
+                SellerEmail = product.Seller.Email ?? string.Empty,
                 Condition = product.Condition,
                 GradeLabel = product.GradeLabel,
                 CardNumber = product.CardNumber,
                 CertNumber = product.CertNumber,
                 EstimatedValue = product.EstimatedValue,
+                ImportPrice = product.ImportPrice,
                 AuctionCount = product.Auctions.Count(auction => auction.DeletedAt == null),
                 CanDelete = !product.Auctions.Any(auction =>
                     auction.DeletedAt == null &&
@@ -234,7 +424,7 @@ public class AdminProductService : IAdminProductService
             Products = products,
             Filter = filter,
             CategoryOptions = await BuildCategoryOptionsAsync(filter.CategoryId),
-            SellerOptions = await BuildSellerOptionsAsync(filter.SellerId),
+            SellerOptions = await BuildSellerOptionsAsync(filter.SellerId, filter.ProductTemplateId),
             ConditionOptions = BuildConditionOptions(filter.Condition),
             TotalItems = totalItems,
             TotalPages = totalPages
@@ -255,6 +445,8 @@ public class AdminProductService : IAdminProductService
                 item.DescriptionHtml,
                 item.CategoryId,
                 CategoryName = item.Category.Name,
+                item.ProductTemplateId,
+                ProductTemplateName = item.ProductTemplate == null ? null : item.ProductTemplate.Name,
                 item.SellerId,
                 SellerName = item.Seller.FullName,
                 SellerEmail = item.Seller.Email,
@@ -336,6 +528,8 @@ public class AdminProductService : IAdminProductService
             DescriptionHtml = product.DescriptionHtml,
             CategoryId = product.CategoryId,
             CategoryName = product.CategoryName,
+            ProductTemplateId = product.ProductTemplateId,
+            ProductTemplateName = product.ProductTemplateName,
             SellerId = product.SellerId,
             SellerName = product.SellerName,
             SellerEmail = product.SellerEmail,
@@ -363,9 +557,27 @@ public class AdminProductService : IAdminProductService
         };
     }
 
-    public async Task<ProductFormViewModel> BuildCreateFormAsync()
+    public async Task<ProductFormViewModel> BuildCreateFormAsync(int? templateId = null)
     {
         var model = new ProductFormViewModel();
+
+        if (templateId.HasValue)
+        {
+            var template = await _dbContext.ProductTemplates
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item => item.Id == templateId.Value && item.DeletedAt == null && item.IsActive);
+
+            if (template is not null)
+            {
+                ApplyTemplateSnapshot(model, template);
+                model.ProductTemplateId = template.Id;
+                model.ProductTemplateName = template.Name;
+                model.ContextTemplateId = template.Id;
+                model.IsTemplateLocked = true;
+                model.PrimaryImageUrl = template.PrimaryImage;
+            }
+        }
+
         await PopulateFormOptionsAsync(model);
         return model;
     }
@@ -387,6 +599,7 @@ public class AdminProductService : IAdminProductService
         var model = new ProductFormViewModel
         {
             Id = product.Id,
+            ProductTemplateId = product.ProductTemplateId,
             Name = product.Name,
             ShortDescription = product.ShortDescription,
             Subtitle = product.Subtitle,
@@ -431,10 +644,15 @@ public class AdminProductService : IAdminProductService
                 })
                 .ToList(),
             IsSellerLocked = product.Auctions.Any(auction =>
-                auction.DeletedAt == null && SellerLockAuctionStatuses.Contains(auction.Status))
+                auction.DeletedAt == null && SellerLockAuctionStatuses.Contains(auction.Status)),
+            IsTemplateLocked = product.Auctions.Any(auction =>
+                auction.DeletedAt == null && SellerLockAuctionStatuses.Contains(auction.Status)),
+            ContextTemplateId = product.ProductTemplateId
         };
 
         await PopulateFormOptionsAsync(model, product.CategoryId, product.SellerId);
+        model.ProductTemplateName = model.ProductTemplateOptions
+            .FirstOrDefault(option => option.Value == product.ProductTemplateId?.ToString())?.Text;
         return model;
     }
 
@@ -445,6 +663,11 @@ public class AdminProductService : IAdminProductService
         {
             return (false, validationError);
         }
+
+        var template = await _dbContext.ProductTemplates
+            .AsNoTracking()
+            .FirstAsync(item => item.Id == model.ProductTemplateId);
+        ApplyTemplateSnapshot(model, template);
 
         var galleryFiles = model.GalleryImageFiles
             .Where(file => file is { Length: > 0 })
@@ -485,7 +708,7 @@ public class AdminProductService : IAdminProductService
             }
 
             imageUrl = string.IsNullOrWhiteSpace(imageUrl)
-                ? DefaultProductImageUrl
+                ? model.PrimaryImageUrl ?? DefaultProductImageUrl
                 : imageUrl;
 
             var now = DateTime.UtcNow;
@@ -591,11 +814,21 @@ public class AdminProductService : IAdminProductService
             return (false, "Cannot change seller while the product has a live or ending soon auction.");
         }
 
+        if (isSellerLocked && model.ProductTemplateId != product.ProductTemplateId)
+        {
+            return (false, "Cannot change template while the product has a live or ending soon auction.");
+        }
+
         var validationError = await ValidateReferencesAsync(model);
         if (validationError is not null)
         {
             return (false, validationError);
         }
+
+        var template = await _dbContext.ProductTemplates
+            .AsNoTracking()
+            .FirstAsync(item => item.Id == model.ProductTemplateId);
+        ApplyTemplateSnapshot(model, template);
 
         var newGalleryFiles = model.GalleryImageFiles
             .Where(file => file is { Length: > 0 })
@@ -842,6 +1075,7 @@ public class AdminProductService : IAdminProductService
         {
             SellerId = model.SellerId,
             CategoryId = model.CategoryId,
+            ProductTemplateId = model.ProductTemplateId,
             Name = model.Name.Trim(),
             ShortDescription = TrimOrNull(model.ShortDescription),
             Subtitle = TrimOrNull(model.Subtitle),
@@ -868,6 +1102,7 @@ public class AdminProductService : IAdminProductService
     {
         product.SellerId = model.SellerId;
         product.CategoryId = model.CategoryId;
+        product.ProductTemplateId = model.ProductTemplateId;
         product.Name = model.Name.Trim();
         product.ShortDescription = TrimOrNull(model.ShortDescription);
         product.Subtitle = TrimOrNull(model.Subtitle);
@@ -890,15 +1125,22 @@ public class AdminProductService : IAdminProductService
 
     private async Task<string?> ValidateReferencesAsync(ProductFormViewModel model)
     {
-        var categoryExists = await _dbContext.Categories
-            .AnyAsync(category =>
-                category.Id == model.CategoryId &&
-                category.DeletedAt == null &&
-                category.IsActive);
-
-        if (!categoryExists)
+        if (!model.ProductTemplateId.HasValue)
         {
-            return "Selected category is not available.";
+            return "Selected mau san pham is not available.";
+        }
+
+        var templateExists = await _dbContext.ProductTemplates
+            .AnyAsync(template =>
+                template.Id == model.ProductTemplateId.Value &&
+                template.DeletedAt == null &&
+                template.IsActive &&
+                template.Category.DeletedAt == null &&
+                template.Category.IsActive);
+
+        if (!templateExists)
+        {
+            return "Selected mau san pham is not available.";
         }
 
         var sellerExists = await _dbContext.Users
@@ -950,8 +1192,16 @@ public class AdminProductService : IAdminProductService
         int? selectedSellerId = null)
     {
         model.CategoryOptions = await BuildCategoryOptionsAsync(selectedCategoryId ?? model.CategoryId);
+        model.ProductTemplateOptions = await BuildProductTemplateOptionsAsync(model.ProductTemplateId);
         model.SellerOptions = await BuildSellerOptionsAsync(selectedSellerId ?? model.SellerId);
         model.ConditionOptions = BuildConditionOptions(model.Condition);
+        model.GradeOptions = BuildGradeOptions(model.GradeLabel);
+        model.LanguageOptions = BuildLanguageOptions(model.Language);
+    }
+
+    private async Task PopulateTemplateFormOptionsAsync(ProductTemplateFormViewModel model)
+    {
+        model.CategoryOptions = await BuildCategoryOptionsAsync(model.CategoryId);
         model.GradeOptions = BuildGradeOptions(model.GradeLabel);
         model.LanguageOptions = BuildLanguageOptions(model.Language);
     }
@@ -976,14 +1226,48 @@ public class AdminProductService : IAdminProductService
             .ToList();
     }
 
-    private async Task<List<SelectListItem>> BuildSellerOptionsAsync(int? selectedId = null)
+    private async Task<List<SelectListItem>> BuildProductTemplateOptionsAsync(int? selectedId = null)
     {
-        var sellers = await _dbContext.Users
+        var templates = await _dbContext.ProductTemplates
+            .AsNoTracking()
+            .Where(template => template.DeletedAt == null && template.IsActive)
+            .OrderBy(template => template.Name)
+            .Select(template => new
+            {
+                template.Id,
+                template.Name,
+                CategoryName = template.Category.Name,
+                template.GradeLabel
+            })
+            .ToListAsync();
+
+        return templates
+            .Select(template => new SelectListItem
+            {
+                Value = template.Id.ToString(),
+                Text = $"{template.Name} ({template.CategoryName}{(string.IsNullOrWhiteSpace(template.GradeLabel) ? string.Empty : $" - {template.GradeLabel}")})",
+                Selected = selectedId == template.Id
+            })
+            .ToList();
+    }
+
+    private async Task<List<SelectListItem>> BuildSellerOptionsAsync(int? selectedId = null, int? templateId = null)
+    {
+        var query = _dbContext.Users
             .AsNoTracking()
             .Where(user =>
                 user.DeletedAt == null &&
                 user.Status == UserStatus.Active &&
-                user.Role == UserRole.User)
+                user.Role == UserRole.User);
+
+        if (templateId.HasValue)
+        {
+            query = query.Where(user => user.Products.Any(product =>
+                product.DeletedAt == null &&
+                product.ProductTemplateId == templateId.Value));
+        }
+
+        var sellers = await query
             .OrderBy(user => user.FullName)
             .Select(user => new { user.Id, user.FullName, user.Email })
             .ToListAsync();
@@ -1034,7 +1318,126 @@ public class AdminProductService : IAdminProductService
             .ToList();
     }
 
-    private static void NormalizeCategoryFilter(ProductCategoryFilterViewModel filter)
+    private async Task<ProductTemplateDetailViewModel?> GetTemplateDetailsAsync(int templateId)
+    {
+        return await _dbContext.ProductTemplates
+            .AsNoTracking()
+            .Where(template => template.Id == templateId && template.DeletedAt == null && template.IsActive)
+            .Select(template => new ProductTemplateDetailViewModel
+            {
+                Id = template.Id,
+                Name = template.Name,
+                CategoryName = template.Category.Name,
+                SetName = template.SetName,
+                CardNumber = template.CardNumber,
+                GradeLabel = template.GradeLabel,
+                Language = template.Language,
+                Year = template.Year,
+                PrimaryImage = template.PrimaryImage,
+                InstanceCount = template.Products.Count(product => product.DeletedAt == null),
+                SellerCount = template.Products
+                    .Where(product => product.DeletedAt == null)
+                    .Select(product => product.SellerId)
+                    .Distinct()
+                    .Count()
+            })
+            .FirstOrDefaultAsync();
+    }
+
+    private async Task<string?> ValidateTemplateAsync(ProductTemplateFormViewModel model)
+    {
+        var categoryExists = await _dbContext.Categories
+            .AnyAsync(category =>
+                category.Id == model.CategoryId &&
+                category.DeletedAt == null &&
+                category.IsActive);
+
+        if (!categoryExists)
+        {
+            return "Selected category is not available.";
+        }
+
+        if (model.PrimaryImageFile is { Length: > 0 })
+        {
+            const long maxImageSize = 2 * 1024 * 1024;
+            var extension = Path.GetExtension(model.PrimaryImageFile.FileName).ToLowerInvariant();
+
+            if (model.PrimaryImageFile.Length > maxImageSize)
+            {
+                return "Mau san pham primary image must not exceed 2MB.";
+            }
+
+            if (extension is not ".jpg" and not ".jpeg" and not ".png")
+            {
+                return "Mau san pham primary image must be JPEG or PNG.";
+            }
+        }
+
+        if (!model.Id.HasValue && model.PrimaryImageFile is not { Length: > 0 })
+        {
+            return "Primary image is required for mau san pham.";
+        }
+
+        var normalizedName = NormalizeTemplateKey(model.Name);
+        var normalizedSet = NormalizeTemplateKey(model.SetName);
+        var normalizedCard = NormalizeTemplateKey(model.CardNumber);
+        var normalizedGrade = NormalizeTemplateKey(model.GradeLabel);
+
+        var candidates = await _dbContext.ProductTemplates
+            .AsNoTracking()
+            .Where(template =>
+                template.DeletedAt == null &&
+                template.IsActive &&
+                template.CategoryId == model.CategoryId &&
+                (!model.Id.HasValue || template.Id != model.Id.Value))
+            .Select(template => new
+            {
+                template.Name,
+                template.SetName,
+                template.CardNumber,
+                template.GradeLabel
+            })
+            .ToListAsync();
+
+        var isDuplicate = candidates.Any(template =>
+            NormalizeTemplateKey(template.Name) == normalizedName &&
+            NormalizeTemplateKey(template.SetName) == normalizedSet &&
+            NormalizeTemplateKey(template.CardNumber) == normalizedCard &&
+            NormalizeTemplateKey(template.GradeLabel) == normalizedGrade);
+
+        return isDuplicate
+            ? "A matching active mau san pham already exists."
+            : null;
+    }
+
+    private static void ApplyTemplateSnapshot(ProductFormViewModel model, ProductTemplate template)
+    {
+        model.ProductTemplateId = template.Id;
+        model.CategoryId = template.CategoryId;
+        model.Name = template.Name;
+        model.ShortDescription = template.ShortDescription;
+        model.DescriptionHtml = template.DescriptionHtml;
+        model.SetName = template.SetName;
+        model.CardNumber = template.CardNumber;
+        model.GradeLabel = template.GradeLabel;
+        model.Year = template.Year;
+        model.Language = template.Language;
+        model.PrimaryImageUrl = template.PrimaryImage;
+        model.ProductTemplateName = template.Name;
+    }
+
+    public static string NormalizeTemplateKey(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        return string.Join(' ', value.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            .ToUpperInvariant();
+    }
+
+    private static void NormalizeTemplateFilter(ProductTemplateFilterViewModel filter)
     {
         if (filter.Page <= 0)
         {

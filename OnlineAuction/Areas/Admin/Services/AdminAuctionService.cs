@@ -499,6 +499,67 @@ public class AdminAuctionService
         return (true, "Auction deleted successfully.");
     }
 
+    public async Task<(bool Success, string Message)> BulkDeleteAsync(IReadOnlyList<int> auctionIds)
+    {
+        if (auctionIds.Count == 0)
+        {
+            return (false, "Please select at least one auction.");
+        }
+
+        var auctions = await _dbContext.Auctions
+            .Include(item => item.Product)
+            .Include(item => item.Bids)
+            .Include(item => item.OrderItems)
+            .Where(item => auctionIds.Contains(item.Id) && item.DeletedAt == null)
+            .ToListAsync();
+
+        if (auctions.Count == 0)
+        {
+            return (false, "No auctions found.");
+        }
+
+        var deletedCount = 0;
+        var skippedMessages = new List<string>();
+        var now = DateTime.UtcNow;
+
+        foreach (var auction in auctions)
+        {
+            var activeBidCount = auction.Bids.Count(bid => bid.DeletedAt == null);
+            if (activeBidCount > 0)
+            {
+                skippedMessages.Add($"#{auction.Id}: has {activeBidCount} bid(s)");
+                continue;
+            }
+
+            var activeOrderCount = auction.OrderItems.Count(item => item.DeletedAt == null);
+            if (activeOrderCount > 0)
+            {
+                skippedMessages.Add($"#{auction.Id}: linked to an order");
+                continue;
+            }
+
+            auction.DeletedAt = now;
+            auction.UpdatedAt = now;
+            auction.Product.DeletedAt = now;
+            auction.Product.UpdatedAt = now;
+            deletedCount++;
+        }
+
+        if (deletedCount == 0)
+        {
+            return (false, string.Join(" ", skippedMessages));
+        }
+
+        await _dbContext.SaveChangesAsync();
+
+        if (skippedMessages.Count == 0)
+        {
+            return (true, $"Deleted {deletedCount} auction(s) successfully.");
+        }
+
+        return (true, $"Deleted {deletedCount} auction(s). Skipped {skippedMessages.Count}: {string.Join(" ", skippedMessages)}");
+    }
+
     public async Task PopulateFormOptionsAsync(AuctionFormViewModel model)
     {
         model.CategoryOptions = await BuildCategoryOptionsAsync(model.CategoryId);

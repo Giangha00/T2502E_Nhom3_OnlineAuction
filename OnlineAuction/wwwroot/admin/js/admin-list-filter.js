@@ -207,6 +207,56 @@
                 window.jQuery(this).val('');
                 submitCallback();
             });
+        },
+
+        bindBulkDelete: function (container, options) {
+            const root = container || document;
+            const settings = Object.assign({
+                formId: null,
+                selectAllId: null,
+                checkboxClass: null,
+                submitDataAttr: 'bulkDelete',
+                emptyMessage: 'Please select at least one item.',
+                confirmMessage: 'Are you sure you want to delete selected items?'
+            }, options);
+
+            const bulkForm = settings.formId ? root.querySelector('#' + settings.formId) : null;
+            const selectAll = settings.selectAllId ? root.querySelector('#' + settings.selectAllId) : null;
+            const checkboxes = settings.checkboxClass
+                ? root.querySelectorAll('.' + settings.checkboxClass)
+                : [];
+
+            if (selectAll) {
+                selectAll.onchange = function () {
+                    checkboxes.forEach(function (checkbox) {
+                        checkbox.checked = selectAll.checked;
+                    });
+                };
+            }
+
+            if (!bulkForm) {
+                return;
+            }
+
+            bulkForm.onsubmit = function (event) {
+                if (event.submitter?.dataset[settings.submitDataAttr] !== 'true') {
+                    return;
+                }
+
+                const selectedCount = bulkForm.querySelectorAll(
+                    settings.checkboxClass ? '.' + settings.checkboxClass + ':checked' : 'input[type="checkbox"]:checked'
+                ).length;
+
+                if (selectedCount === 0) {
+                    event.preventDefault();
+                    alert(settings.emptyMessage);
+                    return;
+                }
+
+                if (!confirm(settings.confirmMessage)) {
+                    event.preventDefault();
+                }
+            };
         }
     };
 })(window);

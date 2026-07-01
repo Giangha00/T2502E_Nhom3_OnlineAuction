@@ -18,6 +18,10 @@ public class ProductDetailViewModel
 
     public int CategoryId { get; set; }
 
+    public int? ProductTemplateId { get; set; }
+
+    public string? ProductTemplateName { get; set; }
+
     public string SellerName { get; set; } = string.Empty;
 
     public string? SellerEmail { get; set; }

@@ -15,6 +15,8 @@ public class AuctionOrder : AuditableEntity
     public decimal VaultInsurance { get; set; }
 
     public decimal TotalAmount { get; set; }
+
+    public decimal PlatformFee { get; set; }
     // Số tiền cọc của winner được trừ vào order.
     // Ví dụ winning bid = 500, deposit = 50
     // thì order sẽ lưu DepositApplied = 50.
