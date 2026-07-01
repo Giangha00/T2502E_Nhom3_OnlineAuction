@@ -23,6 +23,14 @@
                     @Localizer["Admin_BidHistory_TotalBids", Model.BidHistoryTotalCount]
                 </p>
             </div>
+            <a asp-area="Admin"
+               asp-controller="Auction"
+               asp-action="Details"
+               asp-route-id="@Model.Id"
+               asp-route-flaggedOnly="@(!Model.ShowFlaggedBidsOnly)"
+               class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300">
+                @(Model.ShowFlaggedBidsOnly ? Localizer["Admin_BidHistory_Filter_ShowAll"].Value : Localizer["Admin_BidHistory_Filter_FlaggedOnly"].Value)
+            </a>
         </div>
     </div>
 
@@ -60,6 +68,13 @@
                                class="text-brand-600 hover:text-brand-700 hover:underline">
                                 @bid.BidderName
                             </a>
+                            @if (bid.IsFlagged)
+                            {
+                                <span class="ml-2 inline-flex rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-red-700 dark:bg-red-500/20 dark:text-red-300"
+                                      title="@bid.FlagReason">
+                                    @Localizer["Admin_BidHistory_Flagged"]
+                                </span>
+                            }
                         </td>
                         <td class="px-5 py-4 text-theme-sm text-gray-600 dark:text-gray-300">@bid.BidderEmail</td>
                         <td class="px-5 py-4 text-theme-sm font-semibold tabular-nums text-gray-900 dark:text-white/90">$@bid.Amount.ToString("N2")</td>
@@ -97,6 +112,7 @@
                        asp-controller="Auction"
                        asp-action="Details"
                        asp-route-id="@Model.Id"
+                       asp-route-flaggedOnly="@Model.ShowFlaggedBidsOnly"
                        asp-route-bidPage="@(currentPage - 1)"
                        class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 @(currentPage <= 1 ? "pointer-events-none opacity-50" : string.Empty)">
                         @Localizer["Admin_BidHistory_Pagination_Previous"]
@@ -108,6 +124,7 @@
                            asp-controller="Auction"
                            asp-action="Details"
                            asp-route-id="@Model.Id"
+                           asp-route-flaggedOnly="@Model.ShowFlaggedBidsOnly"
                            asp-route-bidPage="@pageNumber"
                            class="rounded-lg border px-3 py-2 text-theme-sm font-medium @(pageNumber == currentPage ? "border-brand-500 bg-brand-500 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300")">
                             @pageNumber
@@ -118,6 +135,7 @@
                        asp-controller="Auction"
                        asp-action="Details"
                        asp-route-id="@Model.Id"
+                       asp-route-flaggedOnly="@Model.ShowFlaggedBidsOnly"
                        asp-route-bidPage="@(currentPage + 1)"
                        class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 @(currentPage >= totalPages ? "pointer-events-none opacity-50" : string.Empty)">
                         @Localizer["Admin_BidHistory_Pagination_Next"]

@@ -1,0 +1,148 @@
+@model AuctionDetailViewModel
+@using OnlineAuction.Entities
+
+@{
+    string AlertTypeLabel(string alertType) => alertType switch
+    {
+        FraudAlertTypes.RateLimitExceeded => Localizer["FraudAlert_Type_RateLimitExceeded"].Value,
+        FraudAlertTypes.SameIpMultipleAccounts => Localizer["FraudAlert_Type_SameIpMultipleAccounts"].Value,
+        FraudAlertTypes.RapidBidding => Localizer["FraudAlert_Type_RapidBidding"].Value,
+        FraudAlertTypes.CollusionRoundTrip => Localizer["FraudAlert_Type_CollusionRoundTrip"].Value,
+        FraudAlertTypes.AbnormalPriceJump => Localizer["FraudAlert_Type_AbnormalPriceJump"].Value,
+        FraudAlertTypes.NewAccountHighBid => Localizer["FraudAlert_Type_NewAccountHighBid"].Value,
+        FraudAlertTypes.SellerRelatedBidder => Localizer["FraudAlert_Type_SellerRelatedBidder"].Value,
+        _ => alertType
+    };
+
+    string SeverityLabel(string severity) => severity switch
+    {
+        FraudAlertSeverities.Low => Localizer["FraudAlert_Severity_Low"].Value,
+        FraudAlertSeverities.Medium => Localizer["FraudAlert_Severity_Medium"].Value,
+        FraudAlertSeverities.High => Localizer["FraudAlert_Severity_High"].Value,
+        _ => severity
+    };
+
+    string StatusLabel(string status) => status switch
+    {
+        FraudAlertStatuses.Open => Localizer["FraudAlert_Status_Open"].Value,
+        FraudAlertStatuses.Reviewed => Localizer["FraudAlert_Status_Reviewed"].Value,
+        FraudAlertStatuses.Dismissed => Localizer["FraudAlert_Status_Dismissed"].Value,
+        _ => status
+    };
+
+    string SeverityClass(string severity) => severity switch
+    {
+        FraudAlertSeverities.High => "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300",
+        FraudAlertSeverities.Medium => "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300",
+        _ => "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-300"
+    };
+
+    string StatusClass(string status) => status switch
+    {
+        FraudAlertStatuses.Open => "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300",
+        FraudAlertStatuses.Reviewed => "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300",
+        FraudAlertStatuses.Dismissed => "bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-gray-300",
+        _ => "bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-gray-300"
+    };
+}
+
+<section class="mt-6 rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+    <div class="border-b border-gray-100 px-6 py-4 dark:border-gray-800">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["FraudAlerts_Title"]</h3>
+                <p class="text-theme-sm text-gray-500 dark:text-gray-400">
+                    @Localizer["FraudAlerts_Total", Model.FraudAlerts.Count]
+                </p>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.FraudAlerts.Count == 0)
+    {
+        <div class="px-6 py-12 text-center">
+            <p class="text-theme-sm font-medium text-gray-600 dark:text-gray-300">@Localizer["FraudAlerts_Empty"]</p>
+        </div>
+    }
+    else
+    {
+        <div class="max-w-full overflow-x-auto">
+            <table class="w-full min-w-[1100px]">
+                <thead>
+                <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["FraudAlerts_Col_Time"]</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["FraudAlerts_Col_Type"]</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["FraudAlerts_Col_Severity"]</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["FraudAlerts_Col_Message"]</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["FraudAlerts_Col_User"]</th>
+                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["FraudAlerts_Col_Status"]</th>
+                    <th class="px-5 py-3 text-right text-theme-xs font-medium uppercase text-gray-500">@Localizer["FraudAlerts_Col_Action"]</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                @foreach (var alert in Model.FraudAlerts)
+                {
+                    <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                        <td class="px-5 py-4 text-theme-sm text-gray-600 dark:text-gray-300">@alert.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td class="px-5 py-4 text-theme-sm font-medium text-gray-800 dark:text-white/90">@AlertTypeLabel(alert.AlertType)</td>
+                        <td class="px-5 py-4">
+                            <span class="inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide @SeverityClass(alert.Severity)">
+                                @SeverityLabel(alert.Severity)
+                            </span>
+                        </td>
+                        <td class="px-5 py-4 text-theme-sm text-gray-600 dark:text-gray-300">@alert.Message</td>
+                        <td class="px-5 py-4 text-theme-sm text-gray-600 dark:text-gray-300">
+                            @if (alert.UserId.HasValue)
+                            {
+                                <a asp-area="Admin"
+                                   asp-controller="User"
+                                   asp-action="Details"
+                                   asp-route-id="@alert.UserId.Value"
+                                   class="text-brand-600 hover:text-brand-700 hover:underline">
+                                    @(alert.UserName ?? $"#{alert.UserId.Value}")
+                                </a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td class="px-5 py-4">
+                            <span class="inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide @StatusClass(alert.Status)">
+                                @StatusLabel(alert.Status)
+                            </span>
+                        </td>
+                        <td class="px-5 py-4 text-right">
+                            @if (alert.Status == FraudAlertStatuses.Open)
+                            {
+                                <div class="flex justify-end gap-2">
+                                    <form asp-area="Admin" asp-controller="Auction" asp-action="ReviewFraudAlert" method="post">
+                                        <input type="hidden" name="alertId" value="@alert.Id" />
+                                        <input type="hidden" name="auctionId" value="@Model.Id" />
+                                        <button type="submit" class="rounded-lg border border-blue-200 px-3 py-1.5 text-theme-xs font-medium text-blue-700 hover:bg-blue-50 dark:border-blue-500/30 dark:text-blue-300">
+                                            @Localizer["FraudAlerts_Action_Review"]
+                                        </button>
+                                    </form>
+                                    <form asp-area="Admin" asp-controller="Auction" asp-action="DismissFraudAlert" method="post">
+                                        <input type="hidden" name="alertId" value="@alert.Id" />
+                                        <input type="hidden" name="auctionId" value="@Model.Id" />
+                                        <button type="submit" class="rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300">
+                                            @Localizer["FraudAlerts_Action_Dismiss"]
+                                        </button>
+                                    </form>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-theme-xs text-gray-500">
+                                    @(alert.ReviewedAt?.ToString("dd/MM/yyyy HH:mm") ?? "-")
+                                </span>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

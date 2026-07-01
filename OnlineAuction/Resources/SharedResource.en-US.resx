@@ -919,6 +919,35 @@
   <data name="Admin_BidHistory_Pagination_PageOf" xml:space="preserve"><value>Page {0} of {1}</value></data>
   <data name="Admin_BidHistory_Pagination_Previous" xml:space="preserve"><value>Previous</value></data>
   <data name="Admin_BidHistory_Pagination_Next" xml:space="preserve"><value>Next</value></data>
+  <data name="Admin_BidHistory_Flagged" xml:space="preserve"><value>Flagged</value></data>
+  <data name="Admin_BidHistory_Filter_FlaggedOnly" xml:space="preserve"><value>Flagged only</value></data>
+  <data name="Admin_BidHistory_Filter_ShowAll" xml:space="preserve"><value>Show all bids</value></data>
+  <data name="Bid_RateLimit_Message" xml:space="preserve"><value>Too many bids. Please wait before bidding again.</value></data>
+  <data name="FraudAlerts_Title" xml:space="preserve"><value>Fraud Alerts</value></data>
+  <data name="FraudAlerts_Total" xml:space="preserve"><value>{0} alert(s)</value></data>
+  <data name="FraudAlerts_Empty" xml:space="preserve"><value>No fraud alerts for this auction.</value></data>
+  <data name="FraudAlerts_Col_Time" xml:space="preserve"><value>Time</value></data>
+  <data name="FraudAlerts_Col_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="FraudAlerts_Col_Severity" xml:space="preserve"><value>Severity</value></data>
+  <data name="FraudAlerts_Col_Message" xml:space="preserve"><value>Message</value></data>
+  <data name="FraudAlerts_Col_User" xml:space="preserve"><value>User</value></data>
+  <data name="FraudAlerts_Col_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="FraudAlerts_Col_Action" xml:space="preserve"><value>Action</value></data>
+  <data name="FraudAlerts_Action_Review" xml:space="preserve"><value>Review</value></data>
+  <data name="FraudAlerts_Action_Dismiss" xml:space="preserve"><value>Dismiss</value></data>
+  <data name="FraudAlert_Type_RateLimitExceeded" xml:space="preserve"><value>Rate limit exceeded</value></data>
+  <data name="FraudAlert_Type_SameIpMultipleAccounts" xml:space="preserve"><value>Same IP accounts</value></data>
+  <data name="FraudAlert_Type_RapidBidding" xml:space="preserve"><value>Rapid bidding</value></data>
+  <data name="FraudAlert_Type_CollusionRoundTrip" xml:space="preserve"><value>Collusion pattern</value></data>
+  <data name="FraudAlert_Type_AbnormalPriceJump" xml:space="preserve"><value>Abnormal price jump</value></data>
+  <data name="FraudAlert_Type_NewAccountHighBid" xml:space="preserve"><value>New account high bid</value></data>
+  <data name="FraudAlert_Type_SellerRelatedBidder" xml:space="preserve"><value>Seller-related bidder</value></data>
+  <data name="FraudAlert_Severity_Low" xml:space="preserve"><value>Low</value></data>
+  <data name="FraudAlert_Severity_Medium" xml:space="preserve"><value>Medium</value></data>
+  <data name="FraudAlert_Severity_High" xml:space="preserve"><value>High</value></data>
+  <data name="FraudAlert_Status_Open" xml:space="preserve"><value>Open</value></data>
+  <data name="FraudAlert_Status_Reviewed" xml:space="preserve"><value>Reviewed</value></data>
+  <data name="FraudAlert_Status_Dismissed" xml:space="preserve"><value>Dismissed</value></data>
   <data name="Admin_Dashboard_Title" xml:space="preserve"><value>Dashboard</value></data>
   <data name="Admin_Dashboard_Subtitle" xml:space="preserve"><value>Monitor platform performance and analytics.</value></data>
   <data name="Admin_Dashboard_Section1_Title" xml:space="preserve"><value>Overview</value></data>
