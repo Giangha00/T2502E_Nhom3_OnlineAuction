@@ -222,6 +222,56 @@ public class CategoryService : ICategoryService
         return (true, "Category deleted successfully.");
     }
 
+    public async Task<(bool Success, string Message)> BulkDeleteAsync(IReadOnlyList<int> categoryIds)
+    {
+        if (categoryIds.Count == 0)
+        {
+            return (false, "Please select at least one category.");
+        }
+
+        var categories = await _dbContext.Categories
+            .Include(item => item.Products)
+            .Where(item => categoryIds.Contains(item.Id) && item.DeletedAt == null)
+            .ToListAsync();
+
+        if (categories.Count == 0)
+        {
+            return (false, "No categories found.");
+        }
+
+        var deletedCount = 0;
+        var skippedMessages = new List<string>();
+        var now = DateTime.UtcNow;
+
+        foreach (var category in categories)
+        {
+            var activeProductCount = category.Products.Count(product => product.DeletedAt == null);
+            if (activeProductCount > 0)
+            {
+                skippedMessages.Add($"#{category.Id} {category.Name}: used by {activeProductCount} product(s)");
+                continue;
+            }
+
+            category.DeletedAt = now;
+            category.UpdatedAt = now;
+            deletedCount++;
+        }
+
+        if (deletedCount == 0)
+        {
+            return (false, string.Join(" ", skippedMessages));
+        }
+
+        await _dbContext.SaveChangesAsync();
+
+        if (skippedMessages.Count == 0)
+        {
+            return (true, $"Deleted {deletedCount} category(ies) successfully.");
+        }
+
+        return (true, $"Deleted {deletedCount} category(ies). Skipped {skippedMessages.Count}: {string.Join(" ", skippedMessages)}");
+    }
+
     private static void NormalizeFilter(CategoryFilterViewModel filter)
     {
         if (filter.Page <= 0)

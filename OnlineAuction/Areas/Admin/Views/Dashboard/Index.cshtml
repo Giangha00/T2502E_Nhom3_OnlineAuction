@@ -33,6 +33,8 @@
     }, jsonOptions);
 }
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -185,8 +187,7 @@
                                     <a asp-area="Admin"
                                        asp-controller="Dashboard"
                                        asp-action="Index"
-                                       asp-route-dateFrom="@Model.Filter.DateFrom.ToString("yyyy-MM-dd")"
-                                       asp-route-dateTo="@Model.Filter.DateTo.ToString("yyyy-MM-dd")"
+                                       asp-route-dateRange="@Model.Filter.DateRange"
                                        asp-route-categoryId="@auction.CategoryId"
                                        class="text-brand-600 hover:underline">
                                         @auction.CategoryName
@@ -197,8 +198,7 @@
                                     <a asp-area="Admin"
                                        asp-controller="Dashboard"
                                        asp-action="Index"
-                                       asp-route-dateFrom="@Model.Filter.DateFrom.ToString("yyyy-MM-dd")"
-                                       asp-route-dateTo="@Model.Filter.DateTo.ToString("yyyy-MM-dd")"
+                                       asp-route-dateRange="@Model.Filter.DateRange"
                                        asp-route-status="@auction.Status"
                                        class="inline-flex rounded-full px-2.5 py-0.5 text-theme-xs font-medium @auction.StatusBadgeClass">
                                         @auction.StatusLabel
@@ -217,6 +217,15 @@
 <script type="application/json" id="dashboard-chart-data">@Html.Raw(chartDataJson)</script>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="~/admin/js/admin-list-filter.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.54.1/dist/apexcharts.min.js"></script>
     <script src="~/admin/js/dashboard.js" asp-append-version="true"></script>
+    <script>
+        AdminListFilter.setupDateRangePicker('#dashboardDateRangePicker', function () {
+            document.getElementById('dashboardFilterForm')?.submit();
+        });
+    </script>
 }
