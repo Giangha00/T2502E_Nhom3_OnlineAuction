@@ -108,6 +108,7 @@ public class ProductDocumentDownloadTests
             CreatedAt = DateTime.UtcNow
         };
 
+        var liveStart = DateTime.UtcNow.AddDays(-1);
         var auction = new Auction
         {
             Product = product,
@@ -115,7 +116,9 @@ public class ProductDocumentDownloadTests
             StartingPrice = 100m,
             BidStep = 10m,
             CurrentPrice = 100m,
-            StartDate = DateTime.UtcNow.AddDays(-1),
+            RegistrationStartDate = liveStart.AddDays(-7),
+            RegistrationEndDate = liveStart,
+            StartDate = liveStart,
             EndDate = DateTime.UtcNow.AddDays(1),
             CreatedAt = DateTime.UtcNow
         };
