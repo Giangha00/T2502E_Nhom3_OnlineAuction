@@ -23,10 +23,13 @@ public class ProductFormViewModel
     [Display(Name = "Description")]
     public string? DescriptionHtml { get; set; }
 
-    [Required(ErrorMessage = "Category is required.")]
-    [Range(1, int.MaxValue, ErrorMessage = "Please select a category.")]
     [Display(Name = "Category")]
     public int CategoryId { get; set; }
+
+    [Required(ErrorMessage = "Mau san pham is required.")]
+    [Range(1, int.MaxValue, ErrorMessage = "Please select a mau san pham.")]
+    [Display(Name = "Mau san pham")]
+    public int? ProductTemplateId { get; set; }
 
     [Required(ErrorMessage = "Seller is required.")]
     [Range(1, int.MaxValue, ErrorMessage = "Please select a seller.")]
@@ -101,7 +104,15 @@ public class ProductFormViewModel
 
     public bool IsSellerLocked { get; set; }
 
+    public bool IsTemplateLocked { get; set; }
+
+    public string? ProductTemplateName { get; set; }
+
+    public int? ContextTemplateId { get; set; }
+
     public List<SelectListItem> CategoryOptions { get; set; } = [];
+
+    public List<SelectListItem> ProductTemplateOptions { get; set; } = [];
 
     public List<SelectListItem> SellerOptions { get; set; } = [];
 

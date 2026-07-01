@@ -5,7 +5,7 @@
     var totalPages = Model.TotalPages <= 0 ? 1 : Model.TotalPages;
     var startPage = Math.Max(1, currentPage - 2);
     var endPage = Math.Min(totalPages, currentPage + 2);
-    var categoryId = Model.ContextCategoryId ?? 0;
+    var templateId = Model.ContextTemplateId ?? 0;
 }
 
 <form id="productBulkDeleteForm"
@@ -14,7 +14,7 @@
       asp-action="BulkDelete"
       method="post">
     @Html.AntiForgeryToken()
-    <input type="hidden" name="ReturnCategoryId" value="@categoryId" />
+    <input type="hidden" name="ReturnTemplateId" value="@templateId" />
 
     <div class="mb-4 flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03] sm:flex-row sm:items-center sm:justify-between">
         <button type="submit"
@@ -53,7 +53,11 @@
                 {
                     <tr>
                         <td colspan="10" class="px-5 py-10 text-center text-theme-sm text-gray-500">
-                            No products found in this category.
+                            Mau nay chua co san pham cua seller.
+                            @if (templateId > 0)
+                            {
+                                <a asp-area="Admin" asp-controller="Product" asp-action="Create" asp-route-templateId="@templateId" class="ml-2 font-medium text-brand-500 hover:underline">Tao san pham</a>
+                            }
                         </td>
                     </tr>
                 }
@@ -79,7 +83,7 @@
                             </td>
                             <td class="px-5 py-4">
                                 <p class="text-theme-sm text-gray-800 dark:text-white/90">@product.SellerName</p>
-                                <p class="text-theme-xs text-gray-500">Seller ID: @product.SellerId</p>
+                                <p class="text-theme-xs text-gray-500">@product.SellerEmail</p>
                             </td>
                             <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">
                                 @product.Condition
@@ -89,7 +93,8 @@
                                 }
                             </td>
                             <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">
-                                @(product.EstimatedValue?.ToString("C") ?? "—")
+                                <p>Est: @(product.EstimatedValue?.ToString("N2") ?? "—")</p>
+                                <p class="text-theme-xs text-gray-500">Import: @(product.ImportPrice?.ToString("N2") ?? "—")</p>
                             </td>
                             <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">1</td>
                             <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">
@@ -122,7 +127,7 @@
                                     @if (product.CanDelete)
                                     {
                                         <button type="submit"
-                                                formaction="@Url.Action("Delete", "Product", new { area = "Admin", id = product.Id, returnCategoryId = categoryId })"
+                                                formaction="@Url.Action("Delete", "Product", new { area = "Admin", id = product.Id, returnTemplateId = templateId })"
                                                 class="text-theme-sm font-medium text-error-600 hover:underline"
                                                 onclick="return confirm('Are you sure you want to delete this product?');">
                                             Delete
@@ -148,12 +153,14 @@
     <nav class="flex flex-wrap items-center gap-2">
         <a asp-area="Admin"
            asp-controller="Product"
-           asp-action="Category"
-           asp-route-id="@categoryId"
+           asp-action="Template"
+           asp-route-id="@templateId"
            asp-route-Search="@Model.Filter.Search"
            asp-route-SellerId="@Model.Filter.SellerId"
            asp-route-Condition="@Model.Filter.Condition"
            asp-route-DateRange="@Model.Filter.DateRange"
+           asp-route-MinEstimatedValue="@Model.Filter.MinEstimatedValue"
+           asp-route-MaxEstimatedValue="@Model.Filter.MaxEstimatedValue"
            asp-route-SortOrder="@Model.Filter.SortOrder"
            asp-route-Page="@(currentPage - 1)"
            class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage <= 1 ? "pointer-events-none opacity-50" : "js-admin-page")">
@@ -164,12 +171,14 @@
         {
             <a asp-area="Admin"
                asp-controller="Product"
-               asp-action="Category"
-               asp-route-id="@categoryId"
+               asp-action="Template"
+               asp-route-id="@templateId"
                asp-route-Search="@Model.Filter.Search"
                asp-route-SellerId="@Model.Filter.SellerId"
                asp-route-Condition="@Model.Filter.Condition"
                asp-route-DateRange="@Model.Filter.DateRange"
+               asp-route-MinEstimatedValue="@Model.Filter.MinEstimatedValue"
+               asp-route-MaxEstimatedValue="@Model.Filter.MaxEstimatedValue"
                asp-route-SortOrder="@Model.Filter.SortOrder"
                asp-route-Page="@pageNumber"
                class="js-admin-page rounded-lg border px-3 py-2 text-theme-sm font-medium @(pageNumber == currentPage ? "border-brand-500 bg-brand-500 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50")">
@@ -179,12 +188,14 @@
 
         <a asp-area="Admin"
            asp-controller="Product"
-           asp-action="Category"
-           asp-route-id="@categoryId"
+           asp-action="Template"
+           asp-route-id="@templateId"
            asp-route-Search="@Model.Filter.Search"
            asp-route-SellerId="@Model.Filter.SellerId"
            asp-route-Condition="@Model.Filter.Condition"
            asp-route-DateRange="@Model.Filter.DateRange"
+           asp-route-MinEstimatedValue="@Model.Filter.MinEstimatedValue"
+           asp-route-MaxEstimatedValue="@Model.Filter.MaxEstimatedValue"
            asp-route-SortOrder="@Model.Filter.SortOrder"
            asp-route-Page="@(currentPage + 1)"
            class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage >= totalPages ? "pointer-events-none opacity-50" : "js-admin-page")">

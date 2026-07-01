@@ -16,6 +16,8 @@ public class ProductListItemViewModel
 
     public string SellerName { get; set; } = string.Empty;
 
+    public string SellerEmail { get; set; } = string.Empty;
+
     public string Condition { get; set; } = string.Empty;
 
     public string? GradeLabel { get; set; }
@@ -25,6 +27,8 @@ public class ProductListItemViewModel
     public string? CertNumber { get; set; }
 
     public decimal? EstimatedValue { get; set; }
+
+    public decimal? ImportPrice { get; set; }
 
     public int AuctionCount { get; set; }
 
