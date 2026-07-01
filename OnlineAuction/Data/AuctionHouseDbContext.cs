@@ -51,11 +51,14 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<Complaint> Complaints => Set<Complaint>();
 
+    public DbSet<ListingFee> ListingFees => Set<ListingFee>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         
         base.OnModelCreating(builder);
         ConfigureAuctionRegistrationDeposits(builder);
+        ConfigureListingFees(builder);
         ConfigureIdentityTables(builder);
         ConfigureUsers(builder);
         ConfigureCategories(builder);
@@ -205,6 +208,45 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureAuditableEntity(entity, "auction_registration_deposits");
     });
 }
+
+    private static void ConfigureListingFees(ModelBuilder builder)
+    {
+        builder.Entity<ListingFee>(entity =>
+        {
+            entity.ToTable("listing_fees");
+
+            entity.Property(f => f.Id).HasColumnName("id");
+            entity.Property(f => f.AuctionId).HasColumnName("auction_id");
+            entity.Property(f => f.SellerId).HasColumnName("seller_id");
+            entity.Property(f => f.FeeAmount).HasColumnName("fee_amount").HasPrecision(18, 2);
+            entity.Property(f => f.FeeType).HasColumnName("fee_type").HasMaxLength(20).IsRequired();
+            entity.Property(f => f.Status).HasColumnName("status").HasMaxLength(20).IsRequired();
+            entity.Property(f => f.PaidAt).HasColumnName("paid_at");
+
+            entity.HasIndex(f => f.AuctionId)
+                .HasDatabaseName("ix_listing_fees_auction_id");
+
+            entity.HasIndex(f => new { f.AuctionId, f.Status })
+                .HasDatabaseName("ix_listing_fees_auction_status");
+
+            entity.HasOne(f => f.Auction)
+                .WithMany(a => a.ListingFees)
+                .HasForeignKey(f => f.AuctionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(f => f.Seller)
+                .WithMany()
+                .HasForeignKey(f => f.SellerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(f => f.CreatedByAdmin)
+                .WithMany()
+                .HasForeignKey(f => f.CreatedBy)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            ConfigureAuditableEntity(entity, "listing_fees");
+        });
+    }
 
     private static void ConfigureIdentityTables(ModelBuilder builder)
     {

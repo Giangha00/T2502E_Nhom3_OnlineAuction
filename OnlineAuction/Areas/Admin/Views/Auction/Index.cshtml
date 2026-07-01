@@ -98,11 +98,22 @@
 @section Scripts {
     <script src="~/admin/js/admin-list-filter.js" asp-append-version="true"></script>
     <script>
+        function bindAuctionBulkActions(container) {
+            AdminListFilter.bindBulkDelete(container, {
+                formId: 'auctionBulkDeleteForm',
+                selectAllId: 'selectAllAuctions',
+                checkboxClass: 'auction-checkbox',
+                emptyMessage: 'Please select at least one auction.',
+                confirmMessage: 'Are you sure you want to delete selected auctions?'
+            });
+        }
+
         AdminListFilter.init({
             formId: 'auctionFilterForm',
             resultsId: 'auctionListResults',
             searchInputId: 'auctionSearchInput',
-            listUrl: '@Url.Action("Index", "Auction", new { area = "Admin" })'
+            listUrl: '@Url.Action("Index", "Auction", new { area = "Admin" })',
+            onUpdated: bindAuctionBulkActions
         });
     </script>
 }
