@@ -93,7 +93,9 @@ internal static class ProductDetailMapper
             BidHistory = MapBidHistory(bids),
             Documents = MapDocuments(product),
             RelatedProducts = relatedProducts.ToList(),
-            BuyNowPrice = auction.BuyNowPrice
+            BuyNowPrice = auction.BuyNowPrice,
+            ListingType = auction.ListingType,
+            ListingRejectReason = auction.RejectReason
         };
     }
 

@@ -125,4 +125,23 @@ public class AuctionController : BaseAdminController
 
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
+    public async Task<IActionResult> BulkDelete(AuctionBulkDeleteViewModel model)
+    {
+        var result = await _auctionService.BulkDeleteAsync(model.SelectedAuctionIds);
+
+        if (result.Success)
+        {
+            TempData["SuccessMessage"] = result.Message;
+        }
+        else
+        {
+            TempData["ErrorMessage"] = result.Message;
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
 }

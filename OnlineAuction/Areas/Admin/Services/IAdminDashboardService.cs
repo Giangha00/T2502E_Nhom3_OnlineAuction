@@ -7,6 +7,7 @@ public interface IAdminDashboardService
     DashboardFilterViewModel NormalizeFilter(
         DateTime? dateFrom,
         DateTime? dateTo,
+        string? dateRange = null,
         string? statusFilter = null,
         int? categoryIdFilter = null,
         DateTime? registrationDateFilter = null,
