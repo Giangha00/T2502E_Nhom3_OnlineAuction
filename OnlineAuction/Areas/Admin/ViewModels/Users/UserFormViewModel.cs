@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using OnlineAuction.Areas.Admin.ViewModels.Permissions;
 using OnlineAuction.Enums;
 
 namespace OnlineAuction.Areas.Admin.ViewModels.Users;
@@ -48,4 +49,10 @@ public class UserFormViewModel
     public List<SelectListItem> RoleOptions { get; set; } = [];
 
     public List<SelectListItem> StatusOptions { get; set; } = [];
+
+    public List<PermissionItemViewModel> AvailablePermissions { get; set; } = [];
+
+    public List<int> AssignedPermissionIds { get; set; } = [];
+
+    public bool ShowPermissionAssignment => Role == UserRole.User;
 }

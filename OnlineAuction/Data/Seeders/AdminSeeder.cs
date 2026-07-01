@@ -32,6 +32,7 @@ public static class AdminSeeder
                 FullName = "System Administrator",
                 PhoneNumber = "0900000000",
                 Role = UserRole.Admin,
+                IsSuperAdmin = true,
                 Status = UserStatus.Active,
                 EmailConfirmed = true,
                 CreatedAt = DateTime.UtcNow
@@ -49,9 +50,10 @@ public static class AdminSeeder
             await userManager.AddToRoleAsync(adminUser, AdminRoleName);
         }
 
-        if (adminUser.Role != UserRole.Admin || !adminUser.EmailConfirmed)
+        if (adminUser.Role != UserRole.Admin || !adminUser.EmailConfirmed || !adminUser.IsSuperAdmin)
         {
             adminUser.Role = UserRole.Admin;
+            adminUser.IsSuperAdmin = true;
             adminUser.Status = UserStatus.Active;
             adminUser.EmailConfirmed = true;
             await userManager.UpdateAsync(adminUser);

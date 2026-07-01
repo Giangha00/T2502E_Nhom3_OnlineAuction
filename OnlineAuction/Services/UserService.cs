@@ -21,17 +21,20 @@ public class UserService : IUserService
     private readonly IAvatarStorageService _avatarStorageService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ISellerAuctionService _sellerAuctionService;
+    private readonly IPermissionService _permissionService;
 
     public UserService(
         AuctionHouseDbContext dbContext,
         IAvatarStorageService avatarStorageService,
         UserManager<ApplicationUser> userManager,
-        ISellerAuctionService sellerAuctionService)
+        ISellerAuctionService sellerAuctionService,
+        IPermissionService permissionService)
     {
         _dbContext = dbContext;
         _avatarStorageService = avatarStorageService;
         _userManager = userManager;
         _sellerAuctionService = sellerAuctionService;
+        _permissionService = permissionService;
     }
 
     public async Task<PublicUserDetailViewModel?> GetPublicProfileAsync(int id, int? viewerUserId = null)
@@ -252,7 +255,7 @@ public class UserService : IUserService
         };
     }
 
-    public UserFormViewModel BuildCreateForm()
+    public async Task<UserFormViewModel> BuildCreateFormAsync()
     {
         var model = new UserFormViewModel
         {
@@ -261,6 +264,7 @@ public class UserService : IUserService
         };
 
         PopulateOptions(model);
+        await PopulatePermissionOptionsAsync(model);
 
         return model;
     }
@@ -288,6 +292,7 @@ public class UserService : IUserService
         };
 
         PopulateOptions(model);
+        await PopulatePermissionOptionsAsync(model, user.Id);
 
         return model;
     }
@@ -364,6 +369,16 @@ public class UserService : IUserService
         }
 
         await IdentityRoleSyncService.SyncUserRoleAsync(_userManager, user, model.Role);
+
+        if (model.Role == UserRole.User)
+        {
+            await _permissionService.UpdateUserPermissionsAsync(user.Id, model.AssignedPermissionIds);
+        }
+        else
+        {
+            await _permissionService.UpdateUserPermissionsAsync(user.Id, []);
+        }
+
         return (true, "User created successfully.");
     }
 
@@ -430,6 +445,16 @@ public class UserService : IUserService
         }
 
         await IdentityRoleSyncService.SyncUserRoleAsync(_userManager, user, model.Role);
+
+        if (model.Role == UserRole.User)
+        {
+            await _permissionService.UpdateUserPermissionsAsync(user.Id, model.AssignedPermissionIds);
+        }
+        else
+        {
+            await _permissionService.UpdateUserPermissionsAsync(user.Id, []);
+        }
+
         return (true, "User updated successfully.");
     }
 
@@ -563,6 +588,14 @@ public class UserService : IUserService
             new SelectListItem("Active", UserStatus.Active.ToString()),
             new SelectListItem("Inactive", UserStatus.Inactive.ToString())
         ];
+    }
+
+    private async Task PopulatePermissionOptionsAsync(UserFormViewModel model, int? userId = null)
+    {
+        model.AvailablePermissions = (await _permissionService.GetPermissionCatalogAsync()).ToList();
+        model.AssignedPermissionIds = userId.HasValue
+            ? (await _permissionService.GetAssignedPermissionIdsForUserAsync(userId.Value)).ToList()
+            : [];
     }
 
     private static (DateTime? StartDate, DateTime? EndDate) ParseDateRange(string? dateRange)
