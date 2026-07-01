@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Areas.Admin.ViewModels.AuctionVerification;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -21,15 +22,18 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
 
     private readonly AuctionHouseDbContext _dbContext;
     private readonly INotificationService _notificationService;
+    private readonly IListingFeeService _listingFeeService;
     private readonly ILogger<AdminAuctionVerificationService> _logger;
 
     public AdminAuctionVerificationService(
         AuctionHouseDbContext dbContext,
         INotificationService notificationService,
+        IListingFeeService listingFeeService,
         ILogger<AdminAuctionVerificationService> logger)
     {
         _dbContext = dbContext;
         _notificationService = notificationService;
+        _listingFeeService = listingFeeService;
         _logger = logger;
     }
 
@@ -74,16 +78,15 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             query = query.Where(auction => auction.ListingType == filter.ListingType);
         }
 
-        if (filter.SubmittedFrom.HasValue)
+        var dateRange = AdminDateRangeHelper.Parse(filter.DateRange);
+        if (dateRange.StartDate.HasValue)
         {
-            var from = filter.SubmittedFrom.Value.Date;
-            query = query.Where(auction => auction.SubmittedAt >= from);
+            query = query.Where(auction => auction.SubmittedAt >= dateRange.StartDate.Value);
         }
 
-        if (filter.SubmittedTo.HasValue)
+        if (dateRange.EndDateExclusive.HasValue)
         {
-            var to = filter.SubmittedTo.Value.Date.AddDays(1);
-            query = query.Where(auction => auction.SubmittedAt < to);
+            query = query.Where(auction => auction.SubmittedAt < dateRange.EndDateExclusive.Value);
         }
 
         query = query.OrderByDescending(auction => auction.SubmittedAt ?? auction.CreatedAt);
@@ -177,11 +180,14 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
                 .ToList(),
             Documents = product.Documents
                 .Where(document => document.DeletedAt == null)
+                .OrderBy(document => document.Name)
                 .Select(document => new VerificationDocumentViewModel
                 {
+                    Id = document.Id,
                     Name = document.Name,
                     FileUrl = document.FileUrl,
-                    FileType = document.FileType
+                    FileType = document.FileType,
+                    CreatedAt = document.CreatedAt
                 })
                 .ToList(),
             StartingPrice = auction.StartingPrice,
@@ -196,7 +202,9 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             SubmittedAt = auction.SubmittedAt,
             SellerId = product.SellerId,
             SellerName = product.Seller.FullName,
-            SellerEmail = product.Seller.Email ?? string.Empty
+            SellerEmail = product.Seller.Email ?? string.Empty,
+            EstimatedListingFee = _listingFeeService.CalculateListingFee(auction.StartingPrice),
+            ListingFeePreview = _listingFeeService.BuildPreviewDescription(auction.StartingPrice)
         };
     }
 
@@ -232,29 +240,52 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             return (false, validationError);
         }
 
-        var now = DateTime.UtcNow;
-        auction.Status = auction.StartDate <= now && auction.EndDate > now
-            ? AuctionStatuses.Live
-            : AuctionStatuses.Scheduled;
-        auction.VerifiedAt = now;
-        auction.VerifiedBy = adminUserId;
-        auction.RejectReason = null;
-        auction.UpdatedAt = now;
+        var feeResult = ListingFeeCollectionResult.Failed("Listing fee collection did not run.");
+        var strategy = _dbContext.Database.CreateExecutionStrategy();
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await strategy.ExecuteAsync(async () =>
+        {
+            await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
-        LogAudit(adminUserId, "approve", auctionId);
+            feeResult = await _listingFeeService.CollectListingFeeAsync(auction, adminUserId, cancellationToken);
+            if (!feeResult.Success)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                return;
+            }
 
+            var now = DateTime.UtcNow;
+            auction.Status = auction.StartDate <= now && auction.EndDate > now
+                ? AuctionStatuses.Live
+                : AuctionStatuses.Scheduled;
+            auction.VerifiedAt = now;
+            auction.VerifiedBy = adminUserId;
+            auction.RejectReason = null;
+            auction.UpdatedAt = now;
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+        });
+
+        if (!feeResult.Success)
+        {
+            return (false, feeResult.Message);
+        }
+
+        LogAudit(adminUserId, "approve", auctionId, $"ListingFee={feeResult.FeeAmount:N2}");
+
+        var feeText = feeResult.FeeAmount.ToString("N2");
         await NotifySellerAsync(
             auction,
             "Listing approved",
-            "Your listing has been approved and is now live on the marketplace.",
+            $"Your listing has been approved and is now live on the marketplace. A listing fee of ${feeText} was charged.",
             "/Account/Selling?tab=active",
+            NotificationReferenceTypes.ListingFeePaid,
             cancellationToken);
 
         var statusMessage = auction.Status == AuctionStatuses.Scheduled
-            ? "Auction approved and scheduled to go live at the start date."
-            : "Auction approved and is now live.";
+            ? $"Auction approved and scheduled to go live at the start date. Listing fee of ${feeText} collected."
+            : $"Auction approved and is now live. Listing fee of ${feeText} collected.";
 
         return (true, statusMessage);
     }
@@ -307,6 +338,7 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             "Listing rejected",
             $"Your listing was rejected. Reason: {rejectReason.Trim()}",
             "/Account/Selling?tab=active",
+            referenceType: null,
             cancellationToken);
 
         return (true, "Auction rejected successfully.");
@@ -317,6 +349,7 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
         var now = DateTime.UtcNow;
 
         var scheduledAuctions = await _dbContext.Auctions
+            .Include(a => a.Product)
             .Where(auction =>
                 auction.DeletedAt == null
                 && auction.Status == AuctionStatuses.Scheduled
@@ -336,14 +369,52 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        foreach (var auction in scheduledAuctions)
+        {
+            var registrantIds = await _dbContext.AuctionRegistrations
+                .AsNoTracking()
+                .Where(r => r.AuctionId == auction.Id && r.Status == AuctionRegistrationStatuses.Approved)
+                .Select(r => r.UserId)
+                .Distinct()
+                .ToListAsync(cancellationToken);
+
+            if (registrantIds.Count == 0)
+            {
+                continue;
+            }
+
+            var productName = auction.Product?.Name ?? "an auction";
+            var relatedUrl = $"/Auction/Detail/{auction.Id}";
+
+            foreach (var userId in registrantIds)
+            {
+                await _notificationService.CreateAndPushAsync(
+                    userId,
+                    "Auction is now live",
+                    $"{productName} is now open for bidding.",
+                    NotificationType.Auction,
+                    relatedUrl,
+                    NotificationReferenceTypes.AuctionNowLive,
+                    auction.Id,
+                    cancellationToken: cancellationToken);
+            }
+        }
+
         return scheduledAuctions.Count;
     }
 
     private static string? ValidateForApproval(Auction auction)
     {
-        if (auction.EndDate <= auction.StartDate)
+        var scheduleError = AuctionScheduleHelper.ValidateSchedule(
+            auction.RegistrationStartDate,
+            auction.RegistrationEndDate,
+            auction.StartDate,
+            auction.EndDate);
+
+        if (scheduleError is not null)
         {
-            return "End date must be greater than start date.";
+            return scheduleError;
         }
 
         if (auction.StartingPrice <= 0)
@@ -397,6 +468,7 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
         string title,
         string message,
         string relatedUrl,
+        string? referenceType,
         CancellationToken cancellationToken)
     {
         try
@@ -407,7 +479,7 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
                 message,
                 NotificationType.Auction,
                 relatedUrl,
-                "auction",
+                referenceType ?? "auction",
                 auction.Id,
                 cancellationToken: cancellationToken);
         }

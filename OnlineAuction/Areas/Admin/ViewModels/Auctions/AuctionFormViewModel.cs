@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 
 namespace OnlineAuction.Areas.Admin.ViewModels.Auctions;
 
@@ -33,13 +34,23 @@ public class AuctionFormViewModel : IValidatableObject
     [Display(Name = "Current Price")]
     public decimal CurrentPrice { get; set; }
 
-    [Required(ErrorMessage = "Start date is required")]
-    [Display(Name = "Start Date")]
+    [Required(ErrorMessage = "Registration start is required")]
+    [Display(Name = "Registration Start")]
+    [DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]
+    public DateTime RegistrationStartDate { get; set; }
+
+    [Required(ErrorMessage = "Registration end is required")]
+    [Display(Name = "Registration End")]
+    [DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]
+    public DateTime RegistrationEndDate { get; set; }
+
+    [Required(ErrorMessage = "Live start is required")]
+    [Display(Name = "Live Start")]
     [DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]
     public DateTime StartDate { get; set; }
 
-    [Required(ErrorMessage = "End date is required")]
-    [Display(Name = "End Date")]
+    [Required(ErrorMessage = "Live end is required")]
+    [Display(Name = "Live End")]
     [DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]
     public DateTime EndDate { get; set; }
 
@@ -79,18 +90,22 @@ public class AuctionFormViewModel : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (EndDate <= StartDate)
+        var scheduleError = AuctionScheduleHelper.ValidateSchedule(
+            RegistrationStartDate,
+            RegistrationEndDate,
+            StartDate,
+            EndDate);
+
+        if (scheduleError is not null)
         {
-            yield return new ValidationResult(
-                "End date must be greater than start date",
-                [nameof(EndDate)]);
+            yield return new ValidationResult(scheduleError, [nameof(RegistrationEndDate), nameof(StartDate)]);
         }
 
-        if (Id == 0 && StartDate < DateTime.Now.AddMinutes(-1))
+        if (Id == 0 && RegistrationStartDate < DateTime.Now.AddMinutes(-1))
         {
             yield return new ValidationResult(
-                "Start date cannot be in the past",
-                [nameof(StartDate)]);
+                "Registration start cannot be in the past",
+                [nameof(RegistrationStartDate)]);
         }
 
         if (BidCount > 0 && StartingPrice > CurrentPrice)

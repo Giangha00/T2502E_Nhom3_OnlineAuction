@@ -1,0 +1,115 @@
+@model AuctionVerificationListViewModel
+
+@{
+    var currentPage = Model.Filter.Page <= 0 ? 1 : Model.Filter.Page;
+    var totalPages = Model.TotalPages <= 0 ? 1 : Model.TotalPages;
+    var startPage = Math.Max(1, currentPage - 2);
+    var endPage = Math.Min(totalPages, currentPage + 2);
+}
+
+<div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+    @if (Model.Items.Count == 0)
+    {
+        <div class="px-6 py-16 text-center">
+            <p class="text-theme-sm font-medium text-gray-700 dark:text-white/80">No auctions pending verification</p>
+            <p class="mt-1 text-theme-xs text-gray-500 dark:text-gray-400">New seller submissions will appear here.</p>
+        </div>
+    }
+    else
+    {
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                <thead class="bg-gray-50 dark:bg-white/[0.02]">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Product</th>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Seller</th>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Category</th>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Starting price</th>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Submitted</th>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Type</th>
+                        <th class="px-4 py-3 text-right text-theme-xs font-semibold uppercase text-gray-500">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                            <td class="px-4 py-3">
+                                <div class="flex items-center gap-3">
+                                    @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" alt="@item.ProductName" class="h-10 w-10 rounded-lg object-cover" />
+                                    }
+                                    <span class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@item.ProductName</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@item.SellerName</td>
+                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@item.CategoryName</td>
+                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">$@item.StartingPrice.ToString("N0")</td>
+                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">
+                                @(item.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "—")
+                            </td>
+                            <td class="px-4 py-3 text-theme-sm capitalize text-gray-700 dark:text-gray-300">@item.ListingType</td>
+                            <td class="px-4 py-3 text-right">
+                                <a asp-action="Details"
+                                   asp-route-id="@item.Id"
+                                   class="inline-flex rounded-lg bg-brand-500 px-3 py-1.5 text-theme-xs font-medium text-white hover:bg-brand-600">
+                                    Review
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@if (Model.TotalItems > 0)
+{
+    <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-theme-sm text-gray-500">
+            Total: <span class="font-medium text-gray-800 dark:text-white/90">@Model.TotalItems</span>
+            · Page <span class="font-medium text-gray-800 dark:text-white/90">@currentPage</span>
+            of <span class="font-medium text-gray-800 dark:text-white/90">@totalPages</span>
+        </p>
+
+        @if (totalPages > 1)
+        {
+            <nav class="flex flex-wrap items-center gap-2">
+                <a asp-action="Index"
+                   asp-route-Page="@(currentPage - 1)"
+                   asp-route-Search="@Model.Filter.Search"
+                   asp-route-CategoryId="@Model.Filter.CategoryId"
+                   asp-route-ListingType="@Model.Filter.ListingType"
+                   asp-route-DateRange="@Model.Filter.DateRange"
+                   class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 @(currentPage <= 1 ? "pointer-events-none opacity-50" : "js-admin-page")">
+                    Previous
+                </a>
+
+                @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
+                {
+                    <a asp-action="Index"
+                       asp-route-Page="@pageNumber"
+                       asp-route-Search="@Model.Filter.Search"
+                       asp-route-CategoryId="@Model.Filter.CategoryId"
+                       asp-route-ListingType="@Model.Filter.ListingType"
+                       asp-route-DateRange="@Model.Filter.DateRange"
+                       class="js-admin-page rounded-lg border px-3 py-2 text-theme-sm font-medium @(pageNumber == currentPage ? "border-brand-500 bg-brand-500 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300")">
+                        @pageNumber
+                    </a>
+                }
+
+                <a asp-action="Index"
+                   asp-route-Page="@(currentPage + 1)"
+                   asp-route-Search="@Model.Filter.Search"
+                   asp-route-CategoryId="@Model.Filter.CategoryId"
+                   asp-route-ListingType="@Model.Filter.ListingType"
+                   asp-route-DateRange="@Model.Filter.DateRange"
+                   class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 @(currentPage >= totalPages ? "pointer-events-none opacity-50" : "js-admin-page")">
+                    Next
+                </a>
+            </nav>
+        }
+    </div>
+}

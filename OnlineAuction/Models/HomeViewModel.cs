@@ -33,6 +33,8 @@ public class AuctionItemViewModel
     public decimal StartingPrice { get; set; }
     public decimal CurrentPrice { get; set; }
     public string Status { get; set; } = string.Empty;
+    public string ListingPhase { get; set; } = string.Empty;
+    public string PhaseCountdownKind { get; set; } = string.Empty;
     public string? RejectReason { get; set; }
     public string TimeRemaining { get; set; } = string.Empty;
     public DateTime? EndDate { get; set; }
@@ -48,7 +50,9 @@ public class AuctionItemViewModel
     public string DealNote { get; set; } = string.Empty;
     public string DisplayTitle { get; set; } = string.Empty;
     public decimal? BuyNowPrice { get; set; }
-    public bool HasBuyNow => BuyNowPrice.HasValue && BuyNowPrice.Value > 0;
+    public bool HasBuyNow =>
+        string.Equals(ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase)
+        || (BuyNowPrice.HasValue && BuyNowPrice.Value > 0);
 }
 
 public class SellerViewModel

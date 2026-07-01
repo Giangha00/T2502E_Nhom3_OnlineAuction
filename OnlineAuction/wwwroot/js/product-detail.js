@@ -28,11 +28,14 @@
   var cdSeconds = document.getElementById('cdSeconds');
 
   var bidStep = parseFloat((bidPanel && bidPanel.getAttribute('data-bid-step')) || config.bidStep || '0');
-  var endDateMs = Date.parse((bidPanel && bidPanel.getAttribute('data-end-date')) || config.endDate || '');
+  var endDateMs = parseUtcDateMs((bidPanel && bidPanel.getAttribute('data-end-date')) || config.endDate || '');
   var canBid = (bidPanel && bidPanel.getAttribute('data-can-bid') === 'true') || config.canBid === true;
   var canPlaceBid = bidPanel && bidPanel.getAttribute('data-can-place-bid') === 'true';
+  var canRegister = bidPanel && bidPanel.getAttribute('data-can-register') === 'true';
+  var countdownKind = (bidPanel && bidPanel.getAttribute('data-countdown-kind')) || config.countdownKind || 'live_end';
   var requiresRegistration = bidPanel && bidPanel.getAttribute('data-requires-registration') === 'true';
   var countdownTimer = null;
+  var countdownReloadScheduled = false;
 
   function formatCurrency(value) {
     var amount = Number(value);
@@ -61,6 +64,23 @@
 
   function pad(value) {
     return String(value).padStart(2, '0');
+  }
+
+  function parseUtcDateMs(value) {
+    if (!value) {
+      return NaN;
+    }
+
+    var text = String(value).trim();
+    if (!text) {
+      return NaN;
+    }
+
+    if (!/[zZ]$|[+-]\d{2}:\d{2}$/.test(text)) {
+      text += 'Z';
+    }
+
+    return Date.parse(text);
   }
 
   function getCsrfToken() {
@@ -99,6 +119,23 @@
     element.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-700', 'bg-red-50', 'text-red-700');
     element.classList.add(isSuccess ? 'bg-emerald-50' : 'bg-red-50');
     element.classList.add(isSuccess ? 'text-emerald-700' : 'text-red-700');
+  }
+
+  function showPageToast(message, isSuccess) {
+    if (!message) {
+      return;
+    }
+
+    var toast = document.createElement('div');
+    toast.className = 'fixed bottom-4 right-4 z-[100] max-w-sm rounded-lg border px-4 py-3 text-sm shadow-lg ' +
+      (isSuccess ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-red-200 bg-red-50 text-red-800');
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    window.setTimeout(function () {
+      toast.remove();
+    }, 5000);
   }
 
   function getCurrentPrice() {
@@ -308,6 +345,49 @@
     }
   }
 
+  function getCountdownSummaryText(days, hours, minutes, seconds) {
+    var templates = {
+      registration_end: i18n.countdownRegistrationEnd || 'Registration closes in {0}d {1}h {2}m {3}s',
+      live_start: i18n.countdownLiveStart || 'Live starts in {0}d {1}h {2}m {3}s',
+      live_end: i18n.countdownLiveEnd || '{0}d {1}h {2}m {3}s remaining'
+    };
+
+    var template = templates[countdownKind] || templates.live_end;
+    return template
+      .replace('{0}', String(days))
+      .replace('{1}', String(hours))
+      .replace('{2}', String(minutes))
+      .replace('{3}', String(seconds));
+  }
+
+  function handleCountdownEnded() {
+    if (countdownTimer) {
+      window.clearInterval(countdownTimer);
+      countdownTimer = null;
+    }
+
+    if (cdDays) cdDays.textContent = '00';
+    if (cdHours) cdHours.textContent = '00';
+    if (cdMinutes) cdMinutes.textContent = '00';
+    if (cdSeconds) cdSeconds.textContent = '00';
+
+    if (countdownSummary) {
+      countdownSummary.textContent = i18n.auctionEnded || 'Auction ended';
+    }
+
+    if (countdownKind === 'live_end' && canPlaceBid) {
+      disableBidding(i18n.auctionEnded || 'Auction ended');
+      return;
+    }
+
+    if (!countdownReloadScheduled) {
+      countdownReloadScheduled = true;
+      window.setTimeout(function () {
+        window.location.reload();
+      }, 1200);
+    }
+  }
+
   function updateCountdown() {
     if (!endDateMs || Number.isNaN(endDateMs)) {
       return;
@@ -315,7 +395,7 @@
 
     var remainingMs = endDateMs - Date.now();
     if (remainingMs <= 0) {
-      disableBidding(i18n.auctionEnded || 'Auction ended');
+      handleCountdownEnded();
       return;
     }
 
@@ -331,7 +411,7 @@
     if (cdSeconds) cdSeconds.textContent = pad(seconds);
 
     if (countdownSummary) {
-      countdownSummary.textContent = days + 'd ' + hours + 'h ' + minutes + 'm remaining';
+      countdownSummary.textContent = getCountdownSummaryText(days, hours, minutes, seconds);
     }
   }
 
@@ -341,9 +421,16 @@
     }
 
     updateCountdown();
-    if (canPlaceBid) {
-      countdownTimer = window.setInterval(updateCountdown, 1000);
+
+    if (endDateMs <= Date.now()) {
+      return;
     }
+
+    if (countdownTimer) {
+      window.clearInterval(countdownTimer);
+    }
+
+    countdownTimer = window.setInterval(updateCountdown, 1000);
   }
 
   function applyBidSuccess(data) {
@@ -367,9 +454,16 @@
     }
 
     if (data.endDate) {
-      endDateMs = Date.parse(data.endDate);
-      if (bidPanel) {
-        bidPanel.setAttribute('data-end-date', data.endDate);
+      var parsedEnd = parseUtcDateMs(data.endDate);
+      if (!Number.isNaN(parsedEnd)) {
+        endDateMs = parsedEnd;
+        countdownKind = 'live_end';
+        countdownReloadScheduled = false;
+        if (bidPanel) {
+          bidPanel.setAttribute('data-end-date', data.endDate);
+          bidPanel.setAttribute('data-countdown-kind', 'live_end');
+        }
+        startCountdown();
       }
     }
 
@@ -531,13 +625,24 @@
           });
         })
         .then(function (data) {
-          showFeedback(registrationFeedback, data.message || i18n.registrationCancelled || 'Registration cancelled.', true);
+          var message = data.message;
+          if (data.refundedAmount != null && data.refundedAmount > 0) {
+            var refundTemplate = i18n.registrationCancelledWithRefund ||
+              'Registration cancelled. Your deposit of {0} has been refunded.';
+            message = refundTemplate.replace('{0}', formatCurrency(data.refundedAmount));
+          } else {
+            message = data.message || i18n.registrationCancelled || 'Registration cancelled.';
+          }
+
+          showFeedback(registrationFeedback, message, true);
+          showPageToast(message, true);
           window.setTimeout(function () {
             window.location.reload();
-          }, 600);
+          }, 2000);
         })
         .catch(function (error) {
           showFeedback(registrationFeedback, error.message, false);
+          showPageToast(error.message, false);
         })
         .finally(function () {
           cancelRegistrationBtn.disabled = false;
@@ -650,7 +755,7 @@
       return;
     }
 
-    if (data.isEnded) {
+    if (data.isEnded && countdownKind === 'live_end') {
       disableBidding(i18n.auctionEnded || 'Auction ended');
     }
 
@@ -658,6 +763,10 @@
   });
 
   startCountdown();
+
+  if (config.flashMessage) {
+    showPageToast(config.flashMessage, config.flashMessageType !== 'error');
+  }
 
   if (bidInput && canPlaceBid) {
     setBidInputValue(snapBidAmount(parseBidInput(bidInput.value)));

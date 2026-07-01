@@ -20,14 +20,34 @@
         ["registrationSuccess"] = Localizer["Js_ProductDetail_RegistrationSuccess"].Value,
         ["registrationFailed"] = Localizer["Js_ProductDetail_RegistrationFailed"].Value,
         ["registrationCancelled"] = Localizer["Js_ProductDetail_RegistrationCancelled"].Value,
+        ["registrationCancelledWithRefund"] = Localizer["Js_ProductDetail_RegistrationCancelledWithRefund"].Value,
         ["cancelRegistrationFailed"] = Localizer["Js_ProductDetail_CancelRegistrationFailed"].Value,
-        ["mustRegisterToBid"] = Localizer["Product_MustRegisterToBid"].Value
+        ["mustRegisterToBid"] = Localizer["Product_MustRegisterToBid"].Value,
+        ["countdownRegistrationEnd"] = Localizer["Js_ProductDetail_CountdownRegistrationEnd"].Value,
+        ["countdownLiveStart"] = Localizer["Js_ProductDetail_CountdownLiveStart"].Value,
+        ["countdownLiveEnd"] = Localizer["Js_ProductDetail_CountdownLiveEnd"].Value
     };
+    var flashMessage = TempData["SuccessMessage"] as string ?? TempData["ErrorMessage"] as string;
+    var flashMessageType = TempData["SuccessMessage"] is not null
+        ? "success"
+        : TempData["ErrorMessage"] is not null
+            ? "error"
+            : null;
 }
 
 <div class="rarecard-page bg-white">
   <div class="w-full px-4 py-8 sm:px-8 lg:px-12 lg:py-10">
     @await Html.PartialAsync("Partials/_Breadcrumb", Model)
+
+    @if (!string.IsNullOrWhiteSpace(flashMessage))
+    {
+      <div id="auctionFlashMessage"
+           class="mb-6 rounded-lg border px-4 py-3 text-sm font-medium @(flashMessageType == "success" ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-red-200 bg-red-50 text-red-800")"
+           role="status"
+           aria-live="polite">
+        @flashMessage
+      </div>
+    }
 
     <div class="product-detail-hero">
       <div class="product-detail-hero__media">
@@ -48,9 +68,12 @@
     window.productDetailConfig = {
       auctionId: @Model.Id,
       bidStep: @Model.BidStep.ToString(System.Globalization.CultureInfo.InvariantCulture),
-      endDate: @Html.Raw(JsonSerializer.Serialize(DateTimeUtilities.ToUtcIsoString(Model.EndDate))),
+      endDate: @Html.Raw(JsonSerializer.Serialize(DateTimeUtilities.ToUtcIsoString(Model.CountdownTargetDate))),
+      countdownKind: @Html.Raw(JsonSerializer.Serialize(Model.PhaseCountdownKind)),
       canBid: @(Model.CanBid ? "true" : "false"),
       requiresRegistration: @(Model.RequiresRegistration ? "true" : "false"),
+      flashMessage: @Html.Raw(JsonSerializer.Serialize(flashMessage)),
+      flashMessageType: @Html.Raw(JsonSerializer.Serialize(flashMessageType)),
       i18n: @Html.Raw(JsonSerializer.Serialize(productDetailI18n))
     };
   </script>
