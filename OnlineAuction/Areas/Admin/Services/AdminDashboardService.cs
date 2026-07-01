@@ -74,7 +74,9 @@ public class AdminDashboardService : IAdminDashboardService
         string? statusFilter = null,
         int? categoryIdFilter = null,
         DateTime? registrationDateFilter = null,
-        string? registrationGranularity = null)
+        string? registrationGranularity = null,
+        string? sectionFilter = null,
+        string? revenueTypeFilter = null)
     {
         if (!string.IsNullOrWhiteSpace(dateRange))
         {
@@ -110,8 +112,106 @@ public class AdminDashboardService : IAdminDashboardService
             StatusFilter = string.IsNullOrWhiteSpace(statusFilter) ? null : statusFilter.Trim(),
             CategoryIdFilter = categoryIdFilter,
             RegistrationDateFilter = registrationDateFilter?.Date,
-            RegistrationGranularity = granularity
+            RegistrationGranularity = granularity,
+            SectionFilter = string.IsNullOrWhiteSpace(sectionFilter) ? null : sectionFilter.Trim(),
+            RevenueTypeFilter = NormalizeRevenueTypeFilter(revenueTypeFilter)
         };
+    }
+
+    public Task<decimal> SumGmvAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default)
+    {
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+
+        return SumSuccessfulPaymentsAsync(rangeStart, rangeEndExclusive, cancellationToken);
+    }
+
+    public async Task<decimal> SumPlatformRevenueAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default)
+    {
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+
+        var listingFees = await SumPaidListingFeesAsync(rangeStart, rangeEndExclusive, cancellationToken);
+        var transactionCommission = await SumPaidOrderPlatformFeesAsync(
+            rangeStart,
+            rangeEndExclusive,
+            cancellationToken);
+
+        return listingFees + transactionCommission;
+    }
+
+    public async Task<IReadOnlyList<DashboardRevenueDetailViewModel>> BuildRevenueDetailTableAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default)
+    {
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+        var rows = new List<DashboardRevenueDetailViewModel>();
+
+        var paymentRows = await _dbContext.Payments.AsNoTracking()
+            .Where(payment => payment.DeletedAt == null
+                              && payment.Status == PaymentStatuses.Success
+                              && payment.PaidAt >= rangeStart
+                              && payment.PaidAt < rangeEndExclusive)
+            .Select(payment => new
+            {
+                payment.PaidAt,
+                payment.Amount,
+                payment.OrderId,
+                payment.Order.OrderReference,
+                AuctionId = payment.Order.Items
+                    .Where(item => item.DeletedAt == null)
+                    .Select(item => (int?)item.AuctionId)
+                    .FirstOrDefault(),
+                PlatformFee = payment.Order.PlatformFee
+            })
+            .ToListAsync(cancellationToken);
+
+        rows.AddRange(paymentRows.Select(row => new DashboardRevenueDetailViewModel
+        {
+            TransactionDate = row.PaidAt!.Value,
+            Type = DashboardRevenueTypes.OrderPayment,
+            ReferenceCode = row.OrderReference,
+            AuctionId = row.AuctionId,
+            OrderId = row.OrderId,
+            GmvAmount = row.Amount,
+            PlatformRevenueAmount = row.PlatformFee,
+            Status = PaymentStatuses.Success
+        }));
+
+        var listingFeeRows = await _dbContext.ListingFees.AsNoTracking()
+            .Where(fee => fee.DeletedAt == null
+                          && fee.Status == ListingFeeStatuses.Paid
+                          && fee.PaidAt >= rangeStart
+                          && fee.PaidAt < rangeEndExclusive)
+            .Select(fee => new
+            {
+                fee.PaidAt,
+                fee.FeeAmount,
+                fee.AuctionId
+            })
+            .ToListAsync(cancellationToken);
+
+        rows.AddRange(listingFeeRows.Select(row => new DashboardRevenueDetailViewModel
+        {
+            TransactionDate = row.PaidAt!.Value,
+            Type = DashboardRevenueTypes.ListingFee,
+            ReferenceCode = $"Auction #{row.AuctionId}",
+            AuctionId = row.AuctionId,
+            GmvAmount = 0m,
+            PlatformRevenueAmount = row.FeeAmount,
+            Status = ListingFeeStatuses.Paid
+        }));
+
+        var filtered = ApplyRevenueTypeFilter(rows, filter.RevenueTypeFilter);
+
+        return filtered
+            .OrderByDescending(row => row.TransactionDate)
+            .ToList();
     }
 
     public async Task<AdminDashboardViewModel> GetDashboardAsync(
@@ -151,11 +251,8 @@ public class AdminDashboardService : IAdminDashboardService
                        && bid.PlacedAt < previousRange.DateTo.AddDays(1),
                 cancellationToken);
 
-        var revenueCurrentPeriod = await SumSuccessfulPaymentsAsync(rangeStart, rangeEndExclusive, cancellationToken);
-        var revenuePreviousPeriod = await SumSuccessfulPaymentsAsync(
-            previousRange.DateFrom,
-            previousRange.DateTo.AddDays(1),
-            cancellationToken);
+        var revenueCurrentPeriod = await SumGmvAsync(filter, cancellationToken);
+        var revenuePreviousPeriod = await SumGmvAsync(previousRange, cancellationToken);
 
         var pendingPayments = await _dbContext.Orders.AsNoTracking()
             .CountAsync(
@@ -196,7 +293,7 @@ public class AdminDashboardService : IAdminDashboardService
             BuildKpiCard("Active Auctions", FormatInteger(activeAuctionsNow), activeAuctionsNow, activeAuctionsPrevious),
             BuildKpiCard("Registered Users", FormatInteger(totalActiveUsers), newRegistrationsCurrent, newRegistrationsPrevious),
             BuildKpiCard("Total Bids", FormatInteger(bidsInRange), bidsInRange, bidsPreviousRange),
-            BuildKpiCard("Revenue (USD)", FormatCurrency(revenueCurrentPeriod), revenueCurrentPeriod, revenuePreviousPeriod)
+            BuildKpiCard("GMV", FormatCurrency(revenueCurrentPeriod), revenueCurrentPeriod, revenuePreviousPeriod, cardKey: DashboardRevenueCardKeys.Gmv)
         };
 
         var secondaryKpiCards = new List<DashboardKpiCardViewModel>
@@ -228,6 +325,8 @@ public class AdminDashboardService : IAdminDashboardService
             TopSellers = await GetTopSellersAsync(filter, cancellationToken),
             NewUsers = filteredNewUsers
         };
+
+        var revenueSection = await BuildRevenueSectionAsync(filter, previousRange, cancellationToken);
 
         var auctionSection = new DashboardAuctionSectionViewModel
         {
@@ -274,7 +373,6 @@ public class AdminDashboardService : IAdminDashboardService
             })
             .ToListAsync(cancellationToken);
 
-        var revenueChart = await BuildDailyPaymentSeriesAsync(rangeStart, rangeEndExclusive, cancellationToken);
         var bidsChart = await BuildDailyBidSeriesAsync(rangeStart, rangeEndExclusive, cancellationToken);
         var statusBreakdown = await BuildStatusBreakdownAsync(cancellationToken);
 
@@ -284,6 +382,7 @@ public class AdminDashboardService : IAdminDashboardService
             KpiCards = kpiCards,
             SecondaryKpiCards = secondaryKpiCards,
             UserSection = userSection,
+            RevenueSection = revenueSection,
             AuctionSection = auctionSection,
             RecentAuctions = recentAuctions
                 .Select(auction => new DashboardRecentAuctionViewModel
@@ -300,7 +399,6 @@ public class AdminDashboardService : IAdminDashboardService
                     EndsIn = FormatEndsIn(auction.EndDate, auction.Status, utcNow)
                 })
                 .ToList(),
-            RevenueChart = revenueChart,
             BidsChart = bidsChart,
             AuctionStatusBreakdown = statusBreakdown
         };
@@ -550,6 +648,22 @@ public class AdminDashboardService : IAdminDashboardService
 
         using var workbook = new XLWorkbook();
 
+        var overviewSheet = workbook.Worksheets.Add("Overview");
+        overviewSheet.Cell(1, 1).Value = "Metric";
+        overviewSheet.Cell(1, 2).Value = "Value";
+        overviewSheet.Cell(2, 1).Value = "GMV";
+        overviewSheet.Cell(2, 2).Value = dashboard.RevenueSection.GmvKpi.DisplayValue;
+        overviewSheet.Cell(3, 1).Value = "Platform Revenue";
+        overviewSheet.Cell(3, 2).Value = dashboard.RevenueSection.PlatformRevenueKpi.DisplayValue;
+        overviewSheet.Cell(4, 1).Value = "Listing Fees";
+        overviewSheet.Cell(4, 2).Value = dashboard.RevenueSection.ListingFeeKpi.DisplayValue;
+        overviewSheet.Cell(5, 1).Value = "Completed Orders";
+        overviewSheet.Cell(5, 2).Value = dashboard.RevenueSection.CompletedOrdersKpi.DisplayValue;
+        overviewSheet.Cell(6, 1).Value = "Active Auctions";
+        overviewSheet.Cell(6, 2).Value = dashboard.KpiCards.FirstOrDefault(card => card.Label == "Active Auctions")?.DisplayValue ?? string.Empty;
+        overviewSheet.Cell(7, 1).Value = "Total Bids";
+        overviewSheet.Cell(7, 2).Value = dashboard.KpiCards.FirstOrDefault(card => card.Label == "Total Bids")?.DisplayValue ?? string.Empty;
+
         var usersSheet = workbook.Worksheets.Add("Users");
         usersSheet.Cell(1, 1).Value = "Metric";
         usersSheet.Cell(1, 2).Value = "Value";
@@ -657,8 +771,30 @@ public class AdminDashboardService : IAdminDashboardService
             recentRow++;
         }
 
+        var revenueDetailSheet = workbook.Worksheets.Add("Revenue Detail");
+        revenueDetailSheet.Cell(1, 1).Value = "Date";
+        revenueDetailSheet.Cell(1, 2).Value = "Type";
+        revenueDetailSheet.Cell(1, 3).Value = "Reference";
+        revenueDetailSheet.Cell(1, 4).Value = "GMV";
+        revenueDetailSheet.Cell(1, 5).Value = "Platform Revenue";
+        revenueDetailSheet.Cell(1, 6).Value = "Status";
+
+        var revenueRow = 2;
+        foreach (var row in dashboard.RevenueSection.DetailRows)
+        {
+            revenueDetailSheet.Cell(revenueRow, 1).Value = row.TransactionDate;
+            revenueDetailSheet.Cell(revenueRow, 2).Value = row.Type;
+            revenueDetailSheet.Cell(revenueRow, 3).Value = row.ReferenceCode;
+            revenueDetailSheet.Cell(revenueRow, 4).Value = row.GmvAmount;
+            revenueDetailSheet.Cell(revenueRow, 5).Value = row.PlatformRevenueAmount;
+            revenueDetailSheet.Cell(revenueRow, 6).Value = row.Status;
+            revenueRow++;
+        }
+
+        overviewSheet.Columns().AdjustToContents();
         usersSheet.Columns().AdjustToContents();
         auctionsSheet.Columns().AdjustToContents();
+        revenueDetailSheet.Columns().AdjustToContents();
 
         using var stream = new MemoryStream();
         workbook.SaveAs(stream);
@@ -672,6 +808,230 @@ public class AdminDashboardService : IAdminDashboardService
             DateTime.UtcNow.Date);
 
         return await ExportExcelAsync(filter, cancellationToken);
+    }
+
+    private async Task<DashboardRevenueSectionViewModel> BuildRevenueSectionAsync(
+        DashboardFilterViewModel filter,
+        DashboardFilterViewModel previousRange,
+        CancellationToken cancellationToken)
+    {
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+
+        var gmvCurrent = await SumGmvAsync(filter, cancellationToken);
+        var gmvPrevious = await SumGmvAsync(previousRange, cancellationToken);
+
+        var platformRevenueCurrent = await SumPlatformRevenueAsync(filter, cancellationToken);
+        var platformRevenuePrevious = await SumPlatformRevenueAsync(previousRange, cancellationToken);
+
+        var listingFeeCurrent = await SumPaidListingFeesAsync(rangeStart, rangeEndExclusive, cancellationToken);
+        var listingFeePrevious = await SumPaidListingFeesAsync(
+            previousRange.DateFrom,
+            previousRange.DateTo.AddDays(1),
+            cancellationToken);
+
+        var completedOrdersCurrent = await CountCompletedOrdersAsync(rangeStart, rangeEndExclusive, cancellationToken);
+        var completedOrdersPrevious = await CountCompletedOrdersAsync(
+            previousRange.DateFrom,
+            previousRange.DateTo.AddDays(1),
+            cancellationToken);
+
+        var transactionCommission = await SumPaidOrderPlatformFeesAsync(
+            rangeStart,
+            rangeEndExclusive,
+            cancellationToken);
+
+        var hasListingFeeData = await _dbContext.ListingFees.AsNoTracking()
+            .AnyAsync(fee => fee.DeletedAt == null, cancellationToken);
+
+        var lineChart = await BuildRevenueLineChartAsync(rangeStart, rangeEndExclusive, cancellationToken);
+        var detailRows = await BuildRevenueDetailTableAsync(filter, cancellationToken);
+
+        return new DashboardRevenueSectionViewModel
+        {
+            GmvKpi = BuildKpiCard(
+                "GMV",
+                FormatCurrency(gmvCurrent),
+                gmvCurrent,
+                gmvPrevious,
+                cardKey: DashboardRevenueCardKeys.Gmv),
+            PlatformRevenueKpi = BuildKpiCard(
+                "Platform Revenue",
+                FormatCurrency(platformRevenueCurrent),
+                platformRevenueCurrent,
+                platformRevenuePrevious,
+                cardKey: DashboardRevenueCardKeys.PlatformRevenue),
+            ListingFeeKpi = BuildKpiCard(
+                "Listing Fees",
+                FormatCurrency(listingFeeCurrent),
+                listingFeeCurrent,
+                listingFeePrevious,
+                cardKey: DashboardRevenueCardKeys.ListingFee),
+            CompletedOrdersKpi = BuildKpiCard(
+                "Completed Orders",
+                FormatInteger(completedOrdersCurrent),
+                completedOrdersCurrent,
+                completedOrdersPrevious,
+                cardKey: DashboardRevenueCardKeys.CompletedOrders),
+            LineChart = lineChart,
+            PlatformBreakdown = BuildPlatformRevenueBreakdown(listingFeeCurrent, transactionCommission),
+            DetailRows = detailRows,
+            HasListingFeeData = hasListingFeeData
+        };
+    }
+
+    private static DashboardPlatformRevenueBreakdownViewModel BuildPlatformRevenueBreakdown(
+        decimal listingFees,
+        decimal transactionCommission)
+    {
+        var total = listingFees + transactionCommission;
+
+        if (total <= 0)
+        {
+            return new DashboardPlatformRevenueBreakdownViewModel
+            {
+                ListingFees = listingFees,
+                TransactionCommission = transactionCommission
+            };
+        }
+
+        return new DashboardPlatformRevenueBreakdownViewModel
+        {
+            ListingFees = listingFees,
+            TransactionCommission = transactionCommission,
+            ListingFeePercentage = Math.Round(listingFees / total * 100m, 1),
+            TransactionCommissionPercentage = Math.Round(transactionCommission / total * 100m, 1)
+        };
+    }
+
+    private async Task<List<DashboardRevenueLinePointViewModel>> BuildRevenueLineChartAsync(
+        DateTime startDate,
+        DateTime endExclusive,
+        CancellationToken cancellationToken)
+    {
+        var gmvByDate = await _dbContext.Payments.AsNoTracking()
+            .Where(payment => payment.DeletedAt == null
+                              && payment.Status == PaymentStatuses.Success
+                              && payment.PaidAt >= startDate
+                              && payment.PaidAt < endExclusive)
+            .GroupBy(payment => payment.PaidAt!.Value.Date)
+            .Select(group => new { Date = group.Key, Total = group.Sum(payment => payment.Amount) })
+            .ToListAsync(cancellationToken);
+
+        var listingFeesByDate = await _dbContext.ListingFees.AsNoTracking()
+            .Where(fee => fee.DeletedAt == null
+                          && fee.Status == ListingFeeStatuses.Paid
+                          && fee.PaidAt >= startDate
+                          && fee.PaidAt < endExclusive)
+            .GroupBy(fee => fee.PaidAt!.Value.Date)
+            .Select(group => new { Date = group.Key, Total = group.Sum(fee => fee.FeeAmount) })
+            .ToListAsync(cancellationToken);
+
+        var commissionByDate = await _dbContext.Payments.AsNoTracking()
+            .Where(payment => payment.DeletedAt == null
+                              && payment.Status == PaymentStatuses.Success
+                              && payment.PaidAt >= startDate
+                              && payment.PaidAt < endExclusive
+                              && PaidOrderStatuses.Contains(payment.Order.Status))
+            .GroupBy(payment => payment.PaidAt!.Value.Date)
+            .Select(group => new { Date = group.Key, Total = group.Sum(payment => payment.Order.PlatformFee) })
+            .ToListAsync(cancellationToken);
+
+        var gmvLookup = gmvByDate.ToDictionary(item => item.Date, item => item.Total);
+        var listingLookup = listingFeesByDate.ToDictionary(item => item.Date, item => item.Total);
+        var commissionLookup = commissionByDate.ToDictionary(item => item.Date, item => item.Total);
+
+        var series = new List<DashboardRevenueLinePointViewModel>();
+        var endDate = endExclusive.AddDays(-1).Date;
+
+        for (var cursor = startDate.Date; cursor <= endDate; cursor = cursor.AddDays(1))
+        {
+            gmvLookup.TryGetValue(cursor, out var gmv);
+            listingLookup.TryGetValue(cursor, out var listingFee);
+            commissionLookup.TryGetValue(cursor, out var commission);
+
+            series.Add(new DashboardRevenueLinePointViewModel
+            {
+                Label = cursor.ToString("MMM d", CultureInfo.InvariantCulture),
+                FilterKey = cursor.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                Gmv = gmv,
+                PlatformRevenue = listingFee + commission
+            });
+        }
+
+        return series;
+    }
+
+    private Task<decimal> SumPaidListingFeesAsync(
+        DateTime startInclusive,
+        DateTime endExclusive,
+        CancellationToken cancellationToken)
+    {
+        return _dbContext.ListingFees.AsNoTracking()
+            .Where(fee => fee.DeletedAt == null
+                          && fee.Status == ListingFeeStatuses.Paid
+                          && fee.PaidAt >= startInclusive
+                          && fee.PaidAt < endExclusive)
+            .SumAsync(fee => fee.FeeAmount, cancellationToken);
+    }
+
+    private async Task<decimal> SumPaidOrderPlatformFeesAsync(
+        DateTime startInclusive,
+        DateTime endExclusive,
+        CancellationToken cancellationToken)
+    {
+        return await _dbContext.Payments.AsNoTracking()
+            .Where(payment => payment.DeletedAt == null
+                              && payment.Status == PaymentStatuses.Success
+                              && payment.PaidAt >= startInclusive
+                              && payment.PaidAt < endExclusive
+                              && PaidOrderStatuses.Contains(payment.Order.Status))
+            .SumAsync(payment => payment.Order.PlatformFee, cancellationToken);
+    }
+
+    private Task<int> CountCompletedOrdersAsync(
+        DateTime startInclusive,
+        DateTime endExclusive,
+        CancellationToken cancellationToken)
+    {
+        return _dbContext.Orders.AsNoTracking()
+            .CountAsync(
+                order => order.DeletedAt == null
+                         && PaidOrderStatuses.Contains(order.Status)
+                         && order.CreatedAt >= startInclusive
+                         && order.CreatedAt < endExclusive,
+                cancellationToken);
+    }
+
+    private static string? NormalizeRevenueTypeFilter(string? revenueTypeFilter)
+    {
+        if (string.IsNullOrWhiteSpace(revenueTypeFilter))
+        {
+            return null;
+        }
+
+        var normalized = revenueTypeFilter.Trim().ToLowerInvariant();
+
+        return normalized switch
+        {
+            DashboardRevenueTypes.OrderPayment => DashboardRevenueTypes.OrderPayment,
+            DashboardRevenueTypes.ListingFee => DashboardRevenueTypes.ListingFee,
+            _ => null
+        };
+    }
+
+    private static List<DashboardRevenueDetailViewModel> ApplyRevenueTypeFilter(
+        List<DashboardRevenueDetailViewModel> rows,
+        string? revenueTypeFilter)
+    {
+        if (string.IsNullOrWhiteSpace(revenueTypeFilter))
+        {
+            return rows;
+        }
+
+        return rows
+            .Where(row => row.Type == revenueTypeFilter)
+            .ToList();
     }
 
     private async Task<List<DateTime>> GetRegistrationDatesAsync(
@@ -877,23 +1237,6 @@ public class AdminDashboardService : IAdminDashboardService
             .SumAsync(payment => payment.Amount, cancellationToken);
     }
 
-    private async Task<List<DashboardChartPointViewModel>> BuildDailyPaymentSeriesAsync(
-        DateTime startDate,
-        DateTime endExclusive,
-        CancellationToken cancellationToken)
-    {
-        var grouped = await _dbContext.Payments.AsNoTracking()
-            .Where(payment => payment.DeletedAt == null
-                              && payment.Status == PaymentStatuses.Success
-                              && payment.PaidAt >= startDate
-                              && payment.PaidAt < endExclusive)
-            .GroupBy(payment => payment.PaidAt!.Value.Date)
-            .Select(group => new { Date = group.Key, Total = group.Sum(payment => payment.Amount) })
-            .ToListAsync(cancellationToken);
-
-        return BuildDailySeries(startDate, endExclusive, grouped.ToDictionary(item => item.Date, item => item.Total));
-    }
-
     private async Task<List<DashboardChartPointViewModel>> BuildDailyBidSeriesAsync(
         DateTime startDate,
         DateTime endExclusive,
@@ -975,13 +1318,15 @@ public class AdminDashboardService : IAdminDashboardService
         decimal currentValue,
         decimal previousValue,
         bool includeChange = true,
-        string? linkUrl = null)
+        string? linkUrl = null,
+        string? cardKey = null)
     {
         var card = new DashboardKpiCardViewModel
         {
             Label = label,
             DisplayValue = displayValue,
-            LinkUrl = linkUrl
+            LinkUrl = linkUrl,
+            CardKey = cardKey
         };
 
         if (!includeChange)
