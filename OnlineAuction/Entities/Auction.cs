@@ -53,6 +53,8 @@ public class Auction : AuditableEntity
     public ICollection<AuctionRegistration> Registrations { get; set; } = [];
 
     public ICollection<WatchlistItem> WatchlistItems { get; set; } = [];
+
+    public ICollection<ListingFee> ListingFees { get; set; } = [];
 }
 
 public static class ListingTypes

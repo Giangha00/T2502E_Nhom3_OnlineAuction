@@ -41,4 +41,5 @@ public static class NotificationReferenceTypes
     public const string AuctionDepositRefunded = "auction_deposit_refunded";
     public const string AuctionStartingSoon = "auction_starting_soon";
     public const string AuctionNowLive = "auction_now_live";
+    public const string ListingFeePaid = "listing_fee_paid";
 }

@@ -79,11 +79,22 @@
 @section Scripts {
     <script src="~/admin/js/admin-list-filter.js" asp-append-version="true"></script>
     <script>
+        function bindCategoryBulkActions(container) {
+            AdminListFilter.bindBulkDelete(container, {
+                formId: 'categoryBulkDeleteForm',
+                selectAllId: 'selectAllCategories',
+                checkboxClass: 'category-checkbox',
+                emptyMessage: 'Please select at least one category.',
+                confirmMessage: 'Are you sure you want to delete selected categories?'
+            });
+        }
+
         AdminListFilter.init({
             formId: 'categoryFilterForm',
             resultsId: 'categoryListResults',
             searchInputId: 'categorySearchInput',
-            listUrl: '@Url.Action("Index", "Category", new { area = "Admin" })'
+            listUrl: '@Url.Action("Index", "Category", new { area = "Admin" })',
+            onUpdated: bindCategoryBulkActions
         });
     </script>
 }
