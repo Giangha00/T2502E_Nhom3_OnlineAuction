@@ -31,12 +31,22 @@ public class CreateAuctionViewModel : SellProductFormViewModel
     public string AuctionEventName { get; set; } = "RareCard Vault: Premium Trading Card Auction 2026";
 
     [Required(ErrorMessage = "Start date is required.")]
-    [Display(Name = "Start Date")]
+    [Display(Name = "Registration Start")]
     [DataType(DataType.DateTime)]
-    public DateTime StartDate { get; set; } = DateTime.Now.AddHours(1);
+    public DateTime RegistrationStartDate { get; set; } = DateTime.Now.AddHours(1);
 
-    [Required(ErrorMessage = "End date is required.")]
-    [Display(Name = "End Date")]
+    [Required(ErrorMessage = "Registration end is required.")]
+    [Display(Name = "Registration End")]
     [DataType(DataType.DateTime)]
-    public DateTime EndDate { get; set; } = DateTime.Now.AddDays(7);
+    public DateTime RegistrationEndDate { get; set; } = DateTime.Now.AddDays(7);
+
+    [Required(ErrorMessage = "Live start is required.")]
+    [Display(Name = "Live Start")]
+    [DataType(DataType.DateTime)]
+    public DateTime StartDate { get; set; } = DateTime.Now.AddDays(7);
+
+    [Required(ErrorMessage = "Live end is required.")]
+    [Display(Name = "Live End")]
+    [DataType(DataType.DateTime)]
+    public DateTime EndDate { get; set; } = DateTime.Now.AddDays(7).AddHours(1);
 }

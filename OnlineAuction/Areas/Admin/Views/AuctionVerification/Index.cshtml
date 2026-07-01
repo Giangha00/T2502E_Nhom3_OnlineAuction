@@ -3,12 +3,9 @@
 @{
     ViewData["Title"] = "Verify Auctions";
     ViewData["AdminPage"] = "verify-auctions";
-
-    var currentPage = Model.Filter.Page <= 0 ? 1 : Model.Filter.Page;
-    var totalPages = Model.TotalPages <= 0 ? 1 : Model.TotalPages;
-    var startPage = Math.Max(1, currentPage - 2);
-    var endPage = Math.Min(totalPages, currentPage + 2);
 }
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -33,20 +30,22 @@
     }
 
     <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
-        <form method="get" class="flex flex-wrap items-end gap-3">
-            <input type="hidden" name="Page" value="1" />
+        <form id="verificationFilterForm" method="get" class="flex flex-wrap items-end gap-3 2xl:flex-nowrap">
+            <input type="hidden" name="Page" value="@(Model.Filter.Page <= 0 ? 1 : Model.Filter.Page)" />
 
             <div class="min-w-[220px] flex-1">
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Search</label>
-                <input name="Search"
+                <input id="verificationSearchInput"
+                       name="Search"
                        value="@Model.Filter.Search"
                        placeholder="Product, seller, or category"
+                       autocomplete="off"
                        class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
             </div>
 
             <div class="w-[180px]">
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Category</label>
-                <select name="CategoryId" class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                <select name="CategoryId" class="admin-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                     <option value="">All</option>
                     @foreach (var category in Model.CategoryOptions)
                     {
@@ -57,115 +56,44 @@
 
             <div class="w-[150px]">
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Listing type</label>
-                <select name="ListingType" class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                <select name="ListingType" class="admin-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                     <option value="">All</option>
                     <option value="auction" selected="@(Model.Filter.ListingType == "auction")">Auction</option>
                     <option value="buynow" selected="@(Model.Filter.ListingType == "buynow")">Buy Now</option>
                 </select>
             </div>
 
-            <div class="w-[160px]">
-                <label class="mb-1 block text-theme-xs font-medium text-gray-500">Submitted from</label>
-                <input type="date"
-                       name="SubmittedFrom"
-                       value="@(Model.Filter.SubmittedFrom?.ToString("yyyy-MM-dd"))"
+            <div class="w-[220px]">
+                <label class="mb-1 block text-theme-xs font-medium text-gray-500">Date range</label>
+                <input id="verificationDateRangePicker"
+                       name="DateRange"
+                       value="@Model.Filter.DateRange"
+                       placeholder="MM/DD/YYYY - MM/DD/YYYY"
+                       autocomplete="off"
                        class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
             </div>
-
-            <div class="w-[160px]">
-                <label class="mb-1 block text-theme-xs font-medium text-gray-500">Submitted to</label>
-                <input type="date"
-                       name="SubmittedTo"
-                       value="@(Model.Filter.SubmittedTo?.ToString("yyyy-MM-dd"))"
-                       class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
-            </div>
-
-            <button type="submit"
-                    class="inline-flex h-10 items-center rounded-lg bg-brand-500 px-4 text-theme-sm font-medium text-white hover:bg-brand-600">
-                Filter
-            </button>
         </form>
     </div>
 
-    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-        @if (Model.Items.Count == 0)
-        {
-            <div class="px-6 py-16 text-center">
-                <p class="text-theme-sm font-medium text-gray-700 dark:text-white/80">No auctions pending verification</p>
-                <p class="mt-1 text-theme-xs text-gray-500 dark:text-gray-400">New seller submissions will appear here.</p>
-            </div>
-        }
-        else
-        {
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-                    <thead class="bg-gray-50 dark:bg-white/[0.02]">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Product</th>
-                            <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Seller</th>
-                            <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Category</th>
-                            <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Starting price</th>
-                            <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Submitted</th>
-                            <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Type</th>
-                            <th class="px-4 py-3 text-right text-theme-xs font-semibold uppercase text-gray-500">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
-                        @foreach (var item in Model.Items)
-                        {
-                            <tr>
-                                <td class="px-4 py-3">
-                                    <div class="flex items-center gap-3">
-                                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
-                                        {
-                                            <img src="@item.ImageUrl" alt="@item.ProductName" class="h-10 w-10 rounded-lg object-cover" />
-                                        }
-                                        <span class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@item.ProductName</span>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@item.SellerName</td>
-                                <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@item.CategoryName</td>
-                                <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">$@item.StartingPrice.ToString("N0")</td>
-                                <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">
-                                    @(item.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "—")
-                                </td>
-                                <td class="px-4 py-3 text-theme-sm capitalize text-gray-700 dark:text-gray-300">@item.ListingType</td>
-                                <td class="px-4 py-3 text-right">
-                                    <a asp-action="Details"
-                                       asp-route-id="@item.Id"
-                                       class="inline-flex rounded-lg bg-brand-500 px-3 py-1.5 text-theme-xs font-medium text-white hover:bg-brand-600">
-                                        Review
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            @if (totalPages > 1)
-            {
-                <div class="flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-800">
-                    <p class="text-theme-xs text-gray-500">
-                        Showing @Model.Items.Count of @Model.TotalItems pending listings
-                    </p>
-                    <div class="flex gap-1">
-                        @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
-                        {
-                            <a asp-action="Index"
-                               asp-route-Page="@pageNumber"
-                               asp-route-Search="@Model.Filter.Search"
-                               asp-route-CategoryId="@Model.Filter.CategoryId"
-                               asp-route-ListingType="@Model.Filter.ListingType"
-                               asp-route-SubmittedFrom="@Model.Filter.SubmittedFrom?.ToString("yyyy-MM-dd")"
-                               asp-route-SubmittedTo="@Model.Filter.SubmittedTo?.ToString("yyyy-MM-dd")"
-                               class="inline-flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-theme-xs font-medium @(pageNumber == currentPage ? "bg-brand-500 text-white" : "border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300")">
-                                @pageNumber
-                            </a>
-                        }
-                    </div>
-                </div>
-            }
-        }
+    <div id="verificationListResults" class="transition-opacity duration-200">
+        <partial name="_AuctionVerificationList" model="Model" />
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="~/admin/js/admin-list-filter.js" asp-append-version="true"></script>
+    <script>
+        AdminListFilter.init({
+            formId: 'verificationFilterForm',
+            resultsId: 'verificationListResults',
+            searchInputId: 'verificationSearchInput',
+            listUrl: '@Url.Action("Index", "AuctionVerification", new { area = "Admin" })',
+            setupDateRange: function (submitCallback) {
+                AdminListFilter.setupDateRangePicker('#verificationDateRangePicker', submitCallback);
+            }
+        });
+    </script>
+}

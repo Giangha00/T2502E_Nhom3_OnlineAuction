@@ -141,4 +141,6 @@ public class ProductDocumentItemViewModel
     public string FileUrl { get; set; } = string.Empty;
 
     public string FileType { get; set; } = "PDF";
+
+    public DateTime CreatedAt { get; set; }
 }

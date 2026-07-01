@@ -15,7 +15,7 @@ public class SignUpViewModel
     public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Phone number is required.")]
-    [Phone(ErrorMessage = "Enter a valid phone number.")]
+    [RegularExpression(@"^\d{11}$", ErrorMessage = "Số điện thoại phải gồm đúng 11 chữ số.")]
     [Display(Name = "Phone number")]
     public string PhoneNumber { get; set; } = string.Empty;
 

@@ -5,6 +5,9 @@ using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
 using OnlineAuction.Helpers;
+using OnlineAuction.Messaging;
+using OnlineAuction.Messaging.Messages;
+using OnlineAuction.Messaging.Handlers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -18,21 +21,21 @@ public class BidService : IBidService
 
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IAuctionRegistrationService _registrationService;
-    private readonly INotificationService _notificationService;
-    private readonly IRealtimePublisher _realtimePublisher;
+    private readonly IRabbitMqPublisher _publisher;
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<BidService> _logger;
 
     public BidService(
         AuctionHouseDbContext dbContext,
         IAuctionRegistrationService registrationService,
-        INotificationService notificationService,
-        IRealtimePublisher realtimePublisher,
+        IRabbitMqPublisher publisher,
+        IServiceScopeFactory scopeFactory,
         ILogger<BidService> logger)
     {
         _dbContext = dbContext;
         _registrationService = registrationService;
-        _notificationService = notificationService;
-        _realtimePublisher = realtimePublisher;
+        _publisher = publisher;
+        _scopeFactory = scopeFactory;
         _logger = logger;
     }
 
@@ -117,8 +120,9 @@ public class BidService : IBidService
             previousBid.IsWinning = false;
         }
 
+        var previousPrice = auction.CurrentPrice;
         var placedAt = DateTime.UtcNow;
-        _dbContext.Bids.Add(new Bid
+        var newBid = new Bid
         {
             AuctionId = auctionId,
             BidderId = bidderId,
@@ -127,7 +131,9 @@ public class BidService : IBidService
             IsWinning = true,
             PlacedAt = placedAt,
             CreatedAt = placedAt
-        });
+        };
+
+        _dbContext.Bids.Add(newBid);
 
         auction.CurrentPrice = amount;
         auction.UpdatedAt = placedAt;
@@ -141,24 +147,33 @@ public class BidService : IBidService
         await transaction.CommitAsync();
 
         var productName = auction.Product.Name;
-        foreach (var outbidUserId in outbidUserIds)
+        var bidPlacedMessage = new BidPlacedMessage
         {
-            await _notificationService.CreateAndPushAsync(
-                outbidUserId,
-                "You've been outbid",
-                $"Someone placed a higher bid on {productName}.",
-                NotificationType.Auction,
-                $"/Auction/Detail/{auctionId}",
-                NotificationReferenceTypes.AuctionOutbid,
-                auctionId,
-                TimeSpan.FromMinutes(5));
+            AuctionId = auctionId,
+            BidId = newBid.Id,
+            BidderId = bidderId,
+            Amount = amount,
+            PreviousPrice = previousPrice,
+            OutbidUserIds = outbidUserIds,
+            ProductName = productName
+        };
+
+        if (!_publisher.TryPublish(RabbitMqQueueNames.BidsPlaced, bidPlacedMessage))
+        {
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var handler = scope.ServiceProvider.GetRequiredService<IBidPlacedMessageHandler>();
+                await handler.HandleAsync(bidPlacedMessage);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Inline bid side-effect handling failed for auction {AuctionId}.", auctionId);
+            }
         }
 
         var bidCount = await _dbContext.Bids.CountAsync(b => b.AuctionId == auctionId);
         var bidHistory = await LoadBidHistoryAsync(auctionId);
-
-        var bidState = BuildBidState(auctionId, auction, bidCount, bidHistory);
-        await _realtimePublisher.SendBidUpdateAsync(auctionId, bidState);
 
         return PlaceBidResult.Ok(
             "Bid placed successfully.",
@@ -182,12 +197,18 @@ public class BidService : IBidService
             {
                 AuctionStatuses.PendingReview => "This auction is pending review and not yet open for bidding.",
                 AuctionStatuses.Rejected => "This auction listing was rejected.",
-                AuctionStatuses.Scheduled => "This auction has not started yet.",
+                AuctionStatuses.Scheduled => "The live auction has not started yet.",
                 AuctionStatuses.Ended or AuctionStatuses.AwaitingPayment => "This auction has ended.",
                 AuctionStatuses.Cancelled => "This auction has been cancelled.",
                 AuctionStatuses.Completed => "This auction is completed.",
                 _ => "This auction is not accepting bids."
             };
+        }
+
+        var now = DateTime.UtcNow;
+        if (now < DateTimeUtilities.AsUtc(auction.StartDate))
+        {
+            return "The live auction has not started yet.";
         }
 
         if (!DateTimeUtilities.IsInFutureUtc(auction.EndDate))

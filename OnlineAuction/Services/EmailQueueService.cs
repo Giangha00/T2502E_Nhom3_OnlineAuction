@@ -1,0 +1,93 @@
+using OnlineAuction.Messaging;
+using OnlineAuction.Messaging.Handlers;
+using OnlineAuction.Messaging.Messages;
+
+namespace OnlineAuction.Services;
+
+public interface IEmailQueueService
+{
+    Task<bool> QueuePasswordResetOtpAsync(
+        string to,
+        string fullName,
+        string otpCode,
+        int expiryMinutes,
+        string locale,
+        CancellationToken cancellationToken = default);
+
+    Task<bool> QueueEmailConfirmationAsync(
+        string to,
+        string fullName,
+        string confirmUrl,
+        string locale,
+        CancellationToken cancellationToken = default);
+}
+
+public sealed class EmailQueueService : IEmailQueueService
+{
+    private readonly IRabbitMqPublisher _publisher;
+    private readonly IServiceScopeFactory _scopeFactory;
+
+    public EmailQueueService(
+        IRabbitMqPublisher publisher,
+        IServiceScopeFactory scopeFactory)
+    {
+        _publisher = publisher;
+        _scopeFactory = scopeFactory;
+    }
+
+    public async Task<bool> QueuePasswordResetOtpAsync(
+        string to,
+        string fullName,
+        string otpCode,
+        int expiryMinutes,
+        string locale,
+        CancellationToken cancellationToken = default)
+    {
+        var message = new EmailSendMessage
+        {
+            Kind = EmailSendKind.PasswordResetOtp,
+            To = to,
+            FullName = fullName,
+            OtpCode = otpCode,
+            ExpiryMinutes = expiryMinutes,
+            Locale = locale
+        };
+
+        if (_publisher.TryPublish(RabbitMqQueueNames.EmailsSend, message))
+        {
+            return true;
+        }
+
+        using var scope = _scopeFactory.CreateScope();
+        var handler = scope.ServiceProvider.GetRequiredService<IEmailSendMessageHandler>();
+        await handler.HandleAsync(message, cancellationToken);
+        return true;
+    }
+
+    public async Task<bool> QueueEmailConfirmationAsync(
+        string to,
+        string fullName,
+        string confirmUrl,
+        string locale,
+        CancellationToken cancellationToken = default)
+    {
+        var message = new EmailSendMessage
+        {
+            Kind = EmailSendKind.EmailConfirmation,
+            To = to,
+            FullName = fullName,
+            ConfirmUrl = confirmUrl,
+            Locale = locale
+        };
+
+        if (_publisher.TryPublish(RabbitMqQueueNames.EmailsSend, message))
+        {
+            return true;
+        }
+
+        using var scope = _scopeFactory.CreateScope();
+        var handler = scope.ServiceProvider.GetRequiredService<IEmailSendMessageHandler>();
+        await handler.HandleAsync(message, cancellationToken);
+        return true;
+    }
+}

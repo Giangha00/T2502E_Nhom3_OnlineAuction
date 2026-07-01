@@ -36,4 +36,10 @@ public static class NotificationReferenceTypes
     public const string RefundApproved = "refund_approved";
     public const string RefundRequested = "refund_requested";
     public const string RefundRejected = "refund_rejected";
+    public const string AuctionRegistrationConfirmed = "auction_registration_confirmed";
+    public const string AuctionRegistrationCancelled = "auction_registration_cancelled";
+    public const string AuctionDepositRefunded = "auction_deposit_refunded";
+    public const string AuctionStartingSoon = "auction_starting_soon";
+    public const string AuctionNowLive = "auction_now_live";
+    public const string ListingFeePaid = "listing_fee_paid";
 }

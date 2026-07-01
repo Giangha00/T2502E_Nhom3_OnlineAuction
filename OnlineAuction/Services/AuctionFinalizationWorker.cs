@@ -1,5 +1,4 @@
 using OnlineAuction.Services.Interfaces;
-using OnlineAuction.Areas.Admin.Services;
 
 namespace OnlineAuction.Services;
 
@@ -25,30 +24,8 @@ public class AuctionFinalizationWorker : BackgroundService
             try
             {
                 using var scope = _scopeFactory.CreateScope();
-                var orderCreationService = scope.ServiceProvider.GetRequiredService<IOrderCreationService>();
-                var orderService = scope.ServiceProvider.GetRequiredService<IOrderService>();
-                var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
-                var verificationService = scope.ServiceProvider.GetRequiredService<IAdminAuctionVerificationService>();
-
-                var createdCount = await orderCreationService.FinalizeExpiredAuctionsAsync(stoppingToken);
-                var cancelledCount = await orderService.CancelAllExpiredPendingOrdersAsync();
-                await notificationService.ProcessAuctionEndingSoonNotificationsAsync(stoppingToken);
-                var activatedCount = await verificationService.ActivateScheduledAuctionsAsync(stoppingToken);
-
-                if (createdCount > 0)
-                {
-                    _logger.LogInformation("Created {CreatedCount} pending payment auction orders.", createdCount);
-                }
-
-                if (cancelledCount > 0)
-                {
-                    _logger.LogInformation("Cancelled {CancelledCount} expired pending payment orders.", cancelledCount);
-                }
-
-                if (activatedCount > 0)
-                {
-                    _logger.LogInformation("Activated {ActivatedCount} scheduled auctions.", activatedCount);
-                }
+                var lifecycleQueue = scope.ServiceProvider.GetRequiredService<IAuctionLifecycleQueueService>();
+                await lifecycleQueue.PublishTickAsync(stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -56,7 +33,7 @@ public class AuctionFinalizationWorker : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to finalize expired auctions.");
+                _logger.LogError(ex, "Failed to publish auction lifecycle work.");
             }
 
             await Task.Delay(PollInterval, stoppingToken);

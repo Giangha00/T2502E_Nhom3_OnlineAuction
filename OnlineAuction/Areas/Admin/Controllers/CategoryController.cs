@@ -126,4 +126,23 @@ public class CategoryController : BaseAdminController
 
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.CategoriesManage)]
+    public async Task<IActionResult> BulkDelete(CategoryBulkDeleteViewModel model)
+    {
+        var result = await _categoryService.BulkDeleteAsync(model.SelectedCategoryIds);
+
+        if (result.Success)
+        {
+            TempData["SuccessMessage"] = result.Message;
+        }
+        else
+        {
+            TempData["ErrorMessage"] = result.Message;
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
 }
