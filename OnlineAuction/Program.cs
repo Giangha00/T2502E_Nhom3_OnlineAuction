@@ -245,6 +245,8 @@ builder.Services.Configure<PasswordResetOtpSettings>(
     builder.Configuration.GetSection(PasswordResetOtpSettings.SectionName));
 builder.Services.Configure<RabbitMqSettings>(
     builder.Configuration.GetSection(RabbitMqSettings.SectionName));
+builder.Services.Configure<BidFraudDetectionSettings>(
+    builder.Configuration.GetSection(BidFraudDetectionSettings.SectionName));
 
 builder.Services.AddHttpClient<IPayPalService, PayPalService>();
 builder.Services.AddHttpClient<IEmailSender, GmailEmailSender>();
@@ -256,6 +258,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuctionService, AuctionService>();
 builder.Services.AddScoped<IBidService, BidService>();
+builder.Services.AddScoped<IBidRateLimitService, BidRateLimitService>();
+builder.Services.AddScoped<IBidFraudDetectionService, BidFraudDetectionService>();
+builder.Services.AddScoped<IBidFraudAlertWriter, BidFraudAlertWriter>();
 builder.Services.AddScoped<IAuctionRegistrationService, AuctionRegistrationService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderCreationService, OrderCreationService>();
@@ -268,6 +273,7 @@ builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 builder.Services.AddScoped<IWatchlistService, WatchlistService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<IProductDocumentDownloadService, ProductDocumentDownloadService>();
+builder.Services.AddScoped<AdminAuctionService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<IAdminAuctionVerificationService, AdminAuctionVerificationService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();

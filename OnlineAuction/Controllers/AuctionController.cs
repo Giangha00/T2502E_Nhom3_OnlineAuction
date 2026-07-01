@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using OnlineAuction.Configurations;
 using OnlineAuction.Helpers;
 using OnlineAuction.Services.Interfaces;
@@ -15,18 +16,28 @@ public class AuctionController : Controller
     private readonly IAuctionRegistrationService _registrationService;
     private readonly IRegistrationDepositService _registrationDepositService;
     private readonly IRegistrationDepositRefundService _depositRefundService;
+    private readonly IBidRateLimitService _bidRateLimitService;
+    private readonly IStringLocalizer<SharedResource> _localizer;
+    private readonly ILogger<AuctionController> _logger;
+
     public AuctionController(
         IAuctionService auctionService,
         IBidService bidService,
         IAuctionRegistrationService registrationService,
         IRegistrationDepositService registrationDepositService ,
-        IRegistrationDepositRefundService depositRefundService)
+        IRegistrationDepositRefundService depositRefundService,
+        IBidRateLimitService bidRateLimitService,
+        IStringLocalizer<SharedResource> localizer,
+        ILogger<AuctionController> logger)
     {
         _auctionService = auctionService;
         _bidService = bidService;
         _registrationService = registrationService;
         _registrationDepositService = registrationDepositService;
         _depositRefundService = depositRefundService;
+        _bidRateLimitService = bidRateLimitService;
+        _localizer = localizer;
+        _logger = logger;
     }
 
     public async Task<IActionResult> Index()
@@ -298,6 +309,21 @@ public async Task<IActionResult> DepositPayPalCancel(string token)
         if (!int.TryParse(userIdClaim, out var bidderId))
         {
             return Unauthorized(new { success = false, message = "Please sign in to place a bid." });
+        }
+
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+        var rateLimit = await _bidRateLimitService.CheckAsync(auctionId, bidderId, ipAddress);
+        if (!rateLimit.IsAllowed)
+        {
+            _logger.LogWarning(
+                "Bid rejected by rate limit for auction {AuctionId}, user {UserId}, IP {IpAddress}.",
+                auctionId,
+                bidderId,
+                ipAddress);
+
+            return StatusCode(
+                StatusCodes.Status429TooManyRequests,
+                new { success = false, message = _localizer["Bid_RateLimit_Message"].Value });
         }
 
         var result = await _bidService.PlaceBidAsync(auctionId, bidderId, amount);
