@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Configurations;
-using OnlineAuction.Data.Seeders;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
 using OnlineAuction.Models;
@@ -16,6 +15,9 @@ namespace OnlineAuction.Areas.Admin.Controllers;
 [AllowAnonymous]
 public class AccountController : Controller
 {
+    private const string AdminCookieName = ".AuctionHouse.Admin";
+    private const string AdminCookiePath = "/Admin";
+
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IPermissionService _permissionService;
 
@@ -28,18 +30,20 @@ public class AccountController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Login(string? returnUrl = null)
+    public async Task<IActionResult> Login(string? returnUrl = null, bool force = false)
     {
-        var adminAuth = await HttpContext.AuthenticateAsync(AuthSchemes.Admin);
-        if (adminAuth.Succeeded)
+        if (!force)
         {
-            var userIdValue = adminAuth.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (int.TryParse(userIdValue, out var userId))
+            var adminAuth = await HttpContext.AuthenticateAsync(AuthSchemes.Admin);
+            if (adminAuth.Succeeded)
             {
-                var existingUser = await _userManager.FindByIdAsync(userId.ToString());
-                if (existingUser is not null && await IdentityRoleSyncService.HasAdminAccessAsync(_userManager, existingUser))
+                var userIdValue = adminAuth.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (int.TryParse(userIdValue, out var userId))
                 {
-                    return RedirectToAction("Index", "Dashboard");
+                    if (await _permissionService.UserHasAdminPanelAccessAsync(userId))
+                    {
+                        return RedirectToAction("Index", "Dashboard");
+                    }
                 }
             }
         }
@@ -82,7 +86,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        if (!await IdentityRoleSyncService.HasAdminAccessAsync(_userManager, user))
+        if (!await _permissionService.UserHasAdminPanelAccessAsync(user.Id))
         {
             ModelState.AddModelError(string.Empty, "Admin access required.");
             return View(model);
@@ -105,12 +109,12 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Dashboard");
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [AcceptVerbs("GET", "POST")]
+    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Logout()
     {
-        await HttpContext.SignOutAsync(AuthSchemes.Admin);
-        return RedirectToAction(nameof(Login));
+        await SignOutAdminAsync();
+        return RedirectToAction(nameof(Login), new { force = true });
     }
 
     [HttpGet]
@@ -131,10 +135,18 @@ public class AccountController : Controller
 
         var roles = await _userManager.GetRolesAsync(user);
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+        claims.Add(new Claim(PermissionClaimTypes.AppRole, user.Role.ToString()));
 
-        var permissions = await _permissionService.GetPermissionsForUserAsync(user.Id);
-        claims.AddRange(permissions.Select(permission =>
-            new Claim(PermissionClaimTypes.Permission, permission)));
+        if (user.Role == UserRole.Admin)
+        {
+            claims.Add(new Claim(PermissionClaimTypes.SuperAdmin, bool.TrueString));
+        }
+        else
+        {
+            var permissions = await _permissionService.GetPermissionsForUserAsync(user.Id);
+            claims.AddRange(permissions.Select(permission =>
+                new Claim(PermissionClaimTypes.Permission, permission)));
+        }
 
         var identity = new ClaimsIdentity(claims, AuthSchemes.Admin);
         var principal = new ClaimsPrincipal(identity);
@@ -145,5 +157,11 @@ public class AccountController : Controller
         };
 
         await HttpContext.SignInAsync(AuthSchemes.Admin, principal, properties);
+    }
+
+    private async Task SignOutAdminAsync()
+    {
+        await HttpContext.SignOutAsync(AuthSchemes.Admin);
+        Response.Cookies.Delete(AdminCookieName, new CookieOptions { Path = AdminCookiePath });
     }
 }

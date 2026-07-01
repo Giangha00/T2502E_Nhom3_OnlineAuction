@@ -43,6 +43,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
 
+    public DbSet<UserPermission> UserPermissions => Set<UserPermission>();
+
     public DbSet<UserOtpCode> UserOtpCodes => Set<UserOtpCode>();
 
     public DbSet<WatchlistItem> WatchlistItems => Set<WatchlistItem>();
@@ -113,6 +115,32 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.HasIndex(rp => new { rp.RoleId, rp.PermissionId })
                 .IsUnique()
                 .HasDatabaseName("ux_role_permissions_role_permission");
+        });
+
+        builder.Entity<UserPermission>(entity =>
+        {
+            entity.ToTable("user_permissions");
+
+            entity.HasKey(up => new { up.UserId, up.PermissionId });
+
+            entity.Property(up => up.UserId).HasColumnName("user_id");
+            entity.Property(up => up.PermissionId).HasColumnName("permission_id");
+
+            entity.HasOne(up => up.User)
+                .WithMany()
+                .HasForeignKey(up => up.UserId)
+                .HasConstraintName("fk_user_permissions_user")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(up => up.Permission)
+                .WithMany(p => p.UserPermissions)
+                .HasForeignKey(up => up.PermissionId)
+                .HasConstraintName("fk_user_permissions_permission")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(up => new { up.UserId, up.PermissionId })
+                .IsUnique()
+                .HasDatabaseName("ux_user_permissions_user_permission");
         });
     }
     private static void ConfigureAuctionRegistrationDeposits(ModelBuilder builder)
@@ -211,6 +239,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(u => u.LockoutEnabled).HasColumnName("lockout_enabled");
             entity.Property(u => u.AccessFailedCount).HasColumnName("access_failed_count");
             entity.Property(u => u.Role).HasColumnName("role").HasColumnType("tinyint");
+            entity.Property(u => u.IsSuperAdmin).HasColumnName("is_super_admin");
             entity.Property(u => u.Status).HasColumnName("status").HasColumnType("tinyint");
             entity.Property(u => u.AvatarUrl).HasColumnName("avatar_url").HasMaxLength(260);
             entity.Property(u => u.CreatedAt).HasColumnName("created_at");

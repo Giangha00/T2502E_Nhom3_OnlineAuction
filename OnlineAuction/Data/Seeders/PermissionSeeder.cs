@@ -21,7 +21,9 @@ public static class PermissionSeeder
         new(PermissionCodes.UsersManage, "Manage Users", "Users", "Create, edit, delete users and manage roles"),
         new(PermissionCodes.CategoriesManage, "Manage Categories", "Categories", "Full category CRUD"),
         new(PermissionCodes.ProductsManage, "Manage Products", "Products", "Product admin module (backlog)"),
-        new(PermissionCodes.ComplaintsReview, "Review Complaints", "Complaints", "Complaint review module (backlog)")
+        new(PermissionCodes.ComplaintsReview, "Review Complaints", "Complaints", "Complaint review module (backlog)"),
+        new(PermissionCodes.PermissionsView, "View Permissions", "Permissions", "View permission catalog and role assignments"),
+        new(PermissionCodes.PermissionsManage, "Manage Permissions", "Permissions", "Update role permission assignments")
     ];
 
     public static async Task SeedAsync(
@@ -55,7 +57,48 @@ public static class PermissionSeeder
             await roleManager.CreateAsync(new IdentityRole<int> { Name = StaffRoleNames.Admin });
         }
 
+        await EnsureRolePermissionsAsync(dbContext, roleManager, StaffRoleNames.Admin, PermissionCodes.All);
+
         await SyncExistingUserRolesAsync(dbContext, userManager);
+    }
+
+    private static async Task EnsureRolePermissionsAsync(
+        AuctionHouseDbContext dbContext,
+        RoleManager<IdentityRole<int>> roleManager,
+        string roleName,
+        IEnumerable<string> permissionCodes)
+    {
+        var role = await roleManager.FindByNameAsync(roleName);
+        if (role is null)
+        {
+            return;
+        }
+
+        var codes = permissionCodes.ToList();
+        var permissions = await dbContext.Permissions
+            .Where(p => codes.Contains(p.Code))
+            .ToListAsync();
+
+        var existingPermissionIds = await dbContext.RolePermissions
+            .Where(rp => rp.RoleId == role.Id)
+            .Select(rp => rp.PermissionId)
+            .ToListAsync();
+
+        foreach (var permission in permissions)
+        {
+            if (existingPermissionIds.Contains(permission.Id))
+            {
+                continue;
+            }
+
+            dbContext.RolePermissions.Add(new RolePermission
+            {
+                RoleId = role.Id,
+                PermissionId = permission.Id
+            });
+        }
+
+        await dbContext.SaveChangesAsync();
     }
 
     private static async Task MigrateLegacyStaffRolesAsync(
