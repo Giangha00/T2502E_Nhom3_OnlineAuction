@@ -5,4 +5,6 @@ public class ProductBulkDeleteViewModel
     public List<int> SelectedProductIds { get; set; } = [];
 
     public int? ReturnCategoryId { get; set; }
+
+    public int? ReturnTemplateId { get; set; }
 }

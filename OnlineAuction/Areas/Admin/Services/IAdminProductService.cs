@@ -4,15 +4,25 @@ namespace OnlineAuction.Areas.Admin.Services;
 
 public interface IAdminProductService
 {
-    Task<ProductCategoryListViewModel> GetCategoryTemplatesAsync(ProductCategoryFilterViewModel filter);
+    Task<ProductTemplateListViewModel> GetProductTemplatesAsync(ProductTemplateFilterViewModel filter);
 
-    Task<ProductListViewModel?> GetCategoryProductsAsync(int categoryId, ProductFilterViewModel filter);
+    Task<ProductListViewModel?> GetTemplateInstancesAsync(int templateId, ProductFilterViewModel filter);
+
+    Task<ProductTemplateFormViewModel> BuildCreateTemplateFormAsync();
+
+    Task<ProductTemplateFormViewModel?> BuildEditTemplateFormAsync(int id);
+
+    Task<(bool Success, string Message)> CreateTemplateAsync(ProductTemplateFormViewModel model);
+
+    Task<(bool Success, string Message)> UpdateTemplateAsync(ProductTemplateFormViewModel model);
+
+    Task<(bool Success, string Message)> DeleteTemplateAsync(int id, int adminUserId);
 
     Task<ProductListViewModel> GetProductsAsync(ProductFilterViewModel filter);
 
     Task<ProductDetailViewModel?> GetDetailsAsync(int id);
 
-    Task<ProductFormViewModel> BuildCreateFormAsync();
+    Task<ProductFormViewModel> BuildCreateFormAsync(int? templateId = null);
 
     Task<ProductFormViewModel?> BuildEditFormAsync(int id);
 
