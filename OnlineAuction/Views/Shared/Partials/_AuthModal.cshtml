@@ -1,8 +1,9 @@
+@using OnlineAuction.Helpers
 @{
     var returnUrlFromQuery = Context.Request.Query["returnUrl"].ToString();
-    var modalReturnUrl = !string.IsNullOrWhiteSpace(returnUrlFromQuery) && Url.IsLocalUrl(returnUrlFromQuery)
-        ? returnUrlFromQuery
-        : Context.Request.Path.Value ?? "/";
+    var modalReturnUrl = AuthRedirectHelper.SanitizeReturnUrl(Url, returnUrlFromQuery)
+        ?? AuthRedirectHelper.SanitizeReturnUrl(Url, Context.Request.Path.Value)
+        ?? "/";
     var authError = TempData["AuthError"] as string;
     var authSuccess = TempData["AuthSuccess"] as string;
     var resetEmail = TempData["ResetPasswordEmail"] as string ?? string.Empty;
@@ -190,7 +191,7 @@
             </div>
             <div class="home-auth-field">
               <label class="home-auth-field__label" for="modalPhone">@Localizer["Auth_Phone"]</label>
-              <input name="phoneNumber" id="modalPhone" type="tel" placeholder="@Localizer["Auth_Placeholder_Phone"]" required class="home-auth-input"/>
+              <input name="phoneNumber" id="modalPhone" type="tel" inputmode="numeric" pattern="\d{11}" maxlength="11" minlength="11" autocomplete="tel" placeholder="@Localizer["Auth_Placeholder_Phone"]" title="@Localizer["Auth_Phone_InvalidLength"]" required class="home-auth-input"/>
             </div>
             <div class="home-auth-field">
               <label class="home-auth-field__label" for="modalSignupPassword">@Localizer["Auth_Password"]</label>

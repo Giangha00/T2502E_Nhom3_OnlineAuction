@@ -11,15 +11,18 @@ public class RegistrationDepositService : IRegistrationDepositService
 {
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IPayPalService _payPalService;
+    private readonly INotificationService _notificationService;
     private readonly ILogger<RegistrationDepositService> _logger;
 
     public RegistrationDepositService(
         AuctionHouseDbContext dbContext,
         IPayPalService payPalService,
+        INotificationService notificationService,
         ILogger<RegistrationDepositService> logger)
     {
         _dbContext = dbContext;
         _payPalService = payPalService;
+        _notificationService = notificationService;
         _logger = logger;
     }
 
@@ -84,21 +87,22 @@ public class RegistrationDepositService : IRegistrationDepositService
                 "Phiên đấu giá này không yêu cầu đặt cọc.");
         }
 
-        // Chỉ cho đăng ký khi live hoặc ending_soon
-        if (auction.Status != AuctionStatuses.Live &&
-            auction.Status != AuctionStatuses.EndingSoon)
-        {
-            return RegistrationDepositResult.Fail(
-                "Chỉ được đăng ký khi phiên đấu giá đang diễn ra.");
-        }
-
+        // Chỉ cho đăng ký trong khung thời gian đăng ký
         var now = DateTime.UtcNow;
-
-        // Project hiện chưa có RegistrationStartTime / RegistrationEndTime riêng
-        // Tạm dùng StartDate / EndDate làm khung thời gian đăng ký
-        if (now < DateTimeUtilities.AsUtc(auction.StartDate) ||
-            now > DateTimeUtilities.AsUtc(auction.EndDate))
+        if (!AuctionScheduleHelper.IsRegistrationOpen(auction, now))
         {
+            if (now < DateTimeUtilities.AsUtc(auction.RegistrationStartDate))
+            {
+                return RegistrationDepositResult.Fail(
+                    "Thời gian đăng ký đấu giá chưa bắt đầu.");
+            }
+
+            if (now >= DateTimeUtilities.AsUtc(auction.RegistrationEndDate))
+            {
+                return RegistrationDepositResult.Fail(
+                    "Thời gian đăng ký đấu giá đã kết thúc.");
+            }
+
             return RegistrationDepositResult.Fail(
                 "Không nằm trong thời gian đăng ký đấu giá.");
         }
@@ -297,6 +301,20 @@ public class RegistrationDepositService : IRegistrationDepositService
         deposit.Registration.UpdatedAt = now;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var auction = await _dbContext.Auctions
+            .AsNoTracking()
+            .Include(a => a.Product)
+            .FirstOrDefaultAsync(a => a.Id == deposit.AuctionId, cancellationToken);
+
+        var productName = auction?.Product?.Name ?? "the auction";
+        await _notificationService.CreateAndPushAsync(
+            userId,
+            "Registration confirmed",
+            $"Your registration for {productName} is confirmed. Deposit of ${deposit.Amount:N0} was received.",
+            NotificationType.Auction,
+            $"/Auction/Detail/{deposit.AuctionId}",
+            cancellationToken: cancellationToken);
 
         return RegistrationDepositResult.Ok(
             "Đặt cọc thành công. Bạn đã được duyệt đăng ký đấu giá.",

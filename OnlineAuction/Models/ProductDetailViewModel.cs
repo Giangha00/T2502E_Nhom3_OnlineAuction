@@ -1,5 +1,7 @@
 namespace OnlineAuction.Models;
 
+using OnlineAuction.Entities;
+
 public class ProductDetailViewModel
 {
     public int Id { get; set; }
@@ -27,6 +29,11 @@ public class ProductDetailViewModel
     public List<decimal> QuickBidAmounts { get; set; } = [];
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
+    public DateTime RegistrationStartDate { get; set; }
+    public DateTime RegistrationEndDate { get; set; }
+    public DateTime CountdownTargetDate { get; set; }
+    public string ListingPhase { get; set; } = string.Empty;
+    public string PhaseCountdownKind { get; set; } = string.Empty;
     public int CountdownDays { get; set; }
     public int CountdownHours { get; set; }
     public int CountdownMinutes { get; set; }
@@ -34,6 +41,7 @@ public class ProductDetailViewModel
     public string AuctionStatus { get; set; } = "Active Auction";
     public string StatusBadgeClass { get; set; } = "bg-emerald-600";
     public bool CanPlaceBid { get; set; }
+    public bool CanRegister { get; set; }
     public bool RequiresRegistration { get; set; } = true;
     public bool IsRegistered { get; set; }
     public string? RegistrationStatus { get; set; }
@@ -48,13 +56,26 @@ public class ProductDetailViewModel
     public List<ProductDocumentViewModel> Documents { get; set; } = [];
     public List<AuctionItemViewModel> RelatedProducts { get; set; } = [];
     public decimal? BuyNowPrice { get; set; }
-    public bool HasBuyNow => BuyNowPrice.HasValue && BuyNowPrice.Value > 0;
+    public string ListingType { get; set; } = ListingTypes.Auction;
+    public string? ListingRejectReason { get; set; }
+    public bool HasBuyNow =>
+        string.Equals(ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase)
+        || (BuyNowPrice.HasValue && BuyNowPrice.Value > 0);
+    public bool CanPurchaseBuyNow =>
+        !IsSeller && AuctionStatus is "Active Auction" or "Ending Soon";
 }
 
 public class ProductDocumentViewModel
 {
+    public int Id { get; set; }
+
     public string Name { get; set; } = string.Empty;
+
     public string FileName { get; set; } = string.Empty;
+
     public string FileType { get; set; } = "PDF";
+
     public string FileUrl { get; set; } = string.Empty;
+
+    public bool ShowCertificateNumber { get; set; }
 }

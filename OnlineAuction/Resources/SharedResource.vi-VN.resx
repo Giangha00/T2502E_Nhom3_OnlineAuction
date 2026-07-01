@@ -274,7 +274,14 @@
   <data name="Sell_AuctionType_Featured" xml:space="preserve"><value>Đấu giá nổi bật</value></data>
   <data name="Sell_AuctionType_Featured_Desc" xml:space="preserve"><value>Ưu tiên hiển thị trên trang chủ và danh mục. Phí bổ sung có thể áp dụng.</value></data>
   <data name="Sell_Section4_Title" xml:space="preserve"><value>Thời gian đấu giá</value></data>
-  <data name="Sell_Section4_Desc" xml:space="preserve"><value>Thời điểm bắt đầu và kết thúc phiên đấu giá</value></data>
+  <data name="Sell_Section4_Desc" xml:space="preserve"><value>Thiết lập thời gian đăng ký và phiên live đấu giá</value></data>
+  <data name="Sell_RegistrationPeriodTitle" xml:space="preserve"><value>Thời gian đăng ký đấu giá</value></data>
+  <data name="Sell_RegistrationStartDate" xml:space="preserve"><value>Bắt đầu đăng ký</value></data>
+  <data name="Sell_RegistrationEndDate" xml:space="preserve"><value>Kết thúc đăng ký</value></data>
+  <data name="Sell_LivePeriodTitle" xml:space="preserve"><value>Thời gian live đấu giá</value></data>
+  <data name="Sell_LivePeriodDesc" xml:space="preserve"><value>Phiên live mặc định kéo dài 1 giờ</value></data>
+  <data name="Sell_LiveStartDate" xml:space="preserve"><value>Bắt đầu live</value></data>
+  <data name="Sell_LiveEndDate" xml:space="preserve"><value>Kết thúc live</value></data>
   <data name="Sell_StartDate" xml:space="preserve"><value>Ngày bắt đầu</value></data>
   <data name="Sell_EndDate" xml:space="preserve"><value>Ngày kết thúc</value></data>
   <data name="Sell_Section5_Title" xml:space="preserve"><value>Tài liệu sản phẩm</value></data>
@@ -284,7 +291,7 @@
   <data name="Sell_DocType_Invoice" xml:space="preserve"><value>Hóa đơn</value></data>
   <data name="Sell_DocType_Verification" xml:space="preserve"><value>Xác minh</value></data>
   <data name="Sell_UploadDocuments" xml:space="preserve"><value>Tải lên tài liệu</value></data>
-  <data name="Sell_UploadDocuments_Hint" xml:space="preserve"><value>PDF, JPG, PNG — tối đa 10MB mỗi file</value></data>
+  <data name="Sell_UploadDocuments_Hint" xml:space="preserve"><value>Chỉ PDF — tối đa 5MB mỗi file, tối đa 5 file</value></data>
   <data name="Sell_ReadyToPublish_Highlight" xml:space="preserve"><value>Sẵn sàng đăng?</value></data>
   <data name="Sell_ReadyToPublish" xml:space="preserve"><value>Xem lại phần xem trước, sau đó tạo phiên đấu giá.</value></data>
   <data name="Sell_SaveDraft" xml:space="preserve"><value>Lưu nháp</value></data>
@@ -315,6 +322,14 @@
   <data name="Sell_Error_StartDatePast" xml:space="preserve"><value>Ngày bắt đầu không được ở quá khứ</value></data>
   <data name="Sell_Error_EndDateRequired" xml:space="preserve"><value>Vui lòng chọn ngày kết thúc</value></data>
   <data name="Sell_Error_EndDateAfterStart" xml:space="preserve"><value>Ngày kết thúc phải sau ngày bắt đầu</value></data>
+  <data name="Sell_Error_RegistrationStartRequired" xml:space="preserve"><value>Vui lòng chọn thời gian bắt đầu đăng ký</value></data>
+  <data name="Sell_Error_RegistrationStartPast" xml:space="preserve"><value>Thời gian bắt đầu đăng ký không được ở quá khứ</value></data>
+  <data name="Sell_Error_RegistrationEndRequired" xml:space="preserve"><value>Vui lòng chọn thời gian kết thúc đăng ký</value></data>
+  <data name="Sell_Error_RegistrationEndAfterStart" xml:space="preserve"><value>Thời gian kết thúc đăng ký phải sau thời gian bắt đầu</value></data>
+  <data name="Sell_Error_LiveStartRequired" xml:space="preserve"><value>Vui lòng chọn thời gian bắt đầu live</value></data>
+  <data name="Sell_Error_LiveStartAfterRegistration" xml:space="preserve"><value>Thời gian live phải bắt đầu sau khi kết thúc đăng ký</value></data>
+  <data name="Sell_Error_LiveEndRequired" xml:space="preserve"><value>Vui lòng chọn thời gian kết thúc live</value></data>
+  <data name="Sell_Error_LiveEndAfterStart" xml:space="preserve"><value>Thời gian kết thúc live phải sau thời gian bắt đầu live</value></data>
   <data name="Sell_Error_ImageInvalidFormat" xml:space="preserve"><value>{0}: định dạng không hợp lệ (chỉ JPG, PNG, WEBP)</value></data>
   <data name="Sell_Error_ImageSizeLimit" xml:space="preserve"><value>{0}: vượt quá giới hạn 5MB</value></data>
   <data name="Sell_Error_DocInvalidFormat" xml:space="preserve"><value>{0}: định dạng không hợp lệ (chỉ PDF, JPG, PNG)</value></data>
@@ -375,6 +390,7 @@
   <data name="Auth_Continue" xml:space="preserve"><value>Tiếp tục</value></data>
   <data name="Auth_FullName" xml:space="preserve"><value>Họ và tên</value></data>
   <data name="Auth_Phone" xml:space="preserve"><value>Số điện thoại</value></data>
+  <data name="Auth_Phone_InvalidLength" xml:space="preserve"><value>Số điện thoại phải gồm đúng 11 chữ số.</value></data>
   <data name="Auth_ConfirmPassword" xml:space="preserve"><value>Xác nhận mật khẩu</value></data>
   <data name="Auth_CreateAccount" xml:space="preserve"><value>Tạo tài khoản</value></data>
   <data name="Auth_Legal" xml:space="preserve"><value>Tiếp tục nghĩa là bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của RareCard.</value></data>
@@ -430,6 +446,14 @@
   <data name="Layout_Footer_PolicyTerms" xml:space="preserve"><value>Chính sách &amp; Điều khoản</value></data>
   <data name="Layout_Copyright" xml:space="preserve"><value>© {0} RareCard. Bảo lưu mọi quyền.</value></data>
   <data name="Auction_PageTitle" xml:space="preserve"><value>Đấu giá trực tiếp</value></data>
+  <data name="Auction_Phase_registration_open" xml:space="preserve"><value>Đang mở đăng ký</value></data>
+  <data name="Auction_Phase_registration_closed" xml:space="preserve"><value>Chờ live</value></data>
+  <data name="Auction_Phase_live_auction" xml:space="preserve"><value>Đang live</value></data>
+  <data name="Auction_Phase_live_ending_soon" xml:space="preserve"><value>Sắp kết thúc</value></data>
+  <data name="Auction_Countdown_RegistrationStart" xml:space="preserve"><value>Mở đăng ký sau</value></data>
+  <data name="Auction_Countdown_RegistrationEnd" xml:space="preserve"><value>Đóng đăng ký sau</value></data>
+  <data name="Auction_Countdown_LiveStart" xml:space="preserve"><value>Bắt đầu live sau</value></data>
+  <data name="Auction_Countdown_LiveEnd" xml:space="preserve"><value>Kết thúc live sau</value></data>
   <data name="Auction_Subtitle" xml:space="preserve"><value>Khám phá vật phẩm sưu tầm đã xác thực, chất lượng cao dành cho nhà sưu tầm khó tính.</value></data>
   <data name="Auction_LiveNow" xml:space="preserve"><value>Đang diễn ra</value></data>
   <data name="Auction_ActiveBids" xml:space="preserve"><value>Đấu giá đang tham gia ({0})</value></data>
@@ -553,6 +577,13 @@
   <data name="Product_Shipping_International" xml:space="preserve"><value>Hỗ trợ vận chuyển quốc tế ưu tiên</value></data>
   <data name="Product_Documents_Title" xml:space="preserve"><value>Tài liệu sản phẩm</value></data>
   <data name="Product_Documents_Desc" xml:space="preserve"><value>Chứng nhận, bảo hành và tệp xác minh</value></data>
+  <data name="Product_Certificates_Tab" xml:space="preserve"><value>Chứng nhận &amp; Tài liệu</value></data>
+  <data name="Product_Documents_Empty" xml:space="preserve"><value>Chưa có chứng nhận</value></data>
+  <data name="Product_Documents_EmptyHint" xml:space="preserve"><value>Liên hệ hỗ trợ nếu bạn cần xác minh chứng nhận.</value></data>
+  <data name="Product_DownloadCertificate" xml:space="preserve"><value>Tải chứng nhận</value></data>
+  <data name="Product_CertificateNumber" xml:space="preserve"><value>Số chứng nhận</value></data>
+  <data name="Admin_Documents_Preview" xml:space="preserve"><value>Xem trước</value></data>
+  <data name="Admin_Documents_Section" xml:space="preserve"><value>Chứng nhận &amp; Tài liệu</value></data>
   <data name="Common_View" xml:space="preserve"><value>Xem</value></data>
   <data name="Common_Download" xml:space="preserve"><value>Tải xuống</value></data>
   <data name="Product_Seller" xml:space="preserve"><value>Người bán</value></data>
@@ -575,6 +606,9 @@
   <data name="Product_RegisteredCount" xml:space="preserve"><value>{0} người đã đăng ký</value></data>
   <data name="Product_YouAreTheSeller" xml:space="preserve"><value>Bạn là người bán sản phẩm này.</value></data>
   <data name="Product_CancelRegistration" xml:space="preserve"><value>Hủy đăng ký</value></data>
+  <data name="Product_CancelRegistrationHint" xml:space="preserve"><value>Bạn có thể hủy đăng ký trước khi phiên live bắt đầu.</value></data>
+  <data name="Product_RegistrationClosesAt" xml:space="preserve"><value>Đóng đăng ký: {0}</value></data>
+  <data name="Product_LiveStartsAt" xml:space="preserve"><value>Bắt đầu live: {0}</value></data>
   <data name="Product_CountdownPreview" xml:space="preserve"><value>Xem trước tĩnh — đếm ngược chưa hoạt động</value></data>
   <data name="Product_AuctionInfo" xml:space="preserve"><value>Thông tin đấu giá</value></data>
   <data name="Product_StartingPrice" xml:space="preserve"><value>Giá khởi điểm</value></data>
@@ -582,6 +616,10 @@
   <data name="Product_MinBidStep" xml:space="preserve"><value>Bước giá tối thiểu</value></data>
   <data name="Product_Condition" xml:space="preserve"><value>Tình trạng</value></data>
   <data name="Product_AuctionTime" xml:space="preserve"><value>Thời gian đấu giá</value></data>
+  <data name="Product_RegistrationTime" xml:space="preserve"><value>Thời gian đăng ký</value></data>
+  <data name="Product_LiveAuctionTime" xml:space="preserve"><value>Thời gian live đấu giá</value></data>
+  <data name="Product_RegistrationNotOpen" xml:space="preserve"><value>Thời gian đăng ký chưa bắt đầu.</value></data>
+  <data name="Product_LiveNotStarted" xml:space="preserve"><value>Phiên live chưa bắt đầu. Vui lòng quay lại khi đến giờ đấu giá.</value></data>
   <data name="Product_StartLabel" xml:space="preserve"><value>Bắt đầu:</value></data>
   <data name="Product_EndLabel" xml:space="preserve"><value>Kết thúc:</value></data>
   <data name="Product_PlaceBidTitle" xml:space="preserve"><value>Đặt giá đấu</value></data>
@@ -825,7 +863,11 @@
   <data name="Js_ProductDetail_RegistrationSuccess" xml:space="preserve"><value>Đăng ký thành công!</value></data>
   <data name="Js_ProductDetail_RegistrationFailed" xml:space="preserve"><value>Không thể đăng ký. Vui lòng thử lại.</value></data>
   <data name="Js_ProductDetail_RegistrationCancelled" xml:space="preserve"><value>Đã hủy đăng ký.</value></data>
+  <data name="Js_ProductDetail_RegistrationCancelledWithRefund" xml:space="preserve"><value>Đã hủy đăng ký. Tiền cọc {0} đã được hoàn lại.</value></data>
   <data name="Js_ProductDetail_CancelRegistrationFailed" xml:space="preserve"><value>Không thể hủy đăng ký.</value></data>
+  <data name="Js_ProductDetail_CountdownRegistrationEnd" xml:space="preserve"><value>Đóng đăng ký sau {0} ngày {1} giờ {2} phút {3} giây</value></data>
+  <data name="Js_ProductDetail_CountdownLiveStart" xml:space="preserve"><value>Live bắt đầu sau {0} ngày {1} giờ {2} phút {3} giây</value></data>
+  <data name="Js_ProductDetail_CountdownLiveEnd" xml:space="preserve"><value>Còn {0} ngày {1} giờ {2} phút {3} giây</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>Đang thêm…</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>Đã thêm vào giỏ.</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>Không thể thêm vào giỏ. Vui lòng thử lại.</value></data>
@@ -913,4 +955,81 @@
   <data name="User_Time_HoursLeft" xml:space="preserve"><value>Còn {0} giờ</value></data>
   <data name="User_Time_MinutesLeft" xml:space="preserve"><value>Còn {0} phút</value></data>
   <data name="Account_Selling_CreateListing" xml:space="preserve"><value>Đăng bán sản phẩm</value></data>
+  <data name="Admin_BidHistory_Title" xml:space="preserve"><value>Lịch sử đấu giá</value></data>
+  <data name="Admin_BidHistory_TotalBids" xml:space="preserve"><value>Tổng {0} lượt đấu giá</value></data>
+  <data name="Admin_BidHistory_Empty" xml:space="preserve"><value>Chưa có lượt đấu giá nào.</value></data>
+  <data name="Admin_BidHistory_Col_Row" xml:space="preserve"><value>STT</value></data>
+  <data name="Admin_BidHistory_Col_Bidder" xml:space="preserve"><value>Người đấu giá</value></data>
+  <data name="Admin_BidHistory_Col_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Admin_BidHistory_Col_Amount" xml:space="preserve"><value>Số tiền bid</value></data>
+  <data name="Admin_BidHistory_Col_Time" xml:space="preserve"><value>Thời gian</value></data>
+  <data name="Admin_BidHistory_Col_Type" xml:space="preserve"><value>Loại</value></data>
+  <data name="Admin_BidHistory_Col_Status" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="Admin_BidHistory_Type_Manual" xml:space="preserve"><value>Thủ công</value></data>
+  <data name="Admin_BidHistory_Type_BuyNow" xml:space="preserve"><value>Mua ngay</value></data>
+  <data name="Admin_BidHistory_Status_Winning" xml:space="preserve"><value>Đang thắng</value></data>
+  <data name="Admin_BidHistory_Status_Outbid" xml:space="preserve"><value>Bị vượt giá</value></data>
+  <data name="Admin_BidHistory_Pagination_PageOf" xml:space="preserve"><value>Trang {0} / {1}</value></data>
+  <data name="Admin_BidHistory_Pagination_Previous" xml:space="preserve"><value>Trước</value></data>
+  <data name="Admin_BidHistory_Pagination_Next" xml:space="preserve"><value>Sau</value></data>
+  <data name="Admin_Dashboard_Title" xml:space="preserve"><value>Bảng điều khiển</value></data>
+  <data name="Admin_Dashboard_Subtitle" xml:space="preserve"><value>Theo dõi hiệu suất nền tảng và thống kê.</value></data>
+  <data name="Admin_Dashboard_Section1_Title" xml:space="preserve"><value>Tổng quan</value></data>
+  <data name="Admin_Dashboard_Section2_Title" xml:space="preserve"><value>Thống kê người dùng</value></data>
+  <data name="Admin_Dashboard_Section2_Description" xml:space="preserve"><value>Xu hướng đăng ký, user active, top buyer/seller.</value></data>
+  <data name="Admin_Dashboard_Section3_Title" xml:space="preserve"><value>Thống kê hàng hóa &amp; đấu giá</value></data>
+  <data name="Admin_Dashboard_Section3_Description" xml:space="preserve"><value>Trạng thái đấu giá, tỷ lệ thành công, bid theo danh mục.</value></data>
+  <data name="Admin_Dashboard_Filter_Title" xml:space="preserve"><value>Bộ lọc thời gian</value></data>
+  <data name="Admin_Dashboard_Filter_Description" xml:space="preserve"><value>Áp dụng khoảng ngày chung cho metric theo thời gian và export.</value></data>
+  <data name="Admin_Dashboard_Filter_From" xml:space="preserve"><value>Từ ngày</value></data>
+  <data name="Admin_Dashboard_Filter_To" xml:space="preserve"><value>Đến ngày</value></data>
+  <data name="Admin_Dashboard_Filter_Apply" xml:space="preserve"><value>Áp dụng</value></data>
+  <data name="Admin_Dashboard_Filter_Export" xml:space="preserve"><value>Xuất Excel</value></data>
+  <data name="Admin_Dashboard_Snapshot_Note" xml:space="preserve"><value>Tại thời điểm hiện tại</value></data>
+  <data name="Admin_Dashboard_FilteredPeriod_Note" xml:space="preserve"><value>Trong khoảng ngày đã chọn</value></data>
+  <data name="Admin_Dashboard_ChangeVsPrevious" xml:space="preserve"><value>so với kỳ trước</value></data>
+  <data name="Admin_Dashboard_NoData" xml:space="preserve"><value>Không có dữ liệu trong khoảng đã chọn</value></data>
+  <data name="Admin_Dashboard_Kpi_NewRegistrations" xml:space="preserve"><value>Đăng ký mới</value></data>
+  <data name="Admin_Dashboard_Kpi_ActiveUsers" xml:space="preserve"><value>User active</value></data>
+  <data name="Admin_Dashboard_Kpi_TotalUsers" xml:space="preserve"><value>Tổng user</value></data>
+  <data name="Admin_Dashboard_Kpi_OngoingAuctions" xml:space="preserve"><value>Đang diễn ra</value></data>
+  <data name="Admin_Dashboard_Kpi_EndedAuctions" xml:space="preserve"><value>Đã kết thúc</value></data>
+  <data name="Admin_Dashboard_Kpi_CancelledAuctions" xml:space="preserve"><value>Bị hủy</value></data>
+  <data name="Admin_Dashboard_Kpi_PendingReview" xml:space="preserve"><value>Chờ duyệt</value></data>
+  <data name="Admin_Dashboard_Kpi_SuccessRate" xml:space="preserve"><value>Tỷ lệ thành công</value></data>
+  <data name="Admin_Dashboard_SuccessRate_Tooltip" xml:space="preserve"><value>Số SP bán được / Tổng SP đăng bán × 100. Chỉ tính order paid hoặc delivered.</value></data>
+  <data name="Admin_Dashboard_SuccessRate_Hint" xml:space="preserve"><value>SP bán được / tổng đăng bán</value></data>
+  <data name="Admin_Dashboard_RegistrationChart_Title" xml:space="preserve"><value>Đăng ký mới</value></data>
+  <data name="Admin_Dashboard_RegistrationChart_Description" xml:space="preserve"><value>Click cột để lọc bảng user mới đăng ký.</value></data>
+  <data name="Admin_Dashboard_Granularity_Day" xml:space="preserve"><value>Ngày</value></data>
+  <data name="Admin_Dashboard_Granularity_Week" xml:space="preserve"><value>Tuần</value></data>
+  <data name="Admin_Dashboard_Granularity_Month" xml:space="preserve"><value>Tháng</value></data>
+  <data name="Admin_Dashboard_TopBuyers_Title" xml:space="preserve"><value>Top 10 Buyers</value></data>
+  <data name="Admin_Dashboard_TopSellers_Title" xml:space="preserve"><value>Top 10 Sellers</value></data>
+  <data name="Admin_Dashboard_NewUsers_Title" xml:space="preserve"><value>User mới đăng ký</value></data>
+  <data name="Admin_Dashboard_NewUsers_Filtered" xml:space="preserve"><value>Đang lọc theo {0}</value></data>
+  <data name="Admin_Dashboard_StatusChart_Title" xml:space="preserve"><value>Đấu giá theo trạng thái</value></data>
+  <data name="Admin_Dashboard_CategoryChart_Title" xml:space="preserve"><value>Danh mục theo tổng tiền bid</value></data>
+  <data name="Admin_Dashboard_CategoryChart_Description" xml:space="preserve"><value>Tổng tiền bid theo category trong khoảng đã chọn.</value></data>
+  <data name="Admin_Dashboard_RevenueChart_Title" xml:space="preserve"><value>Doanh thu</value></data>
+  <data name="Admin_Dashboard_RevenueChart_Description" xml:space="preserve"><value>Thanh toán thành công trong khoảng đã chọn</value></data>
+  <data name="Admin_Dashboard_BidsChart_Title" xml:space="preserve"><value>Lượt bid</value></data>
+  <data name="Admin_Dashboard_BidsChart_Description" xml:space="preserve"><value>Hoạt động bid theo ngày trong khoảng đã chọn</value></data>
+  <data name="Admin_Dashboard_RecentAuctions_Title" xml:space="preserve"><value>Đấu giá gần đây</value></data>
+  <data name="Admin_Dashboard_RecentAuctions_Description" xml:space="preserve"><value>10 tin mới nhất toàn hệ thống.</value></data>
+  <data name="Admin_Dashboard_RecentAuctions_Filtered" xml:space="preserve"><value>Đang lọc</value></data>
+  <data name="Admin_Dashboard_ViewAll" xml:space="preserve"><value>Xem tất cả</value></data>
+  <data name="Admin_Dashboard_Col_Name" xml:space="preserve"><value>Tên</value></data>
+  <data name="Admin_Dashboard_Col_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Admin_Dashboard_Col_RegisteredAt" xml:space="preserve"><value>Ngày đăng ký</value></data>
+  <data name="Admin_Dashboard_Col_Status" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="Admin_Dashboard_Col_BidCount" xml:space="preserve"><value>Số lượt bid</value></data>
+  <data name="Admin_Dashboard_Col_TotalBid" xml:space="preserve"><value>Tổng tiền bid</value></data>
+  <data name="Admin_Dashboard_Col_Listings" xml:space="preserve"><value>Số listing</value></data>
+  <data name="Admin_Dashboard_Col_Sales" xml:space="preserve"><value>Doanh số</value></data>
+  <data name="Admin_Dashboard_Col_Product" xml:space="preserve"><value>Sản phẩm</value></data>
+  <data name="Admin_Dashboard_Col_Seller" xml:space="preserve"><value>Người bán</value></data>
+  <data name="Admin_Dashboard_Col_Category" xml:space="preserve"><value>Danh mục</value></data>
+  <data name="Admin_Dashboard_Col_CurrentBid" xml:space="preserve"><value>Giá hiện tại</value></data>
+  <data name="Admin_Dashboard_Col_EndsIn" xml:space="preserve"><value>Còn lại</value></data>
 </root>

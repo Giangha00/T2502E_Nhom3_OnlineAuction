@@ -10,10 +10,15 @@ public class SellService : ISellService
 {
     public CreateAuctionViewModel BuildCreateForm()
     {
+        var (registrationStart, registrationEnd, liveStart, liveEnd) =
+            AuctionScheduleHelper.CreateDefaultSchedule();
+
         var model = new CreateAuctionViewModel
         {
-            StartDate = DateTime.Now.AddHours(1),
-            EndDate = DateTime.Now.AddDays(7),
+            RegistrationStartDate = registrationStart,
+            RegistrationEndDate = registrationEnd,
+            StartDate = liveStart,
+            EndDate = liveEnd,
             BidStep = 50,
             Authenticator = "PSA",
             GradeValue = "10",
@@ -63,14 +68,20 @@ public class SellService : ISellService
             yield return error;
         }
 
-        if (model.StartDate < DateTime.Now.AddMinutes(-1))
+        if (model.RegistrationStartDate < DateTime.Now.AddMinutes(-1))
         {
-            yield return (nameof(model.StartDate), "Start date cannot be in the past.");
+            yield return (nameof(model.RegistrationStartDate), "Registration start cannot be in the past.");
         }
 
-        if (model.EndDate <= model.StartDate)
+        var scheduleError = AuctionScheduleHelper.ValidateSchedule(
+            model.RegistrationStartDate,
+            model.RegistrationEndDate,
+            model.StartDate,
+            model.EndDate);
+
+        if (scheduleError is not null)
         {
-            yield return (nameof(model.EndDate), "End date must be greater than start date.");
+            yield return (nameof(model.RegistrationEndDate), scheduleError);
         }
 
         if (model.BuyNowPrice.HasValue && model.BuyNowPrice.Value <= model.StartingPrice)

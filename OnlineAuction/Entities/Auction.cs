@@ -28,6 +28,10 @@ public class Auction : AuditableEntity
 
     public string? RejectReason { get; set; }
 
+    public DateTime RegistrationStartDate { get; set; }
+
+    public DateTime RegistrationEndDate { get; set; }
+
     public DateTime StartDate { get; set; }
 
     public DateTime EndDate { get; set; }
@@ -49,6 +53,8 @@ public class Auction : AuditableEntity
     public ICollection<AuctionRegistration> Registrations { get; set; } = [];
 
     public ICollection<WatchlistItem> WatchlistItems { get; set; } = [];
+
+    public ICollection<ListingFee> ListingFees { get; set; } = [];
 }
 
 public static class ListingTypes

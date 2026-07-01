@@ -3,10 +3,18 @@
 
   var DRAFT_KEY = 'auctionHouse_createAuction_draft';
   var MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-  var MAX_DOC_SIZE = 10 * 1024 * 1024;
+  var MAX_DOC_SIZE = 5 * 1024 * 1024;
   var MAX_IMAGES = 5;
+  var MAX_DOCUMENTS = 5;
+  var DEFAULT_LIVE_DURATION_MS = 60 * 60 * 1000;
   var IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-  var DOC_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
+  var DOC_TYPES = ['application/pdf'];
+  var DOC_NAME_OPTIONS = [
+    'PSA Certificate',
+    'BGS Certificate',
+    'Product Verification',
+    'Warranty'
+  ];
 
   var state = {
     images: [],
@@ -146,6 +154,8 @@
       bidStep: $('bidStep')?.value || '',
       buyNowPrice: $('buyNowPrice')?.value || '',
       auctionEventName: $('auctionEventName')?.value.trim() || '',
+      registrationStartDate: $('registrationStartDate')?.value || '',
+      registrationEndDate: $('registrationEndDate')?.value || '',
       startDate: $('startDate')?.value || '',
       endDate: $('endDate')?.value || '',
       imageCount: state.images.length,
@@ -219,7 +229,7 @@
     setPreviewText('previewName', data.productName || t('productNameDefault', 'Product Name'));
     setPreviewText('previewSubtitle', buildPreviewSubtitle(data));
     setPreviewText('previewCurrentBid', formatCardMoney(data.startingPrice));
-    setPreviewText('previewTimeRemaining', formatTimeRemaining(data.endDate));
+    setPreviewText('previewTimeRemaining', formatTimeRemaining(data.endDate || data.startDate));
     setPreviewGradeBadge(data.grade);
     setPreviewMainImage(state.images.length > 0 ? state.images[0].url : '');
   }
@@ -319,15 +329,29 @@
 
     state.documents.forEach(function (doc) {
       var li = document.createElement('li');
-      li.className = 'flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-3';
+      li.className = 'flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between';
+      var selectHtml = '<select data-doc-name="' + doc.id + '" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 sm:w-52">';
+      DOC_NAME_OPTIONS.forEach(function (option) {
+        var selected = option === doc.displayName ? ' selected' : '';
+        selectHtml += '<option value="' + option + '"' + selected + '>' + option + '</option>';
+      });
+      selectHtml += '</select>';
       li.innerHTML =
         '<div class="flex min-w-0 items-center gap-3">' +
-        '<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-xs font-bold text-blue-800">' +
-        doc.name.split('.').pop().toUpperCase().slice(0, 3) + '</span>' +
-        '<div class="min-w-0"><p class="truncate text-sm font-medium text-slate-800">' + doc.name + '</p>' +
-        '<p class="text-xs text-slate-400">' + (doc.size / 1024).toFixed(1) + ' KB</p></div></div>' +
-        '<button type="button" data-remove-doc="' + doc.id + '" class="shrink-0 cursor-pointer text-xs font-semibold text-red-600 hover:text-red-700">' + t('remove', 'Remove') + '</button>';
+        '<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-100 text-xs font-bold text-red-800">PDF</span>' +
+        '<div class="min-w-0"><p class="truncate text-sm font-medium text-slate-800">' + doc.file.name + '</p>' +
+        '<p class="text-xs text-slate-400">' + (doc.file.size / 1024).toFixed(1) + ' KB</p></div></div>' +
+        '<div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">' + selectHtml +
+        '<button type="button" data-remove-doc="' + doc.id + '" class="shrink-0 cursor-pointer text-xs font-semibold text-red-600 hover:text-red-700">' + t('remove', 'Remove') + '</button></div>';
       list.appendChild(li);
+    });
+
+    list.querySelectorAll('[data-doc-name]').forEach(function (select) {
+      select.addEventListener('change', function () {
+        var id = select.getAttribute('data-doc-name');
+        var doc = state.documents.find(function (d) { return d.id === id; });
+        if (doc) doc.displayName = select.value;
+      });
     });
 
     list.querySelectorAll('[data-remove-doc]').forEach(function (btn) {
@@ -344,19 +368,23 @@
   function addDocuments(files) {
     var errors = [];
     Array.from(files).forEach(function (file) {
-      if (!DOC_TYPES.includes(file.type)) {
-        errors.push(tf(t('errorDocInvalidFormat', '{0}: invalid format (PDF, JPG, PNG only)'), file.name));
+      if (state.documents.length >= MAX_DOCUMENTS) {
+        errors.push(t('errorDocMaxCount', 'You can upload up to 5 documents per product.'));
+        return;
+      }
+      var isPdf = DOC_TYPES.includes(file.type) || file.name.toLowerCase().endsWith('.pdf');
+      if (!isPdf) {
+        errors.push(tf(t('errorDocInvalidFormat', '{0}: invalid format (PDF only)'), file.name));
         return;
       }
       if (file.size > MAX_DOC_SIZE) {
-        errors.push(tf(t('errorDocSizeLimit', '{0}: exceeds 10MB limit'), file.name));
+        errors.push(tf(t('errorDocSizeLimit', '{0}: exceeds 5MB limit'), file.name));
         return;
       }
       state.documents.push({
         id: 'doc_' + Date.now() + '_' + Math.random().toString(36).slice(2),
-        name: file.name,
-        size: file.size,
-        file: file
+        file: file,
+        displayName: 'PSA Certificate'
       });
     });
 
@@ -391,6 +419,29 @@
       if (input.files.length) onFiles(input.files);
       if (resetAfterChange) input.value = '';
     });
+  }
+
+  function toLocalDateTimeValue(date) {
+    var pad = function (n) { return String(n).padStart(2, '0'); };
+    return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) +
+      'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
+  }
+
+  function syncLiveEndFromStart() {
+    var startInput = $('startDate');
+    var endInput = $('endDate');
+    if (!startInput || !endInput || !startInput.value) return;
+    var start = new Date(startInput.value);
+    if (isNaN(start.getTime())) return;
+    endInput.value = toLocalDateTimeValue(new Date(start.getTime() + DEFAULT_LIVE_DURATION_MS));
+  }
+
+  function syncLiveStartFromRegistrationEnd() {
+    var registrationEndInput = $('registrationEndDate');
+    var startInput = $('startDate');
+    if (!registrationEndInput || !startInput || !registrationEndInput.value) return;
+    startInput.value = registrationEndInput.value;
+    syncLiveEndFromStart();
   }
 
   function validateForm() {
@@ -466,28 +517,56 @@
       valid = false;
     }
 
-    if (!data.startDate) {
-      showError('startDate', t('errorStartDateRequired', 'Start date is required'));
-      markInvalid($('startDate'));
+    if (!data.registrationStartDate) {
+      showError('registrationStartDate', t('errorRegistrationStartRequired', 'Registration start is required'));
+      markInvalid($('registrationStartDate'));
       valid = false;
     } else {
-      var start = new Date(data.startDate);
-      if (start < now) {
-        showError('startDate', t('errorStartDatePast', 'Start date cannot be in the past'));
+      var registrationStart = new Date(data.registrationStartDate);
+      if (registrationStart < now) {
+        showError('registrationStartDate', t('errorRegistrationStartPast', 'Registration start cannot be in the past'));
+        markInvalid($('registrationStartDate'));
+        valid = false;
+      }
+    }
+
+    if (!data.registrationEndDate) {
+      showError('registrationEndDate', t('errorRegistrationEndRequired', 'Registration end is required'));
+      markInvalid($('registrationEndDate'));
+      valid = false;
+    } else if (data.registrationStartDate) {
+      var regStart = new Date(data.registrationStartDate);
+      var regEnd = new Date(data.registrationEndDate);
+      if (regEnd <= regStart) {
+        showError('registrationEndDate', t('errorRegistrationEndAfterStart', 'Registration end must be after registration start'));
+        markInvalid($('registrationEndDate'));
+        valid = false;
+      }
+    }
+
+    if (!data.startDate) {
+      showError('startDate', t('errorLiveStartRequired', 'Live start is required'));
+      markInvalid($('startDate'));
+      valid = false;
+    } else if (data.registrationEndDate) {
+      var liveStart = new Date(data.startDate);
+      var registrationEnd = new Date(data.registrationEndDate);
+      if (liveStart < registrationEnd) {
+        showError('startDate', t('errorLiveStartAfterRegistration', 'Live start must be after registration ends'));
         markInvalid($('startDate'));
         valid = false;
       }
     }
 
     if (!data.endDate) {
-      showError('endDate', t('errorEndDateRequired', 'End date is required'));
+      showError('endDate', t('errorLiveEndRequired', 'Live end is required'));
       markInvalid($('endDate'));
       valid = false;
     } else if (data.startDate) {
-      var startD = new Date(data.startDate);
-      var endD = new Date(data.endDate);
-      if (endD <= startD) {
-        showError('endDate', t('errorEndDateAfterStart', 'End date must be greater than start date'));
+      var liveStartD = new Date(data.startDate);
+      var liveEndD = new Date(data.endDate);
+      if (liveEndD <= liveStartD) {
+        showError('endDate', t('errorLiveEndAfterStart', 'Live end must be after live start'));
         markInvalid($('endDate'));
         valid = false;
       }
@@ -532,6 +611,8 @@
       if ($('bidStep') && data.bidStep) $('bidStep').value = data.bidStep;
       if ($('buyNowPrice') && data.buyNowPrice) $('buyNowPrice').value = data.buyNowPrice;
       if ($('auctionEventName') && data.auctionEventName) $('auctionEventName').value = data.auctionEventName;
+      if ($('registrationStartDate') && data.registrationStartDate) $('registrationStartDate').value = data.registrationStartDate;
+      if ($('registrationEndDate') && data.registrationEndDate) $('registrationEndDate').value = data.registrationEndDate;
       if ($('startDate') && data.startDate) $('startDate').value = data.startDate;
       if ($('endDate') && data.endDate) $('endDate').value = data.endDate;
 
@@ -619,7 +700,7 @@
       'productName', 'shortDescription', 'subtitle', 'category',
       'year', 'setName', 'language', 'cardNumber', 'authenticator', 'gradeValue', 'grade', 'certificateNumber',
       'startingPrice', 'bidStep', 'buyNowPrice', 'auctionEventName',
-      'startDate', 'endDate'
+      'registrationStartDate', 'registrationEndDate', 'startDate', 'endDate'
     ];
 
     fields.forEach(function (id) {
@@ -628,6 +709,22 @@
       el.addEventListener('input', updatePreview);
       el.addEventListener('change', updatePreview);
     });
+
+    var registrationEndField = $('registrationEndDate');
+    if (registrationEndField) {
+      registrationEndField.addEventListener('change', function () {
+        syncLiveStartFromRegistrationEnd();
+        updatePreview();
+      });
+    }
+
+    var liveStartField = $('startDate');
+    if (liveStartField) {
+      liveStartField.addEventListener('change', function () {
+        syncLiveEndFromStart();
+        updatePreview();
+      });
+    }
 
     form.querySelectorAll('input[name="AuctionType"]').forEach(function (el) {
       el.addEventListener('change', updatePreview);
@@ -681,7 +778,7 @@
       }
       state.documents.forEach(function (doc) {
         formData.append('DocumentFiles', doc.file);
-        formData.append('DocumentNames', doc.name);
+        formData.append('DocumentNames', doc.displayName || 'PSA Certificate');
       });
 
       fetch(form.action, {

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
+using OnlineAuction.Helpers;
 using OnlineAuction.Hubs;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
@@ -69,7 +70,7 @@ public class RealtimePublisher : IRealtimePublisher
                 currentPrice = state.CurrentPrice,
                 bidCount = state.BidCount,
                 minNextBid = state.MinNextBid,
-                endDate = state.EndDate.ToString("o"),
+                endDate = DateTimeUtilities.ToUtcIsoString(state.EndDate),
                 isEnded = state.IsEnded,
                 bidHistory = state.BidHistory.Select(bid => new
                 {

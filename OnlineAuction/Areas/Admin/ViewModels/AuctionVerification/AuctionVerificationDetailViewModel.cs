@@ -67,13 +67,21 @@ public class AuctionVerificationDetailViewModel
     public string SellerName { get; set; } = string.Empty;
 
     public string SellerEmail { get; set; } = string.Empty;
+
+    public decimal EstimatedListingFee { get; set; }
+
+    public string ListingFeePreview { get; set; } = string.Empty;
 }
 
 public class VerificationDocumentViewModel
 {
+    public int Id { get; set; }
+
     public string Name { get; set; } = string.Empty;
 
     public string FileUrl { get; set; } = string.Empty;
 
     public string FileType { get; set; } = string.Empty;
+
+    public DateTime CreatedAt { get; set; }
 }

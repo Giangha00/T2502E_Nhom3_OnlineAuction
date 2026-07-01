@@ -10,9 +10,7 @@ public class AuctionVerificationFilterViewModel
 
     public string? ListingType { get; set; }
 
-    public DateTime? SubmittedFrom { get; set; }
-
-    public DateTime? SubmittedTo { get; set; }
+    public string? DateRange { get; set; }
 
     public int Page { get; set; } = 1;
 

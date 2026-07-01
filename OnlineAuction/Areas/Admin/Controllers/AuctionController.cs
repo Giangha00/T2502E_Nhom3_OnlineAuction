@@ -95,9 +95,9 @@ public class AuctionController : BaseAdminController
 
     [HttpGet]
     [RequirePermission(PermissionCodes.AuctionsView)]
-    public async Task<IActionResult> Details(int id)
+    public async Task<IActionResult> Details(int id, int bidPage = 1)
     {
-        var model = await _auctionService.GetDetailsAsync(id);
+        var model = await _auctionService.GetDetailsAsync(id, bidPage);
 
         if (model is null)
         {
@@ -113,6 +113,25 @@ public class AuctionController : BaseAdminController
     public async Task<IActionResult> Delete(int id)
     {
         var result = await _auctionService.DeleteAsync(id);
+
+        if (result.Success)
+        {
+            TempData["SuccessMessage"] = result.Message;
+        }
+        else
+        {
+            TempData["ErrorMessage"] = result.Message;
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
+    public async Task<IActionResult> BulkDelete(AuctionBulkDeleteViewModel model)
+    {
+        var result = await _auctionService.BulkDeleteAsync(model.SelectedAuctionIds);
 
         if (result.Success)
         {
