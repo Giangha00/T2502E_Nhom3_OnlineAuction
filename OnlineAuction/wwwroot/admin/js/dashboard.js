@@ -13,6 +13,7 @@
     }
 
     const filter = chartData.filter || {};
+    const revenueLabels = chartData.revenueLabels || { gmv: "GMV", platformRevenue: "Platform Revenue" };
     const isDarkMode = document.documentElement.classList.contains("dark");
     const labelColor = isDarkMode ? "#98A2B3" : "#667085";
     const gridColor = isDarkMode ? "#1D2939" : "#E4E7EC";
@@ -47,6 +48,8 @@
             categoryId: filter.categoryId || "",
             registrationDate: "",
             registrationGranularity: filter.registrationGranularity || "day",
+            section: filter.section || "",
+            revenueType: filter.revenueType || "",
             ...params
         };
 
@@ -58,42 +61,76 @@
             }
         });
 
+        if (params.dateFrom && params.dateTo) {
+            url.searchParams.delete("dateRange");
+        }
+
         return url.toString();
     }
 
-    function renderRevenueChart() {
-        const revenueSeries = chartData.revenue || [];
-        const revenueTotal = revenueSeries.reduce((sum, point) => sum + Number(point.value || 0), 0);
+    function scrollToRevenueDetail() {
+        document.getElementById("dashboard-revenue-detail")?.scrollIntoView({ behavior: "smooth" });
+    }
 
-        if (revenueTotal <= 0) {
-            document.querySelector("#dashboard-revenue-empty")?.classList.remove("hidden");
+    function renderRevenueLineChart() {
+        const revenueLine = chartData.revenueLine || [];
+        const gmvTotal = revenueLine.reduce((sum, point) => sum + Number(point.gmv || 0), 0);
+        const platformTotal = revenueLine.reduce((sum, point) => sum + Number(point.platformRevenue || 0), 0);
+
+        if (gmvTotal <= 0 && platformTotal <= 0) {
+            document.querySelector("#dashboard-revenue-line-empty")?.classList.remove("hidden");
             return;
         }
 
-        const revenueChart = new ApexCharts(document.querySelector("#dashboard-revenue-chart"), {
+        const revenueLineChart = new ApexCharts(document.querySelector("#dashboard-revenue-line-chart"), {
             ...baseChartOptions,
-            series: [{
-                name: "Revenue",
-                data: revenueSeries.map((point) => Number(point.value || 0))
-            }],
+            series: [
+                {
+                    name: revenueLabels.gmv,
+                    data: revenueLine.map((point) => Number(point.gmv || 0))
+                },
+                {
+                    name: revenueLabels.platformRevenue,
+                    data: revenueLine.map((point) => Number(point.platformRevenue || 0))
+                }
+            ],
             chart: {
                 ...baseChartOptions.chart,
-                type: "area",
-                height: 280
-            },
-            colors: ["#465fff"],
-            fill: {
-                type: "gradient",
-                gradient: {
-                    shadeIntensity: 1,
-                    opacityFrom: 0.35,
-                    opacityTo: 0.05,
-                    stops: [0, 100]
+                type: "line",
+                height: 300,
+                events: {
+                    markerClick: function (_event, _chartContext, config) {
+                        const point = revenueLine[config.dataPointIndex];
+                        if (!point || !point.filterKey) {
+                            return;
+                        }
+
+                        window.location.href = buildDashboardUrl({
+                            dateFrom: point.filterKey,
+                            dateTo: point.filterKey,
+                            section: "revenue",
+                            revenueType: ""
+                        });
+                    },
+                    dataPointSelection: function (_event, _chartContext, config) {
+                        const point = revenueLine[config.dataPointIndex];
+                        if (!point || !point.filterKey) {
+                            return;
+                        }
+
+                        window.location.href = buildDashboardUrl({
+                            dateFrom: point.filterKey,
+                            dateTo: point.filterKey,
+                            section: "revenue",
+                            revenueType: ""
+                        });
+                    }
                 }
             },
+            colors: ["#465fff", "#12B76A"],
             xaxis: {
                 ...baseChartOptions.xaxis,
-                categories: revenueSeries.map((point) => point.label)
+                categories: revenueLine.map((point) => point.label)
             },
             yaxis: {
                 ...baseChartOptions.yaxis,
@@ -101,10 +138,90 @@
                     ...baseChartOptions.yaxis.labels,
                     formatter: (value) => `$${Math.round(value).toLocaleString()}`
                 }
+            },
+            legend: {
+                position: "top",
+                labels: { colors: labelColor }
             }
         });
 
-        revenueChart.render();
+        revenueLineChart.render();
+    }
+
+    function renderRevenueDonutChart() {
+        const donut = chartData.revenueDonut || {};
+        const listingFees = Number(donut.listingFees || 0);
+        const transactionCommission = Number(donut.transactionCommission || 0);
+        const total = listingFees + transactionCommission;
+
+        if (total <= 0) {
+            document.querySelector("#dashboard-revenue-donut-empty")?.classList.remove("hidden");
+            return;
+        }
+
+        const labels = [donut.listingFeeLabel || "Listing Fees"];
+        const series = [listingFees];
+
+        if (donut.hasTransactionCommission) {
+            labels.push(donut.commissionLabel || "Transaction Commission");
+            series.push(transactionCommission);
+        }
+
+        const revenueDonutChart = new ApexCharts(document.querySelector("#dashboard-revenue-donut-chart"), {
+            chart: {
+                ...baseChartOptions.chart,
+                type: "donut",
+                height: 300
+            },
+            series: series,
+            labels: labels,
+            colors: ["#465fff", "#F79009"],
+            legend: {
+                position: "bottom",
+                labels: { colors: labelColor }
+            },
+            dataLabels: { enabled: true },
+            tooltip: {
+                theme: isDarkMode ? "dark" : "light",
+                y: {
+                    formatter: function (value, opts) {
+                        const percentages = [
+                            donut.listingFeePercentage,
+                            donut.transactionCommissionPercentage
+                        ];
+                        const percentage = percentages[opts.seriesIndex] ?? 0;
+                        return `$${Number(value).toLocaleString()} (${percentage}%)`;
+                    }
+                }
+            }
+        });
+
+        revenueDonutChart.render();
+    }
+
+    function bindRevenueCards() {
+        const cardTypeMap = {
+            gmv: "order_payment",
+            platform_revenue: "listing_fee",
+            listing_fee: "listing_fee"
+        };
+
+        document.querySelectorAll(".dashboard-revenue-card, .dashboard-overview-gmv").forEach(function (card) {
+            card.addEventListener("click", function () {
+                const cardKey = card.getAttribute("data-revenue-card");
+                const revenueType = cardTypeMap[cardKey];
+
+                if (!revenueType) {
+                    scrollToRevenueDetail();
+                    return;
+                }
+
+                window.location.href = buildDashboardUrl({
+                    section: "revenue",
+                    revenueType: revenueType
+                });
+            });
+        });
     }
 
     function renderBidsChart() {
@@ -353,7 +470,9 @@
         });
     }
 
-    renderRevenueChart();
+    renderRevenueLineChart();
+    renderRevenueDonutChart();
+    bindRevenueCards();
     renderBidsChart();
     renderStatusChart();
     renderCategoryChart();
@@ -362,5 +481,9 @@
 
     if (window.location.hash === "#dashboard-new-users" || filter.registrationDate) {
         document.getElementById("dashboard-new-users")?.scrollIntoView({ behavior: "smooth" });
+    }
+
+    if (filter.section === "revenue" || filter.revenueType) {
+        scrollToRevenueDetail();
     }
 })();
