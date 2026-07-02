@@ -85,6 +85,34 @@
             </div>
         </div>
 
+        @if (Model.ShowPermissionAssignment)
+        {
+            <div class="mt-8 border-t border-gray-100 pt-6 dark:border-gray-800">
+                <h3 class="mb-2 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Admin panel permissions</h3>
+                <p class="mb-4 text-theme-xs text-gray-500 dark:text-gray-400">
+                    Grant module access for this user account. They can sign in at <code class="rounded bg-gray-100 px-1">/Admin/Account/Login</code>.
+                </p>
+
+                <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    @foreach (var permission in Model.AvailablePermissions)
+                    {
+                        var isChecked = Model.AssignedPermissionIds.Contains(permission.Id);
+                        <label class="flex items-start gap-3 rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-700">
+                            <input type="checkbox"
+                                   name="AssignedPermissionIds"
+                                   value="@permission.Id"
+                                   checked="@isChecked"
+                                   class="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500" />
+                            <span>
+                                <span class="block text-theme-sm font-medium text-gray-800 dark:text-white/90">@permission.Name</span>
+                                <span class="block font-mono text-[11px] text-gray-500">@permission.Code</span>
+                            </span>
+                        </label>
+                    }
+                </div>
+            </div>
+        }
+
         <div class="mt-6 flex justify-end gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
             <a asp-area="Admin"
                asp-controller="User"

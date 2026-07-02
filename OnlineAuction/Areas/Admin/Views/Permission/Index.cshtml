@@ -1,0 +1,168 @@
+@model OnlineAuction.Areas.Admin.ViewModels.Permissions.PermissionManagementViewModel
+
+@{
+    ViewData["Title"] = "Permission Management";
+    ViewData["AdminPage"] = "permissions";
+    var permissionsByModule = Model.Permissions.GroupBy(p => p.Module).OrderBy(g => g.Key);
+    var selectedUser = Model.SelectedUserId.HasValue
+        ? Model.AssignableUsers.FirstOrDefault(user => user.UserId == Model.SelectedUserId.Value)
+        : null;
+}
+
+<div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+    <div class="mb-6">
+        <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Permission Management</h2>
+        <p class="text-theme-sm text-gray-500 dark:text-gray-400">
+            Dynamic RBAC with two application roles: <strong>Admin</strong> (full access) and <strong>User</strong> (delegated permissions assigned below).
+        </p>
+        <p class="mt-2 text-theme-xs text-amber-700">
+            Permission claims are loaded into the admin cookie at login. After saving, affected users must sign out and sign in again at <code class="rounded bg-gray-100 px-1">/Admin/Account/Login</code>.
+        </p>
+    </div>
+
+    @if (TempData["SuccessMessage"] is string successMessage)
+    {
+        <div class="mb-4 rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-theme-sm text-success-700">
+            @successMessage
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] is string errorMessage)
+    {
+        <div class="mb-4 rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-theme-sm text-error-700">
+            @errorMessage
+        </div>
+    }
+
+    <div class="mb-6 rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="border-b border-gray-200 px-5 py-4 dark:border-gray-800">
+            <h3 class="text-theme-sm font-semibold text-gray-800 dark:text-white/90">Assign permissions to User accounts</h3>
+            <p class="mt-1 text-theme-xs text-gray-500 dark:text-gray-400">
+                Select a <code class="rounded bg-gray-100 px-1">User</code> role account, tick modules they may access in the admin panel, then save.
+            </p>
+        </div>
+
+        <div class="border-b border-gray-100 p-5 dark:border-gray-800">
+            <form asp-area="Admin" asp-controller="Permission" asp-action="Index" method="get" class="flex flex-wrap items-end gap-3">
+                <div class="min-w-[280px] flex-1">
+                    <label for="userId" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400">User account</label>
+                    <select id="userId" name="userId" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                        <option value="">-- Select user --</option>
+                        @foreach (var user in Model.AssignableUsers)
+                        {
+                            <option value="@user.UserId" selected="@(Model.SelectedUserId == user.UserId)">
+                                @user.FullName (@user.Email) — @user.AssignedPermissionCount permission(s)
+                            </option>
+                        }
+                    </select>
+                </div>
+                <button type="submit" class="rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300">
+                    Load user
+                </button>
+            </form>
+        </div>
+
+        @if (selectedUser is not null)
+        {
+            <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-800">
+                <p class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@selectedUser.FullName</p>
+                <p class="text-theme-xs text-gray-500">@selectedUser.Email</p>
+            </div>
+
+            @if (Model.CanManage)
+            {
+                <form asp-area="Admin"
+                      asp-controller="Permission"
+                      asp-action="SaveUser"
+                      method="post"
+                      class="p-5">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="userId" value="@selectedUser.UserId" />
+
+                    <div class="space-y-5">
+                        @foreach (var moduleGroup in permissionsByModule)
+                        {
+                            <div>
+                                <p class="mb-3 text-theme-xs font-semibold uppercase tracking-wide text-gray-500">@moduleGroup.Key</p>
+                                <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                                    @foreach (var permission in moduleGroup)
+                                    {
+                                        var isChecked = Model.SelectedUserPermissionIds.Contains(permission.Id);
+                                        <label class="flex items-start gap-3 rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-700">
+                                            <input type="checkbox"
+                                                   name="permissionIds"
+                                                   value="@permission.Id"
+                                                   checked="@isChecked"
+                                                   class="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500" />
+                                            <span>
+                                                <span class="block text-theme-sm font-medium text-gray-800 dark:text-white/90">@permission.Name</span>
+                                                <span class="block font-mono text-[11px] text-gray-500">@permission.Code</span>
+                                            </span>
+                                        </label>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mt-6 flex justify-end">
+                        <button type="submit"
+                                class="rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
+                            Save permissions
+                        </button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="p-5">
+                    <div class="flex flex-wrap gap-2">
+                        @foreach (var permission in Model.Permissions.Where(p => Model.SelectedUserPermissionIds.Contains(p.Id)))
+                        {
+                            <span class="rounded-full bg-brand-50 px-3 py-1 text-theme-xs font-medium text-brand-700">
+                                @permission.Code
+                            </span>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="p-5 text-theme-sm text-gray-500 dark:text-gray-400">
+                Choose a user account to view or edit their admin permissions.
+            </div>
+        }
+    </div>
+
+    <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="border-b border-gray-200 px-5 py-4 dark:border-gray-800">
+            <h3 class="text-theme-sm font-semibold text-gray-800 dark:text-white/90">Permission catalog</h3>
+            <p class="mt-1 text-theme-xs text-gray-500 dark:text-gray-400">All permission codes enforced by <code class="rounded bg-gray-100 px-1">[RequirePermission]</code> policies.</p>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-left text-theme-sm">
+                <thead class="bg-gray-50 text-theme-xs uppercase text-gray-500 dark:bg-gray-900/40">
+                    <tr>
+                        <th class="px-5 py-3">Code</th>
+                        <th class="px-5 py-3">Name</th>
+                        <th class="px-5 py-3">Module</th>
+                        <th class="px-5 py-3">Description</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                    @foreach (var permission in Model.Permissions)
+                    {
+                        <tr>
+                            <td class="px-5 py-3 font-mono text-theme-xs text-brand-600">@permission.Code</td>
+                            <td class="px-5 py-3 font-medium text-gray-800 dark:text-white/90">@permission.Name</td>
+                            <td class="px-5 py-3 text-gray-600 dark:text-gray-300">@permission.Module</td>
+                            <td class="px-5 py-3 text-gray-500 dark:text-gray-400">@(permission.Description ?? "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

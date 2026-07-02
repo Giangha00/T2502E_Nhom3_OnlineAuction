@@ -24,6 +24,8 @@ public class DashboardController : BaseAdminController
         int? categoryId,
         DateTime? registrationDate,
         string? registrationGranularity,
+        string? section,
+        string? revenueType,
         CancellationToken cancellationToken)
     {
         var filter = _dashboardService.NormalizeFilter(
@@ -33,7 +35,9 @@ public class DashboardController : BaseAdminController
             status,
             categoryId,
             registrationDate,
-            registrationGranularity);
+            registrationGranularity,
+            section,
+            revenueType);
 
         var model = await _dashboardService.GetDashboardAsync(filter, cancellationToken);
         return View(model);

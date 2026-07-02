@@ -87,13 +87,11 @@ public class AuthController : Controller
             return AuthFailureView(model, "login", fromModal);
         }
 
-        foreach (var staffRole in StaffRoleNames.All)
+        if (user.Role == UserRole.Admin)
         {
-            if (await _userManager.IsInRoleAsync(user, staffRole))
-            {
-                ModelState.AddModelError(string.Empty, "Please use the admin login page.");
-                return AuthFailureView(model, "login", fromModal);
-            }
+            var adminReturnUrl = AuthRedirectHelper.SanitizeReturnUrl(Url, model.ReturnUrl);
+            adminReturnUrl ??= Url.Action("Index", "Dashboard", new { area = "Admin" })!;
+            return Redirect($"/Admin/Account/Login?returnUrl={Uri.EscapeDataString(adminReturnUrl)}");
         }
 
         var result = await _signInManager.PasswordSignInAsync(

@@ -6,6 +6,8 @@ public class ProductFilterViewModel
 
     public int? CategoryId { get; set; }
 
+    public int? ProductTemplateId { get; set; }
+
     public int? SellerId { get; set; }
 
     public string? Condition { get; set; }
@@ -15,6 +17,10 @@ public class ProductFilterViewModel
     public DateTime? FromDate { get; set; }
 
     public DateTime? ToDate { get; set; }
+
+    public decimal? MinEstimatedValue { get; set; }
+
+    public decimal? MaxEstimatedValue { get; set; }
 
     public string? SortOrder { get; set; }
 

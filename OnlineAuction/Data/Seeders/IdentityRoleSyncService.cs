@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Configurations;
+using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
 
@@ -31,8 +33,18 @@ public static class IdentityRoleSyncService
         }
     }
 
-    public static async Task<bool> HasAdminAccessAsync(UserManager<ApplicationUser> userManager, ApplicationUser user)
+    public static Task<bool> HasAdminAccessAsync(
+        UserManager<ApplicationUser> userManager,
+        ApplicationUser user,
+        AuctionHouseDbContext dbContext)
     {
-        return await userManager.IsInRoleAsync(user, StaffRoleNames.Admin);
+        if (user.Role == UserRole.Admin)
+        {
+            return Task.FromResult(true);
+        }
+
+        return dbContext.UserPermissions
+            .AsNoTracking()
+            .AnyAsync(up => up.UserId == user.Id);
     }
 }
