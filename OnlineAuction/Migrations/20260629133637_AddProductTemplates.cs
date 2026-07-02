@@ -142,10 +142,10 @@ namespace OnlineAuction.Migrations
                     WHERE deleted_at IS NULL
                     GROUP BY
                         category_id,
-                        UPPER(TRIM(name)),
-                        UPPER(TRIM(COALESCE(set_name, ''))),
-                        UPPER(TRIM(COALESCE(card_number, ''))),
-                        UPPER(TRIM(COALESCE(grade_label, '')))
+                        UPPER(TRIM(name)) COLLATE utf8mb4_unicode_ci,
+                        UPPER(TRIM(COALESCE(set_name, ''))) COLLATE utf8mb4_unicode_ci,
+                        UPPER(TRIM(COALESCE(card_number, ''))) COLLATE utf8mb4_unicode_ci,
+                        UPPER(TRIM(COALESCE(grade_label, ''))) COLLATE utf8mb4_unicode_ci
                 ) grouped_products ON grouped_products.product_id = p.id
                 WHERE p.deleted_at IS NULL;
                 """);
@@ -156,10 +156,10 @@ namespace OnlineAuction.Migrations
                 INNER JOIN product_templates pt
                     ON pt.deleted_at IS NULL
                     AND pt.category_id = p.category_id
-                    AND UPPER(TRIM(pt.name)) = UPPER(TRIM(p.name))
-                    AND UPPER(TRIM(COALESCE(pt.set_name, ''))) = UPPER(TRIM(COALESCE(p.set_name, '')))
-                    AND UPPER(TRIM(COALESCE(pt.card_number, ''))) = UPPER(TRIM(COALESCE(p.card_number, '')))
-                    AND UPPER(TRIM(COALESCE(pt.grade_label, ''))) = UPPER(TRIM(COALESCE(p.grade_label, '')))
+                    AND UPPER(TRIM(pt.name)) COLLATE utf8mb4_unicode_ci = UPPER(TRIM(p.name)) COLLATE utf8mb4_unicode_ci
+                    AND UPPER(TRIM(COALESCE(pt.set_name, ''))) COLLATE utf8mb4_unicode_ci = UPPER(TRIM(COALESCE(p.set_name, ''))) COLLATE utf8mb4_unicode_ci
+                    AND UPPER(TRIM(COALESCE(pt.card_number, ''))) COLLATE utf8mb4_unicode_ci = UPPER(TRIM(COALESCE(p.card_number, ''))) COLLATE utf8mb4_unicode_ci
+                    AND UPPER(TRIM(COALESCE(pt.grade_label, ''))) COLLATE utf8mb4_unicode_ci = UPPER(TRIM(COALESCE(p.grade_label, ''))) COLLATE utf8mb4_unicode_ci
                 SET p.product_template_id = pt.id
                 WHERE p.deleted_at IS NULL
                     AND p.product_template_id IS NULL;

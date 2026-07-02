@@ -520,6 +520,13 @@ namespace OnlineAuction.Migrations
                         .HasColumnType("varchar(30)")
                         .HasColumnName("payment_method");
 
+                    b.Property<decimal>("PlatformFee")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m)
+                        .HasColumnName("platform_fee");
+
                     b.Property<string>("ShippingAddress")
                         .HasMaxLength(300)
                         .HasColumnType("varchar(300)")
