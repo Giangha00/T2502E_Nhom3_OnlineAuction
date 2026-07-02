@@ -490,6 +490,53 @@
   <data name="RelatedProducts_Title" xml:space="preserve"><value>Related Products</value></data>
   <data name="Faq_PageTitle" xml:space="preserve"><value>FAQ</value></data>
   <data name="AboutUs_PageTitle" xml:space="preserve"><value>About Us</value></data>
+  <data name="AboutUs_Story_Eyebrow" xml:space="preserve"><value>Our Story</value></data>
+  <data name="AboutUs_Story_Title" xml:space="preserve"><value>Elevating the legacy of collectible history</value></data>
+  <data name="AboutUs_Story_P1" xml:space="preserve"><value>CardMarket is the trusted home for graded TCG, sports cards, and premium collectibles. We combine heritage auction expertise with modern verification so every listing is transparent, secure, and ready for serious collectors.</value></data>
+  <data name="AboutUs_Story_P2" xml:space="preserve"><value>From PSA slabs to vintage sports legends, our marketplace is built around authenticity first — rigorous verification, transparent pricing, and a community that values provenance as much as price.</value></data>
+  <data name="AboutUs_Story_P3" xml:space="preserve"><value>Whether you are bidding live, buying now, or consigning a grail card, CardMarket gives you live auction updates, verified seller profiles, and secure checkout in one place.</value></data>
+  <data name="AboutUs_Story_BrowseAuctions" xml:space="preserve"><value>Browse Auctions</value></data>
+  <data name="AboutUs_Story_ContactUs" xml:space="preserve"><value>Contact Us</value></data>
+  <data name="AboutUs_Trust_Eyebrow" xml:space="preserve"><value>Trust at a glance</value></data>
+  <data name="AboutUs_Trust_Title" xml:space="preserve"><value>Verified marketplace for graded collectibles</value></data>
+  <data name="AboutUs_Trust_Verified" xml:space="preserve"><value>Verified</value></data>
+  <data name="AboutUs_Trust_Stat1_Label" xml:space="preserve"><value>Years combined market experience</value></data>
+  <data name="AboutUs_Trust_Stat2_Label" xml:space="preserve"><value>Verified listings curated</value></data>
+  <data name="AboutUs_Trust_Stat3_Label" xml:space="preserve"><value>Primary grading partner</value></data>
+  <data name="AboutUs_Trust_PsaTagline" xml:space="preserve"><value>The gold standard</value></data>
+  <data name="AboutUs_Mission_Eyebrow" xml:space="preserve"><value>Our Mission</value></data>
+  <data name="AboutUs_Mission_Title" xml:space="preserve"><value>Preserve every card's story</value></data>
+  <data name="AboutUs_Mission_Desc" xml:space="preserve"><value>We believe that every card tells a story. Our mission is to preserve these stories through a platform built on absolute transparency, expert curation, and technological precision — with industry standards like PSA and BGS authentication at the core.</value></data>
+  <data name="AboutUs_Mission_Integrity_Title" xml:space="preserve"><value>Uncompromising integrity</value></data>
+  <data name="AboutUs_Mission_Integrity_Desc" xml:space="preserve"><value>Every listing is vetted against the highest global standards for authenticity through a multi-step verification process.</value></data>
+  <data name="AboutUs_Mission_Custodians_Title" xml:space="preserve"><value>Historical custodians</value></data>
+  <data name="AboutUs_Mission_Custodians_Desc" xml:space="preserve"><value>We track ownership history and provenance for high-value assets across our ecosystem.</value></data>
+  <data name="AboutUs_Mission_CardAlt" xml:space="preserve"><value>Graded Mickey Mantle baseball card in PSA slab</value></data>
+  <data name="AboutUs_TrustGrading_Eyebrow" xml:space="preserve"><value>Trust &amp; Grading</value></data>
+  <data name="AboutUs_TrustGrading_Title" xml:space="preserve"><value>Precision authentication</value></data>
+  <data name="AboutUs_TrustGrading_Desc" xml:space="preserve"><value>Strategic partnerships with PSA and BGS ensure every card on CardMarket is exactly what it claims to be.</value></data>
+  <data name="AboutUs_TrustGrading_PsaBadge" xml:space="preserve"><value>Primary partner: PSA Grading</value></data>
+  <data name="AboutUs_TrustGrading_PsaTitle" xml:space="preserve"><value>The gold standard</value></data>
+  <data name="AboutUs_TrustGrading_PsaDesc" xml:space="preserve"><value>Direct integration allows real-time verification of PSA slabs in our inventory — no manual entry, no human error.</value></data>
+  <data name="AboutUs_TrustGrading_MultiTitle" xml:space="preserve"><value>Multi-point grading</value></data>
+  <data name="AboutUs_TrustGrading_MultiDesc" xml:space="preserve"><value>Our specialists perform a secondary physical inspection on every high-tier asset before listing.</value></data>
+  <data name="AboutUs_TrustGrading_BgsTitle" xml:space="preserve"><value>BECKETT (BGS)</value></data>
+  <data name="AboutUs_TrustGrading_BgsDesc" xml:space="preserve"><value>Specialized partnership focusing on centering, corners, edges, and surface preservation.</value></data>
+  <data name="AboutUs_TrustGrading_BgsLink" xml:space="preserve"><value>Grading FAQ</value></data>
+  <data name="AboutUs_TrustGrading_VaultTitle" xml:space="preserve"><value>Vaulting &amp; security</value></data>
+  <data name="AboutUs_TrustGrading_VaultDesc" xml:space="preserve"><value>Climate-controlled facilities preserve your assets in museum-grade conditions until the moment of sale.</value></data>
+  <data name="AboutUs_Team_Title" xml:space="preserve"><value>The curators</value></data>
+  <data name="AboutUs_Team_Desc" xml:space="preserve"><value>Our team brings over 30 years of combined experience in the global collectibles market.</value></data>
+  <data name="AboutUs_Team_Member1_Title" xml:space="preserve"><value>Founder &amp; CEO</value></data>
+  <data name="AboutUs_Team_Member1_Bio" xml:space="preserve"><value>Former auction house director with 20 years in high-value collectibles. Julian founded CardMarket to bridge traditional heritage and digital precision.</value></data>
+  <data name="AboutUs_Team_Member2_Title" xml:space="preserve"><value>Head of curation</value></data>
+  <data name="AboutUs_Team_Member2_Bio" xml:space="preserve"><value>Expert in modern TCG history. Elena leads specialists vetting every listing for historical significance.</value></data>
+  <data name="AboutUs_Team_Member3_Title" xml:space="preserve"><value>Technical director</value></data>
+  <data name="AboutUs_Team_Member3_Bio" xml:space="preserve"><value>Architect of our authentication engine. Marcus ensures every transaction is backed by immutable verification.</value></data>
+  <data name="AboutUs_Newsletter_Title" xml:space="preserve"><value>Stay informed on the next big drop</value></data>
+  <data name="AboutUs_Newsletter_Desc" xml:space="preserve"><value>Join our newsletter for early access to curated collections and market insights.</value></data>
+  <data name="AboutUs_Newsletter_Placeholder" xml:space="preserve"><value>Your email address</value></data>
+  <data name="AboutUs_Newsletter_Subscribe" xml:space="preserve"><value>Subscribe</value></data>
   <data name="Policy_PageTitle" xml:space="preserve"><value>Policy &amp; Terms</value></data>
   <data name="Refund_PageTitle" xml:space="preserve"><value>Refund Request</value></data>
   <data name="Error_PageTitle" xml:space="preserve"><value>Error</value></data>
