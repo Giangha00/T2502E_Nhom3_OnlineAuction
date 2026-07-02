@@ -10,7 +10,7 @@ public interface IUserService
 
     Task<UserListViewModel> GetUsersAsync(UserFilterViewModel filter);
 
-    UserFormViewModel BuildCreateForm();
+    Task<UserFormViewModel> BuildCreateFormAsync();
 
     Task<UserFormViewModel?> GetEditFormAsync(int id);
 

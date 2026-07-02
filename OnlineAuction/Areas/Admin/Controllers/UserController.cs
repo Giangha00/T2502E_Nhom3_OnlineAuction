@@ -24,10 +24,9 @@ public class UserController : BaseAdminController
 
     [HttpGet]
     [RequirePermission(PermissionCodes.UsersManage)]
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
-        var model = _userService.BuildCreateForm();
-        return View(model);
+        return View(await _userService.BuildCreateFormAsync());
     }
 
     [HttpPost]
@@ -37,7 +36,7 @@ public class UserController : BaseAdminController
     {
         if (!ModelState.IsValid)
         {
-            return View(_userService.BuildCreateForm());
+            return View(await _userService.BuildCreateFormAsync());
         }
 
         var result = await _userService.CreateAsync(model);
@@ -45,7 +44,7 @@ public class UserController : BaseAdminController
         if (!result.Success)
         {
             ModelState.AddModelError(string.Empty, result.Message);
-            return View(_userService.BuildCreateForm());
+            return View(await _userService.BuildCreateFormAsync());
         }
 
         TempData["SuccessMessage"] = result.Message;

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using OnlineAuction.Configurations;
+using OnlineAuction.Helpers;
 
 namespace OnlineAuction.Authorization;
 
@@ -14,13 +15,8 @@ public sealed class PermissionAuthorizationHandler : AuthorizationHandler<Permis
             return Task.CompletedTask;
         }
 
-        if (context.User.IsInRole(StaffRoleNames.Admin))
-        {
-            context.Succeed(requirement);
-            return Task.CompletedTask;
-        }
-
-        if (context.User.HasClaim(PermissionClaimTypes.Permission, requirement.PermissionCode))
+        if (AdminAccessHelper.IsFullAdmin(context.User) ||
+            context.User.HasClaim(PermissionClaimTypes.Permission, requirement.PermissionCode))
         {
             context.Succeed(requirement);
         }
