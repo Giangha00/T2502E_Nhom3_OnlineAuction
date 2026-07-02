@@ -211,13 +211,6 @@ builder.Services.AddAuthentication()
 
 builder.Services.AddAuthorization(options =>
 {
-    foreach (var permissionCode in PermissionCodes.All)
-    {
-        options.AddPolicy(
-            PermissionCodes.ToPolicyName(permissionCode),
-            policy => policy.Requirements.Add(new PermissionRequirement(permissionCode)));
-    }
-
     options.AddPolicy("ListingOwner", policy =>
     {
         policy.AddAuthenticationSchemes(AuthSchemes.User);
@@ -225,6 +218,7 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, ListingOwnerAuthorizationHandler>();
 
@@ -321,6 +315,7 @@ using (var scope = app.Services.CreateScope())
 
         await MigrationHistoryReconciler.ReconcileAsync(db, migrationLogger);
         await db.Database.MigrateAsync();
+        await UserSchemaPatcher.EnsureAsync(db, migrationLogger);
     }
 
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -369,6 +364,12 @@ app.UseAuthorization();
 #endregion
 
 #region Routes
+
+app.MapGet("/Admin/Login", (HttpContext context) =>
+{
+    var query = context.Request.QueryString.HasValue ? context.Request.QueryString.Value : string.Empty;
+    return Results.Redirect($"/Admin/Account/Login{query}");
+});
 
 app.MapControllerRoute(
     name: "areas",

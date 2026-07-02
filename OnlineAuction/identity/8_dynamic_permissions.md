@@ -1,68 +1,48 @@
 # Dynamic permission-based authorization
 
-OnlineAuction uses **permission codes stored in the database**, loaded into the Admin cookie as claims at login, and enforced via `PermissionAuthorizationHandler`.
+OnlineAuction uses **permission codes in the database**, loaded into the Admin cookie as claims at login, and enforced via a custom `IAuthorizationPolicyProvider` + `PermissionAuthorizationHandler`.
 
-Only two application roles exist: **User** (public site) and **Admin** (admin panel).
+Only two application roles exist: **User** and **Admin**.
 
-## Architecture
+## Architecture (video-style dynamic policies)
 
 | Layer | Implementation |
 |-------|----------------|
-| Storage | `permissions`, `role_permissions` (reserved for future granular admin roles) |
+| Storage | `permissions`, `user_permissions` |
 | Constants | `PermissionCodes` |
 | Service | `IPermissionService` / `PermissionService` |
+| Policy provider | `PermissionAuthorizationPolicyProvider` (creates `Permission:{code}` policies at runtime) |
 | Handler | `PermissionAuthorizationHandler` |
 | Attribute | `[RequirePermission("auctions.verify")]` |
-| Superuser | Identity role **Admin** bypasses all permission checks |
+| Superuser | `UserRole.Admin` bypasses all permission checks |
 
-## Permission codes (seeded)
+## Two-role model
 
-| Code | Module | Typical use |
-|------|--------|-------------|
-| `dashboard.view` | Dashboard | Dashboard index/export |
-| `auctions.view` | Auctions | List/details |
-| `auctions.manage` | Auctions | Create/edit/delete |
-| `auctions.verify` | Auctions | Verify queue |
-| `users.view` | Users | List/details |
-| `users.manage` | Users | CRUD, bulk |
-| `categories.manage` | Categories | Full CRUD |
-| `products.manage` | Products | Backlog |
-| `complaints.review` | Complaints | Backlog |
+| Application role | Admin panel | Permissions |
+|------------------|-------------|-------------|
+| **Admin** | Full access via `/Admin/Account/Login` | All permissions (bypass) |
+| **User** | Access only if assigned permissions | From `user_permissions` table |
 
-## Roles
+Delegated staff: assign permissions on **Permissions** page or **Users → Edit**.
 
-| Role | Admin area | Identity role | Permissions |
-|------|------------|---------------|-------------|
-| **User** | No access | None | None; seller routes use `ListingOwner` policy |
-| **Admin** | Full access via `/Admin/Account/Login` | `Admin` | All permissions (handler bypass) |
-
-Demo admin account (password `User@123`): `admin@auctionhouse.com`
+Demo admin (`User@123`): `admin@auctionhouse.com`
 
 ## Admin login flow
 
-1. User signs in at `/Admin/Account/Login` (must have Identity role `Admin`)
-2. `SignInAdminAsync` loads role claims + permission claims (`permission` claim type)
-3. Controllers use `[RequirePermission(...)]` policies
-4. Missing permission → `/Admin/Account/AccessDenied` (403)
+1. Sign in at `/Admin/Account/Login` (Admin role, or User role with at least one permission)
+2. `SignInAdminAsync` loads `app_role` + `permission` claims (or `super_admin` for Admin role)
+3. Controllers use `[RequirePermission(...)]` — policy resolved dynamically
+4. Missing permission → `/Admin/Account/AccessDenied`
 
-## Role ↔ ApplicationUser.Role sync
+## Permission management UI
 
-`UserService` create/update/bulk role changes call `IdentityRoleSyncService.SyncUserRoleAsync`:
+- **Permissions** (`/Admin/Permission`): select a User account, tick modules, save
+- **Users → Edit**: same permission checkboxes for User role accounts
 
-- `UserRole.User` → remove Admin Identity role
-- `UserRole.Admin` → Identity role `Admin`
-
-Startup seeder `PermissionSeeder` backfills Identity roles for existing users and migrates legacy Moderator/Support rows to User.
+After changes, affected users must sign out and sign in again.
 
 ## Seller resource policy
 
-Public seller routes use policy **`ListingOwner`** (`ListingOwnerAuthorizationHandler`) — only the product owner may edit/cancel listings via `UserAuctionController`.
-
-## Manual test checklist
-
-1. Login as Admin → all admin modules OK
-2. Change user role to Admin in admin form → `IsInRole("Admin")` true
-3. `user1@...` cannot access `/Admin`
-4. Public `/Auth/Login` rejects Admin accounts
+Public seller routes use policy **`ListingOwner`** — only the product owner may edit/cancel listings.
 
 See also [6_dual_session.md](6_dual_session.md) for cookie schemes.

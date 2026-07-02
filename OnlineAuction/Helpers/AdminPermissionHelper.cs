@@ -5,8 +5,8 @@ namespace OnlineAuction.Helpers;
 
 public static class AdminPermissionHelper
 {
+    public static bool IsSuperAdmin(ClaimsPrincipal? user) => AdminAccessHelper.IsFullAdmin(user);
+
     public static bool Can(ClaimsPrincipal? user, string permissionCode) =>
-        user?.Identity?.IsAuthenticated == true &&
-        (user.IsInRole(StaffRoleNames.Admin) ||
-         user.HasClaim(PermissionClaimTypes.Permission, permissionCode));
+        AdminAccessHelper.Can(user, permissionCode);
 }

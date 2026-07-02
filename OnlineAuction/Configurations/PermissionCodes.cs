@@ -17,6 +17,11 @@ public static class PermissionCodes
 
     public const string ComplaintsReview = "complaints.review";
 
+    public const string PermissionsView = "permissions.view";
+    public const string PermissionsManage = "permissions.manage";
+
+    public const string PolicyPrefix = "Permission:";
+
     public static readonly string[] All =
     [
         DashboardView,
@@ -27,8 +32,10 @@ public static class PermissionCodes
         UsersManage,
         CategoriesManage,
         ProductsManage,
-        ComplaintsReview
+        ComplaintsReview,
+        PermissionsView,
+        PermissionsManage
     ];
 
-    public static string ToPolicyName(string permissionCode) => $"Permission:{permissionCode}";
+    public static string ToPolicyName(string permissionCode) => $"{PolicyPrefix}{permissionCode}";
 }

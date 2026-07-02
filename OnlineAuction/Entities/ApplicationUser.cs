@@ -9,6 +9,11 @@ public class ApplicationUser : IdentityUser<int>
 
     public UserRole Role { get; set; } = UserRole.User;
 
+    /// <summary>
+    /// Primary system administrator — bypasses permission checks and always sees the full admin panel.
+    /// </summary>
+    public bool IsSuperAdmin { get; set; }
+
     public UserStatus Status { get; set; } = UserStatus.Active;
 
     public string? AvatarUrl { get; set; }

@@ -13,4 +13,6 @@ public class DashboardKpiCardViewModel
     public bool IsPositiveChange { get; set; }
 
     public string? LinkUrl { get; set; }
+
+    public string? CardKey { get; set; }
 }

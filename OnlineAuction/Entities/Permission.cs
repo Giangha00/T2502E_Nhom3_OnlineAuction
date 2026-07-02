@@ -13,4 +13,6 @@ public class Permission
     public string? Description { get; set; }
 
     public ICollection<RolePermission> RolePermissions { get; set; } = [];
+
+    public ICollection<UserPermission> UserPermissions { get; set; } = [];
 }
