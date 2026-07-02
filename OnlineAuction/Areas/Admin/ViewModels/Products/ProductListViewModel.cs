@@ -12,6 +12,12 @@ public class ProductListViewModel
 
     public string? ContextCategoryName { get; set; }
 
+    public int? ContextTemplateId { get; set; }
+
+    public string? ContextTemplateName { get; set; }
+
+    public ProductTemplateDetailViewModel? ContextTemplate { get; set; }
+
     public List<SelectListItem> CategoryOptions { get; set; } = [];
 
     public List<SelectListItem> SellerOptions { get; set; } = [];

@@ -15,6 +15,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<Category> Categories => Set<Category>();
 
+    public DbSet<ProductTemplate> ProductTemplates => Set<ProductTemplate>();
+
     public DbSet<Product> Products => Set<Product>();
 
     public DbSet<Auction> Auctions => Set<Auction>();
@@ -62,6 +64,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureIdentityTables(builder);
         ConfigureUsers(builder);
         ConfigureCategories(builder);
+        ConfigureProductTemplates(builder);
         ConfigureProducts(builder);
         ConfigureProductImages(builder);
         ConfigureProductDocuments(builder);
@@ -319,6 +322,39 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         });
     }
 
+    private static void ConfigureProductTemplates(ModelBuilder builder)
+    {
+        builder.Entity<ProductTemplate>(entity =>
+        {
+            entity.ToTable("product_templates");
+
+            entity.Property(t => t.Id).HasColumnName("id");
+            entity.Property(t => t.Name).HasColumnName("name").HasMaxLength(255).IsRequired();
+            entity.Property(t => t.CategoryId).HasColumnName("category_id");
+            entity.Property(t => t.SetName).HasColumnName("set_name").HasMaxLength(100);
+            entity.Property(t => t.CardNumber).HasColumnName("card_number").HasMaxLength(50);
+            entity.Property(t => t.GradeLabel).HasColumnName("grade_label").HasMaxLength(50);
+            entity.Property(t => t.Year).HasColumnName("year");
+            entity.Property(t => t.Language).HasColumnName("language").HasMaxLength(50);
+            entity.Property(t => t.ShortDescription).HasColumnName("short_description").HasColumnType("text");
+            entity.Property(t => t.DescriptionHtml).HasColumnName("description_html").HasColumnType("text");
+            entity.Property(t => t.PrimaryImage).HasColumnName("primary_image").HasMaxLength(500).IsRequired();
+            entity.Property(t => t.IsActive).HasColumnName("is_active").HasDefaultValue(true);
+
+            entity.HasIndex(t => t.CategoryId).HasDatabaseName("ix_product_templates_category_id");
+            entity.HasIndex(t => new { t.CategoryId, t.Name, t.SetName, t.CardNumber, t.GradeLabel })
+                .HasDatabaseName("ix_product_templates_lookup");
+
+            entity.HasOne(t => t.Category)
+                .WithMany(c => c.ProductTemplates)
+                .HasForeignKey(t => t.CategoryId)
+                .HasConstraintName("fk_product_templates_category")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            ConfigureAuditableEntity(entity, "product_templates");
+        });
+    }
+
     private static void ConfigureProducts(ModelBuilder builder)
     {
         builder.Entity<Product>(entity =>
@@ -328,6 +364,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(p => p.Id).HasColumnName("id");
             entity.Property(p => p.SellerId).HasColumnName("seller_id");
             entity.Property(p => p.CategoryId).HasColumnName("category_id");
+            entity.Property(p => p.ProductTemplateId).HasColumnName("product_template_id");
             entity.Property(p => p.Name).HasColumnName("name").HasMaxLength(120).IsRequired();
             entity.Property(p => p.ShortDescription).HasColumnName("short_description").HasMaxLength(300);
             entity.Property(p => p.Subtitle).HasColumnName("subtitle").HasMaxLength(160);
@@ -350,6 +387,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
             entity.HasIndex(p => p.SellerId).HasDatabaseName("ix_products_seller_id");
             entity.HasIndex(p => p.CategoryId).HasDatabaseName("ix_products_category_id");
+            entity.HasIndex(p => p.ProductTemplateId).HasDatabaseName("ix_products_product_template_id");
 
             entity.HasOne(p => p.Seller)
                 .WithMany(u => u.Products)
@@ -361,6 +399,12 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
                 .WithMany(t => t.Products)
                 .HasForeignKey(p => p.CategoryId)
                 .HasConstraintName("fk_products_category")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(p => p.ProductTemplate)
+                .WithMany(t => t.Products)
+                .HasForeignKey(p => p.ProductTemplateId)
+                .HasConstraintName("fk_products_product_template")
                 .OnDelete(DeleteBehavior.Restrict);
 
             entity.ToTable(t => t.HasCheckConstraint(
@@ -589,6 +633,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(o => o.ShippingFee).HasColumnName("shipping_fee").HasPrecision(18, 2).HasDefaultValue(45.00m);
             entity.Property(o => o.VaultInsurance).HasColumnName("vault_insurance").HasPrecision(18, 2);
             entity.Property(o => o.TotalAmount).HasColumnName("total_amount").HasPrecision(18, 2);
+            entity.Property(o => o.PlatformFee).HasColumnName("platform_fee").HasPrecision(18, 2).HasDefaultValue(0m);
             entity.Property(o => o.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(OrderStatuses.PendingPayment);
             entity.Property(o => o.OrderSource).HasColumnName("order_source").HasMaxLength(20).IsRequired().HasDefaultValue(OrderSources.AuctionWin);
             entity.Property(o => o.PaymentDeadline).HasColumnName("payment_deadline");
