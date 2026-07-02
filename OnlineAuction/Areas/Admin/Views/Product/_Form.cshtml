@@ -11,6 +11,29 @@
 
 <div class="space-y-8">
     <section>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Mau san pham</h3>
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div class="md:col-span-2">
+                <label asp-for="ProductTemplateId" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+                @if (Model.IsTemplateLocked)
+                {
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-theme-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                        @Model.ProductTemplateName
+                    </div>
+                    <input type="hidden" asp-for="ProductTemplateId" />
+                }
+                else
+                {
+                    <select asp-for="ProductTemplateId" asp-items="Model.ProductTemplateOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                        <option value="">Chon mau san pham</option>
+                    </select>
+                }
+                <span asp-validation-for="ProductTemplateId" class="text-theme-xs text-error-600"></span>
+            </div>
+        </div>
+    </section>
+
+    <section>
         <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Basic Information</h3>
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div class="md:col-span-2">
@@ -44,9 +67,10 @@
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
                 <label asp-for="CategoryId" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                <select asp-for="CategoryId" asp-items="Model.CategoryOptions" disabled class="h-11 w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white/90">
                     <option value="">Select category</option>
                 </select>
+                <input type="hidden" asp-for="CategoryId" />
                 <span asp-validation-for="CategoryId" class="text-theme-xs text-error-600"></span>
             </div>
 
@@ -236,6 +260,7 @@
 </div>
 
 <input type="hidden" asp-for="Id" />
+<input type="hidden" asp-for="ContextTemplateId" />
 
 <script>
   (function () {

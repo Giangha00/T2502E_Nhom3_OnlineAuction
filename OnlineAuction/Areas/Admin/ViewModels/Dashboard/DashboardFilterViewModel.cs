@@ -18,4 +18,8 @@ public class DashboardFilterViewModel
     public string RegistrationGranularity { get; set; } = "day";
 
     public int PeriodDays => Math.Max(1, (DateTo.Date - DateFrom.Date).Days + 1);
+
+    public string? SectionFilter { get; set; }
+
+    public string? RevenueTypeFilter { get; set; }
 }

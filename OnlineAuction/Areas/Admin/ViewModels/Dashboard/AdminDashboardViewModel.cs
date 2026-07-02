@@ -10,11 +10,11 @@ public class AdminDashboardViewModel
 
     public DashboardUserSectionViewModel UserSection { get; set; } = new();
 
+    public DashboardRevenueSectionViewModel RevenueSection { get; set; } = new();
+
     public DashboardAuctionSectionViewModel AuctionSection { get; set; } = new();
 
     public IReadOnlyList<DashboardRecentAuctionViewModel> RecentAuctions { get; set; } = [];
-
-    public IReadOnlyList<DashboardChartPointViewModel> RevenueChart { get; set; } = [];
 
     public IReadOnlyList<DashboardChartPointViewModel> BidsChart { get; set; } = [];
 
