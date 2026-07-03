@@ -1116,4 +1116,177 @@
   <data name="Admin_Dashboard_Revenue_Status_Success" xml:space="preserve"><value>Success</value></data>
   <data name="Admin_Dashboard_Revenue_Status_Applied" xml:space="preserve"><value>Applied</value></data>
   <data name="Admin_Dashboard_Revenue_Status_Paid" xml:space="preserve"><value>Paid</value></data>
+  <data name="AdminProduct.TemplateIndexTitle" xml:space="preserve"><value>Quản lý mẫu sản phẩm</value></data>
+  <data name="AdminProduct.TemplateIndexSubtitle" xml:space="preserve"><value>Xem danh sách mẫu sản phẩm và quản lý sản phẩm của người bán trong từng mẫu.</value></data>
+  <data name="AdminProduct.CreateTemplate" xml:space="preserve"><value>Tạo mẫu sản phẩm</value></data>
+  <data name="AdminProduct.CreateTemplateShort" xml:space="preserve"><value>Tạo mẫu</value></data>
+  <data name="AdminProduct.CreateTemplateSubtitle" xml:space="preserve"><value>Tạo thông tin mẫu dùng chung cho các sản phẩm của người bán.</value></data>
+  <data name="AdminProduct.EditTemplate" xml:space="preserve"><value>Sửa mẫu sản phẩm</value></data>
+  <data name="AdminProduct.EditTemplateSubtitle" xml:space="preserve"><value>Cập nhật thông tin mẫu dùng chung cho các sản phẩm của người bán.</value></data>
+  <data name="AdminProduct.Search" xml:space="preserve"><value>Tìm kiếm</value></data>
+  <data name="AdminProduct.Sort" xml:space="preserve"><value>Sắp xếp</value></data>
+  <data name="AdminProduct.TemplateSearchPlaceholder" xml:space="preserve"><value>Tên mẫu, bộ, mã thẻ, danh mục</value></data>
+  <data name="AdminProduct.ProductSearchPlaceholder" xml:space="preserve"><value>Người bán, mã PRD, mã chứng nhận</value></data>
+  <data name="AdminProduct.SortNameAsc" xml:space="preserve"><value>Tên A-Z</value></data>
+  <data name="AdminProduct.SortNameDesc" xml:space="preserve"><value>Tên Z-A</value></data>
+  <data name="AdminProduct.SortMostProducts" xml:space="preserve"><value>Nhiều sản phẩm nhất</value></data>
+  <data name="AdminProduct.SortRecentlyUpdated" xml:space="preserve"><value>Mới cập nhật</value></data>
+  <data name="AdminProduct.SortPriceAsc" xml:space="preserve"><value>Giá tăng dần</value></data>
+  <data name="AdminProduct.SortPriceDesc" xml:space="preserve"><value>Giá giảm dần</value></data>
+  <data name="AdminProduct.SortNewest" xml:space="preserve"><value>Mới nhất</value></data>
+  <data name="AdminProduct.SortSellerAsc" xml:space="preserve"><value>Người bán A-Z</value></data>
+  <data name="AdminProduct.Preview" xml:space="preserve"><value>Xem trước</value></data>
+  <data name="AdminProduct.TemplateName" xml:space="preserve"><value>Tên mẫu</value></data>
+  <data name="AdminProduct.Category" xml:space="preserve"><value>Danh mục</value></data>
+  <data name="AdminProduct.SetCard" xml:space="preserve"><value>Bộ / mã thẻ</value></data>
+  <data name="AdminProduct.Grade" xml:space="preserve"><value>Điểm</value></data>
+  <data name="AdminProduct.Products" xml:space="preserve"><value>Sản phẩm</value></data>
+  <data name="AdminProduct.LastAdded" xml:space="preserve"><value>Thêm gần nhất</value></data>
+  <data name="AdminProduct.Actions" xml:space="preserve"><value>Thao tác</value></data>
+  <data name="AdminProduct.EmptyTemplates" xml:space="preserve"><value>Chưa có mẫu sản phẩm.</value></data>
+  <data name="AdminProduct.TemplateCode" xml:space="preserve"><value>Mã mẫu</value></data>
+  <data name="AdminProduct.ViewProducts" xml:space="preserve"><value>Xem sản phẩm</value></data>
+  <data name="AdminProduct.CreateProduct" xml:space="preserve"><value>Tạo sản phẩm</value></data>
+  <data name="AdminProduct.CreateProductSubtitle" xml:space="preserve"><value>Thêm sản phẩm trading card mới vào catalog.</value></data>
+  <data name="AdminProduct.EditProduct" xml:space="preserve"><value>Sửa sản phẩm</value></data>
+  <data name="AdminProduct.EditProductSubtitle" xml:space="preserve"><value>Cập nhật thông tin, hình ảnh và tài liệu của sản phẩm.</value></data>
+  <data name="AdminProduct.ProductsByTemplate" xml:space="preserve"><value>Sản phẩm theo mẫu</value></data>
+  <data name="AdminProduct.BackToTemplates" xml:space="preserve"><value>Quay lại danh sách mẫu</value></data>
+  <data name="AdminProduct.TemplateSummary" xml:space="preserve"><value>{0} sản phẩm từ {1} người bán</value></data>
+  <data name="AdminProduct.All" xml:space="preserve"><value>Tất cả</value></data>
+  <data name="AdminProduct.Seller" xml:space="preserve"><value>Người bán</value></data>
+  <data name="AdminProduct.Condition" xml:space="preserve"><value>Tình trạng</value></data>
+  <data name="AdminProduct.MinPrice" xml:space="preserve"><value>Giá tối thiểu</value></data>
+  <data name="AdminProduct.MaxPrice" xml:space="preserve"><value>Giá tối đa</value></data>
+  <data name="AdminProduct.DateRange" xml:space="preserve"><value>Khoảng ngày</value></data>
+  <data name="AdminProduct.DeleteSelected" xml:space="preserve"><value>Xóa mục đã chọn</value></data>
+  <data name="AdminProduct.SelectAllProducts" xml:space="preserve"><value>Chọn tất cả sản phẩm</value></data>
+  <data name="AdminProduct.Product" xml:space="preserve"><value>Sản phẩm</value></data>
+  <data name="AdminProduct.Price" xml:space="preserve"><value>Giá</value></data>
+  <data name="AdminProduct.Quantity" xml:space="preserve"><value>Số lượng</value></data>
+  <data name="AdminProduct.CardCert" xml:space="preserve"><value>Thẻ / chứng nhận</value></data>
+  <data name="AdminProduct.Auctions" xml:space="preserve"><value>Đấu giá</value></data>
+  <data name="AdminProduct.Created" xml:space="preserve"><value>Ngày tạo</value></data>
+  <data name="AdminProduct.EmptyProducts" xml:space="preserve"><value>Mẫu này chưa có sản phẩm của người bán.</value></data>
+  <data name="AdminProduct.ProductCode" xml:space="preserve"><value>Mã sản phẩm</value></data>
+  <data name="AdminProduct.EstimatedShort" xml:space="preserve"><value>Ước tính</value></data>
+  <data name="AdminProduct.ImportShort" xml:space="preserve"><value>Nhập vào</value></data>
+  <data name="AdminProduct.Details" xml:space="preserve"><value>Chi tiết</value></data>
+  <data name="AdminProduct.Edit" xml:space="preserve"><value>Sửa</value></data>
+  <data name="AdminProduct.Delete" xml:space="preserve"><value>Xóa</value></data>
+  <data name="AdminProduct.ConfirmDeleteProduct" xml:space="preserve"><value>Bạn có chắc muốn xóa sản phẩm này?</value></data>
+  <data name="AdminProduct.ConfirmBulkDeleteProducts" xml:space="preserve"><value>Bạn có chắc muốn xóa các sản phẩm đã chọn?</value></data>
+  <data name="AdminProduct.SelectAtLeastOneProduct" xml:space="preserve"><value>Vui lòng chọn ít nhất một sản phẩm.</value></data>
+  <data name="AdminProduct.Total" xml:space="preserve"><value>Tổng</value></data>
+  <data name="AdminProduct.Page" xml:space="preserve"><value>Trang</value></data>
+  <data name="AdminProduct.Of" xml:space="preserve"><value>trên</value></data>
+  <data name="AdminProduct.Previous" xml:space="preserve"><value>Trước</value></data>
+  <data name="AdminProduct.Next" xml:space="preserve"><value>Sau</value></data>
+  <data name="AdminProduct.Cancel" xml:space="preserve"><value>Hủy</value></data>
+  <data name="AdminProduct.SaveChanges" xml:space="preserve"><value>Lưu thay đổi</value></data>
+  <data name="AdminProduct.Template" xml:space="preserve"><value>Mẫu sản phẩm</value></data>
+  <data name="AdminProduct.SelectTemplate" xml:space="preserve"><value>Chọn mẫu sản phẩm</value></data>
+  <data name="AdminProduct.BasicInformation" xml:space="preserve"><value>Thông tin cơ bản</value></data>
+  <data name="AdminProduct.Classification" xml:space="preserve"><value>Phân loại</value></data>
+  <data name="AdminProduct.SelectCategory" xml:space="preserve"><value>Chọn danh mục</value></data>
+  <data name="AdminProduct.SelectSeller" xml:space="preserve"><value>Chọn người bán</value></data>
+  <data name="AdminProduct.CardMetadata" xml:space="preserve"><value>Thông tin thẻ</value></data>
+  <data name="AdminProduct.Grading" xml:space="preserve"><value>Chấm điểm</value></data>
+  <data name="AdminProduct.Value" xml:space="preserve"><value>Giá trị</value></data>
+  <data name="AdminProduct.Media" xml:space="preserve"><value>Hình ảnh và tài liệu</value></data>
+  <data name="AdminProduct.PrimaryImage" xml:space="preserve"><value>Ảnh chính</value></data>
+  <data name="AdminProduct.PrimaryImageHelp" xml:space="preserve"><value>JPG, PNG hoặc WEBP. Tối đa 5MB.</value></data>
+  <data name="AdminProduct.CurrentGallery" xml:space="preserve"><value>Thư viện hiện tại</value></data>
+  <data name="AdminProduct.Gallery" xml:space="preserve"><value>Thư viện ảnh</value></data>
+  <data name="AdminProduct.GalleryImage" xml:space="preserve"><value>Ảnh thư viện</value></data>
+  <data name="AdminProduct.GalleryImages" xml:space="preserve"><value>Ảnh thư viện</value></data>
+  <data name="AdminProduct.GalleryImagesHelp" xml:space="preserve"><value>Tối đa 4 ảnh thư viện, ngoài ảnh chính. JPG, PNG hoặc WEBP. Tối đa 5MB mỗi ảnh.</value></data>
+  <data name="AdminProduct.CurrentDocuments" xml:space="preserve"><value>Tài liệu chứng nhận hiện tại</value></data>
+  <data name="AdminProduct.CertificateDocuments" xml:space="preserve"><value>Tài liệu chứng nhận / xác minh (PDF)</value></data>
+  <data name="AdminProduct.CertificateDocumentsHelp" xml:space="preserve"><value>Tải chứng nhận PSA, báo cáo chấm điểm hoặc PDF xác minh. Tối đa 5MB mỗi file, tối đa 5 tài liệu cho mỗi sản phẩm.</value></data>
+  <data name="AdminProduct.Remove" xml:space="preserve"><value>Gỡ bỏ</value></data>
+  <data name="AdminProduct.View" xml:space="preserve"><value>Xem</value></data>
+  <data name="AdminProduct.Download" xml:space="preserve"><value>Tải xuống</value></data>
+  <data name="AdminProduct.DocumentTypePsaCertificate" xml:space="preserve"><value>Chứng nhận PSA</value></data>
+  <data name="AdminProduct.DocumentTypeBgsCertificate" xml:space="preserve"><value>Chứng nhận BGS</value></data>
+  <data name="AdminProduct.DocumentTypeProductVerification" xml:space="preserve"><value>Xác minh sản phẩm</value></data>
+  <data name="AdminProduct.DocumentTypeWarranty" xml:space="preserve"><value>Bảo hành</value></data>
+  <data name="AdminProduct.TemplateInstancesWarning" xml:space="preserve"><value>Thay đổi chỉ áp dụng cho thông tin mẫu; chứng nhận và giá của từng sản phẩm seller vẫn được giữ riêng.</value></data>
+  <data name="AdminProduct.TemplateInformation" xml:space="preserve"><value>Thông tin mẫu</value></data>
+  <data name="AdminProduct.Description" xml:space="preserve"><value>Mô tả</value></data>
+  <data name="AdminProduct.TemplateImage" xml:space="preserve"><value>Ảnh mẫu sản phẩm</value></data>
+  <data name="AdminProduct.TemplateImageHelp" xml:space="preserve"><value>JPG hoặc PNG. Tối đa 2MB.</value></data>
+  <data name="AdminProduct.ProductDetails" xml:space="preserve"><value>Chi tiết sản phẩm</value></data>
+  <data name="AdminProduct.OpenTemplateProducts" xml:space="preserve"><value>Mở sản phẩm của mẫu {0}</value></data>
+  <data name="AdminProduct.Back" xml:space="preserve"><value>Quay lại</value></data>
+  <data name="AdminProduct.CertificateNumber" xml:space="preserve"><value>Mã chứng nhận</value></data>
+  <data name="AdminProduct.CardNumber" xml:space="preserve"><value>Mã thẻ</value></data>
+  <data name="AdminProduct.Year" xml:space="preserve"><value>Năm</value></data>
+  <data name="AdminProduct.SetName" xml:space="preserve"><value>Tên bộ</value></data>
+  <data name="AdminProduct.Language" xml:space="preserve"><value>Ngôn ngữ</value></data>
+  <data name="AdminProduct.ProductOrigin" xml:space="preserve"><value>Nguồn gốc sản phẩm</value></data>
+  <data name="AdminProduct.EstimatedValue" xml:space="preserve"><value>Giá trị ước tính</value></data>
+  <data name="AdminProduct.ImportPrice" xml:space="preserve"><value>Giá nhập</value></data>
+  <data name="AdminProduct.Updated" xml:space="preserve"><value>Cập nhật</value></data>
+  <data name="AdminProduct.NotUpdated" xml:space="preserve"><value>Chưa cập nhật</value></data>
+  <data name="AdminProduct.GradingSubScores" xml:space="preserve"><value>Điểm thành phần</value></data>
+  <data name="AdminProduct.Centering" xml:space="preserve"><value>Căn giữa</value></data>
+  <data name="AdminProduct.Corners" xml:space="preserve"><value>Góc</value></data>
+  <data name="AdminProduct.Edges" xml:space="preserve"><value>Cạnh</value></data>
+  <data name="AdminProduct.Surface" xml:space="preserve"><value>Bề mặt</value></data>
+  <data name="AdminProduct.CertificatesAndDocuments" xml:space="preserve"><value>Chứng nhận và tài liệu</value></data>
+  <data name="AdminProduct.LinkedAuctions" xml:space="preserve"><value>Phiên đấu giá liên kết</value></data>
+  <data name="AdminProduct.Status" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="AdminProduct.StartingPrice" xml:space="preserve"><value>Giá khởi điểm</value></data>
+  <data name="AdminProduct.CurrentPrice" xml:space="preserve"><value>Giá hiện tại</value></data>
+  <data name="AdminProduct.Dates" xml:space="preserve"><value>Ngày</value></data>
+  <data name="AdminProduct.Links" xml:space="preserve"><value>Liên kết</value></data>
+  <data name="AdminProduct.EmptyLinkedAuctions" xml:space="preserve"><value>Chưa có phiên đấu giá liên kết với sản phẩm này.</value></data>
+  <data name="AdminProduct.Admin" xml:space="preserve"><value>Admin</value></data>
+  <data name="AdminProduct.Public" xml:space="preserve"><value>Công khai</value></data>
+  <data name="AdminProduct.Name" xml:space="preserve"><value>Tên</value></data>
+  <data name="AdminProduct.Type" xml:space="preserve"><value>Loại</value></data>
+  <data name="AdminProduct.Uploaded" xml:space="preserve"><value>Ngày tải lên</value></data>
+  <data name="AdminProduct.EmptyDocuments" xml:space="preserve"><value>Chưa có tài liệu nào được tải lên cho sản phẩm này.</value></data>
+  <data name="AdminProduct.PreviewDocument" xml:space="preserve"><value>Xem trước</value></data>
+  <data name="AdminProduct.Close" xml:space="preserve"><value>Đóng</value></data>
+  <data name="AdminProduct.DocumentPreview" xml:space="preserve"><value>Xem trước tài liệu</value></data>
+  <data name="AdminProduct.Document" xml:space="preserve"><value>Tài liệu</value></data>
+  <data name="AdminProduct.SellerLockedWarning" xml:space="preserve"><value>Sản phẩm đang có phiên đấu giá đang diễn ra hoặc sắp kết thúc. Không thể đổi người bán.</value></data>
+  <data name="AdminProduct.Field.ProductName" xml:space="preserve"><value>Tên sản phẩm</value></data>
+  <data name="AdminProduct.Field.ShortDescription" xml:space="preserve"><value>Mô tả ngắn</value></data>
+  <data name="AdminProduct.Field.Subtitle" xml:space="preserve"><value>Phụ đề</value></data>
+  <data name="AdminProduct.Field.Description" xml:space="preserve"><value>Mô tả</value></data>
+  <data name="AdminProduct.Field.Category" xml:space="preserve"><value>Danh mục</value></data>
+  <data name="AdminProduct.Field.Template" xml:space="preserve"><value>Mẫu sản phẩm</value></data>
+  <data name="AdminProduct.Field.Seller" xml:space="preserve"><value>Người bán</value></data>
+  <data name="AdminProduct.Field.Condition" xml:space="preserve"><value>Tình trạng</value></data>
+  <data name="AdminProduct.Field.ProductOrigin" xml:space="preserve"><value>Nguồn gốc sản phẩm</value></data>
+  <data name="AdminProduct.Field.Year" xml:space="preserve"><value>Năm</value></data>
+  <data name="AdminProduct.Field.SetName" xml:space="preserve"><value>Tên bộ</value></data>
+  <data name="AdminProduct.Field.Language" xml:space="preserve"><value>Ngôn ngữ</value></data>
+  <data name="AdminProduct.Field.CardNumber" xml:space="preserve"><value>Mã thẻ</value></data>
+  <data name="AdminProduct.Field.GradeLabel" xml:space="preserve"><value>Điểm</value></data>
+  <data name="AdminProduct.Field.CertificateNumber" xml:space="preserve"><value>Mã chứng nhận</value></data>
+  <data name="AdminProduct.Field.GradingCentering" xml:space="preserve"><value>Điểm căn giữa</value></data>
+  <data name="AdminProduct.Field.GradingCorners" xml:space="preserve"><value>Điểm góc</value></data>
+  <data name="AdminProduct.Field.GradingEdges" xml:space="preserve"><value>Điểm cạnh</value></data>
+  <data name="AdminProduct.Field.GradingSurface" xml:space="preserve"><value>Điểm bề mặt</value></data>
+  <data name="AdminProduct.Field.EstimatedValue" xml:space="preserve"><value>Giá trị ước tính</value></data>
+  <data name="AdminProduct.Field.ImportPrice" xml:space="preserve"><value>Giá nhập</value></data>
+  <data name="AdminProduct.Field.PrimaryImage" xml:space="preserve"><value>Ảnh chính</value></data>
+  <data name="AdminProduct.Field.TemplateName" xml:space="preserve"><value>Tên mẫu</value></data>
+  <data name="AdminProduct.Validation.ProductNameRequired" xml:space="preserve"><value>Vui lòng nhập tên sản phẩm.</value></data>
+  <data name="AdminProduct.Validation.ProductNameMaxLength" xml:space="preserve"><value>Tên sản phẩm không được vượt quá 120 ký tự.</value></data>
+  <data name="AdminProduct.Validation.ShortDescriptionMaxLength" xml:space="preserve"><value>Mô tả ngắn không được vượt quá 300 ký tự.</value></data>
+  <data name="AdminProduct.Validation.SubtitleMaxLength" xml:space="preserve"><value>Phụ đề không được vượt quá 160 ký tự.</value></data>
+  <data name="AdminProduct.Validation.TemplateRequired" xml:space="preserve"><value>Vui lòng chọn mẫu sản phẩm.</value></data>
+  <data name="AdminProduct.Validation.SellerRequired" xml:space="preserve"><value>Vui lòng chọn người bán.</value></data>
+  <data name="AdminProduct.Validation.ConditionRequired" xml:space="preserve"><value>Vui lòng chọn tình trạng.</value></data>
+  <data name="AdminProduct.Validation.YearRange" xml:space="preserve"><value>Vui lòng nhập năm hợp lệ từ 1800 đến 2100.</value></data>
+  <data name="AdminProduct.Validation.EstimatedValueMin" xml:space="preserve"><value>Giá trị ước tính phải lớn hơn hoặc bằng 0.</value></data>
+  <data name="AdminProduct.Validation.ImportPriceMin" xml:space="preserve"><value>Giá nhập phải lớn hơn hoặc bằng 0.</value></data>
+  <data name="AdminProduct.Validation.TemplateNameRequired" xml:space="preserve"><value>Vui lòng nhập tên mẫu.</value></data>
+  <data name="AdminProduct.Validation.TemplateNameMaxLength" xml:space="preserve"><value>Tên mẫu không được vượt quá 255 ký tự.</value></data>
+  <data name="AdminProduct.Validation.CategoryRequired" xml:space="preserve"><value>Vui lòng chọn danh mục.</value></data>
 </root>

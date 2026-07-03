@@ -5,13 +5,13 @@
 @if (Model.IsSellerLocked)
 {
     <div class="mb-4 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-theme-sm text-warning-700">
-        This product has a live or ending soon auction. Seller cannot be changed.
+        @Localizer["AdminProduct.SellerLockedWarning"]
     </div>
 }
 
 <div class="space-y-8">
     <section>
-        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Mau san pham</h3>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.Template"]</h3>
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div class="md:col-span-2">
                 <label asp-for="ProductTemplateId" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
@@ -25,7 +25,7 @@
                 else
                 {
                     <select asp-for="ProductTemplateId" asp-items="Model.ProductTemplateOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                        <option value="">Chon mau san pham</option>
+                        <option value="">@Localizer["AdminProduct.SelectTemplate"]</option>
                     </select>
                 }
                 <span asp-validation-for="ProductTemplateId" class="text-theme-xs text-error-600"></span>
@@ -34,7 +34,7 @@
     </section>
 
     <section>
-        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Basic Information</h3>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.BasicInformation"]</h3>
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div class="md:col-span-2">
                 <label asp-for="Name" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
@@ -63,12 +63,12 @@
     </section>
 
     <section>
-        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Classification</h3>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.Classification"]</h3>
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
                 <label asp-for="CategoryId" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
                 <select asp-for="CategoryId" asp-items="Model.CategoryOptions" disabled class="h-11 w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white/90">
-                    <option value="">Select category</option>
+                    <option value="">@Localizer["AdminProduct.SelectCategory"]</option>
                 </select>
                 <input type="hidden" asp-for="CategoryId" />
                 <span asp-validation-for="CategoryId" class="text-theme-xs text-error-600"></span>
@@ -84,7 +84,7 @@
                 else
                 {
                     <select asp-for="SellerId" asp-items="Model.SellerOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                        <option value="">Select seller</option>
+                        <option value="">@Localizer["AdminProduct.SelectSeller"]</option>
                     </select>
                 }
                 <span asp-validation-for="SellerId" class="text-theme-xs text-error-600"></span>
@@ -93,7 +93,7 @@
     </section>
 
     <section>
-        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Card Metadata</h3>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.CardMetadata"]</h3>
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
                 <label asp-for="Condition" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
@@ -131,7 +131,7 @@
     </section>
 
     <section>
-        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Grading</h3>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.Grading"]</h3>
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
                 <label asp-for="GradeLabel" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
@@ -166,7 +166,7 @@
     </section>
 
     <section>
-        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Value</h3>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.Value"]</h3>
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
                 <label asp-for="EstimatedValue" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
@@ -183,32 +183,32 @@
     </section>
 
     <section>
-        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Media</h3>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.Media"]</h3>
         <div class="grid grid-cols-1 gap-5">
             <div>
                 <label asp-for="PrimaryImageFile" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
                 @if (!string.IsNullOrWhiteSpace(Model.PrimaryImageUrl))
                 {
                     <div class="mb-3">
-                        <img src="@Model.PrimaryImageUrl" alt="Primary image" class="h-24 w-24 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
+                        <img src="@Model.PrimaryImageUrl" alt="@Localizer["AdminProduct.PrimaryImage"]" class="h-24 w-24 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
                     </div>
                 }
                 <input asp-for="PrimaryImageFile" type="file" accept=".jpg,.jpeg,.png,.webp" class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
-                <p class="mt-1 text-theme-xs text-gray-500">JPG, PNG, or WEBP. Max 5MB.</p>
+                <p class="mt-1 text-theme-xs text-gray-500">@Localizer["AdminProduct.PrimaryImageHelp"]</p>
             </div>
 
             @if (Model.ExistingGalleryImages.Count > 0)
             {
                 <div>
-                    <p class="mb-2 text-theme-sm font-medium text-gray-700 dark:text-gray-400">Current Gallery</p>
+                    <p class="mb-2 text-theme-sm font-medium text-gray-700 dark:text-gray-400">@Localizer["AdminProduct.CurrentGallery"]</p>
                     <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
                         @foreach (var image in Model.ExistingGalleryImages)
                         {
                             <label class="relative block cursor-pointer rounded-lg border border-gray-200 p-2 dark:border-gray-700">
-                                <img src="@image.ImageUrl" alt="Gallery image" class="h-20 w-full rounded object-cover" />
+                                <img src="@image.ImageUrl" alt="@Localizer["AdminProduct.GalleryImage"]" class="h-20 w-full rounded object-cover" />
                                 <div class="mt-2 flex items-center gap-2">
                                     <input type="checkbox" name="RemoveGalleryImageIds" value="@image.Id" class="h-4 w-4 rounded border-gray-300 text-brand-500" />
-                                    <span class="text-theme-xs text-gray-500">Remove</span>
+                                    <span class="text-theme-xs text-gray-500">@Localizer["AdminProduct.Remove"]</span>
                                 </div>
                             </label>
                         }
@@ -217,15 +217,15 @@
             }
 
             <div>
-                <label class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400">Gallery Images</label>
+                <label class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400">@Localizer["AdminProduct.GalleryImages"]</label>
                 <input name="GalleryImageFiles" type="file" accept=".jpg,.jpeg,.png,.webp" multiple class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
-                <p class="mt-1 text-theme-xs text-gray-500">Up to 4 gallery images (plus primary). JPG, PNG, or WEBP. Max 5MB each.</p>
+                <p class="mt-1 text-theme-xs text-gray-500">@Localizer["AdminProduct.GalleryImagesHelp"]</p>
             </div>
 
             @if (Model.ExistingDocuments.Count > 0)
             {
                 <div>
-                    <p class="mb-2 text-theme-sm font-medium text-gray-700 dark:text-gray-400">Current certificate documents</p>
+                    <p class="mb-2 text-theme-sm font-medium text-gray-700 dark:text-gray-400">@Localizer["AdminProduct.CurrentDocuments"]</p>
                     <div class="space-y-2">
                         @foreach (var document in Model.ExistingDocuments)
                         {
@@ -234,14 +234,14 @@
                                     <p class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@document.Name</p>
                                     <p class="text-theme-xs text-gray-500">@document.FileType · @document.CreatedAt.ToString("yyyy-MM-dd")</p>
                                     <div class="mt-2 flex flex-wrap gap-2">
-                                        <a href="@document.FileUrl" target="_blank" rel="noopener" class="text-theme-xs font-medium text-brand-500 hover:underline">View</a>
+                                        <a href="@document.FileUrl" target="_blank" rel="noopener" class="text-theme-xs font-medium text-brand-500 hover:underline">@Localizer["AdminProduct.View"]</a>
                                         <a asp-area="Admin" asp-controller="Product" asp-action="DownloadDocument" asp-route-id="@document.Id"
-                                           class="text-theme-xs font-medium text-brand-500 hover:underline">Download</a>
+                                           class="text-theme-xs font-medium text-brand-500 hover:underline">@Localizer["AdminProduct.Download"]</a>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <input type="checkbox" name="RemoveDocumentIds" value="@document.Id" class="h-4 w-4 rounded border-gray-300 text-brand-500" />
-                                    <span class="text-theme-xs text-gray-500">Remove</span>
+                                    <span class="text-theme-xs text-gray-500">@Localizer["AdminProduct.Remove"]</span>
                                 </div>
                             </label>
                         }
@@ -250,9 +250,9 @@
             }
 
             <div>
-                <label class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400">Certificate / Verification Documents (PDF)</label>
+                <label class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400">@Localizer["AdminProduct.CertificateDocuments"]</label>
                 <input id="adminDocumentFiles" name="DocumentFiles" type="file" accept=".pdf,application/pdf" multiple class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
-                <p class="mt-1 text-theme-xs text-gray-500">Upload PSA certificate, grading report, or verification PDF. Max 5MB per file. Up to 5 documents per product.</p>
+                <p class="mt-1 text-theme-xs text-gray-500">@Localizer["AdminProduct.CertificateDocumentsHelp"]</p>
                 <div id="adminDocumentNameFields" class="mt-3 space-y-2"></div>
             </div>
         </div>
@@ -269,10 +269,10 @@
     if (!fileInput || !nameFields) return;
 
     var docTypeOptions = [
-      'PSA Certificate',
-      'BGS Certificate',
-      'Product Verification',
-      'Warranty'
+      '@Localizer["AdminProduct.DocumentTypePsaCertificate"]',
+      '@Localizer["AdminProduct.DocumentTypeBgsCertificate"]',
+      '@Localizer["AdminProduct.DocumentTypeProductVerification"]',
+      '@Localizer["AdminProduct.DocumentTypeWarranty"]'
     ];
 
     fileInput.addEventListener('change', function () {
@@ -295,11 +295,11 @@
           select.appendChild(option);
         });
         if (file.name.toLowerCase().includes('bgs')) {
-          select.value = 'BGS Certificate';
+          select.value = '@Localizer["AdminProduct.DocumentTypeBgsCertificate"]';
         } else if (file.name.toLowerCase().includes('warranty')) {
-          select.value = 'Warranty';
+          select.value = '@Localizer["AdminProduct.DocumentTypeWarranty"]';
         } else if (file.name.toLowerCase().includes('verification')) {
-          select.value = 'Product Verification';
+          select.value = '@Localizer["AdminProduct.DocumentTypeProductVerification"]';
         }
 
         row.appendChild(label);

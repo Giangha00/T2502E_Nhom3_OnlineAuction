@@ -1,7 +1,7 @@
 @model OnlineAuction.Areas.Admin.ViewModels.Products.ProductDetailViewModel
 
 @{
-    ViewData["Title"] = "Product Details";
+    ViewData["Title"] = Localizer["AdminProduct.ProductDetails"];
     ViewData["AdminPage"] = "products";
 }
 
@@ -11,7 +11,7 @@
            asp-controller="Product"
            asp-action="Index"
            class="text-theme-sm font-medium text-brand-500 hover:underline">
-            ← Back to card types
+            &larr; @Localizer["AdminProduct.BackToTemplates"]
         </a>
 
         <a asp-area="Admin"
@@ -19,15 +19,15 @@
            asp-action="Template"
            asp-route-id="@Model.ProductTemplateId"
            class="text-theme-sm font-medium text-brand-500 hover:underline">
-            Open @Model.ProductTemplateName instances
+            @Localizer["AdminProduct.OpenTemplateProducts", Model.ProductTemplateName ?? string.Empty]
         </a>
     </div>
 
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Product Details</h2>
+            <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.ProductDetails"]</h2>
             <p class="text-theme-sm text-gray-500 dark:text-gray-400">
-                Product #: @Model.ProductCode · ID: @Model.Id
+                @Localizer["AdminProduct.ProductCode"]: @Model.ProductCode · ID: @Model.Id
             </p>
         </div>
 
@@ -37,7 +37,7 @@
                asp-action="Edit"
                asp-route-id="@Model.Id"
                class="rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
-                Edit
+                @Localizer["AdminProduct.Edit"]
             </a>
 
             @if (Model.CanDelete)
@@ -48,10 +48,10 @@
                       asp-route-id="@Model.Id"
                       asp-route-returnTemplateId="@Model.ProductTemplateId"
                       method="post"
-                      onsubmit="return confirm('Are you sure you want to delete this product?');">
+                      onsubmit="return confirm('@Localizer["AdminProduct.ConfirmDeleteProduct"]');">
                     @Html.AntiForgeryToken()
                     <button type="submit" class="rounded-lg border border-error-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-error-600 hover:bg-error-50 dark:border-error-500/30 dark:bg-gray-800">
-                        Delete
+                        @Localizer["AdminProduct.Delete"]
                     </button>
                 </form>
             }
@@ -61,7 +61,7 @@
                asp-action="Template"
                asp-route-id="@Model.ProductTemplateId"
                class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                Back
+                @Localizer["AdminProduct.Back"]
             </a>
         </div>
     </div>
@@ -73,11 +73,11 @@
 
                 @if (Model.GalleryImages.Count > 0)
                 {
-                    <p class="mb-2 text-theme-xs font-medium uppercase text-gray-400">Gallery</p>
+                    <p class="mb-2 text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.Gallery"]</p>
                     <div class="grid grid-cols-2 gap-2">
                         @foreach (var image in Model.GalleryImages)
                         {
-                            <img src="@image.ImageUrl" alt="Gallery" class="h-20 w-full rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
+                            <img src="@image.ImageUrl" alt="@Localizer["AdminProduct.GalleryImage"]" class="h-20 w-full rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
                         }
                     </div>
                 }
@@ -98,72 +98,72 @@
 
                 <dl class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
                     <div>
-                        <dt class="text-theme-xs font-medium uppercase text-gray-400">Category</dt>
+                        <dt class="text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.Category"]</dt>
                         <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.CategoryName</dd>
                     </div>
                     <div>
-                        <dt class="text-theme-xs font-medium uppercase text-gray-400">Seller</dt>
+                        <dt class="text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.Seller"]</dt>
                         <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.SellerName (@Model.SellerEmail)</dd>
                     </div>
                     <div>
-                        <dt class="text-theme-xs font-medium uppercase text-gray-400">Condition</dt>
+                        <dt class="text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.Condition"]</dt>
                         <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.Condition</dd>
                     </div>
                     <div>
-                        <dt class="text-theme-xs font-medium uppercase text-gray-400">Grade</dt>
+                        <dt class="text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.Grade"]</dt>
                         <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.GradeLabel ?? "—")</dd>
                     </div>
                     <div>
-                        <dt class="text-theme-xs font-medium uppercase text-gray-400">Cert Number</dt>
+                        <dt class="text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.CertificateNumber"]</dt>
                         <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.CertNumber ?? "—")</dd>
                     </div>
                     <div>
-                        <dt class="text-theme-xs font-medium uppercase text-gray-400">Card Number</dt>
+                        <dt class="text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.CardNumber"]</dt>
                         <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.CardNumber ?? "—")</dd>
                     </div>
                     <div>
-                        <dt class="text-theme-xs font-medium uppercase text-gray-400">Year</dt>
+                        <dt class="text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.Year"]</dt>
                         <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.Year?.ToString() ?? "—")</dd>
                     </div>
                     <div>
-                        <dt class="text-theme-xs font-medium uppercase text-gray-400">Set Name</dt>
+                        <dt class="text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.SetName"]</dt>
                         <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.SetName ?? "—")</dd>
                     </div>
                     <div>
-                        <dt class="text-theme-xs font-medium uppercase text-gray-400">Language</dt>
+                        <dt class="text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.Language"]</dt>
                         <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.Language ?? "—")</dd>
                     </div>
                     <div>
-                        <dt class="text-theme-xs font-medium uppercase text-gray-400">Product Origin</dt>
+                        <dt class="text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.ProductOrigin"]</dt>
                         <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.ProductOrigin ?? "—")</dd>
                     </div>
                     <div>
-                        <dt class="text-theme-xs font-medium uppercase text-gray-400">Estimated Value</dt>
+                        <dt class="text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.EstimatedValue"]</dt>
                         <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.EstimatedValue?.ToString("N2") ?? "—")</dd>
                     </div>
                     <div>
-                        <dt class="text-theme-xs font-medium uppercase text-gray-400">Import Price</dt>
+                        <dt class="text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.ImportPrice"]</dt>
                         <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.ImportPrice?.ToString("N2") ?? "—")</dd>
                     </div>
                     <div>
-                        <dt class="text-theme-xs font-medium uppercase text-gray-400">Created</dt>
+                        <dt class="text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.Created"]</dt>
                         <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
                     </div>
                     <div>
-                        <dt class="text-theme-xs font-medium uppercase text-gray-400">Updated</dt>
-                        <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.UpdatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Not updated")</dd>
+                        <dt class="text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.Updated"]</dt>
+                        <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.UpdatedAt?.ToString("dd/MM/yyyy HH:mm") ?? Localizer["AdminProduct.NotUpdated"])</dd>
                     </div>
                 </dl>
 
                 @if (!string.IsNullOrWhiteSpace(Model.GradingCentering) || !string.IsNullOrWhiteSpace(Model.GradingCorners) || !string.IsNullOrWhiteSpace(Model.GradingEdges) || !string.IsNullOrWhiteSpace(Model.GradingSurface))
                 {
                     <div class="mt-6 border-t border-gray-100 pt-6 dark:border-gray-800">
-                        <p class="mb-3 text-theme-xs font-medium uppercase text-gray-400">Grading Sub-scores</p>
+                        <p class="mb-3 text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.GradingSubScores"]</p>
                         <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-                            <div><span class="text-theme-xs text-gray-500">Centering</span><p class="text-theme-sm font-medium">@(Model.GradingCentering ?? "—")</p></div>
-                            <div><span class="text-theme-xs text-gray-500">Corners</span><p class="text-theme-sm font-medium">@(Model.GradingCorners ?? "—")</p></div>
-                            <div><span class="text-theme-xs text-gray-500">Edges</span><p class="text-theme-sm font-medium">@(Model.GradingEdges ?? "—")</p></div>
-                            <div><span class="text-theme-xs text-gray-500">Surface</span><p class="text-theme-sm font-medium">@(Model.GradingSurface ?? "—")</p></div>
+                            <div><span class="text-theme-xs text-gray-500">@Localizer["AdminProduct.Centering"]</span><p class="text-theme-sm font-medium">@(Model.GradingCentering ?? "—")</p></div>
+                            <div><span class="text-theme-xs text-gray-500">@Localizer["AdminProduct.Corners"]</span><p class="text-theme-sm font-medium">@(Model.GradingCorners ?? "—")</p></div>
+                            <div><span class="text-theme-xs text-gray-500">@Localizer["AdminProduct.Edges"]</span><p class="text-theme-sm font-medium">@(Model.GradingEdges ?? "—")</p></div>
+                            <div><span class="text-theme-xs text-gray-500">@Localizer["AdminProduct.Surface"]</span><p class="text-theme-sm font-medium">@(Model.GradingSurface ?? "—")</p></div>
                         </div>
                     </div>
                 }
@@ -171,7 +171,7 @@
                 @if (!string.IsNullOrWhiteSpace(Model.DescriptionHtml))
                 {
                     <div class="mt-6 border-t border-gray-100 pt-6 dark:border-gray-800">
-                        <p class="mb-2 text-theme-xs font-medium uppercase text-gray-400">Description</p>
+                        <p class="mb-2 text-theme-xs font-medium uppercase text-gray-400">@Localizer["AdminProduct.Description"]</p>
                         <div class="prose prose-sm max-w-none text-theme-sm text-gray-700 dark:text-gray-300">@Html.Raw(Model.DescriptionHtml)</div>
                     </div>
                 }
@@ -179,13 +179,13 @@
 
             @{
                 ViewData["EditProductUrl"] = Url.Action("Edit", "Product", new { area = "Admin", id = Model.Id });
-                ViewData["SectionTitle"] = "Certificates & Documents";
+                ViewData["SectionTitle"] = Localizer["AdminProduct.CertificatesAndDocuments"];
             }
             @await Html.PartialAsync("~/Areas/Admin/Views/Shared/_ProductDocumentsSection.cshtml", Model.Documents)
 
             <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
                 <div class="border-b border-gray-100 px-6 py-4 dark:border-gray-800">
-                    <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90">Linked Auctions</h4>
+                    <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.LinkedAuctions"]</h4>
                 </div>
 
                 <div class="max-w-full overflow-x-auto">
@@ -193,18 +193,18 @@
                         <thead>
                         <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
                             <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">ID</th>
-                            <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Status</th>
-                            <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Starting</th>
-                            <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Current</th>
-                            <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Dates</th>
-                            <th class="px-5 py-3 text-right text-theme-xs font-medium uppercase text-gray-500">Links</th>
+                            <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["AdminProduct.Status"]</th>
+                            <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["AdminProduct.StartingPrice"]</th>
+                            <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["AdminProduct.CurrentPrice"]</th>
+                            <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">@Localizer["AdminProduct.Dates"]</th>
+                            <th class="px-5 py-3 text-right text-theme-xs font-medium uppercase text-gray-500">@Localizer["AdminProduct.Links"]</th>
                         </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                         @if (Model.LinkedAuctions.Count == 0)
                         {
                             <tr>
-                                <td colspan="6" class="px-5 py-8 text-center text-theme-sm text-gray-500">No auctions linked to this product.</td>
+                                <td colspan="6" class="px-5 py-8 text-center text-theme-sm text-gray-500">@Localizer["AdminProduct.EmptyLinkedAuctions"]</td>
                             </tr>
                         }
                         else
@@ -226,7 +226,7 @@
                                                asp-action="Details"
                                                asp-route-id="@auction.Id"
                                                class="text-theme-sm font-medium text-brand-500 hover:underline">
-                                                Admin
+                                                @Localizer["AdminProduct.Admin"]
                                             </a>
                                             @if (!string.IsNullOrWhiteSpace(auction.PublicDetailUrl))
                                             {
@@ -234,7 +234,7 @@
                                                    target="_blank"
                                                    rel="noopener"
                                                    class="text-theme-sm font-medium text-success-600 hover:underline">
-                                                    Public
+                                                    @Localizer["AdminProduct.Public"]
                                                 </a>
                                             }
                                         </div>
