@@ -618,6 +618,46 @@
     }
   }
 
+  function requestConfirm(options) {
+    if (typeof window.showConfirmModal === 'function') {
+      return window.showConfirmModal(options);
+    }
+
+    var message = options.message || '';
+    if (options.note) {
+      message += '\n\n' + options.note;
+    }
+
+    return Promise.resolve(window.confirm(message));
+  }
+
+  function submitAuctionForm(data, formData) {
+    return fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+      .then(function (response) {
+        return response.json().then(function (payload) {
+          if (!response.ok || payload.success === false) {
+            throw new Error(payload.message || t('errorCreateFailed', 'Could not create auction.'));
+          }
+          return payload;
+        });
+      })
+      .then(function (payload) {
+        showSuccess(data.productName);
+        if (payload.redirectUrl) {
+          window.location.href = payload.redirectUrl;
+        }
+      })
+      .catch(function (error) {
+        showError('images', error.message);
+        showTopToast('error', error.message);
+        showSubmitStatus('error', error.message);
+      });
+  }
+
   function showSuccess(name) {
     showTopToast('success', tf(t('successCreated', 'Your auction "{0}" has been created successfully!'), name));
     try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
@@ -759,30 +799,21 @@
         formData.append('DocumentNames', doc.displayName || 'PSA Certificate');
       });
 
-      fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      })
-        .then(function (response) {
-          return response.json().then(function (payload) {
-            if (!response.ok || payload.success === false) {
-              throw new Error(payload.message || t('errorCreateFailed', 'Could not create auction.'));
-            }
-            return payload;
-          });
-        })
-        .then(function (payload) {
-          showSuccess(data.productName);
-          if (payload.redirectUrl) {
-            window.location.href = payload.redirectUrl;
-          }
-        })
-        .catch(function (error) {
-          showError('images', error.message);
-          showTopToast('error', error.message);
-          showSubmitStatus('error', error.message);
-        });
+      var productName = data.productName || t('productNameDefault', 'Product name');
+
+      requestConfirm({
+        title: t('confirmCreateTitle', 'Submit auction listing?'),
+        message: t('confirmCreateMessage', 'You are about to submit "{0}" for admin review before it goes live.'),
+        messageArgs: [productName],
+        note: t('confirmCreateNote', 'The listing will be pending review.'),
+        confirmText: t('confirmCreateConfirm', 'Create auction')
+      }).then(function (confirmed) {
+        if (!confirmed) {
+          return;
+        }
+
+        submitAuctionForm(data, formData);
+      });
     });
   }
 
