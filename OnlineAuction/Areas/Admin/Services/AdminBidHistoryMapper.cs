@@ -20,7 +20,9 @@ public static class AdminBidHistoryMapper
                 PlacedAt = bid.PlacedAt,
                 BidType = bid.BidType,
                 Status = bid.IsWinning ? "WINNING" : "OUTBID",
-                IsWinning = bid.IsWinning
+                IsWinning = bid.IsWinning,
+                IsFlagged = bid.IsFlagged,
+                FlagReason = bid.FlagReason
             })
             .ToList();
     }

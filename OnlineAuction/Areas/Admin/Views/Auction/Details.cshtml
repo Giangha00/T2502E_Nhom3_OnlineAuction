@@ -118,5 +118,7 @@
         </dl>
     </div>
 
+    @await Html.PartialAsync("_FraudAlertsSection", Model)
+
     @await Html.PartialAsync("_BidHistorySection", Model)
 </div>
