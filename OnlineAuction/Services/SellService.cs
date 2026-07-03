@@ -8,6 +8,13 @@ namespace OnlineAuction.Services;
 
 public class SellService : ISellService
 {
+    private readonly AuctionHouseDbContext _db;
+
+    public SellService(AuctionHouseDbContext db)
+    {
+        _db = db;
+    }
+
     public CreateAuctionViewModel BuildCreateForm()
     {
         var (registrationStart, registrationEnd, liveStart, liveEnd) =
@@ -22,9 +29,7 @@ public class SellService : ISellService
             BidStep = 50,
             Authenticator = "PSA",
             GradeValue = "10",
-            Language = "English",
-            AuctionType = "Normal",
-            AuctionEventName = "RareCard Vault: Premium Trading Card Auction 2026"
+            Language = "English"
         };
 
         PopulateOptions(model);
@@ -48,7 +53,18 @@ public class SellService : ISellService
 
     public void PopulateOptions(SellProductFormViewModel model)
     {
-        model.Categories = MockAuctionData.GetCategoryNames().ToList();
+        model.Categories = _db.Categories
+            .Where(category => category.DeletedAt == null && category.IsActive)
+            .OrderBy(category => category.SortOrder)
+            .ThenBy(category => category.Name)
+            .Select(category => category.Name)
+            .ToList();
+
+        if (model.Categories.Count == 0)
+        {
+            model.Categories = MockAuctionData.GetCategoryNames().ToList();
+        }
+
         model.Authenticators = GradeLabelHelper.Authenticators.ToList();
         model.GradeValues = GradeLabelHelper.GradeValues.ToList();
         model.Languages = CreateAuctionMockData.Languages.ToList();
@@ -68,7 +84,7 @@ public class SellService : ISellService
             yield return error;
         }
 
-        if (model.RegistrationStartDate < DateTime.Now.AddMinutes(-1))
+        if (model.RegistrationStartDate < DateTime.UtcNow.AddMinutes(-1))
         {
             yield return (nameof(model.RegistrationStartDate), "Registration start cannot be in the past.");
         }

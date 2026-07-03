@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Models;
@@ -15,10 +17,12 @@ public class OrderService : IOrderService
     };
 
     private readonly AuctionHouseDbContext _dbContext;
+    private readonly PlatformFeeSettings _feeSettings;
 
-    public OrderService(AuctionHouseDbContext dbContext)
+    public OrderService(AuctionHouseDbContext dbContext, IOptions<PlatformFeeSettings> feeSettings)
     {
         _dbContext = dbContext;
+        _feeSettings = feeSettings.Value;
     }
 
     public async Task<OrderPageViewModel?> BuildOrderPageAsync(int buyerId)
@@ -66,6 +70,7 @@ public class OrderService : IOrderService
                     WinningBid = item.WinningBid,
                     ShippingFee = order.ShippingFee,
                     VaultInsurance = order.VaultInsurance,
+                    PlatformFee = order.PlatformFee,
                     DepositApplied = order.DepositApplied,
                     TotalAmount = order.TotalAmount,
                     PaymentDeadline = order.PaymentDeadline,
@@ -206,6 +211,7 @@ public class OrderService : IOrderService
             foreach (var order in checkoutOrders)
             {
                 order.Status = OrderStatuses.Paid;
+                order.SellerFee = MarketplaceFeeCalculator.CalculateSellerSuccessFee(order.Subtotal, _feeSettings);
             }
 
             await OrderCancellationHelper.MarkAuctionsCompletedAfterPaymentAsync(
@@ -248,6 +254,7 @@ public class OrderService : IOrderService
         model.Subtotal = selectedItems.Sum(item => item.WinningBid);
         model.ShippingFee = selectedItems.Sum(item => item.ShippingFee);
         model.VaultInsurance = selectedItems.Sum(item => item.VaultInsurance);
+        model.PlatformFee = selectedItems.Sum(item => item.PlatformFee);
         model.DepositApplied = selectedItems.Sum(item => item.DepositApplied);
         model.TotalAmount = selectedItems.Sum(item => item.TotalAmount);
         model.SelectedItemCount = selectedItems.Count;
