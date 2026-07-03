@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Areas.Admin.Services;
 using OnlineAuction.Areas.Admin.ViewModels.Auctions;
 using OnlineAuction.Authorization;
 using OnlineAuction.Configurations;
-using OnlineAuction.Data;
-using OnlineAuction.Services.Interfaces;
+using OnlineAuction.Entities;
 
 namespace OnlineAuction.Areas.Admin.Controllers;
 
@@ -12,9 +12,9 @@ public class AuctionController : BaseAdminController
 {
     private readonly AdminAuctionService _auctionService;
 
-    public AuctionController(AuctionHouseDbContext dbContext, IPhotoService photoService)
+    public AuctionController(AdminAuctionService auctionService)
     {
-        _auctionService = new AdminAuctionService(dbContext, photoService);
+        _auctionService = auctionService;
     }
 
     [RequirePermission(PermissionCodes.AuctionsView)]
@@ -95,9 +95,9 @@ public class AuctionController : BaseAdminController
 
     [HttpGet]
     [RequirePermission(PermissionCodes.AuctionsView)]
-    public async Task<IActionResult> Details(int id, int bidPage = 1)
+    public async Task<IActionResult> Details(int id, int bidPage = 1, bool flaggedOnly = false)
     {
-        var model = await _auctionService.GetDetailsAsync(id, bidPage);
+        var model = await _auctionService.GetDetailsAsync(id, bidPage, flaggedOnly);
 
         if (model is null)
         {
@@ -105,6 +105,34 @@ public class AuctionController : BaseAdminController
         }
 
         return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
+    public async Task<IActionResult> ReviewFraudAlert(long alertId, int auctionId)
+    {
+        var result = await _auctionService.ReviewFraudAlertAsync(
+            alertId,
+            GetCurrentAdminId(),
+            FraudAlertStatuses.Reviewed);
+
+        TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+        return RedirectToAction(nameof(Details), new { id = auctionId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
+    public async Task<IActionResult> DismissFraudAlert(long alertId, int auctionId)
+    {
+        var result = await _auctionService.ReviewFraudAlertAsync(
+            alertId,
+            GetCurrentAdminId(),
+            FraudAlertStatuses.Dismissed);
+
+        TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+        return RedirectToAction(nameof(Details), new { id = auctionId });
     }
 
     [HttpPost]
@@ -124,6 +152,12 @@ public class AuctionController : BaseAdminController
         }
 
         return RedirectToAction(nameof(Index));
+    }
+
+    private int GetCurrentAdminId()
+    {
+        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return int.TryParse(value, out var userId) ? userId : 0;
     }
 
     [HttpPost]

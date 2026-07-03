@@ -524,6 +524,53 @@
   <data name="RelatedProducts_Title" xml:space="preserve"><value>Sản phẩm liên quan</value></data>
   <data name="Faq_PageTitle" xml:space="preserve"><value>Câu hỏi thường gặp</value></data>
   <data name="AboutUs_PageTitle" xml:space="preserve"><value>Về chúng tôi</value></data>
+  <data name="AboutUs_Story_Eyebrow" xml:space="preserve"><value>Câu chuyện của chúng tôi</value></data>
+  <data name="AboutUs_Story_Title" xml:space="preserve"><value>Nâng tầm di sản lịch sử sưu tầm</value></data>
+  <data name="AboutUs_Story_P1" xml:space="preserve"><value>CardMarket là nơi đáng tin cậy cho thẻ TCG đã grading, thẻ thể thao và collectibles cao cấp. Chúng tôi kết hợp kinh nghiệm đấu giá truyền thống với xác minh hiện đại để mọi listing đều minh bạch, an toàn và sẵn sàng cho collector chuyên nghiệp.</value></data>
+  <data name="AboutUs_Story_P2" xml:space="preserve"><value>Từ slab PSA đến huyền thoại thể thao vintage, marketplace của chúng tôi đặt tính xác thực lên hàng đầu — xác minh nghiêm ngặt, giá minh bạch và cộng đồng coi trọng nguồn gốc như giá trị.</value></data>
+  <data name="AboutUs_Story_P3" xml:space="preserve"><value>Dù bạn đấu giá trực tiếp, mua ngay hay ký gửi thẻ grail, CardMarket mang đến cập nhật đấu giá live, hồ sơ người bán đã xác minh và thanh toán an toàn trong một nền tảng.</value></data>
+  <data name="AboutUs_Story_BrowseAuctions" xml:space="preserve"><value>Xem đấu giá</value></data>
+  <data name="AboutUs_Story_ContactUs" xml:space="preserve"><value>Liên hệ</value></data>
+  <data name="AboutUs_Trust_Eyebrow" xml:space="preserve"><value>Tin cậy trong nháy mắt</value></data>
+  <data name="AboutUs_Trust_Title" xml:space="preserve"><value>Marketplace đã xác minh cho collectibles đã grading</value></data>
+  <data name="AboutUs_Trust_Verified" xml:space="preserve"><value>Đã xác minh</value></data>
+  <data name="AboutUs_Trust_Stat1_Label" xml:space="preserve"><value>Năm kinh nghiệm thị trường</value></data>
+  <data name="AboutUs_Trust_Stat2_Label" xml:space="preserve"><value>Listing đã kiểm duyệt</value></data>
+  <data name="AboutUs_Trust_Stat3_Label" xml:space="preserve"><value>Đối tác grading chính</value></data>
+  <data name="AboutUs_Trust_PsaTagline" xml:space="preserve"><value>Tiêu chuẩn vàng</value></data>
+  <data name="AboutUs_Mission_Eyebrow" xml:space="preserve"><value>Sứ mệnh</value></data>
+  <data name="AboutUs_Mission_Title" xml:space="preserve"><value>Bảo tồn câu chuyện của mỗi thẻ bài</value></data>
+  <data name="AboutUs_Mission_Desc" xml:space="preserve"><value>Chúng tôi tin mỗi thẻ đều kể một câu chuyện. Sứ mệnh của chúng tôi là bảo tồn những câu chuyện đó qua nền tảng minh bạch, chuyên môn và công nghệ — với tiêu chuẩn PSA và BGS ở trung tâm.</value></data>
+  <data name="AboutUs_Mission_Integrity_Title" xml:space="preserve"><value>Chính trực tuyệt đối</value></data>
+  <data name="AboutUs_Mission_Integrity_Desc" xml:space="preserve"><value>Mọi listing đều được kiểm tra theo tiêu chuẩn xác thực toàn cầu cao nhất qua quy trình nhiều bước.</value></data>
+  <data name="AboutUs_Mission_Custodians_Title" xml:space="preserve"><value>Người giữ di sản</value></data>
+  <data name="AboutUs_Mission_Custodians_Desc" xml:space="preserve"><value>Chúng tôi theo dõi lịch sử sở hữu và nguồn gốc của tài sản giá trị cao trong hệ sinh thái.</value></data>
+  <data name="AboutUs_Mission_CardAlt" xml:space="preserve"><value>Thẻ bóng chày Mickey Mantle đã grading trong slab PSA</value></data>
+  <data name="AboutUs_TrustGrading_Eyebrow" xml:space="preserve"><value>Tin cậy &amp; Grading</value></data>
+  <data name="AboutUs_TrustGrading_Title" xml:space="preserve"><value>Xác thực chính xác</value></data>
+  <data name="AboutUs_TrustGrading_Desc" xml:space="preserve"><value>Đối tác chiến lược với PSA và BGS đảm bảo mọi thẻ trên CardMarket đúng như mô tả.</value></data>
+  <data name="AboutUs_TrustGrading_PsaBadge" xml:space="preserve"><value>Đối tác chính: PSA Grading</value></data>
+  <data name="AboutUs_TrustGrading_PsaTitle" xml:space="preserve"><value>Tiêu chuẩn vàng</value></data>
+  <data name="AboutUs_TrustGrading_PsaDesc" xml:space="preserve"><value>Tích hợp trực tiếp cho phép xác minh slab PSA theo thời gian thực — không nhập tay, không sai sót.</value></data>
+  <data name="AboutUs_TrustGrading_MultiTitle" xml:space="preserve"><value>Grading đa điểm</value></data>
+  <data name="AboutUs_TrustGrading_MultiDesc" xml:space="preserve"><value>Chuyên gia thực hiện kiểm tra vật lý bổ sung cho mọi tài sản hạng cao trước khi đăng.</value></data>
+  <data name="AboutUs_TrustGrading_BgsTitle" xml:space="preserve"><value>BECKETT (BGS)</value></data>
+  <data name="AboutUs_TrustGrading_BgsDesc" xml:space="preserve"><value>Đối tác chuyên sâu về centering, góc, cạnh và bề mặt thẻ.</value></data>
+  <data name="AboutUs_TrustGrading_BgsLink" xml:space="preserve"><value>FAQ Grading</value></data>
+  <data name="AboutUs_TrustGrading_VaultTitle" xml:space="preserve"><value>Kho bảo quản &amp; bảo mật</value></data>
+  <data name="AboutUs_TrustGrading_VaultDesc" xml:space="preserve"><value>Cơ sở kiểm soát khí hậu bảo quản tài sản ở tiêu chuẩn bảo tàng đến khi bán.</value></data>
+  <data name="AboutUs_Team_Title" xml:space="preserve"><value>Đội ngũ curators</value></data>
+  <data name="AboutUs_Team_Desc" xml:space="preserve"><value>Đội ngũ có hơn 30 năm kinh nghiệm kết hợp trong thị trường collectibles toàn cầu.</value></data>
+  <data name="AboutUs_Team_Member1_Title" xml:space="preserve"><value>Nhà sáng lập &amp; CEO</value></data>
+  <data name="AboutUs_Team_Member1_Bio" xml:space="preserve"><value>Cựu giám đốc nhà đấu giá với 20 năm collectibles giá trị cao. Julian sáng lập CardMarket để kết nối di sản truyền thống và độ chính xác số.</value></data>
+  <data name="AboutUs_Team_Member2_Title" xml:space="preserve"><value>Trưởng phòng curation</value></data>
+  <data name="AboutUs_Team_Member2_Bio" xml:space="preserve"><value>Chuyên gia lịch sử TCG hiện đại. Elena dẫn dắt đội chuyên gia kiểm duyệt mọi listing về giá trị lịch sử.</value></data>
+  <data name="AboutUs_Team_Member3_Title" xml:space="preserve"><value>Giám đốc kỹ thuật</value></data>
+  <data name="AboutUs_Team_Member3_Bio" xml:space="preserve"><value>Kiến trúc sư engine xác thực. Marcus đảm bảo mọi giao dịch có xác minh bất biến.</value></data>
+  <data name="AboutUs_Newsletter_Title" xml:space="preserve"><value>Cập nhật drop lớn tiếp theo</value></data>
+  <data name="AboutUs_Newsletter_Desc" xml:space="preserve"><value>Đăng ký newsletter để được truy cập sớm bộ sưu tập và thông tin thị trường.</value></data>
+  <data name="AboutUs_Newsletter_Placeholder" xml:space="preserve"><value>Địa chỉ email của bạn</value></data>
+  <data name="AboutUs_Newsletter_Subscribe" xml:space="preserve"><value>Đăng ký</value></data>
   <data name="Policy_PageTitle" xml:space="preserve"><value>Chính sách &amp; Điều khoản</value></data>
   <data name="Refund_PageTitle" xml:space="preserve"><value>Yêu cầu hoàn tiền</value></data>
   <data name="Error_PageTitle" xml:space="preserve"><value>Lỗi</value></data>
@@ -973,6 +1020,35 @@
   <data name="Admin_BidHistory_Pagination_PageOf" xml:space="preserve"><value>Trang {0} / {1}</value></data>
   <data name="Admin_BidHistory_Pagination_Previous" xml:space="preserve"><value>Trước</value></data>
   <data name="Admin_BidHistory_Pagination_Next" xml:space="preserve"><value>Sau</value></data>
+  <data name="Admin_BidHistory_Flagged" xml:space="preserve"><value>Bị flag</value></data>
+  <data name="Admin_BidHistory_Filter_FlaggedOnly" xml:space="preserve"><value>Chỉ bid bị flag</value></data>
+  <data name="Admin_BidHistory_Filter_ShowAll" xml:space="preserve"><value>Hiện tất cả bid</value></data>
+  <data name="Bid_RateLimit_Message" xml:space="preserve"><value>Quá nhiều lượt bid. Vui lòng chờ trước khi bid tiếp.</value></data>
+  <data name="FraudAlerts_Title" xml:space="preserve"><value>Cảnh báo gian lận</value></data>
+  <data name="FraudAlerts_Total" xml:space="preserve"><value>{0} cảnh báo</value></data>
+  <data name="FraudAlerts_Empty" xml:space="preserve"><value>Không có cảnh báo gian lận cho phiên này.</value></data>
+  <data name="FraudAlerts_Col_Time" xml:space="preserve"><value>Thời gian</value></data>
+  <data name="FraudAlerts_Col_Type" xml:space="preserve"><value>Loại</value></data>
+  <data name="FraudAlerts_Col_Severity" xml:space="preserve"><value>Mức độ</value></data>
+  <data name="FraudAlerts_Col_Message" xml:space="preserve"><value>Mô tả</value></data>
+  <data name="FraudAlerts_Col_User" xml:space="preserve"><value>User</value></data>
+  <data name="FraudAlerts_Col_Status" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="FraudAlerts_Col_Action" xml:space="preserve"><value>Thao tác</value></data>
+  <data name="FraudAlerts_Action_Review" xml:space="preserve"><value>Review</value></data>
+  <data name="FraudAlerts_Action_Dismiss" xml:space="preserve"><value>Bỏ qua</value></data>
+  <data name="FraudAlert_Type_RateLimitExceeded" xml:space="preserve"><value>Vượt giới hạn bid</value></data>
+  <data name="FraudAlert_Type_SameIpMultipleAccounts" xml:space="preserve"><value>Nhiều account cùng IP</value></data>
+  <data name="FraudAlert_Type_RapidBidding" xml:space="preserve"><value>Bid quá nhanh</value></data>
+  <data name="FraudAlert_Type_CollusionRoundTrip" xml:space="preserve"><value>Nghi vấn thông đồng</value></data>
+  <data name="FraudAlert_Type_AbnormalPriceJump" xml:space="preserve"><value>Tăng giá bất thường</value></data>
+  <data name="FraudAlert_Type_NewAccountHighBid" xml:space="preserve"><value>Account mới bid cao</value></data>
+  <data name="FraudAlert_Type_SellerRelatedBidder" xml:space="preserve"><value>Bidder liên quan seller</value></data>
+  <data name="FraudAlert_Severity_Low" xml:space="preserve"><value>Thấp</value></data>
+  <data name="FraudAlert_Severity_Medium" xml:space="preserve"><value>Trung bình</value></data>
+  <data name="FraudAlert_Severity_High" xml:space="preserve"><value>Cao</value></data>
+  <data name="FraudAlert_Status_Open" xml:space="preserve"><value>Đang mở</value></data>
+  <data name="FraudAlert_Status_Reviewed" xml:space="preserve"><value>Đã review</value></data>
+  <data name="FraudAlert_Status_Dismissed" xml:space="preserve"><value>Đã bỏ qua</value></data>
   <data name="Admin_Dashboard_Title" xml:space="preserve"><value>Bảng điều khiển</value></data>
   <data name="Admin_Dashboard_Subtitle" xml:space="preserve"><value>Theo dõi hiệu suất nền tảng và thống kê.</value></data>
   <data name="Admin_Dashboard_Section1_Title" xml:space="preserve"><value>Tổng quan</value></data>
