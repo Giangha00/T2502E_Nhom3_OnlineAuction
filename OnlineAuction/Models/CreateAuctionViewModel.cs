@@ -22,14 +22,6 @@ public class CreateAuctionViewModel : SellProductFormViewModel
     [Display(Name = "Buy Now Price ($)")]
     public decimal? BuyNowPrice { get; set; }
 
-    [Required(ErrorMessage = "Please select an auction type.")]
-    [Display(Name = "Auction Type")]
-    public string AuctionType { get; set; } = "Normal";
-
-    [StringLength(160)]
-    [Display(Name = "Auction Event")]
-    public string AuctionEventName { get; set; } = "RareCard Vault: Premium Trading Card Auction 2026";
-
     [Required(ErrorMessage = "Start date is required.")]
     [Display(Name = "Registration Start")]
     [DataType(DataType.DateTime)]

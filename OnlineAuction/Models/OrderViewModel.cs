@@ -11,6 +11,7 @@ public class WonOrderItem
     public decimal WinningBid { get; set; }
     public decimal ShippingFee { get; set; }
     public decimal VaultInsurance { get; set; }
+    public decimal PlatformFee { get; set; }
     public decimal DepositApplied { get; set; }
     public decimal TotalAmount { get; set; }
     public DateTime PaymentDeadline { get; set; }
@@ -34,6 +35,7 @@ public class OrderPageViewModel
     public decimal Subtotal { get; set; }
     public decimal ShippingFee { get; set; }
     public decimal VaultInsurance { get; set; }
+    public decimal PlatformFee { get; set; }
     public decimal DepositApplied { get; set; }
     public decimal TotalAmount { get; set; }
     public int SelectedItemCount { get; set; }

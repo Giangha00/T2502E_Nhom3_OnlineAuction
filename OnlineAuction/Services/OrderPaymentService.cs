@@ -1,5 +1,7 @@
 using System.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Models;
@@ -16,6 +18,7 @@ public class OrderPaymentService : IOrderPaymentService
     private readonly IOrderService _orderService;
     private readonly IRealtimePublisher _realtimePublisher;
     private readonly ILogger<OrderPaymentService> _logger;
+    private readonly PlatformFeeSettings _feeSettings;
 
     public OrderPaymentService(
         AuctionHouseDbContext dbContext,
@@ -23,7 +26,8 @@ public class OrderPaymentService : IOrderPaymentService
         INotificationService notificationService,
         IOrderService orderService,
         IRealtimePublisher realtimePublisher,
-        ILogger<OrderPaymentService> logger)
+        ILogger<OrderPaymentService> logger,
+        IOptions<PlatformFeeSettings> feeSettings)
     {
         _dbContext = dbContext;
         _payPalService = payPalService;
@@ -31,6 +35,7 @@ public class OrderPaymentService : IOrderPaymentService
         _orderService = orderService;
         _realtimePublisher = realtimePublisher;
         _logger = logger;
+        _feeSettings = feeSettings.Value;
     }
 
     public async Task<PayPalCheckoutResult> InitiatePayPalCheckoutAsync(
@@ -190,6 +195,7 @@ public class OrderPaymentService : IOrderPaymentService
                 order.Status = OrderStatuses.Paid;
                 order.PaymentMethod = "paypal";
                 order.UpdatedAt = now;
+                order.SellerFee = MarketplaceFeeCalculator.CalculateSellerSuccessFee(order.Subtotal, _feeSettings);
                 paidOrderIds.Add(order.Id);
 
                 // ------------------------------------------------------------
@@ -465,6 +471,9 @@ public async Task<string> TestProcessIpnAsync(
             payment.Order.Status = OrderStatuses.Paid;
 
             payment.Order.PaymentMethod = "paypal";
+            payment.Order.SellerFee = MarketplaceFeeCalculator.CalculateSellerSuccessFee(
+                payment.Order.Subtotal,
+                _feeSettings);
 
             payment.Order.UpdatedAt = now;
         }

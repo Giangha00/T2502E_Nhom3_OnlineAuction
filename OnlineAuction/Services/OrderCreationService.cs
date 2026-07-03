@@ -1,5 +1,7 @@
 using System.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Helpers;
@@ -19,6 +21,7 @@ public class OrderCreationService : IOrderCreationService
     private readonly IRealtimePublisher _realtimePublisher;
     private readonly IOrderService _orderService;
     private readonly IBidService _bidService;
+    private readonly PlatformFeeSettings _feeSettings;
 
     public OrderCreationService(
         AuctionHouseDbContext dbContext,
@@ -27,7 +30,8 @@ public class OrderCreationService : IOrderCreationService
         IRegistrationDepositRefundService depositRefundService,
         IRealtimePublisher realtimePublisher,
         IOrderService orderService,
-        IBidService bidService)
+        IBidService bidService,
+        IOptions<PlatformFeeSettings> feeSettings)
     {
         _dbContext = dbContext;
         _logger = logger;
@@ -37,6 +41,7 @@ public class OrderCreationService : IOrderCreationService
         _realtimePublisher = realtimePublisher;
         _orderService = orderService;
         _bidService = bidService;
+        _feeSettings = feeSettings.Value;
     }
 
     public async Task<int> FinalizeExpiredAuctionsAsync(CancellationToken cancellationToken = default)
@@ -184,8 +189,10 @@ public class OrderCreationService : IOrderCreationService
 // Phí bảo hiểm vault hiện có của hệ thống
         var insurance = Math.Round(Math.Max(60m, subtotal * 0.00721m), 2);
 
+        var buyerCheckoutFee = MarketplaceFeeCalculator.CalculateBuyerCheckoutFee(subtotal, _feeSettings);
+
 // Tổng tiền gốc trước khi trừ cọc
-        var totalBeforeDeposit = subtotal + ShippingFee + insurance;
+        var totalBeforeDeposit = subtotal + ShippingFee + insurance + buyerCheckoutFee;
 
 // ------------------------------------------------------------
 // Trừ tiền cọc vào tổng tiền winner cần thanh toán.
@@ -213,6 +220,9 @@ public class OrderCreationService : IOrderCreationService
 
             // Phí bảo hiểm
             VaultInsurance = insurance,
+
+            // Phí thanh toán người mua
+            PlatformFee = buyerCheckoutFee,
 
             // Tiền cọc của winner được trừ vào order
             DepositApplied = depositAmount,
@@ -361,7 +371,8 @@ public class OrderCreationService : IOrderCreationService
         var subtotal = auction.BuyNowPrice.Value;
 
         var insurance = Math.Round(Math.Max(60m, subtotal * 0.00721m), 2);
-        var total = subtotal + ShippingFee + insurance;
+        var buyerCheckoutFee = MarketplaceFeeCalculator.CalculateBuyerCheckoutFee(subtotal, _feeSettings);
+        var total = subtotal + ShippingFee + insurance + buyerCheckoutFee;
 
         var order = new AuctionOrder
         {
@@ -370,6 +381,7 @@ public class OrderCreationService : IOrderCreationService
             Subtotal = subtotal,
             ShippingFee = ShippingFee,
             VaultInsurance = insurance,
+            PlatformFee = buyerCheckoutFee,
             DepositApplied = 0m,
             TotalAmount = total,
             Status = OrderStatuses.PendingPayment,

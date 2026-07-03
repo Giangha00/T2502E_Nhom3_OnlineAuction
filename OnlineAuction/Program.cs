@@ -272,7 +272,6 @@ builder.Services.AddScoped<IAdminComplaintService, AdminComplaintService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
 builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
-builder.Services.AddScoped<IListingFeeService, ListingFeeService>();
 builder.Services.AddScoped<IRegistrationDepositRefundService, RegistrationDepositRefundService>();
 builder.Services.AddScoped<IPasswordResetOtpService, PasswordResetOtpService>();
 builder.Services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();

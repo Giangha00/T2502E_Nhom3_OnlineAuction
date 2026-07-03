@@ -657,6 +657,7 @@
   <data name="Checkout_Won" xml:space="preserve"><value>낙찰</value></data>
   <data name="Checkout_WinningBid" xml:space="preserve"><value>낙찰가</value></data>
   <data name="Checkout_PlatformFee" xml:space="preserve"><value>플랫폼 수수료 (2.5%)</value></data>
+  <data name="Checkout_BuyerCheckoutFee" xml:space="preserve"><value>구매자 결제 수수료 (2.5%)</value></data>
   <data name="Checkout_Shipping" xml:space="preserve"><value>배송</value></data>
   <data name="Checkout_Total" xml:space="preserve"><value>합계</value></data>
   <data name="Checkout_PayNow" xml:space="preserve"><value>지금 {0} 결제</value></data>

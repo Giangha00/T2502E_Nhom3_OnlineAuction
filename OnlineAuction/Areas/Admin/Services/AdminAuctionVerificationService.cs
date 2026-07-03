@@ -22,18 +22,15 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
 
     private readonly AuctionHouseDbContext _dbContext;
     private readonly INotificationService _notificationService;
-    private readonly IListingFeeService _listingFeeService;
     private readonly ILogger<AdminAuctionVerificationService> _logger;
 
     public AdminAuctionVerificationService(
         AuctionHouseDbContext dbContext,
         INotificationService notificationService,
-        IListingFeeService listingFeeService,
         ILogger<AdminAuctionVerificationService> logger)
     {
         _dbContext = dbContext;
         _notificationService = notificationService;
-        _listingFeeService = listingFeeService;
         _logger = logger;
     }
 
@@ -202,9 +199,7 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             SubmittedAt = auction.SubmittedAt,
             SellerId = product.SellerId,
             SellerName = product.Seller.FullName,
-            SellerEmail = product.Seller.Email ?? string.Empty,
-            EstimatedListingFee = _listingFeeService.CalculateListingFee(auction.StartingPrice),
-            ListingFeePreview = _listingFeeService.BuildPreviewDescription(auction.StartingPrice)
+            SellerEmail = product.Seller.Email ?? string.Empty
         };
     }
 
@@ -240,19 +235,11 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             return (false, validationError);
         }
 
-        var feeResult = ListingFeeCollectionResult.Failed("Listing fee collection did not run.");
         var strategy = _dbContext.Database.CreateExecutionStrategy();
 
         await strategy.ExecuteAsync(async () =>
         {
             await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
-
-            feeResult = await _listingFeeService.CollectListingFeeAsync(auction, adminUserId, cancellationToken);
-            if (!feeResult.Success)
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                return;
-            }
 
             var now = DateTime.UtcNow;
             auction.Status = auction.StartDate <= now && auction.EndDate > now
@@ -267,25 +254,19 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             await transaction.CommitAsync(cancellationToken);
         });
 
-        if (!feeResult.Success)
-        {
-            return (false, feeResult.Message);
-        }
+        LogAudit(adminUserId, "approve", auctionId);
 
-        LogAudit(adminUserId, "approve", auctionId, $"ListingFee={feeResult.FeeAmount:N2}");
-
-        var feeText = feeResult.FeeAmount.ToString("N2");
         await NotifySellerAsync(
             auction,
             "Listing approved",
-            $"Your listing has been approved and is now live on the marketplace. A listing fee of ${feeText} was charged.",
+            "Your listing has been approved and is now live on the marketplace.",
             "/Account/Selling?tab=active",
-            NotificationReferenceTypes.ListingFeePaid,
+            NotificationReferenceTypes.AuctionNowLive,
             cancellationToken);
 
         var statusMessage = auction.Status == AuctionStatuses.Scheduled
-            ? $"Auction approved and scheduled to go live at the start date. Listing fee of ${feeText} collected."
-            : $"Auction approved and is now live. Listing fee of ${feeText} collected.";
+            ? "Auction approved and scheduled to go live at the start date."
+            : "Auction approved and is now live.";
 
         return (true, statusMessage);
     }
