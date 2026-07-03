@@ -1019,6 +1019,13 @@
   <data name="Admin_Dashboard_Filter_To" xml:space="preserve"><value>To</value></data>
   <data name="Admin_Dashboard_Filter_Apply" xml:space="preserve"><value>Apply</value></data>
   <data name="Admin_Dashboard_Filter_Export" xml:space="preserve"><value>Export Excel</value></data>
+  <data name="Admin_Dashboard_Filter_Preset_7Days" xml:space="preserve"><value>Last 7 days</value></data>
+  <data name="Admin_Dashboard_Filter_Preset_30Days" xml:space="preserve"><value>Last 30 days</value></data>
+  <data name="Admin_Dashboard_Filter_Preset_ThisMonth" xml:space="preserve"><value>This month</value></data>
+  <data name="Admin_Dashboard_Filter_Preset_LastMonth" xml:space="preserve"><value>Last month</value></data>
+  <data name="Admin_Dashboard_Filter_Error_DateFromAfterDateTo" xml:space="preserve"><value>The start date must be on or before the end date.</value></data>
+  <data name="Admin_Dashboard_Filter_Error_RangeTooLong" xml:space="preserve"><value>Date range cannot exceed 365 days.</value></data>
+  <data name="Admin_Dashboard_Filter_Loading" xml:space="preserve"><value>Loading...</value></data>
   <data name="Admin_Dashboard_Snapshot_Note" xml:space="preserve"><value>At current time</value></data>
   <data name="Admin_Dashboard_FilteredPeriod_Note" xml:space="preserve"><value>Within selected date range</value></data>
   <data name="Admin_Dashboard_ChangeVsPrevious" xml:space="preserve"><value>vs previous period</value></data>

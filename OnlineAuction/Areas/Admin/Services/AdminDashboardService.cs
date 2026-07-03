@@ -15,7 +15,7 @@ public class AdminDashboardService : IAdminDashboardService
     private const int RecentAuctionCount = 10;
     private const int TopUserCount = 10;
     private const int CategoryTopCount = 5;
-    private const int DefaultFilterDays = 30;
+    private const int DefaultFilterDays = DashboardFilterValidator.DefaultFilterDays;
 
     private static readonly string[] ActiveAuctionStatuses =
     [
@@ -90,11 +90,6 @@ public class AdminDashboardService : IAdminDashboardService
 
         var endDate = (dateTo ?? DateTime.UtcNow).Date;
         var startDate = (dateFrom ?? endDate.AddDays(-(DefaultFilterDays - 1))).Date;
-
-        if (startDate > endDate)
-        {
-            (startDate, endDate) = (endDate, startDate);
-        }
 
         var granularity = string.IsNullOrWhiteSpace(registrationGranularity)
             ? "day"
@@ -686,78 +681,86 @@ public class AdminDashboardService : IAdminDashboardService
         CancellationToken cancellationToken = default)
     {
         var dashboard = await GetDashboardAsync(filter, cancellationToken);
+        var auctionsInRange = await GetAuctionsInRangeForExportAsync(filter, cancellationToken);
+        var generatedAtUtc = DateTime.UtcNow;
 
         using var workbook = new XLWorkbook();
 
         var overviewSheet = workbook.Worksheets.Add("Overview");
-        overviewSheet.Cell(1, 1).Value = "Metric";
+        overviewSheet.Cell(1, 1).Value = "Field";
         overviewSheet.Cell(1, 2).Value = "Value";
-        overviewSheet.Cell(2, 1).Value = "GMV";
-        overviewSheet.Cell(2, 2).Value = dashboard.RevenueSection.GmvKpi.DisplayValue;
-        overviewSheet.Cell(3, 1).Value = "Platform Revenue";
-        overviewSheet.Cell(3, 2).Value = dashboard.RevenueSection.PlatformRevenueKpi.DisplayValue;
-        overviewSheet.Cell(4, 1).Value = "Completed Orders";
-        overviewSheet.Cell(4, 2).Value = dashboard.RevenueSection.CompletedOrdersKpi.DisplayValue;
-        overviewSheet.Cell(5, 1).Value = "Active Auctions";
-        overviewSheet.Cell(5, 2).Value = dashboard.KpiCards.FirstOrDefault(card => card.Label == "Active Auctions")?.DisplayValue ?? string.Empty;
-        overviewSheet.Cell(6, 1).Value = "Total Bids";
-        overviewSheet.Cell(6, 2).Value = dashboard.KpiCards.FirstOrDefault(card => card.Label == "Total Bids")?.DisplayValue ?? string.Empty;
+        overviewSheet.Cell(2, 1).Value = "Date From";
+        overviewSheet.Cell(2, 2).Value = filter.DateFrom.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+        overviewSheet.Cell(3, 1).Value = "Date To";
+        overviewSheet.Cell(3, 2).Value = filter.DateTo.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+        overviewSheet.Cell(4, 1).Value = "Report Generated (UTC)";
+        overviewSheet.Cell(4, 2).Value = generatedAtUtc.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 
-        var usersSheet = workbook.Worksheets.Add("Users");
-        usersSheet.Cell(1, 1).Value = "Metric";
-        usersSheet.Cell(1, 2).Value = "Value";
-        usersSheet.Cell(2, 1).Value = "New Registrations";
-        usersSheet.Cell(2, 2).Value = dashboard.UserSection.NewRegistrationsKpi.DisplayValue;
-        usersSheet.Cell(3, 1).Value = "Active Users";
-        usersSheet.Cell(3, 2).Value = dashboard.UserSection.ActiveUsersKpi.DisplayValue;
-        usersSheet.Cell(4, 1).Value = "Total Users";
-        usersSheet.Cell(4, 2).Value = dashboard.UserSection.TotalUsersKpi.DisplayValue;
+        var overviewMetricRow = 6;
+        overviewSheet.Cell(overviewMetricRow, 1).Value = "Metric";
+        overviewSheet.Cell(overviewMetricRow, 2).Value = "Value";
+        overviewMetricRow++;
 
-        var buyersStartRow = 6;
-        usersSheet.Cell(buyersStartRow, 1).Value = "Top Buyers";
-        usersSheet.Cell(buyersStartRow + 1, 1).Value = "Name";
-        usersSheet.Cell(buyersStartRow + 1, 2).Value = "Bid Count";
-        usersSheet.Cell(buyersStartRow + 1, 3).Value = "Total Bid Amount";
-
-        var buyerRow = buyersStartRow + 2;
-        foreach (var buyer in dashboard.UserSection.TopBuyers)
+        void AddOverviewMetric(string metric, string value)
         {
-            usersSheet.Cell(buyerRow, 1).Value = buyer.FullName;
-            usersSheet.Cell(buyerRow, 2).Value = buyer.BidCount;
-            usersSheet.Cell(buyerRow, 3).Value = buyer.TotalBidAmount;
-            buyerRow++;
+            overviewSheet.Cell(overviewMetricRow, 1).Value = metric;
+            overviewSheet.Cell(overviewMetricRow, 2).Value = value;
+            overviewMetricRow++;
         }
 
-        var sellersHeaderRow = buyerRow + 1;
-        usersSheet.Cell(sellersHeaderRow, 1).Value = "Top Sellers";
-        usersSheet.Cell(sellersHeaderRow + 1, 1).Value = "Name";
-        usersSheet.Cell(sellersHeaderRow + 1, 2).Value = "Listing Count";
-        usersSheet.Cell(sellersHeaderRow + 1, 3).Value = "Total Sales";
+        AddOverviewMetric("GMV", dashboard.RevenueSection.GmvKpi.DisplayValue);
+        AddOverviewMetric("Platform Revenue", dashboard.RevenueSection.PlatformRevenueKpi.DisplayValue);
+        AddOverviewMetric("Completed Orders", dashboard.RevenueSection.CompletedOrdersKpi.DisplayValue);
+        AddOverviewMetric(
+            "Active Auctions",
+            dashboard.KpiCards.FirstOrDefault(card => card.Label == "Active Auctions")?.DisplayValue ?? "0");
+        AddOverviewMetric(
+            "Registered Users",
+            dashboard.KpiCards.FirstOrDefault(card => card.Label == "Registered Users")?.DisplayValue ?? "0");
+        AddOverviewMetric(
+            "Total Bids",
+            dashboard.KpiCards.FirstOrDefault(card => card.Label == "Total Bids")?.DisplayValue ?? "0");
+        AddOverviewMetric("New Registrations", dashboard.UserSection.NewRegistrationsKpi.DisplayValue);
+        AddOverviewMetric("Active Users", dashboard.UserSection.ActiveUsersKpi.DisplayValue);
+        AddOverviewMetric("Ongoing Auctions", dashboard.AuctionSection.OngoingKpi.DisplayValue);
+        AddOverviewMetric("Ended Auctions", dashboard.AuctionSection.EndedKpi.DisplayValue);
+        AddOverviewMetric("Cancelled Auctions", dashboard.AuctionSection.CancelledKpi.DisplayValue);
+        AddOverviewMetric("Success Rate", dashboard.AuctionSection.SuccessRateKpi.DisplayValue);
 
-        var sellerRow = sellersHeaderRow + 2;
-        foreach (var seller in dashboard.UserSection.TopSellers)
+        var revenueSheet = workbook.Worksheets.Add("Revenue");
+        revenueSheet.Cell(1, 1).Value = "Summary";
+        revenueSheet.Cell(2, 1).Value = "GMV";
+        revenueSheet.Cell(2, 2).Value = dashboard.RevenueSection.GmvKpi.DisplayValue;
+        revenueSheet.Cell(3, 1).Value = "Platform Revenue";
+        revenueSheet.Cell(3, 2).Value = dashboard.RevenueSection.PlatformRevenueKpi.DisplayValue;
+        revenueSheet.Cell(4, 1).Value = "Completed Orders";
+        revenueSheet.Cell(4, 2).Value = dashboard.RevenueSection.CompletedOrdersKpi.DisplayValue;
+
+        var revenueDetailHeaderRow = 6;
+        revenueSheet.Cell(revenueDetailHeaderRow, 1).Value = "Date";
+        revenueSheet.Cell(revenueDetailHeaderRow, 2).Value = "Type";
+        revenueSheet.Cell(revenueDetailHeaderRow, 3).Value = "Reference";
+        revenueSheet.Cell(revenueDetailHeaderRow, 4).Value = "GMV";
+        revenueSheet.Cell(revenueDetailHeaderRow, 5).Value = "Platform Revenue";
+        revenueSheet.Cell(revenueDetailHeaderRow, 6).Value = "Status";
+
+        var revenueRow = revenueDetailHeaderRow + 1;
+        if (dashboard.RevenueSection.DetailRows.Count == 0)
         {
-            usersSheet.Cell(sellerRow, 1).Value = seller.FullName;
-            usersSheet.Cell(sellerRow, 2).Value = seller.ListingCount;
-            usersSheet.Cell(sellerRow, 3).Value = seller.TotalSales;
-            sellerRow++;
+            revenueSheet.Cell(revenueRow, 1).Value = "No data for selected period";
         }
-
-        var newUsersHeaderRow = sellerRow + 1;
-        usersSheet.Cell(newUsersHeaderRow, 1).Value = "New Registrations";
-        usersSheet.Cell(newUsersHeaderRow + 1, 1).Value = "Name";
-        usersSheet.Cell(newUsersHeaderRow + 1, 2).Value = "Email";
-        usersSheet.Cell(newUsersHeaderRow + 1, 3).Value = "Registered At";
-        usersSheet.Cell(newUsersHeaderRow + 1, 4).Value = "Status";
-
-        var newUserRow = newUsersHeaderRow + 2;
-        foreach (var user in dashboard.UserSection.NewUsers)
+        else
         {
-            usersSheet.Cell(newUserRow, 1).Value = user.FullName;
-            usersSheet.Cell(newUserRow, 2).Value = user.Email;
-            usersSheet.Cell(newUserRow, 3).Value = user.CreatedAt;
-            usersSheet.Cell(newUserRow, 4).Value = user.Status;
-            newUserRow++;
+            foreach (var row in dashboard.RevenueSection.DetailRows)
+            {
+                revenueSheet.Cell(revenueRow, 1).Value = row.TransactionDate;
+                revenueSheet.Cell(revenueRow, 2).Value = row.Type;
+                revenueSheet.Cell(revenueRow, 3).Value = row.ReferenceCode;
+                revenueSheet.Cell(revenueRow, 4).Value = row.GmvAmount;
+                revenueSheet.Cell(revenueRow, 5).Value = row.PlatformRevenueAmount;
+                revenueSheet.Cell(revenueRow, 6).Value = row.Status;
+                revenueRow++;
+            }
         }
 
         var auctionsSheet = workbook.Worksheets.Add("Auctions");
@@ -780,67 +783,61 @@ public class AdminDashboardService : IAdminDashboardService
         auctionsSheet.Cell(categoryHeaderRow + 1, 4).Value = "Percentage";
 
         var categoryRow = categoryHeaderRow + 2;
-        foreach (var category in dashboard.AuctionSection.CategoryBreakdown)
+        if (dashboard.AuctionSection.CategoryBreakdown.Count == 0)
         {
-            auctionsSheet.Cell(categoryRow, 1).Value = category.CategoryName;
-            auctionsSheet.Cell(categoryRow, 2).Value = category.BidCount;
-            auctionsSheet.Cell(categoryRow, 3).Value = category.BidVolume;
-            auctionsSheet.Cell(categoryRow, 4).Value = category.Percentage;
+            auctionsSheet.Cell(categoryRow, 1).Value = "No data for selected period";
             categoryRow++;
         }
-
-        var recentHeaderRow = categoryRow + 1;
-        auctionsSheet.Cell(recentHeaderRow, 1).Value = "Recent Auctions";
-        auctionsSheet.Cell(recentHeaderRow + 1, 1).Value = "Product";
-        auctionsSheet.Cell(recentHeaderRow + 1, 2).Value = "Seller";
-        auctionsSheet.Cell(recentHeaderRow + 1, 3).Value = "Category";
-        auctionsSheet.Cell(recentHeaderRow + 1, 4).Value = "Current Bid";
-        auctionsSheet.Cell(recentHeaderRow + 1, 5).Value = "Status";
-        auctionsSheet.Cell(recentHeaderRow + 1, 6).Value = "Ends In";
-
-        var recentRow = recentHeaderRow + 2;
-        foreach (var auction in dashboard.RecentAuctions)
+        else
         {
-            auctionsSheet.Cell(recentRow, 1).Value = auction.ProductName;
-            auctionsSheet.Cell(recentRow, 2).Value = auction.SellerName;
-            auctionsSheet.Cell(recentRow, 3).Value = auction.CategoryName;
-            auctionsSheet.Cell(recentRow, 4).Value = auction.CurrentPrice;
-            auctionsSheet.Cell(recentRow, 5).Value = auction.StatusLabel;
-            auctionsSheet.Cell(recentRow, 6).Value = auction.EndsIn;
-            recentRow++;
+            foreach (var category in dashboard.AuctionSection.CategoryBreakdown)
+            {
+                auctionsSheet.Cell(categoryRow, 1).Value = category.CategoryName;
+                auctionsSheet.Cell(categoryRow, 2).Value = category.BidCount;
+                auctionsSheet.Cell(categoryRow, 3).Value = category.BidVolume;
+                auctionsSheet.Cell(categoryRow, 4).Value = category.Percentage;
+                categoryRow++;
+            }
         }
 
-        var revenueDetailSheet = workbook.Worksheets.Add("Revenue Detail");
-        revenueDetailSheet.Cell(1, 1).Value = "Date";
-        revenueDetailSheet.Cell(1, 2).Value = "Type";
-        revenueDetailSheet.Cell(1, 3).Value = "Reference";
-        revenueDetailSheet.Cell(1, 4).Value = "GMV";
-        revenueDetailSheet.Cell(1, 5).Value = "Platform Revenue";
-        revenueDetailSheet.Cell(1, 6).Value = "Status";
+        var auctionListHeaderRow = categoryRow + 1;
+        auctionsSheet.Cell(auctionListHeaderRow, 1).Value = "Auctions In Range";
+        auctionsSheet.Cell(auctionListHeaderRow + 1, 1).Value = "Product";
+        auctionsSheet.Cell(auctionListHeaderRow + 1, 2).Value = "Seller";
+        auctionsSheet.Cell(auctionListHeaderRow + 1, 3).Value = "Category";
+        auctionsSheet.Cell(auctionListHeaderRow + 1, 4).Value = "Current Bid";
+        auctionsSheet.Cell(auctionListHeaderRow + 1, 5).Value = "Status";
+        auctionsSheet.Cell(auctionListHeaderRow + 1, 6).Value = "Created At";
 
-        var revenueRow = 2;
-        foreach (var row in dashboard.RevenueSection.DetailRows)
+        var auctionRow = auctionListHeaderRow + 2;
+        if (auctionsInRange.Count == 0)
         {
-            revenueDetailSheet.Cell(revenueRow, 1).Value = row.TransactionDate;
-            revenueDetailSheet.Cell(revenueRow, 2).Value = row.Type;
-            revenueDetailSheet.Cell(revenueRow, 3).Value = row.ReferenceCode;
-            revenueDetailSheet.Cell(revenueRow, 4).Value = row.GmvAmount;
-            revenueDetailSheet.Cell(revenueRow, 5).Value = row.PlatformRevenueAmount;
-            revenueDetailSheet.Cell(revenueRow, 6).Value = row.Status;
-            revenueRow++;
+            auctionsSheet.Cell(auctionRow, 1).Value = "No data for selected period";
+        }
+        else
+        {
+            foreach (var auction in auctionsInRange)
+            {
+                auctionsSheet.Cell(auctionRow, 1).Value = auction.ProductName;
+                auctionsSheet.Cell(auctionRow, 2).Value = auction.SellerName;
+                auctionsSheet.Cell(auctionRow, 3).Value = auction.CategoryName;
+                auctionsSheet.Cell(auctionRow, 4).Value = auction.CurrentPrice;
+                auctionsSheet.Cell(auctionRow, 5).Value = auction.StatusLabel;
+                auctionsSheet.Cell(auctionRow, 6).Value = auction.CreatedAt;
+                auctionRow++;
+            }
         }
 
         overviewSheet.Columns().AdjustToContents();
-        usersSheet.Columns().AdjustToContents();
+        revenueSheet.Columns().AdjustToContents();
         auctionsSheet.Columns().AdjustToContents();
-        revenueDetailSheet.Columns().AdjustToContents();
 
         using var stream = new MemoryStream();
         workbook.SaveAs(stream);
         return stream.ToArray();
     }
 
-    public async Task<byte[]> ExportSummaryCsvAsync(int periodDays = 30, CancellationToken cancellationToken = default)
+    public async Task<byte[]> ExportSummaryCsvAsync(int periodDays = 7, CancellationToken cancellationToken = default)
     {
         var filter = NormalizeFilter(
             DateTime.UtcNow.Date.AddDays(-(periodDays - 1)),
@@ -1267,6 +1264,58 @@ public class AdminDashboardService : IAdminDashboardService
             DateFrom = previousStart,
             DateTo = previousEnd
         };
+    }
+
+    private async Task<IReadOnlyList<DashboardExportAuctionRow>> GetAuctionsInRangeForExportAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken)
+    {
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+
+        var auctions = await _dbContext.Auctions.AsNoTracking()
+            .Where(auction => auction.DeletedAt == null
+                              && auction.Product.DeletedAt == null
+                              && auction.CreatedAt >= rangeStart
+                              && auction.CreatedAt < rangeEndExclusive)
+            .OrderByDescending(auction => auction.CreatedAt)
+            .Select(auction => new
+            {
+                auction.Product.Name,
+                SellerName = auction.Product.Seller.FullName,
+                CategoryName = auction.Product.Category.Name,
+                auction.CurrentPrice,
+                auction.Status,
+                auction.CreatedAt
+            })
+            .ToListAsync(cancellationToken);
+
+        return auctions
+            .Select(auction => new DashboardExportAuctionRow
+            {
+                ProductName = auction.Name,
+                SellerName = auction.SellerName,
+                CategoryName = auction.CategoryName,
+                CurrentPrice = auction.CurrentPrice,
+                StatusLabel = FormatStatusLabel(auction.Status),
+                CreatedAt = auction.CreatedAt
+            })
+            .ToList();
+    }
+
+    private sealed class DashboardExportAuctionRow
+    {
+        public string ProductName { get; init; } = string.Empty;
+
+        public string SellerName { get; init; } = string.Empty;
+
+        public string CategoryName { get; init; } = string.Empty;
+
+        public decimal CurrentPrice { get; init; }
+
+        public string StatusLabel { get; init; } = string.Empty;
+
+        public DateTime CreatedAt { get; init; }
     }
 
     private async Task<int> CountActiveAuctionsAsync(CancellationToken cancellationToken)
