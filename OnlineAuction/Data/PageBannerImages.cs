@@ -2,8 +2,7 @@ namespace OnlineAuction.Data;
 
 public static class PageBannerImages
 {
-    public const string Home =
-        "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=1920&h=900&fit=crop&q=80";
+    public const string Home = "/images/pages/home/banners/pokemon-tcg.png";
 
     public const string Auction =
         "https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=1920&h=600&fit=crop&q=80";
@@ -14,17 +13,13 @@ public static class PageBannerImages
     public const string About =
         "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1600&h=560&fit=crop&q=80";
 
-    public const string AboutMissionCard =
-        "https://images.unsplash.com/photo-1606107557195-0a42c8386a39?w=800&h=1000&fit=crop&q=80";
+    public const string AboutMissionCard = "/images/cards/sports/02-mantle-1952-topps.jpg";
 
-    public const string AboutVault =
-        "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=1200&h=800&fit=crop&q=80";
+    public const string AboutVault = "/images/pages/about/vault.svg";
 
-    public const string AboutCardDetail1 =
-        "https://images.unsplash.com/photo-1613771404721-1f92d799e49f?w=200&h=200&fit=crop&q=80";
+    public const string AboutCardDetail1 = "/images/cards/sports/baseball-mantle.jpg";
 
-    public const string AboutCardDetail2 =
-        "https://images.unsplash.com/photo-1566577739112-5180d5bf7971?w=200&h=200&fit=crop&q=80";
+    public const string AboutCardDetail2 = "/images/cards/sports/01-jordan-1986-fleer.jpg";
 
     public const string Contact =
         "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1600&h=560&fit=crop&q=80";

@@ -48,6 +48,10 @@ public class AuctionDetailViewModel
 
     public IReadOnlyList<AdminBidHistoryItemViewModel> BidHistory { get; set; } = [];
 
+    public IReadOnlyList<FraudAlertViewModel> FraudAlerts { get; set; } = [];
+
+    public bool ShowFlaggedBidsOnly { get; set; }
+
     public int BidHistoryTotalCount { get; set; }
 
     public int BidHistoryPage { get; set; } = 1;

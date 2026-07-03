@@ -51,17 +51,12 @@ Seller **listing fee** is platform revenue charged when admin approves a listing
 
 | Key | Example | Purpose |
 |-----|---------|---------|
-| `ListingFeeType` | `fixed` or `percent` | Calculation mode |
-| `ListingFeeAmount` | `5.00` | Fixed fee (USD) |
-| `ListingFeePercent` | `2.00` | Percent of `StartingPrice` |
-| `UseMockListingFeePayment` | `true` | Dev/MVP: log + mark `paid` without PayPal |
+| `RegistrationDepositPercent` | `10.00` | Bidder registration deposit (% of item value) |
+| `BuyerCheckoutFeePercent` | `2.50` | Buyer fee on won/buy-now checkout |
+| `SellerSuccessFeePercent` | `10.00` | Seller fee when order is paid |
+| `MinimumRegistrationDeposit` | `1.00` | Minimum registration deposit (USD) |
 
-Formula:
-- `fixed` → `ListingFeeAmount`
-- `percent` → `Round(StartingPrice × ListingFeePercent / 100, 2)`
-- Minimum fee: **$1.00**
-
-Admin **Details** page shows estimated fee before Approve. If payment fails, listing stays `pending_review`.
+There is **no listing fee** on admin approval. Seller listings are free to submit; platform revenue comes from the three fees above at registration, checkout, and successful sale.
 
 ## Reject rules
 
@@ -79,12 +74,11 @@ Admin **Details** page shows estimated fee before Approve. If payment fails, lis
 6. Non-admin hits `/Admin/AuctionVerification` → 403
 7. Bid on `pending_review` via direct URL → blocked message
 8. Admin CRUD still works; seeded catalog auctions remain `live`
-9. Admin approves $500 listing with 2% config → listing fee $10, `listing_fees.status = paid`
-10. Admin rejects → no `listing_fees` row
-11. Approve same live listing twice → only one paid fee record
+9. Admin approves listing → no listing fee charged; auction goes live
+10. Admin rejects → seller notified with reason
 
 ## Schema (migration `AddAuctionVerificationFields`)
 
 Columns on `auctions`: `submitted_at`, `verified_at`, `verified_by` (FK → `users`), `reject_reason`, check constraint `chk_auctions_status`.
 
-**Listing fees** (`listing_fees`): `auction_id`, `seller_id`, `fee_amount`, `fee_type`, `status`, `paid_at`, audit columns. Migration `AddListingFees`.
+Orders store `platform_fee` (buyer checkout) and `seller_fee` (seller success) when payment completes.

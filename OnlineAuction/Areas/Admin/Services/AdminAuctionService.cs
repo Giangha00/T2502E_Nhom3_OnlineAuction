@@ -33,11 +33,16 @@ public class AdminAuctionService
 
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IPhotoService _photoService;
+    private readonly ILogger<AdminAuctionService> _logger;
 
-    public AdminAuctionService(AuctionHouseDbContext dbContext, IPhotoService photoService)
+    public AdminAuctionService(
+        AuctionHouseDbContext dbContext,
+        IPhotoService photoService,
+        ILogger<AdminAuctionService> logger)
     {
         _dbContext = dbContext;
         _photoService = photoService;
+        _logger = logger;
     }
 
     public async Task<AuctionListViewModel> GetAuctionsAsync(AuctionFilterViewModel filter)
@@ -118,7 +123,10 @@ public class AdminAuctionService
         };
     }
 
-    public async Task<AuctionDetailViewModel?> GetDetailsAsync(int id, int bidPage = 1)
+    public async Task<AuctionDetailViewModel?> GetDetailsAsync(
+        int id,
+        int bidPage = 1,
+        bool flaggedOnly = false)
     {
         var auction = await _dbContext.Auctions
             .AsNoTracking()
@@ -155,9 +163,19 @@ public class AdminAuctionService
             return null;
         }
 
-        var bidHistoryTotalCount = await _dbContext.Bids
+        auction.ShowFlaggedBidsOnly = flaggedOnly;
+        auction.FraudAlerts = await LoadFraudAlertsAsync(id);
+
+        var bidQuery = _dbContext.Bids
             .AsNoTracking()
-            .CountAsync(bid => bid.AuctionId == id && bid.DeletedAt == null);
+            .Where(bid => bid.AuctionId == id && bid.DeletedAt == null);
+
+        if (flaggedOnly)
+        {
+            bidQuery = bidQuery.Where(bid => bid.IsFlagged);
+        }
+
+        var bidHistoryTotalCount = await bidQuery.CountAsync();
 
         auction.BidHistoryTotalCount = bidHistoryTotalCount;
         auction.BidCount = bidHistoryTotalCount;
@@ -186,10 +204,8 @@ public class AdminAuctionService
         }
 
         var skip = (bidPage - 1) * BidHistoryPageSize;
-        var bids = await _dbContext.Bids
-            .AsNoTracking()
+        var bids = await bidQuery
             .Include(bid => bid.Bidder)
-            .Where(bid => bid.AuctionId == id && bid.DeletedAt == null)
             .OrderByDescending(bid => bid.PlacedAt)
             .Skip(skip)
             .Take(BidHistoryPageSize)
@@ -198,6 +214,39 @@ public class AdminAuctionService
         auction.BidHistory = AdminBidHistoryMapper.Map(bids, skip);
 
         return auction;
+    }
+
+    public async Task<(bool Success, string Message)> ReviewFraudAlertAsync(
+        long alertId,
+        int adminId,
+        string status)
+    {
+        if (status is not (FraudAlertStatuses.Reviewed or FraudAlertStatuses.Dismissed))
+        {
+            return (false, "Invalid fraud alert action.");
+        }
+
+        var alert = await _dbContext.BidFraudAlerts.FirstOrDefaultAsync(item => item.Id == alertId);
+        if (alert is null)
+        {
+            return (false, "Fraud alert not found.");
+        }
+
+        alert.Status = status;
+        alert.ReviewedBy = adminId > 0 ? adminId : null;
+        alert.ReviewedAt = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Admin {AdminId} marked fraud alert {AlertId} as {Status}.",
+            adminId,
+            alertId,
+            status);
+
+        return (true, status == FraudAlertStatuses.Reviewed
+            ? "Fraud alert marked as reviewed."
+            : "Fraud alert dismissed.");
     }
 
     public async Task<AuctionFormViewModel> BuildCreateFormAsync()
@@ -548,6 +597,33 @@ public class AdminAuctionService
         }
 
         return null;
+    }
+
+    private async Task<IReadOnlyList<FraudAlertViewModel>> LoadFraudAlertsAsync(int auctionId)
+    {
+        return await _dbContext.BidFraudAlerts
+            .AsNoTracking()
+            .Include(alert => alert.User)
+            .Include(alert => alert.Reviewer)
+            .Where(alert => alert.AuctionId == auctionId)
+            .OrderByDescending(alert => alert.CreatedAt)
+            .Select(alert => new FraudAlertViewModel
+            {
+                Id = alert.Id,
+                AuctionId = alert.AuctionId,
+                BidId = alert.BidId,
+                UserId = alert.UserId,
+                UserName = alert.User != null ? alert.User.FullName : null,
+                AlertType = alert.AlertType,
+                Severity = alert.Severity,
+                Message = alert.Message,
+                Status = alert.Status,
+                CreatedAt = alert.CreatedAt,
+                ReviewedBy = alert.ReviewedBy,
+                ReviewerName = alert.Reviewer != null ? alert.Reviewer.FullName : null,
+                ReviewedAt = alert.ReviewedAt
+            })
+            .ToListAsync();
     }
 
     private async Task<List<SelectListItem>> BuildCategoryOptionsAsync(int? selectedId = null)

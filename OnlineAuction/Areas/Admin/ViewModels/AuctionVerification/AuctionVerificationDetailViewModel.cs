@@ -67,10 +67,6 @@ public class AuctionVerificationDetailViewModel
     public string SellerName { get; set; } = string.Empty;
 
     public string SellerEmail { get; set; } = string.Empty;
-
-    public decimal EstimatedListingFee { get; set; }
-
-    public string ListingFeePreview { get; set; } = string.Empty;
 }
 
 public class VerificationDocumentViewModel

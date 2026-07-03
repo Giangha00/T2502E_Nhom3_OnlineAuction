@@ -1,6 +1,8 @@
 using System.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
@@ -15,27 +17,34 @@ namespace OnlineAuction.Services;
 
 public class BidService : IBidService
 {
-    private const int AntiSnipeThresholdMinutes = 5;
-    private const int AntiSnipeExtensionMinutes = 5;
     private const int BidHistoryLimit = 20;
 
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IAuctionRegistrationService _registrationService;
+    private readonly IBidFraudDetectionService _fraudDetectionService;
     private readonly IRabbitMqPublisher _publisher;
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly BidFraudDetectionSettings _fraudSettings;
     private readonly ILogger<BidService> _logger;
 
     public BidService(
         AuctionHouseDbContext dbContext,
         IAuctionRegistrationService registrationService,
+        IBidFraudDetectionService fraudDetectionService,
         IRabbitMqPublisher publisher,
         IServiceScopeFactory scopeFactory,
+        IHttpContextAccessor httpContextAccessor,
+        IOptions<BidFraudDetectionSettings> fraudSettings,
         ILogger<BidService> logger)
     {
         _dbContext = dbContext;
         _registrationService = registrationService;
+        _fraudDetectionService = fraudDetectionService;
         _publisher = publisher;
         _scopeFactory = scopeFactory;
+        _httpContextAccessor = httpContextAccessor;
+        _fraudSettings = fraudSettings.Value;
         _logger = logger;
     }
 
@@ -130,7 +139,9 @@ public class BidService : IBidService
             BidType = BidTypes.Manual,
             IsWinning = true,
             PlacedAt = placedAt,
-            CreatedAt = placedAt
+            CreatedAt = placedAt,
+            IpAddress = GetClientIpAddress(),
+            UserAgent = GetUserAgent()
         };
 
         _dbContext.Bids.Add(newBid);
@@ -138,13 +149,30 @@ public class BidService : IBidService
         auction.CurrentPrice = amount;
         auction.UpdatedAt = placedAt;
 
-        if (DateTimeUtilities.RemainingUtc(auction.EndDate).TotalMinutes < AntiSnipeThresholdMinutes)
+        if (DateTimeUtilities.RemainingUtc(auction.EndDate).TotalMinutes < _fraudSettings.AntiSnipeThresholdMinutes)
         {
-            // auction.EndDate = DateTimeUtilities.AsUtc(auction.EndDate).AddMinutes(AntiSnipeExtensionMinutes);
+            auction.EndDate = DateTimeUtilities.AsUtc(auction.EndDate).AddMinutes(_fraudSettings.AntiSnipeExtensionMinutes);
+            _logger.LogInformation(
+                "Anti-snipe extended auction {AuctionId} to {NewEndDate}.",
+                auction.Id,
+                auction.EndDate);
         }
 
         await _dbContext.SaveChangesAsync();
         await transaction.CommitAsync();
+
+        try
+        {
+            await _fraudDetectionService.EvaluateAsync(auctionId, newBid.Id, bidderId, previousPrice);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Fraud detection failed after successful bid {BidId} for auction {AuctionId}.",
+                newBid.Id,
+                auctionId);
+        }
 
         var productName = auction.Product.Name;
         var bidPlacedMessage = new BidPlacedMessage
@@ -304,4 +332,21 @@ public class BidService : IBidService
 
     private static PlaceBidResult Fail(string message, int statusCode = 400) =>
         PlaceBidResult.Fail(message, statusCode);
+
+    private string? GetClientIpAddress()
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
+        return httpContext?.Connection.RemoteIpAddress?.ToString();
+    }
+
+    private string? GetUserAgent()
+    {
+        var userAgent = _httpContextAccessor.HttpContext?.Request.Headers.UserAgent.ToString();
+        if (string.IsNullOrWhiteSpace(userAgent))
+        {
+            return null;
+        }
+
+        return userAgent.Length <= 512 ? userAgent : userAgent[..512];
+    }
 }

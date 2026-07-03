@@ -104,11 +104,6 @@
     }
   }
 
-  function getSelectedRadio(name) {
-    var checked = form.querySelector('input[name="' + name + '"]:checked');
-    return checked ? checked.value : '';
-  }
-
   function composeGradeLabel(authenticator, gradeValue) {
     if (!authenticator || authenticator === 'Ungraded') return 'Ungraded';
     if (!gradeValue) return authenticator;
@@ -149,11 +144,9 @@
       cardNumber: $('cardNumber')?.value.trim() || '',
       grade: $('grade')?.value || '',
       certificateNumber: $('certificateNumber')?.value.trim() || '',
-      auctionType: getSelectedRadio('AuctionType'),
       startingPrice: $('startingPrice')?.value || '',
       bidStep: $('bidStep')?.value || '',
       buyNowPrice: $('buyNowPrice')?.value || '',
-      auctionEventName: $('auctionEventName')?.value.trim() || '',
       registrationStartDate: $('registrationStartDate')?.value || '',
       registrationEndDate: $('registrationEndDate')?.value || '',
       startDate: $('startDate')?.value || '',
@@ -512,11 +505,6 @@
       }
     }
 
-    if (!data.auctionType) {
-      showError('AuctionType', t('errorAuctionTypeRequired', 'Please select an auction type'));
-      valid = false;
-    }
-
     if (!data.registrationStartDate) {
       showError('registrationStartDate', t('errorRegistrationStartRequired', 'Registration start is required'));
       markInvalid($('registrationStartDate'));
@@ -610,16 +598,10 @@
       if ($('startingPrice') && data.startingPrice) $('startingPrice').value = data.startingPrice;
       if ($('bidStep') && data.bidStep) $('bidStep').value = data.bidStep;
       if ($('buyNowPrice') && data.buyNowPrice) $('buyNowPrice').value = data.buyNowPrice;
-      if ($('auctionEventName') && data.auctionEventName) $('auctionEventName').value = data.auctionEventName;
       if ($('registrationStartDate') && data.registrationStartDate) $('registrationStartDate').value = data.registrationStartDate;
       if ($('registrationEndDate') && data.registrationEndDate) $('registrationEndDate').value = data.registrationEndDate;
       if ($('startDate') && data.startDate) $('startDate').value = data.startDate;
       if ($('endDate') && data.endDate) $('endDate').value = data.endDate;
-
-      if (data.auctionType) {
-        var typeRadio = form.querySelector('input[name="AuctionType"][value="' + data.auctionType + '"]');
-        if (typeRadio) typeRadio.checked = true;
-      }
 
       toggleGradeValueField();
       syncGradeHidden();
@@ -634,6 +616,46 @@
     } catch (e) {
       console.warn('Could not load draft', e);
     }
+  }
+
+  function requestConfirm(options) {
+    if (typeof window.showConfirmModal === 'function') {
+      return window.showConfirmModal(options);
+    }
+
+    var message = options.message || '';
+    if (options.note) {
+      message += '\n\n' + options.note;
+    }
+
+    return Promise.resolve(window.confirm(message));
+  }
+
+  function submitAuctionForm(data, formData) {
+    return fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+      .then(function (response) {
+        return response.json().then(function (payload) {
+          if (!response.ok || payload.success === false) {
+            throw new Error(payload.message || t('errorCreateFailed', 'Could not create auction.'));
+          }
+          return payload;
+        });
+      })
+      .then(function (payload) {
+        showSuccess(data.productName);
+        if (payload.redirectUrl) {
+          window.location.href = payload.redirectUrl;
+        }
+      })
+      .catch(function (error) {
+        showError('images', error.message);
+        showTopToast('error', error.message);
+        showSubmitStatus('error', error.message);
+      });
   }
 
   function showSuccess(name) {
@@ -699,7 +721,7 @@
     var fields = [
       'productName', 'shortDescription', 'subtitle', 'category',
       'year', 'setName', 'language', 'cardNumber', 'authenticator', 'gradeValue', 'grade', 'certificateNumber',
-      'startingPrice', 'bidStep', 'buyNowPrice', 'auctionEventName',
+      'startingPrice', 'bidStep', 'buyNowPrice',
       'registrationStartDate', 'registrationEndDate', 'startDate', 'endDate'
     ];
 
@@ -725,10 +747,6 @@
         updatePreview();
       });
     }
-
-    form.querySelectorAll('input[name="AuctionType"]').forEach(function (el) {
-      el.addEventListener('change', updatePreview);
-    });
 
     var authenticatorField = $('authenticator');
     if (authenticatorField) {
@@ -781,30 +799,21 @@
         formData.append('DocumentNames', doc.displayName || 'PSA Certificate');
       });
 
-      fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      })
-        .then(function (response) {
-          return response.json().then(function (payload) {
-            if (!response.ok || payload.success === false) {
-              throw new Error(payload.message || t('errorCreateFailed', 'Could not create auction.'));
-            }
-            return payload;
-          });
-        })
-        .then(function (payload) {
-          showSuccess(data.productName);
-          if (payload.redirectUrl) {
-            window.location.href = payload.redirectUrl;
-          }
-        })
-        .catch(function (error) {
-          showError('images', error.message);
-          showTopToast('error', error.message);
-          showSubmitStatus('error', error.message);
-        });
+      var productName = data.productName || t('productNameDefault', 'Product name');
+
+      requestConfirm({
+        title: t('confirmCreateTitle', 'Submit auction listing?'),
+        message: t('confirmCreateMessage', 'You are about to submit "{0}" for admin review before it goes live.'),
+        messageArgs: [productName],
+        note: t('confirmCreateNote', 'The listing will be pending review.'),
+        confirmText: t('confirmCreateConfirm', 'Create auction')
+      }).then(function (confirmed) {
+        if (!confirmed) {
+          return;
+        }
+
+        submitAuctionForm(data, formData);
+      });
     });
   }
 

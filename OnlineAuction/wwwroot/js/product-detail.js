@@ -46,6 +46,18 @@
     return '$' + amount.toLocaleString(undefined, { maximumFractionDigits: 0 });
   }
 
+  function formatDepositAmount(value) {
+    var amount = Number(value);
+    if (Number.isNaN(amount)) {
+      return '$0.00';
+    }
+
+    return '$' + amount.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
   function formatBidTime(value) {
     var date = new Date(value);
     if (Number.isNaN(date.getTime())) {
@@ -304,6 +316,98 @@
     }
   }
 
+  function requestConfirm(options) {
+    if (typeof window.showConfirmModal === 'function') {
+      return window.showConfirmModal(options);
+    }
+
+    var message = options.message || '';
+    if (options.note) {
+      message += '\n\n' + options.note;
+    }
+
+    return Promise.resolve(window.confirm(message));
+  }
+
+  function submitAuctionRegistration(auctionId) {
+    registerAuctionBtn.disabled = true;
+    registerAuctionBtn.textContent = i18n.registering || 'Creating deposit…';
+
+    postForm('/Auction/InitiateDeposit', { auctionId: auctionId })
+      .then(function (response) {
+        if (response.status === 401) {
+          openAuthModal();
+          throw new Error(i18n.registrationFailed || 'Please sign in to register.');
+        }
+
+        return response.json().then(function (data) {
+          if (!response.ok || !data.success) {
+            throw new Error(data.message || i18n.registrationFailed || 'Unable to create deposit.');
+          }
+
+          return data;
+        });
+      })
+      .then(function (data) {
+        if (!data.approvalUrl) {
+          throw new Error(i18n.registrationFailed || 'Unable to create deposit.');
+        }
+
+        showFeedback(
+          registrationFeedback,
+          data.message || i18n.registrationSuccess || 'Redirecting to PayPal…',
+          true
+        );
+
+        window.location.href = data.approvalUrl;
+      })
+      .catch(function (error) {
+        showFeedback(registrationFeedback, error.message, false);
+      })
+      .finally(function () {
+        registerAuctionBtn.disabled = false;
+        registerAuctionBtn.textContent = i18n.registerForAuction || 'Register for auction';
+      });
+  }
+
+  function submitCancelRegistration(auctionId) {
+    cancelRegistrationBtn.disabled = true;
+
+    postForm('/Auction/CancelRegistration', { auctionId: auctionId })
+      .then(function (response) {
+        return response.json().then(function (data) {
+          if (!response.ok || !data.success) {
+            throw new Error(data.message || i18n.cancelRegistrationFailed || 'Unable to cancel registration.');
+          }
+
+          return data;
+        });
+      })
+      .then(function (data) {
+        var message = data.message;
+        if (data.refundedAmount != null && data.refundedAmount > 0) {
+          var refundTemplate = i18n.registrationCancelledWithRefund ||
+            'Registration cancelled. Your deposit of {0} has been refunded.';
+          message = refundTemplate.replace('{0}', formatCurrency(data.refundedAmount));
+        } else {
+          message = data.message || i18n.registrationCancelled || 'Registration cancelled.';
+        }
+
+        showFeedback(registrationFeedback, message, true);
+        showPageToast(message, true);
+        window.setTimeout(function () {
+          window.location.reload();
+        }, 2000);
+      })
+      .catch(function (error) {
+        showFeedback(registrationFeedback, error.message, false);
+        showPageToast(error.message, false);
+      })
+      .finally(function () {
+        cancelRegistrationBtn.disabled = false;
+      });
+  }
+
   function disableBidding(message) {
     canBid = false;
     canPlaceBid = false;
@@ -532,76 +636,33 @@
 
   if (registerAuctionBtn && bidPanel) {
     registerAuctionBtn.addEventListener('click', function () {
-      // Kiểm tra user đã đăng nhập chưa.
-      // Nếu chưa đăng nhập thì mở modal login/register như logic cũ của project.
       var isLoggedIn = bidPanel.getAttribute('data-is-logged-in') === 'true';
       if (!isLoggedIn) {
         openAuthModal();
         return;
       }
 
-      // Lấy auctionId từ data-auction-id trong _ProductBidPanel.cshtml
       var auctionId = bidPanel.getAttribute('data-auction-id');
       if (!auctionId) {
-        showFeedback(registrationFeedback, 'Không tìm thấy mã phiên đấu giá.', false);
+        showFeedback(registrationFeedback, i18n.registrationFailed || 'Unable to register.', false);
         return;
       }
 
-      // Disable nút để tránh user bấm nhiều lần tạo nhiều PayPal order
-      registerAuctionBtn.disabled = true;
+      var depositAmount = formatDepositAmount(config.registrationDepositAmount || 0);
 
-      // Đổi text để user biết hệ thống đang tạo yêu cầu đặt cọc
-      registerAuctionBtn.textContent = i18n.registering || 'Creating deposit…';
+      requestConfirm({
+        title: i18n.confirmRegisterTitle || 'Register for this auction?',
+        message: i18n.confirmRegisterMessage || 'You will pay a {0} deposit via PayPal.',
+        messageArgs: [depositAmount],
+        note: i18n.confirmRegisterNote || '',
+        confirmText: i18n.registerForAuction || 'Register for auction'
+      }).then(function (confirmed) {
+        if (!confirmed) {
+          return;
+        }
 
-      // Gọi API mới:
-      // Không gọi /Auction/Register nữa vì Register cũ approve trực tiếp.
-      // Luồng mới phải là:
-      // InitiateDeposit -> tạo registration pending -> tạo deposit pending -> tạo PayPal order.
-      postForm('/Auction/InitiateDeposit', { auctionId: auctionId })
-          .then(function (response) {
-            // Nếu hết session hoặc chưa login thì mở modal đăng nhập
-            if (response.status === 401) {
-              openAuthModal();
-              throw new Error(i18n.registrationFailed || 'Please sign in to register.');
-            }
-
-            return response.json().then(function (data) {
-              // Nếu server trả lỗi nghiệp vụ:
-              // seller tự đăng ký, auction ended, productValue <= 0, PayPal lỗi...
-              if (!response.ok || !data.success) {
-                throw new Error(data.message || i18n.registrationFailed || 'Unable to create deposit.');
-              }
-
-              return data;
-            });
-          })
-          .then(function (data) {
-            // Server phải trả về approvalUrl từ PayPal.
-            // Đây là URL để redirect user sang PayPal Sandbox thanh toán tiền cọc.
-            if (!data.approvalUrl) {
-              throw new Error('Không nhận được link thanh toán PayPal.');
-            }
-
-            // Hiển thị thông báo trước khi chuyển trang
-            showFeedback(
-                registrationFeedback,
-                data.message || 'Đang chuyển sang PayPal để thanh toán tiền cọc...',
-                true
-            );
-
-            // Redirect user sang PayPal Sandbox
-            window.location.href = data.approvalUrl;
-          })
-          .catch(function (error) {
-            // Nếu lỗi thì hiện message ra giao diện
-            showFeedback(registrationFeedback, error.message, false);
-          })
-          .finally(function () {
-            // Nếu redirect thành công thì dòng này gần như không thấy.
-            // Nếu lỗi thì enable lại nút để user thử lại.
-            registerAuctionBtn.disabled = false;
-            registerAuctionBtn.textContent = i18n.registerForAuction || 'Register for auction';
-          });
+        submitAuctionRegistration(auctionId);
+      });
     });
   }
 
@@ -612,41 +673,19 @@
         return;
       }
 
-      cancelRegistrationBtn.disabled = true;
+      requestConfirm({
+        title: i18n.confirmCancelRegistrationTitle || 'Cancel auction registration?',
+        message: i18n.confirmCancelRegistrationMessage || 'Are you sure you want to cancel your registration?',
+        note: i18n.confirmCancelRegistrationNote || '',
+        confirmText: i18n.confirmCancelRegistrationConfirm || 'Cancel registration',
+        variant: 'danger'
+      }).then(function (confirmed) {
+        if (!confirmed) {
+          return;
+        }
 
-      postForm('/Auction/CancelRegistration', { auctionId: auctionId })
-        .then(function (response) {
-          return response.json().then(function (data) {
-            if (!response.ok || !data.success) {
-              throw new Error(data.message || i18n.cancelRegistrationFailed || 'Unable to cancel registration.');
-            }
-
-            return data;
-          });
-        })
-        .then(function (data) {
-          var message = data.message;
-          if (data.refundedAmount != null && data.refundedAmount > 0) {
-            var refundTemplate = i18n.registrationCancelledWithRefund ||
-              'Registration cancelled. Your deposit of {0} has been refunded.';
-            message = refundTemplate.replace('{0}', formatCurrency(data.refundedAmount));
-          } else {
-            message = data.message || i18n.registrationCancelled || 'Registration cancelled.';
-          }
-
-          showFeedback(registrationFeedback, message, true);
-          showPageToast(message, true);
-          window.setTimeout(function () {
-            window.location.reload();
-          }, 2000);
-        })
-        .catch(function (error) {
-          showFeedback(registrationFeedback, error.message, false);
-          showPageToast(error.message, false);
-        })
-        .finally(function () {
-          cancelRegistrationBtn.disabled = false;
-        });
+        submitCancelRegistration(auctionId);
+      });
     });
   }
 

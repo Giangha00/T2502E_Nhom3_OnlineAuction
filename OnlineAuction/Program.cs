@@ -239,6 +239,8 @@ builder.Services.Configure<PasswordResetOtpSettings>(
     builder.Configuration.GetSection(PasswordResetOtpSettings.SectionName));
 builder.Services.Configure<RabbitMqSettings>(
     builder.Configuration.GetSection(RabbitMqSettings.SectionName));
+builder.Services.Configure<BidFraudDetectionSettings>(
+    builder.Configuration.GetSection(BidFraudDetectionSettings.SectionName));
 builder.Services.Configure<PlatformFeeSettings>(
     builder.Configuration.GetSection(PlatformFeeSettings.SectionName));
 
@@ -252,6 +254,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuctionService, AuctionService>();
 builder.Services.AddScoped<IBidService, BidService>();
+builder.Services.AddScoped<IBidRateLimitService, BidRateLimitService>();
+builder.Services.AddScoped<IBidFraudDetectionService, BidFraudDetectionService>();
+builder.Services.AddScoped<IBidFraudAlertWriter, BidFraudAlertWriter>();
 builder.Services.AddScoped<IAuctionRegistrationService, AuctionRegistrationService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderCreationService, OrderCreationService>();
@@ -264,6 +269,7 @@ builder.Services.AddScoped<ISellerAuctionService, SellerAuctionService>();
 builder.Services.AddScoped<IWatchlistService, WatchlistService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<IProductDocumentDownloadService, ProductDocumentDownloadService>();
+builder.Services.AddScoped<AdminAuctionService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<IAdminAuctionVerificationService, AdminAuctionVerificationService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
@@ -272,7 +278,6 @@ builder.Services.AddScoped<IAdminComplaintService, AdminComplaintService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
 builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
-builder.Services.AddScoped<IListingFeeService, ListingFeeService>();
 builder.Services.AddScoped<IRegistrationDepositRefundService, RegistrationDepositRefundService>();
 builder.Services.AddScoped<IPasswordResetOtpService, PasswordResetOtpService>();
 builder.Services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();

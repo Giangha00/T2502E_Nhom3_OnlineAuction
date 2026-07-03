@@ -21,7 +21,6 @@
         ["errorBidStepRequired"] = Localizer["Sell_Error_BidStepRequired"].Value,
         ["errorBuyNowPriceInvalid"] = Localizer["Sell_Error_BuyNowPriceInvalid"].Value,
         ["errorBuyNowPriceGreater"] = Localizer["Sell_Error_BuyNowPriceGreater"].Value,
-        ["errorAuctionTypeRequired"] = Localizer["Sell_Error_AuctionTypeRequired"].Value,
         ["errorStartDateRequired"] = Localizer["Sell_Error_StartDateRequired"].Value,
         ["errorStartDatePast"] = Localizer["Sell_Error_StartDatePast"].Value,
         ["errorEndDateRequired"] = Localizer["Sell_Error_EndDateRequired"].Value,
@@ -42,6 +41,10 @@
         ["errorYearRequired"] = Localizer["Sell_Error_YearRequired"].Value,
         ["errorAuthenticatorRequired"] = Localizer["Sell_Error_AuthenticatorRequired"].Value,
         ["errorGradeRequired"] = Localizer["Sell_Error_GradeRequired"].Value,
+        ["confirmCreateTitle"] = Localizer["ConfirmModal_CreateAuction_Title"].Value,
+        ["confirmCreateMessage"] = Localizer["ConfirmModal_CreateAuction_Message"].Value,
+        ["confirmCreateNote"] = Localizer["ConfirmModal_CreateAuction_Note"].Value,
+        ["confirmCreateConfirm"] = Localizer["Sell_CreateAuction"].Value
     };
 }
 
@@ -107,5 +110,6 @@
       i18n: @Html.Raw(JsonSerializer.Serialize(sellI18n))
     };
   </script>
+  <script src="~/js/sell-numeric-input.js" asp-append-version="true"></script>
   <script src="~/js/create-auction.js" asp-append-version="true"></script>
 }
