@@ -1,6 +1,5 @@
 @model AdminDashboardViewModel
 @using System.Text.Json
-@using System.Text.Json.Serialization
 @{
     ViewData["Title"] = "Dashboard";
     ViewData["AdminPage"] = "dashboard";
@@ -10,49 +9,49 @@
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    var chartDataJson = JsonSerializer.Serialize(new
-    {
-        bids = Model.BidsChart,
-        statusBreakdown = Model.AuctionStatusBreakdown,
-        revenueLine = Model.RevenueSection.LineChart,
-        revenueLabels = new
+    var chartDataJson = Model.HasValidFilter
+        ? JsonSerializer.Serialize(new
         {
-            gmv = Localizer["Admin_Dashboard_Kpi_Gmv"].Value,
-            platformRevenue = Localizer["Admin_Dashboard_Kpi_PlatformRevenue"].Value
-        },
-        revenueDonut = new
-        {
-            registrationDeposits = Model.RevenueSection.PlatformBreakdown.RegistrationDeposits,
-            registrationDepositsPercentage = Model.RevenueSection.PlatformBreakdown.RegistrationDepositsPercentage,
-            buyerCheckoutFees = Model.RevenueSection.PlatformBreakdown.BuyerCheckoutFees,
-            buyerCheckoutFeesPercentage = Model.RevenueSection.PlatformBreakdown.BuyerCheckoutFeesPercentage,
-            sellerSuccessFees = Model.RevenueSection.PlatformBreakdown.SellerSuccessFees,
-            sellerSuccessFeesPercentage = Model.RevenueSection.PlatformBreakdown.SellerSuccessFeesPercentage,
-            registrationLabel = Localizer["Admin_Dashboard_Revenue_Donut_RegistrationDeposits"].Value,
-            buyerCheckoutLabel = Localizer["Admin_Dashboard_Revenue_Donut_BuyerCheckoutFees"].Value,
-            sellerSuccessLabel = Localizer["Admin_Dashboard_Revenue_Donut_SellerSuccessFees"].Value
-        },
-        registration = new
-        {
-            day = Model.UserSection.RegistrationByDay,
-            week = Model.UserSection.RegistrationByWeek,
-            month = Model.UserSection.RegistrationByMonth
-        },
-        categoryBreakdown = Model.AuctionSection.CategoryBreakdown,
-        filter = new
-        {
-            dateFrom = Model.Filter.DateFrom.ToString("yyyy-MM-dd"),
-            dateTo = Model.Filter.DateTo.ToString("yyyy-MM-dd"),
-            status = Model.Filter.StatusFilter,
-            categoryId = Model.Filter.CategoryIdFilter,
-            registrationGranularity = Model.Filter.RegistrationGranularity,
-            section = Model.Filter.SectionFilter,
-            revenueType = Model.Filter.RevenueTypeFilter
-        }
-    }, jsonOptions);
+            bids = Model.BidsChart,
+            statusBreakdown = Model.AuctionStatusBreakdown,
+            revenueLine = Model.RevenueSection.LineChart,
+            revenueLabels = new
+            {
+                gmv = Localizer["Admin_Dashboard_Kpi_Gmv"].Value,
+                platformRevenue = Localizer["Admin_Dashboard_Kpi_PlatformRevenue"].Value
+            },
+            revenueDonut = new
+            {
+                registrationDeposits = Model.RevenueSection.PlatformBreakdown.RegistrationDeposits,
+                registrationDepositsPercentage = Model.RevenueSection.PlatformBreakdown.RegistrationDepositsPercentage,
+                buyerCheckoutFees = Model.RevenueSection.PlatformBreakdown.BuyerCheckoutFees,
+                buyerCheckoutFeesPercentage = Model.RevenueSection.PlatformBreakdown.BuyerCheckoutFeesPercentage,
+                sellerSuccessFees = Model.RevenueSection.PlatformBreakdown.SellerSuccessFees,
+                sellerSuccessFeesPercentage = Model.RevenueSection.PlatformBreakdown.SellerSuccessFeesPercentage,
+                registrationLabel = Localizer["Admin_Dashboard_Revenue_Donut_RegistrationDeposits"].Value,
+                buyerCheckoutLabel = Localizer["Admin_Dashboard_Revenue_Donut_BuyerCheckoutFees"].Value,
+                sellerSuccessLabel = Localizer["Admin_Dashboard_Revenue_Donut_SellerSuccessFees"].Value
+            },
+            registration = new
+            {
+                day = Model.UserSection.RegistrationByDay,
+                week = Model.UserSection.RegistrationByWeek,
+                month = Model.UserSection.RegistrationByMonth
+            },
+            categoryBreakdown = Model.AuctionSection.CategoryBreakdown,
+            filter = new
+            {
+                dateFrom = Model.Filter.DateFrom.ToString("yyyy-MM-dd"),
+                dateTo = Model.Filter.DateTo.ToString("yyyy-MM-dd"),
+                status = Model.Filter.StatusFilter,
+                categoryId = Model.Filter.CategoryIdFilter,
+                registrationGranularity = Model.Filter.RegistrationGranularity,
+                section = Model.Filter.SectionFilter,
+                revenueType = Model.Filter.RevenueTypeFilter
+            }
+        }, jsonOptions)
+        : "{}";
 }
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -64,6 +63,8 @@
 
     @await Html.PartialAsync("_DashboardFilterBar", Model)
 
+    @if (Model.HasValidFilter)
+    {
     <div class="mb-2">
         <h2 class="text-title-sm font-bold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_Section1_Title"]</h2>
     </div>
@@ -235,7 +236,8 @@
                                     <a asp-area="Admin"
                                        asp-controller="Dashboard"
                                        asp-action="Index"
-                                       asp-route-dateRange="@Model.Filter.DateRange"
+                                       asp-route-dateFrom="@Model.Filter.DateFrom.ToString("yyyy-MM-dd")"
+                                       asp-route-dateTo="@Model.Filter.DateTo.ToString("yyyy-MM-dd")"
                                        asp-route-categoryId="@auction.CategoryId"
                                        class="text-brand-600 hover:underline">
                                         @auction.CategoryName
@@ -246,7 +248,8 @@
                                     <a asp-area="Admin"
                                        asp-controller="Dashboard"
                                        asp-action="Index"
-                                       asp-route-dateRange="@Model.Filter.DateRange"
+                                       asp-route-dateFrom="@Model.Filter.DateFrom.ToString("yyyy-MM-dd")"
+                                       asp-route-dateTo="@Model.Filter.DateTo.ToString("yyyy-MM-dd")"
                                        asp-route-status="@auction.Status"
                                        class="inline-flex rounded-full px-2.5 py-0.5 text-theme-xs font-medium @auction.StatusBadgeClass">
                                         @auction.StatusLabel
@@ -260,20 +263,19 @@
             </table>
         </div>
     </div>
+    }
 </div>
 
+@if (Model.HasValidFilter)
+{
 <script type="application/json" id="dashboard-chart-data">@Html.Raw(chartDataJson)</script>
+}
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <script src="~/admin/js/admin-list-filter.js" asp-append-version="true"></script>
+    <script src="~/admin/js/dashboard-filter.js" asp-append-version="true"></script>
+    @if (Model.HasValidFilter)
+    {
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.54.1/dist/apexcharts.min.js"></script>
     <script src="~/admin/js/dashboard.js" asp-append-version="true"></script>
-    <script>
-        AdminListFilter.setupDateRangePicker('#dashboardDateRangePicker', function () {
-            document.getElementById('dashboardFilterForm')?.submit();
-        });
-    </script>
+    }
 }

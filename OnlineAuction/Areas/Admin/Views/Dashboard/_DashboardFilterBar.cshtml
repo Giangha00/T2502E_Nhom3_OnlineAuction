@@ -13,32 +13,77 @@
     <input type="hidden" name="section" value="@Model.Filter.SectionFilter" />
     <input type="hidden" name="revenueType" value="@Model.Filter.RevenueTypeFilter" />
 
-    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_Filter_Title"]</h3>
-            <p class="text-theme-sm text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Filter_Description"]</p>
+    <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_Filter_Title"]</h3>
+                <p class="text-theme-sm text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Filter_Description"]</p>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+                <button type="button"
+                        data-dashboard-preset="7d"
+                        class="dashboard-date-preset rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5">
+                    @Localizer["Admin_Dashboard_Filter_Preset_7Days"]
+                </button>
+                <button type="button"
+                        data-dashboard-preset="30d"
+                        class="dashboard-date-preset rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5">
+                    @Localizer["Admin_Dashboard_Filter_Preset_30Days"]
+                </button>
+                <button type="button"
+                        data-dashboard-preset="thisMonth"
+                        class="dashboard-date-preset rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5">
+                    @Localizer["Admin_Dashboard_Filter_Preset_ThisMonth"]
+                </button>
+                <button type="button"
+                        data-dashboard-preset="lastMonth"
+                        class="dashboard-date-preset rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5">
+                    @Localizer["Admin_Dashboard_Filter_Preset_LastMonth"]
+                </button>
+            </div>
         </div>
 
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
-            <div class="w-[220px]">
-                <label for="dashboardDateRangePicker" class="mb-1 block text-theme-xs font-medium uppercase text-gray-500">Date range</label>
-                <input id="dashboardDateRangePicker"
-                       name="dateRange"
-                       value="@Model.Filter.DateRange"
-                       placeholder="MM/DD/YYYY - MM/DD/YYYY"
-                       autocomplete="off"
+        @if (!string.IsNullOrWhiteSpace(Model.FilterValidationErrorKey))
+        {
+            <div class="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-theme-sm text-error-700 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400"
+                 role="alert">
+                @Localizer[Model.FilterValidationErrorKey]
+            </div>
+        }
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+            <div class="w-full sm:w-auto sm:min-w-[160px]">
+                <label for="dashboardDateFrom" class="mb-1 block text-theme-xs font-medium uppercase text-gray-500">@Localizer["Admin_Dashboard_Filter_From"]</label>
+                <input id="dashboardDateFrom"
+                       name="dateFrom"
+                       type="date"
+                       value="@Model.Filter.DateFrom.ToString("yyyy-MM-dd")"
+                       class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            </div>
+
+            <div class="w-full sm:w-auto sm:min-w-[160px]">
+                <label for="dashboardDateTo" class="mb-1 block text-theme-xs font-medium uppercase text-gray-500">@Localizer["Admin_Dashboard_Filter_To"]</label>
+                <input id="dashboardDateTo"
+                       name="dateTo"
+                       type="date"
+                       value="@Model.Filter.DateTo.ToString("yyyy-MM-dd")"
                        class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
             </div>
 
             <button type="submit"
-                    class="h-10 rounded-lg bg-brand-500 px-4 text-theme-sm font-medium text-white hover:bg-brand-600">
-                @Localizer["Admin_Dashboard_Filter_Apply"]
+                    id="dashboardFilterApply"
+                    class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 text-theme-sm font-medium text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70">
+                <span id="dashboardFilterApplyLabel">@Localizer["Admin_Dashboard_Filter_Apply"]</span>
+                <span id="dashboardFilterApplySpinner" class="hidden h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
             </button>
 
-            <a asp-area="Admin"
+            <a id="dashboardExportLink"
+               asp-area="Admin"
                asp-controller="Dashboard"
                asp-action="Export"
-               asp-route-dateRange="@Model.Filter.DateRange"
+               asp-route-dateFrom="@Model.Filter.DateFrom.ToString("yyyy-MM-dd")"
+               asp-route-dateTo="@Model.Filter.DateTo.ToString("yyyy-MM-dd")"
                class="inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                 @Localizer["Admin_Dashboard_Filter_Export"]
             </a>
