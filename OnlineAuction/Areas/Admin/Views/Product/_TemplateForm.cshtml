@@ -5,13 +5,13 @@
 @if (Model.HasInstances)
 {
     <div class="mb-4 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-theme-sm text-warning-700">
-        Thay doi chi ap dung cho thong tin mau; cert va gia cua tung san pham seller van duoc giu rieng.
+        @Localizer["AdminProduct.TemplateInstancesWarning"]
     </div>
 }
 
 <div class="space-y-8">
     <section>
-        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Thong tin mau</h3>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.TemplateInformation"]</h3>
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div class="md:col-span-2">
                 <label asp-for="Name" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
@@ -22,7 +22,7 @@
             <div>
                 <label asp-for="CategoryId" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
                 <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                    <option value="">Select category</option>
+                    <option value="">@Localizer["AdminProduct.SelectCategory"]</option>
                 </select>
                 <span asp-validation-for="CategoryId" class="text-theme-xs text-error-600"></span>
             </div>
@@ -58,7 +58,7 @@
     </section>
 
     <section>
-        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Description</h3>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.Description"]</h3>
         <div class="grid grid-cols-1 gap-5">
             <div>
                 <label asp-for="ShortDescription" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
@@ -73,15 +73,15 @@
     </section>
 
     <section>
-        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Media</h3>
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.Media"]</h3>
         @if (!string.IsNullOrWhiteSpace(Model.PrimaryImageUrl))
         {
             <div class="mb-3">
-                <img src="@Model.PrimaryImageUrl" alt="Anh mau san pham" class="h-24 w-24 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
+                <img src="@Model.PrimaryImageUrl" alt="@Localizer["AdminProduct.TemplateImage"]" class="h-24 w-24 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
             </div>
         }
         <input asp-for="PrimaryImageFile" type="file" accept=".jpg,.jpeg,.png" class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
-        <p class="mt-1 text-theme-xs text-gray-500">JPG or PNG. Max 2MB.</p>
+        <p class="mt-1 text-theme-xs text-gray-500">@Localizer["AdminProduct.TemplateImageHelp"]</p>
     </section>
 </div>
 

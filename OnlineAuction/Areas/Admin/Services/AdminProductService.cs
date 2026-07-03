@@ -182,7 +182,7 @@ public class AdminProductService : IAdminProductService
 
         if (string.IsNullOrWhiteSpace(imageUrl))
         {
-            return (false, "Primary image is required for mau san pham.");
+            return (false, "Vui lòng tải ảnh chính cho mẫu sản phẩm.");
         }
 
         var template = new ProductTemplate
@@ -204,14 +204,14 @@ public class AdminProductService : IAdminProductService
         _dbContext.ProductTemplates.Add(template);
         await _dbContext.SaveChangesAsync();
 
-        return (true, "Mau san pham created successfully.");
+        return (true, "Đã tạo mẫu sản phẩm thành công.");
     }
 
     public async Task<(bool Success, string Message)> UpdateTemplateAsync(ProductTemplateFormViewModel model)
     {
         if (!model.Id.HasValue)
         {
-            return (false, "Mau san pham id is required.");
+            return (false, "Thiếu mã mẫu sản phẩm.");
         }
 
         var template = await _dbContext.ProductTemplates
@@ -219,7 +219,7 @@ public class AdminProductService : IAdminProductService
 
         if (template is null)
         {
-            return (false, "Mau san pham not found.");
+            return (false, "Không tìm thấy mẫu sản phẩm.");
         }
 
         var validationError = await ValidateTemplateAsync(model);
@@ -257,7 +257,7 @@ public class AdminProductService : IAdminProductService
 
         await _dbContext.SaveChangesAsync();
 
-        return (true, "Mau san pham updated successfully.");
+        return (true, "Đã cập nhật mẫu sản phẩm thành công.");
     }
 
     public async Task<(bool Success, string Message)> DeleteTemplateAsync(int id, int adminUserId)
@@ -268,12 +268,12 @@ public class AdminProductService : IAdminProductService
 
         if (template is null)
         {
-            return (false, "Mau san pham not found.");
+            return (false, "Không tìm thấy mẫu sản phẩm.");
         }
 
         if (template.Products.Any(product => product.DeletedAt == null))
         {
-            return (false, "Cannot delete a mau san pham that still has seller products.");
+            return (false, "Không thể xóa mẫu sản phẩm đang có sản phẩm của người bán.");
         }
 
         var now = DateTime.UtcNow;
@@ -283,7 +283,7 @@ public class AdminProductService : IAdminProductService
 
         await _dbContext.SaveChangesAsync();
 
-        return (true, "Mau san pham deleted successfully.");
+        return (true, "Đã xóa mẫu sản phẩm thành công.");
     }
 
     public async Task<ProductListViewModel> GetProductsAsync(ProductFilterViewModel filter)
@@ -671,12 +671,11 @@ public class AdminProductService : IAdminProductService
 
         var galleryFiles = model.GalleryImageFiles
             .Where(file => file is { Length: > 0 })
-            .Take(MaxGalleryImages)
             .ToList();
 
-        if (1 + galleryFiles.Count > 5)
+        if (galleryFiles.Count > MaxGalleryImages)
         {
-            return (false, "You can upload up to 5 images (1 primary + 4 gallery).");
+            return (false, $"Chỉ được tải tối đa {MaxGalleryImages} ảnh thư viện cho mỗi sản phẩm.");
         }
 
         var documentValidation = ValidateDocumentFiles(model.DocumentFiles);
@@ -779,7 +778,7 @@ public class AdminProductService : IAdminProductService
             await _dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return (true, "Product created successfully.");
+            return (true, "Đã tạo sản phẩm thành công.");
         }
         catch
         {
@@ -792,7 +791,7 @@ public class AdminProductService : IAdminProductService
     {
         if (!model.Id.HasValue)
         {
-            return (false, "Product id is required.");
+            return (false, "Thiếu mã sản phẩm.");
         }
 
         var product = await _dbContext.Products
@@ -803,7 +802,7 @@ public class AdminProductService : IAdminProductService
 
         if (product is null)
         {
-            return (false, "Product not found.");
+            return (false, "Không tìm thấy sản phẩm.");
         }
 
         var isSellerLocked = product.Auctions.Any(auction =>
@@ -811,12 +810,12 @@ public class AdminProductService : IAdminProductService
 
         if (isSellerLocked && model.SellerId != product.SellerId)
         {
-            return (false, "Cannot change seller while the product has a live or ending soon auction.");
+            return (false, "Không thể đổi người bán khi sản phẩm đang có phiên đấu giá đang diễn ra hoặc sắp kết thúc.");
         }
 
         if (isSellerLocked && model.ProductTemplateId != product.ProductTemplateId)
         {
-            return (false, "Cannot change template while the product has a live or ending soon auction.");
+            return (false, "Không thể đổi mẫu sản phẩm khi sản phẩm đang có phiên đấu giá đang diễn ra hoặc sắp kết thúc.");
         }
 
         var validationError = await ValidateReferencesAsync(model);
@@ -839,7 +838,7 @@ public class AdminProductService : IAdminProductService
 
         if (remainingGalleryCount + newGalleryFiles.Count > MaxGalleryImages)
         {
-            return (false, $"Gallery can have at most {MaxGalleryImages} images.");
+            return (false, $"Thư viện chỉ được có tối đa {MaxGalleryImages} ảnh.");
         }
 
         var documentValidation = ValidateDocumentFiles(model.DocumentFiles);
@@ -853,7 +852,7 @@ public class AdminProductService : IAdminProductService
         var newDocumentCount = model.DocumentFiles.Count(file => file is { Length: > 0 });
         if (remainingDocumentCount + newDocumentCount > MaxDocumentsPerProduct)
         {
-            return (false, $"A product can have at most {MaxDocumentsPerProduct} documents.");
+            return (false, $"Mỗi sản phẩm chỉ được có tối đa {MaxDocumentsPerProduct} tài liệu.");
         }
 
         string? newImageUrl = null;
@@ -955,7 +954,7 @@ public class AdminProductService : IAdminProductService
         product.UpdatedAt = now;
         await _dbContext.SaveChangesAsync();
 
-        return (true, "Product updated successfully.");
+        return (true, "Đã cập nhật sản phẩm thành công.");
     }
 
     public async Task<(bool Success, string Message)> DeleteAsync(int id, int adminUserId)
@@ -968,26 +967,26 @@ public class AdminProductService : IAdminProductService
 
         if (product is null)
         {
-            return (false, "Product not found.");
+            return (false, "Không tìm thấy sản phẩm.");
         }
 
         var blockingReason = GetDeleteBlockingReason(product);
         if (blockingReason is not null)
         {
-            return (false, $"Cannot delete this product because {blockingReason}");
+            return (false, $"Không thể xóa sản phẩm này vì {blockingReason}");
         }
 
         SoftDeleteProduct(product, adminUserId);
         await _dbContext.SaveChangesAsync();
 
-        return (true, "Product deleted successfully.");
+        return (true, "Đã xóa sản phẩm thành công.");
     }
 
     public async Task<(bool Success, string Message)> BulkDeleteAsync(IReadOnlyList<int> productIds, int adminUserId)
     {
         if (productIds.Count == 0)
         {
-            return (false, "Please select at least one product.");
+            return (false, "Vui lòng chọn ít nhất một sản phẩm.");
         }
 
         var products = await _dbContext.Products
@@ -999,7 +998,7 @@ public class AdminProductService : IAdminProductService
 
         if (products.Count == 0)
         {
-            return (false, "No products found.");
+            return (false, "Không tìm thấy sản phẩm nào.");
         }
 
         var deletedCount = 0;
@@ -1027,10 +1026,10 @@ public class AdminProductService : IAdminProductService
 
         if (skippedMessages.Count == 0)
         {
-            return (true, $"Deleted {deletedCount} product(s) successfully.");
+            return (true, $"Đã xóa {deletedCount} sản phẩm thành công.");
         }
 
-        return (true, $"Deleted {deletedCount} product(s). Skipped {skippedMessages.Count}: {string.Join(" ", skippedMessages)}");
+        return (true, $"Đã xóa {deletedCount} sản phẩm. Bỏ qua {skippedMessages.Count}: {string.Join(" ", skippedMessages)}");
     }
 
     private static string? GetDeleteBlockingReason(Product product)
@@ -1044,7 +1043,7 @@ public class AdminProductService : IAdminProductService
             return null;
         }
 
-        return $"auction #{blockingAuction.Id} is currently {FormatStatusLabel(blockingAuction.Status)}.";
+        return $"phiên đấu giá #{blockingAuction.Id} đang ở trạng thái {FormatStatusLabel(blockingAuction.Status)}.";
     }
 
     private static void SoftDeleteProduct(Product product, int adminUserId)
@@ -1127,7 +1126,7 @@ public class AdminProductService : IAdminProductService
     {
         if (!model.ProductTemplateId.HasValue)
         {
-            return "Selected mau san pham is not available.";
+            return "Mẫu sản phẩm đã chọn không khả dụng.";
         }
 
         var templateExists = await _dbContext.ProductTemplates
@@ -1140,7 +1139,7 @@ public class AdminProductService : IAdminProductService
 
         if (!templateExists)
         {
-            return "Selected mau san pham is not available.";
+            return "Mẫu sản phẩm đã chọn không khả dụng.";
         }
 
         var sellerExists = await _dbContext.Users
@@ -1152,7 +1151,7 @@ public class AdminProductService : IAdminProductService
 
         if (!sellerExists)
         {
-            return "Selected seller is not available.";
+            return "Người bán đã chọn không khả dụng.";
         }
 
         return null;
@@ -1166,20 +1165,20 @@ public class AdminProductService : IAdminProductService
         var uploadCount = files.Count(file => file is { Length: > 0 });
         if (uploadCount > MaxDocumentsPerProduct)
         {
-            return $"You can upload up to {MaxDocumentsPerProduct} documents per product.";
+            return $"Chỉ được tải tối đa {MaxDocumentsPerProduct} tài liệu cho mỗi sản phẩm.";
         }
 
         foreach (var file in files.Where(file => file is { Length: > 0 }))
         {
             if (file.Length > maxFileSize)
             {
-                return "Document file size must not exceed 5MB.";
+                return "Dung lượng tài liệu không được vượt quá 5MB.";
             }
 
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
             if (extension != ".pdf")
             {
-                return "Documents must be PDF files.";
+                return "Tài liệu phải là file PDF.";
             }
         }
 
@@ -1288,11 +1287,19 @@ public class AdminProductService : IAdminProductService
             .Select(condition => new SelectListItem
             {
                 Value = condition,
-                Text = condition,
+                Text = FormatConditionLabel(condition),
                 Selected = condition == selected
             })
             .ToList();
     }
+
+    private static string FormatConditionLabel(string condition) =>
+        condition switch
+        {
+            "Graded" => "Đã chấm điểm",
+            "Ungraded" => "Chưa chấm điểm",
+            _ => condition
+        };
 
     private static List<SelectListItem> BuildGradeOptions(string? selected = null)
     {
@@ -1354,7 +1361,7 @@ public class AdminProductService : IAdminProductService
 
         if (!categoryExists)
         {
-            return "Selected category is not available.";
+            return "Danh mục đã chọn không khả dụng.";
         }
 
         if (model.PrimaryImageFile is { Length: > 0 })
@@ -1364,18 +1371,18 @@ public class AdminProductService : IAdminProductService
 
             if (model.PrimaryImageFile.Length > maxImageSize)
             {
-                return "Mau san pham primary image must not exceed 2MB.";
+                return "Ảnh chính của mẫu sản phẩm không được vượt quá 2MB.";
             }
 
             if (extension is not ".jpg" and not ".jpeg" and not ".png")
             {
-                return "Mau san pham primary image must be JPEG or PNG.";
+                return "Ảnh chính của mẫu sản phẩm phải là JPEG hoặc PNG.";
             }
         }
 
         if (!model.Id.HasValue && model.PrimaryImageFile is not { Length: > 0 })
         {
-            return "Primary image is required for mau san pham.";
+            return "Vui lòng tải ảnh chính cho mẫu sản phẩm.";
         }
 
         var normalizedName = NormalizeTemplateKey(model.Name);
@@ -1406,7 +1413,7 @@ public class AdminProductService : IAdminProductService
             NormalizeTemplateKey(template.GradeLabel) == normalizedGrade);
 
         return isDuplicate
-            ? "A matching active mau san pham already exists."
+            ? "Đã tồn tại mẫu sản phẩm đang hoạt động với thông tin trùng khớp."
             : null;
     }
 
@@ -1507,7 +1514,13 @@ public class AdminProductService : IAdminProductService
     }
 
     private static string FormatStatusLabel(string status) =>
-        status.Replace('_', ' ');
+        status switch
+        {
+            AuctionStatuses.Live => "đang diễn ra",
+            AuctionStatuses.EndingSoon => "sắp kết thúc",
+            AuctionStatuses.AwaitingPayment => "đang chờ thanh toán",
+            _ => status.Replace('_', ' ')
+        };
 
     private static (DateTime? StartDate, DateTime? EndDate) ParseDateRange(string? dateRange)
     {
