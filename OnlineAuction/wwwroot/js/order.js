@@ -92,6 +92,7 @@
         var subtotal = 0;
         var shipping = 0;
         var insurance = 0;
+        var platformFee = 0;
         var deposit = 0;
         var total = 0;
 
@@ -99,6 +100,7 @@
             subtotal += parseAmount(card, 'data-subtotal');
             shipping += parseAmount(card, 'data-shipping');
             insurance += parseAmount(card, 'data-insurance');
+            platformFee += parseAmount(card, 'data-platform-fee');
             deposit += parseAmount(card, 'data-deposit');
             total += parseAmount(card, 'data-total');
         });
@@ -107,6 +109,7 @@
         var subtotalEl = document.getElementById('orderSummarySubtotal');
         var shippingEl = document.getElementById('orderSummaryShipping');
         var insuranceEl = document.getElementById('orderSummaryInsurance');
+        var platformFeeEl = document.getElementById('orderSummaryPlatformFee');
         var depositEl = document.getElementById('orderSummaryDeposit');
         var totalEl = document.getElementById('orderSummaryTotal');
         var completeButton = document.getElementById('orderCompleteButton');
@@ -120,6 +123,7 @@
         if (subtotalEl) subtotalEl.textContent = formatMoney(subtotal);
         if (shippingEl) shippingEl.textContent = formatMoney(shipping);
         if (insuranceEl) insuranceEl.textContent = formatMoney(insurance);
+        if (platformFeeEl) platformFeeEl.textContent = formatMoney(platformFee);
         if (depositEl) {
             depositEl.textContent = deposit > 0 ? '-' + formatMoney(deposit) : '—';
         }

@@ -258,6 +258,7 @@
     @if (!isStandalonePage)
     {
         @await Html.PartialAsync("Partials/_AuthModal")
+        @await Html.PartialAsync("Partials/_ConfirmModal")
     }
 
     @if (!isStandalonePage)
@@ -362,6 +363,15 @@
             };
         </script>
         <script src="~/js/auth-modal.js" asp-append-version="true"></script>
+        <script>
+            window.confirmModalConfig = {
+                i18n: {
+                    confirm: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["ConfirmModal_Confirm"].Value)),
+                    cancel: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Common_Cancel"].Value))
+                }
+            };
+        </script>
+        <script src="~/js/confirm-modal.js" asp-append-version="true"></script>
         <script src="~/js/language-switcher.js" asp-append-version="true"></script>
         <script src="~/js/realtime-hub.js" asp-append-version="true"></script>
         @if (isLoggedIn)

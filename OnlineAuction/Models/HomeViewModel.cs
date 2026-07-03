@@ -4,6 +4,7 @@ using OnlineAuction.Entities;
 
 public class HomeViewModel
 {
+    public IReadOnlyList<HomeHeroBannerViewModel> HeroBanners { get; set; } = HomeHeroBanners.All;
     public List<AuctionItemViewModel> Recommended { get; set; } = [];
     public List<AuctionItemViewModel> TrendingOnAuction { get; set; } = [];
     public List<AuctionItemViewModel> TrendingOnBuyNow { get; set; } = [];
@@ -11,6 +12,23 @@ public class HomeViewModel
     public List<SellerViewModel> BestSellers { get; set; } = [];
     public List<CategoryViewModel> Categories { get; set; } = [];
     public List<VaultPostViewModel> VaultPosts { get; set; } = [];
+}
+
+public class HomeHeroBannerViewModel
+{
+    public string Alt { get; set; } = string.Empty;
+    public string ImageUrl { get; set; } = string.Empty;
+}
+
+public static class HomeHeroBanners
+{
+    public static IReadOnlyList<HomeHeroBannerViewModel> All { get; } =
+    [
+        new() { Alt = "Pokémon Trading Card Game", ImageUrl = "/images/pages/home/banners/pokemon-tcg.png" },
+        new() { Alt = "Trading card games collection", ImageUrl = "/images/pages/home/banners/tcg-collage.png" },
+        new() { Alt = "One Piece Card Game", ImageUrl = "/images/pages/home/banners/one-piece.png" },
+        new() { Alt = "Vintage sports trading cards", ImageUrl = "/images/pages/home/banners/sports-cards.png" },
+    ];
 }
 
 public class HomeProductSectionViewModel

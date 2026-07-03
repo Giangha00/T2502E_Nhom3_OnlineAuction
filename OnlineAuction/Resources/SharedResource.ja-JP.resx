@@ -657,6 +657,7 @@
   <data name="Checkout_Won" xml:space="preserve"><value>落札</value></data>
   <data name="Checkout_WinningBid" xml:space="preserve"><value>落札価格</value></data>
   <data name="Checkout_PlatformFee" xml:space="preserve"><value>プラットフォーム手数料 (2.5%)</value></data>
+  <data name="Checkout_BuyerCheckoutFee" xml:space="preserve"><value>購入者チェックアウト手数料 (2.5%)</value></data>
   <data name="Checkout_Shipping" xml:space="preserve"><value>配送</value></data>
   <data name="Checkout_Total" xml:space="preserve"><value>合計</value></data>
   <data name="Checkout_PayNow" xml:space="preserve"><value>{0}を今すぐ支払う</value></data>

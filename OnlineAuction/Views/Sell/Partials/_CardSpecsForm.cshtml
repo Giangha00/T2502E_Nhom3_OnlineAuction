@@ -21,7 +21,8 @@
     <div class="grid gap-5 sm:grid-cols-2">
       <div>
         <label for="year" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Product_Year"] <span class="text-red-500">*</span></label>
-        <input type="number" id="year" name="Year" value="@(Model.Year.HasValue ? Model.Year : "")" min="1800" max="2100" placeholder="1999" required
+        <input type="text" id="year" name="Year" value="@(Model.Year.HasValue ? Model.Year : "")" maxlength="4" placeholder="1999" required
+               inputmode="numeric" pattern="[0-9]*" data-sell-numeric="integer"
                class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
         <p class="field-error mt-1 hidden text-xs text-red-600" data-for="year"></p>
       </div>

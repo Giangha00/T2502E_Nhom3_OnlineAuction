@@ -15,7 +15,8 @@
         <label for="startingPrice" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_StartingPrice"] <span class="text-red-500">*</span></label>
         <div class="relative">
           <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">$</span>
-          <input type="number" id="startingPrice" name="StartingPrice" value="@(Model.StartingPrice > 0 ? Model.StartingPrice : "")" step="0.01" min="0" placeholder="500"
+          <input type="text" id="startingPrice" name="StartingPrice" value="@(Model.StartingPrice > 0 ? Model.StartingPrice : "")" placeholder="500"
+                 inputmode="decimal" data-sell-numeric="decimal"
                  class="field-input w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-7 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
         </div>
         <p class="field-error mt-1 hidden text-xs text-red-600" data-for="startingPrice"></p>
@@ -24,7 +25,8 @@
         <label for="bidStep" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_BidStep"] <span class="text-red-500">*</span></label>
         <div class="relative">
           <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">$</span>
-          <input type="number" id="bidStep" name="BidStep" value="@(Model.BidStep > 0 ? Model.BidStep : 50)" step="0.01" min="0" placeholder="50"
+          <input type="text" id="bidStep" name="BidStep" value="@(Model.BidStep > 0 ? Model.BidStep : 50)" placeholder="50"
+                 inputmode="decimal" data-sell-numeric="decimal"
                  class="field-input w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-7 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
         </div>
         <p class="field-error mt-1 hidden text-xs text-red-600" data-for="bidStep"></p>
@@ -33,38 +35,13 @@
         <label for="buyNowPrice" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_BuyNowPrice"]</label>
         <div class="relative">
           <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">$</span>
-          <input type="number" id="buyNowPrice" name="BuyNowPrice" value="@(Model.BuyNowPrice.HasValue && Model.BuyNowPrice > 0 ? Model.BuyNowPrice : "")" step="0.01" min="0" placeholder="2000"
+          <input type="text" id="buyNowPrice" name="BuyNowPrice" value="@(Model.BuyNowPrice.HasValue && Model.BuyNowPrice > 0 ? Model.BuyNowPrice : "")" placeholder="2000"
+                 inputmode="decimal" data-sell-numeric="decimal"
                  class="field-input w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-7 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
         </div>
         <p class="field-error mt-1 hidden text-xs text-red-600" data-for="buyNowPrice"></p>
       </div>
     </div>
 
-    <div>
-      <span class="mb-3 block text-sm font-medium text-slate-700">@Localizer["Sell_AuctionType"] <span class="text-red-500">*</span></span>
-      <div class="grid gap-4 sm:grid-cols-2">
-        <label class="auction-type-card group cursor-pointer">
-          <input type="radio" name="AuctionType" value="Normal" class="peer sr-only" @(Model.AuctionType != "Featured" ? "checked=\"checked\"" : null)/>
-          <div class="rounded-xl border-2 border-slate-200 bg-white p-4 transition peer-checked:border-blue-600 peer-checked:bg-blue-50/60">
-            <p class="text-sm font-semibold text-slate-900">@Localizer["Sell_AuctionType_Normal"]</p>
-            <p class="mt-1 text-xs leading-relaxed text-slate-500">@Localizer["Sell_AuctionType_Normal_Desc"]</p>
-          </div>
-        </label>
-        <label class="auction-type-card group cursor-pointer">
-          <input type="radio" name="AuctionType" value="Featured" class="peer sr-only" @(Model.AuctionType == "Featured" ? "checked=\"checked\"" : null)/>
-          <div class="rounded-xl border-2 border-slate-200 bg-white p-4 transition peer-checked:border-blue-600 peer-checked:bg-blue-50/60">
-            <p class="text-sm font-semibold text-slate-900">@Localizer["Sell_AuctionType_Featured"]</p>
-            <p class="mt-1 text-xs leading-relaxed text-slate-500">@Localizer["Sell_AuctionType_Featured_Desc"]</p>
-          </div>
-        </label>
-      </div>
-      <p class="field-error mt-1 hidden text-xs text-red-600" data-for="AuctionType"></p>
-    </div>
-
-    <div>
-      <label for="auctionEventName" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_AuctionEventName"]</label>
-      <input type="text" id="auctionEventName" name="AuctionEventName" value="@Model.AuctionEventName" maxlength="160" placeholder="@Localizer["Sell_AuctionEventName_Placeholder"]"
-             class="field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
-    </div>
   </div>
 </div>

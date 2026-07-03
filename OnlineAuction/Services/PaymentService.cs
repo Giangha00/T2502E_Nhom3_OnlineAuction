@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
@@ -7,10 +9,12 @@ namespace OnlineAuction.Services;
 public class PaymentService : IPaymentService
 {
     private readonly IAuctionService _auctionService;
+    private readonly PlatformFeeSettings _feeSettings;
 
-    public PaymentService(IAuctionService auctionService)
+    public PaymentService(IAuctionService auctionService, IOptions<PlatformFeeSettings> feeSettings)
     {
         _auctionService = auctionService;
+        _feeSettings = feeSettings.Value;
     }
 
     public PaymentInformationViewModel GetPaymentInformation()
@@ -32,7 +36,7 @@ public class PaymentService : IPaymentService
             return null;
         }
 
-        var platformFee = Math.Round(auction.CurrentPrice * 0.025m, 2);
+        var platformFee = MarketplaceFeeCalculator.CalculateBuyerCheckoutFee(auction.CurrentPrice, _feeSettings);
         var shippingFee = GetShippingFee(auction.Category);
         var total = auction.CurrentPrice + platformFee + shippingFee;
 

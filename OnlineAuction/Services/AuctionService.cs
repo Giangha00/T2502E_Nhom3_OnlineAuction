@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
@@ -13,10 +15,14 @@ public class AuctionService : IAuctionService
     private const int HomeSectionItemCount = 15;
 
     private readonly AuctionHouseDbContext _dbContext;
+    private readonly PlatformFeeSettings _feeSettings;
 
-    public AuctionService(AuctionHouseDbContext dbContext)
+    public AuctionService(
+        AuctionHouseDbContext dbContext,
+        IOptions<PlatformFeeSettings> feeSettings)
     {
         _dbContext = dbContext;
+        _feeSettings = feeSettings.Value;
     }
 
     public HomeViewModel GetHomePage() =>
@@ -174,7 +180,8 @@ public class AuctionService : IAuctionService
             currentUserId,
             userRegistrationStatus,
             registrationRejectReason,
-            registrationCount);
+            registrationCount,
+            _feeSettings);
     }
 
     public async Task<AuctionItemViewModel?> GetAuctionByIdAsync(int id)

@@ -6,8 +6,6 @@ public class DashboardRevenueSectionViewModel
 
     public DashboardKpiCardViewModel PlatformRevenueKpi { get; set; } = new();
 
-    public DashboardKpiCardViewModel ListingFeeKpi { get; set; } = new();
-
     public DashboardKpiCardViewModel CompletedOrdersKpi { get; set; } = new();
 
     public IReadOnlyList<DashboardRevenueLinePointViewModel> LineChart { get; set; } = [];
@@ -15,6 +13,4 @@ public class DashboardRevenueSectionViewModel
     public DashboardPlatformRevenueBreakdownViewModel PlatformBreakdown { get; set; } = new();
 
     public IReadOnlyList<DashboardRevenueDetailViewModel> DetailRows { get; set; } = [];
-
-    public bool HasListingFeeData { get; set; }
 }

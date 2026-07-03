@@ -25,7 +25,14 @@
         ["mustRegisterToBid"] = Localizer["Product_MustRegisterToBid"].Value,
         ["countdownRegistrationEnd"] = Localizer["Js_ProductDetail_CountdownRegistrationEnd"].Value,
         ["countdownLiveStart"] = Localizer["Js_ProductDetail_CountdownLiveStart"].Value,
-        ["countdownLiveEnd"] = Localizer["Js_ProductDetail_CountdownLiveEnd"].Value
+        ["countdownLiveEnd"] = Localizer["Js_ProductDetail_CountdownLiveEnd"].Value,
+        ["confirmRegisterTitle"] = Localizer["ConfirmModal_RegisterAuction_Title"].Value,
+        ["confirmRegisterMessage"] = Localizer["ConfirmModal_RegisterAuction_Message"].Value,
+        ["confirmRegisterNote"] = Localizer["ConfirmModal_RegisterAuction_Note"].Value,
+        ["confirmCancelRegistrationTitle"] = Localizer["ConfirmModal_CancelRegistration_Title"].Value,
+        ["confirmCancelRegistrationMessage"] = Localizer["ConfirmModal_CancelRegistration_Message"].Value,
+        ["confirmCancelRegistrationNote"] = Localizer["ConfirmModal_CancelRegistration_Note"].Value,
+        ["confirmCancelRegistrationConfirm"] = Localizer["Product_CancelRegistration"].Value
     };
     var flashMessage = TempData["SuccessMessage"] as string ?? TempData["ErrorMessage"] as string;
     var flashMessageType = TempData["SuccessMessage"] is not null
@@ -72,6 +79,8 @@
       countdownKind: @Html.Raw(JsonSerializer.Serialize(Model.PhaseCountdownKind)),
       canBid: @(Model.CanBid ? "true" : "false"),
       requiresRegistration: @(Model.RequiresRegistration ? "true" : "false"),
+      registrationDepositAmount: @Model.RegistrationDepositAmount.ToString(System.Globalization.CultureInfo.InvariantCulture),
+      productName: @Html.Raw(JsonSerializer.Serialize(Model.Name)),
       flashMessage: @Html.Raw(JsonSerializer.Serialize(flashMessage)),
       flashMessageType: @Html.Raw(JsonSerializer.Serialize(flashMessageType)),
       i18n: @Html.Raw(JsonSerializer.Serialize(productDetailI18n))

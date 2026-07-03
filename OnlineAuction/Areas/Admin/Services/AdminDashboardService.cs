@@ -130,13 +130,20 @@ public class AdminDashboardService : IAdminDashboardService
         var rangeStart = filter.DateFrom.Date;
         var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
 
-        var listingFees = await SumPaidListingFeesAsync(rangeStart, rangeEndExclusive, cancellationToken);
-        var transactionCommission = await SumPaidOrderPlatformFeesAsync(
+        var registrationDeposits = await SumRegistrationDepositRevenueAsync(
+            rangeStart,
+            rangeEndExclusive,
+            cancellationToken);
+        var buyerCheckoutFees = await SumPaidOrderPlatformFeesAsync(
+            rangeStart,
+            rangeEndExclusive,
+            cancellationToken);
+        var sellerSuccessFees = await SumPaidOrderSellerFeesAsync(
             rangeStart,
             rangeEndExclusive,
             cancellationToken);
 
-        return listingFees + transactionCommission;
+        return registrationDeposits + buyerCheckoutFees + sellerSuccessFees;
     }
 
     public async Task<IReadOnlyList<DashboardRevenueDetailViewModel>> BuildRevenueDetailTableAsync(
@@ -178,28 +185,62 @@ public class AdminDashboardService : IAdminDashboardService
             Status = PaymentStatuses.Success
         }));
 
-        var listingFeeRows = await _dbContext.ListingFees.AsNoTracking()
-            .Where(fee => fee.DeletedAt == null
-                          && fee.Status == ListingFeeStatuses.Paid
-                          && fee.PaidAt >= rangeStart
-                          && fee.PaidAt < rangeEndExclusive)
-            .Select(fee => new
+        var sellerFeeRows = await _dbContext.Payments.AsNoTracking()
+            .Where(payment => payment.DeletedAt == null
+                              && payment.Status == PaymentStatuses.Success
+                              && payment.PaidAt >= rangeStart
+                              && payment.PaidAt < rangeEndExclusive
+                              && PaidOrderStatuses.Contains(payment.Order.Status)
+                              && payment.Order.SellerFee > 0)
+            .Select(payment => new
             {
-                fee.PaidAt,
-                fee.FeeAmount,
-                fee.AuctionId
+                payment.PaidAt,
+                payment.OrderId,
+                payment.Order.OrderReference,
+                payment.Order.SellerFee,
+                AuctionId = payment.Order.Items
+                    .Where(item => item.DeletedAt == null)
+                    .Select(item => (int?)item.AuctionId)
+                    .FirstOrDefault()
             })
             .ToListAsync(cancellationToken);
 
-        rows.AddRange(listingFeeRows.Select(row => new DashboardRevenueDetailViewModel
+        rows.AddRange(sellerFeeRows.Select(row => new DashboardRevenueDetailViewModel
         {
             TransactionDate = row.PaidAt!.Value,
-            Type = DashboardRevenueTypes.ListingFee,
-            ReferenceCode = $"Auction #{row.AuctionId}",
+            Type = DashboardRevenueTypes.SellerSuccessFee,
+            ReferenceCode = row.OrderReference,
+            AuctionId = row.AuctionId,
+            OrderId = row.OrderId,
+            GmvAmount = 0m,
+            PlatformRevenueAmount = row.SellerFee,
+            Status = PaymentStatuses.Success
+        }));
+
+        var depositRows = await _dbContext.AuctionRegistrationDeposits.AsNoTracking()
+            .Where(deposit => deposit.DeletedAt == null
+                              && deposit.PaidAt >= rangeStart
+                              && deposit.PaidAt < rangeEndExclusive
+                              && (deposit.Status == AuctionRegistrationDepositStatuses.Paid
+                                  || deposit.Status == AuctionRegistrationDepositStatuses.Applied))
+            .Select(deposit => new
+            {
+                deposit.PaidAt,
+                deposit.AuctionId,
+                deposit.Amount,
+                deposit.Status
+            })
+            .ToListAsync(cancellationToken);
+
+        rows.AddRange(depositRows.Select(row => new DashboardRevenueDetailViewModel
+        {
+            TransactionDate = row.PaidAt!.Value,
+            Type = DashboardRevenueTypes.RegistrationDeposit,
+            ReferenceCode = $"DEP-{row.AuctionId}",
             AuctionId = row.AuctionId,
             GmvAmount = 0m,
-            PlatformRevenueAmount = row.FeeAmount,
-            Status = ListingFeeStatuses.Paid
+            PlatformRevenueAmount = row.Amount,
+            Status = row.Status
         }));
 
         var filtered = ApplyRevenueTypeFilter(rows, filter.RevenueTypeFilter);
@@ -669,7 +710,6 @@ public class AdminDashboardService : IAdminDashboardService
 
         AddOverviewMetric("GMV", dashboard.RevenueSection.GmvKpi.DisplayValue);
         AddOverviewMetric("Platform Revenue", dashboard.RevenueSection.PlatformRevenueKpi.DisplayValue);
-        AddOverviewMetric("Listing Fees", dashboard.RevenueSection.ListingFeeKpi.DisplayValue);
         AddOverviewMetric("Completed Orders", dashboard.RevenueSection.CompletedOrdersKpi.DisplayValue);
         AddOverviewMetric(
             "Active Auctions",
@@ -693,12 +733,10 @@ public class AdminDashboardService : IAdminDashboardService
         revenueSheet.Cell(2, 2).Value = dashboard.RevenueSection.GmvKpi.DisplayValue;
         revenueSheet.Cell(3, 1).Value = "Platform Revenue";
         revenueSheet.Cell(3, 2).Value = dashboard.RevenueSection.PlatformRevenueKpi.DisplayValue;
-        revenueSheet.Cell(4, 1).Value = "Listing Fees";
-        revenueSheet.Cell(4, 2).Value = dashboard.RevenueSection.ListingFeeKpi.DisplayValue;
-        revenueSheet.Cell(5, 1).Value = "Completed Orders";
-        revenueSheet.Cell(5, 2).Value = dashboard.RevenueSection.CompletedOrdersKpi.DisplayValue;
+        revenueSheet.Cell(4, 1).Value = "Completed Orders";
+        revenueSheet.Cell(4, 2).Value = dashboard.RevenueSection.CompletedOrdersKpi.DisplayValue;
 
-        var revenueDetailHeaderRow = 7;
+        var revenueDetailHeaderRow = 6;
         revenueSheet.Cell(revenueDetailHeaderRow, 1).Value = "Date";
         revenueSheet.Cell(revenueDetailHeaderRow, 2).Value = "Type";
         revenueSheet.Cell(revenueDetailHeaderRow, 3).Value = "Reference";
@@ -822,25 +860,24 @@ public class AdminDashboardService : IAdminDashboardService
         var platformRevenueCurrent = await SumPlatformRevenueAsync(filter, cancellationToken);
         var platformRevenuePrevious = await SumPlatformRevenueAsync(previousRange, cancellationToken);
 
-        var listingFeeCurrent = await SumPaidListingFeesAsync(rangeStart, rangeEndExclusive, cancellationToken);
-        var listingFeePrevious = await SumPaidListingFeesAsync(
-            previousRange.DateFrom,
-            previousRange.DateTo.AddDays(1),
-            cancellationToken);
-
         var completedOrdersCurrent = await CountCompletedOrdersAsync(rangeStart, rangeEndExclusive, cancellationToken);
         var completedOrdersPrevious = await CountCompletedOrdersAsync(
             previousRange.DateFrom,
             previousRange.DateTo.AddDays(1),
             cancellationToken);
 
-        var transactionCommission = await SumPaidOrderPlatformFeesAsync(
+        var registrationDeposits = await SumRegistrationDepositRevenueAsync(
             rangeStart,
             rangeEndExclusive,
             cancellationToken);
-
-        var hasListingFeeData = await _dbContext.ListingFees.AsNoTracking()
-            .AnyAsync(fee => fee.DeletedAt == null, cancellationToken);
+        var buyerCheckoutFees = await SumPaidOrderPlatformFeesAsync(
+            rangeStart,
+            rangeEndExclusive,
+            cancellationToken);
+        var sellerSuccessFees = await SumPaidOrderSellerFeesAsync(
+            rangeStart,
+            rangeEndExclusive,
+            cancellationToken);
 
         var lineChart = await BuildRevenueLineChartAsync(rangeStart, rangeEndExclusive, cancellationToken);
         var detailRows = await BuildRevenueDetailTableAsync(filter, cancellationToken);
@@ -859,12 +896,6 @@ public class AdminDashboardService : IAdminDashboardService
                 platformRevenueCurrent,
                 platformRevenuePrevious,
                 cardKey: DashboardRevenueCardKeys.PlatformRevenue),
-            ListingFeeKpi = BuildKpiCard(
-                "Listing Fees",
-                FormatCurrency(listingFeeCurrent),
-                listingFeeCurrent,
-                listingFeePrevious,
-                cardKey: DashboardRevenueCardKeys.ListingFee),
             CompletedOrdersKpi = BuildKpiCard(
                 "Completed Orders",
                 FormatInteger(completedOrdersCurrent),
@@ -872,33 +903,39 @@ public class AdminDashboardService : IAdminDashboardService
                 completedOrdersPrevious,
                 cardKey: DashboardRevenueCardKeys.CompletedOrders),
             LineChart = lineChart,
-            PlatformBreakdown = BuildPlatformRevenueBreakdown(listingFeeCurrent, transactionCommission),
-            DetailRows = detailRows,
-            HasListingFeeData = hasListingFeeData
+            PlatformBreakdown = BuildPlatformRevenueBreakdown(
+                registrationDeposits,
+                buyerCheckoutFees,
+                sellerSuccessFees),
+            DetailRows = detailRows
         };
     }
 
     private static DashboardPlatformRevenueBreakdownViewModel BuildPlatformRevenueBreakdown(
-        decimal listingFees,
-        decimal transactionCommission)
+        decimal registrationDeposits,
+        decimal buyerCheckoutFees,
+        decimal sellerSuccessFees)
     {
-        var total = listingFees + transactionCommission;
+        var total = registrationDeposits + buyerCheckoutFees + sellerSuccessFees;
 
         if (total <= 0)
         {
             return new DashboardPlatformRevenueBreakdownViewModel
             {
-                ListingFees = listingFees,
-                TransactionCommission = transactionCommission
+                RegistrationDeposits = registrationDeposits,
+                BuyerCheckoutFees = buyerCheckoutFees,
+                SellerSuccessFees = sellerSuccessFees
             };
         }
 
         return new DashboardPlatformRevenueBreakdownViewModel
         {
-            ListingFees = listingFees,
-            TransactionCommission = transactionCommission,
-            ListingFeePercentage = Math.Round(listingFees / total * 100m, 1),
-            TransactionCommissionPercentage = Math.Round(transactionCommission / total * 100m, 1)
+            RegistrationDeposits = registrationDeposits,
+            RegistrationDepositsPercentage = Math.Round(registrationDeposits / total * 100m, 1),
+            BuyerCheckoutFees = buyerCheckoutFees,
+            BuyerCheckoutFeesPercentage = Math.Round(buyerCheckoutFees / total * 100m, 1),
+            SellerSuccessFees = sellerSuccessFees,
+            SellerSuccessFeesPercentage = Math.Round(sellerSuccessFees / total * 100m, 1)
         };
     }
 
@@ -916,16 +953,7 @@ public class AdminDashboardService : IAdminDashboardService
             .Select(group => new { Date = group.Key, Total = group.Sum(payment => payment.Amount) })
             .ToListAsync(cancellationToken);
 
-        var listingFeesByDate = await _dbContext.ListingFees.AsNoTracking()
-            .Where(fee => fee.DeletedAt == null
-                          && fee.Status == ListingFeeStatuses.Paid
-                          && fee.PaidAt >= startDate
-                          && fee.PaidAt < endExclusive)
-            .GroupBy(fee => fee.PaidAt!.Value.Date)
-            .Select(group => new { Date = group.Key, Total = group.Sum(fee => fee.FeeAmount) })
-            .ToListAsync(cancellationToken);
-
-        var commissionByDate = await _dbContext.Payments.AsNoTracking()
+        var buyerFeesByDate = await _dbContext.Payments.AsNoTracking()
             .Where(payment => payment.DeletedAt == null
                               && payment.Status == PaymentStatuses.Success
                               && payment.PaidAt >= startDate
@@ -935,9 +963,30 @@ public class AdminDashboardService : IAdminDashboardService
             .Select(group => new { Date = group.Key, Total = group.Sum(payment => payment.Order.PlatformFee) })
             .ToListAsync(cancellationToken);
 
+        var sellerFeesByDate = await _dbContext.Payments.AsNoTracking()
+            .Where(payment => payment.DeletedAt == null
+                              && payment.Status == PaymentStatuses.Success
+                              && payment.PaidAt >= startDate
+                              && payment.PaidAt < endExclusive
+                              && PaidOrderStatuses.Contains(payment.Order.Status))
+            .GroupBy(payment => payment.PaidAt!.Value.Date)
+            .Select(group => new { Date = group.Key, Total = group.Sum(payment => payment.Order.SellerFee) })
+            .ToListAsync(cancellationToken);
+
+        var depositsByDate = await _dbContext.AuctionRegistrationDeposits.AsNoTracking()
+            .Where(deposit => deposit.DeletedAt == null
+                              && deposit.PaidAt >= startDate
+                              && deposit.PaidAt < endExclusive
+                              && (deposit.Status == AuctionRegistrationDepositStatuses.Paid
+                                  || deposit.Status == AuctionRegistrationDepositStatuses.Applied))
+            .GroupBy(deposit => deposit.PaidAt!.Value.Date)
+            .Select(group => new { Date = group.Key, Total = group.Sum(deposit => deposit.Amount) })
+            .ToListAsync(cancellationToken);
+
         var gmvLookup = gmvByDate.ToDictionary(item => item.Date, item => item.Total);
-        var listingLookup = listingFeesByDate.ToDictionary(item => item.Date, item => item.Total);
-        var commissionLookup = commissionByDate.ToDictionary(item => item.Date, item => item.Total);
+        var buyerFeeLookup = buyerFeesByDate.ToDictionary(item => item.Date, item => item.Total);
+        var sellerFeeLookup = sellerFeesByDate.ToDictionary(item => item.Date, item => item.Total);
+        var depositLookup = depositsByDate.ToDictionary(item => item.Date, item => item.Total);
 
         var series = new List<DashboardRevenueLinePointViewModel>();
         var endDate = endExclusive.AddDays(-1).Date;
@@ -945,32 +994,20 @@ public class AdminDashboardService : IAdminDashboardService
         for (var cursor = startDate.Date; cursor <= endDate; cursor = cursor.AddDays(1))
         {
             gmvLookup.TryGetValue(cursor, out var gmv);
-            listingLookup.TryGetValue(cursor, out var listingFee);
-            commissionLookup.TryGetValue(cursor, out var commission);
+            buyerFeeLookup.TryGetValue(cursor, out var buyerFees);
+            sellerFeeLookup.TryGetValue(cursor, out var sellerFees);
+            depositLookup.TryGetValue(cursor, out var deposits);
 
             series.Add(new DashboardRevenueLinePointViewModel
             {
                 Label = cursor.ToString("MMM d", CultureInfo.InvariantCulture),
                 FilterKey = cursor.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 Gmv = gmv,
-                PlatformRevenue = listingFee + commission
+                PlatformRevenue = buyerFees + sellerFees + deposits
             });
         }
 
         return series;
-    }
-
-    private Task<decimal> SumPaidListingFeesAsync(
-        DateTime startInclusive,
-        DateTime endExclusive,
-        CancellationToken cancellationToken)
-    {
-        return _dbContext.ListingFees.AsNoTracking()
-            .Where(fee => fee.DeletedAt == null
-                          && fee.Status == ListingFeeStatuses.Paid
-                          && fee.PaidAt >= startInclusive
-                          && fee.PaidAt < endExclusive)
-            .SumAsync(fee => fee.FeeAmount, cancellationToken);
     }
 
     private async Task<decimal> SumPaidOrderPlatformFeesAsync(
@@ -985,6 +1022,34 @@ public class AdminDashboardService : IAdminDashboardService
                               && payment.PaidAt < endExclusive
                               && PaidOrderStatuses.Contains(payment.Order.Status))
             .SumAsync(payment => payment.Order.PlatformFee, cancellationToken);
+    }
+
+    private async Task<decimal> SumPaidOrderSellerFeesAsync(
+        DateTime startInclusive,
+        DateTime endExclusive,
+        CancellationToken cancellationToken)
+    {
+        return await _dbContext.Payments.AsNoTracking()
+            .Where(payment => payment.DeletedAt == null
+                              && payment.Status == PaymentStatuses.Success
+                              && payment.PaidAt >= startInclusive
+                              && payment.PaidAt < endExclusive
+                              && PaidOrderStatuses.Contains(payment.Order.Status))
+            .SumAsync(payment => payment.Order.SellerFee, cancellationToken);
+    }
+
+    private async Task<decimal> SumRegistrationDepositRevenueAsync(
+        DateTime startInclusive,
+        DateTime endExclusive,
+        CancellationToken cancellationToken)
+    {
+        return await _dbContext.AuctionRegistrationDeposits.AsNoTracking()
+            .Where(deposit => deposit.DeletedAt == null
+                              && deposit.PaidAt >= startInclusive
+                              && deposit.PaidAt < endExclusive
+                              && (deposit.Status == AuctionRegistrationDepositStatuses.Paid
+                                  || deposit.Status == AuctionRegistrationDepositStatuses.Applied))
+            .SumAsync(deposit => deposit.Amount, cancellationToken);
     }
 
     private Task<int> CountCompletedOrdersAsync(
@@ -1013,7 +1078,8 @@ public class AdminDashboardService : IAdminDashboardService
         return normalized switch
         {
             DashboardRevenueTypes.OrderPayment => DashboardRevenueTypes.OrderPayment,
-            DashboardRevenueTypes.ListingFee => DashboardRevenueTypes.ListingFee,
+            DashboardRevenueTypes.RegistrationDeposit => DashboardRevenueTypes.RegistrationDeposit,
+            DashboardRevenueTypes.SellerSuccessFee => DashboardRevenueTypes.SellerSuccessFee,
             _ => null
         };
     }

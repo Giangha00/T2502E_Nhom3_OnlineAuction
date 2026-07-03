@@ -4,35 +4,59 @@
 @inject IStringLocalizer<SharedResource> Localizer
 @{
     ViewData["Title"] = Localizer["Home_PageTitle"];
-    var heroImage = PageBannerImages.Home;
+    var heroBanners = new[]
+    {
+        new { Alt = "Pokémon Trading Card Game", ImageUrl = "/images/pages/home/banners/pokemon-tcg.png" },
+        new { Alt = "Trading card games collection", ImageUrl = "/images/pages/home/banners/tcg-collage.png" },
+        new { Alt = "One Piece Card Game", ImageUrl = "/images/pages/home/banners/one-piece.png" },
+        new { Alt = "Vintage sports trading cards", ImageUrl = "/images/pages/home/banners/sports-cards.png" },
+    };
     var userAuth = await Context.AuthenticateAsync(AuthSchemes.User);
     var isLoggedIn = userAuth.Succeeded;
 }
 
 <div id="homePageContent" class="rarecard-page">
-  <section class="rarecard-hero relative w-full overflow-hidden bg-slate-50">
-    <div class="absolute inset-0 opacity-[0.07]">
-      <img src="@heroImage" alt="" class="h-full w-full object-cover" aria-hidden="true"/>
+  <section class="home-hero-banner" data-home-hero-banner aria-label="@Localizer["Home_Hero_TitleLine1"]">
+    <div class="home-hero-banner__backdrop" aria-hidden="true">
+      @for (var i = 0; i < heroBanners.Length; i++)
+      {
+        <img src="@heroBanners[i].ImageUrl"
+             alt=""
+             class="home-hero-banner__backdrop-img @(i == 0 ? "is-active" : "")"
+             data-home-hero-backdrop
+             loading="@(i == 0 ? "eager" : "lazy")"/>
+      }
     </div>
-    <div class="relative w-full px-4 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
-      <div class="mx-auto max-w-4xl text-center lg:mx-0 lg:text-left">
-        <p class="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">@Localizer["Home_Hero_Eyebrow"]</p>
-        <h1 class="mt-4 text-4xl font-bold leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+
+    <div class="home-hero-banner__slides" aria-live="polite">
+      @for (var i = 0; i < heroBanners.Length; i++)
+      {
+        var banner = heroBanners[i];
+        <div class="home-hero-banner__slide @(i == 0 ? "is-active" : "")"
+             data-home-hero-slide
+             aria-hidden="@(i == 0 ? "false" : "true")">
+          <img src="@banner.ImageUrl" alt="@banner.Alt" class="home-hero-banner__slide-img" loading="@(i == 0 ? "eager" : "lazy")"/>
+        </div>
+      }
+    </div>
+
+    <div class="home-hero-banner__scrim" aria-hidden="true"></div>
+
+    <div class="home-hero-banner__inner">
+      <div class="home-hero-banner__copy">
+        <p class="home-hero-banner__eyebrow">@Localizer["Home_Hero_Eyebrow"]</p>
+        <h1 class="home-hero-banner__title">
           @Localizer["Home_Hero_TitleLine1"]<br/>
-          <span class="text-blue-600">@Localizer["Home_Hero_TitleAccent"]</span>
+          <span class="home-hero-banner__title-accent">@Localizer["Home_Hero_TitleAccent"]</span>
         </h1>
-        <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-600 lg:mx-0 lg:text-lg">
-          @Localizer["Home_Hero_Subtitle"]
-        </p>
-        <div class="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
-          <a asp-controller="Auction" asp-action="Index"
-             class="inline-flex items-center rounded-full bg-slate-900 px-7 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-blue-800">
+        <p class="home-hero-banner__subtitle">@Localizer["Home_Hero_Subtitle"]</p>
+        <div class="home-hero-banner__actions">
+          <a asp-controller="Auction" asp-action="Index" class="home-hero-banner__btn home-hero-banner__btn--primary">
             @Localizer["Home_Hero_ExploreAuctions"]
           </a>
           @if (isLoggedIn)
           {
-            <a asp-controller="Account" asp-action="Selling"
-               class="inline-flex items-center rounded-full border-2 border-slate-900 bg-white px-7 py-3.5 text-xs font-bold uppercase tracking-widest text-slate-900 transition hover:bg-slate-50">
+            <a asp-controller="Account" asp-action="Selling" class="home-hero-banner__btn home-hero-banner__btn--ghost">
               @Localizer["Home_Hero_SellYourCard"]
             </a>
           }
@@ -40,7 +64,7 @@
           {
             var sellReturnUrl = Url.Action("Selling", "Account", new { tab = "active", channel = "buynow" }) ?? "/Account/Selling";
             <button type="button" data-auth-tab="login" data-auth-return-url="@sellReturnUrl"
-                    class="inline-flex cursor-pointer items-center rounded-full border-2 border-slate-900 bg-white px-7 py-3.5 text-xs font-bold uppercase tracking-widest text-slate-900 transition hover:bg-slate-50">
+                    class="home-hero-banner__btn home-hero-banner__btn--ghost">
               @Localizer["Home_Hero_SellYourCard"]
             </button>
           }
@@ -125,6 +149,7 @@
 </div>
 
 @section Scripts {
+  <script src="~/js/home-hero-banner.js" asp-append-version="true"></script>
   <script src="~/js/home-carousel.js" asp-append-version="true"></script>
   <script src="~/js/buy-now-cart.js" asp-append-version="true"></script>
 }
