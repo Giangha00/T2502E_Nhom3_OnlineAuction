@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Helpers;
@@ -13,47 +15,26 @@ public class RegistrationDepositService : IRegistrationDepositService
     private readonly IPayPalService _payPalService;
     private readonly INotificationService _notificationService;
     private readonly ILogger<RegistrationDepositService> _logger;
+    private readonly PlatformFeeSettings _feeSettings;
 
     public RegistrationDepositService(
         AuctionHouseDbContext dbContext,
         IPayPalService payPalService,
         INotificationService notificationService,
-        ILogger<RegistrationDepositService> logger)
+        ILogger<RegistrationDepositService> logger,
+        IOptions<PlatformFeeSettings> feeSettings)
     {
         _dbContext = dbContext;
         _payPalService = payPalService;
         _notificationService = notificationService;
         _logger = logger;
+        _feeSettings = feeSettings.Value;
     }
 
     public decimal CalculateDepositAmount(decimal? estimatedValue, decimal startingPrice)
     {
-        // Ưu tiên Product.EstimatedValue
-        // Nếu EstimatedValue null thì dùng Auction.StartingPrice
         var productValue = estimatedValue ?? startingPrice;
-
-        // Nếu giá trị sản phẩm không hợp lệ thì không cho tạo deposit
-        if (productValue <= 0)
-        {
-            throw new InvalidOperationException(
-                "Không thể tạo tiền cọc vì giá trị sản phẩm không hợp lệ.");
-        }
-
-        // Công thức: depositAmount = Round(productValue * 0.10, 2)
-        var depositAmount = Math.Round(
-            productValue * 0.10m,
-            2,
-            MidpointRounding.AwayFromZero);
-
-        // Sàn tối thiểu $1 nếu team quyết định dùng
-        const decimal minimumDeposit = 1.00m;
-
-        if (depositAmount < minimumDeposit)
-        {
-            depositAmount = minimumDeposit;
-        }
-
-        return depositAmount;
+        return MarketplaceFeeCalculator.CalculateRegistrationDeposit(productValue, _feeSettings);
     }
 
     public async Task<RegistrationDepositResult> InitiateDepositAsync(

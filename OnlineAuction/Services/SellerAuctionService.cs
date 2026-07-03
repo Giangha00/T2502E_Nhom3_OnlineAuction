@@ -302,7 +302,6 @@ public class SellerAuctionService : ISellerAuctionService
                 RegistrationEndDate = model.RegistrationEndDate,
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
-                AuctionEventName = TrimOrNull(model.AuctionEventName),
                 ListingType = ListingTypes.Auction,
                 Status = AuctionStatuses.PendingReview,
                 SubmittedAt = now,

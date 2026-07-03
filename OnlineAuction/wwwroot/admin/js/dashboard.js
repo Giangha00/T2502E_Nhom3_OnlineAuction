@@ -150,21 +150,36 @@
 
     function renderRevenueDonutChart() {
         const donut = chartData.revenueDonut || {};
-        const listingFees = Number(donut.listingFees || 0);
-        const transactionCommission = Number(donut.transactionCommission || 0);
-        const total = listingFees + transactionCommission;
+        const registrationDeposits = Number(donut.registrationDeposits || 0);
+        const buyerCheckoutFees = Number(donut.buyerCheckoutFees || 0);
+        const sellerSuccessFees = Number(donut.sellerSuccessFees || 0);
+        const total = registrationDeposits + buyerCheckoutFees + sellerSuccessFees;
 
         if (total <= 0) {
             document.querySelector("#dashboard-revenue-donut-empty")?.classList.remove("hidden");
             return;
         }
 
-        const labels = [donut.listingFeeLabel || "Listing Fees"];
-        const series = [listingFees];
+        const labels = [];
+        const series = [];
+        const colors = [];
 
-        if (donut.hasTransactionCommission) {
-            labels.push(donut.commissionLabel || "Transaction Commission");
-            series.push(transactionCommission);
+        if (registrationDeposits > 0) {
+            labels.push(donut.registrationLabel || "Registration Deposits");
+            series.push(registrationDeposits);
+            colors.push("#12B76A");
+        }
+
+        if (buyerCheckoutFees > 0) {
+            labels.push(donut.buyerCheckoutLabel || "Buyer Checkout Fees");
+            series.push(buyerCheckoutFees);
+            colors.push("#465fff");
+        }
+
+        if (sellerSuccessFees > 0) {
+            labels.push(donut.sellerSuccessLabel || "Seller Success Fees");
+            series.push(sellerSuccessFees);
+            colors.push("#F79009");
         }
 
         const revenueDonutChart = new ApexCharts(document.querySelector("#dashboard-revenue-donut-chart"), {
@@ -175,7 +190,7 @@
             },
             series: series,
             labels: labels,
-            colors: ["#465fff", "#F79009"],
+            colors: colors,
             legend: {
                 position: "bottom",
                 labels: { colors: labelColor }
@@ -185,11 +200,9 @@
                 theme: isDarkMode ? "dark" : "light",
                 y: {
                     formatter: function (value, opts) {
-                        const percentages = [
-                            donut.listingFeePercentage,
-                            donut.transactionCommissionPercentage
-                        ];
-                        const percentage = percentages[opts.seriesIndex] ?? 0;
+                        const percentage = opts.seriesIndex === 0
+                            ? donut.transactionCommissionPercentage
+                            : 0;
                         return `$${Number(value).toLocaleString()} (${percentage}%)`;
                     }
                 }
@@ -202,8 +215,7 @@
     function bindRevenueCards() {
         const cardTypeMap = {
             gmv: "order_payment",
-            platform_revenue: "listing_fee",
-            listing_fee: "listing_fee"
+            platform_revenue: "order_payment"
         };
 
         document.querySelectorAll(".dashboard-revenue-card, .dashboard-overview-gmv").forEach(function (card) {
