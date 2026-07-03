@@ -16,9 +16,19 @@ public class Bid : AuditableEntity
 
     public DateTime PlacedAt { get; set; } = DateTime.UtcNow;
 
+    public string? IpAddress { get; set; }
+
+    public string? UserAgent { get; set; }
+
+    public bool IsFlagged { get; set; }
+
+    public string? FlagReason { get; set; }
+
     public Auction Auction { get; set; } = null!;
 
     public ApplicationUser Bidder { get; set; } = null!;
+
+    public ICollection<BidFraudAlert> FraudAlerts { get; set; } = [];
 }
 
 public static class BidTypes

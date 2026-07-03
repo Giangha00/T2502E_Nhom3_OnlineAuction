@@ -1020,6 +1020,35 @@
   <data name="Admin_BidHistory_Pagination_PageOf" xml:space="preserve"><value>Trang {0} / {1}</value></data>
   <data name="Admin_BidHistory_Pagination_Previous" xml:space="preserve"><value>Trước</value></data>
   <data name="Admin_BidHistory_Pagination_Next" xml:space="preserve"><value>Sau</value></data>
+  <data name="Admin_BidHistory_Flagged" xml:space="preserve"><value>Bị flag</value></data>
+  <data name="Admin_BidHistory_Filter_FlaggedOnly" xml:space="preserve"><value>Chỉ bid bị flag</value></data>
+  <data name="Admin_BidHistory_Filter_ShowAll" xml:space="preserve"><value>Hiện tất cả bid</value></data>
+  <data name="Bid_RateLimit_Message" xml:space="preserve"><value>Quá nhiều lượt bid. Vui lòng chờ trước khi bid tiếp.</value></data>
+  <data name="FraudAlerts_Title" xml:space="preserve"><value>Cảnh báo gian lận</value></data>
+  <data name="FraudAlerts_Total" xml:space="preserve"><value>{0} cảnh báo</value></data>
+  <data name="FraudAlerts_Empty" xml:space="preserve"><value>Không có cảnh báo gian lận cho phiên này.</value></data>
+  <data name="FraudAlerts_Col_Time" xml:space="preserve"><value>Thời gian</value></data>
+  <data name="FraudAlerts_Col_Type" xml:space="preserve"><value>Loại</value></data>
+  <data name="FraudAlerts_Col_Severity" xml:space="preserve"><value>Mức độ</value></data>
+  <data name="FraudAlerts_Col_Message" xml:space="preserve"><value>Mô tả</value></data>
+  <data name="FraudAlerts_Col_User" xml:space="preserve"><value>User</value></data>
+  <data name="FraudAlerts_Col_Status" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="FraudAlerts_Col_Action" xml:space="preserve"><value>Thao tác</value></data>
+  <data name="FraudAlerts_Action_Review" xml:space="preserve"><value>Review</value></data>
+  <data name="FraudAlerts_Action_Dismiss" xml:space="preserve"><value>Bỏ qua</value></data>
+  <data name="FraudAlert_Type_RateLimitExceeded" xml:space="preserve"><value>Vượt giới hạn bid</value></data>
+  <data name="FraudAlert_Type_SameIpMultipleAccounts" xml:space="preserve"><value>Nhiều account cùng IP</value></data>
+  <data name="FraudAlert_Type_RapidBidding" xml:space="preserve"><value>Bid quá nhanh</value></data>
+  <data name="FraudAlert_Type_CollusionRoundTrip" xml:space="preserve"><value>Nghi vấn thông đồng</value></data>
+  <data name="FraudAlert_Type_AbnormalPriceJump" xml:space="preserve"><value>Tăng giá bất thường</value></data>
+  <data name="FraudAlert_Type_NewAccountHighBid" xml:space="preserve"><value>Account mới bid cao</value></data>
+  <data name="FraudAlert_Type_SellerRelatedBidder" xml:space="preserve"><value>Bidder liên quan seller</value></data>
+  <data name="FraudAlert_Severity_Low" xml:space="preserve"><value>Thấp</value></data>
+  <data name="FraudAlert_Severity_Medium" xml:space="preserve"><value>Trung bình</value></data>
+  <data name="FraudAlert_Severity_High" xml:space="preserve"><value>Cao</value></data>
+  <data name="FraudAlert_Status_Open" xml:space="preserve"><value>Đang mở</value></data>
+  <data name="FraudAlert_Status_Reviewed" xml:space="preserve"><value>Đã review</value></data>
+  <data name="FraudAlert_Status_Dismissed" xml:space="preserve"><value>Đã bỏ qua</value></data>
   <data name="Admin_Dashboard_Title" xml:space="preserve"><value>Bảng điều khiển</value></data>
   <data name="Admin_Dashboard_Subtitle" xml:space="preserve"><value>Theo dõi hiệu suất nền tảng và thống kê.</value></data>
   <data name="Admin_Dashboard_Section1_Title" xml:space="preserve"><value>Tổng quan</value></data>

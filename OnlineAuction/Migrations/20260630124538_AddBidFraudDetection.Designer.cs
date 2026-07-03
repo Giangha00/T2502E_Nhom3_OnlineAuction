@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineAuction.Data;
 
@@ -11,9 +12,11 @@ using OnlineAuction.Data;
 namespace OnlineAuction.Migrations
 {
     [DbContext(typeof(AuctionHouseDbContext))]
-    partial class AuctionHouseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260630124538_AddBidFraudDetection")]
+    partial class AddBidFraudDetection
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -209,10 +212,6 @@ namespace OnlineAuction.Migrations
                         .HasMaxLength(120)
                         .HasColumnType("varchar(120)")
                         .HasColumnName("full_name");
-
-                    b.Property<bool>("IsSuperAdmin")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_super_admin");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("tinyint(1)")
@@ -523,20 +522,6 @@ namespace OnlineAuction.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("varchar(30)")
                         .HasColumnName("payment_method");
-
-                    b.Property<decimal>("PlatformFee")
-                        .ValueGeneratedOnAdd()
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasDefaultValue(0m)
-                        .HasColumnName("platform_fee");
-
-                    b.Property<decimal>("SellerFee")
-                        .ValueGeneratedOnAdd()
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasDefaultValue(0m)
-                        .HasColumnName("seller_fee");
 
                     b.Property<string>("ShippingAddress")
                         .HasMaxLength(300)
@@ -1667,10 +1652,6 @@ namespace OnlineAuction.Migrations
                         .HasColumnType("varchar(120)")
                         .HasColumnName("product_origin");
 
-                    b.Property<int?>("ProductTemplateId")
-                        .HasColumnType("int")
-                        .HasColumnName("product_template_id");
-
                     b.Property<int>("SellerId")
                         .HasColumnType("int")
                         .HasColumnName("seller_id");
@@ -1713,9 +1694,6 @@ namespace OnlineAuction.Migrations
                         .HasDatabaseName("ix_products_deleted_at");
 
                     b.HasIndex("DeletedBy");
-
-                    b.HasIndex("ProductTemplateId")
-                        .HasDatabaseName("ix_products_product_template_id");
 
                     b.HasIndex("SellerId")
                         .HasDatabaseName("ix_products_seller_id");
@@ -1866,113 +1844,6 @@ namespace OnlineAuction.Migrations
                     b.ToTable("product_images", (string)null);
                 });
 
-            modelBuilder.Entity("OnlineAuction.Entities.ProductTemplate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CardNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("card_number");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int")
-                        .HasColumnName("category_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
-
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<int?>("DeletedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("deleted_by");
-
-                    b.Property<string>("DescriptionHtml")
-                        .HasColumnType("text")
-                        .HasColumnName("description_html");
-
-                    b.Property<string>("GradeLabel")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("grade_label");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
-
-                    b.Property<string>("Language")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("language");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("PrimaryImage")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)")
-                        .HasColumnName("primary_image");
-
-                    b.Property<string>("SetName")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("set_name");
-
-                    b.Property<string>("ShortDescription")
-                        .HasColumnType("text")
-                        .HasColumnName("short_description");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("updated_by");
-
-                    b.Property<int?>("Year")
-                        .HasColumnType("int")
-                        .HasColumnName("year");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId")
-                        .HasDatabaseName("ix_product_templates_category_id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("DeletedAt")
-                        .HasDatabaseName("ix_product_templates_deleted_at");
-
-                    b.HasIndex("DeletedBy");
-
-                    b.HasIndex("UpdatedBy");
-
-                    b.HasIndex("CategoryId", "Name", "SetName", "CardNumber", "GradeLabel")
-                        .HasDatabaseName("ix_product_templates_lookup");
-
-                    b.ToTable("product_templates", (string)null);
-                });
-
             modelBuilder.Entity("OnlineAuction.Entities.RolePermission", b =>
                 {
                     b.Property<int>("RoleId")
@@ -2095,27 +1966,6 @@ namespace OnlineAuction.Migrations
                         .HasDatabaseName("ix_user_otp_codes_active_lookup");
 
                     b.ToTable("user_otp_codes", (string)null);
-                });
-
-            modelBuilder.Entity("OnlineAuction.Entities.UserPermission", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.Property<int>("PermissionId")
-                        .HasColumnType("int")
-                        .HasColumnName("permission_id");
-
-                    b.HasKey("UserId", "PermissionId");
-
-                    b.HasIndex("PermissionId");
-
-                    b.HasIndex("UserId", "PermissionId")
-                        .IsUnique()
-                        .HasDatabaseName("ux_user_permissions_user_permission");
-
-                    b.ToTable("user_permissions", (string)null);
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.WatchlistItem", b =>
@@ -2655,12 +2505,6 @@ namespace OnlineAuction.Migrations
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_products_deleted_by");
 
-                    b.HasOne("OnlineAuction.Entities.ProductTemplate", "ProductTemplate")
-                        .WithMany("Products")
-                        .HasForeignKey("ProductTemplateId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_products_product_template");
-
                     b.HasOne("OnlineAuction.Entities.ApplicationUser", "Seller")
                         .WithMany("Products")
                         .HasForeignKey("SellerId")
@@ -2675,8 +2519,6 @@ namespace OnlineAuction.Migrations
                         .HasConstraintName("fk_products_updated_by");
 
                     b.Navigation("Category");
-
-                    b.Navigation("ProductTemplate");
 
                     b.Navigation("Seller");
                 });
@@ -2741,36 +2583,6 @@ namespace OnlineAuction.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("OnlineAuction.Entities.ProductTemplate", b =>
-                {
-                    b.HasOne("OnlineAuction.Entities.Category", "Category")
-                        .WithMany("ProductTemplates")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_product_templates_category");
-
-                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("fk_product_templates_created_by");
-
-                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("DeletedBy")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("fk_product_templates_deleted_by");
-
-                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("fk_product_templates_updated_by");
-
-                    b.Navigation("Category");
-                });
-
             modelBuilder.Entity("OnlineAuction.Entities.RolePermission", b =>
                 {
                     b.HasOne("OnlineAuction.Entities.Permission", "Permission")
@@ -2812,27 +2624,6 @@ namespace OnlineAuction.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_otp_codes_user");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("OnlineAuction.Entities.UserPermission", b =>
-                {
-                    b.HasOne("OnlineAuction.Entities.Permission", "Permission")
-                        .WithMany("UserPermissions")
-                        .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_permissions_permission");
-
-                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_permissions_user");
-
-                    b.Navigation("Permission");
 
                     b.Navigation("User");
                 });
@@ -2903,16 +2694,12 @@ namespace OnlineAuction.Migrations
 
             modelBuilder.Entity("OnlineAuction.Entities.Category", b =>
                 {
-                    b.Navigation("ProductTemplates");
-
                     b.Navigation("Products");
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.Permission", b =>
                 {
                     b.Navigation("RolePermissions");
-
-                    b.Navigation("UserPermissions");
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.Product", b =>
@@ -2922,11 +2709,6 @@ namespace OnlineAuction.Migrations
                     b.Navigation("Documents");
 
                     b.Navigation("Images");
-                });
-
-            modelBuilder.Entity("OnlineAuction.Entities.ProductTemplate", b =>
-                {
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

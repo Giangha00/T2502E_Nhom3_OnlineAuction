@@ -9,6 +9,20 @@
   "PasswordResetOtp": {
     "UseMockOtpSender": true
   },
+  "BidFraudDetection": {
+    "Enabled": true,
+    "RateLimitingEnabled": true,
+    "MaxBidsPerMinutePerUser": 10,
+    "MaxBidsPerMinutePerAuction": 30,
+    "SameIpAccountThreshold": 2,
+    "RapidBidWindowSeconds": 60,
+    "RapidBidCountThreshold": 5,
+    "CollusionRoundTripThreshold": 3,
+    "AbnormalJumpPercent": 50,
+    "NewAccountHoursThreshold": 24,
+    "AntiSnipeThresholdMinutes": 5,
+    "AntiSnipeExtensionMinutes": 5
+  },
   "Email": {
     "Gmail": {
       "ClientId": "YOUR_GOOGLE_OAUTH_CLIENT_ID",

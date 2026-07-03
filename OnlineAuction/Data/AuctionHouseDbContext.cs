@@ -23,6 +23,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<Bid> Bids => Set<Bid>();
 
+    public DbSet<BidFraudAlert> BidFraudAlerts => Set<BidFraudAlert>();
+
     public DbSet<AuctionOrder> Orders => Set<AuctionOrder>();
 
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
@@ -68,6 +70,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureAuctions(builder);
         ConfigureAuctionRegistrations(builder);
         ConfigureBids(builder);
+        ConfigureBidFraudAlerts(builder);
         ConfigureOrders(builder);
         ConfigureOrderItems(builder);
         ConfigurePayments(builder);
@@ -550,9 +553,14 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(b => b.BidType).HasColumnName("bid_type").HasMaxLength(20).IsRequired().HasDefaultValue(BidTypes.Manual);
             entity.Property(b => b.IsWinning).HasColumnName("is_winning");
             entity.Property(b => b.PlacedAt).HasColumnName("placed_at");
+            entity.Property(b => b.IpAddress).HasColumnName("ip_address").HasMaxLength(45);
+            entity.Property(b => b.UserAgent).HasColumnName("user_agent").HasMaxLength(512);
+            entity.Property(b => b.IsFlagged).HasColumnName("is_flagged").HasDefaultValue(false);
+            entity.Property(b => b.FlagReason).HasColumnName("flag_reason").HasMaxLength(255);
 
             entity.HasIndex(b => new { b.AuctionId, b.PlacedAt }).HasDatabaseName("ix_bids_auction_placed_at");
             entity.HasIndex(b => b.BidderId).HasDatabaseName("ix_bids_bidder_id");
+            entity.HasIndex(b => new { b.AuctionId, b.IpAddress }).HasDatabaseName("ix_bids_auction_ip_address");
 
             entity.HasOne(b => b.Auction)
                 .WithMany(a => a.Bids)
@@ -575,6 +583,63 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
                 "`bid_type` IN ('manual', 'buy_now')"));
 
             ConfigureAuditableEntity(entity, "bids");
+        });
+    }
+
+    private static void ConfigureBidFraudAlerts(ModelBuilder builder)
+    {
+        builder.Entity<BidFraudAlert>(entity =>
+        {
+            entity.ToTable("bid_fraud_alerts");
+
+            entity.Property(a => a.Id).HasColumnName("id");
+            entity.Property(a => a.AuctionId).HasColumnName("auction_id");
+            entity.Property(a => a.BidId).HasColumnName("bid_id");
+            entity.Property(a => a.UserId).HasColumnName("user_id");
+            entity.Property(a => a.AlertType).HasColumnName("alert_type").HasMaxLength(50).IsRequired();
+            entity.Property(a => a.Severity).HasColumnName("severity").HasMaxLength(20).IsRequired();
+            entity.Property(a => a.Message).HasColumnName("message").HasColumnType("text").IsRequired();
+            entity.Property(a => a.MetadataJson).HasColumnName("metadata_json").HasColumnType("text");
+            entity.Property(a => a.Status).HasColumnName("status").HasMaxLength(20).IsRequired().HasDefaultValue(FraudAlertStatuses.Open);
+            entity.Property(a => a.ReviewedBy).HasColumnName("reviewed_by");
+            entity.Property(a => a.ReviewedAt).HasColumnName("reviewed_at");
+            entity.Property(a => a.CreatedAt).HasColumnName("created_at");
+
+            entity.HasIndex(a => new { a.AuctionId, a.CreatedAt }).HasDatabaseName("ix_fraud_alerts_auction_created");
+            entity.HasIndex(a => new { a.AuctionId, a.AlertType, a.UserId, a.CreatedAt }).HasDatabaseName("ix_fraud_alerts_dedup_lookup");
+            entity.HasIndex(a => new { a.Status, a.CreatedAt }).HasDatabaseName("ix_fraud_alerts_status_created");
+
+            entity.HasOne(a => a.Auction)
+                .WithMany()
+                .HasForeignKey(a => a.AuctionId)
+                .HasConstraintName("fk_fraud_alerts_auction")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(a => a.Bid)
+                .WithMany(b => b.FraudAlerts)
+                .HasForeignKey(a => a.BidId)
+                .HasConstraintName("fk_fraud_alerts_bid")
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(a => a.User)
+                .WithMany()
+                .HasForeignKey(a => a.UserId)
+                .HasConstraintName("fk_fraud_alerts_user")
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(a => a.Reviewer)
+                .WithMany()
+                .HasForeignKey(a => a.ReviewedBy)
+                .HasConstraintName("fk_fraud_alerts_reviewed_by")
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_fraud_alerts_severity",
+                "`severity` IN ('low','medium','high')"));
+
+            entity.ToTable(t => t.HasCheckConstraint(
+                "chk_fraud_alerts_status",
+                "`status` IN ('open','reviewed','dismissed')"));
         });
     }
 
