@@ -174,6 +174,16 @@
   <data name="Common_Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="ConfirmModal_Confirm" xml:space="preserve"><value>Confirm</value></data>
+  <data name="ConfirmModal_RegisterAuction_Title" xml:space="preserve"><value>Register for this auction?</value></data>
+  <data name="ConfirmModal_RegisterAuction_Message" xml:space="preserve"><value>You will pay a {0} deposit via PayPal to register for this auction.</value></data>
+  <data name="ConfirmModal_RegisterAuction_Note" xml:space="preserve"><value>After payment succeeds, you can place bids once the live auction starts.</value></data>
+  <data name="ConfirmModal_CancelRegistration_Title" xml:space="preserve"><value>Cancel auction registration?</value></data>
+  <data name="ConfirmModal_CancelRegistration_Message" xml:space="preserve"><value>Are you sure you want to cancel your registration for this auction?</value></data>
+  <data name="ConfirmModal_CancelRegistration_Note" xml:space="preserve"><value>Any deposit already paid will be refunded according to platform policy.</value></data>
+  <data name="ConfirmModal_CreateAuction_Title" xml:space="preserve"><value>Submit auction listing?</value></data>
+  <data name="ConfirmModal_CreateAuction_Message" xml:space="preserve"><value>You are about to submit "{0}" for admin review before it goes live.</value></data>
+  <data name="ConfirmModal_CreateAuction_Note" xml:space="preserve"><value>The listing will be pending review. Track its status in your Selling dashboard.</value></data>
   <data name="Home_BestSellers_Title" xml:space="preserve">
     <value>Best Sellers</value>
   </data>

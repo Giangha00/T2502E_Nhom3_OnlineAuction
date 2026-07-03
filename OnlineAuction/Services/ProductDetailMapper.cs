@@ -1,3 +1,4 @@
+using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Helpers;
@@ -18,7 +19,8 @@ internal static class ProductDetailMapper
         int? currentUserId = null,
         string? userRegistrationStatus = null,
         string? registrationRejectReason = null,
-        int registrationCount = 0)
+        int registrationCount = 0,
+        PlatformFeeSettings? feeSettings = null)
     {
         var product = auction.Product;
         var bids = auction.Bids.OrderByDescending(b => b.PlacedAt).ToList();
@@ -37,6 +39,7 @@ internal static class ProductDetailMapper
             auctionAcceptsBids);
         var isRegistered = userRegistrationStatus is not null &&
                            userRegistrationStatus != AuctionRegistrationStatuses.Cancelled;
+        var registrationDepositAmount = ResolveRegistrationDepositAmount(auction, feeSettings);
 
         return new ProductDetailViewModel
         {
@@ -88,6 +91,7 @@ internal static class ProductDetailMapper
             IsSeller = isSeller,
             IsVerifiedAuthentic = auction.VerifiedAt.HasValue,
             RegistrationCount = registrationCount,
+            RegistrationDepositAmount = registrationDepositAmount,
             Seller = seller,
             Grading = BuildGrading(product),
             BidHistory = MapBidHistory(bids),
@@ -117,6 +121,22 @@ internal static class ProductDetailMapper
         }
 
         return registrationStatus == AuctionRegistrationStatuses.Approved;
+    }
+
+    private static decimal ResolveRegistrationDepositAmount(Auction auction, PlatformFeeSettings? feeSettings)
+    {
+        if (!auction.RequiresRegistration || feeSettings is null)
+        {
+            return 0m;
+        }
+
+        var productValue = auction.Product.EstimatedValue ?? auction.StartingPrice;
+        if (productValue <= 0)
+        {
+            return 0m;
+        }
+
+        return MarketplaceFeeCalculator.CalculateRegistrationDeposit(productValue, feeSettings);
     }
 
     public static SellerViewModel MapSeller(ApplicationUser seller, int auctionCount, int successfulSales) =>

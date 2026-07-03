@@ -50,6 +50,7 @@ public class ProductDetailViewModel
     public bool IsSeller { get; set; }
     public bool IsVerifiedAuthentic { get; set; }
     public int RegistrationCount { get; set; }
+    public decimal RegistrationDepositAmount { get; set; }
     public SellerViewModel Seller { get; set; } = new();
     public GradingScoreViewModel Grading { get; set; } = new();
     public List<BidHistoryItemViewModel> BidHistory { get; set; } = [];
