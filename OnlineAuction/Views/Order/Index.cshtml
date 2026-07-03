@@ -94,6 +94,7 @@
                      data-subtotal="@item.WinningBid.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                      data-shipping="@item.ShippingFee.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                      data-insurance="@item.VaultInsurance.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-platform-fee="@item.PlatformFee.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                      data-deposit="@item.DepositApplied.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                      data-total="@item.TotalAmount.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                      data-mandatory="@(item.IsMandatory ? "true" : "false")"
@@ -236,6 +237,10 @@
               <div class="order-checkout__summary-row">
                 <dt>@Localizer["Order_VaultInsurance"]</dt>
                 <dd id="orderSummaryInsurance">$@Model.VaultInsurance.ToString("N2")</dd>
+              </div>
+              <div class="order-checkout__summary-row">
+                <dt>@Localizer["Checkout_BuyerCheckoutFee"]</dt>
+                <dd id="orderSummaryPlatformFee">$@Model.PlatformFee.ToString("N2")</dd>
               </div>
               <div class="order-checkout__summary-row" id="orderSummaryDepositRow">
                 <dt>@Localizer["Order_DepositApplied"]</dt>

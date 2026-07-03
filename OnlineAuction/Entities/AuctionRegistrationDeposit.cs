@@ -1,8 +1,7 @@
 ﻿namespace OnlineAuction.Entities;
 
 /// <summary>
-/// Buyer registration deposit (commitment), not platform listing revenue.
-/// See <see cref="ListingFee"/> for seller listing fees charged on admin approval.
+/// Buyer auction registration deposit (commitment fee).
 /// </summary>
 public class AuctionRegistrationDeposit : AuditableEntity
 {

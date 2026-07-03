@@ -130,19 +130,11 @@
                     Approve to publish this listing. Reject with a clear reason so the seller can fix and resubmit.
                 </p>
 
-                <div class="mt-4 rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 dark:border-brand-500/30 dark:bg-brand-500/10">
-                    <p class="text-theme-xs font-medium uppercase tracking-wide text-brand-700 dark:text-brand-300">Estimated listing fee</p>
-                    <p class="mt-1 text-theme-sm font-semibold text-gray-800 dark:text-white/90">@Model.ListingFeePreview</p>
-                    <p class="mt-1 text-theme-xs text-gray-500 dark:text-gray-400">
-                        Charged from the seller when you approve. Not the same as buyer registration deposit.
-                    </p>
-                </div>
-
                 <form asp-action="Approve"
                       asp-route-id="@Model.Id"
                       method="post"
                       class="mt-6"
-                      onsubmit="return confirm('Approve this listing and charge listing fee of $@(Model.EstimatedListingFee.ToString("N2")) from the seller?');">
+                      onsubmit="return confirm('Approve this listing?');">
                     @Html.AntiForgeryToken()
                     <button type="submit"
                             class="w-full rounded-lg bg-success-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-success-600">
