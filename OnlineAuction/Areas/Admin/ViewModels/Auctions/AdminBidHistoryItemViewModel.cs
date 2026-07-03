@@ -19,4 +19,8 @@ public class AdminBidHistoryItemViewModel
     public string Status { get; set; } = "OUTBID";
 
     public bool IsWinning { get; set; }
+
+    public bool IsFlagged { get; set; }
+
+    public string? FlagReason { get; set; }
 }
