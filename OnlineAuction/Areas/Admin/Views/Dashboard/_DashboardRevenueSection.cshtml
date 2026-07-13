@@ -1,6 +1,6 @@
 @model AdminDashboardViewModel
 
-<section id="dashboard-revenue-section" class="mt-8">
+<section id="dashboard-revenue-section" class="mt-2">
     <div class="mb-4">
         <h2 class="text-title-sm font-bold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_RevenueSection_Title"]</h2>
         <p class="text-theme-sm text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_RevenueSection_Description"]</p>
@@ -9,19 +9,17 @@
         </p>
     </div>
 
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 md:gap-6">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
         @{
             var revenueCards = new[]
             {
                 Model.RevenueSection.GmvKpi,
-                Model.RevenueSection.PlatformRevenueKpi,
-                Model.RevenueSection.CompletedOrdersKpi
+                Model.RevenueSection.CommissionKpi
             };
             var revenueLabels = new[]
             {
                 Localizer["Admin_Dashboard_Kpi_Gmv"].Value,
-                Localizer["Admin_Dashboard_Kpi_PlatformRevenue"].Value,
-                Localizer["Admin_Dashboard_Kpi_CompletedOrders"].Value
+                Localizer["Admin_Dashboard_Kpi_Commission"].Value
             };
         }
 
@@ -30,9 +28,7 @@
             var card = revenueCards[index];
             var label = revenueLabels[index];
 
-            <button type="button"
-                    class="dashboard-revenue-card rounded-2xl border border-gray-200 bg-white p-5 text-left transition hover:border-brand-300 hover:shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03] md:p-6"
-                    data-revenue-card="@card.CardKey">
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                 <span class="text-sm text-gray-500 dark:text-gray-400">@label</span>
                 <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">@card.DisplayValue</h4>
                 @if (!string.IsNullOrEmpty(card.ChangeDisplay))
@@ -44,113 +40,7 @@
                             : "text-error-600 dark:text-error-500";
                     <p class="mt-2 text-theme-xs @changeClass">@card.ChangeDisplay @Localizer["Admin_Dashboard_ChangeVsPrevious"]</p>
                 }
-            </button>
+            </div>
         }
-    </div>
-
-    <div class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-3 md:gap-6">
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 xl:col-span-2">
-            <div class="mb-4">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_RevenueLineChart_Title"]</h3>
-                <p class="text-theme-sm text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_RevenueLineChart_Description"]</p>
-            </div>
-            <div id="dashboard-revenue-line-chart" class="min-h-[300px]"></div>
-            <p id="dashboard-revenue-line-empty" class="hidden py-10 text-center text-theme-sm text-gray-500">@Localizer["Admin_Dashboard_NoData"]</p>
-        </div>
-
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-            <div class="mb-4">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_RevenueDonutChart_Title"]</h3>
-                <p class="text-theme-sm text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_RevenueDonutChart_Description"]</p>
-            </div>
-            <div id="dashboard-revenue-donut-chart" class="min-h-[300px]"></div>
-            <p id="dashboard-revenue-donut-empty" class="hidden py-10 text-center text-theme-sm text-gray-500">@Localizer["Admin_Dashboard_NoData"]</p>
-        </div>
-    </div>
-
-    <div id="dashboard-revenue-detail" class="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
-        <div class="mb-4">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_RevenueDetail_Title"]</h3>
-            <p class="text-theme-sm text-gray-500 dark:text-gray-400">
-                @Localizer["Admin_Dashboard_RevenueDetail_Description"]
-                @if (!string.IsNullOrWhiteSpace(Model.Filter.RevenueTypeFilter))
-                {
-                    <span class="text-brand-600">(@Localizer["Admin_Dashboard_RecentAuctions_Filtered"])</span>
-                }
-            </p>
-        </div>
-
-        <div class="max-w-full overflow-x-auto">
-            <table class="w-full min-w-[900px]">
-                <thead>
-                    <tr class="border-y border-gray-100 dark:border-gray-800">
-                        <th class="py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Revenue_Col_Date"]</th>
-                        <th class="py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Revenue_Col_Type"]</th>
-                        <th class="py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Revenue_Col_Reference"]</th>
-                        <th class="py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Revenue_Col_Gmv"]</th>
-                        <th class="py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Revenue_Col_PlatformRevenue"]</th>
-                        <th class="py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Col_Status"]</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                    @if (Model.RevenueSection.DetailRows.Count == 0)
-                    {
-                        <tr>
-                            <td colspan="6" class="py-10 text-center text-theme-sm text-gray-500 dark:text-gray-400">
-                                @Localizer["Admin_Dashboard_NoData"]
-                            </td>
-                        </tr>
-                    }
-                    else
-                    {
-                        @foreach (var row in Model.RevenueSection.DetailRows)
-                        {
-                            var typeLabel = row.Type switch
-                            {
-                                DashboardRevenueTypes.RegistrationDeposit => Localizer["Admin_Dashboard_Revenue_Type_RegistrationDeposit"].Value,
-                                DashboardRevenueTypes.SellerSuccessFee => Localizer["Admin_Dashboard_Revenue_Type_SellerSuccessFee"].Value,
-                                _ => Localizer["Admin_Dashboard_Revenue_Type_OrderPayment"].Value
-                            };
-                            var statusLabel = row.Type switch
-                            {
-                                DashboardRevenueTypes.RegistrationDeposit when row.Status == AuctionRegistrationDepositStatuses.Applied
-                                    => Localizer["Admin_Dashboard_Revenue_Status_Applied"].Value,
-                                DashboardRevenueTypes.RegistrationDeposit
-                                    => Localizer["Admin_Dashboard_Revenue_Status_Paid"].Value,
-                                _ => Localizer["Admin_Dashboard_Revenue_Status_Success"].Value
-                            };
-
-                            <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
-                                <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">@row.TransactionDate.ToString("yyyy-MM-dd HH:mm")</td>
-                                <td class="py-3 text-theme-sm text-gray-700 dark:text-gray-300">@typeLabel</td>
-                                <td class="py-3 text-theme-sm">
-                                    @if (row.AuctionId.HasValue)
-                                    {
-                                        <a asp-area="Admin"
-                                           asp-controller="Auction"
-                                           asp-action="Details"
-                                           asp-route-id="@row.AuctionId.Value"
-                                           class="font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400">
-                                            @row.ReferenceCode
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-gray-700 dark:text-gray-300">@row.ReferenceCode</span>
-                                    }
-                                </td>
-                                <td class="py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">
-                                    @(row.GmvAmount > 0 ? row.GmvAmount.ToString("C2") : "—")
-                                </td>
-                                <td class="py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">
-                                    @(row.PlatformRevenueAmount > 0 ? row.PlatformRevenueAmount.ToString("C2") : "—")
-                                </td>
-                                <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">@statusLabel</td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
     </div>
 </section>

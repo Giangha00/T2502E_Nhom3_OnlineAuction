@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:element name="root" msdata:IsDataSet="true"></xsd:element>
   </xsd:schema>
   <resheader name="resmimetype">
@@ -10,10 +11,12 @@
     <value>1.3</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0,
+      Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0,
+      Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Home" xml:space="preserve">
   <value>Home</value>
@@ -1024,7 +1027,7 @@
   <data name="Admin_Dashboard_Subtitle" xml:space="preserve"><value>Monitor platform performance and analytics.</value></data>
   <data name="Admin_Dashboard_Section1_Title" xml:space="preserve"><value>Overview</value></data>
   <data name="Admin_Dashboard_Section2_Title" xml:space="preserve"><value>User Statistics</value></data>
-  <data name="Admin_Dashboard_Section2_Description" xml:space="preserve"><value>Registration trends, active users, and top buyers/sellers.</value></data>
+  <data name="Admin_Dashboard_Section2_Description" xml:space="preserve"><value>Registration trends, active users, and top bidders/sellers.</value></data>
   <data name="Admin_Dashboard_Section3_Title" xml:space="preserve"><value>Auction &amp; Product Statistics</value></data>
   <data name="Admin_Dashboard_Section3_Description" xml:space="preserve"><value>Auction status, success rate, and category bid volume.</value></data>
   <data name="Admin_Dashboard_Filter_Title" xml:space="preserve"><value>Date Range Filter</value></data>
@@ -1055,11 +1058,11 @@
   <data name="Admin_Dashboard_SuccessRate_Tooltip" xml:space="preserve"><value>Sold listings / total listed auctions × 100. Paid or delivered orders only.</value></data>
   <data name="Admin_Dashboard_SuccessRate_Hint" xml:space="preserve"><value>Sold listings / total listed</value></data>
   <data name="Admin_Dashboard_RegistrationChart_Title" xml:space="preserve"><value>New Registrations</value></data>
-  <data name="Admin_Dashboard_RegistrationChart_Description" xml:space="preserve"><value>Click a bar to filter the registration table.</value></data>
+  <data name="Admin_Dashboard_RegistrationChart_Description" xml:space="preserve"><value>New registrations by day, week, or month in the selected period.</value></data>
   <data name="Admin_Dashboard_Granularity_Day" xml:space="preserve"><value>Day</value></data>
   <data name="Admin_Dashboard_Granularity_Week" xml:space="preserve"><value>Week</value></data>
   <data name="Admin_Dashboard_Granularity_Month" xml:space="preserve"><value>Month</value></data>
-  <data name="Admin_Dashboard_TopBuyers_Title" xml:space="preserve"><value>Top 10 Buyers</value></data>
+  <data name="Admin_Dashboard_TopBuyers_Title" xml:space="preserve"><value>Top 10 Bidders</value></data>
   <data name="Admin_Dashboard_TopSellers_Title" xml:space="preserve"><value>Top 10 Sellers</value></data>
   <data name="Admin_Dashboard_NewUsers_Title" xml:space="preserve"><value>New Registrations</value></data>
   <data name="Admin_Dashboard_NewUsers_Filtered" xml:space="preserve"><value>Filtered by {0}</value></data>
@@ -1089,12 +1092,13 @@
   <data name="Admin_Dashboard_Col_EndsIn" xml:space="preserve"><value>Ends In</value></data>
   <data name="Admin_Dashboard_Kpi_Gmv" xml:space="preserve"><value>GMV</value></data>
   <data name="Admin_Dashboard_Kpi_PlatformRevenue" xml:space="preserve"><value>Platform Revenue</value></data>
+  <data name="Admin_Dashboard_Kpi_Commission" xml:space="preserve"><value>Commission (Marketplace Fees)</value></data>
   <data name="Admin_Dashboard_Kpi_ListingFees" xml:space="preserve"><value>Listing Fees</value></data>
   <data name="Admin_Dashboard_Kpi_CompletedOrders" xml:space="preserve"><value>Completed Orders</value></data>
   <data name="Admin_Dashboard_RevenueSection_Title" xml:space="preserve"><value>Revenue</value></data>
-  <data name="Admin_Dashboard_RevenueSection_Description" xml:space="preserve"><value>GMV vs platform revenue with transaction detail.</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Platform revenue includes registration deposits, buyer checkout fees, and seller success fees. Deposits refunded to non-winners are excluded.</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>Platform revenue = registration deposits collected + buyer checkout fees (2.5%) + seller success fees (10%). Refunded registration deposits are excluded. Shipping and insurance in order totals are included in GMV as pass-through amounts.</value></data>
+  <data name="Admin_Dashboard_RevenueSection_Description" xml:space="preserve"><value>Total transaction value and marketplace commission.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Commission = buyer checkout fees + seller success fees from paid/delivered orders.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV is the sum of successful payments in the period. Commission is marketplace fees only: buyer checkout fees (PlatformFee) + seller success fees (SellerFee) on paid/delivered orders. Registration deposits are not included.</value></data>
   <data name="Admin_Dashboard_Revenue_NoFeeData" xml:space="preserve"><value>No platform fee data yet</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Title" xml:space="preserve"><value>GMV vs Platform Revenue</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Description" xml:space="preserve"><value>Click a point to filter the detail table by day.</value></data>
