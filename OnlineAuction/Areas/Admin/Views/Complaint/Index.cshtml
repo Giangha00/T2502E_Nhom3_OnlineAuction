@@ -6,6 +6,7 @@
 }
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<link rel="stylesheet" href="~/admin/css/daterangepicker-admin.css" asp-append-version="true" />
 
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -76,14 +77,16 @@
                 </select>
             </div>
 
-            <div class="w-[220px]">
+            <div class="w-[300px]">
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Date range</label>
-                <input id="complaintDateRangePicker"
-                       name="DateRange"
-                       value="@Model.Filter.DateRange"
-                       placeholder="MM/DD/YYYY - MM/DD/YYYY"
-                       autocomplete="off"
-                       class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                @{
+                    ViewData["DateRangeId"] = "complaintDateRangePicker";
+                    ViewData["DateRangeHiddenId"] = "complaintDateRangeValue";
+                    ViewData["DateRangeName"] = "DateRange";
+                    ViewData["DateRangeValue"] = Model.Filter.DateRange;
+                    ViewData["DateRangePlaceholder"] = "Select date range";
+                }
+                @await Html.PartialAsync("_DateRangeTrigger")
             </div>
 
             <div class="w-[140px]">

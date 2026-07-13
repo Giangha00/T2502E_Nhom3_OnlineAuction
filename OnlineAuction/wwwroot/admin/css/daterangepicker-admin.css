@@ -1,0 +1,102 @@
+/* Ensure Date Range Picker appears above admin chrome (sidebar/header). */
+.daterangepicker {
+  z-index: 100000;
+  font-family: Outfit, system-ui, sans-serif;
+  border-radius: 8px;
+  border-color: #e4e7ec;
+  box-shadow: 0 12px 32px rgba(16, 24, 40, 0.12);
+}
+
+.daterangepicker .ranges li.active {
+  background-color: #357ebd;
+  color: #fff;
+}
+
+.daterangepicker td.active,
+.daterangepicker td.active:hover {
+  background-color: #357ebd;
+}
+
+.daterangepicker td.in-range {
+  background-color: #ebf4f8;
+  color: #1d2939;
+}
+
+.daterangepicker td.available:hover,
+.daterangepicker th.available:hover {
+  background-color: #eee;
+}
+
+.daterangepicker .drp-buttons .btn {
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.daterangepicker .drp-buttons .applyBtn {
+  background-color: #357ebd;
+  border-color: #357ebd;
+  color: #fff;
+}
+
+.daterangepicker .drp-buttons .cancelBtn {
+  background-color: #fff;
+  border-color: #ccc;
+  color: #333;
+}
+
+.admin-daterange-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 280px;
+  width: 100%;
+  height: 2.5rem;
+  padding: 0.35rem 0.75rem;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  color: #344054;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.admin-daterange-trigger:hover {
+  border-color: #98a2b3;
+}
+
+.admin-daterange-trigger .admin-daterange-icon,
+.admin-daterange-trigger .admin-daterange-caret {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  color: #667085;
+}
+
+.admin-daterange-trigger .admin-daterange-label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-daterange-trigger .admin-daterange-caret {
+  margin-left: auto;
+}
+
+.dark .admin-daterange-trigger {
+  background: #111827;
+  border-color: #374151;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.dark .admin-daterange-trigger .admin-daterange-icon,
+.dark .admin-daterange-trigger .admin-daterange-caret {
+  color: #98a2b3;
+}
+
+.admin-daterange-input {
+  min-width: 260px;
+}
