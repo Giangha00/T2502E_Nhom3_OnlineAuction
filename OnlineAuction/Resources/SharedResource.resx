@@ -1120,4 +1120,177 @@
   <data name="Admin_Dashboard_Revenue_Status_Success" xml:space="preserve"><value>Success</value></data>
   <data name="Admin_Dashboard_Revenue_Status_Applied" xml:space="preserve"><value>Applied</value></data>
   <data name="Admin_Dashboard_Revenue_Status_Paid" xml:space="preserve"><value>Paid</value></data>
+  <data name="AdminProduct.TemplateIndexTitle" xml:space="preserve"><value>Product templates</value></data>
+  <data name="AdminProduct.TemplateIndexSubtitle" xml:space="preserve"><value>View the list of product templates and manage seller products under each template.</value></data>
+  <data name="AdminProduct.CreateTemplate" xml:space="preserve"><value>Create template</value></data>
+  <data name="AdminProduct.CreateTemplateShort" xml:space="preserve"><value>New template</value></data>
+  <data name="AdminProduct.CreateTemplateSubtitle" xml:space="preserve"><value>Create shared template information for seller products.</value></data>
+  <data name="AdminProduct.EditTemplate" xml:space="preserve"><value>Edit template</value></data>
+  <data name="AdminProduct.EditTemplateSubtitle" xml:space="preserve"><value>Update shared template information for seller products.</value></data>
+  <data name="AdminProduct.Search" xml:space="preserve"><value>Search</value></data>
+  <data name="AdminProduct.Sort" xml:space="preserve"><value>Sort</value></data>
+  <data name="AdminProduct.TemplateSearchPlaceholder" xml:space="preserve"><value>Template name, set, card number, category</value></data>
+  <data name="AdminProduct.ProductSearchPlaceholder" xml:space="preserve"><value>Seller, PRD code, certificate number</value></data>
+  <data name="AdminProduct.SortNameAsc" xml:space="preserve"><value>Name A-Z</value></data>
+  <data name="AdminProduct.SortNameDesc" xml:space="preserve"><value>Name Z-A</value></data>
+  <data name="AdminProduct.SortMostProducts" xml:space="preserve"><value>Most products</value></data>
+  <data name="AdminProduct.SortRecentlyUpdated" xml:space="preserve"><value>Recently updated</value></data>
+  <data name="AdminProduct.SortPriceAsc" xml:space="preserve"><value>Price ascending</value></data>
+  <data name="AdminProduct.SortPriceDesc" xml:space="preserve"><value>Price descending</value></data>
+  <data name="AdminProduct.SortNewest" xml:space="preserve"><value>Newest</value></data>
+  <data name="AdminProduct.SortSellerAsc" xml:space="preserve"><value>Seller A-Z</value></data>
+  <data name="AdminProduct.Preview" xml:space="preserve"><value>Preview</value></data>
+  <data name="AdminProduct.TemplateName" xml:space="preserve"><value>Template name</value></data>
+  <data name="AdminProduct.Category" xml:space="preserve"><value>Category</value></data>
+  <data name="AdminProduct.SetCard" xml:space="preserve"><value>Set / card code</value></data>
+  <data name="AdminProduct.Grade" xml:space="preserve"><value>Grade</value></data>
+  <data name="AdminProduct.Products" xml:space="preserve"><value>Products</value></data>
+  <data name="AdminProduct.LastAdded" xml:space="preserve"><value>Last added</value></data>
+  <data name="AdminProduct.Actions" xml:space="preserve"><value>Actions</value></data>
+  <data name="AdminProduct.EmptyTemplates" xml:space="preserve"><value>No product templates yet.</value></data>
+  <data name="AdminProduct.TemplateCode" xml:space="preserve"><value>Template code</value></data>
+  <data name="AdminProduct.ViewProducts" xml:space="preserve"><value>View products</value></data>
+  <data name="AdminProduct.CreateProduct" xml:space="preserve"><value>Create product</value></data>
+  <data name="AdminProduct.CreateProductSubtitle" xml:space="preserve"><value>Add a new trading card product to the catalog.</value></data>
+  <data name="AdminProduct.EditProduct" xml:space="preserve"><value>Edit product</value></data>
+  <data name="AdminProduct.EditProductSubtitle" xml:space="preserve"><value>Update product information, images, and documents.</value></data>
+  <data name="AdminProduct.ProductsByTemplate" xml:space="preserve"><value>Products by template</value></data>
+  <data name="AdminProduct.BackToTemplates" xml:space="preserve"><value>Back to templates</value></data>
+  <data name="AdminProduct.TemplateSummary" xml:space="preserve"><value>{0} products from {1} sellers</value></data>
+  <data name="AdminProduct.All" xml:space="preserve"><value>All</value></data>
+  <data name="AdminProduct.Seller" xml:space="preserve"><value>Seller</value></data>
+  <data name="AdminProduct.Condition" xml:space="preserve"><value>Condition</value></data>
+  <data name="AdminProduct.MinPrice" xml:space="preserve"><value>Min price</value></data>
+  <data name="AdminProduct.MaxPrice" xml:space="preserve"><value>Max price</value></data>
+  <data name="AdminProduct.DateRange" xml:space="preserve"><value>Date range</value></data>
+  <data name="AdminProduct.DeleteSelected" xml:space="preserve"><value>Delete selected</value></data>
+  <data name="AdminProduct.SelectAllProducts" xml:space="preserve"><value>Select all products</value></data>
+  <data name="AdminProduct.Product" xml:space="preserve"><value>Product</value></data>
+  <data name="AdminProduct.Price" xml:space="preserve"><value>Price</value></data>
+  <data name="AdminProduct.Quantity" xml:space="preserve"><value>Quantity</value></data>
+  <data name="AdminProduct.CardCert" xml:space="preserve"><value>Card / certificate</value></data>
+  <data name="AdminProduct.Auctions" xml:space="preserve"><value>Auctions</value></data>
+  <data name="AdminProduct.Created" xml:space="preserve"><value>Created</value></data>
+  <data name="AdminProduct.EmptyProducts" xml:space="preserve"><value>This template has no seller products yet.</value></data>
+  <data name="AdminProduct.ProductCode" xml:space="preserve"><value>Product code</value></data>
+  <data name="AdminProduct.EstimatedShort" xml:space="preserve"><value>Estimated</value></data>
+  <data name="AdminProduct.ImportShort" xml:space="preserve"><value>Import</value></data>
+  <data name="AdminProduct.Details" xml:space="preserve"><value>Details</value></data>
+  <data name="AdminProduct.Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="AdminProduct.Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="AdminProduct.ConfirmDeleteProduct" xml:space="preserve"><value>Are you sure you want to delete this product?</value></data>
+  <data name="AdminProduct.ConfirmBulkDeleteProducts" xml:space="preserve"><value>Are you sure you want to delete the selected products?</value></data>
+  <data name="AdminProduct.SelectAtLeastOneProduct" xml:space="preserve"><value>Please select at least one product.</value></data>
+  <data name="AdminProduct.Total" xml:space="preserve"><value>Total</value></data>
+  <data name="AdminProduct.Page" xml:space="preserve"><value>Page</value></data>
+  <data name="AdminProduct.Of" xml:space="preserve"><value>of</value></data>
+  <data name="AdminProduct.Previous" xml:space="preserve"><value>Previous</value></data>
+  <data name="AdminProduct.Next" xml:space="preserve"><value>Next</value></data>
+  <data name="AdminProduct.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="AdminProduct.SaveChanges" xml:space="preserve"><value>Save changes</value></data>
+  <data name="AdminProduct.Template" xml:space="preserve"><value>Product template</value></data>
+  <data name="AdminProduct.SelectTemplate" xml:space="preserve"><value>Select product template</value></data>
+  <data name="AdminProduct.BasicInformation" xml:space="preserve"><value>Basic information</value></data>
+  <data name="AdminProduct.Classification" xml:space="preserve"><value>Classification</value></data>
+  <data name="AdminProduct.SelectCategory" xml:space="preserve"><value>Select category</value></data>
+  <data name="AdminProduct.SelectSeller" xml:space="preserve"><value>Select seller</value></data>
+  <data name="AdminProduct.CardMetadata" xml:space="preserve"><value>Card metadata</value></data>
+  <data name="AdminProduct.Grading" xml:space="preserve"><value>Grading</value></data>
+  <data name="AdminProduct.Value" xml:space="preserve"><value>Value</value></data>
+  <data name="AdminProduct.Media" xml:space="preserve"><value>Images and documents</value></data>
+  <data name="AdminProduct.PrimaryImage" xml:space="preserve"><value>Primary image</value></data>
+  <data name="AdminProduct.PrimaryImageHelp" xml:space="preserve"><value>JPG, PNG, or WEBP. Max 5MB.</value></data>
+  <data name="AdminProduct.CurrentGallery" xml:space="preserve"><value>Current gallery</value></data>
+  <data name="AdminProduct.Gallery" xml:space="preserve"><value>Gallery</value></data>
+  <data name="AdminProduct.GalleryImage" xml:space="preserve"><value>Gallery image</value></data>
+  <data name="AdminProduct.GalleryImages" xml:space="preserve"><value>Gallery images</value></data>
+  <data name="AdminProduct.GalleryImagesHelp" xml:space="preserve"><value>Up to 4 gallery images in addition to the primary image. JPG, PNG, or WEBP. Max 5MB each.</value></data>
+  <data name="AdminProduct.CurrentDocuments" xml:space="preserve"><value>Current certificates/documents</value></data>
+  <data name="AdminProduct.CertificateDocuments" xml:space="preserve"><value>Certificate / verification documents (PDF)</value></data>
+  <data name="AdminProduct.CertificateDocumentsHelp" xml:space="preserve"><value>Upload PSA certificates, grading reports, or verification PDFs. Max 5MB each, up to 5 documents per product.</value></data>
+  <data name="AdminProduct.Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="AdminProduct.View" xml:space="preserve"><value>View</value></data>
+  <data name="AdminProduct.Download" xml:space="preserve"><value>Download</value></data>
+  <data name="AdminProduct.DocumentTypePsaCertificate" xml:space="preserve"><value>PSA certificate</value></data>
+  <data name="AdminProduct.DocumentTypeBgsCertificate" xml:space="preserve"><value>BGS certificate</value></data>
+  <data name="AdminProduct.DocumentTypeProductVerification" xml:space="preserve"><value>Product verification</value></data>
+  <data name="AdminProduct.DocumentTypeWarranty" xml:space="preserve"><value>Warranty</value></data>
+  <data name="AdminProduct.TemplateInstancesWarning" xml:space="preserve"><value>This change only applies to template information; certificates and pricing for each seller product will remain separate.</value></data>
+  <data name="AdminProduct.TemplateInformation" xml:space="preserve"><value>Template information</value></data>
+  <data name="AdminProduct.Description" xml:space="preserve"><value>Description</value></data>
+  <data name="AdminProduct.TemplateImage" xml:space="preserve"><value>Template image</value></data>
+  <data name="AdminProduct.TemplateImageHelp" xml:space="preserve"><value>JPG or PNG. Max 2MB.</value></data>
+  <data name="AdminProduct.ProductDetails" xml:space="preserve"><value>Thông tin sản phẩm</value></data>
+  <data name="AdminProduct.OpenTemplateProducts" xml:space="preserve"><value>Open products for template {0}</value></data>
+  <data name="AdminProduct.Back" xml:space="preserve"><value>Back</value></data>
+  <data name="AdminProduct.CertificateNumber" xml:space="preserve"><value>Certificate number</value></data>
+  <data name="AdminProduct.CardNumber" xml:space="preserve"><value>Card number</value></data>
+  <data name="AdminProduct.Year" xml:space="preserve"><value>Year</value></data>
+  <data name="AdminProduct.SetName" xml:space="preserve"><value>Set name</value></data>
+  <data name="AdminProduct.Language" xml:space="preserve"><value>Language</value></data>
+  <data name="AdminProduct.ProductOrigin" xml:space="preserve"><value>Product origin</value></data>
+  <data name="AdminProduct.EstimatedValue" xml:space="preserve"><value>Estimated value</value></data>
+  <data name="AdminProduct.ImportPrice" xml:space="preserve"><value>Import price</value></data>
+  <data name="AdminProduct.Updated" xml:space="preserve"><value>Updated</value></data>
+  <data name="AdminProduct.NotUpdated" xml:space="preserve"><value>Not updated</value></data>
+  <data name="AdminProduct.GradingSubScores" xml:space="preserve"><value>Sub-scores</value></data>
+  <data name="AdminProduct.Centering" xml:space="preserve"><value>Centering</value></data>
+  <data name="AdminProduct.Corners" xml:space="preserve"><value>Corners</value></data>
+  <data name="AdminProduct.Edges" xml:space="preserve"><value>Edges</value></data>
+  <data name="AdminProduct.Surface" xml:space="preserve"><value>Surface</value></data>
+  <data name="AdminProduct.CertificatesAndDocuments" xml:space="preserve"><value>Certificates and documents</value></data>
+  <data name="AdminProduct.LinkedAuctions" xml:space="preserve"><value>Linked auctions</value></data>
+  <data name="AdminProduct.Status" xml:space="preserve"><value>Status</value></data>
+  <data name="AdminProduct.StartingPrice" xml:space="preserve"><value>Starting price</value></data>
+  <data name="AdminProduct.CurrentPrice" xml:space="preserve"><value>Current price</value></data>
+  <data name="AdminProduct.Dates" xml:space="preserve"><value>Dates</value></data>
+  <data name="AdminProduct.Links" xml:space="preserve"><value>Links</value></data>
+  <data name="AdminProduct.EmptyLinkedAuctions" xml:space="preserve"><value>There are no auctions linked to this product yet.</value></data>
+  <data name="AdminProduct.Admin" xml:space="preserve"><value>Admin</value></data>
+  <data name="AdminProduct.Public" xml:space="preserve"><value>Public</value></data>
+  <data name="AdminProduct.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="AdminProduct.Type" xml:space="preserve"><value>Type</value></data>
+  <data name="AdminProduct.Uploaded" xml:space="preserve"><value>Uploaded</value></data>
+  <data name="AdminProduct.EmptyDocuments" xml:space="preserve"><value>No documents have been uploaded for this product yet.</value></data>
+  <data name="AdminProduct.PreviewDocument" xml:space="preserve"><value>Preview</value></data>
+  <data name="AdminProduct.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="AdminProduct.DocumentPreview" xml:space="preserve"><value>Document preview</value></data>
+  <data name="AdminProduct.Document" xml:space="preserve"><value>Document</value></data>
+  <data name="AdminProduct.SellerLockedWarning" xml:space="preserve"><value>This product is currently in an active or soon-to-end auction. The seller cannot be changed.</value></data>
+  <data name="AdminProduct.Field.ProductName" xml:space="preserve"><value>Product name</value></data>
+  <data name="AdminProduct.Field.ShortDescription" xml:space="preserve"><value>Short description</value></data>
+  <data name="AdminProduct.Field.Subtitle" xml:space="preserve"><value>Subtitle</value></data>
+  <data name="AdminProduct.Field.Description" xml:space="preserve"><value>Description</value></data>
+  <data name="AdminProduct.Field.Category" xml:space="preserve"><value>Category</value></data>
+  <data name="AdminProduct.Field.Template" xml:space="preserve"><value>Product template</value></data>
+  <data name="AdminProduct.Field.Seller" xml:space="preserve"><value>Seller</value></data>
+  <data name="AdminProduct.Field.Condition" xml:space="preserve"><value>Condition</value></data>
+  <data name="AdminProduct.Field.ProductOrigin" xml:space="preserve"><value>Product origin</value></data>
+  <data name="AdminProduct.Field.Year" xml:space="preserve"><value>Year</value></data>
+  <data name="AdminProduct.Field.SetName" xml:space="preserve"><value>Set name</value></data>
+  <data name="AdminProduct.Field.Language" xml:space="preserve"><value>Language</value></data>
+  <data name="AdminProduct.Field.CardNumber" xml:space="preserve"><value>Card number</value></data>
+  <data name="AdminProduct.Field.GradeLabel" xml:space="preserve"><value>Grade</value></data>
+  <data name="AdminProduct.Field.CertificateNumber" xml:space="preserve"><value>Certificate number</value></data>
+  <data name="AdminProduct.Field.GradingCentering" xml:space="preserve"><value>Centering score</value></data>
+  <data name="AdminProduct.Field.GradingCorners" xml:space="preserve"><value>Corners score</value></data>
+  <data name="AdminProduct.Field.GradingEdges" xml:space="preserve"><value>Edges score</value></data>
+  <data name="AdminProduct.Field.GradingSurface" xml:space="preserve"><value>Surface score</value></data>
+  <data name="AdminProduct.Field.EstimatedValue" xml:space="preserve"><value>Estimated value</value></data>
+  <data name="AdminProduct.Field.ImportPrice" xml:space="preserve"><value>Import price</value></data>
+  <data name="AdminProduct.Field.PrimaryImage" xml:space="preserve"><value>Primary image</value></data>
+  <data name="AdminProduct.Field.TemplateName" xml:space="preserve"><value>Template name</value></data>
+  <data name="AdminProduct.Validation.ProductNameRequired" xml:space="preserve"><value>Please enter a product name.</value></data>
+  <data name="AdminProduct.Validation.ProductNameMaxLength" xml:space="preserve"><value>Product name cannot exceed 120 characters.</value></data>
+  <data name="AdminProduct.Validation.ShortDescriptionMaxLength" xml:space="preserve"><value>Short description cannot exceed 300 characters.</value></data>
+  <data name="AdminProduct.Validation.SubtitleMaxLength" xml:space="preserve"><value>Subtitle cannot exceed 160 characters.</value></data>
+  <data name="AdminProduct.Validation.TemplateRequired" xml:space="preserve"><value>Please select a product template.</value></data>
+  <data name="AdminProduct.Validation.SellerRequired" xml:space="preserve"><value>Please select a seller.</value></data>
+  <data name="AdminProduct.Validation.ConditionRequired" xml:space="preserve"><value>Please select a condition.</value></data>
+  <data name="AdminProduct.Validation.YearRange" xml:space="preserve"><value>Please enter a valid year from 1800 to 2100.</value></data>
+  <data name="AdminProduct.Validation.EstimatedValueMin" xml:space="preserve"><value>Estimated value must be greater than or equal to 0.</value></data>
+  <data name="AdminProduct.Validation.ImportPriceMin" xml:space="preserve"><value>Import price must be greater than or equal to 0.</value></data>
+  <data name="AdminProduct.Validation.TemplateNameRequired" xml:space="preserve"><value>Please enter a template name.</value></data>
+  <data name="AdminProduct.Validation.TemplateNameMaxLength" xml:space="preserve"><value>Template name cannot exceed 255 characters.</value></data>
+  <data name="AdminProduct.Validation.CategoryRequired" xml:space="preserve"><value>Please select a category.</value></data>
 </root>

@@ -1,14 +1,14 @@
 @model ProductFormViewModel
 
 @{
-    ViewData["Title"] = "Create Product";
+    ViewData["Title"] = Localizer["AdminProduct.CreateProduct"];
     ViewData["AdminPage"] = "products";
 }
 
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
     <div class="mb-6">
-        <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Create Product</h2>
-        <p class="text-theme-sm text-gray-500 dark:text-gray-400">Add a new trading card product to the catalog.</p>
+        <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.CreateProduct"]</h2>
+        <p class="text-theme-sm text-gray-500 dark:text-gray-400">@Localizer["AdminProduct.CreateProductSubtitle"]</p>
     </div>
 
     <form asp-area="Admin"
@@ -26,11 +26,11 @@
                asp-controller="Product"
                asp-action="Index"
                class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                Cancel
+                @Localizer["AdminProduct.Cancel"]
             </a>
 
             <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
-                Create Product
+                @Localizer["AdminProduct.CreateProduct"]
             </button>
         </div>
     </form>
