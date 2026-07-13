@@ -1,0 +1,30 @@
+@* Usage:
+   ViewData["DateRangeId"] = "userDateRangePicker";
+   ViewData["DateRangeHiddenId"] = "userDateRangeValue";
+   ViewData["DateRangeName"] = "DateRange";
+   ViewData["DateRangeValue"] = Model.Filter.DateRange;
+   ViewData["DateRangePlaceholder"] = "Select date range";
+   await Html.PartialAsync("_DateRangeTrigger")
+*@
+@{
+    var id = ViewData["DateRangeId"] as string ?? "adminDateRangePicker";
+    var hiddenId = ViewData["DateRangeHiddenId"] as string ?? $"{id}Value";
+    var name = ViewData["DateRangeName"] as string ?? "DateRange";
+    var value = ViewData["DateRangeValue"] as string ?? string.Empty;
+    var placeholder = ViewData["DateRangePlaceholder"] as string ?? "Select date range";
+}
+<input type="hidden" id="@hiddenId" name="@name" value="@value" />
+<div id="@id"
+     class="admin-daterange-trigger"
+     data-target-input="#@hiddenId"
+     data-placeholder="@placeholder"
+     role="button"
+     tabindex="0">
+    <svg class="admin-daterange-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M6 2a1 1 0 011 1v1h6V3a1 1 0 112 0v1h1a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2h1V3a1 1 0 011-1zm10 7H4v7h12V9z" clip-rule="evenodd" />
+    </svg>
+    <span class="admin-daterange-label">@(string.IsNullOrWhiteSpace(value) ? placeholder : value)</span>
+    <svg class="admin-daterange-caret" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+    </svg>
+</div>

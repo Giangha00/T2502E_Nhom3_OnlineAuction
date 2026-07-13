@@ -178,8 +178,8 @@
             return new AdminListFilter(options);
         },
 
-        setupDateRangePicker: function (inputSelector, submitCallback) {
-            if (!window.jQuery || !window.jQuery.fn.daterangepicker) {
+        setupDateRangePicker: function (inputSelector, submitCallback, options) {
+            if (!window.jQuery || !window.jQuery.fn.daterangepicker || !window.moment) {
                 return;
             }
 
@@ -188,24 +188,131 @@
                 return;
             }
 
-            $picker.daterangepicker({
+            const moment = window.moment;
+            const valueFormat = 'MM/DD/YYYY';
+            const displayFormat = 'MMMM D, YYYY';
+            const isTrigger = !$picker.is('input, textarea, select');
+            const hiddenSelector = $picker.data('targetInput');
+            const $hidden = isTrigger
+                ? (hiddenSelector ? window.jQuery(hiddenSelector) : $picker.find('input[type="hidden"]').first())
+                : $picker;
+
+            const defaults = {
                 autoUpdateInput: false,
+                allowClear: true,
+                alwaysShowCalendars: false,
+                showCustomRangeLabel: true,
+                showDropdowns: true,
+                linkedCalendars: true,
+                opens: 'right',
+                drops: 'auto',
+                ranges: {
+                    Today: [moment(), moment()],
+                    Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [
+                        moment().subtract(1, 'month').startOf('month'),
+                        moment().subtract(1, 'month').endOf('month')
+                    ]
+                },
                 locale: {
+                    format: valueFormat,
+                    applyLabel: 'Apply',
                     cancelLabel: 'Clear',
-                    format: 'MM/DD/YYYY'
+                    customRangeLabel: 'Custom Range',
+                    daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+                    monthNames: [
+                        'January', 'February', 'March', 'April', 'May', 'June',
+                        'July', 'August', 'September', 'October', 'November', 'December'
+                    ],
+                    firstDay: 0
                 }
-            });
+            };
+
+            const settings = Object.assign({}, defaults, options || {});
+            settings.locale = Object.assign({}, defaults.locale, (options && options.locale) || {});
+            if (options && options.ranges) {
+                settings.ranges = options.ranges;
+            }
+
+            // Custom option — not passed to daterangepicker
+            const allowClear = settings.allowClear !== false;
+            delete settings.allowClear;
+
+            function readCurrentValue() {
+                if ($hidden && $hidden.length) {
+                    return ($hidden.val() || '').trim();
+                }
+
+                return ($picker.val() || '').trim();
+            }
+
+            function writeValue(start, end) {
+                const valueText = start.format(valueFormat) + ' - ' + end.format(valueFormat);
+                const displayText = start.format(displayFormat) + ' - ' + end.format(displayFormat);
+
+                if ($hidden && $hidden.length) {
+                    $hidden.val(valueText);
+                }
+
+                if (isTrigger) {
+                    $picker.find('.admin-daterange-label').text(displayText);
+                } else {
+                    $picker.val(valueText);
+                }
+            }
+
+            function clearValue() {
+                if ($hidden && $hidden.length) {
+                    $hidden.val('');
+                }
+
+                if (isTrigger) {
+                    $picker.find('.admin-daterange-label').text(
+                        $picker.data('placeholder') || 'Select date range'
+                    );
+                } else {
+                    $picker.val('');
+                }
+            }
+
+            const currentValue = readCurrentValue();
+            if (currentValue.indexOf(' - ') !== -1) {
+                const parts = currentValue.split(' - ');
+                const startDate = moment(parts[0], valueFormat, true);
+                const endDate = moment(parts[1], valueFormat, true);
+                if (startDate.isValid() && endDate.isValid()) {
+                    settings.startDate = startDate;
+                    settings.endDate = endDate;
+                }
+            }
+
+            $picker.daterangepicker(settings);
+
+            if (settings.startDate && settings.endDate) {
+                writeValue(settings.startDate, settings.endDate);
+            } else if (isTrigger && !currentValue) {
+                clearValue();
+            }
 
             $picker.off('apply.daterangepicker.adminFilter cancel.daterangepicker.adminFilter');
             $picker.on('apply.daterangepicker.adminFilter', function (event, picker) {
-                window.jQuery(this).val(
-                    picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY')
-                );
-                submitCallback();
+                writeValue(picker.startDate, picker.endDate);
+                if (typeof submitCallback === 'function') {
+                    submitCallback(picker);
+                }
             });
             $picker.on('cancel.daterangepicker.adminFilter', function () {
-                window.jQuery(this).val('');
-                submitCallback();
+                if (!allowClear) {
+                    return;
+                }
+
+                clearValue();
+                if (typeof submitCallback === 'function') {
+                    submitCallback(null);
+                }
             });
         },
 
