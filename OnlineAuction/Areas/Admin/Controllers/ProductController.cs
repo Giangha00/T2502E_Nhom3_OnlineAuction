@@ -31,12 +31,6 @@ public class ProductController : BaseAdminController
     }
 
     [HttpGet]
-    public IActionResult Category(int id)
-    {
-        return RedirectToActionPermanent(nameof(Index));
-    }
-
-    [HttpGet]
     public async Task<IActionResult> Template(int id, ProductFilterViewModel filter)
     {
         var model = await _productService.GetTemplateInstancesAsync(id, filter);

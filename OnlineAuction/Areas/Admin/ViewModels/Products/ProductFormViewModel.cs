@@ -7,83 +7,83 @@ public class ProductFormViewModel
 {
     public int? Id { get; set; }
 
-    [Required(ErrorMessage = "Product name is required.")]
-    [StringLength(120, ErrorMessage = "Product name cannot exceed 120 characters.")]
-    [Display(Name = "Name")]
+    [Required(ErrorMessage = "AdminProduct.Validation.ProductNameRequired")]
+    [StringLength(120, ErrorMessage = "AdminProduct.Validation.ProductNameMaxLength")]
+    [Display(Name = "AdminProduct.Field.ProductName")]
     public string Name { get; set; } = string.Empty;
 
-    [StringLength(300, ErrorMessage = "Short description cannot exceed 300 characters.")]
-    [Display(Name = "Short Description")]
+    [StringLength(300, ErrorMessage = "AdminProduct.Validation.ShortDescriptionMaxLength")]
+    [Display(Name = "AdminProduct.Field.ShortDescription")]
     public string? ShortDescription { get; set; }
 
-    [StringLength(160, ErrorMessage = "Subtitle cannot exceed 160 characters.")]
-    [Display(Name = "Subtitle")]
+    [StringLength(160, ErrorMessage = "AdminProduct.Validation.SubtitleMaxLength")]
+    [Display(Name = "AdminProduct.Field.Subtitle")]
     public string? Subtitle { get; set; }
 
-    [Display(Name = "Description")]
+    [Display(Name = "AdminProduct.Field.Description")]
     public string? DescriptionHtml { get; set; }
 
-    [Display(Name = "Category")]
+    [Display(Name = "AdminProduct.Field.Category")]
     public int CategoryId { get; set; }
 
-    [Required(ErrorMessage = "Mau san pham is required.")]
-    [Range(1, int.MaxValue, ErrorMessage = "Please select a mau san pham.")]
-    [Display(Name = "Mau san pham")]
+    [Required(ErrorMessage = "AdminProduct.Validation.TemplateRequired")]
+    [Range(1, int.MaxValue, ErrorMessage = "AdminProduct.Validation.TemplateRequired")]
+    [Display(Name = "AdminProduct.Field.Template")]
     public int? ProductTemplateId { get; set; }
 
-    [Required(ErrorMessage = "Seller is required.")]
-    [Range(1, int.MaxValue, ErrorMessage = "Please select a seller.")]
-    [Display(Name = "Seller")]
+    [Required(ErrorMessage = "AdminProduct.Validation.SellerRequired")]
+    [Range(1, int.MaxValue, ErrorMessage = "AdminProduct.Validation.SellerRequired")]
+    [Display(Name = "AdminProduct.Field.Seller")]
     public int SellerId { get; set; }
 
-    [Required(ErrorMessage = "Condition is required.")]
-    [Display(Name = "Condition")]
+    [Required(ErrorMessage = "AdminProduct.Validation.ConditionRequired")]
+    [Display(Name = "AdminProduct.Field.Condition")]
     public string Condition { get; set; } = "New";
 
-    [Display(Name = "Product Origin")]
+    [Display(Name = "AdminProduct.Field.ProductOrigin")]
     public string? ProductOrigin { get; set; }
 
-    [Range(1800, 2100, ErrorMessage = "Please enter a valid year between 1800 and 2100.")]
-    [Display(Name = "Year")]
+    [Range(1800, 2100, ErrorMessage = "AdminProduct.Validation.YearRange")]
+    [Display(Name = "AdminProduct.Field.Year")]
     public int? Year { get; set; }
 
     [StringLength(120)]
-    [Display(Name = "Set Name")]
+    [Display(Name = "AdminProduct.Field.SetName")]
     public string? SetName { get; set; }
 
-    [Display(Name = "Language")]
+    [Display(Name = "AdminProduct.Field.Language")]
     public string? Language { get; set; } = "English";
 
-    [Display(Name = "Card Number")]
+    [Display(Name = "AdminProduct.Field.CardNumber")]
     public string? CardNumber { get; set; }
 
-    [Display(Name = "Grade Label")]
+    [Display(Name = "AdminProduct.Field.GradeLabel")]
     public string? GradeLabel { get; set; } = "PSA 10";
 
-    [Display(Name = "Certificate Number")]
+    [Display(Name = "AdminProduct.Field.CertificateNumber")]
     public string? CertNumber { get; set; }
 
-    [Display(Name = "Grading — Centering")]
+    [Display(Name = "AdminProduct.Field.GradingCentering")]
     public string? GradingCentering { get; set; } = "10";
 
-    [Display(Name = "Grading — Corners")]
+    [Display(Name = "AdminProduct.Field.GradingCorners")]
     public string? GradingCorners { get; set; } = "10";
 
-    [Display(Name = "Grading — Edges")]
+    [Display(Name = "AdminProduct.Field.GradingEdges")]
     public string? GradingEdges { get; set; } = "10";
 
-    [Display(Name = "Grading — Surface")]
+    [Display(Name = "AdminProduct.Field.GradingSurface")]
     public string? GradingSurface { get; set; } = "10";
 
-    [Range(0, double.MaxValue, ErrorMessage = "Estimated value must be zero or greater.")]
-    [Display(Name = "Estimated Value")]
+    [Range(0, double.MaxValue, ErrorMessage = "AdminProduct.Validation.EstimatedValueMin")]
+    [Display(Name = "AdminProduct.Field.EstimatedValue")]
     public decimal? EstimatedValue { get; set; }
 
-    [Range(0, double.MaxValue, ErrorMessage = "Import price must be zero or greater.")]
-    [Display(Name = "Import Price")]
+    [Range(0, double.MaxValue, ErrorMessage = "AdminProduct.Validation.ImportPriceMin")]
+    [Display(Name = "AdminProduct.Field.ImportPrice")]
     public decimal? ImportPrice { get; set; }
 
-    [Display(Name = "Primary Image")]
+    [Display(Name = "AdminProduct.Field.PrimaryImage")]
     public IFormFile? PrimaryImageFile { get; set; }
 
     public string? PrimaryImageUrl { get; set; }

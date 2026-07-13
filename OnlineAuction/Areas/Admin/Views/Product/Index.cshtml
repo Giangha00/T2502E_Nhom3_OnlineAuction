@@ -1,22 +1,22 @@
 @model ProductTemplateListViewModel
 
 @{
-    ViewData["Title"] = "Product Management";
+    ViewData["Title"] = Localizer["AdminProduct.TemplateIndexTitle"];
     ViewData["AdminPage"] = "products";
 }
 
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Quan ly mau san pham</h2>
-            <p class="text-theme-sm text-gray-500 dark:text-gray-400">Xem danh sach mau san pham va quan ly cac san pham cua seller trong tung mau.</p>
+            <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.TemplateIndexTitle"]</h2>
+            <p class="text-theme-sm text-gray-500 dark:text-gray-400">@Localizer["AdminProduct.TemplateIndexSubtitle"]</p>
         </div>
 
         <a asp-area="Admin"
            asp-controller="Product"
            asp-action="CreateTemplate"
            class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
-            Tao mau san pham
+            @Localizer["AdminProduct.CreateTemplate"]
         </a>
     </div>
 
@@ -39,22 +39,22 @@
             <input type="hidden" name="Page" value="@(Model.Filter.Page <= 0 ? 1 : Model.Filter.Page)" />
 
             <div class="min-w-[220px] flex-1">
-                <label class="mb-1 block text-theme-xs font-medium text-gray-500">Search</label>
+                <label class="mb-1 block text-theme-xs font-medium text-gray-500">@Localizer["AdminProduct.Search"]</label>
                 <input id="productTemplateSearchInput"
                        name="Search"
                        value="@Model.Filter.Search"
-                       placeholder="Ten mau, set, card #, danh muc"
+                       placeholder="@Localizer["AdminProduct.TemplateSearchPlaceholder"]"
                        autocomplete="off"
                        class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
             </div>
 
             <div class="w-[170px]">
-                <label class="mb-1 block text-theme-xs font-medium text-gray-500">Sort</label>
+                <label class="mb-1 block text-theme-xs font-medium text-gray-500">@Localizer["AdminProduct.Sort"]</label>
                 <select name="SortOrder" class="admin-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                    <option value="" selected="@(string.IsNullOrWhiteSpace(Model.Filter.SortOrder))">Name A-Z</option>
-                    <option value="name_desc" selected="@(Model.Filter.SortOrder == "name_desc")">Name Z-A</option>
-                    <option value="count_desc" selected="@(Model.Filter.SortOrder == "count_desc")">Nhieu san pham nhat</option>
-                    <option value="date_desc" selected="@(Model.Filter.SortOrder == "date_desc")">Moi cap nhat</option>
+                    <option value="" selected="@(string.IsNullOrWhiteSpace(Model.Filter.SortOrder))">@Localizer["AdminProduct.SortNameAsc"]</option>
+                    <option value="name_desc" selected="@(Model.Filter.SortOrder == "name_desc")">@Localizer["AdminProduct.SortNameDesc"]</option>
+                    <option value="count_desc" selected="@(Model.Filter.SortOrder == "count_desc")">@Localizer["AdminProduct.SortMostProducts"]</option>
+                    <option value="date_desc" selected="@(Model.Filter.SortOrder == "date_desc")">@Localizer["AdminProduct.SortRecentlyUpdated"]</option>
                 </select>
             </div>
         </form>
