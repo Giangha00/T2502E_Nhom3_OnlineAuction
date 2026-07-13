@@ -8,22 +8,13 @@ public interface IAdminDashboardService
         DateTime? dateFrom,
         DateTime? dateTo,
         string? dateRange = null,
-        string? statusFilter = null,
-        int? categoryIdFilter = null,
-        DateTime? registrationDateFilter = null,
-        string? registrationGranularity = null,
-        string? sectionFilter = null,
-        string? revenueTypeFilter = null);
+        string? registrationGranularity = null);
 
     Task<decimal> SumGmvAsync(
         DashboardFilterViewModel filter,
         CancellationToken cancellationToken = default);
 
-    Task<decimal> SumPlatformRevenueAsync(
-        DashboardFilterViewModel filter,
-        CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<DashboardRevenueDetailViewModel>> BuildRevenueDetailTableAsync(
+    Task<decimal> SumCommissionAsync(
         DashboardFilterViewModel filter,
         CancellationToken cancellationToken = default);
 
@@ -47,7 +38,7 @@ public interface IAdminDashboardService
         DashboardFilterViewModel filter,
         CancellationToken cancellationToken = default);
 
-    Task<(int Ongoing, int Ended, int Cancelled, int PendingReview)> GetAuctionStatusCountsAsync(
+    Task<(int Ongoing, int Ended, int Cancelled)> GetAuctionStatusCountsAsync(
         CancellationToken cancellationToken = default);
 
     Task<decimal?> GetAuctionSuccessRateAsync(CancellationToken cancellationToken = default);

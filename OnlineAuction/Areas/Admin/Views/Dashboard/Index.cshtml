@@ -12,26 +12,6 @@
     var chartDataJson = Model.HasValidFilter
         ? JsonSerializer.Serialize(new
         {
-            bids = Model.BidsChart,
-            statusBreakdown = Model.AuctionStatusBreakdown,
-            revenueLine = Model.RevenueSection.LineChart,
-            revenueLabels = new
-            {
-                gmv = Localizer["Admin_Dashboard_Kpi_Gmv"].Value,
-                platformRevenue = Localizer["Admin_Dashboard_Kpi_PlatformRevenue"].Value
-            },
-            revenueDonut = new
-            {
-                registrationDeposits = Model.RevenueSection.PlatformBreakdown.RegistrationDeposits,
-                registrationDepositsPercentage = Model.RevenueSection.PlatformBreakdown.RegistrationDepositsPercentage,
-                buyerCheckoutFees = Model.RevenueSection.PlatformBreakdown.BuyerCheckoutFees,
-                buyerCheckoutFeesPercentage = Model.RevenueSection.PlatformBreakdown.BuyerCheckoutFeesPercentage,
-                sellerSuccessFees = Model.RevenueSection.PlatformBreakdown.SellerSuccessFees,
-                sellerSuccessFeesPercentage = Model.RevenueSection.PlatformBreakdown.SellerSuccessFeesPercentage,
-                registrationLabel = Localizer["Admin_Dashboard_Revenue_Donut_RegistrationDeposits"].Value,
-                buyerCheckoutLabel = Localizer["Admin_Dashboard_Revenue_Donut_BuyerCheckoutFees"].Value,
-                sellerSuccessLabel = Localizer["Admin_Dashboard_Revenue_Donut_SellerSuccessFees"].Value
-            },
             registration = new
             {
                 day = Model.UserSection.RegistrationByDay,
@@ -43,15 +23,14 @@
             {
                 dateFrom = Model.Filter.DateFrom.ToString("yyyy-MM-dd"),
                 dateTo = Model.Filter.DateTo.ToString("yyyy-MM-dd"),
-                status = Model.Filter.StatusFilter,
-                categoryId = Model.Filter.CategoryIdFilter,
-                registrationGranularity = Model.Filter.RegistrationGranularity,
-                section = Model.Filter.SectionFilter,
-                revenueType = Model.Filter.RevenueTypeFilter
+                registrationGranularity = Model.Filter.RegistrationGranularity
             }
         }, jsonOptions)
         : "{}";
 }
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<link rel="stylesheet" href="~/admin/css/daterangepicker-admin.css" asp-append-version="true" />
 
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -65,204 +44,9 @@
 
     @if (Model.HasValidFilter)
     {
-    <div class="mb-2">
-        <h2 class="text-title-sm font-bold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_Section1_Title"]</h2>
-    </div>
-
-    <div class="grid grid-cols-1 gap-4 md:gap-6 xl:grid-cols-2 2xl:grid-cols-4">
-        @foreach (var card in Model.KpiCards)
-        {
-            var isGmvCard = card.CardKey == DashboardRevenueCardKeys.Gmv;
-            var cardClass = "rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6"
-                + (isGmvCard ? " cursor-pointer transition hover:border-brand-300 hover:shadow-theme-xs" : string.Empty);
-            var cardLabel = card.Label == "GMV" ? Localizer["Admin_Dashboard_Kpi_Gmv"].Value : card.Label;
-
-            @if (isGmvCard)
-            {
-                <button type="button"
-                        class="@cardClass dashboard-overview-gmv"
-                        data-revenue-card="@card.CardKey">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                        <span class="text-lg font-semibold text-gray-700 dark:text-white/80">@cardLabel[..1]</span>
-                    </div>
-                    <div class="mt-5 flex items-end justify-between">
-                        <div>
-                            <span class="text-sm text-gray-500 dark:text-gray-400">@cardLabel</span>
-                            <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">@card.DisplayValue</h4>
-                        </div>
-                        @if (!string.IsNullOrEmpty(card.ChangeDisplay))
-                        {
-                            var changeClass = card.ChangeDisplay == "N/A"
-                                ? "bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-gray-400"
-                                : card.IsPositiveChange
-                                    ? "bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500"
-                                    : "bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500";
-
-                            <span class="flex items-center gap-1 rounded-full py-0.5 pl-2 pr-2.5 text-sm font-medium @changeClass">
-                                @card.ChangeDisplay
-                            </span>
-                        }
-                    </div>
-                </button>
-            }
-            else
-            {
-                <div class="@cardClass">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                        <span class="text-lg font-semibold text-gray-700 dark:text-white/80">@card.Label[..1]</span>
-                    </div>
-                    <div class="mt-5 flex items-end justify-between">
-                        <div>
-                            <span class="text-sm text-gray-500 dark:text-gray-400">@card.Label</span>
-                            <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">@card.DisplayValue</h4>
-                        </div>
-                        @if (!string.IsNullOrEmpty(card.ChangeDisplay))
-                        {
-                            var changeClass = card.ChangeDisplay == "N/A"
-                                ? "bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-gray-400"
-                                : card.IsPositiveChange
-                                    ? "bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500"
-                                    : "bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500";
-
-                            <span class="flex items-center gap-1 rounded-full py-0.5 pl-2 pr-2.5 text-sm font-medium @changeClass">
-                                @card.ChangeDisplay
-                            </span>
-                        }
-                    </div>
-                </div>
-            }
-        }
-    </div>
-
-    @if (Model.SecondaryKpiCards.Count > 0)
-    {
-        <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 md:gap-6">
-            @foreach (var card in Model.SecondaryKpiCards)
-            {
-                @if (string.IsNullOrWhiteSpace(card.LinkUrl))
-                {
-                    <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">@card.Label</span>
-                        <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">@card.DisplayValue</h4>
-                        <p class="mt-2 text-theme-xs text-gray-400">@Localizer["Admin_Dashboard_Snapshot_Note"]</p>
-                    </div>
-                }
-                else
-                {
-                    <a href="@card.LinkUrl"
-                       class="rounded-2xl border border-gray-200 bg-white p-5 transition hover:border-brand-300 hover:shadow-theme-xs dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">@card.Label</span>
-                        <h4 class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">@card.DisplayValue</h4>
-                        <p class="mt-2 text-theme-xs text-gray-400">@Localizer["Admin_Dashboard_Snapshot_Note"]</p>
-                    </a>
-                }
-            }
-        </div>
-    }
-
-    <div class="mt-6 grid grid-cols-1 gap-4 md:gap-6">
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-            <div class="mb-4">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_BidsChart_Title"]</h3>
-                <p class="text-theme-sm text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_BidsChart_Description"]</p>
-            </div>
-            <div id="dashboard-bids-chart" class="min-h-[280px]"></div>
-            <p id="dashboard-bids-empty" class="hidden py-10 text-center text-theme-sm text-gray-500">@Localizer["Admin_Dashboard_NoData"]</p>
-        </div>
-    </div>
-
-    @await Html.PartialAsync("_DashboardRevenueSection", Model)
-
-    @await Html.PartialAsync("_DashboardUserSection", Model)
-    @await Html.PartialAsync("_DashboardAuctionSection", Model)
-
-    <div id="dashboard-recent-auctions" class="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
-        <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_RecentAuctions_Title"]</h3>
-                <p class="text-theme-sm text-gray-500 dark:text-gray-400">
-                    @Localizer["Admin_Dashboard_RecentAuctions_Description"]
-                    @if (!string.IsNullOrWhiteSpace(Model.Filter.StatusFilter) || Model.Filter.CategoryIdFilter.HasValue)
-                    {
-                        <span class="text-brand-600">(@Localizer["Admin_Dashboard_RecentAuctions_Filtered"])</span>
-                    }
-                </p>
-            </div>
-            <a asp-area="Admin"
-               asp-controller="Auction"
-               asp-action="Index"
-               class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
-                @Localizer["Admin_Dashboard_ViewAll"]
-            </a>
-        </div>
-
-        <div class="max-w-full overflow-x-auto">
-            <table class="w-full min-w-[900px]">
-                <thead>
-                    <tr class="border-y border-gray-100 dark:border-gray-800">
-                        <th class="py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Col_Product"]</th>
-                        <th class="py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Col_Seller"]</th>
-                        <th class="py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Col_Category"]</th>
-                        <th class="py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Col_CurrentBid"]</th>
-                        <th class="py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Col_Status"]</th>
-                        <th class="py-3 text-left text-theme-xs font-medium text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Col_EndsIn"]</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                    @if (Model.RecentAuctions.Count == 0)
-                    {
-                        <tr>
-                            <td colspan="6" class="py-10 text-center text-theme-sm text-gray-500 dark:text-gray-400">
-                                @Localizer["Admin_Dashboard_NoData"]
-                            </td>
-                        </tr>
-                    }
-                    else
-                    {
-                        @foreach (var auction in Model.RecentAuctions)
-                        {
-                            <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
-                                <td class="py-3">
-                                    <a asp-area="Admin"
-                                       asp-controller="Auction"
-                                       asp-action="Details"
-                                       asp-route-id="@auction.Id"
-                                       class="text-theme-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400">
-                                        @auction.ProductName
-                                    </a>
-                                </td>
-                                <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">@auction.SellerName</td>
-                                <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">
-                                    <a asp-area="Admin"
-                                       asp-controller="Dashboard"
-                                       asp-action="Index"
-                                       asp-route-dateFrom="@Model.Filter.DateFrom.ToString("yyyy-MM-dd")"
-                                       asp-route-dateTo="@Model.Filter.DateTo.ToString("yyyy-MM-dd")"
-                                       asp-route-categoryId="@auction.CategoryId"
-                                       class="text-brand-600 hover:underline">
-                                        @auction.CategoryName
-                                    </a>
-                                </td>
-                                <td class="py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">@auction.CurrentPrice.ToString("C2")</td>
-                                <td class="py-3">
-                                    <a asp-area="Admin"
-                                       asp-controller="Dashboard"
-                                       asp-action="Index"
-                                       asp-route-dateFrom="@Model.Filter.DateFrom.ToString("yyyy-MM-dd")"
-                                       asp-route-dateTo="@Model.Filter.DateTo.ToString("yyyy-MM-dd")"
-                                       asp-route-status="@auction.Status"
-                                       class="inline-flex rounded-full px-2.5 py-0.5 text-theme-xs font-medium @auction.StatusBadgeClass">
-                                        @auction.StatusLabel
-                                    </a>
-                                </td>
-                                <td class="py-3 text-theme-sm text-gray-500 dark:text-gray-400">@auction.EndsIn</td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
+        @await Html.PartialAsync("_DashboardRevenueSection", Model)
+        @await Html.PartialAsync("_DashboardUserSection", Model)
+        @await Html.PartialAsync("_DashboardAuctionSection", Model)
     }
 </div>
 
@@ -272,6 +56,10 @@
 }
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="~/admin/js/admin-list-filter.js" asp-append-version="true"></script>
     <script src="~/admin/js/dashboard-filter.js" asp-append-version="true"></script>
     @if (Model.HasValidFilter)
     {

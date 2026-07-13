@@ -6,8 +6,6 @@ public class DashboardUserSectionViewModel
 
     public DashboardKpiCardViewModel ActiveUsersKpi { get; set; } = new();
 
-    public DashboardKpiCardViewModel TotalUsersKpi { get; set; } = new();
-
     public IReadOnlyList<DashboardRegistrationChartPointViewModel> RegistrationByDay { get; set; } = [];
 
     public IReadOnlyList<DashboardRegistrationChartPointViewModel> RegistrationByWeek { get; set; } = [];
@@ -17,6 +15,4 @@ public class DashboardUserSectionViewModel
     public IReadOnlyList<DashboardTopUserViewModel> TopBuyers { get; set; } = [];
 
     public IReadOnlyList<DashboardTopUserViewModel> TopSellers { get; set; } = [];
-
-    public IReadOnlyList<DashboardNewUserViewModel> NewUsers { get; set; } = [];
 }
