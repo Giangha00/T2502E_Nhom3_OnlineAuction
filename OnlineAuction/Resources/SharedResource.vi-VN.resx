@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:element name="root" msdata:IsDataSet="true"></xsd:element>
   </xsd:schema>
   <resheader name="resmimetype">
@@ -10,10 +11,12 @@
     <value>1.3</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0,
+      Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0,
+      Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Home" xml:space="preserve">
   <value>Trang chủ</value>
@@ -1063,7 +1066,7 @@
   <data name="Admin_Dashboard_Subtitle" xml:space="preserve"><value>Theo dõi hiệu suất nền tảng và thống kê.</value></data>
   <data name="Admin_Dashboard_Section1_Title" xml:space="preserve"><value>Tổng quan</value></data>
   <data name="Admin_Dashboard_Section2_Title" xml:space="preserve"><value>Thống kê người dùng</value></data>
-  <data name="Admin_Dashboard_Section2_Description" xml:space="preserve"><value>Xu hướng đăng ký, user active, top buyer/seller.</value></data>
+  <data name="Admin_Dashboard_Section2_Description" xml:space="preserve"><value>Xu hướng đăng ký, người dùng hoạt động, top bidder/seller.</value></data>
   <data name="Admin_Dashboard_Section3_Title" xml:space="preserve"><value>Thống kê hàng hóa &amp; đấu giá</value></data>
   <data name="Admin_Dashboard_Section3_Description" xml:space="preserve"><value>Trạng thái đấu giá, tỷ lệ thành công, bid theo danh mục.</value></data>
   <data name="Admin_Dashboard_Filter_Title" xml:space="preserve"><value>Bộ lọc thời gian</value></data>
@@ -1094,11 +1097,11 @@
   <data name="Admin_Dashboard_SuccessRate_Tooltip" xml:space="preserve"><value>Số SP bán được / Tổng SP đăng bán × 100. Chỉ tính order paid hoặc delivered.</value></data>
   <data name="Admin_Dashboard_SuccessRate_Hint" xml:space="preserve"><value>SP bán được / tổng đăng bán</value></data>
   <data name="Admin_Dashboard_RegistrationChart_Title" xml:space="preserve"><value>Đăng ký mới</value></data>
-  <data name="Admin_Dashboard_RegistrationChart_Description" xml:space="preserve"><value>Click cột để lọc bảng user mới đăng ký.</value></data>
+  <data name="Admin_Dashboard_RegistrationChart_Description" xml:space="preserve"><value>Số đăng ký mới theo ngày, tuần hoặc tháng trong khoảng đã chọn.</value></data>
   <data name="Admin_Dashboard_Granularity_Day" xml:space="preserve"><value>Ngày</value></data>
   <data name="Admin_Dashboard_Granularity_Week" xml:space="preserve"><value>Tuần</value></data>
   <data name="Admin_Dashboard_Granularity_Month" xml:space="preserve"><value>Tháng</value></data>
-  <data name="Admin_Dashboard_TopBuyers_Title" xml:space="preserve"><value>Top 10 Buyers</value></data>
+  <data name="Admin_Dashboard_TopBuyers_Title" xml:space="preserve"><value>Top 10 Bidders</value></data>
   <data name="Admin_Dashboard_TopSellers_Title" xml:space="preserve"><value>Top 10 Sellers</value></data>
   <data name="Admin_Dashboard_NewUsers_Title" xml:space="preserve"><value>User mới đăng ký</value></data>
   <data name="Admin_Dashboard_NewUsers_Filtered" xml:space="preserve"><value>Đang lọc theo {0}</value></data>
@@ -1128,12 +1131,13 @@
   <data name="Admin_Dashboard_Col_EndsIn" xml:space="preserve"><value>Còn lại</value></data>
   <data name="Admin_Dashboard_Kpi_Gmv" xml:space="preserve"><value>Tổng giao dịch (GMV)</value></data>
   <data name="Admin_Dashboard_Kpi_PlatformRevenue" xml:space="preserve"><value>Doanh thu sàn</value></data>
+  <data name="Admin_Dashboard_Kpi_Commission" xml:space="preserve"><value>Phí sàn (Commission)</value></data>
   <data name="Admin_Dashboard_Kpi_ListingFees" xml:space="preserve"><value>Phí niêm yết</value></data>
   <data name="Admin_Dashboard_Kpi_CompletedOrders" xml:space="preserve"><value>Đơn hoàn tất</value></data>
   <data name="Admin_Dashboard_RevenueSection_Title" xml:space="preserve"><value>Doanh thu</value></data>
-  <data name="Admin_Dashboard_RevenueSection_Description" xml:space="preserve"><value>GMV và doanh thu sàn kèm bảng chi tiết giao dịch.</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Doanh thu sàn gồm tiền cọc đăng ký, phí thanh toán người mua và phí thành công người bán. Tiền cọc hoàn cho người thua không tính.</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>Doanh thu sàn = tiền cọc đăng ký thu được + phí thanh toán người mua (2.5%) + phí thành công người bán (10%). Tiền cọc đã hoàn không tính. Phí ship/bảo hiểm trong tổng đơn vẫn nằm trong GMV (pass-through).</value></data>
+  <data name="Admin_Dashboard_RevenueSection_Description" xml:space="preserve"><value>Tổng giá trị giao dịch và phí sàn (commission).</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Phí sàn = phí thanh toán người mua + phí thành công người bán từ đơn đã thanh toán/giao.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV là tổng thanh toán thành công trong kỳ. Phí sàn (commission) chỉ gồm phí marketplace: phí người mua (PlatformFee) + phí người bán (SellerFee) trên đơn paid/delivered. Không gồm tiền cọc đăng ký.</value></data>
   <data name="Admin_Dashboard_Revenue_NoFeeData" xml:space="preserve"><value>Chưa có dữ liệu phí</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Title" xml:space="preserve"><value>GMV vs Doanh thu sàn</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Description" xml:space="preserve"><value>Click điểm trên biểu đồ để lọc bảng theo ngày.</value></data>

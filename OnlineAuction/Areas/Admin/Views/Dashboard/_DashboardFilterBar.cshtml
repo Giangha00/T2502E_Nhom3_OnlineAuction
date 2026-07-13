@@ -1,47 +1,24 @@
 @model AdminDashboardViewModel
 
+@{
+    var dateRangeDisplay = AdminDateRangeHelper.Format(Model.Filter.DateFrom, Model.Filter.DateTo);
+}
+
 <form method="get"
       id="dashboardFilterForm"
       asp-area="Admin"
       asp-controller="Dashboard"
       asp-action="Index"
       class="mb-6 rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03] md:p-5">
-    <input type="hidden" name="status" value="@Model.Filter.StatusFilter" />
-    <input type="hidden" name="categoryId" value="@Model.Filter.CategoryIdFilter" />
-    <input type="hidden" name="registrationDate" value="@Model.Filter.RegistrationDateFilter?.ToString("yyyy-MM-dd")" />
     <input type="hidden" name="registrationGranularity" value="@Model.Filter.RegistrationGranularity" />
-    <input type="hidden" name="section" value="@Model.Filter.SectionFilter" />
-    <input type="hidden" name="revenueType" value="@Model.Filter.RevenueTypeFilter" />
+    <input type="hidden" id="dashboardDateFrom" name="dateFrom" value="@Model.Filter.DateFrom.ToString("yyyy-MM-dd")" />
+    <input type="hidden" id="dashboardDateTo" name="dateTo" value="@Model.Filter.DateTo.ToString("yyyy-MM-dd")" />
+    <input type="hidden" id="dashboardDateRangeValue" value="@dateRangeDisplay" />
 
     <div class="flex flex-col gap-4">
-        <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_Filter_Title"]</h3>
-                <p class="text-theme-sm text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Filter_Description"]</p>
-            </div>
-
-            <div class="flex flex-wrap gap-2">
-                <button type="button"
-                        data-dashboard-preset="7d"
-                        class="dashboard-date-preset rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5">
-                    @Localizer["Admin_Dashboard_Filter_Preset_7Days"]
-                </button>
-                <button type="button"
-                        data-dashboard-preset="30d"
-                        class="dashboard-date-preset rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5">
-                    @Localizer["Admin_Dashboard_Filter_Preset_30Days"]
-                </button>
-                <button type="button"
-                        data-dashboard-preset="thisMonth"
-                        class="dashboard-date-preset rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5">
-                    @Localizer["Admin_Dashboard_Filter_Preset_ThisMonth"]
-                </button>
-                <button type="button"
-                        data-dashboard-preset="lastMonth"
-                        class="dashboard-date-preset rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5">
-                    @Localizer["Admin_Dashboard_Filter_Preset_LastMonth"]
-                </button>
-            </div>
+        <div class="flex flex-col gap-1">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_Filter_Title"]</h3>
+            <p class="text-theme-sm text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Filter_Description"]</p>
         </div>
 
         @if (!string.IsNullOrWhiteSpace(Model.FilterValidationErrorKey))
@@ -53,22 +30,24 @@
         }
 
         <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-            <div class="w-full sm:w-auto sm:min-w-[160px]">
-                <label for="dashboardDateFrom" class="mb-1 block text-theme-xs font-medium uppercase text-gray-500">@Localizer["Admin_Dashboard_Filter_From"]</label>
-                <input id="dashboardDateFrom"
-                       name="dateFrom"
-                       type="date"
-                       value="@Model.Filter.DateFrom.ToString("yyyy-MM-dd")"
-                       class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
-            </div>
-
-            <div class="w-full sm:w-auto sm:min-w-[160px]">
-                <label for="dashboardDateTo" class="mb-1 block text-theme-xs font-medium uppercase text-gray-500">@Localizer["Admin_Dashboard_Filter_To"]</label>
-                <input id="dashboardDateTo"
-                       name="dateTo"
-                       type="date"
-                       value="@Model.Filter.DateTo.ToString("yyyy-MM-dd")"
-                       class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-theme-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            <div class="w-full sm:w-auto sm:min-w-[300px]">
+                <label class="mb-1 block text-theme-xs font-medium uppercase text-gray-500">
+                    @Localizer["Admin_Dashboard_Filter_From"] – @Localizer["Admin_Dashboard_Filter_To"]
+                </label>
+                <div id="dashboardDateRangePicker"
+                     class="admin-daterange-trigger"
+                     data-target-input="#dashboardDateRangeValue"
+                     data-placeholder="Select date range"
+                     role="button"
+                     tabindex="0">
+                    <svg class="admin-daterange-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M6 2a1 1 0 011 1v1h6V3a1 1 0 112 0v1h1a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2h1V3a1 1 0 011-1zm10 7H4v7h12V9z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="admin-daterange-label">@dateRangeDisplay</span>
+                    <svg class="admin-daterange-caret" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                    </svg>
+                </div>
             </div>
 
             <button type="submit"

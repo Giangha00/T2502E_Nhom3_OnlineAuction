@@ -1,15 +1,7 @@
 namespace OnlineAuction.Areas.Admin.ViewModels.Dashboard;
 
-public static class DashboardRevenueTypes
-{
-    public const string OrderPayment = "order_payment";
-    public const string RegistrationDeposit = "registration_deposit";
-    public const string SellerSuccessFee = "seller_success_fee";
-}
-
 public static class DashboardRevenueCardKeys
 {
     public const string Gmv = "gmv";
-    public const string PlatformRevenue = "platform_revenue";
-    public const string CompletedOrders = "completed_orders";
+    public const string Commission = "commission";
 }

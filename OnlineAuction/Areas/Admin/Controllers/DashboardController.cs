@@ -21,24 +21,14 @@ public class DashboardController : BaseAdminController
         string? dateRange,
         DateTime? dateFrom,
         DateTime? dateTo,
-        string? status,
-        int? categoryId,
-        DateTime? registrationDate,
         string? registrationGranularity,
-        string? section,
-        string? revenueType,
         CancellationToken cancellationToken)
     {
         var filter = _dashboardService.NormalizeFilter(
             dateFrom,
             dateTo,
             dateRange,
-            status,
-            categoryId,
-            registrationDate,
-            registrationGranularity,
-            section,
-            revenueType);
+            registrationGranularity);
 
         var validation = DashboardFilterValidator.Validate(filter.DateFrom, filter.DateTo);
         if (!validation.IsValid)
