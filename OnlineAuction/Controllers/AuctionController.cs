@@ -96,6 +96,25 @@ public class AuctionController : Controller
             return Unauthorized(new { success = false, message = "Please sign in to register." });
         }
 
+        // If this auction requires a deposit, public Register endpoint must not
+        // approve registration directly. Instruct client to initiate deposit flow.
+        var auctionItem = await _auctionService.GetAuctionByIdAsync(auctionId);
+        if (auctionItem is null)
+        {
+            return NotFound(new { success = false, message = "Auction not found." });
+        }
+
+        if (auctionItem.RequiresRegistration)
+        {
+            var initiateUrl = Url.Action(nameof(InitiateDeposit), "Auction", new { auctionId }, Request.Scheme);
+            return StatusCode(410, new
+            {
+                success = false,
+                message = "This auction requires a deposit. Please complete the deposit flow to register.",
+                initiateDepositUrl = initiateUrl
+            });
+        }
+
         var result = await _registrationService.RegisterAsync(auctionId, userId.Value);
         if (!result.Success)
         {
@@ -117,13 +136,11 @@ public class AuctionController : Controller
     }
     
     [HttpPost]
-    [Authorize(AuthenticationSchemes = AuthSchemes.User)]
+    [Authorize(AuthenticationSchemes = AuthSchemes.Admin)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RefundDeposit(long depositId)
     {
-        // Tạm thời API này dùng để test refund sandbox.
-        // Sau này nên giới hạn chỉ Admin hoặc Worker được gọi.
-
+        // Restricted to Admin/internal workers only in production.
         var result = await _depositRefundService.RefundDepositAsync(depositId);
 
         if (!result.Success)

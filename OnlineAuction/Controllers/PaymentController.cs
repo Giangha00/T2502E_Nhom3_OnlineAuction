@@ -7,19 +7,23 @@ using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Configurations;
 using OnlineAuction.Services.Interfaces;
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.Extensions.Hosting;
 namespace OnlineAuction.Controllers;
 
 public class PaymentController : Controller
 {
     private readonly IPaymentService _paymentService;
     private readonly IOrderPaymentService _orderPaymentService;
+    private readonly IHostEnvironment _env;
 
     public PaymentController(
         IPaymentService paymentService,
-        IOrderPaymentService orderPaymentService)
+        IOrderPaymentService orderPaymentService,
+        IHostEnvironment env)
     {
         _paymentService = paymentService;
         _orderPaymentService = orderPaymentService;
+        _env = env;
     }
 
     public IActionResult Index()
@@ -67,6 +71,13 @@ public async Task<IActionResult> PayPalIpn()
      * paypal_order_id=ABC123
      * mc_gross=20.00
      */
+
+    // Disable this test IPN endpoint in non-development environments to avoid
+    // spoofing and accidental production writes.
+    if (!_env.IsDevelopment())
+    {
+        return NotFound();
+    }
 
     // Trạng thái thanh toán
     // Completed = thành công
