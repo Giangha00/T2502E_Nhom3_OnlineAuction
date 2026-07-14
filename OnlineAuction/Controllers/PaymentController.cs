@@ -1,5 +1,8 @@
+using System.IO;
 using System.Security.Claims;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Configurations;
 using OnlineAuction.Services.Interfaces;
@@ -125,6 +128,26 @@ public async Task<IActionResult> PayPalIpn()
 
     return Ok(result);
 }
+
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> PayPalWebhook()
+    {
+        var requestBody = await new StreamReader(Request.Body).ReadToEndAsync();
+        if (string.IsNullOrWhiteSpace(requestBody))
+        {
+            return BadRequest("Empty PayPal webhook payload.");
+        }
+
+        var result = await _orderPaymentService.ProcessPayPalWebhookAsync(requestBody, Request.Headers);
+        if (!result.Success)
+        {
+            return BadRequest(result.ErrorMessage ?? "Unable to process PayPal webhook.");
+        }
+
+        return Ok();
+    }
+
     [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     public async Task<IActionResult> Confirmation(int orderId)
     {

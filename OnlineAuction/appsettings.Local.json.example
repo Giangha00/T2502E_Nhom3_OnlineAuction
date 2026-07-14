@@ -4,7 +4,8 @@
   },
   "PayPal": {
     "ClientId": "YOUR_SANDBOX_CLIENT_ID",
-    "ClientSecret": "YOUR_SANDBOX_CLIENT_SECRET"
+    "ClientSecret": "YOUR_SANDBOX_CLIENT_SECRET",
+    "WebhookId": "YOUR_PAYPAL_WEBHOOK_ID"
   },
   "PasswordResetOtp": {
     "UseMockOtpSender": true
@@ -25,10 +26,10 @@
   },
   "Email": {
     "Gmail": {
-      "ClientId": "YOUR_GOOGLE_OAUTH_CLIENT_ID",
-      "ClientSecret": "YOUR_GOOGLE_OAUTH_CLIENT_SECRET",
-      "RefreshToken": "YOUR_GMAIL_REFRESH_TOKEN",
-      "SenderEmail": "your-sender@gmail.com",
+      "ClientId": "YOUR_GOOGLE_CLIENT_ID",
+      "ClientSecret": "YOUR_GOOGLE_CLIENT_SECRET",
+      "RefreshToken": "YOUR_GOOGLE_REFRESH_TOKEN",
+      "SenderEmail": "gianghacd@gmail.com",
       "SenderName": "RareCard Auction House"
     }
   },

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using OnlineAuction.Models;
 using OnlineAuction.Models.PayPal;
 
@@ -20,6 +21,14 @@ public interface IOrderPaymentService
     Task CancelPayPalCheckoutAsync(
         int buyerId,
         string? payPalOrderId,
+        CancellationToken cancellationToken = default);
+
+    Task<int> CancelAllStalePayPalSessionsAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
+        string requestBody,
+        IHeaderDictionary headers,
         CancellationToken cancellationToken = default);
 
     Task<PaymentConfirmationViewModel?> GetPaidOrderConfirmationAsync(
