@@ -90,13 +90,17 @@ public class AuctionRegistrationService : IAuctionRegistrationService
         }
 
         var now = DateTime.UtcNow;
-        var status = AuctionRegistrationStatuses.Approved;
+            // If auction requires deposit, new registrations should be pending
+            // until deposit is captured. Otherwise approve immediately.
+            var status = auction.RequiresRegistration
+                ? AuctionRegistrationStatuses.Pending
+                : AuctionRegistrationStatuses.Approved;
 
         if (existing is not null && existing.Status == AuctionRegistrationStatuses.Cancelled)
         {
             existing.Status = status;
             existing.RegisteredAt = now;
-            existing.ReviewedAt = now;
+                existing.ReviewedAt = status == AuctionRegistrationStatuses.Approved ? now : null;
             existing.ReviewedBy = null;
             existing.RejectReason = null;
             existing.UpdatedAt = now;
@@ -109,7 +113,7 @@ public class AuctionRegistrationService : IAuctionRegistrationService
                 UserId = userId,
                 Status = status,
                 RegisteredAt = now,
-                ReviewedAt = now,
+                    ReviewedAt = status == AuctionRegistrationStatuses.Approved ? now : null,
                 CreatedAt = now
             });
         }
