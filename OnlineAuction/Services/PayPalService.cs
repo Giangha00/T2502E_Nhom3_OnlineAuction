@@ -184,6 +184,163 @@ public class PayPalService : IPayPalService
         return PayPalCaptureResult.Fail("Payment could not be completed. Please try again.");
     }
 
+    public async Task<PayPalCancelResult> CancelOrderAsync(
+        string payPalOrderId,
+        CancellationToken cancellationToken = default)
+    {
+        if (!_settings.IsConfigured)
+        {
+            return PayPalCancelResult.Fail(GetNotConfiguredMessage());
+        }
+
+        if (string.IsNullOrWhiteSpace(payPalOrderId))
+        {
+            return PayPalCancelResult.Fail("Missing PayPal order id.");
+        }
+
+        var token = await GetAccessTokenAsync(cancellationToken);
+        if (token is null)
+        {
+            return PayPalCancelResult.Fail("Unable to connect to PayPal.");
+        }
+
+        using var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"{_settings.ApiBaseUrl}/v2/checkout/orders/{payPalOrderId}/void");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Content = new StringContent("{}", Encoding.UTF8, "application/json");
+
+        HttpResponseMessage response;
+        try
+        {
+            response = await _httpClient.SendAsync(request, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "PayPal cancel order request failed for order {PayPalOrderId}.", payPalOrderId);
+            return PayPalCancelResult.Fail("Unable to cancel PayPal order.");
+        }
+
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        if (response.IsSuccessStatusCode)
+        {
+            return PayPalCancelResult.Ok();
+        }
+
+        if (body.Contains("ORDER_ALREADY_CAPTURED", StringComparison.OrdinalIgnoreCase)
+            || body.Contains("ORDER_ALREADY_COMPLETED", StringComparison.OrdinalIgnoreCase)
+            || body.Contains("ORDER_ALREADY_VOIDED", StringComparison.OrdinalIgnoreCase))
+        {
+            return PayPalCancelResult.Fail("PayPal order cannot be cancelled because it has already been completed.");
+        }
+
+        _logger.LogWarning(
+            "PayPal cancel order failed for order {PayPalOrderId} with status {StatusCode}. Body={Body}",
+            payPalOrderId,
+            response.StatusCode,
+            body);
+
+        return PayPalCancelResult.Fail("Unable to cancel PayPal order.");
+    }
+
+    public async Task<PayPalVerifyWebhookResult> VerifyWebhookSignatureAsync(
+        string requestBody,
+        IHeaderDictionary headers,
+        CancellationToken cancellationToken = default)
+    {
+        if (!_settings.IsConfigured)
+        {
+            return PayPalVerifyWebhookResult.Fail(GetNotConfiguredMessage());
+        }
+
+        if (string.IsNullOrWhiteSpace(_settings.WebhookId))
+        {
+            return PayPalVerifyWebhookResult.Fail("PayPal webhook id is not configured.");
+        }
+
+        if (string.IsNullOrWhiteSpace(requestBody))
+        {
+            return PayPalVerifyWebhookResult.Fail("Empty webhook payload.");
+        }
+
+        var token = await GetAccessTokenAsync(cancellationToken);
+        if (token is null)
+        {
+            return PayPalVerifyWebhookResult.Fail("Unable to connect to PayPal.");
+        }
+
+        if (!headers.TryGetValue("Paypal-Transmission-Id", out var transmissionId)
+            || !headers.TryGetValue("Paypal-Transmission-Time", out var transmissionTime)
+            || !headers.TryGetValue("Paypal-Transmission-Sig", out var transmissionSig)
+            || !headers.TryGetValue("Paypal-Cert-Url", out var certUrl)
+            || !headers.TryGetValue("Paypal-Auth-Algo", out var authAlgo))
+        {
+            return PayPalVerifyWebhookResult.Fail("Missing PayPal webhook verification headers.");
+        }
+
+        JsonElement webhookEvent;
+        try
+        {
+            webhookEvent = JsonSerializer.Deserialize<JsonElement>(requestBody, JsonOptions);
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogWarning(ex, "Invalid PayPal webhook payload.");
+            return PayPalVerifyWebhookResult.Fail("Invalid PayPal webhook payload.");
+        }
+
+        var payload = new
+        {
+            auth_algo = authAlgo.ToString(),
+            cert_url = certUrl.ToString(),
+            transmission_id = transmissionId.ToString(),
+            transmission_sig = transmissionSig.ToString(),
+            transmission_time = transmissionTime.ToString(),
+            webhook_id = _settings.WebhookId,
+            webhook_event = webhookEvent
+        };
+
+        using var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"{_settings.ApiBaseUrl}/v1/notifications/verify-webhook-signature");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Content = new StringContent(JsonSerializer.Serialize(payload, JsonOptions), Encoding.UTF8, "application/json");
+
+        HttpResponseMessage response;
+        try
+        {
+            response = await _httpClient.SendAsync(request, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "PayPal verify webhook signature request failed.");
+            return PayPalVerifyWebhookResult.Fail("Unable to verify PayPal webhook.");
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            _logger.LogWarning(
+                "PayPal webhook verification failed with status {StatusCode}. Body={Body}",
+                response.StatusCode,
+                responseBody);
+            return PayPalVerifyWebhookResult.Fail("PayPal webhook verification failed.");
+        }
+
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        var verificationResponse = JsonSerializer.Deserialize<PayPalWebhookVerificationResponse>(body, JsonOptions);
+        if (verificationResponse is null ||
+            !verificationResponse.VerificationStatus.Equals("SUCCESS", StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.LogWarning(
+                "PayPal webhook signature not verified. Response={Response}",
+                body);
+            return PayPalVerifyWebhookResult.Fail("PayPal webhook signature could not be verified.");
+        }
+
+        return PayPalVerifyWebhookResult.Ok();
+    }
+
     private async Task<string?> GetAccessTokenAsync(CancellationToken cancellationToken)
     {
         if (_cache.TryGetValue<string>("paypal:access_token", out var cachedToken))
@@ -325,6 +482,12 @@ public class PayPalService : IPayPalService
     {
         public string Value { get; set; } = string.Empty;
     }
+
+    private sealed class PayPalWebhookVerificationResponse
+    {
+        public string VerificationStatus { get; set; } = string.Empty;
+    }
+
     public async Task<PayPalRefundResult> RefundCaptureAsync(
     string captureId,
     decimal amount,

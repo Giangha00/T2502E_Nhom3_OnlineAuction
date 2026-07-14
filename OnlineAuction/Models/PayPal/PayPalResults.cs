@@ -70,6 +70,42 @@ public class PayPalCaptureCheckoutResult
     public static PayPalCaptureCheckoutResult Fail(string message) =>
         new() { Success = false, ErrorMessage = message };
 }
+
+public class PayPalCancelResult
+{
+    public bool Success { get; init; }
+
+    public string? ErrorMessage { get; init; }
+
+    public static PayPalCancelResult Ok() => new() { Success = true };
+
+    public static PayPalCancelResult Fail(string message) => new() { Success = false, ErrorMessage = message };
+}
+
+public class PayPalVerifyWebhookResult
+{
+    public bool Success { get; init; }
+
+    public bool Verified { get; init; }
+
+    public string? ErrorMessage { get; init; }
+
+    public static PayPalVerifyWebhookResult Ok() => new() { Success = true, Verified = true };
+
+    public static PayPalVerifyWebhookResult Fail(string message) => new() { Success = false, Verified = false, ErrorMessage = message };
+}
+
+public class PayPalWebhookProcessingResult
+{
+    public bool Success { get; init; }
+
+    public string? ErrorMessage { get; init; }
+
+    public static PayPalWebhookProcessingResult Ok() => new() { Success = true };
+
+    public static PayPalWebhookProcessingResult Fail(string message) => new() { Success = false, ErrorMessage = message };
+}
+
 public class PayPalRefundResult
 {
     // true nếu PayPal refund thành công

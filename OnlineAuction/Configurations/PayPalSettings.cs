@@ -15,6 +15,8 @@ public class PayPalSettings
 
     public string CancelUrl { get; set; } = string.Empty;
 
+    public string WebhookId { get; set; } = string.Empty;
+
     public string CurrencyCode { get; set; } = "USD";
 
     public bool IsConfigured =>
