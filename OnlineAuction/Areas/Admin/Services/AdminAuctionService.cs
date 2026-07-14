@@ -263,7 +263,6 @@ public class AdminAuctionService
             BidStep = 50,
             Status = AuctionStatuses.Live,
             ListingType = ListingTypes.Auction,
-            RequiresRegistration = true,
             CategoryOptions = await BuildCategoryOptionsAsync(),
             SellerOptions = await BuildSellerOptionsAsync(),
             StatusOptions = BuildStatusOptions(),
@@ -298,7 +297,6 @@ public class AdminAuctionService
             EndDate = auction.EndDate,
             Status = auction.Status,
             ListingType = auction.ListingType,
-            RequiresRegistration = auction.RequiresRegistration,
             CategoryId = auction.Product.CategoryId,
             SellerId = auction.Product.SellerId,
             ImageUrl = auction.Product.PrimaryImage,
@@ -352,7 +350,7 @@ public class AdminAuctionService
             BidStep = model.BidStep,
             CurrentPrice = model.StartingPrice,
             ListingType = model.ListingType,
-            RequiresRegistration = model.RequiresRegistration,
+            RequiresRegistration = model.ListingType == ListingTypes.Auction,
             // Admin-created listings bypass seller review and can go live immediately.
             Status = model.Status,
             RegistrationStartDate = model.RegistrationStartDate,
@@ -438,7 +436,7 @@ public class AdminAuctionService
         auction.StartingPrice = model.StartingPrice;
         auction.BidStep = model.BidStep;
         auction.ListingType = model.ListingType;
-        auction.RequiresRegistration = model.RequiresRegistration;
+        auction.RequiresRegistration = model.ListingType == ListingTypes.Auction;
         auction.Status = model.Status;
         auction.RegistrationStartDate = model.RegistrationStartDate;
         auction.RegistrationEndDate = model.RegistrationEndDate;

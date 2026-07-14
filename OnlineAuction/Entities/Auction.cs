@@ -16,6 +16,10 @@ public class Auction : AuditableEntity
 
     public string ListingType { get; set; } = ListingTypes.Auction;
 
+    /// <summary>
+    /// Always true for auction listings; retained for schema compatibility.
+    /// Buy Now listings do not use registration and keep this false.
+    /// </summary>
     public bool RequiresRegistration { get; set; } = true;
 
     public string Status { get; set; } = AuctionStatuses.Live;

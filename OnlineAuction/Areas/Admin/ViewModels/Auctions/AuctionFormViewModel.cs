@@ -70,9 +70,6 @@ public class AuctionFormViewModel : IValidatableObject
     [Display(Name = "Seller")]
     public int SellerId { get; set; }
 
-    [Display(Name = "Requires Registration")]
-    public bool RequiresRegistration { get; set; } = true;
-
     public string? ImageUrl { get; set; }
 
     [Display(Name = "Product Image")]
