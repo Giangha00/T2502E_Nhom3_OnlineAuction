@@ -104,7 +104,7 @@
                     }
                     <div><dt class="text-theme-xs uppercase text-gray-400">Schedule</dt><dd class="mt-1 text-theme-sm">@Model.StartDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm") – @Model.EndDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd></div>
                     <div><dt class="text-theme-xs uppercase text-gray-400">Event</dt><dd class="mt-1 text-theme-sm">@(Model.AuctionEventName ?? "—")</dd></div>
-                    <div><dt class="text-theme-xs uppercase text-gray-400">Registration required</dt><dd class="mt-1 text-theme-sm">@(Model.RequiresRegistration ? "Yes" : "No")</dd></div>
+                    <div><dt class="text-theme-xs uppercase text-gray-400">Registration</dt><dd class="mt-1 text-theme-sm">@(Model.ListingType == ListingTypes.Auction ? "Registration required" : "Not applicable")</dd></div>
                     <div><dt class="text-theme-xs uppercase text-gray-400">Listing type</dt><dd class="mt-1 text-theme-sm capitalize">@Model.ListingType</dd></div>
                 </dl>
             </section>
