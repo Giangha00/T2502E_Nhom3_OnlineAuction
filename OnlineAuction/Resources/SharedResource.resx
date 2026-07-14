@@ -1209,6 +1209,17 @@
   <data name="AdminProduct.CertificateDocuments" xml:space="preserve"><value>Certificate / verification documents (PDF)</value></data>
   <data name="AdminProduct.CertificateDocumentsHelp" xml:space="preserve"><value>Upload PSA certificates, grading reports, or verification PDFs. Max 5MB each, up to 5 documents per product.</value></data>
   <data name="AdminProduct.Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="AdminProduct.ClearSelection" xml:space="preserve"><value>Clear selection</value></data>
+  <data name="AdminProduct.UndoRemove" xml:space="preserve"><value>Undo</value></data>
+  <data name="AdminProduct.MarkedForRemoval" xml:space="preserve"><value>Marked for removal</value></data>
+  <data name="AdminProduct.CurrentPrimary" xml:space="preserve"><value>Current primary image</value></data>
+  <data name="AdminProduct.ImageUploader.CloseLightbox" xml:space="preserve"><value>Close image preview</value></data>
+  <data name="AdminProduct.ImageUploader.InvalidFormat" xml:space="preserve"><value>Only JPG, PNG, or WEBP images are allowed.</value></data>
+  <data name="AdminProduct.ImageUploader.SizeLimit" xml:space="preserve"><value>Image must not exceed 5MB.</value></data>
+  <data name="AdminProduct.ImageUploader.TemplateInvalidFormat" xml:space="preserve"><value>Template image must be JPEG or PNG.</value></data>
+  <data name="AdminProduct.ImageUploader.TemplateSizeLimit" xml:space="preserve"><value>Template image must not exceed 2MB.</value></data>
+  <data name="AdminProduct.ImageUploader.GalleryLimit" xml:space="preserve"><value>You can upload up to 4 gallery images.</value></data>
+  <data name="AdminProduct.ImageUploader.GalleryPartial" xml:space="preserve"><value>Some files were skipped due to limits or invalid format.</value></data>
   <data name="AdminProduct.View" xml:space="preserve"><value>View</value></data>
   <data name="AdminProduct.Download" xml:space="preserve"><value>Download</value></data>
   <data name="AdminProduct.DocumentTypePsaCertificate" xml:space="preserve"><value>PSA certificate</value></data>
