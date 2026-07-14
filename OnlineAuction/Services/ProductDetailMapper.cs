@@ -191,6 +191,9 @@ internal static class ProductDetailMapper
             IsHot = status == "Ending Soon" || bidCount >= HotBidCountThreshold
         };
 
+        // Expose whether auction requires registration for listing summaries
+        item.RequiresRegistration = auction.RequiresRegistration;
+
         ApplyDealInfo(item);
         return item;
     }

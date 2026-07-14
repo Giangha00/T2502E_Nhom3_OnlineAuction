@@ -68,6 +68,7 @@ public class AuctionItemViewModel
     public string DealNote { get; set; } = string.Empty;
     public string DisplayTitle { get; set; } = string.Empty;
     public decimal? BuyNowPrice { get; set; }
+    public bool RequiresRegistration { get; set; } = true;
     public bool HasBuyNow =>
         string.Equals(ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase)
         || (BuyNowPrice.HasValue && BuyNowPrice.Value > 0);
