@@ -1,4 +1,19 @@
 @model ProductFormViewModel
+@using System.Text.Json
+
+@{
+    var imageUploaderLabels = JsonSerializer.Serialize(new
+    {
+        remove = Localizer["AdminProduct.Remove"].Value,
+        clear = Localizer["AdminProduct.ClearSelection"].Value,
+        undo = Localizer["AdminProduct.UndoRemove"].Value,
+        markedForRemoval = Localizer["AdminProduct.MarkedForRemoval"].Value,
+        invalidFormat = Localizer["AdminProduct.ImageUploader.InvalidFormat"].Value,
+        sizeLimit = Localizer["AdminProduct.ImageUploader.SizeLimit"].Value,
+        galleryLimit = Localizer["AdminProduct.ImageUploader.GalleryLimit"].Value,
+        galleryPartial = Localizer["AdminProduct.ImageUploader.GalleryPartial"].Value
+    });
+}
 
 <div asp-validation-summary="ModelOnly" class="mb-4 text-theme-sm text-error-600"></div>
 
@@ -184,33 +199,92 @@
 
     <section>
         <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.Media"]</h3>
-        <div class="grid grid-cols-1 gap-5">
+        <div class="grid grid-cols-1 gap-5"
+             data-product-image-uploader
+             data-mode="product"
+             data-max-gallery="4"
+             data-max-image-size="5242880"
+             data-labels='@Html.Raw(imageUploaderLabels)'>
             <div>
                 <label asp-for="PrimaryImageFile" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                @if (!string.IsNullOrWhiteSpace(Model.PrimaryImageUrl))
-                {
-                    <div class="mb-3">
-                        <img src="@Model.PrimaryImageUrl" alt="@Localizer["AdminProduct.PrimaryImage"]" class="h-24 w-24 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
+                <div class="mb-3 flex flex-wrap items-start gap-4">
+                    <div data-saved-primary-image class="@(string.IsNullOrWhiteSpace(Model.PrimaryImageUrl) ? "hidden" : string.Empty)">
+                        <button type="button"
+                                class="block cursor-zoom-in overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700"
+                                data-saved-primary-open>
+                            <img data-saved-primary-thumb
+                                 src="@Model.PrimaryImageUrl"
+                                 alt="@Localizer["AdminProduct.PrimaryImage"]"
+                                 class="h-40 w-40 object-cover" />
+                        </button>
+                        <p class="mt-1 text-theme-xs text-gray-500">@Localizer["AdminProduct.CurrentPrimary"]</p>
                     </div>
-                }
-                <input asp-for="PrimaryImageFile" type="file" accept=".jpg,.jpeg,.png,.webp" class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
+
+                    <div data-primary-preview-wrap class="relative hidden">
+                        <button type="button"
+                                class="block cursor-zoom-in overflow-hidden rounded-lg border border-brand-200 ring-2 ring-brand-100 dark:border-brand-700 dark:ring-brand-500/20">
+                            <img data-primary-preview-img
+                                 alt="@Localizer["AdminProduct.Preview"]"
+                                 class="h-40 w-40 object-cover" />
+                        </button>
+                        <button type="button"
+                                data-primary-clear
+                                aria-label="@Localizer["AdminProduct.ClearSelection"]"
+                                class="mt-2 inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+                            @Localizer["AdminProduct.ClearSelection"]
+                        </button>
+                    </div>
+                </div>
+                <input asp-for="PrimaryImageFile"
+                       type="file"
+                       accept=".jpg,.jpeg,.png,.webp"
+                       data-primary-input
+                       class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
                 <p class="mt-1 text-theme-xs text-gray-500">@Localizer["AdminProduct.PrimaryImageHelp"]</p>
             </div>
 
             @if (Model.ExistingGalleryImages.Count > 0)
             {
-                <div>
+                <div data-existing-gallery>
                     <p class="mb-2 text-theme-sm font-medium text-gray-700 dark:text-gray-400">@Localizer["AdminProduct.CurrentGallery"]</p>
                     <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
                         @foreach (var image in Model.ExistingGalleryImages)
                         {
-                            <label class="relative block cursor-pointer rounded-lg border border-gray-200 p-2 dark:border-gray-700">
-                                <img src="@image.ImageUrl" alt="@Localizer["AdminProduct.GalleryImage"]" class="h-20 w-full rounded object-cover" />
+                            <div class="relative overflow-hidden rounded-lg border border-gray-200 bg-white p-2 dark:border-gray-700 dark:bg-gray-900"
+                                 data-existing-gallery-item
+                                 data-image-id="@image.Id">
+                                <button type="button" class="block w-full cursor-zoom-in">
+                                    <img data-existing-gallery-thumb
+                                         src="@image.ImageUrl"
+                                         alt="@Localizer["AdminProduct.GalleryImage"]"
+                                         class="h-24 w-full rounded object-cover" />
+                                </button>
+                                <input type="checkbox"
+                                       name="RemoveGalleryImageIds"
+                                       value="@image.Id"
+                                       class="sr-only"
+                                       data-remove-checkbox />
+                                <span data-removal-badge
+                                      class="absolute left-2 top-2 hidden rounded bg-error-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                                    @Localizer["AdminProduct.MarkedForRemoval"]
+                                </span>
                                 <div class="mt-2 flex items-center gap-2">
-                                    <input type="checkbox" name="RemoveGalleryImageIds" value="@image.Id" class="h-4 w-4 rounded border-gray-300 text-brand-500" />
-                                    <span class="text-theme-xs text-gray-500">@Localizer["AdminProduct.Remove"]</span>
+                                    <button type="button"
+                                            data-mark-remove
+                                            aria-label="@Localizer["AdminProduct.Remove"]"
+                                            class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-theme-xs font-medium text-error-600 hover:bg-error-50 dark:hover:bg-error-500/10">
+                                        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 00-.629.74v.018a49.25 49.25 0 00.005-.001 2.75 2.75 0 011.902 2.606v1.435a2.75 2.75 0 01-1.902 2.606 49.124 49.124 0 00-.005-.002.75.75 0 00-.629.74v.018c.781.122 1.57.221 2.365.298V16.25A2.75 2.75 0 0010.75 19h-1.5A2.75 2.75 0 006.5 16.25v-1.443c-.795-.077-1.584-.176-2.365-.298a.75.75 0 00-.629-.739v-.018a49.25 49.25 0 00.005.001 2.75 2.75 0 011.902-2.606V9.45a2.75 2.75 0 01-1.902-2.606 49.124 49.124 0 00-.005.002.75.75 0 00-.629-.74v-.018c.781-.122 1.57-.221 2.365-.298V3.75A2.75 2.75 0 008.75 1h2.5zM7.5 3.75a1.25 1.25 0 011.25-1.25h2.5a1.25 1.25 0 011.25 1.25v.443a47.85 47.85 0 00-5 0V3.75zM4.5 6.15v.018a47.85 47.85 0 005 0v-.018 47.85 47.85 0 00-5 0zm0 7.35v.018a47.85 47.85 0 005 0v-.018 47.85 47.85 0 00-5 0z" clip-rule="evenodd" />
+                                        </svg>
+                                        @Localizer["AdminProduct.Remove"]
+                                    </button>
+                                    <button type="button"
+                                            data-undo-remove
+                                            class="hidden rounded-lg px-2 py-1 text-theme-xs font-medium text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-500/10">
+                                        @Localizer["AdminProduct.UndoRemove"]
+                                    </button>
                                 </div>
-                            </label>
+                            </div>
                         }
                     </div>
                 </div>
@@ -218,8 +292,14 @@
 
             <div>
                 <label class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400">@Localizer["AdminProduct.GalleryImages"]</label>
-                <input name="GalleryImageFiles" type="file" accept=".jpg,.jpeg,.png,.webp" multiple class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
+                <input name="GalleryImageFiles"
+                       type="file"
+                       accept=".jpg,.jpeg,.png,.webp"
+                       multiple
+                       data-gallery-input
+                       class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
                 <p class="mt-1 text-theme-xs text-gray-500">@Localizer["AdminProduct.GalleryImagesHelp"]</p>
+                <div data-gallery-preview-grid class="mt-3 hidden grid grid-cols-2 gap-4 sm:grid-cols-4"></div>
             </div>
 
             @if (Model.ExistingDocuments.Count > 0)
