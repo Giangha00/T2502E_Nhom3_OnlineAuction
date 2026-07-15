@@ -192,9 +192,6 @@
   <data name="Layout_Brand_Tagline" xml:space="preserve">
     <value>Discover authenticated trading cards through premium online auctions.</value>
   </data>
-  <data name="Layout_Footer_Address" xml:space="preserve">
-    <value>FPT Polytechnic Building, Trinh Van Bo, Xuan Phuong, Hanoi 100000, Vietnam</value>
-  </data>
   <data name="Home_Hero_TitleAccent" xml:space="preserve">
     <value>Rarest Collectibles</value>
   </data>
@@ -643,8 +640,6 @@
   <data name="Product_SalesCount" xml:space="preserve"><value>{0} sales</value></data>
   <data name="Product_EndingSoonTitle" xml:space="preserve"><value>Ending Soon</value></data>
   <data name="Product_RelatedSubtitle" xml:space="preserve"><value>Other rare collectibles you might be interested in</value></data>
-  <data name="Product_SimilarListingsTitle" xml:space="preserve"><value>Similar listings</value></data>
-  <data name="Product_MoreRelatedTitle" xml:space="preserve"><value>More related cards</value></data>
   <data name="Product_ViewAllArrow" xml:space="preserve"><value>View all →</value></data>
   <data name="Product_CountdownTitle" xml:space="preserve"><value>Auction Ends In</value></data>
   <data name="Product_Days" xml:space="preserve"><value>Days</value></data>
@@ -967,6 +962,14 @@
   <data name="User_Stat_TotalAuctions" xml:space="preserve"><value>Total Auctions</value></data>
   <data name="User_Stat_Completed" xml:space="preserve"><value>Completed</value></data>
   <data name="User_Stat_TotalSales" xml:space="preserve"><value>Total Sales</value></data>
+  <data name="User_Stat_PaidOrders" xml:space="preserve"><value>Paid Orders</value></data>
+  <data name="User_Stat_GrossSales" xml:space="preserve"><value>Gross Sales (Subtotal)</value></data>
+  <data name="User_Stat_SellerFee" xml:space="preserve"><value>Seller Success Fee</value></data>
+  <data name="User_Stat_NetProceeds" xml:space="preserve"><value>Net Proceeds</value></data>
+  <data name="User_Stat_NetProceedsNote" xml:space="preserve"><value>Subtotal − seller fee. Manual payout / Phase 2.</value></data>
+  <data name="User_SellerStats_Title" xml:space="preserve"><value>Seller Statistics</value></data>
+  <data name="User_SellerStats_Description" xml:space="preserve"><value>Activity and earnings overview</value></data>
+  <data name="User_Stat_Rating" xml:space="preserve"><value>Rating</value></data>
   <data name="User_Stat_SuccessRate" xml:space="preserve"><value>Success Rate</value></data>
   <data name="User_NotUpdated" xml:space="preserve"><value>Not updated</value></data>
   <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
@@ -1090,6 +1093,7 @@
   <data name="Admin_Dashboard_Col_TotalBid" xml:space="preserve"><value>Total Bid</value></data>
   <data name="Admin_Dashboard_Col_Listings" xml:space="preserve"><value>Listings</value></data>
   <data name="Admin_Dashboard_Col_Sales" xml:space="preserve"><value>Sales</value></data>
+  <data name="Admin_Dashboard_Col_NetProceeds" xml:space="preserve"><value>Net Proceeds</value></data>
   <data name="Admin_Dashboard_Col_Product" xml:space="preserve"><value>Product</value></data>
   <data name="Admin_Dashboard_Col_Seller" xml:space="preserve"><value>Seller</value></data>
   <data name="Admin_Dashboard_Col_Category" xml:space="preserve"><value>Category</value></data>
@@ -1098,12 +1102,16 @@
   <data name="Admin_Dashboard_Kpi_Gmv" xml:space="preserve"><value>GMV</value></data>
   <data name="Admin_Dashboard_Kpi_PlatformRevenue" xml:space="preserve"><value>Platform Revenue</value></data>
   <data name="Admin_Dashboard_Kpi_Commission" xml:space="preserve"><value>Commission (Marketplace Fees)</value></data>
+  <data name="Admin_Dashboard_Kpi_BuyerFee" xml:space="preserve"><value>Buyer Checkout Fee</value></data>
+  <data name="Admin_Dashboard_Kpi_SellerFee" xml:space="preserve"><value>Seller Success Fee</value></data>
+  <data name="Admin_Dashboard_Kpi_SellerProceeds" xml:space="preserve"><value>Seller Net Proceeds</value></data>
   <data name="Admin_Dashboard_Kpi_ListingFees" xml:space="preserve"><value>Listing Fees</value></data>
   <data name="Admin_Dashboard_Kpi_CompletedOrders" xml:space="preserve"><value>Completed Orders</value></data>
   <data name="Admin_Dashboard_RevenueSection_Title" xml:space="preserve"><value>Revenue</value></data>
   <data name="Admin_Dashboard_RevenueSection_Description" xml:space="preserve"><value>Total transaction value and marketplace commission.</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Commission = buyer checkout fees + seller success fees from paid/delivered orders.</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV is the sum of successful payments in the period. Commission is marketplace fees only: buyer checkout fees (PlatformFee) + seller success fees (SellerFee) on paid/delivered orders. Registration deposits are not included.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Commission = buyer checkout fees + seller success fees from paid/delivered orders (PayPal and COD).</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV is the sum of successful Payment.Amount in the period (includes COD payment rows). Commission is marketplace fees only: buyer checkout fees (PlatformFee) + seller success fees (SellerFee) on paid/delivered orders. Seller net proceeds = Subtotal − SellerFee. Registration deposits are not commission.</value></data>
+  <data name="Admin_Dashboard_Revenue_PayoutNote" xml:space="preserve"><value>Phase 1 ledger only — seller PayPal payout is manual / Phase 2.</value></data>
   <data name="Admin_Dashboard_Revenue_NoFeeData" xml:space="preserve"><value>No platform fee data yet</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Title" xml:space="preserve"><value>GMV vs Platform Revenue</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Description" xml:space="preserve"><value>Click a point to filter the detail table by day.</value></data>
@@ -1214,17 +1222,6 @@
   <data name="AdminProduct.CertificateDocuments" xml:space="preserve"><value>Certificate / verification documents (PDF)</value></data>
   <data name="AdminProduct.CertificateDocumentsHelp" xml:space="preserve"><value>Upload PSA certificates, grading reports, or verification PDFs. Max 5MB each, up to 5 documents per product.</value></data>
   <data name="AdminProduct.Remove" xml:space="preserve"><value>Remove</value></data>
-  <data name="AdminProduct.ClearSelection" xml:space="preserve"><value>Clear selection</value></data>
-  <data name="AdminProduct.UndoRemove" xml:space="preserve"><value>Undo</value></data>
-  <data name="AdminProduct.MarkedForRemoval" xml:space="preserve"><value>Marked for removal</value></data>
-  <data name="AdminProduct.CurrentPrimary" xml:space="preserve"><value>Current primary image</value></data>
-  <data name="AdminProduct.ImageUploader.CloseLightbox" xml:space="preserve"><value>Close image preview</value></data>
-  <data name="AdminProduct.ImageUploader.InvalidFormat" xml:space="preserve"><value>Only JPG, PNG, or WEBP images are allowed.</value></data>
-  <data name="AdminProduct.ImageUploader.SizeLimit" xml:space="preserve"><value>Image must not exceed 5MB.</value></data>
-  <data name="AdminProduct.ImageUploader.TemplateInvalidFormat" xml:space="preserve"><value>Template image must be JPEG or PNG.</value></data>
-  <data name="AdminProduct.ImageUploader.TemplateSizeLimit" xml:space="preserve"><value>Template image must not exceed 2MB.</value></data>
-  <data name="AdminProduct.ImageUploader.GalleryLimit" xml:space="preserve"><value>You can upload up to 4 gallery images.</value></data>
-  <data name="AdminProduct.ImageUploader.GalleryPartial" xml:space="preserve"><value>Some files were skipped due to limits or invalid format.</value></data>
   <data name="AdminProduct.View" xml:space="preserve"><value>View</value></data>
   <data name="AdminProduct.Download" xml:space="preserve"><value>Download</value></data>
   <data name="AdminProduct.DocumentTypePsaCertificate" xml:space="preserve"><value>PSA certificate</value></data>
@@ -1309,4 +1306,18 @@
   <data name="AdminProduct.Validation.TemplateNameRequired" xml:space="preserve"><value>Please enter a template name.</value></data>
   <data name="AdminProduct.Validation.TemplateNameMaxLength" xml:space="preserve"><value>Template name cannot exceed 255 characters.</value></data>
   <data name="AdminProduct.Validation.CategoryRequired" xml:space="preserve"><value>Please select a category.</value></data>
+<data name="Layout_Footer_Address" xml:space="preserve">
+    <value>FPT Polytechnic Building, Trinh Van Bo, Xuan Phuong, Hanoi 100000, Vietnam</value>
+  </data>
+<data name="AdminProduct.ClearSelection" xml:space="preserve"><value>Clear selection</value></data>
+<data name="AdminProduct.UndoRemove" xml:space="preserve"><value>Undo</value></data>
+<data name="AdminProduct.MarkedForRemoval" xml:space="preserve"><value>Marked for removal</value></data>
+<data name="AdminProduct.CurrentPrimary" xml:space="preserve"><value>Current primary image</value></data>
+<data name="AdminProduct.ImageUploader.CloseLightbox" xml:space="preserve"><value>Close image preview</value></data>
+<data name="AdminProduct.ImageUploader.InvalidFormat" xml:space="preserve"><value>Only JPG, PNG, or WEBP images are allowed.</value></data>
+<data name="AdminProduct.ImageUploader.SizeLimit" xml:space="preserve"><value>Image must not exceed 5MB.</value></data>
+<data name="AdminProduct.ImageUploader.TemplateInvalidFormat" xml:space="preserve"><value>Template image must be JPEG or PNG.</value></data>
+<data name="AdminProduct.ImageUploader.TemplateSizeLimit" xml:space="preserve"><value>Template image must not exceed 2MB.</value></data>
+<data name="AdminProduct.ImageUploader.GalleryLimit" xml:space="preserve"><value>You can upload up to 4 gallery images.</value></data>
+<data name="AdminProduct.ImageUploader.GalleryPartial" xml:space="preserve"><value>Some files were skipped due to limits or invalid format.</value></data>
 </root>

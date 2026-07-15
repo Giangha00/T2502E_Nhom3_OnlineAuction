@@ -198,7 +198,7 @@ public class OrderPaymentService : IOrderPaymentService
                 order.Status = OrderStatuses.Paid;
                 order.PaymentMethod = "paypal";
                 order.UpdatedAt = now;
-                order.SellerFee = MarketplaceFeeCalculator.CalculateSellerSuccessFee(order.Subtotal, _feeSettings);
+                MarketplaceFeeCalculator.ApplySellerSettlement(order, _feeSettings);
                 paidOrderIds.Add(order.Id);
 
                 // ------------------------------------------------------------
@@ -555,7 +555,7 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
                 order.Status = OrderStatuses.Paid;
                 order.PaymentMethod = "paypal";
                 order.UpdatedAt = now;
-                order.SellerFee = MarketplaceFeeCalculator.CalculateSellerSuccessFee(order.Subtotal, _feeSettings);
+                MarketplaceFeeCalculator.ApplySellerSettlement(order, _feeSettings);
 
                 var auctionId = order.Items.First().AuctionId;
                 var winnerDeposit = await _dbContext.AuctionRegistrationDeposits
@@ -735,9 +735,7 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
                 payment.Order.Status = OrderStatuses.Paid;
 
                 payment.Order.PaymentMethod = "paypal";
-                payment.Order.SellerFee = MarketplaceFeeCalculator.CalculateSellerSuccessFee(
-                    payment.Order.Subtotal,
-                    _feeSettings);
+                MarketplaceFeeCalculator.ApplySellerSettlement(payment.Order, _feeSettings);
 
                 payment.Order.UpdatedAt = now;
             }

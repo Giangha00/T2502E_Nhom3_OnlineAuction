@@ -53,9 +53,9 @@
     "PrefetchCount": 10
   },
   "PlatformFee": {
-    "RegistrationDepositPercent": 10.00,
-    "BuyerCheckoutFeePercent": 2.50,
-    "SellerSuccessFeePercent": 10.00,
-    "MinimumRegistrationDeposit": 1.00
+    "RegistrationDepositPercent": 10.0,
+    "BuyerCheckoutFeePercent": 2.5,
+    "SellerSuccessFeePercent": 10.0,
+    "MinimumRegistrationDeposit": 1.0
   }
 }

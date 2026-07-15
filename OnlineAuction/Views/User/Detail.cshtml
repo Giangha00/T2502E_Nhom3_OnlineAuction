@@ -34,7 +34,7 @@
         <p class="user-detail-stat-card__value">@Model.Statistics.CompletedAuctions</p>
       </div>
       <div class="user-detail-stat-card">
-        <p class="user-detail-stat-card__label">@Localizer["User_Stat_TotalSales"]</p>
+        <p class="user-detail-stat-card__label">@Localizer["User_Stat_PaidOrders"]</p>
         <p class="user-detail-stat-card__value">@Model.Statistics.TotalSales</p>
       </div>
       <div class="user-detail-stat-card">
@@ -42,6 +42,25 @@
         <p class="user-detail-stat-card__value user-detail-stat-card__value--accent">@successRate%</p>
       </div>
     </div>
+
+    @if (Model.IsOwner)
+    {
+      <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div class="user-detail-stat-card">
+          <p class="user-detail-stat-card__label">@Localizer["User_Stat_GrossSales"]</p>
+          <p class="user-detail-stat-card__value">@Model.Statistics.GrossSales.ToString("C2")</p>
+        </div>
+        <div class="user-detail-stat-card">
+          <p class="user-detail-stat-card__label">@Localizer["User_Stat_SellerFee"]</p>
+          <p class="user-detail-stat-card__value">@Model.Statistics.SellerFees.ToString("C2")</p>
+        </div>
+        <div class="user-detail-stat-card">
+          <p class="user-detail-stat-card__label">@Localizer["User_Stat_NetProceeds"]</p>
+          <p class="user-detail-stat-card__value user-detail-stat-card__value--accent">@Model.Statistics.NetProceeds.ToString("C2")</p>
+          <p class="mt-1 text-xs text-slate-400">@Localizer["User_Stat_NetProceedsNote"]</p>
+        </div>
+      </div>
+    }
 
     <div class="user-detail-actions-mobile mt-6 lg:hidden">
       @await Html.PartialAsync("Partials/_ActionButtons", Model.Profile)

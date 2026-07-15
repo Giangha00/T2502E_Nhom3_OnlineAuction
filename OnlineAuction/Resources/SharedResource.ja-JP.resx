@@ -189,9 +189,6 @@
   <data name="Layout_Brand_Tagline" xml:space="preserve">
     <value>認証済みトレーディングカードをプレミアムオンラインオークションで見つけましょう。</value>
   </data>
-  <data name="Layout_Footer_Address" xml:space="preserve">
-    <value>FPT Polytechnicビル、Trinh Van Bo、Xuan Phuong、ハノイ 100000、ベトナム</value>
-  </data>
   <data name="Home_Hero_TitleAccent" xml:space="preserve">
     <value>希少なコレクションに投資</value>
   </data>
@@ -559,8 +556,6 @@
   <data name="Product_SalesCount" xml:space="preserve"><value>{0}件の販売</value></data>
   <data name="Product_EndingSoonTitle" xml:space="preserve"><value>まもなく終了</value></data>
   <data name="Product_RelatedSubtitle" xml:space="preserve"><value>おすすめのレアコレクション</value></data>
-  <data name="Product_SimilarListingsTitle" xml:space="preserve"><value>類似出品</value></data>
-  <data name="Product_MoreRelatedTitle" xml:space="preserve"><value>その他の関連カード</value></data>
   <data name="Product_ViewAllArrow" xml:space="preserve"><value>すべて見る →</value></data>
   <data name="Product_CountdownTitle" xml:space="preserve"><value>オークション終了まで</value></data>
   <data name="Product_Days" xml:space="preserve"><value>日</value></data>
@@ -905,4 +900,7 @@
   <data name="User_Time_HoursLeft" xml:space="preserve"><value>残り {0} 時間</value></data>
   <data name="User_Time_MinutesLeft" xml:space="preserve"><value>残り {0} 分</value></data>
   <data name="Account_Selling_CreateListing" xml:space="preserve"><value>出品する</value></data>
+<data name="Layout_Footer_Address" xml:space="preserve">
+    <value>FPT Polytechnicビル、Trinh Van Bo、Xuan Phuong、ハノイ 100000、ベトナム</value>
+  </data>
 </root>
