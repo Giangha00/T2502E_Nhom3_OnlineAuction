@@ -35,6 +35,8 @@ public class AuctionRegistrationDeposit : AuditableEntity
 
     public DateTime? RefundedAt { get; set; }
 
+    public DateTime? ForfeitedAt { get; set; }
+
     public Auction Auction { get; set; } = null!;
 
     public ApplicationUser User { get; set; } = null!;
@@ -53,4 +55,6 @@ public static class AuctionRegistrationDepositStatuses
     // Ví dụ: thắng bid 500$, đã cọc 50$ thì order chỉ cần trả phần còn lại.
     // Trạng thái này KHÔNG phải refund, vì tiền không trả lại qua PayPal.
     public const string Applied = "applied";
+    // Winner failed to pay within the deadline; deposit is retained by the platform (no PayPal refund).
+    public const string Forfeited = "forfeited";
 }

@@ -197,6 +197,9 @@ public class AdminAuctionService
 
         auction.BidHistoryPage = bidPage;
 
+        auction.WinnerNonPaymentLogs = await LoadWinnerNonPaymentLogsAsync(id);
+        auction.ForfeitedDeposits = await LoadForfeitedDepositsAsync(id);
+
         if (bidHistoryTotalCount == 0)
         {
             auction.BidHistory = [];
@@ -214,6 +217,45 @@ public class AdminAuctionService
         auction.BidHistory = AdminBidHistoryMapper.Map(bids, skip);
 
         return auction;
+    }
+
+    private async Task<IReadOnlyList<AdminWinnerNonPaymentLogViewModel>> LoadWinnerNonPaymentLogsAsync(int auctionId)
+    {
+        return await _dbContext.WinnerNonPaymentLogs
+            .AsNoTracking()
+            .Where(log => log.AuctionId == auctionId)
+            .OrderByDescending(log => log.CreatedAt)
+            .Select(log => new AdminWinnerNonPaymentLogViewModel
+            {
+                Id = log.Id,
+                Action = log.Action,
+                Details = log.Details,
+                DefaultingUserId = log.DefaultingUserId,
+                ForfeitedAmount = log.ForfeitedAmount,
+                SecondChanceUserId = log.SecondChanceUserId,
+                CreatedAt = log.CreatedAt
+            })
+            .ToListAsync();
+    }
+
+    private async Task<IReadOnlyList<AdminForfeitedDepositViewModel>> LoadForfeitedDepositsAsync(int auctionId)
+    {
+        return await _dbContext.AuctionRegistrationDeposits
+            .AsNoTracking()
+            .Include(deposit => deposit.User)
+            .Where(deposit =>
+                deposit.AuctionId == auctionId &&
+                deposit.Status == AuctionRegistrationDepositStatuses.Forfeited)
+            .OrderByDescending(deposit => deposit.ForfeitedAt)
+            .Select(deposit => new AdminForfeitedDepositViewModel
+            {
+                DepositId = deposit.Id,
+                UserId = deposit.UserId,
+                UserName = deposit.User.FullName,
+                Amount = deposit.Amount,
+                ForfeitedAt = deposit.ForfeitedAt
+            })
+            .ToListAsync();
     }
 
     public async Task<(bool Success, string Message)> ReviewFraudAlertAsync(

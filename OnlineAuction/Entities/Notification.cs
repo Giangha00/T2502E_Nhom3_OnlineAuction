@@ -39,6 +39,9 @@ public static class NotificationReferenceTypes
     public const string AuctionRegistrationConfirmed = "auction_registration_confirmed";
     public const string AuctionRegistrationCancelled = "auction_registration_cancelled";
     public const string AuctionDepositRefunded = "auction_deposit_refunded";
+    public const string AuctionPaymentExpired = "auction_payment_expired";
+    public const string AuctionSecondChanceOffered = "auction_second_chance_offered";
+    public const string AuctionRelistRecommended = "auction_relist_recommended";
     public const string AuctionStartingSoon = "auction_starting_soon";
     public const string AuctionNowLive = "auction_now_live";
     public const string ListingFeePaid = "listing_fee_paid";

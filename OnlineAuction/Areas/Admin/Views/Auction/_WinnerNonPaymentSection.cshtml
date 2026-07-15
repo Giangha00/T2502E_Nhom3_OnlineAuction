@@ -1,0 +1,65 @@
+@model AuctionDetailViewModel
+
+@if (Model.ForfeitedDeposits.Count == 0 && Model.WinnerNonPaymentLogs.Count == 0)
+{
+    return;
+}
+
+<section class="mt-8 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+    <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Winner non-payment recovery</h3>
+
+    @if (Model.ForfeitedDeposits.Count > 0)
+    {
+        <div class="mb-6">
+            <h4 class="mb-2 text-theme-sm font-medium text-gray-700 dark:text-gray-300">Forfeited deposits</h4>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-left text-theme-sm">
+                    <thead class="border-b border-gray-200 text-theme-xs uppercase text-gray-400 dark:border-gray-700">
+                        <tr>
+                            <th class="px-3 py-2">User</th>
+                            <th class="px-3 py-2">Amount</th>
+                            <th class="px-3 py-2">Forfeited at (UTC)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var deposit in Model.ForfeitedDeposits)
+                        {
+                            <tr class="border-b border-gray-100 dark:border-gray-800">
+                                <td class="px-3 py-2 text-gray-800 dark:text-white/90">@deposit.UserName (#@deposit.UserId)</td>
+                                <td class="px-3 py-2">@deposit.Amount.ToString("N2")</td>
+                                <td class="px-3 py-2 text-gray-500">@(deposit.ForfeitedAt?.ToString("yyyy-MM-dd HH:mm") ?? "—")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    @if (Model.WinnerNonPaymentLogs.Count > 0)
+    {
+        <div>
+            <h4 class="mb-2 text-theme-sm font-medium text-gray-700 dark:text-gray-300">Recovery audit log</h4>
+            <div class="space-y-3">
+                @foreach (var log in Model.WinnerNonPaymentLogs)
+                {
+                    <div class="rounded-lg border border-gray-100 px-4 py-3 dark:border-gray-800">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="text-theme-xs font-semibold uppercase tracking-wide text-brand-600">@log.Action.Replace('_', ' ')</span>
+                            <span class="text-theme-xs text-gray-500">@log.CreatedAt.ToString("yyyy-MM-dd HH:mm") UTC</span>
+                        </div>
+                        <p class="mt-1 text-theme-sm text-gray-700 dark:text-gray-300">@log.Details</p>
+                        @if (log.ForfeitedAmount.HasValue)
+                        {
+                            <p class="mt-1 text-theme-xs text-error-600">Forfeited: @log.ForfeitedAmount.Value.ToString("N2")</p>
+                        }
+                        @if (log.SecondChanceUserId.HasValue)
+                        {
+                            <p class="mt-1 text-theme-xs text-gray-500">Second-chance bidder: #@log.SecondChanceUserId</p>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</section>

@@ -243,6 +243,8 @@ builder.Services.Configure<BidFraudDetectionSettings>(
     builder.Configuration.GetSection(BidFraudDetectionSettings.SectionName));
 builder.Services.Configure<PlatformFeeSettings>(
     builder.Configuration.GetSection(PlatformFeeSettings.SectionName));
+builder.Services.Configure<WinnerNonPaymentSettings>(
+    builder.Configuration.GetSection(WinnerNonPaymentSettings.SectionName));
 
 builder.Services.AddHttpClient<IPayPalService, PayPalService>();
 builder.Services.AddHttpClient<IEmailSender, GmailEmailSender>();
@@ -260,6 +262,7 @@ builder.Services.AddScoped<IBidFraudAlertWriter, BidFraudAlertWriter>();
 builder.Services.AddScoped<IAuctionRegistrationService, AuctionRegistrationService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderCreationService, OrderCreationService>();
+builder.Services.AddScoped<IWinnerNonPaymentRecoveryService, WinnerNonPaymentRecoveryService>();
 builder.Services.AddScoped<IOrderPaymentService, OrderPaymentService>();
 builder.Services.AddHostedService<AuctionFinalizationWorker>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
