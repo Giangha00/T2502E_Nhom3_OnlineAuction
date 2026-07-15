@@ -84,7 +84,7 @@
             <div>
                 <dt class="text-theme-xs font-medium uppercase text-gray-400">Registration</dt>
                 <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    @(Model.RequiresRegistration ? "Required" : "Not required")
+                    @(Model.ListingType == ListingTypes.Auction ? "Registration required" : "Not applicable")
                 </dd>
                 <dd class="text-theme-xs text-gray-500">@Model.RegistrationCount registration(s)</dd>
             </div>
