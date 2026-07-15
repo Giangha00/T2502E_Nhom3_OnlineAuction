@@ -202,6 +202,9 @@
   <data name="Layout_Brand_Tagline" xml:space="preserve">
     <value>Khám phá thẻ sưu tầm đã xác thực qua các phiên đấu giá trực tuyến cao cấp.</value>
   </data>
+  <data name="Layout_Footer_Address" xml:space="preserve">
+    <value>Tòa nhà FPT Polytechnic, Trịnh Văn Bô, Xuân Phương, Hà Nội 100000</value>
+  </data>
   <data name="Home_Hero_TitleAccent" xml:space="preserve">
     <value>vật phẩm sưu tầm hiếm nhất</value>
   </data>

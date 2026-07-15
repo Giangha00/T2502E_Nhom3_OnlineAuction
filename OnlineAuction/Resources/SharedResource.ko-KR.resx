@@ -189,6 +189,9 @@
   <data name="Layout_Brand_Tagline" xml:space="preserve">
     <value>인증된 트레이딩 카드를 프리미엄 온라인 경매로 만나보세요.</value>
   </data>
+  <data name="Layout_Footer_Address" xml:space="preserve">
+    <value>FPT Polytechnic 빌딩, Trinh Van Bo, Xuan Phuong, 하노이 100000, 베트남</value>
+  </data>
   <data name="Home_Hero_TitleAccent" xml:space="preserve">
     <value>희귀한 수집품에 투자하세요</value>
   </data>
