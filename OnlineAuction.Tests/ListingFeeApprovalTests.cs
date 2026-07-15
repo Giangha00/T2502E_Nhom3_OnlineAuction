@@ -23,11 +23,9 @@ public class ListingFeeApprovalTests
         await using var db = await CreateContextAsync();
         var auctionId = await SeedPendingAuctionAsync(db);
 
-        var listingFeeService = CreateListingFeeService(db, useMockPayment: true);
         var verificationService = new AdminAuctionVerificationService(
             db,
             new StubNotificationService(),
-            listingFeeService,
             NullLogger<AdminAuctionVerificationService>.Instance);
 
         var result = await verificationService.ApproveAsync(auctionId, adminUserId: 2);
@@ -54,7 +52,6 @@ public class ListingFeeApprovalTests
         var verificationService = new AdminAuctionVerificationService(
             db,
             new StubNotificationService(),
-            CreateListingFeeService(db, useMockPayment: true),
             NullLogger<AdminAuctionVerificationService>.Instance);
 
         var result = await verificationService.RejectAsync(
@@ -92,11 +89,9 @@ public class ListingFeeApprovalTests
         await using var db = await CreateContextAsync();
         var auctionId = await SeedPendingAuctionAsync(db);
 
-        var listingFeeService = CreateListingFeeService(db, useMockPayment: true);
         var verificationService = new AdminAuctionVerificationService(
             db,
             new StubNotificationService(),
-            listingFeeService,
             NullLogger<AdminAuctionVerificationService>.Instance);
 
         await verificationService.ApproveAsync(auctionId, adminUserId: 2);
@@ -106,7 +101,7 @@ public class ListingFeeApprovalTests
         Assert.Single(await db.ListingFees.ToListAsync());
     }
 
-    private static ListingFeeService CreateListingFeeService(
+    private static object CreateListingFeeService(
         AuctionHouseDbContext db,
         bool useMockPayment,
         string environmentName = "Development")
@@ -117,12 +112,11 @@ public class ListingFeeApprovalTests
             ListingFeePercent = 2.00m,
             UseMockListingFeePayment = useMockPayment
         });
-
-        return new ListingFeeService(
-            db,
-            settings,
-            new FakeHostEnvironment(environmentName),
-            NullLogger<ListingFeeService>.Instance);
+        // ListingFeeService has been removed in this branch; tests that depended on
+        // it have been updated to construct AdminAuctionVerificationService without
+        // the listing fee dependency. Return a placeholder object to satisfy
+        // existing test helpers.
+        return new object();
     }
 
     private static async Task<AuctionHouseDbContext> CreateContextAsync()

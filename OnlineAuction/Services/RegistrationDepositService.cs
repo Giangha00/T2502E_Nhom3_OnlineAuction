@@ -332,6 +332,15 @@ public class RegistrationDepositService : IRegistrationDepositService
                 "Giao dịch đã thanh toán, không thể hủy.");
         }
 
+        var cancelResult = await _payPalService.CancelOrderAsync(payPalOrderId, cancellationToken);
+        if (!cancelResult.Success)
+        {
+            _logger.LogWarning(
+                "PayPal deposit cancel failed for order {PayPalOrderId}: {ErrorMessage}",
+                payPalOrderId,
+                cancelResult.ErrorMessage);
+        }
+
         var now = DateTime.UtcNow;
 
         deposit.Status = AuctionRegistrationDepositStatuses.Cancelled;

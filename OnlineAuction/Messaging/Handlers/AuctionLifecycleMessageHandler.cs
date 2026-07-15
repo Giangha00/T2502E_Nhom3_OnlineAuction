@@ -21,6 +21,7 @@ public sealed class AuctionLifecycleMessageHandler : IAuctionLifecycleMessageHan
     private readonly INotificationService _notificationService;
     private readonly IAdminAuctionVerificationService _verificationService;
     private readonly IRegistrationDepositRefundService _depositRefundService;
+    private readonly IOrderPaymentService _orderPaymentService;
     private readonly ILogger<AuctionLifecycleMessageHandler> _logger;
 
     public AuctionLifecycleMessageHandler(
@@ -30,6 +31,7 @@ public sealed class AuctionLifecycleMessageHandler : IAuctionLifecycleMessageHan
         INotificationService notificationService,
         IAdminAuctionVerificationService verificationService,
         IRegistrationDepositRefundService depositRefundService,
+        IOrderPaymentService orderPaymentService,
         ILogger<AuctionLifecycleMessageHandler> logger)
     {
         _dbContext = dbContext;
@@ -38,6 +40,7 @@ public sealed class AuctionLifecycleMessageHandler : IAuctionLifecycleMessageHan
         _notificationService = notificationService;
         _verificationService = verificationService;
         _depositRefundService = depositRefundService;
+        _orderPaymentService = orderPaymentService;
         _logger = logger;
     }
 
@@ -51,6 +54,7 @@ public sealed class AuctionLifecycleMessageHandler : IAuctionLifecycleMessageHan
 
             case AuctionLifecycleAction.CancelExpiredOrders:
                 await _orderService.CancelAllExpiredPendingOrdersAsync();
+                await _orderPaymentService.CancelAllStalePayPalSessionsAsync(cancellationToken);
                 break;
 
             case AuctionLifecycleAction.ProcessEndingSoonNotifications:
