@@ -1,4 +1,19 @@
 @model ProductTemplateFormViewModel
+@using System.Text.Json
+
+@{
+    var imageUploaderLabels = JsonSerializer.Serialize(new
+    {
+        remove = Localizer["AdminProduct.Remove"].Value,
+        clear = Localizer["AdminProduct.ClearSelection"].Value,
+        undo = Localizer["AdminProduct.UndoRemove"].Value,
+        markedForRemoval = Localizer["AdminProduct.MarkedForRemoval"].Value,
+        invalidFormat = Localizer["AdminProduct.ImageUploader.TemplateInvalidFormat"].Value,
+        sizeLimit = Localizer["AdminProduct.ImageUploader.TemplateSizeLimit"].Value,
+        galleryLimit = Localizer["AdminProduct.ImageUploader.GalleryLimit"].Value,
+        galleryPartial = Localizer["AdminProduct.ImageUploader.GalleryPartial"].Value
+    });
+}
 
 <div asp-validation-summary="ModelOnly" class="mb-4 text-theme-sm text-error-600"></div>
 
@@ -74,14 +89,45 @@
 
     <section>
         <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["AdminProduct.Media"]</h3>
-        @if (!string.IsNullOrWhiteSpace(Model.PrimaryImageUrl))
-        {
-            <div class="mb-3">
-                <img src="@Model.PrimaryImageUrl" alt="@Localizer["AdminProduct.TemplateImage"]" class="h-24 w-24 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
+        <div data-product-image-uploader
+             data-mode="template"
+             data-max-image-size="2097152"
+             data-labels='@Html.Raw(imageUploaderLabels)'>
+            <label asp-for="PrimaryImageFile" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+            <div class="mb-3 flex flex-wrap items-start gap-4">
+                <div data-saved-primary-image class="@(string.IsNullOrWhiteSpace(Model.PrimaryImageUrl) ? "hidden" : string.Empty)">
+                    <button type="button"
+                            class="block cursor-zoom-in overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+                        <img data-saved-primary-thumb
+                             src="@Model.PrimaryImageUrl"
+                             alt="@Localizer["AdminProduct.TemplateImage"]"
+                             class="h-40 w-40 object-cover" />
+                    </button>
+                    <p class="mt-1 text-theme-xs text-gray-500">@Localizer["AdminProduct.CurrentPrimary"]</p>
+                </div>
+
+                <div data-primary-preview-wrap class="relative hidden">
+                    <button type="button"
+                            class="block cursor-zoom-in overflow-hidden rounded-lg border border-brand-200 ring-2 ring-brand-100 dark:border-brand-700 dark:ring-brand-500/20">
+                        <img data-primary-preview-img
+                             alt="@Localizer["AdminProduct.Preview"]"
+                             class="h-40 w-40 object-cover" />
+                    </button>
+                    <button type="button"
+                            data-primary-clear
+                            aria-label="@Localizer["AdminProduct.ClearSelection"]"
+                            class="mt-2 inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+                        @Localizer["AdminProduct.ClearSelection"]
+                    </button>
+                </div>
             </div>
-        }
-        <input asp-for="PrimaryImageFile" type="file" accept=".jpg,.jpeg,.png" class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
-        <p class="mt-1 text-theme-xs text-gray-500">@Localizer["AdminProduct.TemplateImageHelp"]</p>
+            <input asp-for="PrimaryImageFile"
+                   type="file"
+                   accept=".jpg,.jpeg,.png"
+                   data-primary-input
+                   class="block w-full text-theme-sm text-gray-700 dark:text-gray-300" />
+            <p class="mt-1 text-theme-xs text-gray-500">@Localizer["AdminProduct.TemplateImageHelp"]</p>
+        </div>
     </section>
 </div>
 
