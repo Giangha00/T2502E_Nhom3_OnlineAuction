@@ -750,6 +750,11 @@ footer .footer-link--active:visited {
   color: #155724;
 }
 
+.deal-badge--fair {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
 .recommended-deal-card__note {
   font-size: 0.72rem;
   line-height: 1.25;
@@ -1664,6 +1669,108 @@ body.home-auth-open {
 .product-gallery__main img {
   height: 100%;
   width: 100%;
+}
+
+/* Product detail — related listings carousels */
+.product-detail-related-row {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0.35rem 0 0.65rem;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.product-detail-related-row.is-scrolling .product-detail-related-row__item {
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.35s ease;
+  opacity: 0.92;
+  transform: scale(0.985);
+}
+
+.product-detail-related-row.is-nudge-left {
+  animation: homeCarouselNudgeLeft 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.product-detail-related-row.is-nudge-right {
+  animation: homeCarouselNudgeRight 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.product-detail-related-row::-webkit-scrollbar {
+  display: none;
+}
+
+.product-detail-related-row__item {
+  flex: 0 0 168px;
+  scroll-snap-align: start;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.35s ease;
+}
+
+@media (min-width: 640px) {
+  .product-detail-related-row__item {
+    flex-basis: 184px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .product-detail-related-row__item {
+    flex-basis: 200px;
+  }
+}
+
+.product-detail-related .recommended-deal-card__image-wrap {
+  padding: 0.8rem;
+}
+
+.product-detail-related .recommended-deal-card__body {
+  padding: 0.75rem 0.15rem 0.2rem;
+}
+
+.product-detail-related .recommended-deal-card__title {
+  min-height: 2.4rem;
+  font-size: 0.85rem;
+}
+
+.product-detail-related .recommended-deal-card__price {
+  font-size: 1.15rem;
+}
+
+.product-detail-related .recommended-deal-card__meta {
+  margin-top: 0.5rem;
+  gap: 0.4rem;
+}
+
+.product-detail-related .recommended-deal-card__note {
+  font-size: 0.72rem;
+}
+
+.product-detail-related .deal-badge {
+  font-size: 0.68rem;
+  padding: 0.18rem 0.5rem;
+}
+
+.product-detail-related__carousel .home-carousel-btn--prev {
+  left: -0.35rem;
+}
+
+.product-detail-related__carousel .home-carousel-btn--next {
+  right: -0.35rem;
+}
+
+@media (min-width: 1024px) {
+  .product-detail-related__carousel .home-carousel-btn--prev {
+    left: -0.75rem;
+  }
+
+  .product-detail-related__carousel .home-carousel-btn--next {
+    right: -0.75rem;
+  }
 }
 
 .product-bid-panel__divider {

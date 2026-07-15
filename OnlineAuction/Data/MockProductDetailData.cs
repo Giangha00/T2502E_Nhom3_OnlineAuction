@@ -97,7 +97,12 @@ public static class MockProductDetailData
             Documents = BuildDocuments(auction),
             RelatedProducts = MockAuctionData.GetAllAuctions()
                 .Where(a => a.Status == "Ending Soon" && a.Id != auction.Id)
-                .Take(4)
+                .Take(12)
+                .ToList(),
+            MoreRelatedProducts = MockAuctionData.GetAllAuctions()
+                .Where(a => a.Id != auction.Id && a.Status is "Live" or "Ending Soon")
+                .Skip(12)
+                .Take(12)
                 .ToList()
         };
     }

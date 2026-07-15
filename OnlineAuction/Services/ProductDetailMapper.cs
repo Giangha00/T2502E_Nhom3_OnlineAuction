@@ -16,6 +16,7 @@ internal static class ProductDetailMapper
         Auction auction,
         SellerViewModel seller,
         IReadOnlyList<AuctionItemViewModel> relatedProducts,
+        IReadOnlyList<AuctionItemViewModel>? moreRelatedProducts = null,
         int? currentUserId = null,
         string? userRegistrationStatus = null,
         string? registrationRejectReason = null,
@@ -97,6 +98,7 @@ internal static class ProductDetailMapper
             BidHistory = MapBidHistory(bids),
             Documents = MapDocuments(product),
             RelatedProducts = relatedProducts.ToList(),
+            MoreRelatedProducts = (moreRelatedProducts ?? []).ToList(),
             BuyNowPrice = auction.BuyNowPrice,
             ListingType = auction.ListingType,
             ListingRejectReason = auction.RejectReason

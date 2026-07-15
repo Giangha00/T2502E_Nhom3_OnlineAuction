@@ -1,7 +1,12 @@
 @model OnlineAuction.Models.AuctionItemViewModel
 @{
     var isBuyNow = string.Equals(Model.ListingType, OnlineAuction.Entities.ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
-    var isGreatDeal = string.Equals(Model.DealLabel, "Great Deal", StringComparison.OrdinalIgnoreCase);
+    var dealBadgeClass = Model.DealLabel switch
+    {
+        "Great Deal" => "deal-badge--great",
+        "Fair Deal" => "deal-badge--fair",
+        _ => "deal-badge--good"
+    };
     var title = string.IsNullOrWhiteSpace(Model.DisplayTitle) ? Model.Name : Model.DisplayTitle;
 }
 
@@ -20,7 +25,7 @@
         <div class="recommended-deal-card__meta">
           @if (!string.IsNullOrWhiteSpace(Model.DealLabel))
           {
-            <span class="deal-badge @(isGreatDeal ? "deal-badge--great" : "deal-badge--good")">@Model.DealLabel</span>
+            <span class="deal-badge @dealBadgeClass">@Model.DealLabel</span>
           }
           @if (!string.IsNullOrWhiteSpace(Model.DealNote))
           {

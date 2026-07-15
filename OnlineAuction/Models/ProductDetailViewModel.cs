@@ -56,6 +56,7 @@ public class ProductDetailViewModel
     public List<BidHistoryItemViewModel> BidHistory { get; set; } = [];
     public List<ProductDocumentViewModel> Documents { get; set; } = [];
     public List<AuctionItemViewModel> RelatedProducts { get; set; } = [];
+    public List<AuctionItemViewModel> MoreRelatedProducts { get; set; } = [];
     public decimal? BuyNowPrice { get; set; }
     public string ListingType { get; set; } = ListingTypes.Auction;
     public string? ListingRejectReason { get; set; }

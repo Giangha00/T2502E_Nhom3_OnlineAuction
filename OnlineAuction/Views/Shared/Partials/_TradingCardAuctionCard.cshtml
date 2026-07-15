@@ -160,6 +160,51 @@ else if (variant == "home")
         </div>
     </article>
 }
+else if (variant == "related")
+{
+    <article class="rarecard-card rarecard-card--related group">
+        <div class="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm transition hover:shadow-md">
+            <a asp-controller="@(isWon ? "Order" : isBuyNow ? "BuyNow" : "Auction")"
+               asp-action="@(isWon ? "Index" : "Detail")"
+               asp-route-id="@(isWon ? null : item.Id)"
+               class="block min-h-[44px]">
+                <div class="relative aspect-[3/4] bg-stone-50">
+                    <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" class="h-full w-full object-cover"/>
+                    @if (!isBuyNow && !string.IsNullOrWhiteSpace(item.ListingPhase))
+                    {
+                        <span class="absolute left-2 top-2 max-w-[calc(100%-1rem)] rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide shadow @phaseBadgeClass">
+                            @Localizer[phaseLabelKey]
+                        </span>
+                    }
+                    else if (isBuyNow)
+                    {
+                        <span class="absolute left-2 top-2 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white bg-emerald-600">@Localizer["BuyNow_InStock"]</span>
+                    }
+                    else if (!string.IsNullOrEmpty(item.Grade))
+                    {
+                        <span class="absolute right-2 top-2 rounded bg-slate-900 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">@item.Grade</span>
+                    }
+                </div>
+                <div class="p-3">
+                    <h3 class="line-clamp-2 text-xs font-semibold leading-snug text-stone-900">@item.Name</h3>
+                    <div class="mt-2.5 flex items-end justify-between gap-2 border-t border-stone-100 pt-2.5">
+                        <div>
+                            <p class="text-[9px] font-semibold uppercase tracking-wider text-stone-400">@Localizer[priceLabelKey]</p>
+                            <p class="text-base font-bold tabular-nums text-blue-700">$@item.CurrentPrice.ToString("N0")</p>
+                        </div>
+                        @if (Model.ShowTimeRemaining && !isBuyNow)
+                        {
+                            <div class="text-right">
+                                <p class="text-[9px] font-semibold uppercase tracking-wider text-stone-400">@Localizer[countdownLabelKey]</p>
+                                <p class="text-[11px] font-semibold tabular-nums @(isEndingSoon ? "text-red-600" : "text-stone-700")">@item.TimeRemaining</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </a>
+        </div>
+    </article>
+}
 else
 {
     <article class="rarecard-card rarecard-card--grid group @(Model.EnableFiltering ? "auction-card" : "")" @Html.Raw(filterAttrs)>

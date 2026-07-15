@@ -1,5 +1,9 @@
 (function () {
   function getItemSelector(section) {
+    if (section.hasAttribute('data-product-related-carousel')) {
+      return '.product-detail-related-row__item';
+    }
+
     return section.hasAttribute('data-home-carousel-header-nav')
       ? '.rarecard-recommended-row__item'
       : '.rarecard-home-row__item';
@@ -105,7 +109,11 @@
     var item = track.querySelector(getItemSelector(section));
     var gap = 16;
     var amount = item ? item.getBoundingClientRect().width + gap : track.clientWidth * 0.75;
-    var scrollMultiplier = section.hasAttribute('data-home-carousel-header-nav') ? 2 : 3;
+    var scrollMultiplier = section.hasAttribute('data-home-carousel-header-nav')
+      ? 2
+      : section.hasAttribute('data-product-related-carousel')
+        ? 4
+        : 3;
 
     triggerNudge(track, direction);
     pulseButton(direction < 0 ? prev : next);
