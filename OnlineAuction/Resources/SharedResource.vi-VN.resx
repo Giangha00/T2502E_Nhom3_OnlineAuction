@@ -653,6 +653,8 @@
   <data name="Product_SalesCount" xml:space="preserve"><value>{0} giao dịch</value></data>
   <data name="Product_EndingSoonTitle" xml:space="preserve"><value>Sắp kết thúc</value></data>
   <data name="Product_RelatedSubtitle" xml:space="preserve"><value>Các vật phẩm hiếm khác bạn có thể quan tâm</value></data>
+  <data name="Product_SimilarListingsTitle" xml:space="preserve"><value>Tin đăng tương tự</value></data>
+  <data name="Product_MoreRelatedTitle" xml:space="preserve"><value>Thẻ liên quan khác</value></data>
   <data name="Product_ViewAllArrow" xml:space="preserve"><value>Xem tất cả →</value></data>
   <data name="Product_CountdownTitle" xml:space="preserve"><value>Đấu giá kết thúc sau</value></data>
   <data name="Product_Days" xml:space="preserve"><value>Ngày</value></data>

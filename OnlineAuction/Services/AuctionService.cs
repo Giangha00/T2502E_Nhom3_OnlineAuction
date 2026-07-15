@@ -166,10 +166,31 @@ public class AuctionService : IAuctionService
                 (a.Status == AuctionStatuses.Live || a.Status == AuctionStatuses.EndingSoon) &&
                 a.EndDate > DateTime.UtcNow)
             .OrderBy(a => a.EndDate)
-            .Take(4)
+            .Take(12)
+            .ToListAsync();
+
+        var similarIds = related.Select(a => a.Id).ToList();
+
+        var moreRelated = await _dbContext.Auctions
+            .AsNoTracking()
+            .Include(a => a.Product)
+                .ThenInclude(p => p.Category)
+            .Include(a => a.Bids)
+            .Where(a =>
+                a.Id != id &&
+                !similarIds.Contains(a.Id) &&
+                (a.Status == AuctionStatuses.Live || a.Status == AuctionStatuses.EndingSoon) &&
+                a.EndDate > DateTime.UtcNow)
+            .OrderByDescending(a => a.Bids.Count)
+            .ThenByDescending(a => a.CreatedAt)
+            .Take(12)
             .ToListAsync();
 
         var relatedItems = related
+            .Select(auction => ProductDetailMapper.MapToAuctionItem(auction))
+            .ToList();
+
+        var moreRelatedItems = moreRelated
             .Select(auction => ProductDetailMapper.MapToAuctionItem(auction))
             .ToList();
 
@@ -177,6 +198,7 @@ public class AuctionService : IAuctionService
             auction,
             seller,
             relatedItems,
+            moreRelatedItems,
             currentUserId,
             userRegistrationStatus,
             registrationRejectReason,
