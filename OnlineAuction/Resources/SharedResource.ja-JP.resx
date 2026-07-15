@@ -189,6 +189,9 @@
   <data name="Layout_Brand_Tagline" xml:space="preserve">
     <value>認証済みトレーディングカードをプレミアムオンラインオークションで見つけましょう。</value>
   </data>
+  <data name="Layout_Footer_Address" xml:space="preserve">
+    <value>FPT Polytechnicビル、Trinh Van Bo、Xuan Phuong、ハノイ 100000、ベトナム</value>
+  </data>
   <data name="Home_Hero_TitleAccent" xml:space="preserve">
     <value>希少なコレクションに投資</value>
   </data>

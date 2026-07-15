@@ -202,6 +202,9 @@
   <data name="Layout_Brand_Tagline" xml:space="preserve">
     <value>Discover authenticated trading cards through premium online auctions.</value>
   </data>
+  <data name="Layout_Footer_Address" xml:space="preserve">
+    <value>FPT Polytechnic Building, Trinh Van Bo, Xuan Phuong, Hanoi 100000, Vietnam</value>
+  </data>
   <data name="Home_Hero_TitleAccent" xml:space="preserve">
     <value>Rarest Collectibles</value>
   </data>
