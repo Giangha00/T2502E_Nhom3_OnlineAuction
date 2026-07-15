@@ -166,7 +166,12 @@ public class OrderCreationService : IOrderCreationService
         }
 
         var now = DateTime.UtcNow;
-        var order = await BuildAuctionWinOrderAsync(auction, winningBid, now, paymentDeadlineHours: 48, cancellationToken);
+        var order = await BuildAuctionWinOrderAsync(
+            auction,
+            winningBid,
+            now,
+            paymentDeadlineHours: 48,
+            cancellationToken: cancellationToken);
         if (order is null)
         {
             await transaction.RollbackAsync(cancellationToken);
@@ -207,15 +212,17 @@ public class OrderCreationService : IOrderCreationService
         int auctionId,
         DateTime now,
         int paymentDeadlineHours,
+        int? excludingCancelledOrderId = null,
+        long? winningBidId = null,
         CancellationToken cancellationToken = default)
     {
         var hasActiveOrder = await _dbContext.OrderItems
-            .AsNoTracking()
             .Include(item => item.Order)
             .AnyAsync(item =>
                     item.AuctionId == auctionId &&
                     item.Order.DeletedAt == null &&
-                    item.Order.Status != OrderStatuses.Cancelled,
+                    item.Order.Status != OrderStatuses.Cancelled &&
+                    (!excludingCancelledOrderId.HasValue || item.Order.Id != excludingCancelledOrderId.Value),
                 cancellationToken);
 
         if (hasActiveOrder)
@@ -232,11 +239,15 @@ public class OrderCreationService : IOrderCreationService
             return false;
         }
 
-        var winningBid = await _dbContext.Bids
-            .Where(bid => bid.AuctionId == auctionId && bid.IsWinning)
-            .OrderByDescending(bid => bid.Amount)
-            .ThenByDescending(bid => bid.PlacedAt)
-            .FirstOrDefaultAsync(cancellationToken);
+        var winningBid = winningBidId.HasValue
+            ? await _dbContext.Bids.FirstOrDefaultAsync(
+                bid => bid.Id == winningBidId.Value && bid.AuctionId == auctionId,
+                cancellationToken)
+            : await _dbContext.Bids
+                .Where(bid => bid.AuctionId == auctionId && bid.IsWinning)
+                .OrderByDescending(bid => bid.Amount)
+                .ThenByDescending(bid => bid.PlacedAt)
+                .FirstOrDefaultAsync(cancellationToken);
 
         if (winningBid is null)
         {
@@ -248,6 +259,7 @@ public class OrderCreationService : IOrderCreationService
             winningBid,
             now,
             paymentDeadlineHours,
+            excludingCancelledOrderId,
             cancellationToken);
 
         if (order is null)
@@ -268,7 +280,8 @@ public class OrderCreationService : IOrderCreationService
         Bid winningBid,
         DateTime now,
         int paymentDeadlineHours,
-        CancellationToken cancellationToken)
+        int? excludingCancelledOrderId = null,
+        CancellationToken cancellationToken = default)
     {
         var subtotal = winningBid.Amount;
 
@@ -286,11 +299,11 @@ public class OrderCreationService : IOrderCreationService
         var total = Math.Max(0, totalBeforeDeposit - depositAmount);
 
         var priorCancelledCount = await _dbContext.OrderItems
-            .AsNoTracking()
             .Include(item => item.Order)
             .CountAsync(item =>
                     item.AuctionId == auction.Id &&
-                    item.Order.Status == OrderStatuses.Cancelled,
+                    (item.Order.Status == OrderStatuses.Cancelled ||
+                     (excludingCancelledOrderId.HasValue && item.Order.Id == excludingCancelledOrderId.Value)),
                 cancellationToken);
 
         var recoverySuffix = priorCancelledCount > 0 ? $"-SC{priorCancelledCount + 1}" : string.Empty;

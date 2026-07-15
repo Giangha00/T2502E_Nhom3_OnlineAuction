@@ -18,6 +18,8 @@ public interface IOrderCreationService
         int auctionId,
         DateTime now,
         int paymentDeadlineHours,
+        int? excludingCancelledOrderId = null,
+        long? winningBidId = null,
         CancellationToken cancellationToken = default);
 
     Task<(bool Success, string Message)> CreatePendingPaymentOrderForBuyNowAsync(

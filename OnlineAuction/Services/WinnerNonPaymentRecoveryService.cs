@@ -141,6 +141,8 @@ public class WinnerNonPaymentRecoveryService : IWinnerNonPaymentRecoveryService
                 auctionId.Value,
                 now,
                 _settings.SecondChancePaymentHours,
+                cancelledOrder.Id,
+                runnerUp.Id,
                 cancellationToken);
 
             if (secondChanceCreated)
