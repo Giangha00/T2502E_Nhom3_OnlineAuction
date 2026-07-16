@@ -992,6 +992,9 @@
   <data name="Admin_BidHistory_Filter_FlaggedOnly" xml:space="preserve"><value>Flagged only</value></data>
   <data name="Admin_BidHistory_Filter_ShowAll" xml:space="preserve"><value>Show all bids</value></data>
   <data name="Bid_RateLimit_Message" xml:space="preserve"><value>Too many bids. Please wait before bidding again.</value></data>
+  <data name="Bid_ShadowBan_Message" xml:space="preserve"><value>Your bidding activity is temporarily restricted. Please try again later.</value></data>
+  <data name="Bid_Challenge_Required" xml:space="preserve"><value>Please complete the bid challenge and try again.</value></data>
+  <data name="Bid_Challenge_Prompt" xml:space="preserve"><value>Enter challenge token to continue bidding:</value></data>
   <data name="FraudAlerts_Title" xml:space="preserve"><value>Fraud Alerts</value></data>
   <data name="FraudAlerts_Total" xml:space="preserve"><value>{0} alert(s)</value></data>
   <data name="FraudAlerts_Empty" xml:space="preserve"><value>No fraud alerts for this auction.</value></data>

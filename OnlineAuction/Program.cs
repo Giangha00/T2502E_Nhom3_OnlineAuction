@@ -34,6 +34,8 @@ if (builder.Environment.IsDevelopment())
     mvcBuilder.AddRazorRuntimeCompilation();
 }
 
+// DistributedMemoryCache: single-instance rate limits / shadow-ban / challenge flags.
+// For multi-instance, replace with Redis (AddStackExchangeRedisCache) — see Documents/bid_rate_limit_fraud.md.
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddMemoryCache();
 builder.Services.AddSession(options =>
@@ -257,6 +259,8 @@ builder.Services.AddScoped<IBidService, BidService>();
 builder.Services.AddScoped<IBidRateLimitService, BidRateLimitService>();
 builder.Services.AddScoped<IBidFraudDetectionService, BidFraudDetectionService>();
 builder.Services.AddScoped<IBidFraudAlertWriter, BidFraudAlertWriter>();
+builder.Services.AddScoped<IBidShadowBanService, BidShadowBanService>();
+builder.Services.AddScoped<IBidChallengeService, BidChallengeService>();
 builder.Services.AddScoped<IAuctionRegistrationService, AuctionRegistrationService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderCreationService, OrderCreationService>();

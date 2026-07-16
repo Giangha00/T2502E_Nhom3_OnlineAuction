@@ -1045,6 +1045,9 @@
   <data name="Admin_BidHistory_Filter_FlaggedOnly" xml:space="preserve"><value>Chỉ bid bị flag</value></data>
   <data name="Admin_BidHistory_Filter_ShowAll" xml:space="preserve"><value>Hiện tất cả bid</value></data>
   <data name="Bid_RateLimit_Message" xml:space="preserve"><value>Quá nhiều lượt bid. Vui lòng chờ trước khi bid tiếp.</value></data>
+  <data name="Bid_ShadowBan_Message" xml:space="preserve"><value>Hoạt động bid của bạn đang bị hạn chế tạm thời. Vui lòng thử lại sau.</value></data>
+  <data name="Bid_Challenge_Required" xml:space="preserve"><value>Vui lòng hoàn thành challenge rồi bid lại.</value></data>
+  <data name="Bid_Challenge_Prompt" xml:space="preserve"><value>Nhập challenge token để tiếp tục bid:</value></data>
   <data name="FraudAlerts_Title" xml:space="preserve"><value>Cảnh báo gian lận</value></data>
   <data name="FraudAlerts_Total" xml:space="preserve"><value>{0} cảnh báo</value></data>
   <data name="FraudAlerts_Empty" xml:space="preserve"><value>Không có cảnh báo gian lận cho phiên này.</value></data>
