@@ -919,14 +919,6 @@
   <data name="User_Stat_TotalAuctions" xml:space="preserve"><value>Total Auctions</value></data>
   <data name="User_Stat_Completed" xml:space="preserve"><value>Completed</value></data>
   <data name="User_Stat_TotalSales" xml:space="preserve"><value>Total Sales</value></data>
-  <data name="User_Stat_PaidOrders" xml:space="preserve"><value>Paid Orders</value></data>
-  <data name="User_Stat_GrossSales" xml:space="preserve"><value>Gross Sales (Subtotal)</value></data>
-  <data name="User_Stat_SellerFee" xml:space="preserve"><value>Seller Success Fee</value></data>
-  <data name="User_Stat_NetProceeds" xml:space="preserve"><value>Net Proceeds</value></data>
-  <data name="User_Stat_NetProceedsNote" xml:space="preserve"><value>Subtotal − seller fee. Manual payout / Phase 2.</value></data>
-  <data name="User_SellerStats_Title" xml:space="preserve"><value>Seller Statistics</value></data>
-  <data name="User_SellerStats_Description" xml:space="preserve"><value>Activity and earnings overview</value></data>
-  <data name="User_Stat_Rating" xml:space="preserve"><value>Rating</value></data>
   <data name="User_Stat_SuccessRate" xml:space="preserve"><value>Success Rate</value></data>
   <data name="User_NotUpdated" xml:space="preserve"><value>Not updated</value></data>
   <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
@@ -1079,7 +1071,6 @@
   <data name="Admin_Dashboard_Col_TotalBid" xml:space="preserve"><value>Total Bid</value></data>
   <data name="Admin_Dashboard_Col_Listings" xml:space="preserve"><value>Listings</value></data>
   <data name="Admin_Dashboard_Col_Sales" xml:space="preserve"><value>Sales</value></data>
-  <data name="Admin_Dashboard_Col_NetProceeds" xml:space="preserve"><value>Net Proceeds</value></data>
   <data name="Admin_Dashboard_Col_Product" xml:space="preserve"><value>Product</value></data>
   <data name="Admin_Dashboard_Col_Seller" xml:space="preserve"><value>Seller</value></data>
   <data name="Admin_Dashboard_Col_Category" xml:space="preserve"><value>Category</value></data>
@@ -1088,16 +1079,12 @@
   <data name="Admin_Dashboard_Kpi_Gmv" xml:space="preserve"><value>GMV</value></data>
   <data name="Admin_Dashboard_Kpi_PlatformRevenue" xml:space="preserve"><value>Platform Revenue</value></data>
   <data name="Admin_Dashboard_Kpi_Commission" xml:space="preserve"><value>Commission (Marketplace Fees)</value></data>
-  <data name="Admin_Dashboard_Kpi_BuyerFee" xml:space="preserve"><value>Buyer Checkout Fee</value></data>
-  <data name="Admin_Dashboard_Kpi_SellerFee" xml:space="preserve"><value>Seller Success Fee</value></data>
-  <data name="Admin_Dashboard_Kpi_SellerProceeds" xml:space="preserve"><value>Seller Net Proceeds</value></data>
   <data name="Admin_Dashboard_Kpi_ListingFees" xml:space="preserve"><value>Listing Fees</value></data>
   <data name="Admin_Dashboard_Kpi_CompletedOrders" xml:space="preserve"><value>Completed Orders</value></data>
   <data name="Admin_Dashboard_RevenueSection_Title" xml:space="preserve"><value>Revenue</value></data>
   <data name="Admin_Dashboard_RevenueSection_Description" xml:space="preserve"><value>Total transaction value and marketplace commission.</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Commission = buyer checkout fees + seller success fees from paid/delivered orders (PayPal and COD).</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV is the sum of successful Payment.Amount in the period (includes COD payment rows). Commission is marketplace fees only: buyer checkout fees (PlatformFee) + seller success fees (SellerFee) on paid/delivered orders. Seller net proceeds = Subtotal − SellerFee. Registration deposits are not commission.</value></data>
-  <data name="Admin_Dashboard_Revenue_PayoutNote" xml:space="preserve"><value>Phase 1 ledger only — seller PayPal payout is manual / Phase 2.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Commission = buyer checkout fees + seller success fees from paid/delivered orders.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV is the sum of successful payments in the period. Commission is marketplace fees only: buyer checkout fees (PlatformFee) + seller success fees (SellerFee) on paid/delivered orders. Registration deposits are not included.</value></data>
   <data name="Admin_Dashboard_Revenue_NoFeeData" xml:space="preserve"><value>No platform fee data yet</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Title" xml:space="preserve"><value>GMV vs Platform Revenue</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Description" xml:space="preserve"><value>Click a point to filter the detail table by day.</value></data>
@@ -1119,7 +1106,15 @@
   <data name="Admin_Dashboard_Revenue_Status_Success" xml:space="preserve"><value>Success</value></data>
   <data name="Admin_Dashboard_Revenue_Status_Applied" xml:space="preserve"><value>Applied</value></data>
   <data name="Admin_Dashboard_Revenue_Status_Paid" xml:space="preserve"><value>Paid</value></data>
-<data name="Layout_Footer_Address" xml:space="preserve">
-    <value>FPT Polytechnic Building, Trinh Van Bo, Xuan Phuong, Hanoi 100000, Vietnam</value>
-  </data>
+  <data name="Notification_AuctionWon_Title" xml:space="preserve"><value>You won the auction!</value></data>
+  <data name="Notification_AuctionWon_Message" xml:space="preserve"><value>Congratulations! You won {0}. Complete payment within 48 hours.</value></data>
+  <data name="Notification_SellerAwaitingPayment_Title" xml:space="preserve"><value>Item sold - awaiting payment</value></data>
+  <data name="Notification_SellerAwaitingPayment_Message" xml:space="preserve"><value>{0} has a winning buyer. Order {1} is awaiting payment.</value></data>
+  <data name="Notification_PaymentSuccess_Title" xml:space="preserve"><value>Payment successful</value></data>
+  <data name="Notification_PaymentSuccess_Message" xml:space="preserve"><value>{0} payment for order {1} has been confirmed.</value></data>
+  <data name="Notification_SellerPaymentReceived_Title" xml:space="preserve"><value>Payment received</value></data>
+  <data name="Notification_SellerPaymentReceived_Message" xml:space="preserve"><value>Payment for {0} on order {1} was confirmed via {2}.</value></data>
+  <data name="Notification_OrderCancelled_Title" xml:space="preserve"><value>Order cancelled</value></data>
+  <data name="Notification_OrderCancelledBuyer_Message" xml:space="preserve"><value>Order {1} for {0} was cancelled because the payment deadline passed.</value></data>
+  <data name="Notification_OrderCancelledSeller_Message" xml:space="preserve"><value>Order {1} for {0} was cancelled because the winner did not pay before the deadline.</value></data>
 </root>
