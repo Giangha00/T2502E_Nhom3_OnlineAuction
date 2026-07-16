@@ -9,6 +9,7 @@
     var resetEmail = TempData["ResetPasswordEmail"] as string ?? string.Empty;
     var maskedEmail = TempData["PasswordResetEmailMasked"] as string ?? string.Empty;
     var devOtp = TempData["PasswordResetOtp"] as string;
+    var emailConfirmationUrl = TempData["EmailConfirmationUrl"] as string;
 }
 
 <div id="authModalOverlay" class="home-auth-overlay home-auth-overlay--hidden" aria-hidden="true" hidden>
@@ -59,6 +60,13 @@
           @if (!string.IsNullOrWhiteSpace(authSuccess))
           {
             <p id="authModalSuccess" class="home-auth-alert home-auth-alert--success" data-auth-auto-dismiss="5000" role="status">@authSuccess</p>
+          }
+          @if (!string.IsNullOrWhiteSpace(emailConfirmationUrl))
+          {
+            <p class="home-auth-alert home-auth-alert--success" role="status">
+              Link kích hoạt (dev):
+              <a href="@emailConfirmationUrl" class="underline break-all">@emailConfirmationUrl</a>
+            </p>
           }
         </div>
 

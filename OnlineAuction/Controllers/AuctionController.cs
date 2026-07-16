@@ -17,6 +17,8 @@ public class AuctionController : Controller
     private readonly IRegistrationDepositService _registrationDepositService;
     private readonly IRegistrationDepositRefundService _depositRefundService;
     private readonly IBidRateLimitService _bidRateLimitService;
+    private readonly IBidChallengeService _bidChallengeService;
+    private readonly IBidShadowBanService _bidShadowBanService;
     private readonly IStringLocalizer<SharedResource> _localizer;
     private readonly ILogger<AuctionController> _logger;
 
@@ -27,6 +29,8 @@ public class AuctionController : Controller
         IRegistrationDepositService registrationDepositService ,
         IRegistrationDepositRefundService depositRefundService,
         IBidRateLimitService bidRateLimitService,
+        IBidChallengeService bidChallengeService,
+        IBidShadowBanService bidShadowBanService,
         IStringLocalizer<SharedResource> localizer,
         ILogger<AuctionController> logger)
     {
@@ -36,6 +40,8 @@ public class AuctionController : Controller
         _registrationDepositService = registrationDepositService;
         _depositRefundService = depositRefundService;
         _bidRateLimitService = bidRateLimitService;
+        _bidChallengeService = bidChallengeService;
+        _bidShadowBanService = bidShadowBanService;
         _localizer = localizer;
         _logger = logger;
     }
@@ -328,6 +334,17 @@ public async Task<IActionResult> DepositPayPalCancel(string token)
             return Unauthorized(new { success = false, message = "Please sign in to place a bid." });
         }
 
+        if (await _bidShadowBanService.IsShadowBannedAsync(bidderId))
+        {
+            return StatusCode(
+                StatusCodes.Status403Forbidden,
+                new
+                {
+                    success = false,
+                    message = _localizer["Bid_ShadowBan_Message"].Value
+                });
+        }
+
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
         var rateLimit = await _bidRateLimitService.CheckAsync(auctionId, bidderId, ipAddress);
         if (!rateLimit.IsAllowed)
@@ -343,6 +360,30 @@ public async Task<IActionResult> DepositPayPalCancel(string token)
                 new { success = false, message = _localizer["Bid_RateLimit_Message"].Value });
         }
 
+        var challengeRequirement = await _bidChallengeService.GetRequirementAsync(
+            bidderId,
+            rateLimit.UserCount);
+        if (challengeRequirement.IsRequired || rateLimit.RequiresChallenge)
+        {
+            var challengeToken = Request.Headers["X-Bid-Challenge-Token"].FirstOrDefault()
+                ?? Request.Form["challengeToken"].FirstOrDefault();
+            var verification = await _bidChallengeService.VerifyAsync(challengeToken);
+            if (!verification.IsValid)
+            {
+                return StatusCode(
+                    StatusCodes.Status403Forbidden,
+                    new
+                    {
+                        success = false,
+                        requiresChallenge = true,
+                        challengeProvider = challengeRequirement.Provider,
+                        message = _localizer["Bid_Challenge_Required"].Value
+                    });
+            }
+
+            await _bidChallengeService.ClearRequirementAsync(bidderId);
+        }
+
         var result = await _bidService.PlaceBidAsync(auctionId, bidderId, amount);
         if (!result.Success)
         {
@@ -350,6 +391,12 @@ public async Task<IActionResult> DepositPayPalCancel(string token)
             {
                 404 => NotFound(new { success = false, message = result.Message }),
                 401 => Unauthorized(new { success = false, message = result.Message }),
+                403 => StatusCode(
+                    StatusCodes.Status403Forbidden,
+                    new { success = false, message = result.Message }),
+                429 => StatusCode(
+                    StatusCodes.Status429TooManyRequests,
+                    new { success = false, message = result.Message }),
                 _ => BadRequest(new { success = false, message = result.Message })
             };
         }

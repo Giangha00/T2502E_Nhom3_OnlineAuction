@@ -34,6 +34,8 @@ if (builder.Environment.IsDevelopment())
     mvcBuilder.AddRazorRuntimeCompilation();
 }
 
+// DistributedMemoryCache: single-instance rate limits / shadow-ban / challenge flags.
+// For multi-instance, replace with Redis (AddStackExchangeRedisCache) — see Documents/bid_rate_limit_fraud.md.
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddMemoryCache();
 builder.Services.AddSession(options =>
@@ -237,6 +239,8 @@ builder.Services.Configure<FirebaseSettings>(
     builder.Configuration.GetSection(FirebaseSettings.SectionName));
 builder.Services.Configure<PasswordResetOtpSettings>(
     builder.Configuration.GetSection(PasswordResetOtpSettings.SectionName));
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection(EmailSettings.SectionName));
 builder.Services.Configure<RabbitMqSettings>(
     builder.Configuration.GetSection(RabbitMqSettings.SectionName));
 builder.Services.Configure<BidFraudDetectionSettings>(
@@ -247,8 +251,9 @@ builder.Services.Configure<WinnerNonPaymentSettings>(
     builder.Configuration.GetSection(WinnerNonPaymentSettings.SectionName));
 
 builder.Services.AddHttpClient<IPayPalService, PayPalService>();
-builder.Services.AddHttpClient<IEmailSender, GmailEmailSender>();
-builder.Services.AddHttpClient<IEmailVerificationService, EmailVerificationService>();
+builder.Services.AddHttpClient<GmailEmailSender>();
+builder.Services.AddScoped<IEmailSender>(sp => sp.GetRequiredService<GmailEmailSender>());
+builder.Services.AddScoped<IEmailVerificationService>(sp => sp.GetRequiredService<GmailEmailSender>());
 
 builder.Services.AddScoped<IAvatarStorageService, CloudinaryAvatarStorageService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
@@ -259,6 +264,8 @@ builder.Services.AddScoped<IBidService, BidService>();
 builder.Services.AddScoped<IBidRateLimitService, BidRateLimitService>();
 builder.Services.AddScoped<IBidFraudDetectionService, BidFraudDetectionService>();
 builder.Services.AddScoped<IBidFraudAlertWriter, BidFraudAlertWriter>();
+builder.Services.AddScoped<IBidShadowBanService, BidShadowBanService>();
+builder.Services.AddScoped<IBidChallengeService, BidChallengeService>();
 builder.Services.AddScoped<IAuctionRegistrationService, AuctionRegistrationService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderCreationService, OrderCreationService>();

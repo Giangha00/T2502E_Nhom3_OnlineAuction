@@ -972,14 +972,6 @@
   <data name="User_Stat_TotalAuctions" xml:space="preserve"><value>Tổng đấu giá</value></data>
   <data name="User_Stat_Completed" xml:space="preserve"><value>Hoàn tất</value></data>
   <data name="User_Stat_TotalSales" xml:space="preserve"><value>Tổng doanh số</value></data>
-  <data name="User_Stat_PaidOrders" xml:space="preserve"><value>Đơn đã thanh toán</value></data>
-  <data name="User_Stat_GrossSales" xml:space="preserve"><value>Doanh số gộp (Subtotal)</value></data>
-  <data name="User_Stat_SellerFee" xml:space="preserve"><value>Phí thành công seller</value></data>
-  <data name="User_Stat_NetProceeds" xml:space="preserve"><value>Net proceeds</value></data>
-  <data name="User_Stat_NetProceedsNote" xml:space="preserve"><value>Subtotal − phí seller. Payout thủ công / Phase 2.</value></data>
-  <data name="User_SellerStats_Title" xml:space="preserve"><value>Thống kê người bán</value></data>
-  <data name="User_SellerStats_Description" xml:space="preserve"><value>Hoạt động và thu nhập</value></data>
-  <data name="User_Stat_Rating" xml:space="preserve"><value>Đánh giá</value></data>
   <data name="User_Stat_SuccessRate" xml:space="preserve"><value>Tỷ lệ thành công</value></data>
   <data name="User_NotUpdated" xml:space="preserve"><value>Chưa cập nhật</value></data>
   <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
@@ -1045,6 +1037,9 @@
   <data name="Admin_BidHistory_Filter_FlaggedOnly" xml:space="preserve"><value>Chỉ bid bị flag</value></data>
   <data name="Admin_BidHistory_Filter_ShowAll" xml:space="preserve"><value>Hiện tất cả bid</value></data>
   <data name="Bid_RateLimit_Message" xml:space="preserve"><value>Quá nhiều lượt bid. Vui lòng chờ trước khi bid tiếp.</value></data>
+  <data name="Bid_ShadowBan_Message" xml:space="preserve"><value>Hoạt động bid của bạn đang bị hạn chế tạm thời. Vui lòng thử lại sau.</value></data>
+  <data name="Bid_Challenge_Required" xml:space="preserve"><value>Vui lòng hoàn thành challenge rồi bid lại.</value></data>
+  <data name="Bid_Challenge_Prompt" xml:space="preserve"><value>Nhập challenge token để tiếp tục bid:</value></data>
   <data name="FraudAlerts_Title" xml:space="preserve"><value>Cảnh báo gian lận</value></data>
   <data name="FraudAlerts_Total" xml:space="preserve"><value>{0} cảnh báo</value></data>
   <data name="FraudAlerts_Empty" xml:space="preserve"><value>Không có cảnh báo gian lận cho phiên này.</value></data>
@@ -1132,7 +1127,6 @@
   <data name="Admin_Dashboard_Col_TotalBid" xml:space="preserve"><value>Tổng tiền bid</value></data>
   <data name="Admin_Dashboard_Col_Listings" xml:space="preserve"><value>Số listing</value></data>
   <data name="Admin_Dashboard_Col_Sales" xml:space="preserve"><value>Doanh số</value></data>
-  <data name="Admin_Dashboard_Col_NetProceeds" xml:space="preserve"><value>Net proceeds</value></data>
   <data name="Admin_Dashboard_Col_Product" xml:space="preserve"><value>Sản phẩm</value></data>
   <data name="Admin_Dashboard_Col_Seller" xml:space="preserve"><value>Người bán</value></data>
   <data name="Admin_Dashboard_Col_Category" xml:space="preserve"><value>Danh mục</value></data>
@@ -1141,16 +1135,12 @@
   <data name="Admin_Dashboard_Kpi_Gmv" xml:space="preserve"><value>Tổng giao dịch (GMV)</value></data>
   <data name="Admin_Dashboard_Kpi_PlatformRevenue" xml:space="preserve"><value>Doanh thu sàn</value></data>
   <data name="Admin_Dashboard_Kpi_Commission" xml:space="preserve"><value>Phí sàn (Commission)</value></data>
-  <data name="Admin_Dashboard_Kpi_BuyerFee" xml:space="preserve"><value>Phí người mua</value></data>
-  <data name="Admin_Dashboard_Kpi_SellerFee" xml:space="preserve"><value>Phí thành công người bán</value></data>
-  <data name="Admin_Dashboard_Kpi_SellerProceeds" xml:space="preserve"><value>Net proceeds người bán</value></data>
   <data name="Admin_Dashboard_Kpi_ListingFees" xml:space="preserve"><value>Phí niêm yết</value></data>
   <data name="Admin_Dashboard_Kpi_CompletedOrders" xml:space="preserve"><value>Đơn hoàn tất</value></data>
   <data name="Admin_Dashboard_RevenueSection_Title" xml:space="preserve"><value>Doanh thu</value></data>
   <data name="Admin_Dashboard_RevenueSection_Description" xml:space="preserve"><value>Tổng giá trị giao dịch và phí sàn (commission).</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Phí sàn = phí thanh toán người mua + phí thành công người bán từ đơn đã thanh toán/giao (PayPal và COD).</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV là tổng Payment.Amount thành công trong kỳ (gồm COD). Phí sàn (commission) chỉ gồm phí marketplace: phí người mua (PlatformFee) + phí người bán (SellerFee) trên đơn paid/delivered. Net proceeds người bán = Subtotal − SellerFee. Không gồm tiền cọc đăng ký.</value></data>
-  <data name="Admin_Dashboard_Revenue_PayoutNote" xml:space="preserve"><value>Phase 1 chỉ sổ sách — payout PayPal tới seller là manual / Phase 2.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Phí sàn = phí thanh toán người mua + phí thành công người bán từ đơn đã thanh toán/giao.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV là tổng thanh toán thành công trong kỳ. Phí sàn (commission) chỉ gồm phí marketplace: phí người mua (PlatformFee) + phí người bán (SellerFee) trên đơn paid/delivered. Không gồm tiền cọc đăng ký.</value></data>
   <data name="Admin_Dashboard_Revenue_NoFeeData" xml:space="preserve"><value>Chưa có dữ liệu phí</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Title" xml:space="preserve"><value>GMV vs Doanh thu sàn</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Description" xml:space="preserve"><value>Click điểm trên biểu đồ để lọc bảng theo ngày.</value></data>
@@ -1172,7 +1162,15 @@
   <data name="Admin_Dashboard_Revenue_Status_Success" xml:space="preserve"><value>Thành công</value></data>
   <data name="Admin_Dashboard_Revenue_Status_Applied" xml:space="preserve"><value>Đã áp dụng</value></data>
   <data name="Admin_Dashboard_Revenue_Status_Paid" xml:space="preserve"><value>Đã thanh toán</value></data>
-<data name="Layout_Footer_Address" xml:space="preserve">
-    <value>Tòa nhà FPT Polytechnic, Trịnh Văn Bô, Xuân Phương, Hà Nội 100000</value>
-  </data>
+  <data name="Notification_AuctionWon_Title" xml:space="preserve"><value>Bạn đã thắng đấu giá!</value></data>
+  <data name="Notification_AuctionWon_Message" xml:space="preserve"><value>Chúc mừng! Bạn đã thắng {0}. Vui lòng thanh toán trong 48 giờ.</value></data>
+  <data name="Notification_SellerAwaitingPayment_Title" xml:space="preserve"><value>Sản phẩm đã bán - chờ thanh toán</value></data>
+  <data name="Notification_SellerAwaitingPayment_Message" xml:space="preserve"><value>{0} đã có người mua thắng. Đơn {1} đang chờ thanh toán.</value></data>
+  <data name="Notification_PaymentSuccess_Title" xml:space="preserve"><value>Thanh toán thành công</value></data>
+  <data name="Notification_PaymentSuccess_Message" xml:space="preserve"><value>Thanh toán {0} cho đơn {1} đã được xác nhận.</value></data>
+  <data name="Notification_SellerPaymentReceived_Title" xml:space="preserve"><value>Đã nhận thanh toán</value></data>
+  <data name="Notification_SellerPaymentReceived_Message" xml:space="preserve"><value>Thanh toán cho {0} ở đơn {1} đã được xác nhận qua {2}.</value></data>
+  <data name="Notification_OrderCancelled_Title" xml:space="preserve"><value>Đơn hàng đã hủy</value></data>
+  <data name="Notification_OrderCancelledBuyer_Message" xml:space="preserve"><value>Đơn {1} cho {0} đã bị hủy vì quá hạn thanh toán.</value></data>
+  <data name="Notification_OrderCancelledSeller_Message" xml:space="preserve"><value>Đơn {1} cho {0} đã bị hủy vì người thắng không thanh toán đúng hạn.</value></data>
 </root>

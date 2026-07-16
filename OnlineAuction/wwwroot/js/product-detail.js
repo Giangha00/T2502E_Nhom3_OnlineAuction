@@ -100,7 +100,9 @@
     return csrfMeta ? csrfMeta.getAttribute('content') : '';
   }
 
-  function postForm(url, payload) {
+  var bidChallengeToken = '';
+
+  function postForm(url, payload, extraHeaders) {
     var body = new URLSearchParams();
     Object.keys(payload).forEach(function (key) {
       body.append(key, payload[key]);
@@ -111,15 +113,36 @@
       body.append('__RequestVerificationToken', csrfToken);
     }
 
+    var headers = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-Requested-With': 'XMLHttpRequest'
+    };
+
+    if (extraHeaders) {
+      Object.keys(extraHeaders).forEach(function (key) {
+        if (extraHeaders[key]) {
+          headers[key] = extraHeaders[key];
+        }
+      });
+    }
+
     return fetch(url, {
       method: 'POST',
       credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'X-Requested-With': 'XMLHttpRequest'
-      },
+      headers: headers,
       body: body.toString()
     });
+  }
+
+  function promptBidChallengeToken() {
+    var message = i18n.challengePrompt || 'Enter challenge token to continue bidding:';
+    var token = window.prompt(message, bidChallengeToken || '');
+    if (token === null) {
+      return null;
+    }
+
+    bidChallengeToken = String(token).trim();
+    return bidChallengeToken;
   }
 
   function showFeedback(element, message, isSuccess) {
@@ -755,22 +778,47 @@
       placeBidBtn.disabled = true;
       placeBidBtn.textContent = i18n.placingBid || 'Placing bid…';
 
-      postForm('/Auction/PlaceBid', { auctionId: auctionId, amount: amount })
-        .then(function (response) {
+      function placeBidRequest(challengeToken) {
+        var headers = {};
+        if (challengeToken) {
+          headers['X-Bid-Challenge-Token'] = challengeToken;
+        }
+
+        return postForm('/Auction/PlaceBid', {
+          auctionId: auctionId,
+          amount: amount,
+          challengeToken: challengeToken || ''
+        }, headers).then(function (response) {
           if (response.status === 401) {
             openAuthModal();
             throw new Error(i18n.bidFailed || 'Please sign in to place a bid.');
           }
 
           return response.json().then(function (data) {
-            if (!response.ok || !data.success) {
-              throw new Error(data.message || i18n.bidFailed || 'Unable to place bid. Please try again.');
-            }
-
+            data.__status = response.status;
             return data;
           });
+        });
+      }
+
+      placeBidRequest(bidChallengeToken)
+        .then(function (data) {
+          if (data && data.requiresChallenge) {
+            var token = promptBidChallengeToken();
+            if (!token) {
+              throw new Error(data.message || i18n.challengeRequired || 'Please complete the bid challenge and try again.');
+            }
+
+            return placeBidRequest(token);
+          }
+
+          return data;
         })
         .then(function (data) {
+          if (!data || !data.success) {
+            throw new Error((data && data.message) || i18n.bidFailed || 'Unable to place bid. Please try again.');
+          }
+
           applyBidSuccess(data);
         })
         .catch(function (error) {
