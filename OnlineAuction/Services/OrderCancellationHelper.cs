@@ -42,10 +42,7 @@ public static class OrderCancellationHelper
 
             auction.WinnerId = null;
         }
-        else
-        {
-            auction.Status = AuctionStatuses.Ended;
-        }
+        // auction_win non-payment is handled by WinnerNonPaymentRecoveryService.
 
         auction.UpdatedAt = now;
     }

@@ -19,7 +19,6 @@ public class OrderCreationService : IOrderCreationService
     private readonly INotificationService _notificationService;
     private readonly IRegistrationDepositRefundService _depositRefundService;
     private readonly IRealtimePublisher _realtimePublisher;
-    private readonly IOrderService _orderService;
     private readonly IBidService _bidService;
     private readonly PlatformFeeSettings _feeSettings;
 
@@ -29,17 +28,14 @@ public class OrderCreationService : IOrderCreationService
         INotificationService notificationService,
         IRegistrationDepositRefundService depositRefundService,
         IRealtimePublisher realtimePublisher,
-        IOrderService orderService,
         IBidService bidService,
         IOptions<PlatformFeeSettings> feeSettings)
     {
         _dbContext = dbContext;
         _logger = logger;
         _notificationService = notificationService;
-        // Service này dùng để tự động hoàn tiền cọc cho loser khi auction kết thúc
         _depositRefundService = depositRefundService;
         _realtimePublisher = realtimePublisher;
-        _orderService = orderService;
         _bidService = bidService;
         _feeSettings = feeSettings.Value;
     }
@@ -128,16 +124,20 @@ public class OrderCreationService : IOrderCreationService
             IsolationLevel.Serializable,
             cancellationToken);
 
-        var existingOrderId = await _dbContext.OrderItems
+        var existingActiveOrderId = await _dbContext.OrderItems
             .AsNoTracking()
-            .Where(item => item.AuctionId == auctionId)
+            .Include(item => item.Order)
+            .Where(item =>
+                item.AuctionId == auctionId &&
+                item.Order.DeletedAt == null &&
+                item.Order.Status != OrderStatuses.Cancelled)
             .Select(item => (int?)item.OrderId)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (existingOrderId.HasValue)
+        if (existingActiveOrderId.HasValue)
         {
             await transaction.CommitAsync(cancellationToken);
-            return existingOrderId;
+            return existingActiveOrderId;
         }
 
         var auction = await _dbContext.Auctions
@@ -166,87 +166,18 @@ public class OrderCreationService : IOrderCreationService
         }
 
         var now = DateTime.UtcNow;
-
-// Giá thắng của phiên đấu giá
-        var subtotal = winningBid.Amount;
-
-// ------------------------------------------------------------
-// Lấy tiền cọc đã thanh toán của winner.
-//
-// Chỉ lấy deposit status = paid.
-// Không lấy pending/cancelled/refunded.
-// Nếu không có deposit thì depositAmount = 0.
-// ------------------------------------------------------------
-        var winnerDeposit = await _dbContext.AuctionRegistrationDeposits
-            .FirstOrDefaultAsync(d =>
-                    d.AuctionId == auctionId &&
-                    d.UserId == winningBid.BidderId &&
-                    d.Status == AuctionRegistrationDepositStatuses.Paid,
-                cancellationToken);
-
-        var depositAmount = winnerDeposit?.Amount ?? 0m;
-
-// Phí bảo hiểm vault hiện có của hệ thống
-        var insurance = Math.Round(Math.Max(60m, subtotal * 0.00721m), 2);
-
-        var buyerCheckoutFee = MarketplaceFeeCalculator.CalculateBuyerCheckoutFee(subtotal, _feeSettings);
-
-// Tổng tiền gốc trước khi trừ cọc
-        var totalBeforeDeposit = subtotal + ShippingFee + insurance + buyerCheckoutFee;
-
-// ------------------------------------------------------------
-// Trừ tiền cọc vào tổng tiền winner cần thanh toán.
-//
-// Ví dụ:
-// Winning bid = 500
-// Shipping = 45
-// Insurance = 60
-// Deposit = 50
-//
-// TotalAmount = 500 + 45 + 60 - 50 = 555
-// ------------------------------------------------------------
-        var total = Math.Max(0, totalBeforeDeposit - depositAmount);
-
-        var order = new AuctionOrder
+        var order = await BuildAuctionWinOrderAsync(
+            auction,
+            winningBid,
+            now,
+            paymentDeadlineHours: 48,
+            cancellationToken: cancellationToken);
+        if (order is null)
         {
-            OrderReference = $"AH-{now:yyyyMMdd}-{auction.Id}",
-            BuyerId = winningBid.BidderId,
+            await transaction.RollbackAsync(cancellationToken);
+            return null;
+        }
 
-            // Giá thắng
-            Subtotal = subtotal,
-
-            // Phí ship
-            ShippingFee = ShippingFee,
-
-            // Phí bảo hiểm
-            VaultInsurance = insurance,
-
-            // Phí thanh toán người mua
-            PlatformFee = buyerCheckoutFee,
-
-            // Tiền cọc của winner được trừ vào order
-            DepositApplied = depositAmount,
-
-            // Số tiền winner còn phải thanh toán sau khi trừ cọc
-            TotalAmount = total,
-
-            Status = OrderStatuses.PendingPayment,
-            OrderSource = OrderSources.AuctionWin,
-            PaymentDeadline = now.AddHours(48),
-            CreatedAt = now,
-            Items =
-            [
-                new OrderItem
-                {
-                    AuctionId = auction.Id,
-                    ItemName = auction.Product.Name,
-                    ItemGrade = auction.Product.GradeLabel,
-                    ItemImageUrl = auction.Product.PrimaryImage,
-                    WinningBid = subtotal,
-                    CreatedAt = now
-                }
-            ]
-        };
         _dbContext.Orders.Add(order);
         auction.Status = AuctionStatuses.AwaitingPayment;
         auction.WinnerId = winningBid.BidderId;
@@ -264,13 +195,155 @@ public class OrderCreationService : IOrderCreationService
 
             return await _dbContext.OrderItems
                 .AsNoTracking()
-                .Where(item => item.AuctionId == auctionId)
+                .Include(item => item.Order)
+                .Where(item =>
+                    item.AuctionId == auctionId &&
+                    item.Order.DeletedAt == null &&
+                    item.Order.Status != OrderStatuses.Cancelled)
                 .Select(item => (int?)item.OrderId)
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
+        await NotifyAuctionWinAsync(auction, winningBid.BidderId, cancellationToken);
+        return order.Id;
+    }
+
+    public async Task<bool> TryCreatePendingPaymentOrderWithinUnitOfWorkAsync(
+        int auctionId,
+        DateTime now,
+        int paymentDeadlineHours,
+        int? excludingCancelledOrderId = null,
+        long? winningBidId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var hasActiveOrder = await _dbContext.OrderItems
+            .Include(item => item.Order)
+            .AnyAsync(item =>
+                    item.AuctionId == auctionId &&
+                    item.Order.DeletedAt == null &&
+                    item.Order.Status != OrderStatuses.Cancelled &&
+                    (!excludingCancelledOrderId.HasValue || item.Order.Id != excludingCancelledOrderId.Value),
+                cancellationToken);
+
+        if (hasActiveOrder)
+        {
+            return false;
+        }
+
+        var auction = await _dbContext.Auctions
+            .Include(item => item.Product)
+            .FirstOrDefaultAsync(item => item.Id == auctionId, cancellationToken);
+
+        if (auction is null)
+        {
+            return false;
+        }
+
+        var winningBid = winningBidId.HasValue
+            ? await _dbContext.Bids.FirstOrDefaultAsync(
+                bid => bid.Id == winningBidId.Value && bid.AuctionId == auctionId,
+                cancellationToken)
+            : await _dbContext.Bids
+                .Where(bid => bid.AuctionId == auctionId && bid.IsWinning)
+                .OrderByDescending(bid => bid.Amount)
+                .ThenByDescending(bid => bid.PlacedAt)
+                .FirstOrDefaultAsync(cancellationToken);
+
+        if (winningBid is null)
+        {
+            return false;
+        }
+
+        var order = await BuildAuctionWinOrderAsync(
+            auction,
+            winningBid,
+            now,
+            paymentDeadlineHours,
+            excludingCancelledOrderId,
+            cancellationToken);
+
+        if (order is null)
+        {
+            return false;
+        }
+
+        _dbContext.Orders.Add(order);
+        auction.Status = AuctionStatuses.AwaitingPayment;
+        auction.WinnerId = winningBid.BidderId;
+        auction.UpdatedAt = now;
+
+        return true;
+    }
+
+    private async Task<AuctionOrder?> BuildAuctionWinOrderAsync(
+        Auction auction,
+        Bid winningBid,
+        DateTime now,
+        int paymentDeadlineHours,
+        int? excludingCancelledOrderId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var subtotal = winningBid.Amount;
+
+        var winnerDeposit = await _dbContext.AuctionRegistrationDeposits
+            .FirstOrDefaultAsync(d =>
+                    d.AuctionId == auction.Id &&
+                    d.UserId == winningBid.BidderId &&
+                    d.Status == AuctionRegistrationDepositStatuses.Paid,
+                cancellationToken);
+
+        var depositAmount = winnerDeposit?.Amount ?? 0m;
+        var insurance = Math.Round(Math.Max(60m, subtotal * 0.00721m), 2);
+        var buyerCheckoutFee = MarketplaceFeeCalculator.CalculateBuyerCheckoutFee(subtotal, _feeSettings);
+        var totalBeforeDeposit = subtotal + ShippingFee + insurance + buyerCheckoutFee;
+        var total = Math.Max(0, totalBeforeDeposit - depositAmount);
+
+        var priorCancelledCount = await _dbContext.OrderItems
+            .Include(item => item.Order)
+            .CountAsync(item =>
+                    item.AuctionId == auction.Id &&
+                    (item.Order.Status == OrderStatuses.Cancelled ||
+                     (excludingCancelledOrderId.HasValue && item.Order.Id == excludingCancelledOrderId.Value)),
+                cancellationToken);
+
+        var recoverySuffix = priorCancelledCount > 0 ? $"-SC{priorCancelledCount + 1}" : string.Empty;
+
+        return new AuctionOrder
+        {
+            OrderReference = $"AH-{now:yyyyMMdd}-{auction.Id}{recoverySuffix}",
+            BuyerId = winningBid.BidderId,
+            Subtotal = subtotal,
+            ShippingFee = ShippingFee,
+            VaultInsurance = insurance,
+            PlatformFee = buyerCheckoutFee,
+            DepositApplied = depositAmount,
+            TotalAmount = total,
+            Status = OrderStatuses.PendingPayment,
+            OrderSource = OrderSources.AuctionWin,
+            PaymentDeadline = now.AddHours(paymentDeadlineHours),
+            CreatedAt = now,
+            Items =
+            [
+                new OrderItem
+                {
+                    AuctionId = auction.Id,
+                    ItemName = auction.Product.Name,
+                    ItemGrade = auction.Product.GradeLabel,
+                    ItemImageUrl = auction.Product.PrimaryImage,
+                    WinningBid = subtotal,
+                    CreatedAt = now
+                }
+            ]
+        };
+    }
+
+    private async Task NotifyAuctionWinAsync(
+        Auction auction,
+        int winningBidderId,
+        CancellationToken cancellationToken)
+    {
         await _notificationService.CreateAndPushAsync(
-            winningBid.BidderId,
+            winningBidderId,
             "You won the auction!",
             $"Congratulations! You won {auction.Product.Name}. Complete payment within 48 hours.",
             NotificationType.Winning,
@@ -279,16 +352,20 @@ public class OrderCreationService : IOrderCreationService
             auction.Id,
             cancellationToken: cancellationToken);
 
-        var orderCount = await _orderService.CountPendingPaymentOrdersAsync(winningBid.BidderId);
-        await _realtimePublisher.SendOrderCountToUserAsync(winningBid.BidderId, orderCount, cancellationToken);
+        var orderCount = await _dbContext.Orders
+            .AsNoTracking()
+            .CountAsync(order =>
+                order.BuyerId == winningBidderId &&
+                order.Status == OrderStatuses.PendingPayment &&
+                order.DeletedAt == null,
+                cancellationToken);
+        await _realtimePublisher.SendOrderCountToUserAsync(winningBidderId, orderCount, cancellationToken);
 
         var bidState = await _bidService.GetBidStateAsync(auction.Id, cancellationToken);
         if (bidState is not null)
         {
             await _realtimePublisher.SendBidUpdateAsync(auction.Id, bidState, cancellationToken);
         }
-
-        return order.Id;
     }
 
     public Task<(bool Success, string Message)> CreatePendingPaymentOrderForBuyNowAsync(
@@ -419,7 +496,13 @@ public class OrderCreationService : IOrderCreationService
             return (true, "Item is already in your orders.");
         }
 
-        var orderCount = await _orderService.CountPendingPaymentOrdersAsync(buyerId);
+        var orderCount = await _dbContext.Orders
+            .AsNoTracking()
+            .CountAsync(order =>
+                order.BuyerId == buyerId &&
+                order.Status == OrderStatuses.PendingPayment &&
+                order.DeletedAt == null,
+                cancellationToken);
         await _realtimePublisher.SendOrderCountToUserAsync(buyerId, orderCount, cancellationToken);
 
         return (true, "Added to your orders.");

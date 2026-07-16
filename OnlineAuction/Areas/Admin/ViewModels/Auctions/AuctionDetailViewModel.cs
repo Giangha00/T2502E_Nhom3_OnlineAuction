@@ -59,4 +59,8 @@ public class AuctionDetailViewModel
     public int BidHistoryPageSize { get; set; } = 20;
 
     public int BidHistoryTotalPages { get; set; } = 1;
+
+    public IReadOnlyList<AdminWinnerNonPaymentLogViewModel> WinnerNonPaymentLogs { get; set; } = [];
+
+    public IReadOnlyList<AdminForfeitedDepositViewModel> ForfeitedDeposits { get; set; } = [];
 }

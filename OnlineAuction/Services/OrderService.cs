@@ -18,11 +18,16 @@ public class OrderService : IOrderService
 
     private readonly AuctionHouseDbContext _dbContext;
     private readonly PlatformFeeSettings _feeSettings;
+    private readonly IWinnerNonPaymentRecoveryService _winnerNonPaymentRecoveryService;
 
-    public OrderService(AuctionHouseDbContext dbContext, IOptions<PlatformFeeSettings> feeSettings)
+    public OrderService(
+        AuctionHouseDbContext dbContext,
+        IOptions<PlatformFeeSettings> feeSettings,
+        IWinnerNonPaymentRecoveryService winnerNonPaymentRecoveryService)
     {
         _dbContext = dbContext;
         _feeSettings = feeSettings.Value;
+        _winnerNonPaymentRecoveryService = winnerNonPaymentRecoveryService;
     }
 
     public async Task<OrderPageViewModel?> BuildOrderPageAsync(int buyerId)
@@ -253,7 +258,15 @@ public class OrderService : IOrderService
         {
             order.Status = OrderStatuses.Cancelled;
             order.UpdatedAt = now;
-            await OrderCancellationHelper.ApplyCancellationSideEffectsAsync(_dbContext, order, now);
+
+            if (OrderCheckoutSelection.ResolveOrderSource(order) == OrderSources.AuctionWin)
+            {
+                await _winnerNonPaymentRecoveryService.ProcessExpiredAuctionWinOrderAsync(order, now);
+            }
+            else
+            {
+                await OrderCancellationHelper.ApplyCancellationSideEffectsAsync(_dbContext, order, now);
+            }
         }
 
         await _dbContext.SaveChangesAsync();

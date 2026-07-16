@@ -55,6 +55,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<Complaint> Complaints => Set<Complaint>();
 
+    public DbSet<WinnerNonPaymentLog> WinnerNonPaymentLogs => Set<WinnerNonPaymentLog>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         
@@ -80,6 +82,37 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureUserOtpCodes(builder);
         ConfigureWatchlistItems(builder);
         ConfigureComplaints(builder);
+        ConfigureWinnerNonPaymentLogs(builder);
+    }
+
+    private static void ConfigureWinnerNonPaymentLogs(ModelBuilder builder)
+    {
+        builder.Entity<WinnerNonPaymentLog>(entity =>
+        {
+            entity.ToTable("winner_non_payment_logs");
+
+            entity.Property(item => item.Id).HasColumnName("id");
+            entity.Property(item => item.AuctionId).HasColumnName("auction_id");
+            entity.Property(item => item.CancelledOrderId).HasColumnName("cancelled_order_id");
+            entity.Property(item => item.DefaultingUserId).HasColumnName("defaulting_user_id");
+            entity.Property(item => item.ForfeitedDepositId).HasColumnName("forfeited_deposit_id");
+            entity.Property(item => item.ForfeitedAmount)
+                .HasColumnName("forfeited_amount")
+                .HasPrecision(18, 2);
+            entity.Property(item => item.Action).HasColumnName("action").HasMaxLength(50).IsRequired();
+            entity.Property(item => item.Details).HasColumnName("details").HasMaxLength(1000).IsRequired();
+            entity.Property(item => item.SecondChanceUserId).HasColumnName("second_chance_user_id");
+            entity.Property(item => item.SecondChanceOrderId).HasColumnName("second_chance_order_id");
+            entity.Property(item => item.CreatedAt).HasColumnName("created_at");
+
+            entity.HasIndex(item => item.AuctionId).HasDatabaseName("ix_winner_non_payment_logs_auction_id");
+
+            entity.HasOne(item => item.Auction)
+                .WithMany()
+                .HasForeignKey(item => item.AuctionId)
+                .HasConstraintName("fk_winner_non_payment_logs_auction")
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 
     private static void ConfigurePermissions(ModelBuilder builder)
@@ -188,6 +221,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         entity.Property(d => d.PaidAt).HasColumnName("paid_at");
 
         entity.Property(d => d.RefundedAt).HasColumnName("refunded_at");
+
+        entity.Property(d => d.ForfeitedAt).HasColumnName("forfeited_at");
 
         // Tìm deposit bằng paypal_order_id khi PayPal return về token
         entity.HasIndex(d => d.PayPalOrderId)
