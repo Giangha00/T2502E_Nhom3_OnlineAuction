@@ -32,7 +32,10 @@ public static class NotificationReferenceTypes
     public const string AuctionOutbid = "auction_outbid";
     public const string AuctionEndingSoon = "auction_ending_soon";
     public const string AuctionWon = "auction_won";
+    public const string SellerAwaitingPayment = "seller_awaiting_payment";
     public const string PaymentSuccess = "payment_success";
+    public const string SellerPaymentReceived = "seller_payment_received";
+    public const string OrderCancelledPaymentOverdue = "order_cancelled_payment_overdue";
     public const string RefundApproved = "refund_approved";
     public const string RefundRequested = "refund_requested";
     public const string RefundRejected = "refund_rejected";

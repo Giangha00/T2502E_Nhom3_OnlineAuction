@@ -31,6 +31,7 @@
       "RefreshToken": "YOUR_GOOGLE_REFRESH_TOKEN",
       "SenderEmail": "gianghacd@gmail.com",
       "SenderName": "RareCard Auction House"
+      
     }
   },
   "FirebaseSettings": {

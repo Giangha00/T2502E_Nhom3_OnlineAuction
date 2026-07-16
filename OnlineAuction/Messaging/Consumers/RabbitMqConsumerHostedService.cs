@@ -83,14 +83,40 @@ public sealed class RabbitMqConsumerHostedService : BackgroundService
 
         RegisterConsumer(RabbitMqQueueNames.BidsPlaced, HandleBidPlacedAsync);
         RegisterConsumer(RabbitMqQueueNames.NotificationsDeliver, HandleNotificationDeliverAsync);
-        RegisterConsumer(RabbitMqQueueNames.EmailsSend, HandleEmailSendAsync);
+        RegisterConsumer(RabbitMqQueueNames.EmailsSend, HandleEmailSendAsync, requeueOnFailure: false);
         RegisterConsumer(RabbitMqQueueNames.AuctionLifecycle, HandleAuctionLifecycleAsync);
 
         stoppingToken.Register(Cleanup);
         return Task.Delay(Timeout.Infinite, stoppingToken);
     }
 
-    private void RegisterConsumer(string queueName, Func<ReadOnlyMemory<byte>, CancellationToken, Task> handler)
+    private void RegisterConsumer(
+        string queueName,
+        Func<ReadOnlyMemory<byte>, CancellationToken, Task> handler,
+        bool requeueOnFailure = true)
+    {
+        RegisterConsumerCore(
+            queueName,
+            async (body, cancellationToken) =>
+            {
+                await handler(body, cancellationToken);
+                return true;
+            },
+            requeueOnFailure);
+    }
+
+    private void RegisterConsumer(
+        string queueName,
+        Func<ReadOnlyMemory<byte>, CancellationToken, Task<bool>> handler,
+        bool requeueOnFailure = true)
+    {
+        RegisterConsumerCore(queueName, handler, requeueOnFailure);
+    }
+
+    private void RegisterConsumerCore(
+        string queueName,
+        Func<ReadOnlyMemory<byte>, CancellationToken, Task<bool>> handler,
+        bool requeueOnFailure)
     {
         if (_connection is null)
         {
@@ -108,13 +134,22 @@ public sealed class RabbitMqConsumerHostedService : BackgroundService
         {
             try
             {
-                await handler(eventArgs.Body, CancellationToken.None);
-                channel.BasicAck(eventArgs.DeliveryTag, false);
+                var succeeded = await handler(eventArgs.Body, CancellationToken.None);
+                if (succeeded)
+                {
+                    channel.BasicAck(eventArgs.DeliveryTag, false);
+                    return;
+                }
+
+                _logger.LogWarning(
+                    "Message from queue {QueueName} was not processed successfully.",
+                    queueName);
+                channel.BasicNack(eventArgs.DeliveryTag, false, requeue: requeueOnFailure);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to process message from queue {QueueName}.", queueName);
-                channel.BasicNack(eventArgs.DeliveryTag, false, requeue: true);
+                channel.BasicNack(eventArgs.DeliveryTag, false, requeue: requeueOnFailure);
             }
         };
 
@@ -148,17 +183,17 @@ public sealed class RabbitMqConsumerHostedService : BackgroundService
         await delivery.DeliverAsync(message.NotificationId, cancellationToken);
     }
 
-    private async Task HandleEmailSendAsync(ReadOnlyMemory<byte> body, CancellationToken cancellationToken)
+    private async Task<bool> HandleEmailSendAsync(ReadOnlyMemory<byte> body, CancellationToken cancellationToken)
     {
         var message = RabbitMqJson.Deserialize<EmailSendMessage>(body.Span);
         if (message is null)
         {
-            return;
+            return false;
         }
 
         using var scope = _scopeFactory.CreateScope();
         var handler = scope.ServiceProvider.GetRequiredService<IEmailSendMessageHandler>();
-        await handler.HandleAsync(message, cancellationToken);
+        return await handler.HandleAsync(message, cancellationToken);
     }
 
     private async Task HandleAuctionLifecycleAsync(ReadOnlyMemory<byte> body, CancellationToken cancellationToken)

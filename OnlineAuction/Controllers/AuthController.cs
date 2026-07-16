@@ -35,6 +35,7 @@ public class AuthController : Controller
     private readonly IEmailQueueService _emailQueueService;
     private readonly IPasswordResetOtpService _passwordResetOtpService;
     private readonly PasswordResetOtpSettings _otpSettings;
+    private readonly IWebHostEnvironment _environment;
     private readonly IStringLocalizer<SharedResource> _localizer;
 
     public AuthController(
@@ -43,6 +44,7 @@ public class AuthController : Controller
         IEmailQueueService emailQueueService,
         IPasswordResetOtpService passwordResetOtpService,
         IOptions<PasswordResetOtpSettings> otpOptions,
+        IWebHostEnvironment environment,
         IStringLocalizer<SharedResource> localizer)
     {
         _signInManager = signInManager;
@@ -50,6 +52,7 @@ public class AuthController : Controller
         _emailQueueService = emailQueueService;
         _passwordResetOtpService = passwordResetOtpService;
         _otpSettings = otpOptions.Value;
+        _environment = environment;
         _localizer = localizer;
     }
 
@@ -722,6 +725,11 @@ public class AuthController : Controller
         if (string.IsNullOrWhiteSpace(confirmUrl))
         {
             return false;
+        }
+
+        if (_environment.IsDevelopment())
+        {
+            TempData["EmailConfirmationUrl"] = confirmUrl;
         }
 
         var locale = HttpContext.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name

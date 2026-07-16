@@ -1,4 +1,3 @@
-using OnlineAuction.Messaging;
 using OnlineAuction.Messaging.Handlers;
 using OnlineAuction.Messaging.Messages;
 
@@ -24,14 +23,10 @@ public interface IEmailQueueService
 
 public sealed class EmailQueueService : IEmailQueueService
 {
-    private readonly IRabbitMqPublisher _publisher;
     private readonly IServiceScopeFactory _scopeFactory;
 
-    public EmailQueueService(
-        IRabbitMqPublisher publisher,
-        IServiceScopeFactory scopeFactory)
+    public EmailQueueService(IServiceScopeFactory scopeFactory)
     {
-        _publisher = publisher;
         _scopeFactory = scopeFactory;
     }
 
@@ -53,15 +48,9 @@ public sealed class EmailQueueService : IEmailQueueService
             Locale = locale
         };
 
-        if (_publisher.TryPublish(RabbitMqQueueNames.EmailsSend, message))
-        {
-            return true;
-        }
-
         using var scope = _scopeFactory.CreateScope();
         var handler = scope.ServiceProvider.GetRequiredService<IEmailSendMessageHandler>();
-        await handler.HandleAsync(message, cancellationToken);
-        return true;
+        return await handler.HandleAsync(message, cancellationToken);
     }
 
     public async Task<bool> QueueEmailConfirmationAsync(
@@ -80,14 +69,8 @@ public sealed class EmailQueueService : IEmailQueueService
             Locale = locale
         };
 
-        if (_publisher.TryPublish(RabbitMqQueueNames.EmailsSend, message))
-        {
-            return true;
-        }
-
         using var scope = _scopeFactory.CreateScope();
         var handler = scope.ServiceProvider.GetRequiredService<IEmailSendMessageHandler>();
-        await handler.HandleAsync(message, cancellationToken);
-        return true;
+        return await handler.HandleAsync(message, cancellationToken);
     }
 }
