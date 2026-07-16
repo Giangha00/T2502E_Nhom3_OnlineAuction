@@ -149,13 +149,35 @@ public class BidService : IBidService
         auction.CurrentPrice = amount;
         auction.UpdatedAt = placedAt;
 
-        if (DateTimeUtilities.RemainingUtc(auction.EndDate).TotalMinutes < _fraudSettings.AntiSnipeThresholdMinutes)
+        var remainingMinutes = DateTimeUtilities.RemainingUtc(auction.EndDate).TotalMinutes;
+        var endDateUtc = DateTimeUtilities.AsUtc(auction.EndDate);
+        var startDateUtc = DateTimeUtilities.AsUtc(auction.StartDate);
+        var totalLiveWindowMinutes = Math.Max(0, (endDateUtc - startDateUtc).TotalMinutes);
+        var extensionMinutesAlreadyApplied = Math.Max(0, totalLiveWindowMinutes - AuctionScheduleHelper.DefaultLiveDuration.TotalMinutes);
+        var maxExtensionMinutes = Math.Max(0, _fraudSettings.MaxEndDateExtensionTotalMinutes);
+        var maxExtensionCount = Math.Max(0, _fraudSettings.MaxAntiSnipeExtensions);
+        var antiSnipeExtensionCount = Math.Max(0, (int)Math.Floor(extensionMinutesAlreadyApplied / Math.Max(1, _fraudSettings.AntiSnipeExtensionMinutes)));
+        var withinExtensionCap = antiSnipeExtensionCount < maxExtensionCount && extensionMinutesAlreadyApplied < maxExtensionMinutes;
+
+        if (remainingMinutes < _fraudSettings.AntiSnipeThresholdMinutes && withinExtensionCap)
         {
-            auction.EndDate = DateTimeUtilities.AsUtc(auction.EndDate).AddMinutes(_fraudSettings.AntiSnipeExtensionMinutes);
+            var extendedEndDate = endDateUtc.AddMinutes(_fraudSettings.AntiSnipeExtensionMinutes);
+            auction.EndDate = extendedEndDate;
             _logger.LogInformation(
                 "Anti-snipe extended auction {AuctionId} to {NewEndDate}.",
                 auction.Id,
                 auction.EndDate);
+        }
+        else if (remainingMinutes < _fraudSettings.AntiSnipeThresholdMinutes)
+        {
+            _logger.LogInformation(
+                "Anti-snipe extension skipped for auction {AuctionId} because the configured extension cap was reached (remainingMinutes={RemainingMinutes}, extensionCount={ExtensionCount}, maxExtensions={MaxExtensions}, extensionTotalMinutes={TotalExtensionMinutes}, maxTotalMinutes={MaxExtensionMinutes}).",
+                auction.Id,
+                remainingMinutes,
+                antiSnipeExtensionCount,
+                maxExtensionCount,
+                extensionMinutesAlreadyApplied,
+                maxExtensionMinutes);
         }
 
         await _dbContext.SaveChangesAsync();

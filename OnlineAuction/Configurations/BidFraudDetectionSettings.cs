@@ -27,4 +27,8 @@ public sealed class BidFraudDetectionSettings
     public int AntiSnipeThresholdMinutes { get; set; } = 5;
 
     public int AntiSnipeExtensionMinutes { get; set; } = 5;
+
+    public int MaxAntiSnipeExtensions { get; set; } = 3;
+
+    public int MaxEndDateExtensionTotalMinutes { get; set; } = 15;
 }

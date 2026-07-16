@@ -150,6 +150,22 @@ public class OrderCreationService : IOrderCreationService
             return null;
         }
 
+        var shouldFinalize = auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon
+            && !DateTimeUtilities.IsInFutureUtc(auction.EndDate);
+
+        if (!shouldFinalize)
+        {
+            _logger.LogInformation(
+                "Skipping auction {AuctionId} finalization due to state re-check: status={Status}, endDate={EndDateUtc}, future={IsFuture}.",
+                auction.Id,
+                auction.Status,
+                auction.EndDate,
+                DateTimeUtilities.IsInFutureUtc(auction.EndDate));
+
+            await transaction.RollbackAsync(cancellationToken);
+            return null;
+        }
+
         var winningBid = await _dbContext.Bids
             .Where(bid => bid.AuctionId == auctionId && bid.IsWinning)
             .OrderByDescending(bid => bid.Amount)
@@ -185,6 +201,34 @@ public class OrderCreationService : IOrderCreationService
 
         try
         {
+            // Re-check DB state to avoid racing with anti-snipe extensions or other status changes
+            // Reload auction from database so any concurrent bid that extended EndDate is observed.
+            await _dbContext.Entry(auction).ReloadAsync(cancellationToken);
+
+            var isEndDateInFuture = DateTimeUtilities.IsInFutureUtc(auction.EndDate);
+            var isStatusLive = auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon;
+
+            if (!isStatusLive || isEndDateInFuture)
+            {
+                if (isEndDateInFuture)
+                {
+                    _logger.LogInformation(
+                        "Skipping auction {AuctionId} finalization: anti-snipe extension detected (endDate={EndDateUtc}).",
+                        auction.Id,
+                        auction.EndDate);
+                }
+                else
+                {
+                    _logger.LogInformation(
+                        "Skipping auction {AuctionId} finalization due to status change: status={Status}.",
+                        auction.Id,
+                        auction.Status);
+                }
+
+                await transaction.RollbackAsync(cancellationToken);
+                return null;
+            }
+
             await _dbContext.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
         }
