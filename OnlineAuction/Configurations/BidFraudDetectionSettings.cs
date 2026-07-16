@@ -39,6 +39,10 @@ public sealed class BidFraudDetectionSettings
 
     public int AntiSnipeExtensionMinutes { get; set; } = 5;
 
+    public int MaxAntiSnipeExtensions { get; set; } = 3;
+
+    public int MaxEndDateExtensionTotalMinutes { get; set; } = 15;
+
     /// <summary>
     /// Action when a high-severity fraud rule fires: Alert, Reject, or ShadowBan.
     /// </summary>

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using OnlineAuction.Configurations;
@@ -77,10 +78,47 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             action => action == WinnerNonPaymentActions.RelistRecommended);
     }
 
+    [Fact]
+    public async Task CreatePendingPaymentOrderForAuctionAsync_SkipsWhenAuctionWasAntiSnipeExtended()
+    {
+        var now = new DateTime(2026, 7, 15, 12, 0, 0, DateTimeKind.Utc);
+        await using var db = CreateDbContext();
+        var auctionId = await SeedAuctionForFinalizerRaceAsync(db, now);
+
+        var orderCreationService = CreateOrderCreationService(db);
+        var auction = await db.Auctions.FirstAsync(item => item.Id == auctionId);
+        auction.Status = AuctionStatuses.EndingSoon;
+        auction.EndDate = now.AddMinutes(10);
+        auction.UpdatedAt = now;
+        await db.SaveChangesAsync();
+
+        var orderId = await orderCreationService.CreatePendingPaymentOrderForAuctionAsync(auctionId);
+
+        Assert.Null(orderId);
+        Assert.Empty(await db.Orders.ToListAsync());
+        Assert.Equal(AuctionStatuses.EndingSoon, (await db.Auctions.FindAsync(auctionId))!.Status);
+    }
+
+    [Fact]
+    public async Task FinalizeExpiredAuctionsAsync_CreatesOrderWhenAuctionHasActuallyExpired()
+    {
+        var now = new DateTime(2026, 7, 15, 12, 0, 0, DateTimeKind.Utc);
+        await using var db = CreateDbContext();
+        var auctionId = await SeedAuctionForFinalizerRaceAsync(db, now);
+
+        var orderCreationService = CreateOrderCreationService(db);
+        var createdCount = await orderCreationService.FinalizeExpiredAuctionsAsync();
+
+        Assert.Equal(1, createdCount);
+        Assert.Single(await db.Orders.ToListAsync());
+        Assert.Equal(AuctionStatuses.AwaitingPayment, (await db.Auctions.FindAsync(auctionId))!.Status);
+    }
+
     private static AuctionHouseDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<AuctionHouseDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(warnings => warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning))
             .Options;
 
         return new AuctionHouseDbContext(options);
@@ -117,12 +155,65 @@ public class WinnerNonPaymentRecoveryIntegrationTests
         return new OrderService(db, feeSettings, recoveryService);
     }
 
+    private static OrderCreationService CreateOrderCreationService(AuctionHouseDbContext db)
+    {
+        var feeSettings = Options.Create(new PlatformFeeSettings());
+        var notificationService = new NoOpNotificationService();
+        var realtimePublisher = new NoOpRealtimePublisher();
+        var bidService = new NoOpBidService();
+        var depositRefundService = new NoOpRegistrationDepositRefundService();
+
+        return new OrderCreationService(
+            db,
+            NullLogger<OrderCreationService>.Instance,
+            notificationService,
+            depositRefundService,
+            realtimePublisher,
+            bidService,
+            feeSettings);
+    }
+
     private static async Task<int> SeedSecondChanceScenarioAsync(AuctionHouseDbContext db, DateTime now)
     {
         const int auctionId = 100;
         const int sellerId = 10;
         const int winnerId = 1;
         const int runnerUpId = 2;
+
+        db.Users.AddRange(
+            new ApplicationUser
+            {
+                Id = sellerId,
+                UserName = "seller",
+                NormalizedUserName = "SELLER",
+                Email = "seller@test.com",
+                NormalizedEmail = "SELLER@TEST.COM",
+                FullName = "Seller",
+                PhoneNumber = "000",
+                CreatedAt = now
+            },
+            new ApplicationUser
+            {
+                Id = winnerId,
+                UserName = "winner",
+                NormalizedUserName = "WINNER",
+                Email = "winner@test.com",
+                NormalizedEmail = "WINNER@TEST.COM",
+                FullName = "Winner",
+                PhoneNumber = "001",
+                CreatedAt = now
+            },
+            new ApplicationUser
+            {
+                Id = runnerUpId,
+                UserName = "runnerup",
+                NormalizedUserName = "RUNNERUP",
+                Email = "runnerup@test.com",
+                NormalizedEmail = "RUNNERUP@TEST.COM",
+                FullName = "Runner Up",
+                PhoneNumber = "002",
+                CreatedAt = now
+            });
 
         var product = new Product
         {
@@ -150,8 +241,19 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             EndDate = now.AddDays(-1)
         };
 
+        var registration = new AuctionRegistration
+        {
+            Id = 1,
+            AuctionId = auctionId,
+            UserId = winnerId,
+            Status = AuctionRegistrationStatuses.Approved,
+            RegisteredAt = now.AddDays(-7),
+            ReviewedAt = now.AddDays(-6)
+        };
+
         db.Products.Add(product);
         db.Auctions.Add(auction);
+        db.AuctionRegistrations.Add(registration);
         db.Bids.AddRange(
             new Bid
             {
@@ -217,11 +319,119 @@ public class WinnerNonPaymentRecoveryIntegrationTests
         return auctionId;
     }
 
+    private static async Task<int> SeedAuctionForFinalizerRaceAsync(AuctionHouseDbContext db, DateTime now)
+    {
+        const int auctionId = 300;
+        const int sellerId = 10;
+        const int winnerId = 1;
+
+        db.Users.AddRange(
+            new ApplicationUser
+            {
+                Id = sellerId,
+                UserName = "seller",
+                NormalizedUserName = "SELLER",
+                Email = "seller@test.com",
+                NormalizedEmail = "SELLER@TEST.COM",
+                FullName = "Seller",
+                PhoneNumber = "000",
+                CreatedAt = now
+            },
+            new ApplicationUser
+            {
+                Id = winnerId,
+                UserName = "winner",
+                NormalizedUserName = "WINNER",
+                Email = "winner@test.com",
+                NormalizedEmail = "WINNER@TEST.COM",
+                FullName = "Winner",
+                PhoneNumber = "001",
+                CreatedAt = now
+            });
+
+        var product = new Product
+        {
+            Id = 3,
+            SellerId = sellerId,
+            CategoryId = 1,
+            Name = "Race Repro Card",
+            PrimaryImage = "/img3.png",
+            GradeLabel = "PSA 10"
+        };
+
+        var auction = new Auction
+        {
+            Id = auctionId,
+            ProductId = product.Id,
+            Product = product,
+            Status = AuctionStatuses.Live,
+            StartingPrice = 50m,
+            BidStep = 5m,
+            CurrentPrice = 100m,
+            RegistrationStartDate = now.AddDays(-7),
+            RegistrationEndDate = now.AddDays(-5),
+            StartDate = now.AddDays(-2),
+            EndDate = now.AddMinutes(-1),
+            ListingType = ListingTypes.Auction,
+            RequiresRegistration = false
+        };
+
+        db.Products.Add(product);
+        db.Auctions.Add(auction);
+        db.Bids.Add(new Bid
+        {
+            Id = 4,
+            AuctionId = auctionId,
+            BidderId = winnerId,
+            Amount = 100m,
+            IsWinning = true,
+            PlacedAt = now.AddMinutes(-3)
+        });
+
+        db.AuctionRegistrationDeposits.Add(new AuctionRegistrationDeposit
+        {
+            Id = 2,
+            AuctionId = auctionId,
+            UserId = winnerId,
+            AuctionRegistrationId = 2,
+            Amount = 50m,
+            Status = AuctionRegistrationDepositStatuses.Paid,
+            PaidAt = now.AddDays(-2)
+        });
+
+        await db.SaveChangesAsync();
+        return auctionId;
+    }
+
     private static async Task<int> SeedRelistScenarioAsync(AuctionHouseDbContext db, DateTime now)
     {
         const int auctionId = 200;
         const int sellerId = 10;
         const int winnerId = 1;
+
+        db.Users.AddRange(
+            new ApplicationUser
+            {
+                Id = sellerId,
+                UserName = "seller",
+                NormalizedUserName = "SELLER",
+                Email = "seller@test.com",
+                NormalizedEmail = "SELLER@TEST.COM",
+                FullName = "Seller",
+                PhoneNumber = "000",
+                CreatedAt = now
+            },
+            new ApplicationUser
+            {
+                Id = winnerId,
+                UserName = "winner",
+                NormalizedUserName = "WINNER",
+                Email = "winner@test.com",
+                NormalizedEmail = "WINNER@TEST.COM",
+                FullName = "Winner",
+                PhoneNumber = "001",
+                CreatedAt = now
+            });
 
         var product = new Product
         {
