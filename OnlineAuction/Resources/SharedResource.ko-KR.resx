@@ -189,9 +189,6 @@
   <data name="Layout_Brand_Tagline" xml:space="preserve">
     <value>인증된 트레이딩 카드를 프리미엄 온라인 경매로 만나보세요.</value>
   </data>
-  <data name="Layout_Footer_Address" xml:space="preserve">
-    <value>FPT Polytechnic 빌딩, Trinh Van Bo, Xuan Phuong, 하노이 100000, 베트남</value>
-  </data>
   <data name="Home_Hero_TitleAccent" xml:space="preserve">
     <value>희귀한 수집품에 투자하세요</value>
   </data>
@@ -559,8 +556,6 @@
   <data name="Product_SalesCount" xml:space="preserve"><value>판매 {0}건</value></data>
   <data name="Product_EndingSoonTitle" xml:space="preserve"><value>곧 종료</value></data>
   <data name="Product_RelatedSubtitle" xml:space="preserve"><value>관심 있을 만한 다른 희귀 수집품</value></data>
-  <data name="Product_SimilarListingsTitle" xml:space="preserve"><value>유사 상품</value></data>
-  <data name="Product_MoreRelatedTitle" xml:space="preserve"><value>더 많은 관련 카드</value></data>
   <data name="Product_ViewAllArrow" xml:space="preserve"><value>모두 보기 →</value></data>
   <data name="Product_CountdownTitle" xml:space="preserve"><value>경매 종료까지</value></data>
   <data name="Product_Days" xml:space="preserve"><value>일</value></data>
@@ -905,4 +900,7 @@
   <data name="User_Time_HoursLeft" xml:space="preserve"><value>{0}시간 남음</value></data>
   <data name="User_Time_MinutesLeft" xml:space="preserve"><value>{0}분 남음</value></data>
   <data name="Account_Selling_CreateListing" xml:space="preserve"><value>상품 등록</value></data>
+<data name="Layout_Footer_Address" xml:space="preserve">
+    <value>FPT Polytechnic 빌딩, Trinh Van Bo, Xuan Phuong, 하노이 100000, 베트남</value>
+  </data>
 </root>

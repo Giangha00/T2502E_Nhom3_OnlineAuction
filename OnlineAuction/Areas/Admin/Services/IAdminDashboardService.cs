@@ -18,6 +18,18 @@ public interface IAdminDashboardService
         DashboardFilterViewModel filter,
         CancellationToken cancellationToken = default);
 
+    Task<decimal> SumBuyerCheckoutFeesAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default);
+
+    Task<decimal> SumSellerSuccessFeesAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default);
+
+    Task<decimal> SumSellerProceedsAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default);
+
     Task<AdminDashboardViewModel> GetDashboardAsync(
         DashboardFilterViewModel filter,
         CancellationToken cancellationToken = default);

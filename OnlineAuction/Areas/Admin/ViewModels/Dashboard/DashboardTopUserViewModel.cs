@@ -13,4 +13,6 @@ public class DashboardTopUserViewModel
     public int ListingCount { get; set; }
 
     public decimal TotalSales { get; set; }
+
+    public decimal GrossSales { get; set; }
 }

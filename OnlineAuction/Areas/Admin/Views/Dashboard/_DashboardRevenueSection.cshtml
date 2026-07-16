@@ -7,19 +7,26 @@
         <p class="mt-1 text-theme-xs text-gray-400" title="@Localizer["Admin_Dashboard_Revenue_Rules_Tooltip"]">
             @Localizer["Admin_Dashboard_Revenue_Rules_Short"]
         </p>
+        <p class="mt-1 text-theme-xs text-gray-400">@Localizer["Admin_Dashboard_Revenue_PayoutNote"]</p>
     </div>
 
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5 md:gap-6">
         @{
             var revenueCards = new[]
             {
                 Model.RevenueSection.GmvKpi,
-                Model.RevenueSection.CommissionKpi
+                Model.RevenueSection.CommissionKpi,
+                Model.RevenueSection.BuyerFeeKpi,
+                Model.RevenueSection.SellerFeeKpi,
+                Model.RevenueSection.SellerProceedsKpi
             };
             var revenueLabels = new[]
             {
                 Localizer["Admin_Dashboard_Kpi_Gmv"].Value,
-                Localizer["Admin_Dashboard_Kpi_Commission"].Value
+                Localizer["Admin_Dashboard_Kpi_Commission"].Value,
+                Localizer["Admin_Dashboard_Kpi_BuyerFee"].Value,
+                Localizer["Admin_Dashboard_Kpi_SellerFee"].Value,
+                Localizer["Admin_Dashboard_Kpi_SellerProceeds"].Value
             };
         }
 
