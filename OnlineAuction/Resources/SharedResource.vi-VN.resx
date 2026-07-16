@@ -1159,4 +1159,15 @@
   <data name="Admin_Dashboard_Revenue_Status_Success" xml:space="preserve"><value>Thành công</value></data>
   <data name="Admin_Dashboard_Revenue_Status_Applied" xml:space="preserve"><value>Đã áp dụng</value></data>
   <data name="Admin_Dashboard_Revenue_Status_Paid" xml:space="preserve"><value>Đã thanh toán</value></data>
+  <data name="Notification_AuctionWon_Title" xml:space="preserve"><value>Bạn đã thắng đấu giá!</value></data>
+  <data name="Notification_AuctionWon_Message" xml:space="preserve"><value>Chúc mừng! Bạn đã thắng {0}. Vui lòng thanh toán trong 48 giờ.</value></data>
+  <data name="Notification_SellerAwaitingPayment_Title" xml:space="preserve"><value>Sản phẩm đã bán - chờ thanh toán</value></data>
+  <data name="Notification_SellerAwaitingPayment_Message" xml:space="preserve"><value>{0} đã có người mua thắng. Đơn {1} đang chờ thanh toán.</value></data>
+  <data name="Notification_PaymentSuccess_Title" xml:space="preserve"><value>Thanh toán thành công</value></data>
+  <data name="Notification_PaymentSuccess_Message" xml:space="preserve"><value>Thanh toán {0} cho đơn {1} đã được xác nhận.</value></data>
+  <data name="Notification_SellerPaymentReceived_Title" xml:space="preserve"><value>Đã nhận thanh toán</value></data>
+  <data name="Notification_SellerPaymentReceived_Message" xml:space="preserve"><value>Thanh toán cho {0} ở đơn {1} đã được xác nhận qua {2}.</value></data>
+  <data name="Notification_OrderCancelled_Title" xml:space="preserve"><value>Đơn hàng đã hủy</value></data>
+  <data name="Notification_OrderCancelledBuyer_Message" xml:space="preserve"><value>Đơn {1} cho {0} đã bị hủy vì quá hạn thanh toán.</value></data>
+  <data name="Notification_OrderCancelledSeller_Message" xml:space="preserve"><value>Đơn {1} cho {0} đã bị hủy vì người thắng không thanh toán đúng hạn.</value></data>
 </root>

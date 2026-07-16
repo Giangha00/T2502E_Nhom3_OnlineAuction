@@ -1,6 +1,8 @@
 using System.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using OnlineAuction;
 using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
@@ -21,6 +23,7 @@ public class OrderCreationService : IOrderCreationService
     private readonly IRealtimePublisher _realtimePublisher;
     private readonly IOrderService _orderService;
     private readonly IBidService _bidService;
+    private readonly IStringLocalizer<SharedResource> _localizer;
     private readonly PlatformFeeSettings _feeSettings;
 
     public OrderCreationService(
@@ -31,6 +34,7 @@ public class OrderCreationService : IOrderCreationService
         IRealtimePublisher realtimePublisher,
         IOrderService orderService,
         IBidService bidService,
+        IStringLocalizer<SharedResource> localizer,
         IOptions<PlatformFeeSettings> feeSettings)
     {
         _dbContext = dbContext;
@@ -41,6 +45,7 @@ public class OrderCreationService : IOrderCreationService
         _realtimePublisher = realtimePublisher;
         _orderService = orderService;
         _bidService = bidService;
+        _localizer = localizer;
         _feeSettings = feeSettings.Value;
     }
 
@@ -271,12 +276,22 @@ public class OrderCreationService : IOrderCreationService
 
         await _notificationService.CreateAndPushAsync(
             winningBid.BidderId,
-            "You won the auction!",
-            $"Congratulations! You won {auction.Product.Name}. Complete payment within 48 hours.",
+            _localizer["Notification_AuctionWon_Title"],
+            _localizer["Notification_AuctionWon_Message", auction.Product.Name],
             NotificationType.Winning,
             "/Order",
             NotificationReferenceTypes.AuctionWon,
             auction.Id,
+            cancellationToken: cancellationToken);
+
+        await _notificationService.CreateAndPushAsync(
+            auction.Product.SellerId,
+            _localizer["Notification_SellerAwaitingPayment_Title"],
+            _localizer["Notification_SellerAwaitingPayment_Message", auction.Product.Name, order.OrderReference],
+            NotificationType.Auction,
+            $"/Admin/Auction/Details/{auction.Id}",
+            NotificationReferenceTypes.SellerAwaitingPayment,
+            order.Id,
             cancellationToken: cancellationToken);
 
         var orderCount = await _orderService.CountPendingPaymentOrdersAsync(winningBid.BidderId);
@@ -421,6 +436,16 @@ public class OrderCreationService : IOrderCreationService
 
         var orderCount = await _orderService.CountPendingPaymentOrdersAsync(buyerId);
         await _realtimePublisher.SendOrderCountToUserAsync(buyerId, orderCount, cancellationToken);
+
+        await _notificationService.CreateAndPushAsync(
+            auction.Product.SellerId,
+            _localizer["Notification_SellerAwaitingPayment_Title"],
+            _localizer["Notification_SellerAwaitingPayment_Message", auction.Product.Name, order.OrderReference],
+            NotificationType.Auction,
+            $"/Admin/Auction/Details/{auction.Id}",
+            NotificationReferenceTypes.SellerAwaitingPayment,
+            order.Id,
+            cancellationToken: cancellationToken);
 
         return (true, "Added to your orders.");
     }

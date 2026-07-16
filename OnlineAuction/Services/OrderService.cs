@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using OnlineAuction;
 using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
@@ -17,11 +19,19 @@ public class OrderService : IOrderService
     };
 
     private readonly AuctionHouseDbContext _dbContext;
+    private readonly INotificationService _notificationService;
+    private readonly IStringLocalizer<SharedResource> _localizer;
     private readonly PlatformFeeSettings _feeSettings;
 
-    public OrderService(AuctionHouseDbContext dbContext, IOptions<PlatformFeeSettings> feeSettings)
+    public OrderService(
+        AuctionHouseDbContext dbContext,
+        INotificationService notificationService,
+        IStringLocalizer<SharedResource> localizer,
+        IOptions<PlatformFeeSettings> feeSettings)
     {
         _dbContext = dbContext;
+        _notificationService = notificationService;
+        _localizer = localizer;
         _feeSettings = feeSettings.Value;
     }
 
@@ -129,6 +139,8 @@ public class OrderService : IOrderService
 
         var expiredOrders = await _dbContext.Orders
             .Include(order => order.Items)
+                .ThenInclude(item => item.Auction)
+                    .ThenInclude(auction => auction.Product)
             .Where(order =>
                 order.BuyerId == buyerId &&
                 order.Status == OrderStatuses.PendingPayment &&
@@ -145,6 +157,8 @@ public class OrderService : IOrderService
 
         var expiredOrders = await _dbContext.Orders
             .Include(order => order.Items)
+                .ThenInclude(item => item.Auction)
+                    .ThenInclude(auction => auction.Product)
             .Where(order =>
                 order.Status == OrderStatuses.PendingPayment &&
                 order.DeletedAt == null &&
@@ -181,6 +195,8 @@ public class OrderService : IOrderService
         var now = DateTime.UtcNow;
         var orders = await _dbContext.Orders
             .Include(order => order.Items)
+                .ThenInclude(item => item.Auction)
+                    .ThenInclude(auction => auction.Product)
             .Where(order =>
                 order.BuyerId == buyerId &&
                 order.Status == OrderStatuses.PendingPayment &&
@@ -224,6 +240,11 @@ public class OrderService : IOrderService
 
         if (string.Equals(paymentMethod, "cod", StringComparison.OrdinalIgnoreCase))
         {
+            foreach (var order in checkoutOrders)
+            {
+                await NotifyPaymentSucceededAsync(order, "COD");
+            }
+
             var references = string.Join(", ", checkoutOrders.Select(order => order.OrderReference));
             return (true, $"Thanh toán thành công! Đã xác nhận {checkoutOrders.Count} hóa đơn ({references}).");
         }
@@ -246,7 +267,72 @@ public class OrderService : IOrderService
         }
 
         await _dbContext.SaveChangesAsync();
+        foreach (var order in expiredOrders)
+        {
+            await NotifyOrderCancelledAsync(order);
+        }
+
         return expiredOrders.Count;
+    }
+
+    private async Task NotifyPaymentSucceededAsync(AuctionOrder order, string paymentMethod)
+    {
+        var item = order.Items.FirstOrDefault();
+        var productName = item?.ItemName ?? order.OrderReference;
+        var auction = item?.Auction;
+
+        await _notificationService.CreateAndPushAsync(
+            order.BuyerId,
+            _localizer["Notification_PaymentSuccess_Title"],
+            _localizer["Notification_PaymentSuccess_Message", paymentMethod, order.OrderReference],
+            NotificationType.Payment,
+            "/Order",
+            NotificationReferenceTypes.PaymentSuccess,
+            order.Id);
+
+        if (auction?.Product is null)
+        {
+            return;
+        }
+
+        await _notificationService.CreateAndPushAsync(
+            auction.Product.SellerId,
+            _localizer["Notification_SellerPaymentReceived_Title"],
+            _localizer["Notification_SellerPaymentReceived_Message", productName, order.OrderReference, paymentMethod],
+            NotificationType.Payment,
+            $"/Admin/Auction/Details/{auction.Id}",
+            NotificationReferenceTypes.SellerPaymentReceived,
+            order.Id);
+    }
+
+    private async Task NotifyOrderCancelledAsync(AuctionOrder order)
+    {
+        var item = order.Items.FirstOrDefault();
+        var productName = item?.ItemName ?? order.OrderReference;
+        var auction = item?.Auction;
+
+        await _notificationService.CreateAndPushAsync(
+            order.BuyerId,
+            _localizer["Notification_OrderCancelled_Title"],
+            _localizer["Notification_OrderCancelledBuyer_Message", productName, order.OrderReference],
+            NotificationType.Auction,
+            "/Order",
+            NotificationReferenceTypes.OrderCancelledPaymentOverdue,
+            order.Id);
+
+        if (auction?.Product is null)
+        {
+            return;
+        }
+
+        await _notificationService.CreateAndPushAsync(
+            auction.Product.SellerId,
+            _localizer["Notification_OrderCancelled_Title"],
+            _localizer["Notification_OrderCancelledSeller_Message", productName, order.OrderReference],
+            NotificationType.Auction,
+            $"/Admin/Auction/Details/{auction.Id}",
+            NotificationReferenceTypes.OrderCancelledPaymentOverdue,
+            order.Id);
     }
 
     private static void ApplySummary(OrderPageViewModel model, IReadOnlyList<WonOrderItem> selectedItems)

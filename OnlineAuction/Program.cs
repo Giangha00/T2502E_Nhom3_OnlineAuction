@@ -237,6 +237,8 @@ builder.Services.Configure<FirebaseSettings>(
     builder.Configuration.GetSection(FirebaseSettings.SectionName));
 builder.Services.Configure<PasswordResetOtpSettings>(
     builder.Configuration.GetSection(PasswordResetOtpSettings.SectionName));
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection(EmailSettings.SectionName));
 builder.Services.Configure<RabbitMqSettings>(
     builder.Configuration.GetSection(RabbitMqSettings.SectionName));
 builder.Services.Configure<BidFraudDetectionSettings>(
@@ -245,8 +247,9 @@ builder.Services.Configure<PlatformFeeSettings>(
     builder.Configuration.GetSection(PlatformFeeSettings.SectionName));
 
 builder.Services.AddHttpClient<IPayPalService, PayPalService>();
-builder.Services.AddHttpClient<IEmailSender, GmailEmailSender>();
-builder.Services.AddHttpClient<IEmailVerificationService, EmailVerificationService>();
+builder.Services.AddHttpClient<GmailEmailSender>();
+builder.Services.AddScoped<IEmailSender>(sp => sp.GetRequiredService<GmailEmailSender>());
+builder.Services.AddScoped<IEmailVerificationService>(sp => sp.GetRequiredService<GmailEmailSender>());
 
 builder.Services.AddScoped<IAvatarStorageService, CloudinaryAvatarStorageService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();

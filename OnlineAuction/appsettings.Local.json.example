@@ -30,6 +30,7 @@
       "RefreshToken": "YOUR_GMAIL_REFRESH_TOKEN",
       "SenderEmail": "your-sender@gmail.com",
       "SenderName": "RareCard Auction House"
+      
     }
   },
   "FirebaseSettings": {

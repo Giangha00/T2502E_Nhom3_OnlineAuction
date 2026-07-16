@@ -1,6 +1,8 @@
 using System.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using OnlineAuction;
 using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
@@ -18,6 +20,7 @@ public class OrderPaymentService : IOrderPaymentService
     private readonly IOrderService _orderService;
     private readonly IRealtimePublisher _realtimePublisher;
     private readonly ILogger<OrderPaymentService> _logger;
+    private readonly IStringLocalizer<SharedResource> _localizer;
     private readonly PlatformFeeSettings _feeSettings;
 
     public OrderPaymentService(
@@ -27,6 +30,7 @@ public class OrderPaymentService : IOrderPaymentService
         IOrderService orderService,
         IRealtimePublisher realtimePublisher,
         ILogger<OrderPaymentService> logger,
+        IStringLocalizer<SharedResource> localizer,
         IOptions<PlatformFeeSettings> feeSettings)
     {
         _dbContext = dbContext;
@@ -35,6 +39,7 @@ public class OrderPaymentService : IOrderPaymentService
         _orderService = orderService;
         _realtimePublisher = realtimePublisher;
         _logger = logger;
+        _localizer = localizer;
         _feeSettings = feeSettings.Value;
     }
 
@@ -139,6 +144,8 @@ public class OrderPaymentService : IOrderPaymentService
         var pendingPayments = await _dbContext.Payments
             .Include(payment => payment.Order)
                 .ThenInclude(order => order.Items)
+                    .ThenInclude(item => item.Auction)
+                        .ThenInclude(auction => auction.Product)
             .Where(payment =>
                 payment.PayPalOrderId == payPalOrderId &&
                 payment.Order.BuyerId == buyerId)
@@ -246,14 +253,8 @@ public class OrderPaymentService : IOrderPaymentService
 
         foreach (var orderId in paidOrderIds)
         {
-            await _notificationService.CreateAndPushAsync(
-                buyerId,
-                "Payment successful",
-                "Your payment has been confirmed. View your order confirmation.",
-                NotificationType.Payment,
-                $"/Payment/Confirmation?orderId={orderId}",
-                NotificationReferenceTypes.PaymentSuccess,
-                orderId);
+            var order = orders.First(item => item.Id == orderId);
+            await NotifyPaymentSucceededAsync(order, "PayPal", cancellationToken);
         }
 
         var orderCount = await _orderService.CountPendingPaymentOrdersAsync(buyerId);
@@ -409,6 +410,9 @@ public async Task<string> TestProcessIpnAsync(
 
     var payments = await _dbContext.Payments
         .Include(x => x.Order)
+            .ThenInclude(order => order.Items)
+                .ThenInclude(item => item.Auction)
+                    .ThenInclude(auction => auction.Product)
         .Where(x => x.PayPalOrderId == payPalOrderId)
         .ToListAsync(cancellationToken);
 
@@ -478,6 +482,13 @@ public async Task<string> TestProcessIpnAsync(
             payment.Order.UpdatedAt = now;
         }
 
+        var paidOrders = payments.Select(payment => payment.Order).DistinctBy(order => order.Id).ToList();
+        await OrderCancellationHelper.MarkAuctionsCompletedAfterPaymentAsync(
+            _dbContext,
+            paidOrders,
+            now,
+            cancellationToken);
+
         /*
          * SaveChanges
          * lưu tất cả thay đổi xuống database
@@ -487,15 +498,7 @@ public async Task<string> TestProcessIpnAsync(
 
         foreach (var payment in payments)
         {
-            await _notificationService.CreateAndPushAsync(
-                payment.Order.BuyerId,
-                "Payment successful",
-                "Your payment has been confirmed. View your order confirmation.",
-                NotificationType.Payment,
-                $"/Payment/Confirmation?orderId={payment.OrderId}",
-                NotificationReferenceTypes.PaymentSuccess,
-                payment.OrderId,
-                cancellationToken: cancellationToken);
+            await NotifyPaymentSucceededAsync(payment.Order, "PayPal", cancellationToken);
         }
 
         var buyerIds = payments.Select(p => p.Order.BuyerId).Distinct();
@@ -547,6 +550,41 @@ public async Task<string> TestProcessIpnAsync(
 
     return $"Chưa xử lý status: {paymentStatus}";
 }
+    private async Task NotifyPaymentSucceededAsync(
+        AuctionOrder order,
+        string paymentMethod,
+        CancellationToken cancellationToken)
+    {
+        var item = order.Items.FirstOrDefault();
+        var productName = item?.ItemName ?? order.OrderReference;
+        var auction = item?.Auction;
+
+        await _notificationService.CreateAndPushAsync(
+            order.BuyerId,
+            _localizer["Notification_PaymentSuccess_Title"],
+            _localizer["Notification_PaymentSuccess_Message", paymentMethod, order.OrderReference],
+            NotificationType.Payment,
+            "/Order",
+            NotificationReferenceTypes.PaymentSuccess,
+            order.Id,
+            cancellationToken: cancellationToken);
+
+        if (auction?.Product is null)
+        {
+            return;
+        }
+
+        await _notificationService.CreateAndPushAsync(
+            auction.Product.SellerId,
+            _localizer["Notification_SellerPaymentReceived_Title"],
+            _localizer["Notification_SellerPaymentReceived_Message", productName, order.OrderReference, paymentMethod],
+            NotificationType.Payment,
+            $"/Admin/Auction/Details/{auction.Id}",
+            NotificationReferenceTypes.SellerPaymentReceived,
+            order.Id,
+            cancellationToken: cancellationToken);
+    }
+
     private static bool AmountsMatch(decimal expected, decimal actual) =>
         Math.Abs(expected - actual) < 0.01m;
 }

@@ -1293,4 +1293,15 @@
   <data name="AdminProduct.Validation.TemplateNameRequired" xml:space="preserve"><value>Please enter a template name.</value></data>
   <data name="AdminProduct.Validation.TemplateNameMaxLength" xml:space="preserve"><value>Template name cannot exceed 255 characters.</value></data>
   <data name="AdminProduct.Validation.CategoryRequired" xml:space="preserve"><value>Please select a category.</value></data>
+  <data name="Notification_AuctionWon_Title" xml:space="preserve"><value>You won the auction!</value></data>
+  <data name="Notification_AuctionWon_Message" xml:space="preserve"><value>Congratulations! You won {0}. Complete payment within 48 hours.</value></data>
+  <data name="Notification_SellerAwaitingPayment_Title" xml:space="preserve"><value>Item sold - awaiting payment</value></data>
+  <data name="Notification_SellerAwaitingPayment_Message" xml:space="preserve"><value>{0} has a winning buyer. Order {1} is awaiting payment.</value></data>
+  <data name="Notification_PaymentSuccess_Title" xml:space="preserve"><value>Payment successful</value></data>
+  <data name="Notification_PaymentSuccess_Message" xml:space="preserve"><value>{0} payment for order {1} has been confirmed.</value></data>
+  <data name="Notification_SellerPaymentReceived_Title" xml:space="preserve"><value>Payment received</value></data>
+  <data name="Notification_SellerPaymentReceived_Message" xml:space="preserve"><value>Payment for {0} on order {1} was confirmed via {2}.</value></data>
+  <data name="Notification_OrderCancelled_Title" xml:space="preserve"><value>Order cancelled</value></data>
+  <data name="Notification_OrderCancelledBuyer_Message" xml:space="preserve"><value>Order {1} for {0} was cancelled because the payment deadline passed.</value></data>
+  <data name="Notification_OrderCancelledSeller_Message" xml:space="preserve"><value>Order {1} for {0} was cancelled because the winner did not pay before the deadline.</value></data>
 </root>
