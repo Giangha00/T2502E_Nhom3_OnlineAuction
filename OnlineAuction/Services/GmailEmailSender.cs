@@ -111,16 +111,6 @@ public class GmailEmailSender : IEmailSender, IEmailVerificationService
             return true;
         }
 
-        if (_environment.IsDevelopment())
-        {
-            _logger.LogWarning(
-                "Email delivery unavailable. Development email to {Email}. Subject: {Subject}. Content: {Content}",
-                to,
-                subject,
-                html);
-            return true;
-        }
-
         _logger.LogError(
             "Email delivery failed for {Email}. Check Gmail OAuth refresh token or SMTP settings.",
             to);
@@ -132,17 +122,10 @@ public class GmailEmailSender : IEmailSender, IEmailVerificationService
 
     private bool HandleMissingSender(string to, string subject, string html)
     {
-        if (_environment.IsDevelopment())
-        {
-            _logger.LogWarning(
-                "Email sender config is missing. Development email to {Email}. Subject: {Subject}. Content: {Content}",
-                to,
-                subject,
-                html);
-            return true;
-        }
-
-        _logger.LogError("Email sender config is missing.");
+        _logger.LogError(
+            "Email sender config is missing. Cannot send to {Email}. Subject: {Subject}",
+            to,
+            subject);
         return false;
     }
 

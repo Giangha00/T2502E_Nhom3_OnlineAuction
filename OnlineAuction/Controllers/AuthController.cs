@@ -483,7 +483,7 @@ public class AuthController : Controller
                 if (resent)
                 {
                     TempData["AuthSuccess"] =
-                        "Email này đã đăng ký nhưng chưa kích hoạt. Chúng tôi đã gửi lại email kích hoạt.";
+                        "Email này đã đăng ký nhưng chưa kích hoạt. Chúng tôi đã gửi lại email kích hoạt. Vui lòng xác thực trước khi đăng nhập.";
                     return RedirectAfterAuthSuccess(model.ReturnUrl, "login");
                 }
 
@@ -532,7 +532,7 @@ public class AuthController : Controller
         }
 
         TempData["AuthSuccess"] =
-            "Đăng ký thành công. Vui lòng kiểm tra email để kích hoạt tài khoản.";
+            "Đăng ký thành công. Vui lòng kiểm tra email và xác thực tài khoản trước khi đăng nhập.";
         return RedirectAfterAuthSuccess(model.ReturnUrl, "login");
     }
 
@@ -725,11 +725,6 @@ public class AuthController : Controller
         if (string.IsNullOrWhiteSpace(confirmUrl))
         {
             return false;
-        }
-
-        if (_environment.IsDevelopment())
-        {
-            TempData["EmailConfirmationUrl"] = confirmUrl;
         }
 
         var locale = HttpContext.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name

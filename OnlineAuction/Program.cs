@@ -251,7 +251,11 @@ builder.Services.Configure<WinnerNonPaymentSettings>(
     builder.Configuration.GetSection(WinnerNonPaymentSettings.SectionName));
 
 builder.Services.AddHttpClient<IPayPalService, PayPalService>();
-builder.Services.AddHttpClient<GmailEmailSender>();
+builder.Services.AddHttpClient<GmailEmailSender>(client =>
+{
+    // Avoid ~100s hangs when Gmail OAuth/API is unreachable during signup / OTP.
+    client.Timeout = TimeSpan.FromSeconds(12);
+});
 builder.Services.AddScoped<IEmailSender>(sp => sp.GetRequiredService<GmailEmailSender>());
 builder.Services.AddScoped<IEmailVerificationService>(sp => sp.GetRequiredService<GmailEmailSender>());
 

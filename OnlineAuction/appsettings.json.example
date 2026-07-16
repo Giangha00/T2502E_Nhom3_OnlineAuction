@@ -15,7 +15,7 @@
     "RefreshTestAuctionsInDevelopment": true
   },
   "CloudinarySettings": {
-    "CloudName": "drzztxdrc",
+    "CloudName": "YOUR_CLOUDINARY_CLOUD_NAME",
     "ApiKey": "YOUR_CLOUDINARY_API_KEY",
     "ApiSecret": "YOUR_CLOUDINARY_API_SECRET"
   },

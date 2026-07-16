@@ -17,6 +17,8 @@ wwwroot/css/output.css
 # OS
 .DS_Store
 
-# App settings
+# App settings (keep templates)
 appsettings.json
 appsettings.*.json
+!appsettings.json.example
+!appsettings.Local.json.example

@@ -41,10 +41,13 @@ orleans.codegen.cs
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
-# App settings — commit base config; keep secrets/local overrides out of git
+# App settings — do not commit real config; use *.example templates
+**/appsettings.json
 **/appsettings.Local.json
 **/appsettings.*.local.json
 **/appsettings.Development.json
+!**/**/appsettings.json.example
+!**/**/appsettings.Local.json.example
 **/.env
 **/.env.*
 !**/.env.example
