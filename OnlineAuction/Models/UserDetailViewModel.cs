@@ -53,6 +53,12 @@ public class SellerStatisticsViewModel
 
     public int TotalSales { get; set; }
 
+    public decimal GrossSales { get; set; }
+
+    public decimal SellerFees { get; set; }
+
+    public decimal NetProceeds { get; set; }
+
     public double Rating { get; set; }
 }
 

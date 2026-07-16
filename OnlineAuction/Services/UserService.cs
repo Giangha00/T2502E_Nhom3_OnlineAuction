@@ -81,6 +81,31 @@ public class UserService : IUserService
                 auction.Product.SellerId == id &&
                 auction.Status == AuctionStatuses.Completed);
 
+        var paidOrderEarnings = await _dbContext.OrderItems
+            .AsNoTracking()
+            .Where(item =>
+                item.DeletedAt == null &&
+                item.Order.DeletedAt == null &&
+                item.Auction.Product.SellerId == id &&
+                (item.Order.Status == OrderStatuses.Paid || item.Order.Status == OrderStatuses.Delivered))
+            .Select(item => new
+            {
+                item.OrderId,
+                item.Order.Subtotal,
+                item.Order.SellerFee,
+                item.Order.SellerProceeds
+            })
+            .ToListAsync();
+
+        var uniquePaidOrders = paidOrderEarnings
+            .GroupBy(row => row.OrderId)
+            .Select(group => group.First())
+            .ToList();
+
+        var grossSales = uniquePaidOrders.Sum(row => row.Subtotal);
+        var sellerFees = uniquePaidOrders.Sum(row => row.SellerFee);
+        var netProceeds = uniquePaidOrders.Sum(row => row.SellerProceeds);
+
         var totalAuctionHistory = await _dbContext.Auctions
             .AsNoTracking()
             .CountAsync(auction =>
@@ -154,7 +179,10 @@ public class UserService : IUserService
                 TotalAuctions = totalAuctionHistory,
                 TotalBuyNowListings = buyNowListings.Count,
                 CompletedAuctions = completedAuctions,
-                TotalSales = completedAuctions,
+                TotalSales = uniquePaidOrders.Count,
+                GrossSales = grossSales,
+                SellerFees = sellerFees,
+                NetProceeds = netProceeds,
                 Rating = 0
             },
             Auctions = auctions,

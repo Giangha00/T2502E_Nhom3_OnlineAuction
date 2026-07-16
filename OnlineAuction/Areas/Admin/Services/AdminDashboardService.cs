@@ -124,6 +124,33 @@ public class AdminDashboardService : IAdminDashboardService
         return buyerCheckoutFees + sellerSuccessFees;
     }
 
+    public Task<decimal> SumBuyerCheckoutFeesAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default)
+    {
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+        return SumPaidOrderPlatformFeesAsync(rangeStart, rangeEndExclusive, cancellationToken);
+    }
+
+    public Task<decimal> SumSellerSuccessFeesAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default)
+    {
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+        return SumPaidOrderSellerFeesAsync(rangeStart, rangeEndExclusive, cancellationToken);
+    }
+
+    public Task<decimal> SumSellerProceedsAsync(
+        DashboardFilterViewModel filter,
+        CancellationToken cancellationToken = default)
+    {
+        var rangeStart = filter.DateFrom.Date;
+        var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
+        return SumPaidOrderSellerProceedsAsync(rangeStart, rangeEndExclusive, cancellationToken);
+    }
+
     public async Task<AdminDashboardViewModel> GetDashboardAsync(
         DashboardFilterViewModel filter,
         CancellationToken cancellationToken = default)
@@ -254,15 +281,32 @@ public class AdminDashboardService : IAdminDashboardService
             .Select(group => new { SellerId = group.Key, ListingCount = group.Count() })
             .ToListAsync(cancellationToken);
 
-        var salesTotals = await _dbContext.OrderItems.AsNoTracking()
+        var salesRows = await _dbContext.OrderItems.AsNoTracking()
             .Where(item => item.DeletedAt == null
                            && item.Order.DeletedAt == null
                            && PaidOrderStatuses.Contains(item.Order.Status)
                            && item.Order.CreatedAt >= rangeStart
                            && item.Order.CreatedAt < rangeEndExclusive)
-            .GroupBy(item => item.Auction.Product.SellerId)
-            .Select(group => new { SellerId = group.Key, TotalSales = group.Sum(item => item.WinningBid) })
+            .Select(item => new
+            {
+                SellerId = item.Auction.Product.SellerId,
+                item.OrderId,
+                item.Order.SellerProceeds,
+                item.WinningBid
+            })
             .ToListAsync(cancellationToken);
+
+        var salesTotals = salesRows
+            .GroupBy(item => item.SellerId)
+            .Select(group => new
+            {
+                SellerId = group.Key,
+                TotalSales = group
+                    .GroupBy(row => row.OrderId)
+                    .Sum(orderGroup => orderGroup.First().SellerProceeds),
+                GrossSales = group.Sum(row => row.WinningBid)
+            })
+            .ToList();
 
         var sellerIds = listingCounts.Select(item => item.SellerId)
             .Union(salesTotals.Select(item => item.SellerId))
@@ -281,6 +325,7 @@ public class AdminDashboardService : IAdminDashboardService
 
         var listingLookup = listingCounts.ToDictionary(item => item.SellerId, item => item.ListingCount);
         var salesLookup = salesTotals.ToDictionary(item => item.SellerId, item => item.TotalSales);
+        var grossLookup = salesTotals.ToDictionary(item => item.SellerId, item => item.GrossSales);
 
         return sellerIds
             .Select(sellerId => new DashboardTopUserViewModel
@@ -288,7 +333,8 @@ public class AdminDashboardService : IAdminDashboardService
                 UserId = sellerId,
                 FullName = sellerNames.GetValueOrDefault(sellerId, "Unknown"),
                 ListingCount = listingLookup.GetValueOrDefault(sellerId),
-                TotalSales = salesLookup.GetValueOrDefault(sellerId)
+                TotalSales = salesLookup.GetValueOrDefault(sellerId),
+                GrossSales = grossLookup.GetValueOrDefault(sellerId)
             })
             .OrderByDescending(item => item.TotalSales)
             .ThenByDescending(item => item.ListingCount)
@@ -454,6 +500,12 @@ public class AdminDashboardService : IAdminDashboardService
         revenueSheet.Cell(2, 2).Value = dashboard.RevenueSection.GmvKpi.DisplayValue;
         revenueSheet.Cell(3, 1).Value = "Commission";
         revenueSheet.Cell(3, 2).Value = dashboard.RevenueSection.CommissionKpi.DisplayValue;
+        revenueSheet.Cell(4, 1).Value = "BuyerCheckoutFee";
+        revenueSheet.Cell(4, 2).Value = dashboard.RevenueSection.BuyerFeeKpi.DisplayValue;
+        revenueSheet.Cell(5, 1).Value = "SellerSuccessFee";
+        revenueSheet.Cell(5, 2).Value = dashboard.RevenueSection.SellerFeeKpi.DisplayValue;
+        revenueSheet.Cell(6, 1).Value = "SellerProceeds";
+        revenueSheet.Cell(6, 2).Value = dashboard.RevenueSection.SellerProceedsKpi.DisplayValue;
 
         var auctionsSheet = workbook.Worksheets.Add("Auctions");
         auctionsSheet.Cell(1, 1).Value = "Metric";
@@ -549,6 +601,15 @@ public class AdminDashboardService : IAdminDashboardService
         var commissionCurrent = await SumCommissionAsync(filter, cancellationToken);
         var commissionPrevious = await SumCommissionAsync(previousRange, cancellationToken);
 
+        var buyerFeeCurrent = await SumBuyerCheckoutFeesAsync(filter, cancellationToken);
+        var buyerFeePrevious = await SumBuyerCheckoutFeesAsync(previousRange, cancellationToken);
+
+        var sellerFeeCurrent = await SumSellerSuccessFeesAsync(filter, cancellationToken);
+        var sellerFeePrevious = await SumSellerSuccessFeesAsync(previousRange, cancellationToken);
+
+        var sellerProceedsCurrent = await SumSellerProceedsAsync(filter, cancellationToken);
+        var sellerProceedsPrevious = await SumSellerProceedsAsync(previousRange, cancellationToken);
+
         return new DashboardRevenueSectionViewModel
         {
             GmvKpi = BuildKpiCard(
@@ -562,7 +623,25 @@ public class AdminDashboardService : IAdminDashboardService
                 FormatCurrency(commissionCurrent),
                 commissionCurrent,
                 commissionPrevious,
-                cardKey: DashboardRevenueCardKeys.Commission)
+                cardKey: DashboardRevenueCardKeys.Commission),
+            BuyerFeeKpi = BuildKpiCard(
+                "BuyerFee",
+                FormatCurrency(buyerFeeCurrent),
+                buyerFeeCurrent,
+                buyerFeePrevious,
+                cardKey: DashboardRevenueCardKeys.BuyerFee),
+            SellerFeeKpi = BuildKpiCard(
+                "SellerFee",
+                FormatCurrency(sellerFeeCurrent),
+                sellerFeeCurrent,
+                sellerFeePrevious,
+                cardKey: DashboardRevenueCardKeys.SellerFee),
+            SellerProceedsKpi = BuildKpiCard(
+                "SellerProceeds",
+                FormatCurrency(sellerProceedsCurrent),
+                sellerProceedsCurrent,
+                sellerProceedsPrevious,
+                cardKey: DashboardRevenueCardKeys.SellerProceeds)
         };
     }
 
@@ -592,6 +671,20 @@ public class AdminDashboardService : IAdminDashboardService
                               && payment.PaidAt < endExclusive
                               && PaidOrderStatuses.Contains(payment.Order.Status))
             .SumAsync(payment => payment.Order.SellerFee, cancellationToken);
+    }
+
+    private async Task<decimal> SumPaidOrderSellerProceedsAsync(
+        DateTime startInclusive,
+        DateTime endExclusive,
+        CancellationToken cancellationToken)
+    {
+        return await _dbContext.Payments.AsNoTracking()
+            .Where(payment => payment.DeletedAt == null
+                              && payment.Status == PaymentStatuses.Success
+                              && payment.PaidAt >= startInclusive
+                              && payment.PaidAt < endExclusive
+                              && PaidOrderStatuses.Contains(payment.Order.Status))
+            .SumAsync(payment => payment.Order.SellerProceeds, cancellationToken);
     }
 
     private async Task<List<DateTime>> GetRegistrationDatesAsync(

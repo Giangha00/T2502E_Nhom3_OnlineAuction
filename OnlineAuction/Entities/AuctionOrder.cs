@@ -19,9 +19,12 @@ public class AuctionOrder : AuditableEntity
     public decimal PlatformFee { get; set; }
 
     public decimal SellerFee { get; set; }
-    // Số tiền cọc của winner được trừ vào order.
-    // Ví dụ winning bid = 500, deposit = 50
-    // thì order sẽ lưu DepositApplied = 50.
+
+    /// <summary>
+    /// Phase 1 ledger: Subtotal − SellerFee when paid. Not a PayPal payout.
+    /// </summary>
+    public decimal SellerProceeds { get; set; }
+
     public decimal DepositApplied { get; set; }
 
     public string Status { get; set; } = OrderStatuses.PendingPayment;

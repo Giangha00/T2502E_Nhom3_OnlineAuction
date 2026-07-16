@@ -211,7 +211,18 @@ public class OrderService : IOrderService
             foreach (var order in checkoutOrders)
             {
                 order.Status = OrderStatuses.Paid;
-                order.SellerFee = MarketplaceFeeCalculator.CalculateSellerSuccessFee(order.Subtotal, _feeSettings);
+                MarketplaceFeeCalculator.ApplySellerSettlement(order, _feeSettings);
+
+                _dbContext.Payments.Add(new Payment
+                {
+                    OrderId = order.Id,
+                    Amount = order.TotalAmount,
+                    Status = PaymentStatuses.Success,
+                    TransactionId = $"COD-{order.OrderReference}",
+                    PaidAt = now,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                });
             }
 
             await OrderCancellationHelper.MarkAuctionsCompletedAfterPaymentAsync(

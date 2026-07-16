@@ -538,6 +538,13 @@ namespace OnlineAuction.Migrations
                         .HasDefaultValue(0m)
                         .HasColumnName("seller_fee");
 
+                    b.Property<decimal>("SellerProceeds")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m)
+                        .HasColumnName("seller_proceeds");
+
                     b.Property<string>("ShippingAddress")
                         .HasMaxLength(300)
                         .HasColumnType("varchar(300)")
