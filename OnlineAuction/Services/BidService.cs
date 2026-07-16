@@ -114,6 +114,40 @@ public class BidService : IBidService
             return Fail(registrationError);
         }
 
+        var previousPrice = auction.CurrentPrice;
+        var ipAddress = GetClientIpAddress();
+
+        try
+        {
+            var fraudGate = await _fraudDetectionService.EvaluatePreBidAsync(
+                auctionId,
+                bidderId,
+                amount,
+                previousPrice,
+                ipAddress);
+
+            if (!fraudGate.IsAllowed)
+            {
+                _logger.LogWarning(
+                    "Bid rejected by fraud gate for auction {AuctionId}, user {UserId}, alert {AlertType}, shadowBan={ShadowBan}.",
+                    auctionId,
+                    bidderId,
+                    fraudGate.TriggeredAlertType,
+                    fraudGate.AppliedShadowBan);
+                return Fail(
+                    fraudGate.BlockMessage ?? "Your bid was rejected by fraud protection.",
+                    403);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Pre-bid fraud detection failed for auction {AuctionId}, user {UserId}. Allowing bid to proceed.",
+                auctionId,
+                bidderId);
+        }
+
         var previousWinningBids = await _dbContext.Bids
             .Where(b => b.AuctionId == auctionId && b.IsWinning)
             .ToListAsync();
@@ -129,7 +163,6 @@ public class BidService : IBidService
             previousBid.IsWinning = false;
         }
 
-        var previousPrice = auction.CurrentPrice;
         var placedAt = DateTime.UtcNow;
         var newBid = new Bid
         {
@@ -140,7 +173,7 @@ public class BidService : IBidService
             IsWinning = true,
             PlacedAt = placedAt,
             CreatedAt = placedAt,
-            IpAddress = GetClientIpAddress(),
+            IpAddress = ipAddress,
             UserAgent = GetUserAgent()
         };
 
@@ -163,7 +196,7 @@ public class BidService : IBidService
 
         try
         {
-            await _fraudDetectionService.EvaluateAsync(auctionId, newBid.Id, bidderId, previousPrice);
+            await _fraudDetectionService.EvaluatePostBidAsync(auctionId, newBid.Id, bidderId, previousPrice);
         }
         catch (Exception ex)
         {
