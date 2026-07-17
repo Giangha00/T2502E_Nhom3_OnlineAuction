@@ -275,6 +275,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderCreationService, OrderCreationService>();
 builder.Services.AddScoped<IWinnerNonPaymentRecoveryService, WinnerNonPaymentRecoveryService>();
 builder.Services.AddScoped<IOrderPaymentService, OrderPaymentService>();
+builder.Services.AddScoped<IPayPalCaptureGuardService, PayPalCaptureGuardService>();
 builder.Services.AddHostedService<AuctionFinalizationWorker>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IRefundComplaintService, RefundComplaintService>();
