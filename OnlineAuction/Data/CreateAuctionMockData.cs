@@ -1,9 +1,10 @@
 namespace OnlineAuction.Data;
 
+/// <summary>
+/// Static option lists for sell forms (not product listings).
+/// </summary>
 public static class CreateAuctionMockData
 {
-    public static IReadOnlyList<string> Categories => MockAuctionData.GetCategoryNames();
-
     public static readonly IReadOnlyList<string> AuctionTypes =
     [
         "Normal",

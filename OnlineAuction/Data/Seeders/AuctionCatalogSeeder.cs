@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
@@ -15,7 +16,9 @@ public static class AuctionCatalogSeeder
         "RareCard Vault Daily Auctions"
     ];
 
-    private const int SeededAuctionDurationDays = 7;
+    private const string OnePieceSellerEmail = "nguyen.hai@auctionhouse.local";
+    private const string YugiohSellerEmail = "nguyen.ha@auctionhouse.local";
+    private const string DemoPassword = "User@123";
 
     private static bool IsExpiredSeededListing(Auction auction, DateTime now) =>
         auction.EndDate <= now
@@ -23,22 +26,33 @@ public static class AuctionCatalogSeeder
             or AuctionStatuses.AwaitingPayment
             or AuctionStatuses.Completed;
 
-    public static async Task SeedAsync(AuctionHouseDbContext dbContext, bool refreshInDevelopment = false)
+    public static async Task SeedAsync(
+        AuctionHouseDbContext dbContext,
+        UserManager<ApplicationUser> userManager,
+        bool refreshInDevelopment = false)
     {
         if (refreshInDevelopment)
         {
             await ClearSeededAuctionsAsync(dbContext);
         }
 
-        var seller = await dbContext.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Email == "user1@auctionhouse.local" && u.Status == UserStatus.Active);
+        var onePieceSeller = await EnsureSellerAsync(
+            userManager,
+            OnePieceSellerEmail,
+            "nguyen.hai",
+            "Nguyễn Hải");
+
+        var yugiohSeller = await EnsureSellerAsync(
+            userManager,
+            YugiohSellerEmail,
+            "nguyen.ha",
+            "Nguyễn Hà");
 
         var bidder = await dbContext.Users
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Email == "user3@auctionhouse.local" && u.Status == UserStatus.Active);
 
-        if (seller is null)
+        if (onePieceSeller is null || yugiohSeller is null)
         {
             return;
         }
@@ -55,18 +69,104 @@ public static class AuctionCatalogSeeder
                 continue;
             }
 
-            await SeedEntryAsync(dbContext, entry, seller.Id, bidder?.Id, categoryCache, now, seedIndex);
+            var sellerId = ResolveSellerId(entry.CategoryName, onePieceSeller.Id, yugiohSeller.Id);
+            await SeedEntryAsync(dbContext, entry, sellerId, bidder?.Id, categoryCache, now, seedIndex);
             existingProductNames.Add(entry.Name);
             seedIndex++;
         }
 
         await BackfillBuyNowPricesAsync(dbContext);
         await EnsureFullFlowDemoScheduleAsync(dbContext, DateTime.UtcNow);
+        await DeactivateUnusedSeedCategoriesAsync(dbContext);
 
         if (!refreshInDevelopment)
         {
             await ReactivateExpiredSeededListingsAsync(dbContext, now);
         }
+    }
+
+    private static async Task DeactivateUnusedSeedCategoriesAsync(AuctionHouseDbContext dbContext)
+    {
+        var keep = new[] { "One Piece", "Yu-Gi-Oh!" };
+        var extras = await dbContext.Categories
+            .Where(category => category.IsActive && !keep.Contains(category.Name))
+            .ToListAsync();
+
+        if (extras.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var category in extras)
+        {
+            category.IsActive = false;
+            category.UpdatedAt = DateTime.UtcNow;
+        }
+
+        await dbContext.SaveChangesAsync();
+    }
+
+    private static int ResolveSellerId(string categoryName, int onePieceSellerId, int yugiohSellerId) =>
+        categoryName.Equals("Yu-Gi-Oh!", StringComparison.OrdinalIgnoreCase)
+            ? yugiohSellerId
+            : onePieceSellerId;
+
+    private static async Task<ApplicationUser?> EnsureSellerAsync(
+        UserManager<ApplicationUser> userManager,
+        string email,
+        string userName,
+        string fullName)
+    {
+        var user = await userManager.FindByEmailAsync(email);
+        if (user is null)
+        {
+            user = new ApplicationUser
+            {
+                UserName = userName,
+                Email = email,
+                FullName = fullName,
+                PhoneNumber = "0900000000",
+                Role = UserRole.User,
+                Status = UserStatus.Active,
+                EmailConfirmed = true,
+                AvatarUrl = "/admin/images/user/user-01.jpg",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var result = await userManager.CreateAsync(user, DemoPassword);
+            if (!result.Succeeded)
+            {
+                return null;
+            }
+
+            return user;
+        }
+
+        var needsUpdate = false;
+        if (!string.Equals(user.FullName, fullName, StringComparison.Ordinal))
+        {
+            user.FullName = fullName;
+            needsUpdate = true;
+        }
+
+        if (user.Status != UserStatus.Active)
+        {
+            user.Status = UserStatus.Active;
+            needsUpdate = true;
+        }
+
+        if (!user.EmailConfirmed)
+        {
+            user.EmailConfirmed = true;
+            needsUpdate = true;
+        }
+
+        if (needsUpdate)
+        {
+            await userManager.UpdateAsync(user);
+        }
+
+        return user;
     }
 
     private static async Task<HashSet<string>> GetExistingSeededProductNamesAsync(AuctionHouseDbContext dbContext)
@@ -118,6 +218,41 @@ public static class AuctionCatalogSeeder
         };
 
         dbContext.Products.Add(product);
+        await dbContext.SaveChangesAsync();
+
+        var gallery = new List<ProductImage>
+        {
+            new()
+            {
+                ProductId = product.Id,
+                ImageUrl = entry.PrimaryImage,
+                SortOrder = 0,
+                CreatedAt = now
+            }
+        };
+
+        if (entry.GalleryImages is { Count: > 0 })
+        {
+            var sort = 1;
+            foreach (var url in entry.GalleryImages)
+            {
+                if (string.IsNullOrWhiteSpace(url) ||
+                    url.Equals(entry.PrimaryImage, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                gallery.Add(new ProductImage
+                {
+                    ProductId = product.Id,
+                    ImageUrl = url,
+                    SortOrder = sort++,
+                    CreatedAt = now
+                });
+            }
+        }
+
+        dbContext.ProductImages.AddRange(gallery);
         await dbContext.SaveChangesAsync();
 
         var auction = new Auction
@@ -367,7 +502,7 @@ public static class AuctionCatalogSeeder
                 Name = categoryName,
                 Slug = slug,
                 IsActive = true,
-                SortOrder = 0,
+                SortOrder = categoryName.Equals("One Piece", StringComparison.OrdinalIgnoreCase) ? 1 : 2,
                 CreatedAt = DateTime.UtcNow
             };
 

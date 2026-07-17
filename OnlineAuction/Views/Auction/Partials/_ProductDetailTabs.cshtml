@@ -3,7 +3,6 @@
 <section class="product-detail-tabs mt-10">
   <div class="product-detail-tabs__nav" role="tablist">
     <button type="button" class="product-detail-tabs__tab is-active" role="tab" aria-selected="true" data-tab="about">@Localizer["Product_AboutTheWork"]</button>
-    <button type="button" class="product-detail-tabs__tab" role="tab" aria-selected="false" data-tab="grading">@Localizer["Product_Grading"]</button>
     <button type="button" class="product-detail-tabs__tab" role="tab" aria-selected="false" data-tab="certificates">@Localizer["Product_Certificates_Tab"]</button>
     <button type="button" class="product-detail-tabs__tab" role="tab" aria-selected="false" data-tab="bids">@Localizer["Product_BidHistory"]</button>
     <button type="button" class="product-detail-tabs__tab" role="tab" aria-selected="false" data-tab="shipping">@Localizer["Product_Shipping"]</button>
@@ -31,10 +30,6 @@
         <p class="mt-1 text-sm font-medium text-slate-900">@Model.CardNumber</p>
       </div>
     </div>
-  </div>
-
-  <div class="product-detail-tabs__panel" role="tabpanel" data-panel="grading" hidden>
-    @await Html.PartialAsync("Partials/_GradingSection", Model)
   </div>
 
   <div class="product-detail-tabs__panel" role="tabpanel" data-panel="certificates" hidden>

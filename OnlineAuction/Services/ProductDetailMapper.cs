@@ -297,7 +297,7 @@ internal static class ProductDetailMapper
             {
                 Name = group.Key,
                 ItemCount = group.Count(),
-                ImageUrl = MockAuctionData.GetCategoryImageUrl(group.Key),
+                ImageUrl = CategoryImages.GetImageUrl(group.Key),
                 DisplayCount = $"{group.Count()} Items"
             })
             .ToList();

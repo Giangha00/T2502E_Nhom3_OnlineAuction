@@ -70,13 +70,13 @@ public class AuctionService : IAuctionService
 
         return new HomeViewModel
         {
-            Recommended = WithFallback(recommended, MockAuctionData.GetRecommended),
-            TrendingOnAuction = WithFallback(trendingOnAuction, MockAuctionData.GetTrendingOnAuction),
+            Recommended = recommended,
+            TrendingOnAuction = trendingOnAuction,
             TrendingOnBuyNow = trendingOnBuyNow,
-            RecentlyAdded = WithFallback(recentlyAdded, MockAuctionData.GetRecentlyAdded),
-            BestSellers = WithFallback(bestSellers, MockAuctionData.GetBestSellers),
-            Categories = categories.Count > 0 ? categories : MockAuctionData.GetCategories(),
-            VaultPosts = MockAuctionData.GetVaultPosts()
+            RecentlyAdded = recentlyAdded,
+            BestSellers = bestSellers,
+            Categories = categories,
+            VaultPosts = []
         };
     }
 
@@ -330,9 +330,6 @@ public class AuctionService : IAuctionService
         int count) =>
         source.Take(count).ToList();
 
-    private static List<T> WithFallback<T>(List<T> primary, Func<List<T>> fallback) =>
-        primary.Count > 0 ? primary : fallback();
-
     private async Task<List<CategoryViewModel>> BuildAuctionCategoriesAsync(
         IReadOnlyList<AuctionItemViewModel> auctions)
     {
@@ -358,7 +355,7 @@ public class AuctionService : IAuctionService
             {
                 Name = name,
                 ItemCount = countsByName.GetValueOrDefault(name, 0),
-                ImageUrl = MockAuctionData.GetCategoryImageUrl(name),
+                ImageUrl = CategoryImages.GetImageUrl(name),
                 DisplayCount = countsByName.TryGetValue(name, out var count)
                     ? $"{count} Items"
                     : "0 Items"
