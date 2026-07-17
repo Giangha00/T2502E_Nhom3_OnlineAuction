@@ -249,6 +249,8 @@ builder.Services.Configure<PlatformFeeSettings>(
     builder.Configuration.GetSection(PlatformFeeSettings.SectionName));
 builder.Services.Configure<WinnerNonPaymentSettings>(
     builder.Configuration.GetSection(WinnerNonPaymentSettings.SectionName));
+builder.Services.Configure<SmokeTestingSettings>(
+    builder.Configuration.GetSection(SmokeTestingSettings.SectionName));
 
 builder.Services.AddHttpClient<IPayPalService, PayPalService>();
 builder.Services.AddHttpClient<GmailEmailSender>(client =>

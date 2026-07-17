@@ -45,6 +45,9 @@
     "VerifiedSessionMinutes": 15,
     "UseMockOtpSender": false
   },
+  "SmokeTesting": {
+    "Enabled": false
+  },
   "BidFraudDetection": {
     "Enabled": true,
     "RateLimitingEnabled": true,
