@@ -207,17 +207,17 @@ else if (variant == "related")
 }
 else
 {
-    <article class="rarecard-card rarecard-card--grid group @(Model.EnableFiltering ? "auction-card" : "")" @Html.Raw(filterAttrs)>
-        <div class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:shadow-lg">
+    <article class="rarecard-card rarecard-card--grid group h-full @(Model.EnableFiltering ? "auction-card" : "")" @Html.Raw(filterAttrs)>
+        <div class="rarecard-card__shell overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:shadow-lg">
             <a asp-controller="@(isWon ? "Order" : isBuyNow ? "BuyNow" : "Auction")"
                asp-action="@(isWon ? "Index" : "Detail")"
                asp-route-id="@(isWon ? null : item.Id)"
-               class="block">
-                <div class="relative flex h-44 items-center justify-center bg-stone-50 sm:h-48">
-                    <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" class="max-h-full max-w-full object-contain p-2 transition duration-500 group-hover:scale-[1.02]"/>
+               class="flex flex-1 flex-col">
+                <div class="rarecard-card__image-wrap relative bg-stone-50">
+                    <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" class="rarecard-card__image object-contain transition duration-500 group-hover:scale-[1.03]"/>
                     @if (!isBuyNow && !string.IsNullOrWhiteSpace(item.ListingPhase))
                     {
-                        <span class="absolute left-3 top-3 max-w-[calc(100%-1.5rem)] rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide shadow @phaseBadgeClass">
+                        <span class="absolute left-3 top-3 max-w-[calc(100%-3.5rem)] rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide shadow @phaseBadgeClass">
                             @Localizer[phaseLabelKey]
                         </span>
                     }
@@ -227,7 +227,7 @@ else
                     }
                     else if (!string.IsNullOrEmpty(item.Grade))
                     {
-                        <span class="absolute @(isBuyNow ? "left-3 top-3" : "right-3 top-3") rounded-md bg-slate-900 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">@item.Grade</span>
+                        <span class="absolute left-3 top-3 rounded-md bg-slate-900 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">@item.Grade</span>
                     }
                     @if (Model.ShowWatchlistButton)
                     {
@@ -237,20 +237,17 @@ else
                                 data-watched="@(Model.IsWatched ? "true" : "false")"
                                 aria-pressed="@(Model.IsWatched ? "true" : "false")"
                                 aria-label="@(Model.IsWatched ? "Remove from watchlist" : "Add to watchlist")"
-                                class="watchlist-btn absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 shadow transition @(Model.IsWatched ? "text-red-500" : "text-stone-400 hover:text-red-500")">
+                                class="watchlist-btn absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 bg-white/95 shadow-sm transition @(Model.IsWatched ? "text-red-500" : "text-stone-400 hover:text-red-500")">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="@(Model.IsWatched ? "currentColor" : "none")" stroke="currentColor" stroke-width="2">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                             </svg>
                         </button>
                     }
                 </div>
-                <div class="p-3 sm:p-4">
+                <div class="rarecard-card__body flex flex-1 flex-col p-3 sm:p-4">
                     <p class="text-[10px] font-bold uppercase tracking-wide text-blue-700">@item.Category</p>
-                    <h3 class="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-stone-900">@item.Name</h3>
-                    @if (!string.IsNullOrEmpty(item.Subtitle))
-                    {
-                        <p class="mt-1 line-clamp-1 text-xs text-stone-500">@item.Subtitle</p>
-                    }
+                    <h3 class="mt-1 line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-snug text-stone-900">@item.Name</h3>
+                    <p class="mt-1 line-clamp-1 min-h-[1.125rem] text-xs text-stone-500">@(string.IsNullOrEmpty(item.Subtitle) ? "\u00a0" : item.Subtitle)</p>
                     @if (Model.ShowProductMeta && (!string.IsNullOrEmpty(item.Grade) || !string.IsNullOrEmpty(item.Condition) || item.Year > 0))
                     {
                         <div class="mt-2 flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-semibold uppercase tracking-wide text-stone-500">
@@ -268,7 +265,7 @@ else
                             }
                         </div>
                     }
-                    <div class="mt-4 flex items-end justify-between gap-2 border-t border-stone-100 pt-3">
+                    <div class="rarecard-card__price-row mt-auto flex items-end justify-between gap-2 border-t border-stone-100 pt-3">
                         <div>
                             <p class="text-[10px] font-semibold uppercase tracking-wider text-stone-400">@Localizer[priceLabelKey]</p>
                             <p class="text-xl font-bold tabular-nums text-blue-700">$@item.CurrentPrice.ToString("N0")</p>
@@ -291,15 +288,17 @@ else
             {
                 @if (isWon)
                 {
-                    <a asp-controller="Order" asp-action="Index" class="block px-4 pb-4">
-                        <span class="mt-4 block w-full rounded-full bg-emerald-600 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-white">@Localizer["Card_CompletePayment"]</span>
+                    <div class="rarecard-card__actions px-4 pb-4">
+                    <a asp-controller="Order" asp-action="Index" class="block">
+                        <span class="block w-full rounded-full bg-emerald-600 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-white">@Localizer["Card_CompletePayment"]</span>
                     </a>
+                    </div>
                 }
                 else if (isBuyNow)
                 {
-                    <div class="px-4 pb-4">
+                    <div class="rarecard-card__actions px-4 pb-4">
                         <button type="button"
-                                class="buy-now-add-to-cart mt-4 block w-full rounded-full bg-blue-700 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-blue-800"
+                                class="buy-now-add-to-cart block w-full rounded-full bg-blue-700 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-blue-800"
                                 data-auction-id="@item.Id"
                                 data-is-logged-in="@(isLoggedIn ? "true" : "false")"
                                 data-label="@actionLabel"
@@ -310,11 +309,13 @@ else
                 }
                 else
                 {
-                    <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id" class="block px-4 pb-4">
-                        <span class="mt-4 block w-full rounded-full bg-blue-700 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-white transition group-hover:bg-blue-800">
+                    <div class="rarecard-card__actions px-4 pb-4">
+                    <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id" class="block">
+                        <span class="block w-full rounded-full bg-blue-700 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-white transition group-hover:bg-blue-800">
                             @actionLabel
                         </span>
                     </a>
+                    </div>
                 }
             }
         </div>
