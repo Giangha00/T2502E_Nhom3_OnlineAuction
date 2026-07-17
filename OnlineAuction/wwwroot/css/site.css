@@ -503,7 +503,8 @@ footer .footer-link--active:visited {
 }
 
 .rarecard-home-row__item {
-  flex: 0 0 212px;
+  flex: 0 0 200px;
+  display: flex;
   scroll-snap-align: start;
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
@@ -512,13 +513,13 @@ footer .footer-link--active:visited {
 
 @media (min-width: 640px) {
   .rarecard-home-row__item {
-    flex-basis: 240px;
+    flex-basis: 220px;
   }
 }
 
 @media (min-width: 1024px) {
   .rarecard-home-row__item {
-    flex-basis: 260px;
+    flex-basis: 236px;
   }
 }
 
@@ -615,19 +616,20 @@ footer .footer-link--active:visited {
 }
 
 .rarecard-recommended-row__item {
-  flex: 0 0 220px;
+  flex: 0 0 200px;
+  display: flex;
   scroll-snap-align: start;
 }
 
 @media (min-width: 640px) {
   .rarecard-recommended-row__item {
-    flex-basis: 248px;
+    flex-basis: 220px;
   }
 }
 
 @media (min-width: 1024px) {
   .rarecard-recommended-row__item {
-    flex-basis: 272px;
+    flex-basis: 236px;
   }
 }
 
@@ -668,65 +670,17 @@ footer .footer-link--active:visited {
   height: 100%;
 }
 
-.recommended-deal-card__image-wrap {
-  display: flex;
-  aspect-ratio: 4 / 5;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-radius: 0.75rem;
-  border: 1px solid #e7e5e4;
-  background: #f5f5f4;
-  padding: 1rem;
-}
-
-.recommended-deal-card__image {
-  max-height: 100%;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 8px 18px rgba(15, 23, 42, 0.12));
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.recommended-deal-card:hover .recommended-deal-card__image {
-  transform: scale(1.03);
-}
-
-.recommended-deal-card__body {
-  padding: 0.85rem 0.15rem 0.25rem;
-}
-
-.recommended-deal-card__title {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  min-height: 2.6rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  line-height: 1.3;
-  color: #0f172a;
-}
-
-.recommended-deal-card__footer {
-  margin-top: 0.85rem;
-}
-
-.recommended-deal-card__price {
-  font-size: 1.35rem;
-  font-weight: 700;
-  line-height: 1.1;
-  color: #0f172a;
-  font-variant-numeric: tabular-nums;
-}
-
 .recommended-deal-card__meta {
-  margin-top: 0.55rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.35rem;
+}
+
+.recommended-deal-card__note {
+  font-size: 0.68rem;
+  line-height: 1.25;
+  color: #64748b;
 }
 
 .deal-badge {
@@ -753,12 +707,6 @@ footer .footer-link--active:visited {
 .deal-badge--fair {
   background: #ffedd5;
   color: #c2410c;
-}
-
-.recommended-deal-card__note {
-  font-size: 0.72rem;
-  line-height: 1.25;
-  color: #64748b;
 }
 
 .home-carousel-btn--prev {
@@ -861,6 +809,56 @@ footer .footer-link--active:visited {
 
   .rarecard-card--grid .rarecard-card__image-wrap {
     padding: 1.2rem 1.35rem;
+  }
+}
+
+/* Home carousel cards — same frame style as listing grid, compact size */
+.rarecard-card--home {
+  height: 100%;
+}
+
+.rarecard-card--home .rarecard-card__shell {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.rarecard-card--home .rarecard-card__image-wrap {
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  padding: 0.75rem 0.9rem;
+  background: #fafaf9;
+  overflow: hidden;
+}
+
+.rarecard-card--home .rarecard-card__image {
+  max-height: 78%;
+  max-width: 78%;
+  width: auto;
+  height: auto;
+  filter: drop-shadow(0 10px 22px rgba(15, 23, 42, 0.1));
+}
+
+.rarecard-card--home .rarecard-card__body {
+  flex: 1 1 auto;
+}
+
+.rarecard-card--home .rarecard-card__actions {
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .rarecard-card--home .rarecard-card__image-wrap {
+    padding: 0.8rem 0.95rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .rarecard-card--home .rarecard-card__image-wrap {
+    padding: 0.85rem 1rem;
   }
 }
 
@@ -1781,11 +1779,11 @@ body.home-auth-open {
   }
 }
 
-.product-detail-related .recommended-deal-card__image-wrap {
+.product-detail-related .rarecard-card__image-wrap {
   padding: 0.8rem;
 }
 
-.product-detail-related .recommended-deal-card__body {
+.product-detail-related .rarecard-card__body {
   padding: 0.75rem 0.15rem 0.2rem;
 }
 

@@ -78,6 +78,8 @@ public class SellerViewModel
 {
     public int Id { get; set; }
     public string Username { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
+    public string DisplayName => string.IsNullOrWhiteSpace(FullName) ? Username : FullName;
     public string AvatarUrl { get; set; } = string.Empty;
     public int AuctionCount { get; set; }
     public int SuccessfulSales { get; set; }

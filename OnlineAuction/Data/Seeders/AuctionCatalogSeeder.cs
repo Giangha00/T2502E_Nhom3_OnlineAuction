@@ -20,6 +20,16 @@ public static class AuctionCatalogSeeder
     private const string YugiohSellerEmail = "nguyen.ha@auctionhouse.local";
     private const string DemoPassword = "User@123";
 
+    private static readonly (string Email, string UserName, string FullName, string AvatarUrl)[] BestSellerProfiles =
+    [
+        ("giangha@auctionhouse.local", "giangha", "Nguyễn Giang Hà", "/admin/images/user/user-01.jpg"),
+        ("nguyen.hai@auctionhouse.local", "nguyen.hai", "Đinh Văn Hải", "/admin/images/user/user-02.jpg"),
+        ("viet.anh@auctionhouse.local", "viet.anh", "Phạm Việt Anh", "/admin/images/user/user-03.jpg"),
+        ("dan.long@auctionhouse.local", "dan.long", "Cậu Đan Long", "/admin/images/user/user-04.jpg"),
+        ("huu.quan@auctionhouse.local", "huu.quan", "Nguyễn Hữu Quân", "/admin/images/user/user-05.jpg"),
+        ("van.hung@auctionhouse.local", "van.hung", "Nguyễn Văn Hưng", "/admin/images/user/user-06.jpg")
+    ];
+
     private static bool IsExpiredSeededListing(Auction auction, DateTime now) =>
         auction.EndDate <= now
         || auction.Status is AuctionStatuses.Ended
@@ -36,11 +46,9 @@ public static class AuctionCatalogSeeder
             await ClearSeededAuctionsAsync(dbContext);
         }
 
-        var onePieceSeller = await EnsureSellerAsync(
-            userManager,
-            OnePieceSellerEmail,
-            "nguyen.hai",
-            "Nguyễn Hải");
+        await EnsureBestSellersAsync(userManager);
+
+        var onePieceSeller = await userManager.FindByEmailAsync(OnePieceSellerEmail);
 
         var yugiohSeller = await EnsureSellerAsync(
             userManager,
@@ -111,13 +119,33 @@ public static class AuctionCatalogSeeder
             ? yugiohSellerId
             : onePieceSellerId;
 
+    private static async Task EnsureBestSellersAsync(UserManager<ApplicationUser> userManager)
+    {
+        foreach (var profile in BestSellerProfiles)
+        {
+            await EnsureSellerAsync(
+                userManager,
+                profile.Email,
+                profile.UserName,
+                profile.FullName,
+                profile.AvatarUrl);
+        }
+    }
+
     private static async Task<ApplicationUser?> EnsureSellerAsync(
         UserManager<ApplicationUser> userManager,
         string email,
         string userName,
-        string fullName)
+        string fullName,
+        string? avatarUrl = null)
     {
+        avatarUrl ??= "/admin/images/user/user-01.jpg";
         var user = await userManager.FindByEmailAsync(email);
+        if (user is null)
+        {
+            user = await userManager.FindByNameAsync(userName);
+        }
+
         if (user is null)
         {
             user = new ApplicationUser
@@ -129,7 +157,7 @@ public static class AuctionCatalogSeeder
                 Role = UserRole.User,
                 Status = UserStatus.Active,
                 EmailConfirmed = true,
-                AvatarUrl = "/admin/images/user/user-01.jpg",
+                AvatarUrl = avatarUrl,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -158,6 +186,12 @@ public static class AuctionCatalogSeeder
         if (!user.EmailConfirmed)
         {
             user.EmailConfirmed = true;
+            needsUpdate = true;
+        }
+
+        if (!string.Equals(user.AvatarUrl, avatarUrl, StringComparison.Ordinal))
+        {
+            user.AvatarUrl = avatarUrl;
             needsUpdate = true;
         }
 

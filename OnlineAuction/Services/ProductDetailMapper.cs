@@ -146,6 +146,7 @@ internal static class ProductDetailMapper
         {
             Id = seller.Id,
             Username = seller.UserName ?? seller.Email ?? "Seller",
+            FullName = seller.FullName,
             AvatarUrl = seller.AvatarUrl ?? "/admin/images/user/user-01.jpg",
             AuctionCount = auctionCount,
             SuccessfulSales = successfulSales,
