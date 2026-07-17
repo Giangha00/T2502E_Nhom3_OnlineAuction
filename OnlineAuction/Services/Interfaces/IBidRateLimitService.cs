@@ -1,6 +1,12 @@
 namespace OnlineAuction.Services.Interfaces;
 
-public sealed record BidRateLimitResult(bool IsAllowed, string? Reason = null);
+public sealed record BidRateLimitResult(
+    bool IsAllowed,
+    string? Reason = null,
+    bool RequiresChallenge = false,
+    int UserCount = 0,
+    int AuctionCount = 0,
+    int IpCount = 0);
 
 public interface IBidRateLimitService
 {

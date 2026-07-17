@@ -150,6 +150,22 @@ public class OrderCreationService : IOrderCreationService
             return null;
         }
 
+        var shouldFinalize = auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon
+            && !DateTimeUtilities.IsInFutureUtc(auction.EndDate);
+
+        if (!shouldFinalize)
+        {
+            _logger.LogInformation(
+                "Skipping auction {AuctionId} finalization due to state re-check: status={Status}, endDate={EndDateUtc}, future={IsFuture}.",
+                auction.Id,
+                auction.Status,
+                auction.EndDate,
+                DateTimeUtilities.IsInFutureUtc(auction.EndDate));
+
+            await transaction.RollbackAsync(cancellationToken);
+            return null;
+        }
+
         var winningBid = await _dbContext.Bids
             .Where(bid => bid.AuctionId == auctionId && bid.IsWinning)
             .OrderByDescending(bid => bid.Amount)

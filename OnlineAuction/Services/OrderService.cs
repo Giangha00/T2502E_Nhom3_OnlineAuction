@@ -20,14 +20,23 @@ public class OrderService : IOrderService
     private readonly PlatformFeeSettings _feeSettings;
     private readonly IWinnerNonPaymentRecoveryService _winnerNonPaymentRecoveryService;
 
+    private sealed class NullWinnerNonPaymentRecoveryService : IWinnerNonPaymentRecoveryService
+    {
+        public Task ProcessExpiredAuctionWinOrderAsync(
+            AuctionOrder cancelledOrder,
+            DateTime now,
+            CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
+    }
+
     public OrderService(
         AuctionHouseDbContext dbContext,
         IOptions<PlatformFeeSettings> feeSettings,
-        IWinnerNonPaymentRecoveryService winnerNonPaymentRecoveryService)
+        IWinnerNonPaymentRecoveryService? winnerNonPaymentRecoveryService = null)
     {
         _dbContext = dbContext;
         _feeSettings = feeSettings.Value;
-        _winnerNonPaymentRecoveryService = winnerNonPaymentRecoveryService;
+        _winnerNonPaymentRecoveryService = winnerNonPaymentRecoveryService ?? new NullWinnerNonPaymentRecoveryService();
     }
 
     public async Task<OrderPageViewModel?> BuildOrderPageAsync(int buyerId)

@@ -23,4 +23,19 @@ public class PlatformFeeSettings
     /// Minimum registration deposit amount (USD).
     /// </summary>
     public decimal MinimumRegistrationDeposit { get; set; } = 1.00m;
+
+    /// <summary>
+    /// Legacy listing fee type setting retained for compatibility with older tests and callers.
+    /// </summary>
+    public string ListingFeeType { get; set; } = ListingFeeTypes.Fixed;
+
+    /// <summary>
+    /// Legacy fixed listing fee amount retained for compatibility with older tests and callers.
+    /// </summary>
+    public decimal ListingFeeAmount { get; set; } = 0m;
+
+    /// <summary>
+    /// Legacy percentage listing fee retained for compatibility with older tests and callers.
+    /// </summary>
+    public decimal ListingFeePercent { get; set; } = 0m;
 }
