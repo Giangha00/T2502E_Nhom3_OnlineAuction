@@ -60,8 +60,7 @@ public sealed class EmailQueueService : IEmailQueueService
 
         using var scope = _scopeFactory.CreateScope();
         var handler = scope.ServiceProvider.GetRequiredService<IEmailSendMessageHandler>();
-        await handler.HandleAsync(message, cancellationToken);
-        return true;
+        return await handler.HandleAsync(message, cancellationToken);
     }
 
     public async Task<bool> QueueEmailConfirmationAsync(
@@ -87,7 +86,6 @@ public sealed class EmailQueueService : IEmailQueueService
 
         using var scope = _scopeFactory.CreateScope();
         var handler = scope.ServiceProvider.GetRequiredService<IEmailSendMessageHandler>();
-        await handler.HandleAsync(message, cancellationToken);
-        return true;
+        return await handler.HandleAsync(message, cancellationToken);
     }
 }

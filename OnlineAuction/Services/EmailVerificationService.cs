@@ -4,6 +4,9 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using OnlineAuction.Configurations;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Services;
@@ -15,15 +18,21 @@ public class EmailVerificationService : IEmailVerificationService
 
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
+    private readonly EmailVerificationSettings _settings;
+    private readonly IHostEnvironment _environment;
     private readonly ILogger<EmailVerificationService> _logger;
 
     public EmailVerificationService(
         HttpClient httpClient,
         IConfiguration configuration,
+        IOptions<EmailVerificationSettings> settings,
+        IHostEnvironment environment,
         ILogger<EmailVerificationService> logger)
     {
         _httpClient = httpClient;
         _configuration = configuration;
+        _settings = settings.Value;
+        _environment = environment;
         _logger = logger;
     }
 
@@ -34,6 +43,15 @@ public class EmailVerificationService : IEmailVerificationService
         string locale,
         CancellationToken cancellationToken = default)
     {
+        if (ShouldUseMockEmailConfirmation())
+        {
+            _logger.LogWarning(
+                "Mock email confirmation for {Email}. Activation link: {ConfirmUrl}",
+                to,
+                confirmUrl);
+            return true;
+        }
+
         var clientId = GetSetting("Email:Gmail:ClientId", "EmailVerification:Gmail:ClientId", "GMAIL_CLIENT_ID");
         var clientSecret = GetSetting("Email:Gmail:ClientSecret", "EmailVerification:Gmail:ClientSecret", "GMAIL_CLIENT_SECRET");
         var refreshToken = GetSetting("Email:Gmail:RefreshToken", "EmailVerification:Gmail:RefreshToken", "GMAIL_REFRESH_TOKEN");
@@ -46,6 +64,15 @@ public class EmailVerificationService : IEmailVerificationService
             string.IsNullOrWhiteSpace(refreshToken) ||
             string.IsNullOrWhiteSpace(senderEmail))
         {
+            if (_environment.IsDevelopment())
+            {
+                _logger.LogWarning(
+                    "Gmail email verification config is missing. Development activation link for {Email}: {ConfirmUrl}",
+                    to,
+                    confirmUrl);
+                return true;
+            }
+
             _logger.LogError("Gmail email verification config is missing.");
             return false;
         }
@@ -254,6 +281,9 @@ public class EmailVerificationService : IEmailVerificationService
 
     private static string Truncate(string value, int maxLength) =>
         value.Length <= maxLength ? value : value[..maxLength];
+
+    private bool ShouldUseMockEmailConfirmation() =>
+        _settings.UseMockEmailConfirmation && _environment.IsDevelopment();
 
     private sealed record GmailSendRequest([property: JsonPropertyName("raw")] string Raw);
 

@@ -9,6 +9,10 @@
         <UserSecretsId>online-auction-dev-secrets</UserSecretsId>
     </PropertyGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="OnlineAuction.Tests" />
+    </ItemGroup>
+
     <ItemGroup Condition="'$(Configuration)' == 'Debug'">
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.11" />
     </ItemGroup>

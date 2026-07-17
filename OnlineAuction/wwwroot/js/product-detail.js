@@ -746,11 +746,21 @@
       }
 
       var auctionId = bidPanel.getAttribute('data-auction-id');
-      var amount = bidInput ? snapBidAmount(parseBidInput(bidInput.value)) : null;
-      if (!auctionId || amount === null || Number.isNaN(amount)) {
+      var rawAmount = bidInput ? parseBidInput(bidInput.value) : NaN;
+      var minBid = getMinBid();
+
+      if (!auctionId || Number.isNaN(rawAmount) || rawAmount <= 0) {
+        showFeedback(bidFeedback, i18n.bidFailed || 'Unable to place bid. Please try again.', false);
         return;
       }
 
+      if (rawAmount < minBid) {
+        var tooLowTemplate = i18n.bidTooLow || 'Your bid must be at least {0}.';
+        showFeedback(bidFeedback, tooLowTemplate.replace('{0}', formatCurrency(minBid)), false);
+        return;
+      }
+
+      var amount = rawAmount;
       setBidInputValue(amount);
       placeBidBtn.disabled = true;
       placeBidBtn.textContent = i18n.placingBid || 'Placing bid…';

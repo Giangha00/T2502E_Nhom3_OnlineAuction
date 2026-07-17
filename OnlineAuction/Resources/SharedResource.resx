@@ -908,6 +908,7 @@
   <data name="Js_Order_NoSelection" xml:space="preserve"><value>Please select at least one product to pay.</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Placing bid…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Unable to place bid. Please try again.</value></data>
+  <data name="Js_ProductDetail_BidTooLow" xml:space="preserve"><value>Your bid must be at least {0}.</value></data>
   <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Bid placed successfully!</value></data>
   <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>Auction ended</value></data>
   <data name="Js_ProductDetail_Registering" xml:space="preserve"><value>Registering…</value></data>

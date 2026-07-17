@@ -5,7 +5,7 @@ namespace OnlineAuction.Messaging.Handlers;
 
 public interface IEmailSendMessageHandler
 {
-    Task HandleAsync(EmailSendMessage message, CancellationToken cancellationToken = default);
+    Task<bool> HandleAsync(EmailSendMessage message, CancellationToken cancellationToken = default);
 }
 
 public sealed class EmailSendMessageHandler : IEmailSendMessageHandler
@@ -24,14 +24,14 @@ public sealed class EmailSendMessageHandler : IEmailSendMessageHandler
         _logger = logger;
     }
 
-    public async Task HandleAsync(EmailSendMessage message, CancellationToken cancellationToken = default)
+    public async Task<bool> HandleAsync(EmailSendMessage message, CancellationToken cancellationToken = default)
     {
         switch (message.Kind)
         {
             case EmailSendKind.PasswordResetOtp:
                 if (string.IsNullOrWhiteSpace(message.OtpCode) || message.ExpiryMinutes is null)
                 {
-                    return;
+                    return false;
                 }
 
                 var otpSent = await _emailSender.SendPasswordResetOtpAsync(
@@ -47,12 +47,12 @@ public sealed class EmailSendMessageHandler : IEmailSendMessageHandler
                     _logger.LogWarning("Password reset OTP email failed for {Email}.", message.To);
                 }
 
-                break;
+                return otpSent;
 
             case EmailSendKind.EmailConfirmation:
                 if (string.IsNullOrWhiteSpace(message.ConfirmUrl))
                 {
-                    return;
+                    return false;
                 }
 
                 var confirmSent = await _emailVerificationService.SendConfirmationAsync(
@@ -67,7 +67,10 @@ public sealed class EmailSendMessageHandler : IEmailSendMessageHandler
                     _logger.LogWarning("Email confirmation failed for {Email}.", message.To);
                 }
 
-                break;
+                return confirmSent;
+
+            default:
+                return false;
         }
     }
 }

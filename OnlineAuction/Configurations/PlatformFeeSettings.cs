@@ -23,4 +23,9 @@ public class PlatformFeeSettings
     /// Minimum registration deposit amount (USD).
     /// </summary>
     public decimal MinimumRegistrationDeposit { get; set; } = 1.00m;
+
+    /// <summary>
+    /// Development only: skip PayPal and auto-approve registration after mock deposit.
+    /// </summary>
+    public bool UseMockRegistrationDepositPayment { get; set; }
 }

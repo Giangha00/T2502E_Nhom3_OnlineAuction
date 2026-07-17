@@ -320,6 +320,22 @@ public static class AuctionCatalogSeeder
                 .ExecuteDeleteAsync();
         }
 
+        await dbContext.BidFraudAlerts
+            .Where(alert => auctionIds.Contains(alert.AuctionId))
+            .ExecuteDeleteAsync();
+
+        await dbContext.WinnerNonPaymentLogs
+            .Where(log => auctionIds.Contains(log.AuctionId))
+            .ExecuteDeleteAsync();
+
+        await dbContext.WatchlistItems
+            .Where(item => auctionIds.Contains(item.AuctionId))
+            .ExecuteDeleteAsync();
+
+        await dbContext.AuctionRegistrationDeposits
+            .Where(deposit => auctionIds.Contains(deposit.AuctionId))
+            .ExecuteDeleteAsync();
+
         await dbContext.Bids
             .Where(bid => auctionIds.Contains(bid.AuctionId))
             .ExecuteDeleteAsync();

@@ -10,6 +10,9 @@
   "PasswordResetOtp": {
     "UseMockOtpSender": true
   },
+  "EmailVerification": {
+    "UseMockEmailConfirmation": true
+  },
   "BidFraudDetection": {
     "Enabled": true,
     "RateLimitingEnabled": true,
@@ -43,7 +46,7 @@
     "VapidKey": "YOUR_WEB_PUSH_VAPID_KEY"
   },
   "RabbitMq": {
-    "Enabled": true,
+    "Enabled": false,
     "HostName": "localhost",
     "Port": 5672,
     "UserName": "guest",
@@ -56,6 +59,7 @@
     "RegistrationDepositPercent": 10.0,
     "BuyerCheckoutFeePercent": 2.5,
     "SellerSuccessFeePercent": 10.0,
-    "MinimumRegistrationDeposit": 1.0
+    "MinimumRegistrationDeposit": 1.0,
+    "UseMockRegistrationDepositPayment": true
   }
 }
