@@ -20,6 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region MVC + Localization
 
+builder.Configuration.AddJsonFile("appsettings.json.example", optional: true, reloadOnChange: true);
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 var mvcBuilder = builder.Services.AddControllersWithViews()
     .AddViewLocalization()
@@ -94,6 +95,11 @@ builder.Services.AddSession(options =>
 
 var dbProvider = builder.Configuration.GetValue<string>("DatabaseProvider") ?? "MySql";
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "Missing ConnectionStrings:DefaultConnection. Create OnlineAuction/appsettings.Local.json from appsettings.Local.json.example or set the ConnectionStrings__DefaultConnection environment variable.");
+}
 
 builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
 {
