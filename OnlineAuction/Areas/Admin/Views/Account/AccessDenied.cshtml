@@ -10,8 +10,10 @@
             You do not have permission to access the admin panel.
         </p>
         <a asp-area="Admin" asp-controller="Account" asp-action="Login"
-           class="mt-6 inline-flex rounded-lg bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-600">
-            Back to Login
+           class="admin-icon-action admin-icon-action--primary admin-icon-action--lg mx-auto"
+           title="Back to Login"
+           aria-label="Back to Login">
+            <partial name="_AdminIcon" model='"arrow-left"' />
         </a>
     </div>
 </div>

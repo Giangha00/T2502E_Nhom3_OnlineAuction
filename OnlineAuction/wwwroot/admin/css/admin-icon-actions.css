@@ -1,0 +1,190 @@
+.admin-icon-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.admin-icon-action__svg {
+    width: 1.125rem;
+    height: 1.125rem;
+}
+
+.admin-icon-action--sm {
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+.admin-icon-action--sm .admin-icon-action__svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.admin-icon-action--lg {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.admin-icon-action--lg .admin-icon-action__svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.admin-icon-action--view {
+    color: #465fff;
+    background: #ecf3ff;
+}
+
+.admin-icon-action--view:hover {
+    background: #dde9ff;
+}
+
+.admin-icon-action--edit {
+    color: #f79009;
+    background: #fffaeb;
+}
+
+.admin-icon-action--edit:hover {
+    background: #fef0c7;
+}
+
+.admin-icon-action--delete {
+    color: #f04438;
+    background: #fef3f2;
+}
+
+.admin-icon-action--delete:hover {
+    background: #fee4e2;
+}
+
+.admin-icon-action--create {
+    color: #12b76a;
+    background: #ecfdf3;
+}
+
+.admin-icon-action--create:hover {
+    background: #d1fadf;
+}
+
+.admin-icon-action--neutral {
+    color: #344054;
+    background: #fff;
+    border-color: #d0d5dd;
+}
+
+.admin-icon-action--neutral:hover {
+    background: #f9fafb;
+}
+
+.admin-icon-action--primary {
+    color: #fff;
+    background: #465fff;
+    border-color: #465fff;
+}
+
+.admin-icon-action--primary:hover {
+    background: #3641f5;
+    border-color: #3641f5;
+}
+
+.admin-icon-action--review {
+    color: #fff;
+    background: #465fff;
+    border-color: #465fff;
+}
+
+.admin-icon-action--review:hover {
+    background: #3641f5;
+    border-color: #3641f5;
+}
+
+.admin-icon-action--approve {
+    color: #fff;
+    background: #12b76a;
+    border-color: #12b76a;
+}
+
+.admin-icon-action--approve:hover {
+    background: #039855;
+    border-color: #039855;
+}
+
+.admin-icon-action--reject {
+    color: #fff;
+    background: #f04438;
+    border-color: #f04438;
+}
+
+.admin-icon-action--reject:hover {
+    background: #d92d20;
+    border-color: #d92d20;
+}
+
+.admin-icon-action--pagination {
+    color: #344054;
+    background: #fff;
+    border-color: #d0d5dd;
+    width: 2.25rem;
+    height: 2.25rem;
+}
+
+.admin-icon-action--pagination:hover {
+    background: #f9fafb;
+}
+
+.admin-icon-action--pagination.is-disabled,
+.admin-icon-action--pagination:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.admin-icon-action.w-full {
+    width: 100%;
+}
+
+.admin-icon-action-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.375rem;
+}
+
+.dark .admin-icon-action--view {
+    color: #9cb9ff;
+    background: rgba(70, 95, 255, 0.15);
+}
+
+.dark .admin-icon-action--edit {
+    color: #fdb022;
+    background: rgba(247, 144, 9, 0.15);
+}
+
+.dark .admin-icon-action--delete {
+    color: #f97066;
+    background: rgba(240, 68, 56, 0.15);
+}
+
+.dark .admin-icon-action--create {
+    color: #32d583;
+    background: rgba(18, 183, 106, 0.15);
+}
+
+.dark .admin-icon-action--neutral,
+.dark .admin-icon-action--pagination {
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.03);
+    border-color: #344054;
+}
+
+.dark .admin-icon-action--neutral:hover,
+.dark .admin-icon-action--pagination:hover {
+    background: rgba(255, 255, 255, 0.06);
+}

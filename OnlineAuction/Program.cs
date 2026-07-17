@@ -343,11 +343,15 @@ using (var scope = app.Services.CreateScope())
     var refreshTestAuctions = configuration.GetValue("SeedData:RefreshTestAuctionsOnStartup", false)
         || (app.Environment.IsDevelopment()
             && configuration.GetValue("SeedData:RefreshTestAuctionsInDevelopment", true));
+    var syncCatalog = !refreshTestAuctions && (
+        configuration.GetValue("SeedData:SyncCatalogOnStartup", false)
+        || (app.Environment.IsDevelopment()
+            && configuration.GetValue("SeedData:SyncCatalogInDevelopment", true)));
 
     await UserSeeder.SeedAsync(db, userManager);
     await AdminSeeder.SeedAsync(db, userManager, roleManager);
     await PermissionSeeder.SeedAsync(db, roleManager, userManager);
-    await AuctionCatalogSeeder.SeedAsync(db, userManager, refreshTestAuctions);
+    await AuctionCatalogSeeder.SeedAsync(db, userManager, refreshTestAuctions, syncCatalog);
 }
 
 using (var scope = app.Services.CreateScope())

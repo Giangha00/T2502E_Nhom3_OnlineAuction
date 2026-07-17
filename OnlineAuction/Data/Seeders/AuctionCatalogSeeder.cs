@@ -18,6 +18,7 @@ public static class AuctionCatalogSeeder
 
     private const string OnePieceSellerEmail = "nguyen.hai@auctionhouse.local";
     private const string YugiohSellerEmail = "nguyen.ha@auctionhouse.local";
+    private const string SportsSellerEmail = "viet.anh@auctionhouse.local";
     private const string DemoPassword = "User@123";
 
     private static bool IsExpiredSeededListing(Auction auction, DateTime now) =>
@@ -29,7 +30,8 @@ public static class AuctionCatalogSeeder
     public static async Task SeedAsync(
         AuctionHouseDbContext dbContext,
         UserManager<ApplicationUser> userManager,
-        bool refreshInDevelopment = false)
+        bool refreshInDevelopment = false,
+        bool syncCatalog = false)
     {
         if (refreshInDevelopment)
         {
@@ -48,6 +50,12 @@ public static class AuctionCatalogSeeder
             "nguyen.ha",
             "Nguyễn Hà");
 
+        var sportsSeller = await EnsureSellerAsync(
+            userManager,
+            SportsSellerEmail,
+            "viet.anh",
+            "Việt Anh");
+
         var bidder = await dbContext.Users
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Email == "user3@auctionhouse.local" && u.Status == UserStatus.Active);
@@ -57,27 +65,58 @@ public static class AuctionCatalogSeeder
             return;
         }
 
-        var existingProductNames = await GetExistingSeededProductNamesAsync(dbContext);
+        var sportsSellerId = sportsSeller?.Id;
+
+        var existingProducts = refreshInDevelopment || !syncCatalog
+            ? new Dictionary<string, Product>(StringComparer.OrdinalIgnoreCase)
+            : await GetExistingSeededProductsByNameAsync(dbContext);
         var now = DateTime.UtcNow;
         var categoryCache = new Dictionary<string, Category>(StringComparer.OrdinalIgnoreCase);
+        var templateCache = new Dictionary<string, ProductTemplate>(StringComparer.OrdinalIgnoreCase);
+        var catalogNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         var seedIndex = 0;
         foreach (var entry in SpreadsheetAuctionCatalog.GetEntries())
         {
-            if (existingProductNames.Contains(entry.Name))
+            catalogNames.Add(entry.Name);
+
+            var sellerId = ResolveSellerId(
+                entry.CategoryName,
+                onePieceSeller.Id,
+                yugiohSeller.Id,
+                sportsSellerId);
+            if (!sellerId.HasValue)
             {
                 continue;
             }
 
-            var sellerId = ResolveSellerId(entry.CategoryName, onePieceSeller.Id, yugiohSeller.Id);
-            await SeedEntryAsync(dbContext, entry, sellerId, bidder?.Id, categoryCache, now, seedIndex);
-            existingProductNames.Add(entry.Name);
+            if (existingProducts.TryGetValue(entry.Name, out var existingProduct))
+            {
+                await SyncSeededEntryAsync(
+                    dbContext,
+                    existingProduct,
+                    entry,
+                    sellerId.Value,
+                    categoryCache,
+                    templateCache,
+                    now);
+                seedIndex++;
+                continue;
+            }
+
+            await SeedEntryAsync(dbContext, entry, sellerId.Value, bidder?.Id, categoryCache, templateCache, now, seedIndex);
             seedIndex++;
         }
 
-        await BackfillBuyNowPricesAsync(dbContext);
+        if (syncCatalog && !refreshInDevelopment)
+        {
+            await RemoveOrphanedSeededProductsAsync(dbContext, catalogNames);
+        }
+
+        await BackfillSeededProductTemplatesAsync(dbContext, templateCache);
+        await SyncBuyNowPricesAsync(dbContext);
         await EnsureFullFlowDemoScheduleAsync(dbContext, DateTime.UtcNow);
-        await DeactivateUnusedSeedCategoriesAsync(dbContext);
+        await SyncSeedCategoriesAsync(dbContext);
 
         if (!refreshInDevelopment)
         {
@@ -85,31 +124,55 @@ public static class AuctionCatalogSeeder
         }
     }
 
-    private static async Task DeactivateUnusedSeedCategoriesAsync(AuctionHouseDbContext dbContext)
+    private static int? ResolveSellerId(
+        string categoryName,
+        int onePieceSellerId,
+        int yugiohSellerId,
+        int? sportsSellerId) =>
+        categoryName switch
+        {
+            _ when categoryName.Equals("Yu-Gi-Oh!", StringComparison.OrdinalIgnoreCase) => yugiohSellerId,
+            _ when categoryName.Equals("Pokémon", StringComparison.OrdinalIgnoreCase) => yugiohSellerId,
+            _ when categoryName.Equals("Sports", StringComparison.OrdinalIgnoreCase) => sportsSellerId,
+            _ => onePieceSellerId
+        };
+
+    private static async Task SyncSeedCategoriesAsync(AuctionHouseDbContext dbContext)
     {
-        var keep = new[] { "One Piece", "Yu-Gi-Oh!" };
-        var extras = await dbContext.Categories
-            .Where(category => category.IsActive && !keep.Contains(category.Name))
-            .ToListAsync();
+        var keep = new[] { "One Piece", "Yu-Gi-Oh!", "Pokémon", "Sports" };
+        var keepNormalized = keep
+            .Select(CategorySlug.NormalizeForCompare)
+            .ToHashSet(StringComparer.Ordinal);
 
-        if (extras.Count == 0)
+        var categories = await dbContext.Categories.ToListAsync();
+        var changed = false;
+        var now = DateTime.UtcNow;
+
+        foreach (var category in categories)
         {
-            return;
+            var normalized = CategorySlug.NormalizeForCompare(category.Name);
+            var shouldKeep = keep.Contains(category.Name, StringComparer.OrdinalIgnoreCase)
+                || keepNormalized.Contains(normalized);
+
+            if (shouldKeep && !category.IsActive)
+            {
+                category.IsActive = true;
+                category.UpdatedAt = now;
+                changed = true;
+            }
+            else if (!shouldKeep && category.IsActive)
+            {
+                category.IsActive = false;
+                category.UpdatedAt = now;
+                changed = true;
+            }
         }
 
-        foreach (var category in extras)
+        if (changed)
         {
-            category.IsActive = false;
-            category.UpdatedAt = DateTime.UtcNow;
+            await dbContext.SaveChangesAsync();
         }
-
-        await dbContext.SaveChangesAsync();
     }
-
-    private static int ResolveSellerId(string categoryName, int onePieceSellerId, int yugiohSellerId) =>
-        categoryName.Equals("Yu-Gi-Oh!", StringComparison.OrdinalIgnoreCase)
-            ? yugiohSellerId
-            : onePieceSellerId;
 
     private static async Task<ApplicationUser?> EnsureSellerAsync(
         UserManager<ApplicationUser> userManager,
@@ -169,18 +232,200 @@ public static class AuctionCatalogSeeder
         return user;
     }
 
-    private static async Task<HashSet<string>> GetExistingSeededProductNamesAsync(AuctionHouseDbContext dbContext)
+    private static async Task<Dictionary<string, Product>> GetExistingSeededProductsByNameAsync(
+        AuctionHouseDbContext dbContext)
     {
-        var names = await dbContext.Products
-            .AsNoTracking()
+        var products = await dbContext.Products
+            .Include(product => product.Images)
+            .Include(product => product.Auctions)
+                .ThenInclude(auction => auction.Bids)
+            .Include(product => product.Category)
             .Where(product =>
                 product.Auctions.Any(auction =>
                     auction.AuctionEventName != null &&
                     LegacySeedEventNames.Contains(auction.AuctionEventName)))
-            .Select(product => product.Name)
             .ToListAsync();
 
-        return names.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        return products
+            .Where(product => !string.IsNullOrWhiteSpace(product.Name))
+            .GroupBy(product => product.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(group => group.Key, group => group.First(), StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static async Task SyncSeededEntryAsync(
+        AuctionHouseDbContext dbContext,
+        Product product,
+        SpreadsheetAuctionCatalog.Entry entry,
+        int sellerId,
+        Dictionary<string, Category> categoryCache,
+        Dictionary<string, ProductTemplate> templateCache,
+        DateTime now)
+    {
+        var category = await GetOrCreateCategoryAsync(dbContext, entry.CategoryName, categoryCache);
+        var template = await GetOrCreateTemplateFromEntryAsync(dbContext, entry, category, templateCache, now);
+
+        ApplyProductFieldsFromEntry(product, entry, sellerId, category.Id, template.Id);
+        product.UpdatedAt = now;
+
+        SyncProductImages(dbContext, product, entry, now);
+
+        foreach (var auction in product.Auctions.Where(IsLegacySeededAuction))
+        {
+            SyncSeededAuctionFromEntry(auction, entry);
+            auction.UpdatedAt = now;
+        }
+
+        await dbContext.SaveChangesAsync();
+    }
+
+    private static bool IsLegacySeededAuction(Auction auction) =>
+        auction.AuctionEventName != null &&
+        LegacySeedEventNames.Contains(auction.AuctionEventName);
+
+    private static void ApplyProductFieldsFromEntry(
+        Product product,
+        SpreadsheetAuctionCatalog.Entry entry,
+        int sellerId,
+        int categoryId,
+        int templateId)
+    {
+        product.SellerId = sellerId;
+        product.CategoryId = categoryId;
+        product.ProductTemplateId = templateId;
+        product.Name = entry.Name;
+        product.ShortDescription = SpreadsheetAuctionCatalog.BuildShortDescription(entry.Description);
+        product.DescriptionHtml = SpreadsheetAuctionCatalog.BuildDescriptionHtml(entry.Description);
+        product.Condition = entry.Condition;
+        product.Year = entry.Year;
+        product.SetName = entry.SetName;
+        product.Language = entry.Language;
+        product.CardNumber = entry.CardNumber;
+        product.GradeLabel = entry.GradeLabel;
+        product.CertNumber = entry.Condition == "graded"
+            ? $"{entry.GradeLabel.Replace(" ", "-")}-{entry.CardNumber.Replace("/", "-")}"
+            : null;
+        product.PrimaryImage = entry.PrimaryImage;
+    }
+
+    private static void ApplyTemplateFieldsFromEntry(
+        ProductTemplate template,
+        SpreadsheetAuctionCatalog.Entry entry,
+        int categoryId)
+    {
+        template.Name = entry.Name;
+        template.CategoryId = categoryId;
+        template.SetName = entry.SetName;
+        template.CardNumber = entry.CardNumber;
+        template.GradeLabel = entry.GradeLabel;
+        template.Year = entry.Year;
+        template.Language = entry.Language;
+        template.ShortDescription = SpreadsheetAuctionCatalog.BuildShortDescription(entry.Description);
+        template.DescriptionHtml = SpreadsheetAuctionCatalog.BuildDescriptionHtml(entry.Description);
+        template.PrimaryImage = entry.PrimaryImage;
+        template.IsActive = true;
+    }
+
+    private static void SyncProductImages(
+        AuctionHouseDbContext dbContext,
+        Product product,
+        SpreadsheetAuctionCatalog.Entry entry,
+        DateTime now)
+    {
+        var desiredUrls = BuildDesiredImageUrls(entry);
+        var currentUrls = product.Images
+            .OrderBy(image => image.SortOrder)
+            .Select(image => image.ImageUrl)
+            .ToList();
+
+        if (currentUrls.SequenceEqual(desiredUrls, StringComparer.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        if (product.Images.Count > 0)
+        {
+            dbContext.ProductImages.RemoveRange(product.Images);
+            product.Images.Clear();
+        }
+
+        var sortOrder = 0;
+        foreach (var url in desiredUrls)
+        {
+            var image = new ProductImage
+            {
+                ProductId = product.Id,
+                ImageUrl = url,
+                SortOrder = sortOrder++,
+                CreatedAt = now
+            };
+            product.Images.Add(image);
+            dbContext.ProductImages.Add(image);
+        }
+    }
+
+    private static List<string> BuildDesiredImageUrls(SpreadsheetAuctionCatalog.Entry entry)
+    {
+        var urls = new List<string> { entry.PrimaryImage };
+
+        if (entry.GalleryImages is not { Count: > 0 })
+        {
+            return urls;
+        }
+
+        foreach (var url in entry.GalleryImages)
+        {
+            if (string.IsNullOrWhiteSpace(url) ||
+                url.Equals(entry.PrimaryImage, StringComparison.OrdinalIgnoreCase) ||
+                urls.Contains(url, StringComparer.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            urls.Add(url);
+        }
+
+        return urls;
+    }
+
+    private static void SyncSeededAuctionFromEntry(
+        Auction auction,
+        SpreadsheetAuctionCatalog.Entry entry)
+    {
+        var bidStep = SpreadsheetAuctionCatalog.ComputeBidStep(entry.StartingPrice);
+        var buyNowPrice = SpreadsheetAuctionCatalog.TryGetBuyNowPrice(entry.Name);
+        var hasBids = auction.Bids.Count > 0;
+
+        auction.BidStep = bidStep;
+        auction.BuyNowPrice = buyNowPrice;
+
+        if (!hasBids)
+        {
+            auction.StartingPrice = entry.StartingPrice;
+            auction.CurrentPrice = entry.StartingPrice;
+        }
+    }
+
+    private static async Task RemoveOrphanedSeededProductsAsync(
+        AuctionHouseDbContext dbContext,
+        IReadOnlySet<string> catalogNames)
+    {
+        var orphanedProductIds = await dbContext.Products
+            .AsNoTracking()
+            .Where(product =>
+                product.Name != null &&
+                !catalogNames.Contains(product.Name) &&
+                product.Auctions.Any(auction =>
+                    auction.AuctionEventName != null &&
+                    LegacySeedEventNames.Contains(auction.AuctionEventName)))
+            .Select(product => product.Id)
+            .ToListAsync();
+
+        if (orphanedProductIds.Count == 0)
+        {
+            return;
+        }
+
+        await DeleteSeededProductsAsync(dbContext, orphanedProductIds);
     }
 
     private static async Task SeedEntryAsync(
@@ -189,70 +434,27 @@ public static class AuctionCatalogSeeder
         int sellerId,
         int? bidderId,
         Dictionary<string, Category> categoryCache,
+        Dictionary<string, ProductTemplate> templateCache,
         DateTime now,
         int seedIndex)
     {
         var category = await GetOrCreateCategoryAsync(dbContext, entry.CategoryName, categoryCache);
+        var template = await GetOrCreateTemplateFromEntryAsync(dbContext, entry, category, templateCache, now);
         var bidStep = SpreadsheetAuctionCatalog.ComputeBidStep(entry.StartingPrice);
         var buyNowPrice = SpreadsheetAuctionCatalog.TryGetBuyNowPrice(entry.Name);
 
         var product = new Product
         {
-            SellerId = sellerId,
-            CategoryId = category.Id,
-            Name = entry.Name,
-            ShortDescription = SpreadsheetAuctionCatalog.BuildShortDescription(entry.Description),
-            DescriptionHtml = SpreadsheetAuctionCatalog.BuildDescriptionHtml(entry.Description),
-            Condition = entry.Condition,
-            Year = entry.Year,
-            SetName = entry.SetName,
-            Language = entry.Language,
-            CardNumber = entry.CardNumber,
-            GradeLabel = entry.GradeLabel,
-            CertNumber = entry.Condition == "graded"
-                ? $"{entry.GradeLabel.Replace(" ", "-")}-{entry.CardNumber.Replace("/", "-")}"
-                : null,
-            PrimaryImage = entry.PrimaryImage,
             Category = category,
             CreatedAt = now
         };
 
+        ApplyProductFieldsFromEntry(product, entry, sellerId, category.Id, template.Id);
+
         dbContext.Products.Add(product);
         await dbContext.SaveChangesAsync();
 
-        var gallery = new List<ProductImage>
-        {
-            new()
-            {
-                ProductId = product.Id,
-                ImageUrl = entry.PrimaryImage,
-                SortOrder = 0,
-                CreatedAt = now
-            }
-        };
-
-        if (entry.GalleryImages is { Count: > 0 })
-        {
-            var sort = 1;
-            foreach (var url in entry.GalleryImages)
-            {
-                if (string.IsNullOrWhiteSpace(url) ||
-                    url.Equals(entry.PrimaryImage, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                gallery.Add(new ProductImage
-                {
-                    ProductId = product.Id,
-                    ImageUrl = url,
-                    SortOrder = sort++,
-                    CreatedAt = now
-                });
-            }
-        }
-
-        dbContext.ProductImages.AddRange(gallery);
+        SyncProductImages(dbContext, product, entry, now);
         await dbContext.SaveChangesAsync();
 
         var auction = new Auction
@@ -308,21 +510,136 @@ public static class AuctionCatalogSeeder
         await dbContext.SaveChangesAsync();
     }
 
-    private static async Task BackfillBuyNowPricesAsync(AuctionHouseDbContext dbContext)
+    private static async Task BackfillSeededProductTemplatesAsync(
+        AuctionHouseDbContext dbContext,
+        Dictionary<string, ProductTemplate> templateCache)
     {
-        var priceMap = SpreadsheetAuctionCatalog.GetBuyNowPriceMap();
-        if (priceMap.Count == 0)
+        var now = DateTime.UtcNow;
+        var seededProducts = await dbContext.Products
+            .Include(product => product.Category)
+            .Where(product =>
+                product.ProductTemplateId == null &&
+                product.Auctions.Any(auction =>
+                    auction.AuctionEventName != null &&
+                    LegacySeedEventNames.Contains(auction.AuctionEventName)))
+            .ToListAsync();
+
+        if (seededProducts.Count == 0)
         {
             return;
         }
 
-        var productNames = priceMap.Keys.ToList();
+        foreach (var product in seededProducts)
+        {
+            if (product.Category is null)
+            {
+                continue;
+            }
+
+            var template = await GetOrCreateTemplateFromProductAsync(dbContext, product, product.Category, templateCache, now);
+            product.ProductTemplateId = template.Id;
+            product.UpdatedAt = now;
+        }
+
+        await dbContext.SaveChangesAsync();
+    }
+
+    private static async Task<ProductTemplate> GetOrCreateTemplateFromEntryAsync(
+        AuctionHouseDbContext dbContext,
+        SpreadsheetAuctionCatalog.Entry entry,
+        Category category,
+        Dictionary<string, ProductTemplate> cache,
+        DateTime now)
+    {
+        var cacheKey = BuildTemplateCacheKey(category.Id, entry.Name);
+        if (cache.TryGetValue(cacheKey, out var cached))
+        {
+            return cached;
+        }
+
+        var template = await dbContext.ProductTemplates
+            .FirstOrDefaultAsync(item =>
+                item.DeletedAt == null &&
+                item.CategoryId == category.Id &&
+                item.Name == entry.Name);
+
+        if (template is null)
+        {
+            template = new ProductTemplate
+            {
+                PrimaryImage = entry.PrimaryImage,
+                IsActive = true,
+                CreatedAt = now
+            };
+
+            dbContext.ProductTemplates.Add(template);
+        }
+
+        ApplyTemplateFieldsFromEntry(template, entry, category.Id);
+        template.UpdatedAt = now;
+        await dbContext.SaveChangesAsync();
+
+        cache[cacheKey] = template;
+        return template;
+    }
+
+    private static async Task<ProductTemplate> GetOrCreateTemplateFromProductAsync(
+        AuctionHouseDbContext dbContext,
+        Product product,
+        Category category,
+        Dictionary<string, ProductTemplate> cache,
+        DateTime now)
+    {
+        var cacheKey = BuildTemplateCacheKey(category.Id, product.Name);
+        if (cache.TryGetValue(cacheKey, out var cached))
+        {
+            return cached;
+        }
+
+        var template = await dbContext.ProductTemplates
+            .FirstOrDefaultAsync(item =>
+                item.DeletedAt == null &&
+                item.CategoryId == category.Id &&
+                item.Name == product.Name);
+
+        if (template is null)
+        {
+            template = new ProductTemplate
+            {
+                Name = product.Name,
+                CategoryId = category.Id,
+                SetName = product.SetName,
+                CardNumber = product.CardNumber,
+                GradeLabel = product.GradeLabel,
+                Year = product.Year,
+                Language = product.Language,
+                ShortDescription = product.ShortDescription,
+                DescriptionHtml = product.DescriptionHtml,
+                PrimaryImage = product.PrimaryImage,
+                IsActive = true,
+                CreatedAt = now
+            };
+
+            dbContext.ProductTemplates.Add(template);
+            await dbContext.SaveChangesAsync();
+        }
+
+        cache[cacheKey] = template;
+        return template;
+    }
+
+    private static string BuildTemplateCacheKey(int categoryId, string name) =>
+        $"{categoryId}:{name.Trim()}";
+
+    private static async Task SyncBuyNowPricesAsync(AuctionHouseDbContext dbContext)
+    {
+        var priceMap = SpreadsheetAuctionCatalog.GetBuyNowPriceMap();
         var auctions = await dbContext.Auctions
             .Include(auction => auction.Product)
             .Where(auction =>
-                auction.BuyNowPrice == null &&
-                auction.Product.Name != null &&
-                productNames.Contains(auction.Product.Name))
+                auction.AuctionEventName != null &&
+                LegacySeedEventNames.Contains(auction.AuctionEventName) &&
+                auction.Product.Name != null)
             .ToListAsync();
 
         if (auctions.Count == 0)
@@ -333,12 +650,21 @@ public static class AuctionCatalogSeeder
         var changed = false;
         foreach (var auction in auctions)
         {
-            if (priceMap.TryGetValue(auction.Product.Name, out var buyNowPrice))
+            var productName = auction.Product.Name!;
+            decimal? catalogPrice = null;
+            if (priceMap.TryGetValue(productName, out var mappedPrice))
             {
-                auction.BuyNowPrice = buyNowPrice;
-                auction.UpdatedAt = DateTime.UtcNow;
-                changed = true;
+                catalogPrice = mappedPrice;
             }
+
+            if (auction.BuyNowPrice == catalogPrice)
+            {
+                continue;
+            }
+
+            auction.BuyNowPrice = catalogPrice;
+            auction.UpdatedAt = DateTime.UtcNow;
+            changed = true;
         }
 
         if (changed)
@@ -417,11 +743,36 @@ public static class AuctionCatalogSeeder
 
     private static async Task ClearSeededAuctionsAsync(AuctionHouseDbContext dbContext)
     {
-        var testAuctions = await dbContext.Auctions
+        var productIds = await dbContext.Auctions
             .AsNoTracking()
             .Where(auction =>
                 auction.AuctionEventName != null &&
                 LegacySeedEventNames.Contains(auction.AuctionEventName))
+            .Select(auction => auction.ProductId)
+            .Distinct()
+            .ToListAsync();
+
+        if (productIds.Count == 0)
+        {
+            return;
+        }
+
+        await DeleteSeededProductsAsync(dbContext, productIds);
+        await DeleteOrphanedSeedTemplatesAsync(dbContext);
+    }
+
+    private static async Task DeleteSeededProductsAsync(
+        AuctionHouseDbContext dbContext,
+        IReadOnlyList<int> productIds)
+    {
+        if (productIds.Count == 0)
+        {
+            return;
+        }
+
+        var testAuctions = await dbContext.Auctions
+            .AsNoTracking()
+            .Where(auction => productIds.Contains(auction.ProductId))
             .Select(auction => new { auction.Id, auction.ProductId })
             .ToListAsync();
 
@@ -431,7 +782,7 @@ public static class AuctionCatalogSeeder
         }
 
         var auctionIds = testAuctions.Select(auction => auction.Id).ToList();
-        var productIds = testAuctions.Select(auction => auction.ProductId).Distinct().ToList();
+        var affectedProductIds = testAuctions.Select(auction => auction.ProductId).Distinct().ToList();
 
         var orderIds = await dbContext.OrderItems
             .AsNoTracking()
@@ -468,17 +819,39 @@ public static class AuctionCatalogSeeder
             .ExecuteDeleteAsync();
 
         await dbContext.ProductImages
-            .Where(image => productIds.Contains(image.ProductId))
+            .Where(image => affectedProductIds.Contains(image.ProductId))
             .ExecuteDeleteAsync();
 
         await dbContext.ProductDocuments
-            .Where(document => productIds.Contains(document.ProductId))
+            .Where(document => affectedProductIds.Contains(document.ProductId))
             .ExecuteDeleteAsync();
 
         await dbContext.Products
-            .Where(product => productIds.Contains(product.Id))
+            .Where(product => affectedProductIds.Contains(product.Id))
             .Where(product => !product.Auctions.Any())
             .ExecuteDeleteAsync();
+    }
+
+    private static async Task DeleteOrphanedSeedTemplatesAsync(AuctionHouseDbContext dbContext)
+    {
+        var catalogNames = SpreadsheetAuctionCatalog.GetEntries()
+            .Select(entry => entry.Name)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var orphanedTemplates = await dbContext.ProductTemplates
+            .Where(template =>
+                template.DeletedAt == null &&
+                !template.Products.Any() &&
+                catalogNames.Contains(template.Name))
+            .ToListAsync();
+
+        if (orphanedTemplates.Count == 0)
+        {
+            return;
+        }
+
+        dbContext.ProductTemplates.RemoveRange(orphanedTemplates);
+        await dbContext.SaveChangesAsync();
     }
 
     private static async Task<Category> GetOrCreateCategoryAsync(
@@ -492,8 +865,12 @@ public static class AuctionCatalogSeeder
         }
 
         var slug = CategorySlug.ToSlug(categoryName);
-        var category = await dbContext.Categories
-            .FirstOrDefaultAsync(item => item.Name == categoryName || item.Slug == slug);
+        var normalizedName = CategorySlug.NormalizeForCompare(categoryName);
+        var categories = await dbContext.Categories.ToListAsync();
+        var category = categories.FirstOrDefault(item =>
+            item.Name == categoryName
+            || item.Slug == slug
+            || CategorySlug.NormalizeForCompare(item.Name) == normalizedName);
 
         if (category is null)
         {
@@ -502,11 +879,24 @@ public static class AuctionCatalogSeeder
                 Name = categoryName,
                 Slug = slug,
                 IsActive = true,
-                SortOrder = categoryName.Equals("One Piece", StringComparison.OrdinalIgnoreCase) ? 1 : 2,
+                SortOrder = categoryName switch
+                {
+                    _ when categoryName.Equals("One Piece", StringComparison.OrdinalIgnoreCase) => 1,
+                    _ when categoryName.Equals("Yu-Gi-Oh!", StringComparison.OrdinalIgnoreCase) => 2,
+                    _ when categoryName.Equals("Pokémon", StringComparison.OrdinalIgnoreCase) => 3,
+                    _ when categoryName.Equals("Sports", StringComparison.OrdinalIgnoreCase) => 4,
+                    _ => 5
+                },
                 CreatedAt = DateTime.UtcNow
             };
 
             dbContext.Categories.Add(category);
+            await dbContext.SaveChangesAsync();
+        }
+        else if (!category.IsActive)
+        {
+            category.IsActive = true;
+            category.UpdatedAt = DateTime.UtcNow;
             await dbContext.SaveChangesAsync();
         }
 

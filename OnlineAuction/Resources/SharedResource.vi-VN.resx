@@ -1135,6 +1135,7 @@
   <data name="Admin_Dashboard_Kpi_Gmv" xml:space="preserve"><value>Tổng giao dịch (GMV)</value></data>
   <data name="Admin_Dashboard_Kpi_PlatformRevenue" xml:space="preserve"><value>Doanh thu sàn</value></data>
   <data name="Admin_Dashboard_Kpi_Commission" xml:space="preserve"><value>Phí sàn (Commission)</value></data>
+  <data name="Admin_Dashboard_Kpi_SellerProceeds" xml:space="preserve"><value>Tiền người bán nhận</value></data>
   <data name="Admin_Dashboard_Kpi_ListingFees" xml:space="preserve"><value>Phí niêm yết</value></data>
   <data name="Admin_Dashboard_Kpi_CompletedOrders" xml:space="preserve"><value>Đơn hoàn tất</value></data>
   <data name="Admin_Dashboard_RevenueSection_Title" xml:space="preserve"><value>Doanh thu</value></data>

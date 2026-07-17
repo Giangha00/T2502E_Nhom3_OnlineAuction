@@ -15,4 +15,6 @@ public class DashboardKpiCardViewModel
     public string? LinkUrl { get; set; }
 
     public string? CardKey { get; set; }
+
+    public decimal NumericValue { get; set; }
 }

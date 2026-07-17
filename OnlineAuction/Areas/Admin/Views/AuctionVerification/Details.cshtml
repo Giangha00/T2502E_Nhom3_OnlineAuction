@@ -12,8 +12,10 @@
             <p class="text-theme-sm text-gray-500 dark:text-gray-400">Auction #@Model.Id · submitted @(Model.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "—")</p>
         </div>
         <a asp-action="Index"
-           class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-            Back to queue
+           class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg"
+           title="Back to queue"
+           aria-label="Back to queue">
+            <partial name="_AdminIcon" model='"arrow-left"' />
         </a>
     </div>
 
@@ -117,8 +119,10 @@
                    asp-controller="User"
                    asp-action="Details"
                    asp-route-id="@Model.SellerId"
-                   class="mt-3 inline-flex text-theme-sm font-medium text-brand-600 hover:text-brand-700">
-                    View seller in Admin
+                   class="admin-icon-action admin-icon-action--view admin-icon-action--sm mt-3"
+                   title="View seller in Admin"
+                   aria-label="View seller in Admin">
+                    <partial name="_AdminIcon" model='"external"' />
                 </a>
             </section>
         </div>
@@ -137,8 +141,10 @@
                       onsubmit="return confirm('Approve this listing?');">
                     @Html.AntiForgeryToken()
                     <button type="submit"
-                            class="w-full rounded-lg bg-success-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-success-600">
-                        Approve
+                            class="admin-icon-action admin-icon-action--approve admin-icon-action--lg mx-auto w-full max-w-none"
+                            title="Approve"
+                            aria-label="Approve">
+                        <partial name="_AdminIcon" model='"check"' />
                     </button>
                 </form>
 
@@ -158,8 +164,10 @@
                               placeholder="Explain what needs to be fixed..."
                               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></textarea>
                     <button type="submit"
-                            class="w-full rounded-lg bg-error-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-error-600">
-                        Reject
+                            class="admin-icon-action admin-icon-action--reject admin-icon-action--lg mx-auto w-full max-w-none"
+                            title="Reject"
+                            aria-label="Reject">
+                        <partial name="_AdminIcon" model='"x-mark"' />
                     </button>
                 </form>
             </div>

@@ -9,7 +9,7 @@
     <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90">@sectionTitle</h4>
     @if (!string.IsNullOrWhiteSpace(editProductUrl))
     {
-      <a href="@editProductUrl" class="text-theme-sm font-medium text-brand-500 hover:underline">@Localizer["AdminProduct.EditProduct"]</a>
+      <a href="@editProductUrl" class="admin-icon-action admin-icon-action--edit admin-icon-action--sm" title="@Localizer["AdminProduct.EditProduct"]" aria-label="@Localizer["AdminProduct.EditProduct"]"><partial name="_AdminIcon" model='"pencil"' /></a>
     }
   </div>
 
@@ -39,19 +39,25 @@
               <td class="px-4 py-3">
                 <div class="flex justify-end gap-2">
                   <a href="@document.FileUrl" target="_blank" rel="noopener"
-                     class="rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300">
-                    @Localizer["AdminProduct.View"]
+                     class="admin-icon-action admin-icon-action--view"
+                     title="@Localizer["AdminProduct.View"]"
+                     aria-label="@Localizer["AdminProduct.View"]">
+                    <partial name="_AdminIcon" model='"eye"' />
                   </a>
                   <a asp-area="Admin" asp-controller="Product" asp-action="DownloadDocument" asp-route-id="@document.Id"
-                     class="rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300">
-                    @Localizer["AdminProduct.Download"]
+                     class="admin-icon-action admin-icon-action--neutral"
+                     title="@Localizer["AdminProduct.Download"]"
+                     aria-label="@Localizer["AdminProduct.Download"]">
+                    <partial name="_AdminIcon" model='"download"' />
                   </a>
                   <button type="button"
-                          class="rounded-lg bg-brand-500 px-3 py-1.5 text-theme-xs font-medium text-white hover:bg-brand-600"
+                          class="admin-icon-action admin-icon-action--review"
+                          title="@Localizer["AdminProduct.PreviewDocument"]"
+                          aria-label="@Localizer["AdminProduct.PreviewDocument"]"
                           data-doc-preview
                           data-doc-url="@document.FileUrl"
                           data-doc-name="@document.Name">
-                    @Localizer["AdminProduct.PreviewDocument"]
+                    <partial name="_AdminIcon" model='"preview"' />
                   </button>
                 </div>
               </td>
@@ -67,7 +73,7 @@
   <div class="flex h-[min(90vh,820px)] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-gray-900">
     <div class="flex items-center justify-between border-b border-gray-200 px-5 py-4 dark:border-gray-800">
       <h3 id="adminDocumentPreviewTitle" class="text-base font-semibold text-gray-900 dark:text-white"></h3>
-      <button type="button" id="adminDocumentPreviewClose" class="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-300">@Localizer["AdminProduct.Close"]</button>
+      <button type="button" id="adminDocumentPreviewClose" class="admin-icon-action admin-icon-action--neutral admin-icon-action--sm" title="@Localizer["AdminProduct.Close"]" aria-label="@Localizer["AdminProduct.Close"]"><partial name="_AdminIcon" model='"x-mark"' /></button>
     </div>
     <iframe id="adminDocumentPreviewFrame" title="@Localizer["AdminProduct.DocumentPreview"]" class="h-full w-full border-0 bg-white"></iframe>
   </div>

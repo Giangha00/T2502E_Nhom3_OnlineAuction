@@ -25,12 +25,17 @@
             <a asp-area="Admin"
                asp-controller="Product"
                asp-action="Index"
-               class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                @Localizer["AdminProduct.Cancel"]
+               class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg"
+               title="@Localizer["AdminProduct.Cancel"]"
+               aria-label="@Localizer["AdminProduct.Cancel"]">
+                <partial name="_AdminIcon" model='"x-mark"' />
             </a>
 
-            <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
-                @Localizer["AdminProduct.CreateProduct"]
+            <button type="submit"
+                    class="admin-icon-action admin-icon-action--primary admin-icon-action--lg"
+                    title="@Localizer["AdminProduct.CreateProduct"]"
+                    aria-label="@Localizer["AdminProduct.CreateProduct"]">
+                <partial name="_AdminIcon" model='"plus"' />
             </button>
         </div>
     </form>

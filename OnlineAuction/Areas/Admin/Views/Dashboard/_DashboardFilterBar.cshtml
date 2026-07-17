@@ -9,16 +9,22 @@
       asp-area="Admin"
       asp-controller="Dashboard"
       asp-action="Index"
-      class="mb-6 rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03] md:p-5">
+      class="admin-dashboard-filter mb-6">
     <input type="hidden" name="registrationGranularity" value="@Model.Filter.RegistrationGranularity" />
     <input type="hidden" id="dashboardDateFrom" name="dateFrom" value="@Model.Filter.DateFrom.ToString("yyyy-MM-dd")" />
     <input type="hidden" id="dashboardDateTo" name="dateTo" value="@Model.Filter.DateTo.ToString("yyyy-MM-dd")" />
     <input type="hidden" id="dashboardDateRangeValue" value="@dateRangeDisplay" />
 
     <div class="flex flex-col gap-4">
-        <div class="flex flex-col gap-1">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_Filter_Title"]</h3>
-            <p class="text-theme-sm text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Filter_Description"]</p>
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_Filter_Title"]</h3>
+                <p class="text-theme-sm text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Filter_Description"]</p>
+            </div>
+            <span class="admin-dashboard-period-badge">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M6 2a1 1 0 011 1v1h6V3a1 1 0 112 0v1h1a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2h1V3a1 1 0 011-1zm10 7H4v7h12V9z" clip-rule="evenodd" /></svg>
+                @dateRangeDisplay
+            </span>
         </div>
 
         @if (!string.IsNullOrWhiteSpace(Model.FilterValidationErrorKey))
@@ -28,6 +34,13 @@
                 @Localizer[Model.FilterValidationErrorKey]
             </div>
         }
+
+        <div class="admin-dashboard-filter__presets" role="group" aria-label="@Localizer["Admin_Dashboard_Filter_Title"]">
+            <button type="button" class="admin-dashboard-filter__preset" data-dashboard-preset="7">@Localizer["Admin_Dashboard_Filter_Preset_7Days"]</button>
+            <button type="button" class="admin-dashboard-filter__preset" data-dashboard-preset="30">@Localizer["Admin_Dashboard_Filter_Preset_30Days"]</button>
+            <button type="button" class="admin-dashboard-filter__preset" data-dashboard-preset="this-month">@Localizer["Admin_Dashboard_Filter_Preset_ThisMonth"]</button>
+            <button type="button" class="admin-dashboard-filter__preset" data-dashboard-preset="last-month">@Localizer["Admin_Dashboard_Filter_Preset_LastMonth"]</button>
+        </div>
 
         <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
             <div class="w-full sm:w-auto sm:min-w-[300px]">
@@ -52,9 +65,11 @@
 
             <button type="submit"
                     id="dashboardFilterApply"
-                    class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 text-theme-sm font-medium text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70">
-                <span id="dashboardFilterApplyLabel">@Localizer["Admin_Dashboard_Filter_Apply"]</span>
+                    class="admin-icon-action admin-icon-action--primary admin-icon-action--lg disabled:cursor-not-allowed disabled:opacity-70"
+                    title="@Localizer["Admin_Dashboard_Filter_Apply"]"
+                    aria-label="@Localizer["Admin_Dashboard_Filter_Apply"]">
                 <span id="dashboardFilterApplySpinner" class="hidden h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                <span id="dashboardFilterApplyLabel"><partial name="_AdminIcon" model='"apply"' /></span>
             </button>
 
             <a id="dashboardExportLink"
@@ -63,8 +78,10 @@
                asp-action="Export"
                asp-route-dateFrom="@Model.Filter.DateFrom.ToString("yyyy-MM-dd")"
                asp-route-dateTo="@Model.Filter.DateTo.ToString("yyyy-MM-dd")"
-               class="inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                @Localizer["Admin_Dashboard_Filter_Export"]
+               class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg"
+               title="@Localizer["Admin_Dashboard_Filter_Export"]"
+               aria-label="@Localizer["Admin_Dashboard_Filter_Export"]">
+                <partial name="_AdminIcon" model='"export"' />
             </a>
         </div>
     </div>

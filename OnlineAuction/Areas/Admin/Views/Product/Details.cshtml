@@ -6,20 +6,24 @@
 }
 
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
-    <div class="mb-4 flex flex-wrap items-center gap-4">
+    <div class="mb-4 flex flex-wrap items-center gap-3">
         <a asp-area="Admin"
            asp-controller="Product"
            asp-action="Index"
-           class="text-theme-sm font-medium text-brand-500 hover:underline">
-            &larr; @Localizer["AdminProduct.BackToTemplates"]
+           class="admin-icon-action admin-icon-action--neutral admin-icon-action--sm"
+           title="@Localizer["AdminProduct.BackToTemplates"]"
+           aria-label="@Localizer["AdminProduct.BackToTemplates"]">
+            <partial name="_AdminIcon" model='"arrow-left"' />
         </a>
 
         <a asp-area="Admin"
            asp-controller="Product"
            asp-action="Template"
            asp-route-id="@Model.ProductTemplateId"
-           class="text-theme-sm font-medium text-brand-500 hover:underline">
-            @Localizer["AdminProduct.OpenTemplateProducts", Model.ProductTemplateName ?? string.Empty]
+           class="admin-icon-action admin-icon-action--view admin-icon-action--sm"
+           title="@Localizer["AdminProduct.OpenTemplateProducts", Model.ProductTemplateName ?? string.Empty]"
+           aria-label="@Localizer["AdminProduct.OpenTemplateProducts", Model.ProductTemplateName ?? string.Empty]">
+            <partial name="_AdminIcon" model='"layers"' />
         </a>
     </div>
 
@@ -36,8 +40,10 @@
                asp-controller="Product"
                asp-action="Edit"
                asp-route-id="@Model.Id"
-               class="rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
-                @Localizer["AdminProduct.Edit"]
+               class="admin-icon-action admin-icon-action--edit admin-icon-action--lg"
+               title="@Localizer["AdminProduct.Edit"]"
+               aria-label="@Localizer["AdminProduct.Edit"]">
+                <partial name="_AdminIcon" model='"pencil"' />
             </a>
 
             @if (Model.CanDelete)
@@ -50,8 +56,11 @@
                       method="post"
                       onsubmit="return confirm('@Localizer["AdminProduct.ConfirmDeleteProduct"]');">
                     @Html.AntiForgeryToken()
-                    <button type="submit" class="rounded-lg border border-error-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-error-600 hover:bg-error-50 dark:border-error-500/30 dark:bg-gray-800">
-                        @Localizer["AdminProduct.Delete"]
+                    <button type="submit"
+                            class="admin-icon-action admin-icon-action--delete admin-icon-action--lg"
+                            title="@Localizer["AdminProduct.Delete"]"
+                            aria-label="@Localizer["AdminProduct.Delete"]">
+                        <partial name="_AdminIcon" model='"trash"' />
                     </button>
                 </form>
             }
@@ -60,8 +69,10 @@
                asp-controller="Product"
                asp-action="Template"
                asp-route-id="@Model.ProductTemplateId"
-               class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                @Localizer["AdminProduct.Back"]
+               class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg"
+               title="@Localizer["AdminProduct.Back"]"
+               aria-label="@Localizer["AdminProduct.Back"]">
+                <partial name="_AdminIcon" model='"arrow-left"' />
             </a>
         </div>
     </div>
@@ -220,21 +231,25 @@
                                         @auction.StartDate.ToString("dd/MM/yyyy") – @auction.EndDate.ToString("dd/MM/yyyy")
                                     </td>
                                     <td class="px-5 py-4">
-                                        <div class="flex justify-end gap-3">
+                                        <div class="admin-icon-action-group">
                                             <a asp-area="Admin"
                                                asp-controller="Auction"
                                                asp-action="Details"
                                                asp-route-id="@auction.Id"
-                                               class="text-theme-sm font-medium text-brand-500 hover:underline">
-                                                @Localizer["AdminProduct.Admin"]
+                                               class="admin-icon-action admin-icon-action--view"
+                                               title="@Localizer["AdminProduct.Admin"]"
+                                               aria-label="@Localizer["AdminProduct.Admin"]">
+                                                <partial name="_AdminIcon" model='"eye"' />
                                             </a>
                                             @if (!string.IsNullOrWhiteSpace(auction.PublicDetailUrl))
                                             {
                                                 <a href="@auction.PublicDetailUrl"
                                                    target="_blank"
                                                    rel="noopener"
-                                                   class="text-theme-sm font-medium text-success-600 hover:underline">
-                                                    @Localizer["AdminProduct.Public"]
+                                                   class="admin-icon-action admin-icon-action--create"
+                                                   title="@Localizer["AdminProduct.Public"]"
+                                                   aria-label="@Localizer["AdminProduct.Public"]">
+                                                    <partial name="_AdminIcon" model='"external"' />
                                                 </a>
                                             }
                                         </div>

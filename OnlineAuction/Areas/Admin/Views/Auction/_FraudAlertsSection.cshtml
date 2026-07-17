@@ -119,15 +119,21 @@
                                     <form asp-area="Admin" asp-controller="Auction" asp-action="ReviewFraudAlert" method="post">
                                         <input type="hidden" name="alertId" value="@alert.Id" />
                                         <input type="hidden" name="auctionId" value="@Model.Id" />
-                                        <button type="submit" class="rounded-lg border border-blue-200 px-3 py-1.5 text-theme-xs font-medium text-blue-700 hover:bg-blue-50 dark:border-blue-500/30 dark:text-blue-300">
-                                            @Localizer["FraudAlerts_Action_Review"]
+                                        <button type="submit"
+                                                class="admin-icon-action admin-icon-action--review"
+                                                title="@Localizer["FraudAlerts_Action_Review"]"
+                                                aria-label="@Localizer["FraudAlerts_Action_Review"]">
+                                            <partial name="_AdminIcon" model='"review"' />
                                         </button>
                                     </form>
                                     <form asp-area="Admin" asp-controller="Auction" asp-action="DismissFraudAlert" method="post">
                                         <input type="hidden" name="alertId" value="@alert.Id" />
                                         <input type="hidden" name="auctionId" value="@Model.Id" />
-                                        <button type="submit" class="rounded-lg border border-gray-300 px-3 py-1.5 text-theme-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300">
-                                            @Localizer["FraudAlerts_Action_Dismiss"]
+                                        <button type="submit"
+                                                class="admin-icon-action admin-icon-action--neutral"
+                                                title="@Localizer["FraudAlerts_Action_Dismiss"]"
+                                                aria-label="@Localizer["FraudAlerts_Action_Dismiss"]">
+                                            <partial name="_AdminIcon" model='"x-mark"' />
                                         </button>
                                     </form>
                                 </div>

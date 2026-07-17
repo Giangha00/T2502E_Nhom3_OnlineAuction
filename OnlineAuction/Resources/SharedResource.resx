@@ -1093,6 +1093,7 @@
   <data name="Admin_Dashboard_Kpi_Gmv" xml:space="preserve"><value>GMV</value></data>
   <data name="Admin_Dashboard_Kpi_PlatformRevenue" xml:space="preserve"><value>Platform Revenue</value></data>
   <data name="Admin_Dashboard_Kpi_Commission" xml:space="preserve"><value>Commission (Marketplace Fees)</value></data>
+  <data name="Admin_Dashboard_Kpi_SellerProceeds" xml:space="preserve"><value>Seller Proceeds</value></data>
   <data name="Admin_Dashboard_Kpi_ListingFees" xml:space="preserve"><value>Listing Fees</value></data>
   <data name="Admin_Dashboard_Kpi_CompletedOrders" xml:space="preserve"><value>Completed Orders</value></data>
   <data name="Admin_Dashboard_RevenueSection_Title" xml:space="preserve"><value>Revenue</value></data>
