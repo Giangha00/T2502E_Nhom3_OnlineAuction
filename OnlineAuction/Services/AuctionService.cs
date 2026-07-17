@@ -14,6 +14,36 @@ public class AuctionService : IAuctionService
 {
     private const int HomeSectionItemCount = 15;
 
+    private static readonly string[] CuratedBestSellerEmails =
+    [
+        "giangha@auctionhouse.local",
+        "nguyen.hai@auctionhouse.local",
+        "viet.anh@auctionhouse.local",
+        "dan.long@auctionhouse.local",
+        "huu.quan@auctionhouse.local",
+        "van.hung@auctionhouse.local"
+    ];
+
+    private static readonly string[] CuratedBestSellerUserNames =
+    [
+        "giangha",
+        "nguyen.hai",
+        "viet.anh",
+        "dan.long",
+        "huu.quan",
+        "van.hung"
+    ];
+
+    private static readonly string[] CuratedBestSellerNames =
+    [
+        "Nguyễn Giang Hà",
+        "Đinh Văn Hải",
+        "Phạm Việt Anh",
+        "Cậu Đan Long",
+        "Nguyễn Hữu Quân",
+        "Nguyễn Văn Hưng"
+    ];
+
     private readonly AuctionHouseDbContext _dbContext;
     private readonly PlatformFeeSettings _feeSettings;
 
@@ -297,32 +327,66 @@ public class AuctionService : IAuctionService
         return auctions;
     }
 
-    private async Task<List<SellerViewModel>> QueryBestSellersAsync(int count = 5)
+    private async Task<List<SellerViewModel>> QueryBestSellersAsync()
     {
         var now = DateTime.UtcNow;
         var sellers = await _dbContext.Users
             .AsNoTracking()
             .Include(user => user.Products)
                 .ThenInclude(product => product.Auctions)
-            .Where(user => user.Status == UserStatus.Active && user.Role == UserRole.User)
+            .Where(user =>
+                user.Status == UserStatus.Active &&
+                ((user.Email != null && CuratedBestSellerEmails.Contains(user.Email)) ||
+                 (user.UserName != null && CuratedBestSellerUserNames.Contains(user.UserName))))
             .ToListAsync();
 
-        return sellers
-            .Select(user =>
-            {
-                var auctions = user.Products.SelectMany(product => product.Auctions).ToList();
-                var liveCount = auctions.Count(auction =>
-                    (auction.Status == AuctionStatuses.Live || auction.Status == AuctionStatuses.EndingSoon) &&
-                    auction.EndDate > now);
-                var completedCount = auctions.Count(auction => auction.Status == AuctionStatuses.Completed);
+        var sellersByEmail = sellers
+            .Where(user => !string.IsNullOrWhiteSpace(user.Email))
+            .ToDictionary(user => user.Email!, StringComparer.OrdinalIgnoreCase);
 
-                return ProductDetailMapper.MapSeller(user, liveCount, completedCount);
-            })
-            .Where(seller => seller.AuctionCount > 0)
-            .OrderByDescending(seller => seller.AuctionCount)
-            .ThenByDescending(seller => seller.SuccessfulSales)
-            .Take(count)
-            .ToList();
+        var sellersByUserName = sellers
+            .Where(user => !string.IsNullOrWhiteSpace(user.UserName))
+            .ToDictionary(user => user.UserName!, StringComparer.OrdinalIgnoreCase);
+
+        var result = new List<SellerViewModel>(CuratedBestSellerEmails.Length);
+
+        for (var index = 0; index < CuratedBestSellerEmails.Length; index++)
+        {
+            var email = CuratedBestSellerEmails[index];
+            var userName = CuratedBestSellerUserNames[index];
+            var displayName = CuratedBestSellerNames[index];
+
+            ApplicationUser? user = null;
+            if (!sellersByEmail.TryGetValue(email, out user))
+            {
+                sellersByUserName.TryGetValue(userName, out user);
+            }
+            {
+                result.Add(new SellerViewModel
+                {
+                    FullName = displayName,
+                    Username = displayName,
+                    AvatarUrl = $"/admin/images/user/user-{((index % 37) + 1):D2}.jpg"
+                });
+                continue;
+            }
+
+            var auctions = user.Products.SelectMany(product => product.Auctions).ToList();
+            var liveCount = auctions.Count(auction =>
+                (auction.Status == AuctionStatuses.Live || auction.Status == AuctionStatuses.EndingSoon) &&
+                auction.EndDate > now);
+            var completedCount = auctions.Count(auction => auction.Status == AuctionStatuses.Completed);
+
+            var seller = ProductDetailMapper.MapSeller(user, liveCount, completedCount);
+            if (string.IsNullOrWhiteSpace(seller.FullName))
+            {
+                seller.FullName = displayName;
+            }
+
+            result.Add(seller);
+        }
+
+        return result;
     }
 
     private static List<AuctionItemViewModel> PickSection(

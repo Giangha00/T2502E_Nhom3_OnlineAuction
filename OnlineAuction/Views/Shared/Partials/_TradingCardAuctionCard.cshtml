@@ -102,33 +102,48 @@ else if (variant == "compact")
 }
 else if (variant == "home")
 {
-    <article class="rarecard-card rarecard-card--home group">
-        <div class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition duration-300 group-hover:shadow-lg">
+    <article class="rarecard-card rarecard-card--home group h-full">
+        <div class="rarecard-card__shell overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition duration-300 group-hover:shadow-lg">
             <a asp-controller="@(isBuyNow ? "BuyNow" : "Auction")"
                asp-action="Detail"
                asp-route-id="@item.Id"
-               class="block">
-                <div class="relative aspect-[3/4] bg-stone-50">
-                    <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"/>
-                    @if (!string.IsNullOrEmpty(item.Grade))
+               class="flex flex-1 flex-col">
+                <div class="rarecard-card__image-wrap relative bg-stone-50">
+                    <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" class="rarecard-card__image object-contain transition duration-500 group-hover:scale-[1.03]"/>
+                    @if (!isBuyNow && !string.IsNullOrWhiteSpace(item.ListingPhase))
                     {
-                        <span class="absolute left-3 top-3 rounded-md bg-slate-900 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">@item.Grade</span>
+                        <span class="absolute left-2.5 top-2.5 max-w-[calc(100%-3rem)] rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide shadow @phaseBadgeClass">
+                            @Localizer[phaseLabelKey]
+                        </span>
+                    }
+                    else if (isBuyNow)
+                    {
+                        <span class="absolute left-2.5 top-2.5 rounded-md bg-emerald-600 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">@Localizer["BuyNow_InStock"]</span>
+                    }
+                    else if (!string.IsNullOrEmpty(item.Grade))
+                    {
+                        <span class="absolute left-2.5 top-2.5 rounded-md bg-slate-900 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">@item.Grade</span>
                     }
                 </div>
-                <div class="p-4">
-                    <h3 class="line-clamp-2 text-base font-semibold leading-snug text-stone-900">@item.Name</h3>
-                    @if (!string.IsNullOrEmpty(item.Subtitle))
-                    {
-                        <p class="mt-1 line-clamp-1 text-xs text-stone-500">@item.Subtitle</p>
-                    }
-                    <div class="mt-3.5 flex items-end justify-between gap-2 border-t border-stone-100 pt-3.5">
+                <div class="rarecard-card__body flex flex-1 flex-col p-3">
+                    <p class="text-[9px] font-bold uppercase tracking-wide text-blue-700">@item.Category</p>
+                    <h3 class="mt-1 line-clamp-2 min-h-[2.25rem] text-sm font-semibold leading-snug text-stone-900">@item.Name</h3>
+                    <p class="mt-1 line-clamp-1 min-h-[1rem] text-[11px] text-stone-500">@(string.IsNullOrEmpty(item.Subtitle) ? "\u00a0" : item.Subtitle)</p>
+                    <div class="rarecard-card__price-row mt-auto flex items-end justify-between gap-2 border-t border-stone-100 pt-2.5">
                         <div>
-                            <p class="text-[10px] font-semibold uppercase tracking-wider text-stone-400">@(isBuyNow ? Localizer["BuyNow_Price"] : Localizer["Card_CurrentBid"])</p>
-                            <p class="text-xl font-bold tabular-nums text-blue-700">$@item.CurrentPrice.ToString("N0")</p>
+                            <p class="text-[9px] font-semibold uppercase tracking-wider text-stone-400">@Localizer[priceLabelKey]</p>
+                            <p class="text-lg font-bold tabular-nums text-blue-700">$@item.CurrentPrice.ToString("N0")</p>
                         </div>
-                        @if (!isBuyNow)
+                        @if (Model.ShowTimeRemaining && !isBuyNow)
                         {
-                            <p class="max-w-[6rem] truncate text-right text-xs font-medium tabular-nums @(isEndingSoon ? "text-red-600" : "text-stone-600")">@item.TimeRemaining</p>
+                            <div class="text-right">
+                                <p class="text-[9px] font-semibold uppercase tracking-wider text-stone-400">@Localizer[countdownLabelKey]</p>
+                                <p class="text-[11px] font-semibold tabular-nums @(isEndingSoon ? "text-red-600" : "text-stone-700")">@item.TimeRemaining</p>
+                            </div>
+                        }
+                        else if (isBuyNow)
+                        {
+                            <p class="text-right text-[11px] font-semibold text-emerald-700">@Localizer["BuyNow_InStock"]</p>
                         }
                     </div>
                 </div>
@@ -137,9 +152,9 @@ else if (variant == "home")
             {
                 @if (isBuyNow)
                 {
-                    <div class="px-4 pb-4">
+                    <div class="rarecard-card__actions px-3 pb-3">
                         <button type="button"
-                                class="buy-now-add-to-cart mt-3.5 block w-full rounded-full bg-blue-700 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-blue-800"
+                                class="buy-now-add-to-cart block w-full rounded-full bg-blue-700 py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-white transition hover:bg-blue-800"
                                 data-auction-id="@item.Id"
                                 data-is-logged-in="@(isLoggedIn ? "true" : "false")"
                                 data-label="@actionLabel"
@@ -150,11 +165,13 @@ else if (variant == "home")
                 }
                 else
                 {
-                    <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id" class="block px-4 pb-4">
-                        <span class="mt-3.5 block w-full rounded-full bg-blue-700 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-white transition group-hover:bg-blue-800">
-                            @actionLabel
-                        </span>
-                    </a>
+                    <div class="rarecard-card__actions px-3 pb-3">
+                        <a asp-controller="Auction" asp-action="Detail" asp-route-id="@item.Id" class="block">
+                            <span class="block w-full rounded-full bg-blue-700 py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-white transition group-hover:bg-blue-800">
+                                @actionLabel
+                            </span>
+                        </a>
+                    </div>
                 }
             }
         </div>
