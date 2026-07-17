@@ -347,7 +347,7 @@ using (var scope = app.Services.CreateScope())
     await UserSeeder.SeedAsync(db, userManager);
     await AdminSeeder.SeedAsync(db, userManager, roleManager);
     await PermissionSeeder.SeedAsync(db, roleManager, userManager);
-    await AuctionCatalogSeeder.SeedAsync(db, refreshTestAuctions);
+    await AuctionCatalogSeeder.SeedAsync(db, userManager, refreshTestAuctions);
 }
 
 using (var scope = app.Services.CreateScope())

@@ -60,11 +60,6 @@ public class SellService : ISellService
             .Select(category => category.Name)
             .ToList();
 
-        if (model.Categories.Count == 0)
-        {
-            model.Categories = MockAuctionData.GetCategoryNames().ToList();
-        }
-
         model.Authenticators = GradeLabelHelper.Authenticators.ToList();
         model.GradeValues = GradeLabelHelper.GradeValues.ToList();
         model.Languages = CreateAuctionMockData.Languages.ToList();
