@@ -439,7 +439,7 @@ CREATE TABLE orders (
         FOREIGN KEY (deleted_by) REFERENCES users (id)
         ON UPDATE CASCADE ON DELETE SET NULL,
     CONSTRAINT chk_orders_amounts
-        CHECK (subtotal > 0 AND total_amount > 0)
+        CHECK (subtotal > 0 AND total_amount >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================

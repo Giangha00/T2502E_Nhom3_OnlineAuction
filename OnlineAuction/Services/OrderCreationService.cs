@@ -182,53 +182,28 @@ public class OrderCreationService : IOrderCreationService
         }
 
         var now = DateTime.UtcNow;
-        var order = await BuildAuctionWinOrderAsync(
+        var orderBuild = await BuildAuctionWinOrderAsync(
             auction,
             winningBid,
             now,
             paymentDeadlineHours: 48,
             cancellationToken: cancellationToken);
-        if (order is null)
+        if (orderBuild is null)
         {
             await transaction.RollbackAsync(cancellationToken);
             return null;
         }
 
+        var order = orderBuild.Order;
         _dbContext.Orders.Add(order);
-        auction.Status = AuctionStatuses.AwaitingPayment;
+        auction.Status = order.Status == OrderStatuses.Paid
+            ? AuctionStatuses.Completed
+            : AuctionStatuses.AwaitingPayment;
         auction.WinnerId = winningBid.BidderId;
         auction.UpdatedAt = now;
 
         try
         {
-            // Re-check DB state to avoid racing with anti-snipe extensions or other status changes
-            // Reload auction from database so any concurrent bid that extended EndDate is observed.
-            await _dbContext.Entry(auction).ReloadAsync(cancellationToken);
-
-            var isEndDateInFuture = DateTimeUtilities.IsInFutureUtc(auction.EndDate);
-            var isStatusLive = auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon;
-
-            if (!isStatusLive || isEndDateInFuture)
-            {
-                if (isEndDateInFuture)
-                {
-                    _logger.LogInformation(
-                        "Skipping auction {AuctionId} finalization: anti-snipe extension detected (endDate={EndDateUtc}).",
-                        auction.Id,
-                        auction.EndDate);
-                }
-                else
-                {
-                    _logger.LogInformation(
-                        "Skipping auction {AuctionId} finalization due to status change: status={Status}.",
-                        auction.Id,
-                        auction.Status);
-                }
-
-                await transaction.RollbackAsync(cancellationToken);
-                return null;
-            }
-
             await _dbContext.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
         }
@@ -248,7 +223,28 @@ public class OrderCreationService : IOrderCreationService
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
-        await NotifyAuctionWinAsync(auction, winningBid.BidderId, cancellationToken);
+        if (orderBuild.ExcessDepositRefundAmount > 0 && orderBuild.WinnerDepositId.HasValue)
+        {
+            var refundResult = await _depositRefundService.RefundDepositAmountAsync(
+                orderBuild.WinnerDepositId.Value,
+                orderBuild.ExcessDepositRefundAmount,
+                cancellationToken: cancellationToken);
+
+            if (!refundResult.Success)
+            {
+                _logger.LogWarning(
+                    "Excess deposit refund failed for auction {AuctionId}, deposit {DepositId}: {Message}",
+                    auctionId,
+                    orderBuild.WinnerDepositId.Value,
+                    refundResult.Message);
+            }
+        }
+
+        await NotifyAuctionWinAsync(
+            auction,
+            winningBid.BidderId,
+            order.Status == OrderStatuses.Paid,
+            cancellationToken);
         return order.Id;
     }
 
@@ -298,7 +294,7 @@ public class OrderCreationService : IOrderCreationService
             return false;
         }
 
-        var order = await BuildAuctionWinOrderAsync(
+        var orderBuild = await BuildAuctionWinOrderAsync(
             auction,
             winningBid,
             now,
@@ -306,20 +302,23 @@ public class OrderCreationService : IOrderCreationService
             excludingCancelledOrderId,
             cancellationToken);
 
-        if (order is null)
+        if (orderBuild is null)
         {
             return false;
         }
 
+        var order = orderBuild.Order;
         _dbContext.Orders.Add(order);
-        auction.Status = AuctionStatuses.AwaitingPayment;
+        auction.Status = order.Status == OrderStatuses.Paid
+            ? AuctionStatuses.Completed
+            : AuctionStatuses.AwaitingPayment;
         auction.WinnerId = winningBid.BidderId;
         auction.UpdatedAt = now;
 
         return true;
     }
 
-    private async Task<AuctionOrder?> BuildAuctionWinOrderAsync(
+    private async Task<AuctionWinOrderBuildResult?> BuildAuctionWinOrderAsync(
         Auction auction,
         Bid winningBid,
         DateTime now,
@@ -340,7 +339,10 @@ public class OrderCreationService : IOrderCreationService
         var insurance = Math.Round(Math.Max(60m, subtotal * 0.00721m), 2);
         var buyerCheckoutFee = MarketplaceFeeCalculator.CalculateBuyerCheckoutFee(subtotal, _feeSettings);
         var totalBeforeDeposit = subtotal + ShippingFee + insurance + buyerCheckoutFee;
-        var total = Math.Max(0, totalBeforeDeposit - depositAmount);
+        var depositApplied = Math.Min(depositAmount, totalBeforeDeposit);
+        var total = Math.Max(0, totalBeforeDeposit - depositApplied);
+        var isCoveredByDeposit = winnerDeposit is not null && total == 0m;
+        var excessDepositRefundAmount = Math.Max(0, depositAmount - depositApplied);
 
         var priorCancelledCount = await _dbContext.OrderItems
             .Include(item => item.Order)
@@ -352,7 +354,13 @@ public class OrderCreationService : IOrderCreationService
 
         var recoverySuffix = priorCancelledCount > 0 ? $"-SC{priorCancelledCount + 1}" : string.Empty;
 
-        return new AuctionOrder
+        if (isCoveredByDeposit && winnerDeposit is not null)
+        {
+            winnerDeposit.Status = AuctionRegistrationDepositStatuses.Applied;
+            winnerDeposit.UpdatedAt = now;
+        }
+
+        var order = new AuctionOrder
         {
             OrderReference = $"AH-{now:yyyyMMdd}-{auction.Id}{recoverySuffix}",
             BuyerId = winningBid.BidderId,
@@ -360,11 +368,12 @@ public class OrderCreationService : IOrderCreationService
             ShippingFee = ShippingFee,
             VaultInsurance = insurance,
             PlatformFee = buyerCheckoutFee,
-            DepositApplied = depositAmount,
+            DepositApplied = depositApplied,
             TotalAmount = total,
-            Status = OrderStatuses.PendingPayment,
+            Status = isCoveredByDeposit ? OrderStatuses.Paid : OrderStatuses.PendingPayment,
             OrderSource = OrderSources.AuctionWin,
             PaymentDeadline = now.AddHours(paymentDeadlineHours),
+            PaymentMethod = isCoveredByDeposit ? "deposit" : null,
             CreatedAt = now,
             Items =
             [
@@ -379,19 +388,37 @@ public class OrderCreationService : IOrderCreationService
                 }
             ]
         };
+
+        if (isCoveredByDeposit)
+        {
+            MarketplaceFeeCalculator.ApplySellerSettlement(order, _feeSettings);
+        }
+
+        return new AuctionWinOrderBuildResult(
+            order,
+            winnerDeposit?.Id,
+            excessDepositRefundAmount);
     }
+
+    private sealed record AuctionWinOrderBuildResult(
+        AuctionOrder Order,
+        long? WinnerDepositId,
+        decimal ExcessDepositRefundAmount);
 
     private async Task NotifyAuctionWinAsync(
         Auction auction,
         int winningBidderId,
+        bool paidByDeposit,
         CancellationToken cancellationToken)
     {
         await _notificationService.CreateAndPushAsync(
             winningBidderId,
             "You won the auction!",
-            $"Congratulations! You won {auction.Product.Name}. Complete payment within 48 hours.",
+            paidByDeposit
+                ? $"Congratulations! You won {auction.Product.Name}. Your registration deposit covered the order."
+                : $"Congratulations! You won {auction.Product.Name}. Complete payment within 48 hours.",
             NotificationType.Winning,
-            "/Order",
+            paidByDeposit ? "/Account/PurchaseHistory" : "/Order",
             NotificationReferenceTypes.AuctionWon,
             auction.Id,
             cancellationToken: cancellationToken);

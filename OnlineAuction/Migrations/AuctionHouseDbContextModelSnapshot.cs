@@ -623,7 +623,7 @@ namespace OnlineAuction.Migrations
 
                     b.ToTable("orders", null, t =>
                         {
-                            t.HasCheckConstraint("chk_orders_amounts", "`subtotal` > 0 AND `total_amount` > 0");
+                            t.HasCheckConstraint("chk_orders_amounts", "`subtotal` > 0 AND `total_amount` >= 0");
                         });
                 });
 

@@ -29,6 +29,20 @@ public class RegistrationDepositRefundService : IRegistrationDepositRefundServic
         long depositId,
         bool pushNotification = true,
         CancellationToken cancellationToken = default)
+        => await RefundDepositAmountCoreAsync(depositId, null, pushNotification, cancellationToken);
+
+    public async Task<RegistrationDepositResult> RefundDepositAmountAsync(
+        long depositId,
+        decimal amount,
+        bool pushNotification = true,
+        CancellationToken cancellationToken = default)
+        => await RefundDepositAmountCoreAsync(depositId, amount, pushNotification, cancellationToken);
+
+    private async Task<RegistrationDepositResult> RefundDepositAmountCoreAsync(
+        long depositId,
+        decimal? amount,
+        bool pushNotification,
+        CancellationToken cancellationToken)
     {
         var deposit = await _dbContext.AuctionRegistrationDeposits
             .Include(d => d.Auction)
@@ -49,7 +63,24 @@ public class RegistrationDepositRefundService : IRegistrationDepositRefundServic
                 depositAmount: deposit.Amount);
         }
 
-        if (deposit.Status != AuctionRegistrationDepositStatuses.Paid)
+        if (deposit.Status == AuctionRegistrationDepositStatuses.Applied &&
+            amount.HasValue &&
+            !string.IsNullOrWhiteSpace(deposit.PayPalRefundId))
+        {
+            return RegistrationDepositResult.Ok(
+                "Tiền cọc dư đã được hoàn trước đó.",
+                auctionId: deposit.AuctionId,
+                depositAmount: amount.Value);
+        }
+
+        if (deposit.Status == AuctionRegistrationDepositStatuses.Applied && !amount.HasValue)
+        {
+            return RegistrationDepositResult.Fail(
+                "Tiền cọc đã được áp dụng cho đơn hàng, không thể hoàn toàn bộ.");
+        }
+
+        if (deposit.Status != AuctionRegistrationDepositStatuses.Paid &&
+            deposit.Status != AuctionRegistrationDepositStatuses.Applied)
         {
             return RegistrationDepositResult.Fail(
                 "Chỉ có thể hoàn tiền cọc đã thanh toán.");
@@ -61,9 +92,15 @@ public class RegistrationDepositRefundService : IRegistrationDepositRefundServic
                 "Không có PayPal capture id để hoàn tiền.");
         }
 
+        var refundAmount = amount ?? deposit.Amount;
+        if (refundAmount <= 0 || refundAmount > deposit.Amount)
+        {
+            return RegistrationDepositResult.Fail("Số tiền hoàn cọc không hợp lệ.");
+        }
+
         var refundResult = await _payPalService.RefundCaptureAsync(
             deposit.PayPalCaptureId,
-            deposit.Amount,
+            refundAmount,
             cancellationToken);
 
         if (!refundResult.Success)
@@ -78,7 +115,11 @@ public class RegistrationDepositRefundService : IRegistrationDepositRefundServic
                 refundResult.ErrorMessage ?? "Hoàn tiền thất bại.");
         }
 
-        deposit.Status = AuctionRegistrationDepositStatuses.Refunded;
+        if (refundAmount == deposit.Amount)
+        {
+            deposit.Status = AuctionRegistrationDepositStatuses.Refunded;
+        }
+
         deposit.PayPalRefundId = refundResult.RefundId;
         deposit.RefundedAt = DateTime.UtcNow;
         deposit.UpdatedAt = DateTime.UtcNow;
@@ -91,7 +132,7 @@ public class RegistrationDepositRefundService : IRegistrationDepositRefundServic
             await _notificationService.CreateAndPushAsync(
                 deposit.UserId,
                 "Deposit refunded",
-                $"Your deposit of ${deposit.Amount:N0} for {productName} has been refunded.",
+                $"Your deposit refund of ${refundAmount:N0} for {productName} has been processed.",
                 NotificationType.Refund,
                 $"/Auction/Detail/{deposit.AuctionId}",
                 NotificationReferenceTypes.AuctionDepositRefunded,
@@ -102,7 +143,7 @@ public class RegistrationDepositRefundService : IRegistrationDepositRefundServic
         return RegistrationDepositResult.Ok(
             "Hoàn tiền cọc thành công.",
             auctionId: deposit.AuctionId,
-            depositAmount: deposit.Amount);
+            depositAmount: refundAmount);
     }
     public async Task<int> RefundLoserDepositsForAuctionAsync(
     int auctionId,

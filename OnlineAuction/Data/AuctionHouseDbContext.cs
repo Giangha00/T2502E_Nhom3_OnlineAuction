@@ -716,7 +716,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_orders_amounts",
-                "`subtotal` > 0 AND `total_amount` > 0"));
+                "`subtotal` > 0 AND `total_amount` >= 0"));
 
             ConfigureAuditableEntity(entity, "orders");
         });
