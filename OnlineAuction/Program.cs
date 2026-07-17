@@ -249,6 +249,8 @@ builder.Services.Configure<PlatformFeeSettings>(
     builder.Configuration.GetSection(PlatformFeeSettings.SectionName));
 builder.Services.Configure<WinnerNonPaymentSettings>(
     builder.Configuration.GetSection(WinnerNonPaymentSettings.SectionName));
+builder.Services.Configure<SmokeTestingSettings>(
+    builder.Configuration.GetSection(SmokeTestingSettings.SectionName));
 
 builder.Services.AddHttpClient<IPayPalService, PayPalService>();
 builder.Services.AddHttpClient<GmailEmailSender>(client =>
@@ -275,6 +277,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderCreationService, OrderCreationService>();
 builder.Services.AddScoped<IWinnerNonPaymentRecoveryService, WinnerNonPaymentRecoveryService>();
 builder.Services.AddScoped<IOrderPaymentService, OrderPaymentService>();
+builder.Services.AddScoped<IPayPalCaptureGuardService, PayPalCaptureGuardService>();
 builder.Services.AddHostedService<AuctionFinalizationWorker>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IRefundComplaintService, RefundComplaintService>();
@@ -343,11 +346,15 @@ using (var scope = app.Services.CreateScope())
     var refreshTestAuctions = configuration.GetValue("SeedData:RefreshTestAuctionsOnStartup", false)
         || (app.Environment.IsDevelopment()
             && configuration.GetValue("SeedData:RefreshTestAuctionsInDevelopment", true));
+    var syncCatalog = !refreshTestAuctions && (
+        configuration.GetValue("SeedData:SyncCatalogOnStartup", false)
+        || (app.Environment.IsDevelopment()
+            && configuration.GetValue("SeedData:SyncCatalogInDevelopment", true)));
 
     await UserSeeder.SeedAsync(db, userManager);
     await AdminSeeder.SeedAsync(db, userManager, roleManager);
     await PermissionSeeder.SeedAsync(db, roleManager, userManager);
-    await AuctionCatalogSeeder.SeedAsync(db, userManager, refreshTestAuctions);
+    await AuctionCatalogSeeder.SeedAsync(db, userManager, refreshTestAuctions, syncCatalog);
 }
 
 using (var scope = app.Services.CreateScope())

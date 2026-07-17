@@ -17,8 +17,10 @@
     <div class="mb-4 flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03] sm:flex-row sm:items-center sm:justify-between">
         <button type="submit"
                 data-bulk-delete="true"
-                class="h-10 rounded-lg border border-error-300 bg-white px-4 text-theme-sm font-medium text-error-600 hover:bg-error-50 dark:border-error-500/30 dark:bg-gray-800">
-            Delete selected
+                class="admin-icon-action admin-icon-action--delete admin-icon-action--lg"
+                title="Delete selected"
+                aria-label="Delete selected">
+            <partial name="_AdminIcon" model='"trash"' />
         </button>
 
         <div class="text-theme-sm text-gray-500">
@@ -78,28 +80,34 @@
                             </td>
                             <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@category.CreatedAt.ToString("dd/MM/yyyy")</td>
                             <td class="px-5 py-4">
-                                <div class="flex justify-end gap-3">
+                                <div class="admin-icon-action-group">
                                     <a asp-area="Admin"
                                        asp-controller="Category"
                                        asp-action="Details"
                                        asp-route-id="@category.Id"
-                                       class="text-theme-sm font-medium text-brand-500 hover:underline">
-                                        Details
+                                       class="admin-icon-action admin-icon-action--view"
+                                       title="Details"
+                                       aria-label="Details">
+                                        <partial name="_AdminIcon" model='"eye"' />
                                     </a>
 
                                     <a asp-area="Admin"
                                        asp-controller="Category"
                                        asp-action="Edit"
                                        asp-route-id="@category.Id"
-                                       class="text-theme-sm font-medium text-warning-600 hover:underline">
-                                        Edit
+                                       class="admin-icon-action admin-icon-action--edit"
+                                       title="Edit"
+                                       aria-label="Edit">
+                                        <partial name="_AdminIcon" model='"pencil"' />
                                     </a>
 
                                     <button type="submit"
                                             formaction="@Url.Action("Delete", "Category", new { area = "Admin", id = category.Id })"
-                                            class="text-theme-sm font-medium text-error-600 hover:underline"
+                                            class="admin-icon-action admin-icon-action--delete"
+                                            title="Delete"
+                                            aria-label="Delete"
                                             onclick="return confirm('Are you sure you want to delete this category?');">
-                                        Delete
+                                        <partial name="_AdminIcon" model='"trash"' />
                                     </button>
                                 </div>
                             </td>
@@ -126,8 +134,10 @@
            asp-route-SortOrder="@Model.Filter.SortOrder"
            asp-route-IsActive="@Model.Filter.IsActive"
            asp-route-Page="@(currentPage - 1)"
-           class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage <= 1 ? "pointer-events-none opacity-50" : "js-admin-page")">
-            Previous
+           class="admin-icon-action admin-icon-action--pagination @(currentPage <= 1 ? "is-disabled" : "js-admin-page")"
+           title="Previous"
+           aria-label="Previous">
+            <partial name="_AdminIcon" model='"chevron-left"' />
         </a>
 
         @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
@@ -151,8 +161,10 @@
            asp-route-SortOrder="@Model.Filter.SortOrder"
            asp-route-IsActive="@Model.Filter.IsActive"
            asp-route-Page="@(currentPage + 1)"
-           class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage >= totalPages ? "pointer-events-none opacity-50" : "js-admin-page")">
-            Next
+           class="admin-icon-action admin-icon-action--pagination @(currentPage >= totalPages ? "is-disabled" : "js-admin-page")"
+           title="Next"
+           aria-label="Next">
+            <partial name="_AdminIcon" model='"chevron-right"' />
         </a>
     </nav>
 </div>

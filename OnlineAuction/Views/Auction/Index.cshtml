@@ -186,7 +186,7 @@
       function sortCards(list) {
         var sort = sortSelect.value;
         return list.sort(function (a, b) {
-          if (sort === 'default') return Number(a.dataset.id) - Number(b.dataset.id);
+          if (sort === 'default') return Number(b.dataset.id) - Number(a.dataset.id);
           if (sort === 'price-asc') return Number(a.dataset.price) - Number(b.dataset.price);
           if (sort === 'price-desc') return Number(b.dataset.price) - Number(a.dataset.price);
           if (sort === 'name') return a.dataset.name.localeCompare(b.dataset.name);

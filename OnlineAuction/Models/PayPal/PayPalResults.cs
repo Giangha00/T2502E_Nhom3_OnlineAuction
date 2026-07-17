@@ -1,5 +1,88 @@
 namespace OnlineAuction.Models.PayPal;
 
+public class PayPalOrderDetailsResult
+{
+    public bool Success { get; init; }
+
+    public string? PayPalOrderId { get; init; }
+
+    public string? Status { get; init; }
+
+    public decimal OrderAmount { get; init; }
+
+    public string? CaptureId { get; init; }
+
+    public decimal? CapturedAmount { get; init; }
+
+    public bool IsCaptured => !string.IsNullOrWhiteSpace(CaptureId);
+
+    public string? ErrorMessage { get; init; }
+
+    public static PayPalOrderDetailsResult Ok(
+        string payPalOrderId,
+        string status,
+        decimal orderAmount,
+        string? captureId = null,
+        decimal? capturedAmount = null) =>
+        new()
+        {
+            Success = true,
+            PayPalOrderId = payPalOrderId,
+            Status = status,
+            OrderAmount = orderAmount,
+            CaptureId = captureId,
+            CapturedAmount = capturedAmount
+        };
+
+    public static PayPalOrderDetailsResult Fail(string message) =>
+        new() { Success = false, ErrorMessage = message };
+}
+
+public class SafePayPalCaptureResult
+{
+    public bool Success { get; init; }
+
+    public bool WasAlreadyCaptured { get; init; }
+
+    public string? CaptureId { get; init; }
+
+    public decimal CapturedAmount { get; init; }
+
+    public bool RefundAttempted { get; init; }
+
+    public bool RefundSucceeded { get; init; }
+
+    public string? ErrorMessage { get; init; }
+
+    public static SafePayPalCaptureResult Ok(string captureId, decimal amount) =>
+        new() { Success = true, CaptureId = captureId, CapturedAmount = amount };
+
+    public static SafePayPalCaptureResult FromExistingCapture(string captureId, decimal amount) =>
+        new()
+        {
+            Success = true,
+            WasAlreadyCaptured = true,
+            CaptureId = captureId,
+            CapturedAmount = amount
+        };
+
+    public static SafePayPalCaptureResult Fail(string message, bool refundAttempted = false, bool refundSucceeded = false) =>
+        new()
+        {
+            Success = false,
+            ErrorMessage = message,
+            RefundAttempted = refundAttempted,
+            RefundSucceeded = refundSucceeded
+        };
+}
+
+public record PayPalCaptureContext(
+    string Flow,
+    int UserId,
+    int? OrderId = null,
+    long? DepositId = null,
+    IReadOnlyList<int>? OrderIds = null);
+
 public class PayPalCreateOrderResult
 {
     public bool Success { get; init; }

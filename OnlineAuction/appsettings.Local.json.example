@@ -10,6 +10,9 @@
   "PasswordResetOtp": {
     "UseMockOtpSender": true
   },
+  "SmokeTesting": {
+    "Enabled": true
+  },
   "BidFraudDetection": {
     "Enabled": true,
     "RateLimitingEnabled": true,

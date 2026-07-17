@@ -392,6 +392,13 @@ public class AdminProductService : IAdminProductService
         var products = await query
             .Skip((filter.Page - 1) * filter.PageSize)
             .Take(filter.PageSize)
+            .AsSplitQuery()
+            .Include(product => product.Category)
+            .Include(product => product.Seller)
+            .Include(product => product.Auctions)
+            .ToListAsync();
+
+        var productItems = products
             .Select(product => new ProductListItemViewModel
             {
                 Id = product.Id,
@@ -415,13 +422,13 @@ public class AdminProductService : IAdminProductService
                      auction.Status == AuctionStatuses.AwaitingPayment)),
                 CreatedAt = product.CreatedAt
             })
-            .ToListAsync();
+            .ToList();
 
-        ApplyProductCodes(products);
+        ApplyProductCodes(productItems);
 
         return new ProductListViewModel
         {
-            Products = products,
+            Products = productItems,
             Filter = filter,
             CategoryOptions = await BuildCategoryOptionsAsync(filter.CategoryId),
             SellerOptions = await BuildSellerOptionsAsync(filter.SellerId, filter.ProductTemplateId),
@@ -1261,9 +1268,21 @@ public class AdminProductService : IAdminProductService
 
         if (templateId.HasValue)
         {
-            query = query.Where(user => user.Products.Any(product =>
-                product.DeletedAt == null &&
-                product.ProductTemplateId == templateId.Value));
+            var sellerIds = await _dbContext.Products
+                .AsNoTracking()
+                .Where(product =>
+                    product.DeletedAt == null &&
+                    product.ProductTemplateId == templateId.Value)
+                .Select(product => product.SellerId)
+                .Distinct()
+                .ToListAsync();
+
+            if (sellerIds.Count == 0)
+            {
+                return [];
+            }
+
+            query = query.Where(user => sellerIds.Contains(user.Id));
         }
 
         var sellers = await query
@@ -1327,28 +1346,40 @@ public class AdminProductService : IAdminProductService
 
     private async Task<ProductTemplateDetailViewModel?> GetTemplateDetailsAsync(int templateId)
     {
-        return await _dbContext.ProductTemplates
+        var template = await _dbContext.ProductTemplates
             .AsNoTracking()
-            .Where(template => template.Id == templateId && template.DeletedAt == null && template.IsActive)
-            .Select(template => new ProductTemplateDetailViewModel
+            .Where(item => item.Id == templateId && item.DeletedAt == null && item.IsActive)
+            .Select(item => new ProductTemplateDetailViewModel
             {
-                Id = template.Id,
-                Name = template.Name,
-                CategoryName = template.Category.Name,
-                SetName = template.SetName,
-                CardNumber = template.CardNumber,
-                GradeLabel = template.GradeLabel,
-                Language = template.Language,
-                Year = template.Year,
-                PrimaryImage = template.PrimaryImage,
-                InstanceCount = template.Products.Count(product => product.DeletedAt == null),
-                SellerCount = template.Products
-                    .Where(product => product.DeletedAt == null)
-                    .Select(product => product.SellerId)
-                    .Distinct()
-                    .Count()
+                Id = item.Id,
+                Name = item.Name,
+                CategoryName = item.Category.Name,
+                SetName = item.SetName,
+                CardNumber = item.CardNumber,
+                GradeLabel = item.GradeLabel,
+                Language = item.Language,
+                Year = item.Year,
+                PrimaryImage = item.PrimaryImage
             })
             .FirstOrDefaultAsync();
+
+        if (template is null)
+        {
+            return null;
+        }
+
+        template.InstanceCount = await _dbContext.Products
+            .AsNoTracking()
+            .CountAsync(product => product.ProductTemplateId == templateId && product.DeletedAt == null);
+
+        template.SellerCount = await _dbContext.Products
+            .AsNoTracking()
+            .Where(product => product.ProductTemplateId == templateId && product.DeletedAt == null)
+            .Select(product => product.SellerId)
+            .Distinct()
+            .CountAsync();
+
+        return template;
     }
 
     private async Task<string?> ValidateTemplateAsync(ProductTemplateFormViewModel model)

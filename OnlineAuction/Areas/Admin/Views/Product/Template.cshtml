@@ -12,8 +12,8 @@
 
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
     <div class="mb-4">
-        <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="inline-flex items-center text-theme-sm font-medium text-brand-500 hover:underline">
-            &larr; @Localizer["AdminProduct.BackToTemplates"]
+        <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="admin-icon-action admin-icon-action--neutral admin-icon-action--sm" title="@Localizer["AdminProduct.BackToTemplates"]" aria-label="@Localizer["AdminProduct.BackToTemplates"]">
+            <partial name="_AdminIcon" model='"arrow-left"' />
         </a>
     </div>
 
@@ -42,8 +42,8 @@
             </div>
         </div>
 
-        <a asp-area="Admin" asp-controller="Product" asp-action="Create" asp-route-templateId="@templateId" class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
-            @Localizer["AdminProduct.CreateProduct"]
+        <a asp-area="Admin" asp-controller="Product" asp-action="Create" asp-route-templateId="@templateId" class="admin-icon-action admin-icon-action--primary admin-icon-action--lg" title="@Localizer["AdminProduct.CreateProduct"]" aria-label="@Localizer["AdminProduct.CreateProduct"]">
+            <partial name="_AdminIcon" model='"plus"' />
         </a>
     </div>
 

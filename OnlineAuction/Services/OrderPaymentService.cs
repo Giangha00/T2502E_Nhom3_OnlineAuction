@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Models.PayPal;
 using OnlineAuction.Services.Interfaces;
@@ -17,6 +18,7 @@ public class OrderPaymentService : IOrderPaymentService
 {
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IPayPalService _payPalService;
+    private readonly IPayPalCaptureGuardService _payPalCaptureGuardService;
     private readonly INotificationService _notificationService;
     private readonly IOrderService _orderService;
     private readonly IRealtimePublisher _realtimePublisher;
@@ -26,6 +28,7 @@ public class OrderPaymentService : IOrderPaymentService
     public OrderPaymentService(
         AuctionHouseDbContext dbContext,
         IPayPalService payPalService,
+        IPayPalCaptureGuardService payPalCaptureGuardService,
         INotificationService notificationService,
         IOrderService orderService,
         IRealtimePublisher realtimePublisher,
@@ -34,6 +37,7 @@ public class OrderPaymentService : IOrderPaymentService
     {
         _dbContext = dbContext;
         _payPalService = payPalService;
+        _payPalCaptureGuardService = payPalCaptureGuardService;
         _notificationService = notificationService;
         _orderService = orderService;
         _realtimePublisher = realtimePublisher;
@@ -162,28 +166,43 @@ public class OrderPaymentService : IOrderPaymentService
             return PayPalCaptureCheckoutResult.Ok(orders[0].Id, orders.Select(order => order.Id).ToList());
         }
 
-        var expectedAmount = orders
+        var payableOrders = orders
             .Where(order => order.Status == OrderStatuses.PendingPayment)
-            .Sum(order => order.TotalAmount);
+            .ToList();
 
-        var captureResult = await _payPalService.CaptureOrderAsync(payPalOrderId, cancellationToken);
-        if (!captureResult.Success)
-        {
-            return PayPalCaptureCheckoutResult.Fail(captureResult.ErrorMessage ?? "Payment capture failed.");
-        }
-
-        if (!AmountsMatch(expectedAmount, captureResult.CapturedAmount))
+        if (payableOrders.Count == 0)
         {
             _logger.LogWarning(
-                "PayPal capture amount mismatch for buyer {BuyerId}. Expected {Expected}, got {Actual}.",
+                "PayPal capture rejected because no payable orders remain. PayPalOrderId={PayPalOrderId} BuyerId={BuyerId} OrderIds={OrderIds}",
+                payPalOrderId,
                 buyerId,
-                expectedAmount,
-                captureResult.CapturedAmount);
+                string.Join(',', orders.Select(order => order.Id)));
 
-            return PayPalCaptureCheckoutResult.Fail("Payment amount did not match the order total.");
+            return PayPalCaptureCheckoutResult.Fail(
+                "These orders are no longer payable. Please return to My Orders and start checkout again.");
+        }
+
+        var expectedAmount = payableOrders.Sum(order => order.TotalAmount);
+        var captureContext = new PayPalCaptureContext(
+            Flow: "order",
+            UserId: buyerId,
+            OrderId: payableOrders[0].Id,
+            OrderIds: payableOrders.Select(order => order.Id).ToList());
+
+        var captureResult = await _payPalCaptureGuardService.SafeCaptureAsync(
+            payPalOrderId,
+            expectedAmount,
+            captureContext,
+            cancellationToken);
+
+        if (!captureResult.Success || string.IsNullOrWhiteSpace(captureResult.CaptureId))
+        {
+            return PayPalCaptureCheckoutResult.Fail(
+                captureResult.ErrorMessage ?? "Payment capture failed.");
         }
 
         var paidOrderIds = new List<int>();
+        string? persistenceFailureMessage = null;
         var strategy = _dbContext.Database.CreateExecutionStrategy();
         await strategy.ExecuteAsync(async () =>
         {
@@ -191,26 +210,54 @@ public class OrderPaymentService : IOrderPaymentService
                 IsolationLevel.Serializable,
                 cancellationToken);
 
+            var reloadedPayments = await _dbContext.Payments
+                .Include(payment => payment.Order)
+                    .ThenInclude(order => order.Items)
+                .Where(payment =>
+                    payment.PayPalOrderId == payPalOrderId &&
+                    payment.Order.BuyerId == buyerId)
+                .ToListAsync(cancellationToken);
+
+            var reloadedOrders = reloadedPayments
+                .Select(payment => payment.Order)
+                .DistinctBy(order => order.Id)
+                .ToList();
+
+            if (reloadedOrders.All(order => order.Status == OrderStatuses.Paid))
+            {
+                paidOrderIds.AddRange(reloadedOrders.Select(order => order.Id));
+                await transaction.CommitAsync(cancellationToken);
+                return;
+            }
+
+            var stillPayableOrders = reloadedOrders
+                .Where(order => order.Status == OrderStatuses.PendingPayment)
+                .ToList();
+
+            if (stillPayableOrders.Count == 0)
+            {
+                persistenceFailureMessage =
+                    "Payment could not be applied because the order is no longer payable.";
+                return;
+            }
+
+            var reloadedExpectedAmount = stillPayableOrders.Sum(order => order.TotalAmount);
+            if (!PayPalAmountHelper.AmountsMatch(reloadedExpectedAmount, captureResult.CapturedAmount))
+            {
+                persistenceFailureMessage =
+                    "Payment amount changed while completing checkout. A refund has been initiated.";
+                return;
+            }
+
             var now = DateTime.UtcNow;
 
-            foreach (var order in orders.Where(order => order.Status == OrderStatuses.PendingPayment))
+            foreach (var order in stillPayableOrders)
             {
                 order.Status = OrderStatuses.Paid;
                 order.PaymentMethod = "paypal";
                 order.UpdatedAt = now;
                 MarketplaceFeeCalculator.ApplySellerSettlement(order, _feeSettings);
                 paidOrderIds.Add(order.Id);
-
-                // ------------------------------------------------------------
-                // Tiền cọc của winner đã được sử dụng.
-                //
-                // Deposit:
-                // Paid
-                //      ↓
-                // Applied
-                //
-                // Không refund nữa.
-                // ------------------------------------------------------------
 
                 var auctionId = order.Items.First().AuctionId;
 
@@ -228,7 +275,7 @@ public class OrderPaymentService : IOrderPaymentService
                 }
             }
 
-            foreach (var payment in pendingPayments.Where(payment => payment.Status == PaymentStatuses.Pending))
+            foreach (var payment in reloadedPayments.Where(payment => payment.Status == PaymentStatuses.Pending))
             {
                 payment.Status = PaymentStatuses.Success;
                 payment.TransactionId = captureResult.CaptureId;
@@ -236,7 +283,7 @@ public class OrderPaymentService : IOrderPaymentService
                 payment.UpdatedAt = now;
             }
 
-            var paidOrders = orders.Where(order => paidOrderIds.Contains(order.Id)).ToList();
+            var paidOrders = stillPayableOrders.Where(order => paidOrderIds.Contains(order.Id)).ToList();
             await OrderCancellationHelper.MarkAuctionsCompletedAfterPaymentAsync(
                 _dbContext,
                 paidOrders,
@@ -246,6 +293,30 @@ public class OrderPaymentService : IOrderPaymentService
             await _dbContext.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
         });
+
+        if (!string.IsNullOrWhiteSpace(persistenceFailureMessage))
+        {
+            var recovery = await _payPalService.RefundCaptureAsync(
+                captureResult.CaptureId,
+                captureResult.CapturedAmount,
+                cancellationToken);
+
+            _logger.LogCritical(
+                "MANUAL_RECOVERY_REQUIRED PayPal order capture could not be persisted. PayPalOrderId={PayPalOrderId} CaptureId={CaptureId} RefundSucceeded={RefundSucceeded} RefundError={RefundError} Reason={Reason}",
+                payPalOrderId,
+                captureResult.CaptureId,
+                recovery.Success,
+                recovery.ErrorMessage,
+                persistenceFailureMessage);
+
+            return PayPalCaptureCheckoutResult.Fail(persistenceFailureMessage);
+        }
+
+        if (paidOrderIds.Count == 0)
+        {
+            return PayPalCaptureCheckoutResult.Fail(
+                "Payment could not be applied because the order is no longer payable.");
+        }
 
         foreach (var orderId in paidOrderIds)
         {
@@ -533,7 +604,15 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
             .Where(order => order.Status == OrderStatuses.PendingPayment)
             .Sum(order => order.TotalAmount);
 
-        if (!AmountsMatch(expectedAmount, captureAmount))
+        if (expectedAmount <= 0)
+        {
+            _logger.LogWarning(
+                "PayPal webhook ignored because no payable orders remain. PayPalOrderId={PayPalOrderId}",
+                payPalOrderId);
+            return PayPalWebhookProcessingResult.Ok();
+        }
+
+        if (!PayPalAmountHelper.AmountsMatch(expectedAmount, captureAmount))
         {
             _logger.LogWarning(
                 "PayPal webhook capture amount mismatch for order {PayPalOrderId}. Expected={Expected}, Actual={Actual}.",
@@ -809,7 +888,4 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
 
         return $"Chưa xử lý status: {paymentStatus}";
     }
-
-    private static bool AmountsMatch(decimal expected, decimal actual) =>
-        Math.Abs(expected - actual) < 0.01m;
 }
