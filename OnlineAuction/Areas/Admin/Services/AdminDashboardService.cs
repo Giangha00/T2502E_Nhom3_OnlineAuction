@@ -177,7 +177,10 @@ public class AdminDashboardService : IAdminDashboardService
                     FormatInteger(newRegistrationsCurrent),
                     newRegistrationsCurrent,
                     newRegistrationsPrevious),
-                ActiveUsersKpi = BuildSnapshotKpi("Active Users", FormatInteger(activeUsersCount)),
+                ActiveUsersKpi = BuildSnapshotKpi(
+                    "Active Users",
+                    FormatInteger(activeUsersCount),
+                    activeUsersCount),
                 RegistrationByDay = BuildRegistrationSeries(registrationDates, "day", filter),
                 RegistrationByWeek = BuildRegistrationSeries(registrationDates, "week", filter),
                 RegistrationByMonth = BuildRegistrationSeries(registrationDates, "month", filter),
@@ -186,12 +189,22 @@ public class AdminDashboardService : IAdminDashboardService
             },
             AuctionSection = new DashboardAuctionSectionViewModel
             {
-                OngoingKpi = BuildSnapshotKpi("Ongoing Auctions", FormatInteger(statusCounts.Ongoing)),
-                EndedKpi = BuildSnapshotKpi("Ended Auctions", FormatInteger(statusCounts.Ended)),
-                CancelledKpi = BuildSnapshotKpi("Cancelled Auctions", FormatInteger(statusCounts.Cancelled)),
+                OngoingKpi = BuildSnapshotKpi(
+                    "Ongoing Auctions",
+                    FormatInteger(statusCounts.Ongoing),
+                    statusCounts.Ongoing),
+                EndedKpi = BuildSnapshotKpi(
+                    "Ended Auctions",
+                    FormatInteger(statusCounts.Ended),
+                    statusCounts.Ended),
+                CancelledKpi = BuildSnapshotKpi(
+                    "Cancelled Auctions",
+                    FormatInteger(statusCounts.Cancelled),
+                    statusCounts.Cancelled),
                 SuccessRateKpi = BuildSnapshotKpi(
                     "Success Rate",
-                    successRate.HasValue ? $"{successRate.Value:0.0}%" : "N/A"),
+                    successRate.HasValue ? $"{successRate.Value:0.0}%" : "N/A",
+                    successRate ?? 0),
                 CategoryBreakdown = await GetCategoryBidBreakdownAsync(filter, cancellationToken)
             }
         };
@@ -868,12 +881,16 @@ public class AdminDashboardService : IAdminDashboardService
 
     private static DashboardKpiCardViewModel BuildSnapshotKpi(
         string label,
-        string displayValue)
+        string displayValue,
+        decimal numericValue = 0,
+        string? cardKey = null)
     {
         return new DashboardKpiCardViewModel
         {
             Label = label,
             DisplayValue = displayValue,
+            NumericValue = numericValue,
+            CardKey = cardKey,
             ChangeDisplay = string.Empty
         };
     }
@@ -889,6 +906,7 @@ public class AdminDashboardService : IAdminDashboardService
         {
             Label = label,
             DisplayValue = displayValue,
+            NumericValue = currentValue,
             CardKey = cardKey
         };
 

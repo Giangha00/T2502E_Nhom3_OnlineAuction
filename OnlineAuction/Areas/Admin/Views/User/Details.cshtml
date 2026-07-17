@@ -17,15 +17,19 @@
                asp-controller="User"
                asp-action="Edit"
                asp-route-id="@Model.Id"
-               class="rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
-                Edit
+               class="admin-icon-action admin-icon-action--edit admin-icon-action--lg"
+               title="Edit"
+               aria-label="Edit">
+                <partial name="_AdminIcon" model='"pencil"' />
             </a>
 
             <a asp-area="Admin"
                asp-controller="User"
                asp-action="Index"
-               class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                Back
+               class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg"
+               title="Back"
+               aria-label="Back">
+                <partial name="_AdminIcon" model='"arrow-left"' />
             </a>
         </div>
     </div>

@@ -28,7 +28,7 @@
                 <tr>
                     <td colspan="8" class="px-5 py-10 text-center text-theme-sm text-gray-500">
                         @Localizer["AdminProduct.EmptyTemplates"]
-                        <a asp-area="Admin" asp-controller="Product" asp-action="CreateTemplate" class="ml-2 font-medium text-brand-500 hover:underline">@Localizer["AdminProduct.CreateTemplate"]</a>
+                        <a asp-area="Admin" asp-controller="Product" asp-action="CreateTemplate" class="admin-icon-action admin-icon-action--create admin-icon-action--sm ml-2" title="@Localizer["AdminProduct.CreateTemplate"]" aria-label="@Localizer["AdminProduct.CreateTemplate"]"><partial name="_AdminIcon" model='"plus"' /></a>
                     </td>
                 </tr>
             }
@@ -53,10 +53,10 @@
                         <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@template.InstanceCount</td>
                         <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@(template.LastAddedAt?.ToString("dd/MM/yyyy") ?? "—")</td>
                         <td class="px-5 py-4">
-                            <div class="flex justify-end gap-3">
-                                <a asp-area="Admin" asp-controller="Product" asp-action="Template" asp-route-id="@template.Id" class="text-theme-sm font-medium text-brand-500 hover:underline">@Localizer["AdminProduct.ViewProducts"]</a>
-                                <a asp-area="Admin" asp-controller="Product" asp-action="EditTemplate" asp-route-id="@template.Id" class="text-theme-sm font-medium text-warning-600 hover:underline">@Localizer["AdminProduct.EditTemplate"]</a>
-                                <a asp-area="Admin" asp-controller="Product" asp-action="Create" asp-route-templateId="@template.Id" class="text-theme-sm font-medium text-success-600 hover:underline">@Localizer["AdminProduct.CreateProduct"]</a>
+                            <div class="admin-icon-action-group">
+                                <a asp-area="Admin" asp-controller="Product" asp-action="Template" asp-route-id="@template.Id" class="admin-icon-action admin-icon-action--view" title="@Localizer["AdminProduct.ViewProducts"]" aria-label="@Localizer["AdminProduct.ViewProducts"]"><partial name="_AdminIcon" model='"layers"' /></a>
+                                <a asp-area="Admin" asp-controller="Product" asp-action="EditTemplate" asp-route-id="@template.Id" class="admin-icon-action admin-icon-action--edit" title="@Localizer["AdminProduct.EditTemplate"]" aria-label="@Localizer["AdminProduct.EditTemplate"]"><partial name="_AdminIcon" model='"pencil"' /></a>
+                                <a asp-area="Admin" asp-controller="Product" asp-action="Create" asp-route-templateId="@template.Id" class="admin-icon-action admin-icon-action--create" title="@Localizer["AdminProduct.CreateProduct"]" aria-label="@Localizer["AdminProduct.CreateProduct"]"><partial name="_AdminIcon" model='"plus"' /></a>
                             </div>
                         </td>
                     </tr>
@@ -75,13 +75,13 @@
     </p>
 
     <nav class="flex flex-wrap items-center gap-2">
-        <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-Search="@Model.Filter.Search" asp-route-SortOrder="@Model.Filter.SortOrder" asp-route-Page="@(currentPage - 1)" class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage <= 1 ? "pointer-events-none opacity-50" : "js-admin-page")">@Localizer["AdminProduct.Previous"]</a>
+        <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-Search="@Model.Filter.Search" asp-route-SortOrder="@Model.Filter.SortOrder" asp-route-Page="@(currentPage - 1)" class="admin-icon-action admin-icon-action--pagination @(currentPage <= 1 ? "is-disabled" : "js-admin-page")" title="@Localizer["AdminProduct.Previous"]" aria-label="@Localizer["AdminProduct.Previous"]"><partial name="_AdminIcon" model='"chevron-left"' /></a>
 
         @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
         {
             <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-Search="@Model.Filter.Search" asp-route-SortOrder="@Model.Filter.SortOrder" asp-route-Page="@pageNumber" class="js-admin-page rounded-lg border px-3 py-2 text-theme-sm font-medium @(pageNumber == currentPage ? "border-brand-500 bg-brand-500 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50")">@pageNumber</a>
         }
 
-        <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-Search="@Model.Filter.Search" asp-route-SortOrder="@Model.Filter.SortOrder" asp-route-Page="@(currentPage + 1)" class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 @(currentPage >= totalPages ? "pointer-events-none opacity-50" : "js-admin-page")">@Localizer["AdminProduct.Next"]</a>
+        <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-Search="@Model.Filter.Search" asp-route-SortOrder="@Model.Filter.SortOrder" asp-route-Page="@(currentPage + 1)" class="admin-icon-action admin-icon-action--pagination @(currentPage >= totalPages ? "is-disabled" : "js-admin-page")" title="@Localizer["AdminProduct.Next"]" aria-label="@Localizer["AdminProduct.Next"]"><partial name="_AdminIcon" model='"chevron-right"' /></a>
     </nav>
 </div>

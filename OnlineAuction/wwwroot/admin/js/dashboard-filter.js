@@ -7,9 +7,37 @@
   const applySpinner = document.getElementById("dashboardFilterApplySpinner");
   const exportLink = document.getElementById("dashboardExportLink");
   const rangeTrigger = document.getElementById("dashboardDateRangePicker");
+  const presetButtons = document.querySelectorAll("[data-dashboard-preset]");
 
   if (!form || !dateFromInput || !dateToInput || !rangeTrigger) {
     return;
+  }
+
+  function formatDateInput(date) {
+    return moment(date).format("YYYY-MM-DD");
+  }
+
+  function formatDisplayRange(start, end) {
+    return `${moment(start).format("MM/DD/YYYY")} - ${moment(end).format("MM/DD/YYYY")}`;
+  }
+
+  function setDateRange(start, end) {
+    dateFromInput.value = formatDateInput(start);
+    dateToInput.value = formatDateInput(end);
+
+    const displayInput = document.getElementById("dashboardDateRangeValue");
+    const label = rangeTrigger.querySelector(".admin-daterange-label");
+    const display = formatDisplayRange(start, end);
+
+    if (displayInput) {
+      displayInput.value = display;
+    }
+
+    if (label) {
+      label.textContent = display;
+    }
+
+    updateExportLink(moment(start), moment(end));
   }
 
   function updateExportLink(startMoment, endMoment) {
@@ -34,9 +62,7 @@
       return;
     }
 
-    dateFromInput.value = picker.startDate.format("YYYY-MM-DD");
-    dateToInput.value = picker.endDate.format("YYYY-MM-DD");
-    updateExportLink(picker.startDate, picker.endDate);
+    setDateRange(picker.startDate, picker.endDate);
   }
 
   function showLoading() {
@@ -48,6 +74,44 @@
     applyLabel.classList.add("hidden");
     applySpinner.classList.remove("hidden");
   }
+
+  function applyPreset(preset) {
+    const today = moment().startOf("day");
+    let start;
+    let end = today.clone();
+
+    switch (preset) {
+      case "7":
+        start = today.clone().subtract(6, "days");
+        break;
+      case "30":
+        start = today.clone().subtract(29, "days");
+        break;
+      case "this-month":
+        start = today.clone().startOf("month");
+        break;
+      case "last-month":
+        start = today.clone().subtract(1, "month").startOf("month");
+        end = today.clone().subtract(1, "month").endOf("month");
+        break;
+      default:
+        return;
+    }
+
+    setDateRange(start, end);
+    showLoading();
+    form.submit();
+  }
+
+  presetButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      presetButtons.forEach(function (item) {
+        item.classList.remove("is-active");
+      });
+      button.classList.add("is-active");
+      applyPreset(button.getAttribute("data-dashboard-preset"));
+    });
+  });
 
   form.addEventListener("submit", showLoading);
 

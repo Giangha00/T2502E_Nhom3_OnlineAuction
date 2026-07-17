@@ -14,8 +14,10 @@
         <a asp-area="Admin"
            asp-controller="Product"
            asp-action="Index"
-           class="inline-flex items-center text-theme-sm font-medium text-brand-500 hover:underline">
-            ← Back to card types
+           class="admin-icon-action admin-icon-action--neutral admin-icon-action--sm"
+           title="Back to card types"
+           aria-label="Back to card types">
+            <partial name="_AdminIcon" model='"arrow-left"' />
         </a>
     </div>
 
@@ -31,8 +33,10 @@
            asp-controller="Product"
            asp-action="Create"
            asp-route-categoryId="@categoryId"
-           class="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
-            Create Product
+           class="admin-icon-action admin-icon-action--primary admin-icon-action--lg"
+           title="Create Product"
+           aria-label="Create Product">
+            <partial name="_AdminIcon" model='"plus"' />
         </a>
     </div>
 

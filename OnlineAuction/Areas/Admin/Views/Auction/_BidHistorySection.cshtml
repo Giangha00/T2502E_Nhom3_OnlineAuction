@@ -114,8 +114,10 @@
                        asp-route-id="@Model.Id"
                        asp-route-flaggedOnly="@Model.ShowFlaggedBidsOnly"
                        asp-route-bidPage="@(currentPage - 1)"
-                       class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 @(currentPage <= 1 ? "pointer-events-none opacity-50" : string.Empty)">
-                        @Localizer["Admin_BidHistory_Pagination_Previous"]
+                       class="admin-icon-action admin-icon-action--pagination @(currentPage <= 1 ? "is-disabled" : string.Empty)"
+                       title="@Localizer["Admin_BidHistory_Pagination_Previous"]"
+                       aria-label="@Localizer["Admin_BidHistory_Pagination_Previous"]">
+                        <partial name="_AdminIcon" model='"chevron-left"' />
                     </a>
 
                     @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
@@ -137,8 +139,10 @@
                        asp-route-id="@Model.Id"
                        asp-route-flaggedOnly="@Model.ShowFlaggedBidsOnly"
                        asp-route-bidPage="@(currentPage + 1)"
-                       class="rounded-lg border border-gray-300 px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 @(currentPage >= totalPages ? "pointer-events-none opacity-50" : string.Empty)">
-                        @Localizer["Admin_BidHistory_Pagination_Next"]
+                       class="admin-icon-action admin-icon-action--pagination @(currentPage >= totalPages ? "is-disabled" : string.Empty)"
+                       title="@Localizer["Admin_BidHistory_Pagination_Next"]"
+                       aria-label="@Localizer["Admin_BidHistory_Pagination_Next"]">
+                        <partial name="_AdminIcon" model='"chevron-right"' />
                     </a>
                 </nav>
             </div>

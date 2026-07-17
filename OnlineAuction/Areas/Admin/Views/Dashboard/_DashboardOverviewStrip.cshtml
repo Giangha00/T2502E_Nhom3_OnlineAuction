@@ -1,0 +1,32 @@
+@model AdminDashboardViewModel
+
+<section class="admin-dashboard__hero" aria-label="@Localizer["Admin_Dashboard_Section1_Title"]">
+    @await Html.PartialAsync("_DashboardKpiCard", Model.RevenueSection.GmvKpi, new ViewDataDictionary(ViewData)
+    {
+        ["Label"] = Localizer["Admin_Dashboard_Kpi_Gmv"].Value,
+        ["Tone"] = "revenue",
+        ["Hero"] = true,
+        ["Hint"] = Localizer["Admin_Dashboard_RevenueChart_Description"].Value
+    })
+
+    @await Html.PartialAsync("_DashboardKpiCard", Model.UserSection.NewRegistrationsKpi, new ViewDataDictionary(ViewData)
+    {
+        ["Label"] = Localizer["Admin_Dashboard_Kpi_NewRegistrations"].Value,
+        ["Tone"] = "purple",
+        ["Hint"] = Localizer["Admin_Dashboard_FilteredPeriod_Note"].Value
+    })
+
+    @await Html.PartialAsync("_DashboardKpiCard", Model.UserSection.ActiveUsersKpi, new ViewDataDictionary(ViewData)
+    {
+        ["Label"] = Localizer["Admin_Dashboard_Kpi_ActiveUsers"].Value,
+        ["Tone"] = "brand",
+        ["Hint"] = Localizer["Admin_Dashboard_FilteredPeriod_Note"].Value
+    })
+
+    @await Html.PartialAsync("_DashboardKpiCard", Model.AuctionSection.SuccessRateKpi, new ViewDataDictionary(ViewData)
+    {
+        ["Label"] = Localizer["Admin_Dashboard_Kpi_SuccessRate"].Value,
+        ["Tone"] = "success",
+        ["Hint"] = Localizer["Admin_Dashboard_SuccessRate_Hint"].Value
+    })
+</section>

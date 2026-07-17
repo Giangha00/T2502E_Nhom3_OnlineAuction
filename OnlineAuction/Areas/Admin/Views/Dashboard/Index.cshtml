@@ -4,6 +4,8 @@
     ViewData["Title"] = "Dashboard";
     ViewData["AdminPage"] = "dashboard";
 
+    var dateRangeDisplay = AdminDateRangeHelper.Format(Model.Filter.DateFrom, Model.Filter.DateTo);
+
     var jsonOptions = new JsonSerializerOptions
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -19,6 +21,32 @@
                 month = Model.UserSection.RegistrationByMonth
             },
             categoryBreakdown = Model.AuctionSection.CategoryBreakdown,
+            revenue = new
+            {
+                gmv = Model.RevenueSection.GmvKpi.NumericValue,
+                commission = Model.RevenueSection.CommissionKpi.NumericValue,
+                buyerFee = Model.RevenueSection.BuyerFeeKpi.NumericValue,
+                sellerFee = Model.RevenueSection.SellerFeeKpi.NumericValue,
+                sellerProceeds = Model.RevenueSection.SellerProceedsKpi.NumericValue
+            },
+            auctionStatus = new
+            {
+                ongoing = Model.AuctionSection.OngoingKpi.NumericValue,
+                ended = Model.AuctionSection.EndedKpi.NumericValue,
+                cancelled = Model.AuctionSection.CancelledKpi.NumericValue,
+                successRate = Model.AuctionSection.SuccessRateKpi.NumericValue
+            },
+            labels = new
+            {
+                ongoing = Localizer["Admin_Dashboard_Kpi_OngoingAuctions"].Value,
+                ended = Localizer["Admin_Dashboard_Kpi_EndedAuctions"].Value,
+                cancelled = Localizer["Admin_Dashboard_Kpi_CancelledAuctions"].Value,
+                commission = Localizer["Admin_Dashboard_Kpi_Commission"].Value,
+                buyerFee = Localizer["Admin_Dashboard_Revenue_Donut_BuyerCheckoutFees"].Value,
+                sellerFee = Localizer["Admin_Dashboard_Revenue_Donut_SellerSuccessFees"].Value,
+                buyerCheckoutFees = Localizer["Admin_Dashboard_Revenue_Donut_BuyerCheckoutFees"].Value,
+                sellerSuccessFees = Localizer["Admin_Dashboard_Revenue_Donut_SellerSuccessFees"].Value
+            },
             filter = new
             {
                 dateFrom = Model.Filter.DateFrom.ToString("yyyy-MM-dd"),
@@ -31,22 +59,30 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <link rel="stylesheet" href="~/admin/css/daterangepicker-admin.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/admin/css/admin-dashboard.css" asp-append-version="true" />
 
-<div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+<div class="admin-dashboard mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">@Localizer["Admin_Dashboard_Title"]</h2>
             <p class="text-theme-sm text-gray-500 dark:text-gray-400">@Localizer["Admin_Dashboard_Subtitle"]</p>
         </div>
+        @if (Model.HasValidFilter)
+        {
+            <span class="admin-dashboard-period-badge">@dateRangeDisplay</span>
+        }
     </div>
 
     @await Html.PartialAsync("_DashboardFilterBar", Model)
 
     @if (Model.HasValidFilter)
     {
-        @await Html.PartialAsync("_DashboardRevenueSection", Model)
-        @await Html.PartialAsync("_DashboardUserSection", Model)
-        @await Html.PartialAsync("_DashboardAuctionSection", Model)
+        <div class="admin-dashboard-layout">
+            @await Html.PartialAsync("_DashboardOverviewStrip", Model)
+            @await Html.PartialAsync("_DashboardRevenueSection", Model)
+            @await Html.PartialAsync("_DashboardUserSection", Model)
+            @await Html.PartialAsync("_DashboardAuctionSection", Model)
+        </div>
     }
 </div>
 

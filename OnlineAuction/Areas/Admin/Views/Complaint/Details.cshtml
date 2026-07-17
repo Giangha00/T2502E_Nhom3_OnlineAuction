@@ -14,8 +14,10 @@
             </p>
         </div>
         <a asp-action="Index"
-           class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-            Back to list
+           class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg"
+           title="Back to list"
+           aria-label="Back to list">
+            <partial name="_AdminIcon" model='"arrow-left"' />
         </a>
     </div>
 
@@ -150,8 +152,10 @@
                            asp-controller="User"
                            asp-action="Details"
                            asp-route-id="@Model.BuyerId"
-                           class="mt-2 inline-flex text-theme-sm font-medium text-brand-600 hover:text-brand-700">
-                            View buyer
+                           class="admin-icon-action admin-icon-action--view admin-icon-action--sm mt-2"
+                           title="View buyer"
+                           aria-label="View buyer">
+                            <partial name="_AdminIcon" model='"external"' />
                         </a>
                     </div>
                     @if (Model.SellerId.HasValue)
@@ -164,8 +168,10 @@
                                asp-controller="User"
                                asp-action="Details"
                                asp-route-id="@Model.SellerId"
-                               class="mt-2 inline-flex text-theme-sm font-medium text-brand-600 hover:text-brand-700">
-                                View seller
+                               class="admin-icon-action admin-icon-action--view admin-icon-action--sm mt-2"
+                               title="View seller"
+                               aria-label="View seller">
+                                <partial name="_AdminIcon" model='"external"' />
                             </a>
                         </div>
                     }
@@ -176,8 +182,10 @@
                        asp-controller="Auction"
                        asp-action="Details"
                        asp-route-id="@Model.AuctionId"
-                       class="mt-4 inline-flex text-theme-sm font-medium text-brand-600 hover:text-brand-700">
-                        View auction #@Model.AuctionId
+                       class="admin-icon-action admin-icon-action--view admin-icon-action--sm mt-4"
+                       title="View auction #@Model.AuctionId"
+                       aria-label="View auction #@Model.AuctionId">
+                        <partial name="_AdminIcon" model='"external"' />
                     </a>
                 }
             </section>
@@ -215,8 +223,10 @@
                                   placeholder="Add internal note..."
                                   class="w-full rounded-lg border border-gray-300 px-3 py-2 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></textarea>
                         <button type="submit"
-                                class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                            Save note
+                                class="admin-icon-action admin-icon-action--primary admin-icon-action--lg mx-auto w-full max-w-none"
+                                title="Save note"
+                                aria-label="Save note">
+                            <partial name="_AdminIcon" model='"save"' />
                         </button>
                     </form>
                 </div>
@@ -234,8 +244,10 @@
                             <input type="hidden" name="ComplaintId" value="@Model.Id" />
                             <input type="hidden" name="Action" value="@ComplaintStatusActions.UnderReview" />
                             <button type="submit"
-                                    class="w-full rounded-lg bg-brand-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-brand-600">
-                                Mark under review
+                                    class="admin-icon-action admin-icon-action--review admin-icon-action--lg mx-auto w-full max-w-none"
+                                    title="Mark under review"
+                                    aria-label="Mark under review">
+                                <partial name="_AdminIcon" model='"review"' />
                             </button>
                         </form>
                     }
@@ -260,9 +272,11 @@
                                 <button type="submit"
                                         name="Action"
                                         value="@ComplaintStatusActions.Approve"
-                                        class="w-full rounded-lg bg-success-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-success-600"
+                                        class="admin-icon-action admin-icon-action--approve admin-icon-action--lg mx-auto w-full max-w-none"
+                                        title="Approve"
+                                        aria-label="Approve"
                                         onclick="return confirm('Approve this refund request?');">
-                                    Approve
+                                    <partial name="_AdminIcon" model='"check"' />
                                 </button>
                             }
 
@@ -271,8 +285,10 @@
                                 <button type="submit"
                                         name="Action"
                                         value="@ComplaintStatusActions.Reject"
-                                        class="w-full rounded-lg bg-error-500 px-4 py-2.5 text-theme-sm font-medium text-white hover:bg-error-600">
-                                    Reject
+                                        class="admin-icon-action admin-icon-action--reject admin-icon-action--lg mx-auto w-full max-w-none"
+                                        title="Reject"
+                                        aria-label="Reject">
+                                    <partial name="_AdminIcon" model='"x-mark"' />
                                 </button>
                             }
                         </form>
@@ -285,9 +301,11 @@
                             <input type="hidden" name="ComplaintId" value="@Model.Id" />
                             <input type="hidden" name="Action" value="@ComplaintStatusActions.Close" />
                             <button type="submit"
-                                    class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                                    class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg mx-auto w-full max-w-none"
+                                    title="Close complaint"
+                                    aria-label="Close complaint"
                                     onclick="return confirm('Close this complaint?');">
-                                Close complaint
+                                <partial name="_AdminIcon" model='"x-mark"' />
                             </button>
                         </form>
                     }

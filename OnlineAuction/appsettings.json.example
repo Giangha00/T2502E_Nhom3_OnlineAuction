@@ -12,7 +12,9 @@
   },
   "SeedData": {
     "RefreshTestAuctionsOnStartup": false,
-    "RefreshTestAuctionsInDevelopment": true
+    "RefreshTestAuctionsInDevelopment": true,
+    "SyncCatalogOnStartup": false,
+    "SyncCatalogInDevelopment": true
   },
   "CloudinarySettings": {
     "CloudName": "YOUR_CLOUDINARY_CLOUD_NAME",
