@@ -5,6 +5,7 @@ using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Helpers;
 using OnlineAuction.Models;
+using OnlineAuction.Models.PayPal;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Services;
@@ -13,6 +14,7 @@ public class RegistrationDepositService : IRegistrationDepositService
 {
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IPayPalService _payPalService;
+    private readonly IPayPalCaptureGuardService _payPalCaptureGuardService;
     private readonly INotificationService _notificationService;
     private readonly ILogger<RegistrationDepositService> _logger;
     private readonly PlatformFeeSettings _feeSettings;
@@ -20,12 +22,14 @@ public class RegistrationDepositService : IRegistrationDepositService
     public RegistrationDepositService(
         AuctionHouseDbContext dbContext,
         IPayPalService payPalService,
+        IPayPalCaptureGuardService payPalCaptureGuardService,
         INotificationService notificationService,
         ILogger<RegistrationDepositService> logger,
         IOptions<PlatformFeeSettings> feeSettings)
     {
         _dbContext = dbContext;
         _payPalService = payPalService;
+        _payPalCaptureGuardService = payPalCaptureGuardService;
         _notificationService = notificationService;
         _logger = logger;
         _feeSettings = feeSettings.Value;
@@ -227,8 +231,64 @@ public class RegistrationDepositService : IRegistrationDepositService
                 404);
         }
 
-        // Idempotency:
-        // Nếu return URL bị gọi lại lần 2 thì không capture lại
+        if (deposit.Status == AuctionRegistrationDepositStatuses.Paid)
+        {
+            return RegistrationDepositResult.Ok(
+                "Bạn đã đặt cọc thành công trước đó.",
+                auctionId: deposit.AuctionId,
+                depositAmount: deposit.Amount);
+        }
+
+        if (deposit.Status == AuctionRegistrationDepositStatuses.Applied)
+        {
+            return RegistrationDepositResult.Ok(
+                "Tiền cọc đã được sử dụng cho đơn hàng.",
+                auctionId: deposit.AuctionId,
+                depositAmount: deposit.Amount);
+        }
+
+        if (deposit.Status != AuctionRegistrationDepositStatuses.Pending)
+        {
+            _logger.LogWarning(
+                "Deposit capture rejected because local state is not pending. DepositId={DepositId} Status={Status} PayPalOrderId={PayPalOrderId}",
+                deposit.Id,
+                deposit.Status,
+                payPalOrderId);
+
+            return RegistrationDepositResult.Fail(
+                "Giao dịch đặt cọc không còn ở trạng thái chờ thanh toán.");
+        }
+
+        var captureContext = new PayPalCaptureContext(
+            Flow: "deposit",
+            UserId: userId,
+            DepositId: deposit.Id);
+
+        var captureResult = await _payPalCaptureGuardService.SafeCaptureAsync(
+            payPalOrderId,
+            deposit.Amount,
+            captureContext,
+            cancellationToken);
+
+        if (!captureResult.Success || string.IsNullOrWhiteSpace(captureResult.CaptureId))
+        {
+            return RegistrationDepositResult.Fail(
+                captureResult.ErrorMessage ?? "Capture PayPal thất bại.");
+        }
+
+        deposit = await _dbContext.AuctionRegistrationDeposits
+            .Include(d => d.Registration)
+            .FirstOrDefaultAsync(
+                d => d.PayPalOrderId == payPalOrderId && d.UserId == userId,
+                cancellationToken);
+
+        if (deposit == null)
+        {
+            return RegistrationDepositResult.Fail(
+                "Không tìm thấy giao dịch đặt cọc.",
+                404);
+        }
+
         if (deposit.Status == AuctionRegistrationDepositStatuses.Paid)
         {
             return RegistrationDepositResult.Ok(
@@ -239,34 +299,40 @@ public class RegistrationDepositService : IRegistrationDepositService
 
         if (deposit.Status != AuctionRegistrationDepositStatuses.Pending)
         {
+            var recovery = await _payPalService.RefundCaptureAsync(
+                captureResult.CaptureId,
+                captureResult.CapturedAmount,
+                cancellationToken);
+
+            _logger.LogCritical(
+                "MANUAL_RECOVERY_REQUIRED PayPal deposit capture could not be persisted. DepositId={DepositId} PayPalOrderId={PayPalOrderId} CaptureId={CaptureId} RefundSucceeded={RefundSucceeded} RefundError={RefundError}",
+                deposit.Id,
+                payPalOrderId,
+                captureResult.CaptureId,
+                recovery.Success,
+                recovery.ErrorMessage);
+
             return RegistrationDepositResult.Fail(
                 "Giao dịch đặt cọc không còn ở trạng thái chờ thanh toán.");
         }
 
-        // Capture PayPal order
-        var captureResult = await _payPalService.CaptureOrderAsync(
-            payPalOrderId,
-            cancellationToken);
-
-        if (!captureResult.Success)
+        if (!PayPalAmountHelper.AmountsMatch(deposit.Amount, captureResult.CapturedAmount))
         {
-            return RegistrationDepositResult.Fail(
-                captureResult.ErrorMessage ?? "Capture PayPal thất bại.");
-        }
+            var recovery = await _payPalService.RefundCaptureAsync(
+                captureResult.CaptureId,
+                captureResult.CapturedAmount,
+                cancellationToken);
 
-        // Verify số tiền capture khớp deposit amount
-        var difference = Math.Abs(deposit.Amount - captureResult.CapturedAmount);
-
-        if (difference >= 0.01m)
-        {
-            _logger.LogWarning(
-                "Deposit amount mismatch. DepositId={DepositId}, Expected={Expected}, Actual={Actual}",
+            _logger.LogCritical(
+                "MANUAL_RECOVERY_REQUIRED PayPal deposit amount changed before persistence. DepositId={DepositId} PayPalOrderId={PayPalOrderId} Expected={Expected} Captured={Captured} RefundSucceeded={RefundSucceeded}",
                 deposit.Id,
+                payPalOrderId,
                 deposit.Amount,
-                captureResult.CapturedAmount);
+                captureResult.CapturedAmount,
+                recovery.Success);
 
             return RegistrationDepositResult.Fail(
-                "Số tiền PayPal capture không khớp với tiền cọc.");
+                "Số tiền PayPal capture không khớp với tiền cọc. Đã khởi tạo hoàn tiền.");
         }
 
         var now = DateTime.UtcNow;
@@ -276,7 +342,6 @@ public class RegistrationDepositService : IRegistrationDepositService
         deposit.PaidAt = now;
         deposit.UpdatedAt = now;
 
-        // Thanh toán cọc thành công thì approve registration
         deposit.Registration.Status = AuctionRegistrationStatuses.Approved;
         deposit.Registration.ReviewedAt = now;
         deposit.Registration.UpdatedAt = now;

@@ -12,6 +12,10 @@ public interface IPayPalService
         string cancelUrl,
         CancellationToken cancellationToken = default);
 
+    Task<PayPalOrderDetailsResult> GetOrderDetailsAsync(
+        string payPalOrderId,
+        CancellationToken cancellationToken = default);
+
     Task<PayPalCaptureResult> CaptureOrderAsync(
         string payPalOrderId,
         CancellationToken cancellationToken = default);

@@ -119,6 +119,40 @@ public class PayPalService : IPayPalService
         return PayPalCreateOrderResult.Ok(order.Id, approvalUrl);
     }
 
+    public async Task<PayPalOrderDetailsResult> GetOrderDetailsAsync(
+        string payPalOrderId,
+        CancellationToken cancellationToken = default)
+    {
+        if (!_settings.IsConfigured)
+        {
+            return PayPalOrderDetailsResult.Fail(GetNotConfiguredMessage());
+        }
+
+        if (string.IsNullOrWhiteSpace(payPalOrderId))
+        {
+            return PayPalOrderDetailsResult.Fail("Missing PayPal order id.");
+        }
+
+        var token = await GetAccessTokenAsync(cancellationToken);
+        if (token is null)
+        {
+            return PayPalOrderDetailsResult.Fail("Unable to connect to PayPal.");
+        }
+
+        var parsed = await FetchOrderDetailsAsync(payPalOrderId, token, cancellationToken);
+        if (parsed is null)
+        {
+            return PayPalOrderDetailsResult.Fail("Unable to load PayPal order details.");
+        }
+
+        return PayPalOrderDetailsResult.Ok(
+            payPalOrderId,
+            parsed.Value.Status,
+            parsed.Value.OrderAmount,
+            parsed.Value.CaptureId,
+            parsed.Value.CapturedAmount);
+    }
+
     public async Task<PayPalCaptureResult> CaptureOrderAsync(
         string payPalOrderId,
         CancellationToken cancellationToken = default)
@@ -167,13 +201,15 @@ public class PayPalService : IPayPalService
         if (body.Contains("ORDER_ALREADY_CAPTURED", StringComparison.OrdinalIgnoreCase)
             || body.Contains("ORDER_ALREADY_COMPLETED", StringComparison.OrdinalIgnoreCase))
         {
-            var capture = await GetCapturedOrderDetailsAsync(payPalOrderId, token, cancellationToken);
-            if (capture is null)
+            var capture = await FetchOrderDetailsAsync(payPalOrderId, token, cancellationToken);
+            if (capture is null || string.IsNullOrWhiteSpace(capture.Value.CaptureId))
             {
                 return PayPalCaptureResult.AlreadyDone(null, 0);
             }
 
-            return PayPalCaptureResult.AlreadyDone(capture.Value.CaptureId, capture.Value.Amount);
+            return PayPalCaptureResult.AlreadyDone(
+                capture.Value.CaptureId,
+                capture.Value.CapturedAmount ?? capture.Value.OrderAmount);
         }
 
         _logger.LogWarning(
@@ -386,7 +422,7 @@ public class PayPalService : IPayPalService
         return tokenResponse.AccessToken;
     }
 
-    private async Task<(string CaptureId, decimal Amount)?> GetCapturedOrderDetailsAsync(
+    private async Task<(string Status, decimal OrderAmount, string? CaptureId, decimal? CapturedAmount)?> FetchOrderDetailsAsync(
         string payPalOrderId,
         string token,
         CancellationToken cancellationToken)
@@ -396,38 +432,76 @@ public class PayPalService : IPayPalService
             $"{_settings.ApiBaseUrl}/v2/checkout/orders/{payPalOrderId}");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var response = await _httpClient.SendAsync(request, cancellationToken);
+        HttpResponseMessage response;
+        try
+        {
+            response = await _httpClient.SendAsync(request, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "PayPal get order details failed for order {PayPalOrderId}.", payPalOrderId);
+            return null;
+        }
+
         if (!response.IsSuccessStatusCode)
         {
+            _logger.LogWarning(
+                "PayPal get order details failed for order {PayPalOrderId} with status {StatusCode}.",
+                payPalOrderId,
+                response.StatusCode);
             return null;
         }
 
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
-        return ParseCapture(body);
+        return ParseOrderDetails(body);
     }
 
-    private static (string CaptureId, decimal Amount)? ParseCapture(string body)
+    private static (string Status, decimal OrderAmount, string? CaptureId, decimal? CapturedAmount)? ParseOrderDetails(string body)
     {
         var order = JsonSerializer.Deserialize<PayPalOrderResponse>(body, JsonOptions);
-        var capture = order?.PurchaseUnits?
-            .SelectMany(unit => unit.Payments?.Captures ?? [])
-            .FirstOrDefault(item => item is not null);
-
-        if (capture is null || string.IsNullOrWhiteSpace(capture.Id))
+        if (order is null || string.IsNullOrWhiteSpace(order.Status))
         {
             return null;
+        }
+
+        var purchaseUnit = order.PurchaseUnits?.FirstOrDefault();
+        if (purchaseUnit?.Amount?.Value is null
+            || !decimal.TryParse(
+                purchaseUnit.Amount.Value,
+                NumberStyles.Number,
+                CultureInfo.InvariantCulture,
+                out var orderAmount))
+        {
+            return null;
+        }
+
+        var capture = purchaseUnit.Payments?.Captures?.FirstOrDefault(item => item is not null);
+        if (capture is null || string.IsNullOrWhiteSpace(capture.Id))
+        {
+            return (order.Status, orderAmount, null, null);
         }
 
         if (!decimal.TryParse(
                 capture.Amount?.Value,
                 NumberStyles.Number,
                 CultureInfo.InvariantCulture,
-                out var amount))
+                out var capturedAmount))
+        {
+            return (order.Status, orderAmount, capture.Id, orderAmount);
+        }
+
+        return (order.Status, orderAmount, capture.Id, capturedAmount);
+    }
+
+    private static (string CaptureId, decimal Amount)? ParseCapture(string body)
+    {
+        var parsed = ParseOrderDetails(body);
+        if (parsed is null || string.IsNullOrWhiteSpace(parsed.Value.CaptureId))
         {
             return null;
         }
 
-        return (capture.Id, amount);
+        return (parsed.Value.CaptureId, parsed.Value.CapturedAmount ?? parsed.Value.OrderAmount);
     }
 
     private static string FormatAmount(decimal amount) =>
@@ -449,6 +523,8 @@ public class PayPalService : IPayPalService
     {
         public string Id { get; set; } = string.Empty;
 
+        public string Status { get; set; } = string.Empty;
+
         public List<PayPalLink> Links { get; set; } = [];
 
         public List<PayPalPurchaseUnit> PurchaseUnits { get; set; } = [];
@@ -463,6 +539,8 @@ public class PayPalService : IPayPalService
 
     private sealed class PayPalPurchaseUnit
     {
+        public PayPalMoney? Amount { get; set; }
+
         public PayPalPayments? Payments { get; set; }
     }
 

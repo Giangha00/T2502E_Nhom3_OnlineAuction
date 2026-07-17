@@ -35,8 +35,10 @@ public class AuthController : Controller
     private readonly IEmailQueueService _emailQueueService;
     private readonly IPasswordResetOtpService _passwordResetOtpService;
     private readonly PasswordResetOtpSettings _otpSettings;
+    private readonly SmokeTestingSettings _smokeTesting;
     private readonly IWebHostEnvironment _environment;
     private readonly IStringLocalizer<SharedResource> _localizer;
+    private readonly ILogger<AuthController> _logger;
 
     public AuthController(
         SignInManager<ApplicationUser> signInManager,
@@ -44,16 +46,20 @@ public class AuthController : Controller
         IEmailQueueService emailQueueService,
         IPasswordResetOtpService passwordResetOtpService,
         IOptions<PasswordResetOtpSettings> otpOptions,
+        IOptions<SmokeTestingSettings> smokeTesting,
         IWebHostEnvironment environment,
-        IStringLocalizer<SharedResource> localizer)
+        IStringLocalizer<SharedResource> localizer,
+        ILogger<AuthController> logger)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _emailQueueService = emailQueueService;
         _passwordResetOtpService = passwordResetOtpService;
         _otpSettings = otpOptions.Value;
+        _smokeTesting = smokeTesting.Value;
         _environment = environment;
         _localizer = localizer;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -524,6 +530,18 @@ public class AuthController : Controller
         var emailSent = await SendEmailConfirmationAsync(user, cancellationToken);
         if (!emailSent)
         {
+            // Smoke pack (Development + SmokeTesting:Enabled): keep the user so
+            // scripts/smoke can confirm via POST /Smoke/ConfirmEmail without Gmail.
+            if (_environment.IsDevelopment() && _smokeTesting.Enabled)
+            {
+                _logger.LogWarning(
+                    "Signup email send failed for {Email}; keeping user for smoke confirm.",
+                    user.Email);
+                TempData["AuthSuccess"] =
+                    "Đăng ký thành công (smoke). Xác thực qua /Smoke/ConfirmEmail trước khi đăng nhập.";
+                return RedirectAfterAuthSuccess(model.ReturnUrl, "login");
+            }
+
             await _userManager.DeleteAsync(user);
             ModelState.AddModelError(
                 string.Empty,

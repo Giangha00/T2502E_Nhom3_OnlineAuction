@@ -792,18 +792,75 @@ footer .footer-link--active:visited {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
   gap: 1.25rem;
+  align-items: stretch;
+}
+
+.rarecard-card--grid {
+  height: 100%;
+}
+
+.rarecard-card--grid .rarecard-card__shell {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.rarecard-card--grid .rarecard-card__image-wrap {
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.1rem 1.25rem;
+  background: #fafaf9;
+  overflow: hidden;
+}
+
+.rarecard-card--grid .rarecard-card__image {
+  max-height: 78%;
+  max-width: 78%;
+  width: auto;
+  height: auto;
+  filter: drop-shadow(0 10px 22px rgba(15, 23, 42, 0.1));
+}
+
+.rarecard-card--grid .rarecard-card__body {
+  flex: 1 1 auto;
+  min-height: 9.5rem;
+}
+
+.rarecard-card--grid .rarecard-card__price-row {
+  min-height: 3.75rem;
+}
+
+.rarecard-card--grid .rarecard-card__actions {
+  flex-shrink: 0;
 }
 
 @media (min-width: 640px) {
   .rarecard-auction-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .rarecard-card--grid .rarecard-card__image-wrap {
+    padding: 1.15rem 1.3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .rarecard-auction-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.35rem;
+  }
 }
 
 @media (min-width: 1280px) {
   .rarecard-auction-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.5rem;
+  }
+
+  .rarecard-card--grid .rarecard-card__image-wrap {
+    padding: 1.2rem 1.35rem;
   }
 }
 

@@ -83,6 +83,19 @@ To keep orders while testing PayPal, add to `appsettings.Local.json`:
 { "SeedData": { "RefreshTestAuctionsInDevelopment": false } }
 ```
 
+### Release smoke (pre-merge / demo)
+
+Short pack (≤ 20 min): `AUTH-REG-01` → `AUTH-LOGIN-01` → `AUCTION_REG-03` → `BID-01`.  
+Smoke fail → **block release** of the related feature. See [Documents/release_smoke.md](Documents/release_smoke.md).
+
+```powershell
+# appsettings.Local.json → "SmokeTesting": { "Enabled": true }
+dotnet run --launch-profile http
+.\scripts\smoke\Invoke-ReleaseSmoke.ps1
+```
+
+Report template: `scripts/smoke/SMOKE_REPORT_TEMPLATE.md`.
+
 ---
 
 ## Authentication (dual session)
