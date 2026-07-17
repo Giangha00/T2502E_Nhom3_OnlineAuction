@@ -4,6 +4,7 @@ using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Services;
+using OnlineAuction.Services.Interfaces;
 using Xunit;
 
 namespace OnlineAuction.Tests;
@@ -51,7 +52,7 @@ public class OrderPayPathFeeTests
         db.Orders.Add(order);
         await db.SaveChangesAsync();
 
-        var service = new OrderService(db, Options.Create(FeeSettings));
+        var service = new OrderService(db, Options.Create(FeeSettings), new NoOpWinnerNonPaymentRecoveryService());
         var (success, _) = await service.CompleteOrderAsync(1, new Models.CompleteOrderRequest
         {
             PaymentMethod = "cod",
@@ -83,5 +84,14 @@ public class OrderPayPathFeeTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         return new AuctionHouseDbContext(options);
+    }
+
+    private sealed class NoOpWinnerNonPaymentRecoveryService : IWinnerNonPaymentRecoveryService
+    {
+        public Task ProcessExpiredAuctionWinOrderAsync(
+            AuctionOrder cancelledOrder,
+            DateTime now,
+            CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
     }
 }

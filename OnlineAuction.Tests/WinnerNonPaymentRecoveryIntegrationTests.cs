@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using OnlineAuction.Configurations;
@@ -77,10 +78,89 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             action => action == WinnerNonPaymentActions.RelistRecommended);
     }
 
+    [Fact]
+    public async Task CreatePendingPaymentOrderForAuctionAsync_WhenDepositCoversAmount_PaysOrderAndRefundsExcess()
+    {
+        var now = DateTime.UtcNow;
+        await using var db = CreateDbContext();
+        const int auctionId = 300;
+        const int winnerId = 3;
+        var refundService = new RecordingRegistrationDepositRefundService();
+
+        var product = new Product
+        {
+            Id = 3,
+            SellerId = 10,
+            CategoryId = 1,
+            Name = "Low Bid Card",
+            PrimaryImage = "/img3.png",
+            GradeLabel = "PSA 8"
+        };
+
+        db.Products.Add(product);
+        db.Auctions.Add(new Auction
+        {
+            Id = auctionId,
+            ProductId = product.Id,
+            Product = product,
+            Status = AuctionStatuses.Live,
+            StartingPrice = 1m,
+            BidStep = 1m,
+            CurrentPrice = 10m,
+            RegistrationStartDate = now.AddDays(-7),
+            RegistrationEndDate = now.AddDays(-5),
+            StartDate = now.AddDays(-3),
+            EndDate = now.AddDays(-1)
+        });
+        db.Bids.Add(new Bid
+        {
+            Id = 30,
+            AuctionId = auctionId,
+            BidderId = winnerId,
+            Amount = 10m,
+            IsWinning = true,
+            PlacedAt = now.AddHours(-2)
+        });
+        db.AuctionRegistrationDeposits.Add(new AuctionRegistrationDeposit
+        {
+            Id = 30,
+            AuctionId = auctionId,
+            UserId = winnerId,
+            AuctionRegistrationId = 30,
+            Amount = 200m,
+            Status = AuctionRegistrationDepositStatuses.Paid,
+            PayPalCaptureId = "CAPTURE-30",
+            PaidAt = now.AddDays(-2)
+        });
+        await db.SaveChangesAsync();
+
+        var orderCreationService = CreateOrderCreationService(db, refundService);
+        var orderId = await orderCreationService.CreatePendingPaymentOrderForAuctionAsync(auctionId);
+
+        Assert.NotNull(orderId);
+
+        var order = await db.Orders.SingleAsync();
+        Assert.Equal(OrderStatuses.Paid, order.Status);
+        Assert.Equal(0m, order.TotalAmount);
+        Assert.Equal(115.25m, order.DepositApplied);
+        Assert.Equal("deposit", order.PaymentMethod);
+
+        var deposit = await db.AuctionRegistrationDeposits.SingleAsync();
+        Assert.Equal(AuctionRegistrationDepositStatuses.Applied, deposit.Status);
+
+        var auction = await db.Auctions.FindAsync(auctionId);
+        Assert.Equal(AuctionStatuses.Completed, auction!.Status);
+        Assert.Equal(winnerId, auction.WinnerId);
+
+        Assert.Equal(30, refundService.LastDepositId);
+        Assert.Equal(84.75m, refundService.LastRefundAmount);
+    }
+
     private static AuctionHouseDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<AuctionHouseDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .ConfigureWarnings(warnings => warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning))
             .Options;
 
         return new AuctionHouseDbContext(options);
@@ -96,14 +176,7 @@ public class WinnerNonPaymentRecoveryIntegrationTests
         var bidService = new NoOpBidService();
         var depositRefundService = new NoOpRegistrationDepositRefundService();
 
-        var orderCreationService = new OrderCreationService(
-            db,
-            NullLogger<OrderCreationService>.Instance,
-            notificationService,
-            depositRefundService,
-            realtimePublisher,
-            bidService,
-            feeSettings);
+        var orderCreationService = CreateOrderCreationService(db, depositRefundService);
 
         var recoveryService = new WinnerNonPaymentRecoveryService(
             db,
@@ -115,6 +188,25 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             NullLogger<WinnerNonPaymentRecoveryService>.Instance);
 
         return new OrderService(db, feeSettings, recoveryService);
+    }
+
+    private static OrderCreationService CreateOrderCreationService(
+        AuctionHouseDbContext db,
+        IRegistrationDepositRefundService depositRefundService)
+    {
+        var feeSettings = Options.Create(new PlatformFeeSettings());
+        var notificationService = new NoOpNotificationService();
+        var realtimePublisher = new NoOpRealtimePublisher();
+        var bidService = new NoOpBidService();
+
+        return new OrderCreationService(
+            db,
+            NullLogger<OrderCreationService>.Instance,
+            notificationService,
+            depositRefundService,
+            realtimePublisher,
+            bidService,
+            feeSettings);
     }
 
     private static async Task<int> SeedSecondChanceScenarioAsync(AuctionHouseDbContext db, DateTime now)
@@ -382,6 +474,41 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             bool pushNotification = true,
             CancellationToken cancellationToken = default)
             => Task.FromResult(new RegistrationDepositResult { Success = true });
+
+        public Task<RegistrationDepositResult> RefundDepositAmountAsync(
+            long depositId,
+            decimal amount,
+            bool pushNotification = true,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(new RegistrationDepositResult { Success = true });
+
+        public Task<int> RefundLoserDepositsForAuctionAsync(
+            int auctionId,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(0);
+    }
+
+    private sealed class RecordingRegistrationDepositRefundService : IRegistrationDepositRefundService
+    {
+        public long? LastDepositId { get; private set; }
+        public decimal? LastRefundAmount { get; private set; }
+
+        public Task<RegistrationDepositResult> RefundDepositAsync(
+            long depositId,
+            bool pushNotification = true,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(new RegistrationDepositResult { Success = true });
+
+        public Task<RegistrationDepositResult> RefundDepositAmountAsync(
+            long depositId,
+            decimal amount,
+            bool pushNotification = true,
+            CancellationToken cancellationToken = default)
+        {
+            LastDepositId = depositId;
+            LastRefundAmount = amount;
+            return Task.FromResult(new RegistrationDepositResult { Success = true });
+        }
 
         public Task<int> RefundLoserDepositsForAuctionAsync(
             int auctionId,
