@@ -919,6 +919,7 @@
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Đang đặt giá…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Không thể đặt giá. Vui lòng thử lại.</value></data>
   <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Đặt giá thành công!</value></data>
+  <data name="Js_ProductDetail_BidTooLow" xml:space="preserve"><value>Giá đặt phải ít nhất {0}.</value></data>
   <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>Phiên đấu giá đã kết thúc</value></data>
   <data name="Js_ProductDetail_Registering" xml:space="preserve"><value>Đang đăng ký…</value></data>
   <data name="Js_ProductDetail_RegistrationSuccess" xml:space="preserve"><value>Đăng ký thành công!</value></data>

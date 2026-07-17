@@ -810,6 +810,7 @@
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>入札中…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>入札できませんでした。もう一度お試しください。</value></data>
   <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>入札が完了しました！</value></data>
+  <data name="Js_ProductDetail_BidTooLow" xml:space="preserve"><value>入札額は少なくとも {0} 以上である必要があります。</value></data>
   <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>オークション終了</value></data>
   <data name="Js_ProductDetail_Registering" xml:space="preserve"><value>登録中…</value></data>
   <data name="Js_ProductDetail_RegistrationSuccess" xml:space="preserve"><value>登録が完了しました！</value></data>

@@ -38,4 +38,9 @@ public class PlatformFeeSettings
     /// Legacy percentage listing fee retained for compatibility with older tests and callers.
     /// </summary>
     public decimal ListingFeePercent { get; set; } = 0m;
+
+    /// <summary>
+    /// Development only: skip PayPal and auto-approve registration after mock deposit.
+    /// </summary>
+    public bool UseMockRegistrationDepositPayment { get; set; }
 }

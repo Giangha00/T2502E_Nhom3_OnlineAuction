@@ -13,6 +13,9 @@
   "SmokeTesting": {
     "Enabled": true
   },
+  "EmailVerification": {
+    "UseMockEmailConfirmation": true
+  },
   "BidFraudDetection": {
     "Enabled": true,
     "RateLimitingEnabled": true,
@@ -71,6 +74,7 @@
     "RegistrationDepositPercent": 10.0,
     "BuyerCheckoutFeePercent": 2.5,
     "SellerSuccessFeePercent": 10.0,
-    "MinimumRegistrationDeposit": 1.0
+    "MinimumRegistrationDeposit": 1.0,
+    "UseMockRegistrationDepositPayment": true
   }
 }

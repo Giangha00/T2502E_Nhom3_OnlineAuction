@@ -247,6 +247,8 @@ builder.Services.Configure<PasswordResetOtpSettings>(
     builder.Configuration.GetSection(PasswordResetOtpSettings.SectionName));
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection(EmailSettings.SectionName));
+builder.Services.Configure<EmailVerificationSettings>(
+    builder.Configuration.GetSection(EmailVerificationSettings.SectionName));
 builder.Services.Configure<RabbitMqSettings>(
     builder.Configuration.GetSection(RabbitMqSettings.SectionName));
 builder.Services.Configure<BidFraudDetectionSettings>(

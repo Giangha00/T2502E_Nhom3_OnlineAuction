@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OnlineAuction.Configurations;
 using OnlineAuction.Data;
@@ -17,6 +18,7 @@ public class RegistrationDepositService : IRegistrationDepositService
     private readonly IPayPalCaptureGuardService _payPalCaptureGuardService;
     private readonly INotificationService _notificationService;
     private readonly ILogger<RegistrationDepositService> _logger;
+    private readonly IHostEnvironment _environment;
     private readonly PlatformFeeSettings _feeSettings;
 
     public RegistrationDepositService(
@@ -25,6 +27,7 @@ public class RegistrationDepositService : IRegistrationDepositService
         IPayPalCaptureGuardService payPalCaptureGuardService,
         INotificationService notificationService,
         ILogger<RegistrationDepositService> logger,
+        IHostEnvironment environment,
         IOptions<PlatformFeeSettings> feeSettings)
     {
         _dbContext = dbContext;
@@ -32,6 +35,7 @@ public class RegistrationDepositService : IRegistrationDepositService
         _payPalCaptureGuardService = payPalCaptureGuardService;
         _notificationService = notificationService;
         _logger = logger;
+        _environment = environment;
         _feeSettings = feeSettings.Value;
     }
 
@@ -118,6 +122,18 @@ public class RegistrationDepositService : IRegistrationDepositService
         {
             return RegistrationDepositResult.Fail(
                 "Bạn đã đăng ký phiên đấu giá này rồi.");
+        }
+
+        if (ShouldUseMockDepositPayment())
+        {
+            return await CompleteMockDepositAsync(
+                auction,
+                auctionId,
+                userId,
+                registration,
+                depositAmount,
+                now,
+                cancellationToken);
         }
 
         // Tạo reference gửi sang PayPal
@@ -366,6 +382,90 @@ public class RegistrationDepositService : IRegistrationDepositService
             "Đặt cọc thành công. Bạn đã được duyệt đăng ký đấu giá.",
             auctionId: deposit.AuctionId,
             depositAmount: deposit.Amount);
+    }
+
+    private bool ShouldUseMockDepositPayment() =>
+        _environment.IsDevelopment() && _feeSettings.UseMockRegistrationDepositPayment;
+
+    private async Task<RegistrationDepositResult> CompleteMockDepositAsync(
+        Auction auction,
+        int auctionId,
+        int userId,
+        AuctionRegistration? registration,
+        decimal depositAmount,
+        DateTime now,
+        CancellationToken cancellationToken)
+    {
+        if (registration != null)
+        {
+            foreach (var oldDeposit in registration.Deposits
+                         .Where(d => d.Status == AuctionRegistrationDepositStatuses.Pending))
+            {
+                oldDeposit.Status = AuctionRegistrationDepositStatuses.Cancelled;
+                oldDeposit.UpdatedAt = now;
+            }
+        }
+
+        if (registration is null)
+        {
+            registration = new AuctionRegistration
+            {
+                AuctionId = auctionId,
+                UserId = userId,
+                Status = AuctionRegistrationStatuses.Approved,
+                RegisteredAt = now,
+                ReviewedAt = now,
+                CreatedAt = now
+            };
+
+            _dbContext.AuctionRegistrations.Add(registration);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        else
+        {
+            registration.Status = AuctionRegistrationStatuses.Approved;
+            registration.RegisteredAt = now;
+            registration.ReviewedAt = now;
+            registration.RejectReason = null;
+            registration.UpdatedAt = now;
+        }
+
+        var mockPayPalOrderId = $"mock-deposit-{auctionId}-{userId}-{Guid.NewGuid():N}";
+
+        _dbContext.AuctionRegistrationDeposits.Add(new AuctionRegistrationDeposit
+        {
+            AuctionId = auctionId,
+            UserId = userId,
+            AuctionRegistrationId = registration.Id,
+            Amount = depositAmount,
+            Status = AuctionRegistrationDepositStatuses.Paid,
+            PayPalOrderId = mockPayPalOrderId,
+            PayPalCaptureId = $"mock-capture-{Guid.NewGuid():N}",
+            PaidAt = now,
+            CreatedAt = now
+        });
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var productName = auction.Product?.Name ?? "the auction";
+        await _notificationService.CreateAndPushAsync(
+            userId,
+            "Registration confirmed",
+            $"Your registration for {productName} is confirmed. Deposit of ${depositAmount:N0} was received (mock).",
+            NotificationType.Auction,
+            $"/Auction/Detail/{auctionId}",
+            cancellationToken: cancellationToken);
+
+        _logger.LogInformation(
+            "Mock registration deposit completed for user {UserId} on auction {AuctionId}.",
+            userId,
+            auctionId);
+
+        return RegistrationDepositResult.Ok(
+            "Registration successful (mock deposit — PayPal skipped in Development).",
+            $"/Auction/Detail/{auctionId}",
+            auctionId,
+            depositAmount);
     }
 
     public async Task<RegistrationDepositResult> CancelDepositAsync(

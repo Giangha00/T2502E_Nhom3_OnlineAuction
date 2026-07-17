@@ -100,9 +100,7 @@
     return csrfMeta ? csrfMeta.getAttribute('content') : '';
   }
 
-  var bidChallengeToken = '';
-
-  function postForm(url, payload, extraHeaders) {
+  function postForm(url, payload) {
     var body = new URLSearchParams();
     Object.keys(payload).forEach(function (key) {
       body.append(key, payload[key]);
@@ -113,36 +111,15 @@
       body.append('__RequestVerificationToken', csrfToken);
     }
 
-    var headers = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'X-Requested-With': 'XMLHttpRequest'
-    };
-
-    if (extraHeaders) {
-      Object.keys(extraHeaders).forEach(function (key) {
-        if (extraHeaders[key]) {
-          headers[key] = extraHeaders[key];
-        }
-      });
-    }
-
     return fetch(url, {
       method: 'POST',
       credentials: 'same-origin',
-      headers: headers,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
       body: body.toString()
     });
-  }
-
-  function promptBidChallengeToken() {
-    var message = i18n.challengePrompt || 'Enter challenge token to continue bidding:';
-    var token = window.prompt(message, bidChallengeToken || '');
-    if (token === null) {
-      return null;
-    }
-
-    bidChallengeToken = String(token).trim();
-    return bidChallengeToken;
   }
 
   function showFeedback(element, message, isSuccess) {
@@ -769,56 +746,41 @@
       }
 
       var auctionId = bidPanel.getAttribute('data-auction-id');
-      var amount = bidInput ? snapBidAmount(parseBidInput(bidInput.value)) : null;
-      if (!auctionId || amount === null || Number.isNaN(amount)) {
+      var rawAmount = bidInput ? parseBidInput(bidInput.value) : NaN;
+      var minBid = getMinBid();
+
+      if (!auctionId || Number.isNaN(rawAmount) || rawAmount <= 0) {
+        showFeedback(bidFeedback, i18n.bidFailed || 'Unable to place bid. Please try again.', false);
         return;
       }
 
+      if (rawAmount < minBid) {
+        var tooLowTemplate = i18n.bidTooLow || 'Your bid must be at least {0}.';
+        showFeedback(bidFeedback, tooLowTemplate.replace('{0}', formatCurrency(minBid)), false);
+        return;
+      }
+
+      var amount = rawAmount;
       setBidInputValue(amount);
       placeBidBtn.disabled = true;
       placeBidBtn.textContent = i18n.placingBid || 'Placing bid…';
 
-      function placeBidRequest(challengeToken) {
-        var headers = {};
-        if (challengeToken) {
-          headers['X-Bid-Challenge-Token'] = challengeToken;
-        }
-
-        return postForm('/Auction/PlaceBid', {
-          auctionId: auctionId,
-          amount: amount,
-          challengeToken: challengeToken || ''
-        }, headers).then(function (response) {
+      postForm('/Auction/PlaceBid', { auctionId: auctionId, amount: amount })
+        .then(function (response) {
           if (response.status === 401) {
             openAuthModal();
             throw new Error(i18n.bidFailed || 'Please sign in to place a bid.');
           }
 
           return response.json().then(function (data) {
-            data.__status = response.status;
-            return data;
-          });
-        });
-      }
-
-      placeBidRequest(bidChallengeToken)
-        .then(function (data) {
-          if (data && data.requiresChallenge) {
-            var token = promptBidChallengeToken();
-            if (!token) {
-              throw new Error(data.message || i18n.challengeRequired || 'Please complete the bid challenge and try again.');
+            if (!response.ok || !data.success) {
+              throw new Error(data.message || i18n.bidFailed || 'Unable to place bid. Please try again.');
             }
 
-            return placeBidRequest(token);
-          }
-
-          return data;
+            return data;
+          });
         })
         .then(function (data) {
-          if (!data || !data.success) {
-            throw new Error((data && data.message) || i18n.bidFailed || 'Unable to place bid. Please try again.');
-          }
-
           applyBidSuccess(data);
         })
         .catch(function (error) {

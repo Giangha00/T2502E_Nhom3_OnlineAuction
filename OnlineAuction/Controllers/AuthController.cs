@@ -36,6 +36,7 @@ public class AuthController : Controller
     private readonly IPasswordResetOtpService _passwordResetOtpService;
     private readonly PasswordResetOtpSettings _otpSettings;
     private readonly SmokeTestingSettings _smokeTesting;
+    private readonly EmailVerificationSettings _emailVerificationSettings;
     private readonly IWebHostEnvironment _environment;
     private readonly IStringLocalizer<SharedResource> _localizer;
     private readonly ILogger<AuthController> _logger;
@@ -47,6 +48,7 @@ public class AuthController : Controller
         IPasswordResetOtpService passwordResetOtpService,
         IOptions<PasswordResetOtpSettings> otpOptions,
         IOptions<SmokeTestingSettings> smokeTesting,
+        IOptions<EmailVerificationSettings> emailVerificationOptions,
         IWebHostEnvironment environment,
         IStringLocalizer<SharedResource> localizer,
         ILogger<AuthController> logger)
@@ -57,6 +59,7 @@ public class AuthController : Controller
         _passwordResetOtpService = passwordResetOtpService;
         _otpSettings = otpOptions.Value;
         _smokeTesting = smokeTesting.Value;
+        _emailVerificationSettings = emailVerificationOptions.Value;
         _environment = environment;
         _localizer = localizer;
         _logger = logger;
@@ -485,6 +488,15 @@ public class AuthController : Controller
         {
             if (!await _userManager.IsEmailConfirmedAsync(existingUser))
             {
+                if (ShouldUseMockEmailConfirmation())
+                {
+                    existingUser.EmailConfirmed = true;
+                    await _userManager.UpdateAsync(existingUser);
+                    TempData["AuthSuccess"] =
+                        "Email này đã đăng ký nhưng chưa kích hoạt. Tài khoản đã được kích hoạt tự động (chế độ dev).";
+                    return RedirectAfterAuthSuccess(model.ReturnUrl, "login");
+                }
+
                 var resent = await SendEmailConfirmationAsync(existingUser, cancellationToken);
                 if (resent)
                 {
@@ -525,6 +537,15 @@ public class AuthController : Controller
             }
 
             return AuthFailureView(model, "signup", fromModal);
+        }
+
+        if (ShouldUseMockEmailConfirmation())
+        {
+            user.EmailConfirmed = true;
+            await _userManager.UpdateAsync(user);
+            TempData["AuthSuccess"] =
+                "Đăng ký thành công. Tài khoản đã được kích hoạt tự động (chế độ dev). Bạn có thể đăng nhập ngay.";
+            return RedirectAfterAuthSuccess(model.ReturnUrl, "login");
         }
 
         var emailSent = await SendEmailConfirmationAsync(user, cancellationToken);
@@ -755,6 +776,9 @@ public class AuthController : Controller
             locale,
             cancellationToken);
     }
+
+    private bool ShouldUseMockEmailConfirmation() =>
+        _emailVerificationSettings.UseMockEmailConfirmation && _environment.IsDevelopment();
 
     private IActionResult RedirectAfterAuthSuccess(string? returnUrl, string openAuthTab) =>
         RedirectWithAuthTab(openAuthTab, returnUrl);
