@@ -360,6 +360,8 @@ public class RegistrationDepositService : IRegistrationDepositService
             $"Your registration for {productName} is confirmed. Deposit of ${deposit.Amount:N0} was received.",
             NotificationType.Auction,
             $"/Auction/Detail/{deposit.AuctionId}",
+            NotificationReferenceTypes.AuctionRegistrationConfirmed,
+            deposit.AuctionId,
             cancellationToken: cancellationToken);
 
         return RegistrationDepositResult.Ok(

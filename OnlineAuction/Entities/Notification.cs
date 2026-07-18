@@ -48,4 +48,9 @@ public static class NotificationReferenceTypes
     public const string AuctionStartingSoon = "auction_starting_soon";
     public const string AuctionNowLive = "auction_now_live";
     public const string ListingFeePaid = "listing_fee_paid";
+    public const string AuctionBidPlaced = "auction_bid_placed";
+    public const string AuctionNewBid = "auction_new_bid";
+    public const string BuyNowOrderCreated = "buy_now_order_created";
+    public const string RefundUnderReview = "refund_under_review";
+    public const string RefundClosed = "refund_closed";
 }

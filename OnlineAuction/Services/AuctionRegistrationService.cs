@@ -240,6 +240,8 @@ public class AuctionRegistrationService : IAuctionRegistrationService
             notificationMessage,
             NotificationType.Auction,
             $"/Auction/Detail/{auctionId}",
+            NotificationReferenceTypes.AuctionRegistrationCancelled,
+            auctionId,
             cancellationToken: default);
 
         return AuctionRegistrationResult.Ok(

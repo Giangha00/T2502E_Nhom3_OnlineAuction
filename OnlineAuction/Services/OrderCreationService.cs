@@ -242,6 +242,7 @@ public class OrderCreationService : IOrderCreationService
 
         await NotifyAuctionWinAsync(
             auction,
+            order,
             winningBid.BidderId,
             order.Status == OrderStatuses.Paid,
             cancellationToken);
@@ -407,6 +408,7 @@ public class OrderCreationService : IOrderCreationService
 
     private async Task NotifyAuctionWinAsync(
         Auction auction,
+        AuctionOrder order,
         int winningBidderId,
         bool paidByDeposit,
         CancellationToken cancellationToken)
@@ -423,12 +425,30 @@ public class OrderCreationService : IOrderCreationService
             auction.Id,
             cancellationToken: cancellationToken);
 
+        if (paidByDeposit)
+        {
+            await OrderNotificationHelper.NotifySellerPaymentReceivedAsync(
+                _notificationService,
+                _dbContext,
+                order.Id,
+                "deposit",
+                cancellationToken);
+        }
+        else
+        {
+            await OrderNotificationHelper.NotifySellerAwaitingPaymentAsync(
+                _notificationService,
+                _dbContext,
+                order,
+                cancellationToken);
+        }
+
         var orderCount = await _dbContext.Orders
             .AsNoTracking()
-            .CountAsync(order =>
-                order.BuyerId == winningBidderId &&
-                order.Status == OrderStatuses.PendingPayment &&
-                order.DeletedAt == null,
+            .CountAsync(o =>
+                o.BuyerId == winningBidderId &&
+                o.Status == OrderStatuses.PendingPayment &&
+                o.DeletedAt == null,
                 cancellationToken);
         await _realtimePublisher.SendOrderCountToUserAsync(winningBidderId, orderCount, cancellationToken);
 
@@ -567,12 +587,28 @@ public class OrderCreationService : IOrderCreationService
             return (true, "Item is already in your orders.");
         }
 
+        await _notificationService.CreateAndPushAsync(
+            buyerId,
+            "Order created",
+            $"{auction.Product.Name} was added to your orders. Complete payment before the deadline.",
+            NotificationType.Payment,
+            "/Order",
+            NotificationReferenceTypes.BuyNowOrderCreated,
+            order.Id,
+            cancellationToken: cancellationToken);
+
+        await OrderNotificationHelper.NotifySellerAwaitingPaymentAsync(
+            _notificationService,
+            _dbContext,
+            order,
+            cancellationToken);
+
         var orderCount = await _dbContext.Orders
             .AsNoTracking()
-            .CountAsync(order =>
-                order.BuyerId == buyerId &&
-                order.Status == OrderStatuses.PendingPayment &&
-                order.DeletedAt == null,
+            .CountAsync(pendingOrder =>
+                pendingOrder.BuyerId == buyerId &&
+                pendingOrder.Status == OrderStatuses.PendingPayment &&
+                pendingOrder.DeletedAt == null,
                 cancellationToken);
         await _realtimePublisher.SendOrderCountToUserAsync(buyerId, orderCount, cancellationToken);
 

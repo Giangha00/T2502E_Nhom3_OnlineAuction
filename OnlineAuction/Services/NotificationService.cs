@@ -291,14 +291,21 @@ public class NotificationService : INotificationService
                 .Distinct()
                 .ToListAsync(cancellationToken);
 
-            var watcherIds = await _dbContext.AuctionRegistrations
+            var registrantIds = await _dbContext.AuctionRegistrations
                 .AsNoTracking()
                 .Where(r => r.AuctionId == auction.Id && r.Status == AuctionRegistrationStatuses.Approved)
                 .Select(r => r.UserId)
                 .ToListAsync(cancellationToken);
 
+            var watchlistIds = await _dbContext.WatchlistItems
+                .AsNoTracking()
+                .Where(w => w.AuctionId == auction.Id)
+                .Select(w => w.UserId)
+                .ToListAsync(cancellationToken);
+
             var recipientIds = bidderIds
-                .Concat(watcherIds)
+                .Concat(registrantIds)
+                .Concat(watchlistIds)
                 .Distinct()
                 .ToList();
 
@@ -346,7 +353,18 @@ public class NotificationService : INotificationService
                 .Distinct()
                 .ToListAsync(cancellationToken);
 
-            if (registrantIds.Count == 0)
+            var watchlistIds = await _dbContext.WatchlistItems
+                .AsNoTracking()
+                .Where(w => w.AuctionId == auction.Id)
+                .Select(w => w.UserId)
+                .ToListAsync(cancellationToken);
+
+            var recipientIds = registrantIds
+                .Concat(watchlistIds)
+                .Distinct()
+                .ToList();
+
+            if (recipientIds.Count == 0)
             {
                 continue;
             }
@@ -355,7 +373,7 @@ public class NotificationService : INotificationService
             var relatedUrl = $"/Auction/Detail/{auction.Id}";
             var startLocal = DateTimeUtilities.AsUtc(auction.StartDate).ToLocalTime().ToString("dd/MM/yyyy HH:mm");
 
-            foreach (var userId in registrantIds)
+            foreach (var userId in recipientIds)
             {
                 await CreateAndPushAsync(
                     userId,

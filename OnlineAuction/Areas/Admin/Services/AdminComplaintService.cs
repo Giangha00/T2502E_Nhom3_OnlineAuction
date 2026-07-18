@@ -341,7 +341,10 @@ public class AdminComplaintService : IAdminComplaintService
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        if (normalizedAction is ComplaintStatusActions.Approve or ComplaintStatusActions.Reject)
+        if (normalizedAction is ComplaintStatusActions.Approve
+            or ComplaintStatusActions.Reject
+            or ComplaintStatusActions.UnderReview
+            or ComplaintStatusActions.Close)
         {
             await TryNotifyBuyerAsync(complaint, normalizedAction, cancellationToken);
         }
@@ -386,6 +389,30 @@ public class AdminComplaintService : IAdminComplaintService
                     NotificationType.Refund,
                     "/Refund",
                     NotificationReferenceTypes.RefundRejected,
+                    complaint.Id,
+                    cancellationToken: cancellationToken);
+            }
+            else if (action == ComplaintStatusActions.UnderReview)
+            {
+                await _notificationService.CreateAndPushAsync(
+                    complaint.BuyerId,
+                    "Refund request under review",
+                    "Your refund request is now under review. We will update you when a decision is made.",
+                    NotificationType.Refund,
+                    "/Refund",
+                    NotificationReferenceTypes.RefundUnderReview,
+                    complaint.Id,
+                    cancellationToken: cancellationToken);
+            }
+            else if (action == ComplaintStatusActions.Close)
+            {
+                await _notificationService.CreateAndPushAsync(
+                    complaint.BuyerId,
+                    "Refund request closed",
+                    complaint.ResolutionNote ?? "Your refund request has been closed.",
+                    NotificationType.Refund,
+                    "/Refund",
+                    NotificationReferenceTypes.RefundClosed,
                     complaint.Id,
                     cancellationToken: cancellationToken);
             }
