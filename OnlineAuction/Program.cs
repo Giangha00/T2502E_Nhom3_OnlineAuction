@@ -20,8 +20,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region MVC + Localization
 
-builder.Configuration.AddJsonFile("appsettings.json.example", optional: true, reloadOnChange: true);
-builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+// Local/example overrides must NOT run in Production — they would override Azure App Settings
+// (e.g. ConnectionStrings__DefaultConnection) and break App Service startup.
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddJsonFile("appsettings.json.example", optional: true, reloadOnChange: true);
+    builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+}
+
 var mvcBuilder = builder.Services.AddControllersWithViews()
     .AddViewLocalization()
     .AddDataAnnotationsLocalization(options =>
