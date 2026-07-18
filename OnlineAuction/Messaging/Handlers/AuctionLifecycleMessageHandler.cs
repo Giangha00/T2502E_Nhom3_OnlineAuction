@@ -126,13 +126,23 @@ public sealed class AuctionLifecycleMessageHandler : IAuctionLifecycleMessageHan
             .Distinct()
             .ToListAsync(cancellationToken);
 
-        var watcherIds = await _dbContext.AuctionRegistrations
+        var registrantIds = await _dbContext.AuctionRegistrations
             .AsNoTracking()
             .Where(r => r.AuctionId == auctionId && r.Status == AuctionRegistrationStatuses.Approved)
             .Select(r => r.UserId)
             .ToListAsync(cancellationToken);
 
-        var recipientIds = bidderIds.Concat(watcherIds).Distinct().ToList();
+        var watchlistIds = await _dbContext.WatchlistItems
+            .AsNoTracking()
+            .Where(w => w.AuctionId == auctionId)
+            .Select(w => w.UserId)
+            .ToListAsync(cancellationToken);
+
+        var recipientIds = bidderIds
+            .Concat(registrantIds)
+            .Concat(watchlistIds)
+            .Distinct()
+            .ToList();
         var productName = auction.Product?.Name ?? "an auction";
         var relatedUrl = $"/Auction/Detail/{auction.Id}";
 
