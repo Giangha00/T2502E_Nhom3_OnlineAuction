@@ -477,6 +477,7 @@
   <data name="Product_AboutTheWork" xml:space="preserve"><value>작품 소개</value></data>
   <data name="Product_Grading" xml:space="preserve"><value>등급</value></data>
   <data name="Product_BidHistory" xml:space="preserve"><value>입찰 내역</value></data>
+  <data name="Product_BidHistoryTableTitle" xml:space="preserve"><value>입찰 활동</value></data>
   <data name="Product_Shipping" xml:space="preserve"><value>배송</value></data>
   <data name="Product_EstimatedValue" xml:space="preserve"><value>예상 가치:</value></data>
   <data name="Product_BuyersPremium" xml:space="preserve"><value>가격에 구매자 수수료가 포함됩니다. 배송비 및 세금이 적용될 수 있습니다.</value></data>
@@ -570,6 +571,22 @@
   <data name="Product_RegistrationRejected" xml:space="preserve"><value>등록이 거부되었습니다.</value></data>
   <data name="Product_MustRegisterToBid" xml:space="preserve"><value>입찰 전에 이 경매에 등록해야 합니다.</value></data>
   <data name="Product_RegisteredCount" xml:space="preserve"><value>{0}명 등록</value></data>
+  <data name="Product_RegisteredBiddersTab" xml:space="preserve"><value>등록자 ({0})</value></data>
+  <data name="Product_NoRegisteredBidders" xml:space="preserve"><value>승인된 등록자가 아직 없습니다.</value></data>
+  <data name="Product_RegisteredAt" xml:space="preserve"><value>등록일</value></data>
+  <data name="Product_RegisteredBidderApproved" xml:space="preserve"><value>승인됨</value></data>
+  <data name="Product_RegisteredBidderShowDetails" xml:space="preserve"><value>상세 보기</value></data>
+  <data name="Product_RegisteredBidderHideDetails" xml:space="preserve"><value>상세 닫기</value></data>
+  <data name="Product_RegisteredBidderDisplayName" xml:space="preserve"><value>표시 이름</value></data>
+  <data name="Product_RegisteredBidderMemberSinceLabel" xml:space="preserve"><value>가입 연도</value></data>
+  <data name="Product_RegisteredBidderMemberSince" xml:space="preserve"><value>{0}년</value></data>
+  <data name="Product_RegisteredBidderBidsOnLotLabel" xml:space="preserve"><value>이 로트 입찰</value></data>
+  <data name="Product_RegisteredBidderBidsOnLot" xml:space="preserve"><value>{0}회</value></data>
+  <data name="Product_RegisteredBidderCompletedPurchases" xml:space="preserve"><value>Card Market에서 {0}건 구매 완료</value></data>
+  <data name="Product_ViewBidderProfile" xml:space="preserve"><value>전체 프로필 보기</value></data>
+  <data name="Product_RegisteredBiddersNote" xml:space="preserve"><value>등록이 승인되고 보증금이 완료된 사용자만 표시됩니다.</value></data>
+  <data name="Product_SimilarListingsTitle" xml:space="preserve"><value>유사 상품</value></data>
+  <data name="Js_ProductDetail_RegisteredBiddersEmpty" xml:space="preserve"><value>승인된 등록자가 아직 없습니다.</value></data>
   <data name="Product_YouAreTheSeller" xml:space="preserve"><value>귀하는 이 상품의 판매자입니다.</value></data>
   <data name="Product_CancelRegistration" xml:space="preserve"><value>등록 취소</value></data>
   <data name="Product_CountdownPreview" xml:space="preserve"><value>정적 미리보기 — 카운트다운은 실시간이 아닙니다</value></data>

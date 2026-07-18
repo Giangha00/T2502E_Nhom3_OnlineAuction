@@ -1870,6 +1870,22 @@ body.home-auth-open {
   display: none;
 }
 
+.registered-bidders {
+  overflow: hidden;
+}
+
+.registered-bidder-card__summary {
+  outline: none;
+}
+
+.registered-bidder-card__summary:focus-visible {
+  box-shadow: inset 0 0 0 2px #2563eb;
+}
+
+.registered-bidder-card[open] .registered-bidder-card__summary {
+  background: #f8fafc;
+}
+
 .product-countdown {
   border-radius: 1rem;
   background: #0f172a;

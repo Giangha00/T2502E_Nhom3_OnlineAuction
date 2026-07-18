@@ -24,7 +24,8 @@ var builder = WebApplication.CreateBuilder(args);
 // (e.g. ConnectionStrings__DefaultConnection) and break App Service startup.
 if (builder.Environment.IsDevelopment())
 {
-    builder.Configuration.AddJsonFile("appsettings.json.example", optional: true, reloadOnChange: true);
+    // appsettings.json.example is a copy template only (YOUR_* placeholders). Loading it here
+    // overrides user-secrets and breaks PayPal/Gmail/SmokeTesting — use appsettings.Local.json instead.
     builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 }
 
@@ -335,6 +336,16 @@ var firebaseSettings = builder.Configuration
     .Get<FirebaseSettings>() ?? new FirebaseSettings();
 
 var app = builder.Build();
+
+var payPalSettings = app.Services.GetRequiredService<IOptions<PayPalSettings>>().Value;
+app.Logger.LogInformation(
+    payPalSettings.IsConfigured
+        ? "PayPal {Mode} configured (ClientId suffix: ...{ClientIdSuffix})."
+        : "PayPal not configured. Set user-secrets PayPal:ClientId and PayPal:ClientSecret, then restart.",
+    payPalSettings.IsSandbox ? "sandbox" : "live",
+    payPalSettings.ClientId.Length > 6
+        ? payPalSettings.ClientId[^6..]
+        : "??????");
 
 FirebaseMessagingService.Initialize(
     firebaseSettings,

@@ -514,6 +514,7 @@
   <data name="Product_AboutTheWork" xml:space="preserve"><value>About the work</value></data>
   <data name="Product_Grading" xml:space="preserve"><value>Grading</value></data>
   <data name="Product_BidHistory" xml:space="preserve"><value>Bid history</value></data>
+  <data name="Product_BidHistoryTableTitle" xml:space="preserve"><value>Bid activity</value></data>
   <data name="Product_Shipping" xml:space="preserve"><value>Shipping</value></data>
   <data name="Product_EstimatedValue" xml:space="preserve"><value>Estimated value:</value></data>
   <data name="Product_BuyersPremium" xml:space="preserve"><value>Price includes buyer's premium. Shipping and taxes may apply.</value></data>
@@ -614,7 +615,7 @@
   <data name="Product_PendingVerification" xml:space="preserve"><value>This listing has not yet completed specialist verification.</value></data>
   <data name="Product_Bidder" xml:space="preserve"><value>Bidder</value></data>
   <data name="Product_BidAmount" xml:space="preserve"><value>Bid Amount</value></data>
-  <data name="Product_DateTime" xml:space="preserve"><value>Date &amp;amp; Time</value></data>
+  <data name="Product_DateTime" xml:space="preserve"><value>Date &amp; Time</value></data>
   <data name="Product_Status" xml:space="preserve"><value>Status</value></data>
   <data name="Product_Winning" xml:space="preserve"><value>Highest bid</value></data>
   <data name="Product_Outbid" xml:space="preserve"><value>Outbid</value></data>
@@ -654,6 +655,22 @@
   <data name="Product_RegistrationRejected" xml:space="preserve"><value>Your registration was rejected.</value></data>
   <data name="Product_MustRegisterToBid" xml:space="preserve"><value>You must register for this auction before placing a bid.</value></data>
   <data name="Product_RegisteredCount" xml:space="preserve"><value>{0} registered</value></data>
+  <data name="Product_RegisteredBiddersTab" xml:space="preserve"><value>Registered bidders ({0})</value></data>
+  <data name="Product_NoRegisteredBidders" xml:space="preserve"><value>No approved registrants yet.</value></data>
+  <data name="Product_RegisteredAt" xml:space="preserve"><value>Registered</value></data>
+  <data name="Product_RegisteredBidderApproved" xml:space="preserve"><value>Approved</value></data>
+  <data name="Product_RegisteredBidderShowDetails" xml:space="preserve"><value>View details</value></data>
+  <data name="Product_RegisteredBidderHideDetails" xml:space="preserve"><value>Hide details</value></data>
+  <data name="Product_RegisteredBidderDisplayName" xml:space="preserve"><value>Display name</value></data>
+  <data name="Product_RegisteredBidderMemberSinceLabel" xml:space="preserve"><value>Member since</value></data>
+  <data name="Product_RegisteredBidderMemberSince" xml:space="preserve"><value>{0}</value></data>
+  <data name="Product_RegisteredBidderBidsOnLotLabel" xml:space="preserve"><value>Bids on this lot</value></data>
+  <data name="Product_RegisteredBidderBidsOnLot" xml:space="preserve"><value>{0} bid(s)</value></data>
+  <data name="Product_RegisteredBidderCompletedPurchases" xml:space="preserve"><value>{0} completed purchase(s) on Card Market</value></data>
+  <data name="Product_ViewBidderProfile" xml:space="preserve"><value>View full profile</value></data>
+  <data name="Product_RegisteredBiddersNote" xml:space="preserve"><value>Only users with approved registration and a successful deposit are listed here.</value></data>
+  <data name="Product_SimilarListingsTitle" xml:space="preserve"><value>Similar listings</value></data>
+  <data name="Js_ProductDetail_RegisteredBiddersEmpty" xml:space="preserve"><value>No approved registrants yet.</value></data>
   <data name="Product_YouAreTheSeller" xml:space="preserve"><value>You are the seller of this listing.</value></data>
   <data name="Product_CancelRegistration" xml:space="preserve"><value>Cancel registration</value></data>
   <data name="Product_CancelRegistrationHint" xml:space="preserve"><value>You can cancel your registration before the live session starts.</value></data>

@@ -82,6 +82,7 @@ public class AuctionController : Controller
             isEnded = state.IsEnded,
             bidHistory = state.BidHistory.Select(bid => new
             {
+                bidderId = bid.BidderId,
                 bidderName = bid.BidderName,
                 amount = bid.Amount,
                 bidTime = bid.BidTime,
@@ -411,6 +412,7 @@ public async Task<IActionResult> DepositPayPalCancel(string token)
             endDate = result.EndDate is null ? null : DateTimeUtilities.AsUtc(result.EndDate.Value).ToString("o"),
             bidHistory = result.BidHistory?.Select(bid => new
             {
+                bidderId = bid.BidderId,
                 bidderName = bid.BidderName,
                 amount = bid.Amount,
                 bidTime = bid.BidTime,

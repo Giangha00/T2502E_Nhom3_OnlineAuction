@@ -277,6 +277,15 @@
     }
   }
 
+  function renderBidderCell(bid) {
+    var name = escapeHtml(bid.bidderName || '');
+    if (bid.bidderId) {
+      return '<a href="/User/Detail/' + encodeURIComponent(bid.bidderId) + '" class="font-medium text-slate-800 transition hover:text-blue-700 hover:underline">' + name + '</a>';
+    }
+
+    return '<span class="font-medium text-slate-800">' + name + '</span>';
+  }
+
   function renderBidHistory(items) {
     if (!bidHistoryBody) {
       return;
@@ -307,7 +316,7 @@
       }
 
       return '<tr>' +
-        '<td class="px-5 py-4 font-medium text-slate-800">' + bid.bidderName + '</td>' +
+        '<td class="px-5 py-4">' + renderBidderCell(bid) + '</td>' +
         '<td class="px-5 py-4 font-bold tabular-nums text-slate-900">' + formatCurrency(bid.amount) + '</td>' +
         '<td class="px-5 py-4 text-slate-500">' + formatBidTime(bid.bidTime) + '</td>' +
         '<td class="px-5 py-4"><span class="' + badgeClass + '">' + statusLabel + '</span></td>' +
@@ -331,6 +340,33 @@
 
     var template = i18n.registeredCount || '{0} registered';
     registrationCountLabel.textContent = template.replace('{0}', String(count));
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function activateTab(target) {
+    if (!target) {
+      return;
+    }
+
+    tabButtons.forEach(function (btn) {
+      var isActive = btn.getAttribute('data-tab') === target;
+      btn.classList.toggle('is-active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+
+    tabPanels.forEach(function (panel) {
+      var isMatch = panel.getAttribute('data-panel') === target;
+      panel.classList.toggle('is-active', isMatch);
+      panel.hidden = !isMatch;
+    });
   }
 
   function openAuthModal() {
@@ -640,20 +676,7 @@
   tabButtons.forEach(function (button) {
     button.addEventListener('click', function () {
       var target = button.getAttribute('data-tab');
-      if (!target) return;
-
-      tabButtons.forEach(function (btn) {
-        btn.classList.remove('is-active');
-        btn.setAttribute('aria-selected', 'false');
-      });
-      button.classList.add('is-active');
-      button.setAttribute('aria-selected', 'true');
-
-      tabPanels.forEach(function (panel) {
-        var isMatch = panel.getAttribute('data-panel') === target;
-        panel.classList.toggle('is-active', isMatch);
-        panel.hidden = !isMatch;
-      });
+      activateTab(target);
     });
   });
 
