@@ -74,6 +74,7 @@ public class RealtimePublisher : IRealtimePublisher
                 isEnded = state.IsEnded,
                 bidHistory = state.BidHistory.Select(bid => new
                 {
+                    bidderId = bid.BidderId,
                     bidderName = bid.BidderName,
                     amount = bid.Amount,
                     bidTime = bid.BidTime,

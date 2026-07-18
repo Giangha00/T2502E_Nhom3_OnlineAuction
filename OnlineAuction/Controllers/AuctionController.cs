@@ -82,6 +82,7 @@ public class AuctionController : Controller
             isEnded = state.IsEnded,
             bidHistory = state.BidHistory.Select(bid => new
             {
+                bidderId = bid.BidderId,
                 bidderName = bid.BidderName,
                 amount = bid.Amount,
                 bidTime = bid.BidTime,
@@ -167,130 +168,135 @@ public class AuctionController : Controller
         });
     }
     
-    
     [HttpPost]
-[Authorize]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> InitiateDeposit(int auctionId)
-{
-    // Lấy user hiện tại từ Claims
-    var userId = GetCurrentUserId();
-
-    if (!userId.HasValue)
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> InitiateDeposit(int auctionId)
     {
-        return Unauthorized(new
+        // Lấy user hiện tại từ Claims
+        var userId = GetCurrentUserId();
+
+        if (!userId.HasValue)
         {
-            success = false,
-            message = "Bạn cần đăng nhập để đăng ký đấu giá."
+            return Unauthorized(new
+            {
+                success = false,
+                message = "Bạn cần đăng nhập để đăng ký đấu giá."
+            });
+        }
+
+        // PayPal thanh toán thành công sẽ redirect về URL này.
+        // Dùng path /DepositPayPalReturn/{id} để auctionId không bị mất khi PayPal gắn ?token=
+        var returnUrl = Url.Action(
+            nameof(DepositPayPalReturn),
+            "Auction",
+            new { id = auctionId },
+            Request.Scheme)!;
+
+        // PayPal bị user hủy sẽ redirect về URL này
+        var cancelUrl = Url.Action(
+            nameof(DepositPayPalCancel),
+            "Auction",
+            new { id = auctionId },
+            Request.Scheme)!;
+
+        // Gọi service xử lý toàn bộ logic:
+        // validate auction
+        // tính tiền cọc
+        // tạo registration pending
+        // tạo deposit pending
+        // tạo PayPal order
+        var result = await _registrationDepositService.InitiateDepositAsync(
+            auctionId,
+            userId.Value,
+            returnUrl,
+            cancelUrl);
+
+        if (!result.Success)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = result.Message
+            });
+        }
+
+        // Trả approvalUrl cho frontend
+        // Frontend sẽ window.location.href = approvalUrl
+        return Json(new
+        {
+            success = true,
+            message = result.Message,
+            approvalUrl = result.ApprovalUrl,
+            depositAmount = result.DepositAmount
         });
     }
 
-    // PayPal thanh toán thành công sẽ redirect về URL này
-    var returnUrl = Url.Action(
-        nameof(DepositPayPalReturn),
-        "Auction",
-        null,
-        Request.Scheme)!;
-
-    // PayPal bị user hủy sẽ redirect về URL này
-    var cancelUrl = Url.Action(
-        nameof(DepositPayPalCancel),
-        "Auction",
-        null,
-        Request.Scheme)!;
-
-    // Gọi service xử lý toàn bộ logic:
-    // validate auction
-    // tính tiền cọc
-    // tạo registration pending
-    // tạo deposit pending
-    // tạo PayPal order
-    var result = await _registrationDepositService.InitiateDepositAsync(
-        auctionId,
-        userId.Value,
-        returnUrl,
-        cancelUrl);
-
-    if (!result.Success)
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> DepositPayPalReturn(int id, string token)
     {
-        return BadRequest(new
+        // token PayPal gửi về chính là PayPalOrderId
+        // id = auctionId (đặt trên path return URL)
+        var userId = GetCurrentUserId();
+
+        if (!userId.HasValue)
         {
-            success = false,
-            message = result.Message
-        });
+            return RedirectToAction("Login", "Auth");
+        }
+
+        // Capture tiền từ PayPal
+        // Nếu capture thành công:
+        // deposit.status = paid
+        // registration.status = approved
+        var result = await _registrationDepositService.CaptureDepositAsync(
+            userId.Value,
+            token);
+
+        var detailAuctionId = result.AuctionId ?? (id > 0 ? id : null);
+
+        if (!result.Success)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAuctionDetailOrIndex(detailAuctionId);
+        }
+
+        TempData["SuccessMessage"] = result.Message;
+        return RedirectToAuctionDetailOrIndex(detailAuctionId);
     }
 
-    // Trả approvalUrl cho frontend
-    // Frontend sẽ window.location.href = approvalUrl
-    return Json(new
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> DepositPayPalCancel(int id, string token)
     {
-        success = true,
-        message = result.Message,
-        approvalUrl = result.ApprovalUrl,
-        depositAmount = result.DepositAmount
-    });
-}
+        var userId = GetCurrentUserId();
 
-[HttpGet]
-[Authorize]
-public async Task<IActionResult> DepositPayPalReturn(string token)
-{
-    // token PayPal gửi về chính là PayPalOrderId
-    var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return RedirectToAction("Login", "Auth");
+        }
 
-    if (!userId.HasValue)
-    {
-        return RedirectToAction("Login", "Account");
-    }
+        // User hủy thanh toán trên PayPal
+        // deposit.status = cancelled
+        // registration.status = cancelled
+        var result = await _registrationDepositService.CancelDepositAsync(
+            userId.Value,
+            token);
 
-    // Capture tiền từ PayPal
-    // Nếu capture thành công:
-    // deposit.status = paid
-    // registration.status = approved
-    var result = await _registrationDepositService.CaptureDepositAsync(
-        userId.Value,
-        token);
-
-    if (!result.Success)
-    {
         TempData["ErrorMessage"] = result.Message;
+
+        return RedirectToAuctionDetailOrIndex(result.AuctionId ?? (id > 0 ? id : null));
+    }
+
+    private IActionResult RedirectToAuctionDetailOrIndex(int? auctionId)
+    {
+        if (auctionId is > 0)
+        {
+            return RedirectToAction(nameof(Detail), new { id = auctionId.Value });
+        }
+
         return RedirectToAction(nameof(Index));
     }
-
-    TempData["SuccessMessage"] = result.Message;
-
-    // Quay lại trang chi tiết phiên đấu giá
-    return RedirectToAction(nameof(Detail), new
-    {
-        id = result.AuctionId
-    });
-}
-
-[HttpGet]
-[Authorize]
-public async Task<IActionResult> DepositPayPalCancel(string token)
-{
-    var userId = GetCurrentUserId();
-
-    if (!userId.HasValue)
-    {
-        return RedirectToAction("Login", "Account");
-    }
-
-    // User hủy thanh toán trên PayPal
-    // deposit.status = cancelled
-    // registration.status = cancelled
-    var result = await _registrationDepositService.CancelDepositAsync(
-        userId.Value,
-        token);
-
-    TempData["ErrorMessage"] = result.Message;
-
-    return RedirectToAction(nameof(Detail), new
-    {
-        id = result.AuctionId
-    });
-}
     [HttpPost]
     [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     [ValidateAntiForgeryToken]
@@ -411,6 +417,7 @@ public async Task<IActionResult> DepositPayPalCancel(string token)
             endDate = result.EndDate is null ? null : DateTimeUtilities.AsUtc(result.EndDate.Value).ToString("o"),
             bidHistory = result.BidHistory?.Select(bid => new
             {
+                bidderId = bid.BidderId,
                 bidderName = bid.BidderName,
                 amount = bid.Amount,
                 bidTime = bid.BidTime,

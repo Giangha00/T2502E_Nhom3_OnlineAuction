@@ -311,6 +311,7 @@ internal static class ProductDetailMapper
         return bidList
             .Select(bid => new BidHistoryItemViewModel
             {
+                BidderId = bid.BidderId,
                 BidderName = FormatBidderName(bid.Bidder),
                 Amount = bid.Amount,
                 BidTime = bid.PlacedAt,
