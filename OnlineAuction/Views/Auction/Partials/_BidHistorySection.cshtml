@@ -23,7 +23,21 @@
           @foreach (var bid in Model.BidHistory)
           {
             <tr>
-              <td class="px-5 py-4 font-medium text-slate-800">@bid.BidderName</td>
+              <td class="px-5 py-4 font-medium text-slate-800">
+                @if (bid.BidderId > 0)
+                {
+                  <a asp-controller="User"
+                     asp-action="Detail"
+                     asp-route-id="@bid.BidderId"
+                     class="text-slate-800 underline-offset-2 transition hover:text-blue-700 hover:underline">
+                    @bid.BidderName
+                  </a>
+                }
+                else
+                {
+                  @bid.BidderName
+                }
+              </td>
               <td class="px-5 py-4 font-bold tabular-nums text-slate-900">$@bid.Amount.ToString("N0")</td>
               <td class="px-5 py-4 text-slate-500">@bid.BidTime.ToString("MMM dd, yyyy · HH:mm")</td>
               <td class="px-5 py-4">

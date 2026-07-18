@@ -277,6 +277,29 @@
     }
   }
 
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function renderBidderNameCell(bid) {
+    var name = escapeHtml(bid.bidderName || '');
+    var bidderId = Number(bid.bidderId);
+    if (!bidderId) {
+      return '<td class="px-5 py-4 font-medium text-slate-800">' + name + '</td>';
+    }
+
+    return '<td class="px-5 py-4 font-medium text-slate-800">' +
+      '<a href="/User/Detail/' + bidderId + '" ' +
+      'class="text-slate-800 underline-offset-2 transition hover:text-blue-700 hover:underline">' +
+      name +
+      '</a></td>';
+  }
+
   function renderBidHistory(items) {
     if (!bidHistoryBody) {
       return;
@@ -307,7 +330,7 @@
       }
 
       return '<tr>' +
-        '<td class="px-5 py-4 font-medium text-slate-800">' + bid.bidderName + '</td>' +
+        renderBidderNameCell(bid) +
         '<td class="px-5 py-4 font-bold tabular-nums text-slate-900">' + formatCurrency(bid.amount) + '</td>' +
         '<td class="px-5 py-4 text-slate-500">' + formatBidTime(bid.bidTime) + '</td>' +
         '<td class="px-5 py-4"><span class="' + badgeClass + '">' + statusLabel + '</span></td>' +

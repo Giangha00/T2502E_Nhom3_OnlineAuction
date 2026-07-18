@@ -256,7 +256,8 @@ public class RegistrationDepositService : IRegistrationDepositService
                 payPalOrderId);
 
             return RegistrationDepositResult.Fail(
-                "Giao dịch đặt cọc không còn ở trạng thái chờ thanh toán.");
+                "Giao dịch đặt cọc không còn ở trạng thái chờ thanh toán.",
+                auctionId: deposit.AuctionId);
         }
 
         var captureContext = new PayPalCaptureContext(
@@ -273,7 +274,8 @@ public class RegistrationDepositService : IRegistrationDepositService
         if (!captureResult.Success || string.IsNullOrWhiteSpace(captureResult.CaptureId))
         {
             return RegistrationDepositResult.Fail(
-                captureResult.ErrorMessage ?? "Capture PayPal thất bại.");
+                captureResult.ErrorMessage ?? "Capture PayPal thất bại.",
+                auctionId: deposit.AuctionId);
         }
 
         deposit = await _dbContext.AuctionRegistrationDeposits
@@ -313,7 +315,8 @@ public class RegistrationDepositService : IRegistrationDepositService
                 recovery.ErrorMessage);
 
             return RegistrationDepositResult.Fail(
-                "Giao dịch đặt cọc không còn ở trạng thái chờ thanh toán.");
+                "Giao dịch đặt cọc không còn ở trạng thái chờ thanh toán.",
+                auctionId: deposit.AuctionId);
         }
 
         if (!PayPalAmountHelper.AmountsMatch(deposit.Amount, captureResult.CapturedAmount))
@@ -332,7 +335,8 @@ public class RegistrationDepositService : IRegistrationDepositService
                 recovery.Success);
 
             return RegistrationDepositResult.Fail(
-                "Số tiền PayPal capture không khớp với tiền cọc. Đã khởi tạo hoàn tiền.");
+                "Số tiền PayPal capture không khớp với tiền cọc. Đã khởi tạo hoàn tiền.",
+                auctionId: deposit.AuctionId);
         }
 
         var now = DateTime.UtcNow;
@@ -396,7 +400,8 @@ public class RegistrationDepositService : IRegistrationDepositService
         if (deposit.Status == AuctionRegistrationDepositStatuses.Paid)
         {
             return RegistrationDepositResult.Fail(
-                "Giao dịch đã thanh toán, không thể hủy.");
+                "Giao dịch đã thanh toán, không thể hủy.",
+                auctionId: deposit.AuctionId);
         }
 
         var cancelResult = await _payPalService.CancelOrderAsync(payPalOrderId, cancellationToken);
