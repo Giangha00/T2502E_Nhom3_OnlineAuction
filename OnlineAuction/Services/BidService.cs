@@ -235,6 +235,7 @@ public class BidService : IBidService
             AuctionId = auctionId,
             BidId = newBid.Id,
             BidderId = bidderId,
+            SellerId = auction.Product.SellerId,
             Amount = amount,
             PreviousPrice = previousPrice,
             OutbidUserIds = outbidUserIds,

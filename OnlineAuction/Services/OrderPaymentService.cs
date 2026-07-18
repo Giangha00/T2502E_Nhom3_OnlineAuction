@@ -328,6 +328,12 @@ public class OrderPaymentService : IOrderPaymentService
                 $"/Payment/Confirmation?orderId={orderId}",
                 NotificationReferenceTypes.PaymentSuccess,
                 orderId);
+
+            await OrderNotificationHelper.NotifySellerPaymentReceivedAsync(
+                _notificationService,
+                _dbContext,
+                orderId,
+                "PayPal");
         }
 
         var orderCount = await _orderService.CountPendingPaymentOrdersAsync(buyerId);
@@ -680,6 +686,13 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
                 $"/Payment/Confirmation?orderId={order.Id}",
                 NotificationReferenceTypes.PaymentSuccess,
                 order.Id);
+
+            await OrderNotificationHelper.NotifySellerPaymentReceivedAsync(
+                _notificationService,
+                _dbContext,
+                order.Id,
+                "PayPal",
+                cancellationToken);
         }
 
         var buyerIds = orders.Select(order => order.BuyerId).Distinct();
@@ -837,6 +850,13 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
                     NotificationReferenceTypes.PaymentSuccess,
                     payment.OrderId,
                     cancellationToken: cancellationToken);
+
+                await OrderNotificationHelper.NotifySellerPaymentReceivedAsync(
+                    _notificationService,
+                    _dbContext,
+                    payment.OrderId,
+                    "PayPal",
+                    cancellationToken);
             }
 
             var buyerIds = payments.Select(p => p.Order.BuyerId).Distinct();
