@@ -18,8 +18,8 @@ public static class MigrationHistoryReconciler
         ILogger logger,
         CancellationToken cancellationToken = default)
     {
-        if (db.Database.ProviderName?.Contains("MySql", StringComparison.OrdinalIgnoreCase) != true
-            && db.Database.ProviderName?.Contains("SqlServer", StringComparison.OrdinalIgnoreCase) != true)
+        // MySQL-only: uses MySQL information_schema / backtick DDL for orphan repair.
+        if (db.Database.ProviderName?.Contains("MySql", StringComparison.OrdinalIgnoreCase) != true)
         {
             return;
         }

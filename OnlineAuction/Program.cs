@@ -110,6 +110,15 @@ builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
             sqlite.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
         });
     }
+    else if (dbProvider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
+    {
+        options.UseSqlServer(connectionString, sqlServer =>
+        {
+            sqlServer.MigrationsHistoryTable("__ef_migrations_history");
+            sqlServer.EnableRetryOnFailure();
+            sqlServer.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+        });
+    }
     else
     {
         var serverVersion = ServerVersion.Parse("8.0.36-mysql");

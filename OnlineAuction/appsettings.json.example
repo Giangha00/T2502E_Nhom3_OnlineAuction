@@ -1,5 +1,5 @@
 {
-  "DatabaseProvider": "MySql",
+  "DatabaseProvider": "SqlServer",
   "Logging": {
     "LogLevel": {
       "Default": "Information",
@@ -8,7 +8,7 @@
   },
   "AllowedHosts": "*",
   "ConnectionStrings": {
-    "DefaultConnection": "server=localhost;port=3306;database=online_auction;user=root;password=;"
+    "DefaultConnection": "Server=localhost,1434;Database=online_auction;User Id=sa;Password=OnlineAuction@123;TrustServerCertificate=True;Encrypt=False;"
   },
   "SeedData": {
     "RefreshTestAuctionsOnStartup": false,
