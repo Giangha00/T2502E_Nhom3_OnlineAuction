@@ -19,7 +19,9 @@ public class OrderPaymentService : IOrderPaymentService
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IPayPalService _payPalService;
     private readonly IPayPalCaptureGuardService _payPalCaptureGuardService;
+    private readonly ISandboxPayPalWalletService _sandboxPayPalWalletService;
     private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly IOrderService _orderService;
     private readonly IRealtimePublisher _realtimePublisher;
     private readonly ILogger<OrderPaymentService> _logger;
@@ -29,7 +31,9 @@ public class OrderPaymentService : IOrderPaymentService
         AuctionHouseDbContext dbContext,
         IPayPalService payPalService,
         IPayPalCaptureGuardService payPalCaptureGuardService,
+        ISandboxPayPalWalletService sandboxPayPalWalletService,
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         IOrderService orderService,
         IRealtimePublisher realtimePublisher,
         ILogger<OrderPaymentService> logger,
@@ -38,7 +42,9 @@ public class OrderPaymentService : IOrderPaymentService
         _dbContext = dbContext;
         _payPalService = payPalService;
         _payPalCaptureGuardService = payPalCaptureGuardService;
+        _sandboxPayPalWalletService = sandboxPayPalWalletService;
         _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _orderService = orderService;
         _realtimePublisher = realtimePublisher;
         _logger = logger;
@@ -75,6 +81,16 @@ public class OrderPaymentService : IOrderPaymentService
 
         var totalAmount = orders.Sum(order => order.TotalAmount);
         var referenceId = string.Join(',', orders.Select(order => order.OrderReference));
+
+        var walletCheck = await _sandboxPayPalWalletService.EnsureSufficientBalanceAsync(
+            buyerId,
+            totalAmount,
+            cancellationToken);
+        if (!walletCheck.Success)
+        {
+            return PayPalCheckoutResult.Fail(
+                walletCheck.ErrorMessage ?? "Insufficient PayPal sandbox wallet balance.");
+        }
 
         var createResult = await _payPalService.CreateCheckoutOrderAsync(
             totalAmount,
@@ -183,6 +199,17 @@ public class OrderPaymentService : IOrderPaymentService
         }
 
         var expectedAmount = payableOrders.Sum(order => order.TotalAmount);
+
+        var walletCheck = await _sandboxPayPalWalletService.EnsureSufficientBalanceAsync(
+            buyerId,
+            expectedAmount,
+            cancellationToken);
+        if (!walletCheck.Success)
+        {
+            return PayPalCaptureCheckoutResult.Fail(
+                walletCheck.ErrorMessage ?? "Insufficient PayPal sandbox wallet balance.");
+        }
+
         var captureContext = new PayPalCaptureContext(
             Flow: "order",
             UserId: buyerId,
@@ -246,6 +273,17 @@ public class OrderPaymentService : IOrderPaymentService
             {
                 persistenceFailureMessage =
                     "Payment amount changed while completing checkout. A refund has been initiated.";
+                return;
+            }
+
+            var deductResult = await _sandboxPayPalWalletService.TryDeductAsync(
+                buyerId,
+                reloadedExpectedAmount,
+                cancellationToken);
+            if (!deductResult.Success)
+            {
+                persistenceFailureMessage = deductResult.ErrorMessage
+                    ?? "Insufficient PayPal sandbox wallet balance.";
                 return;
             }
 
@@ -322,8 +360,8 @@ public class OrderPaymentService : IOrderPaymentService
         {
             await _notificationService.CreateAndPushAsync(
                 buyerId,
-                "Payment successful",
-                "Your payment has been confirmed. View your order confirmation.",
+                _notifyLocalizer[NotificationKeys.PaymentSuccessTitle],
+                _notifyLocalizer[NotificationKeys.PaymentSuccessSimpleMessage],
                 NotificationType.Payment,
                 $"/Payment/Confirmation?orderId={orderId}",
                 NotificationReferenceTypes.PaymentSuccess,
@@ -331,6 +369,7 @@ public class OrderPaymentService : IOrderPaymentService
 
             await OrderNotificationHelper.NotifySellerPaymentReceivedAsync(
                 _notificationService,
+                _notifyLocalizer,
                 _dbContext,
                 orderId,
                 "PayPal");
@@ -628,14 +667,47 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
             return PayPalWebhookProcessingResult.Fail("Payment amount did not match order total.");
         }
 
+        var webhookBuyerId = orders[0].BuyerId;
+        var webhookWalletCheck = await _sandboxPayPalWalletService.EnsureSufficientBalanceAsync(
+            webhookBuyerId,
+            expectedAmount,
+            cancellationToken);
+        if (!webhookWalletCheck.Success)
+        {
+            _logger.LogWarning(
+                "PayPal webhook rejected due to insufficient sandbox wallet. PayPalOrderId={PayPalOrderId} BuyerId={BuyerId}",
+                payPalOrderId,
+                webhookBuyerId);
+            return PayPalWebhookProcessingResult.Fail(
+                webhookWalletCheck.ErrorMessage ?? "Insufficient PayPal sandbox wallet balance.");
+        }
+
         var strategy = _dbContext.Database.CreateExecutionStrategy();
+        var walletDeductFailed = false;
+        string? walletDeductError = null;
         await strategy.ExecuteAsync(async () =>
         {
             await using var transaction = await _dbContext.Database.BeginTransactionAsync(
                 IsolationLevel.Serializable,
                 cancellationToken);
 
-            foreach (var order in orders.Where(order => order.Status == OrderStatuses.PendingPayment))
+            var payableOrders = orders.Where(order => order.Status == OrderStatuses.PendingPayment).ToList();
+            var amountToDeduct = payableOrders.Sum(order => order.TotalAmount);
+            if (amountToDeduct > 0)
+            {
+                var deductResult = await _sandboxPayPalWalletService.TryDeductAsync(
+                    webhookBuyerId,
+                    amountToDeduct,
+                    cancellationToken);
+                if (!deductResult.Success)
+                {
+                    walletDeductFailed = true;
+                    walletDeductError = deductResult.ErrorMessage;
+                    return;
+                }
+            }
+
+            foreach (var order in payableOrders)
             {
                 order.Status = OrderStatuses.Paid;
                 order.PaymentMethod = "paypal";
@@ -676,12 +748,18 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
             await transaction.CommitAsync(cancellationToken);
         });
 
+        if (walletDeductFailed)
+        {
+            return PayPalWebhookProcessingResult.Fail(
+                walletDeductError ?? "Insufficient PayPal sandbox wallet balance.");
+        }
+
         foreach (var order in orders.Where(order => order.Status == OrderStatuses.Paid))
         {
             await _notificationService.CreateAndPushAsync(
                 order.BuyerId,
-                "Payment successful",
-                "Your payment has been confirmed. View your order confirmation.",
+                _notifyLocalizer[NotificationKeys.PaymentSuccessTitle],
+                _notifyLocalizer[NotificationKeys.PaymentSuccessSimpleMessage],
                 NotificationType.Payment,
                 $"/Payment/Confirmation?orderId={order.Id}",
                 NotificationReferenceTypes.PaymentSuccess,
@@ -689,6 +767,7 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
 
             await OrderNotificationHelper.NotifySellerPaymentReceivedAsync(
                 _notificationService,
+                _notifyLocalizer,
                 _dbContext,
                 order.Id,
                 "PayPal",
@@ -843,8 +922,8 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
             {
                 await _notificationService.CreateAndPushAsync(
                     payment.Order.BuyerId,
-                    "Payment successful",
-                    "Your payment has been confirmed. View your order confirmation.",
+                    _notifyLocalizer[NotificationKeys.PaymentSuccessTitle],
+                    _notifyLocalizer[NotificationKeys.PaymentSuccessSimpleMessage],
                     NotificationType.Payment,
                     $"/Payment/Confirmation?orderId={payment.OrderId}",
                     NotificationReferenceTypes.PaymentSuccess,
@@ -853,6 +932,7 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
 
                 await OrderNotificationHelper.NotifySellerPaymentReceivedAsync(
                     _notificationService,
+                    _notifyLocalizer,
                     _dbContext,
                     payment.OrderId,
                     "PayPal",

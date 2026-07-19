@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -20,6 +21,7 @@ public class OrderService : IOrderService
     private readonly PlatformFeeSettings _feeSettings;
     private readonly IWinnerNonPaymentRecoveryService _winnerNonPaymentRecoveryService;
     private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
 
     private sealed class NullWinnerNonPaymentRecoveryService : IWinnerNonPaymentRecoveryService
     {
@@ -83,12 +85,14 @@ public class OrderService : IOrderService
         AuctionHouseDbContext dbContext,
         IOptions<PlatformFeeSettings> feeSettings,
         IWinnerNonPaymentRecoveryService? winnerNonPaymentRecoveryService = null,
-        INotificationService? notificationService = null)
+        INotificationService? notificationService = null,
+        INotificationLocalizer? notifyLocalizer = null)
     {
         _dbContext = dbContext;
         _feeSettings = feeSettings.Value;
         _winnerNonPaymentRecoveryService = winnerNonPaymentRecoveryService ?? new NullWinnerNonPaymentRecoveryService();
         _notificationService = notificationService ?? new NullNotificationService();
+        _notifyLocalizer = notifyLocalizer ?? new NullNotificationLocalizer();
     }
 
     public async Task<OrderPageViewModel?> BuildOrderPageAsync(int buyerId)
@@ -305,8 +309,8 @@ public class OrderService : IOrderService
             {
                 await _notificationService.CreateAndPushAsync(
                     buyerId,
-                    "Payment successful",
-                    "Your COD order has been confirmed. View your order confirmation.",
+                _notifyLocalizer[NotificationKeys.PaymentSuccessTitle],
+                _notifyLocalizer[NotificationKeys.PaymentSuccessCodMessage],
                     NotificationType.Payment,
                     $"/Payment/Confirmation?orderId={order.Id}",
                     NotificationReferenceTypes.PaymentSuccess,
@@ -314,6 +318,7 @@ public class OrderService : IOrderService
 
                 await OrderNotificationHelper.NotifySellerPaymentReceivedAsync(
                     _notificationService,
+                    _notifyLocalizer,
                     _dbContext,
                     order.Id,
                     "COD");
@@ -347,6 +352,7 @@ public class OrderService : IOrderService
                 await OrderCancellationHelper.ApplyCancellationSideEffectsAsync(_dbContext, order, now);
                 await OrderNotificationHelper.NotifyPaymentOverdueCancelledAsync(
                     _notificationService,
+                    _notifyLocalizer,
                     _dbContext,
                     order);
             }
@@ -354,6 +360,12 @@ public class OrderService : IOrderService
 
         await _dbContext.SaveChangesAsync();
         return expiredOrders.Count;
+    }
+
+    private sealed class NullNotificationLocalizer : INotificationLocalizer
+    {
+        public string this[string name] => name;
+        public string Format(string name, params object[] args) => string.Format(name, args);
     }
 
     private static void ApplySummary(OrderPageViewModel model, IReadOnlyList<WonOrderItem> selectedItems)

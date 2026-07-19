@@ -52,19 +52,6 @@
     }
     else
     {
-      @if (TempData["OrderMessage"] is string orderMessage)
-      {
-        <div class="order-checkout__alert order-checkout__alert--success">
-          @orderMessage
-        </div>
-      }
-      @if (TempData["OrderError"] is string orderError)
-      {
-        <div class="order-checkout__alert order-checkout__alert--error">
-          @orderError
-        </div>
-      }
-
       <form id="orderCheckoutForm" asp-controller="Order" asp-action="Complete" method="post" class="order-checkout">
         @Html.AntiForgeryToken()
         <div id="selectedOrderIdsContainer" class="order-checkout__hidden-inputs" aria-hidden="true"></div>

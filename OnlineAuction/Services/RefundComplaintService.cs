@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -19,15 +20,18 @@ public class RefundComplaintService : IRefundComplaintService
 
     private readonly AuctionHouseDbContext _dbContext;
     private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<RefundComplaintService> _logger;
 
     public RefundComplaintService(
         AuctionHouseDbContext dbContext,
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         ILogger<RefundComplaintService> logger)
     {
         _dbContext = dbContext;
         _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
     }
 
@@ -248,8 +252,8 @@ public class RefundComplaintService : IRefundComplaintService
         {
             await _notificationService.CreateAndPushAsync(
                 complaint.BuyerId,
-                "Refund request submitted",
-                $"Your refund request {complaint.RequestReference} has been received and is pending review.",
+                _notifyLocalizer[NotificationKeys.RefundSubmittedTitle],
+                _notifyLocalizer.Format(NotificationKeys.RefundSubmittedMessage, complaint.RequestReference),
                 NotificationType.Refund,
                 $"/Refund/Confirmation?requestId={Uri.EscapeDataString(complaint.RequestReference)}",
                 NotificationReferenceTypes.RefundRequested,

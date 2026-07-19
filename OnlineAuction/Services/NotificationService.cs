@@ -17,17 +17,20 @@ public class NotificationService : INotificationService
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IRabbitMqPublisher _publisher;
     private readonly INotificationDeliveryService _deliveryService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<NotificationService> _logger;
 
     public NotificationService(
         AuctionHouseDbContext dbContext,
         IRabbitMqPublisher publisher,
         INotificationDeliveryService deliveryService,
+        INotificationLocalizer notifyLocalizer,
         ILogger<NotificationService> logger)
     {
         _dbContext = dbContext;
         _publisher = publisher;
         _deliveryService = deliveryService;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
     }
 
@@ -316,8 +319,8 @@ public class NotificationService : INotificationService
             {
                 await CreateAndPushAsync(
                     userId,
-                    "Auction ending soon",
-                    $"{productName} ends within the next hour.",
+                    _notifyLocalizer[NotificationKeys.AuctionEndingSoonTitle],
+                    _notifyLocalizer.Format(NotificationKeys.AuctionEndingSoonMessage, productName),
                     NotificationType.Auction,
                     relatedUrl,
                     NotificationReferenceTypes.AuctionEndingSoon,
@@ -377,8 +380,8 @@ public class NotificationService : INotificationService
             {
                 await CreateAndPushAsync(
                     userId,
-                    "Auction starting soon",
-                    $"{productName} goes live at {startLocal}. Get ready to bid.",
+                    _notifyLocalizer[NotificationKeys.AuctionStartingSoonTitle],
+                    _notifyLocalizer.Format(NotificationKeys.AuctionStartingSoonMessage, productName, startLocal),
                     NotificationType.Auction,
                     relatedUrl,
                     NotificationReferenceTypes.AuctionStartingSoon,

@@ -34,6 +34,8 @@ public static class NotificationReferenceTypes
     public const string AuctionWon = "auction_won";
     public const string SellerAwaitingPayment = "seller_awaiting_payment";
     public const string PaymentSuccess = "payment_success";
+    public const string PaymentFailed = "payment_failed";
+    public const string PaymentCancelled = "payment_cancelled";
     public const string SellerPaymentReceived = "seller_payment_received";
     public const string OrderCancelledPaymentOverdue = "order_cancelled_payment_overdue";
     public const string RefundApproved = "refund_approved";
@@ -41,6 +43,9 @@ public static class NotificationReferenceTypes
     public const string RefundRejected = "refund_rejected";
     public const string AuctionRegistrationConfirmed = "auction_registration_confirmed";
     public const string AuctionRegistrationCancelled = "auction_registration_cancelled";
+    public const string AuctionDepositInitiated = "auction_deposit_initiated";
+    public const string AuctionDepositCancelled = "auction_deposit_cancelled";
+    public const string AuctionDepositFailed = "auction_deposit_failed";
     public const string AuctionDepositRefunded = "auction_deposit_refunded";
     public const string AuctionPaymentExpired = "auction_payment_expired";
     public const string AuctionSecondChanceOffered = "auction_second_chance_offered";
@@ -48,7 +53,11 @@ public static class NotificationReferenceTypes
     public const string AuctionStartingSoon = "auction_starting_soon";
     public const string AuctionNowLive = "auction_now_live";
     public const string ListingFeePaid = "listing_fee_paid";
+    public const string ListingSubmitted = "listing_submitted";
+    public const string ListingUpdated = "listing_updated";
+    public const string ListingCancelled = "listing_cancelled";
     public const string AuctionBidPlaced = "auction_bid_placed";
+    public const string AuctionBidFailed = "auction_bid_failed";
     public const string AuctionNewBid = "auction_new_bid";
     public const string BuyNowOrderCreated = "buy_now_order_created";
     public const string RefundUnderReview = "refund_under_review";

@@ -918,6 +918,7 @@
   <data name="Js_Order_NoSelection" xml:space="preserve"><value>Vui lòng chọn ít nhất một sản phẩm để thanh toán.</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Đang đặt giá…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Không thể đặt giá. Vui lòng thử lại.</value></data>
+  <data name="Js_ProductDetail_BidTooLow" xml:space="preserve"><value>Giá đặt phải ít nhất {0}. Vui lòng nhập mức cao hơn mức tối thiểu.</value></data>
   <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Đặt giá thành công!</value></data>
   <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>Phiên đấu giá đã kết thúc</value></data>
   <data name="Js_ProductDetail_Registering" xml:space="preserve"><value>Đang đăng ký…</value></data>
@@ -1174,4 +1175,75 @@
   <data name="Notification_OrderCancelled_Title" xml:space="preserve"><value>Đơn hàng đã hủy</value></data>
   <data name="Notification_OrderCancelledBuyer_Message" xml:space="preserve"><value>Đơn {1} cho {0} đã bị hủy vì quá hạn thanh toán.</value></data>
   <data name="Notification_OrderCancelledSeller_Message" xml:space="preserve"><value>Đơn {1} cho {0} đã bị hủy vì người thắng không thanh toán đúng hạn.</value></data>
+  <data name="Notification_AuctionWonDepositCovered_Message" xml:space="preserve"><value>Chúc mừng! Bạn đã thắng {0}. Tiền cọc đăng ký đã đủ để thanh toán đơn hàng.</value></data>
+  <data name="Notification_BuyNowOrderCreated_Title" xml:space="preserve"><value>Đã tạo đơn hàng</value></data>
+  <data name="Notification_BuyNowOrderCreated_Message" xml:space="preserve"><value>{0} đã được thêm vào đơn hàng. Vui lòng thanh toán trước hạn.</value></data>
+  <data name="Notification_DepositRefunded_Title" xml:space="preserve"><value>Đã hoàn tiền cọc</value></data>
+  <data name="Notification_DepositRefunded_Message" xml:space="preserve"><value>Hoàn tiền cọc ${0} cho {1} đã được xử lý.</value></data>
+  <data name="Notification_RegistrationCancelled_Title" xml:space="preserve"><value>Đã hủy đăng ký</value></data>
+  <data name="Notification_RegistrationCancelledWithRefund_Message" xml:space="preserve"><value>Đã hủy đăng ký {0}. Tiền cọc ${1} đã được hoàn.</value></data>
+  <data name="Notification_RegistrationCancelledNoRefund_Message" xml:space="preserve"><value>Đã hủy đăng ký {0}.</value></data>
+  <data name="Notification_RegistrationCancelFailed_Title" xml:space="preserve"><value>Hủy đăng ký thất bại</value></data>
+  <data name="Notification_AuctionEndingSoon_Title" xml:space="preserve"><value>Phiên đấu giá sắp kết thúc</value></data>
+  <data name="Notification_AuctionEndingSoon_Message" xml:space="preserve"><value>{0} sẽ kết thúc trong vòng một giờ tới.</value></data>
+  <data name="Notification_AuctionStartingSoon_Title" xml:space="preserve"><value>Phiên đấu giá sắp bắt đầu</value></data>
+  <data name="Notification_AuctionStartingSoon_Message" xml:space="preserve"><value>{0} sẽ bắt đầu lúc {1}. Hãy sẵn sàng đặt giá.</value></data>
+  <data name="Notification_PaymentFailed_Title" xml:space="preserve"><value>Thanh toán thất bại</value></data>
+  <data name="Notification_PaymentCancelled_Title" xml:space="preserve"><value>Thanh toán đã hủy</value></data>
+  <data name="Notification_PaymentCancelled_Message" xml:space="preserve"><value>Thanh toán PayPal đã bị hủy. Đơn hàng vẫn đang chờ thanh toán.</value></data>
+  <data name="Notification_PaymentMissingToken_Message" xml:space="preserve"><value>PayPal không trả về token thanh toán hợp lệ.</value></data>
+  <data name="Notification_PaymentCouldNotComplete_Message" xml:space="preserve"><value>Không thể hoàn tất thanh toán.</value></data>
+  <data name="Notification_PaymentUnableStartCheckout_Message" xml:space="preserve"><value>Không thể bắt đầu thanh toán PayPal.</value></data>
+  <data name="Notification_PaymentCompleteFields_Message" xml:space="preserve"><value>Vui lòng điền đầy đủ các trường bắt buộc.</value></data>
+  <data name="Notification_PaymentSuccessCod_Message" xml:space="preserve"><value>Đơn COD của bạn đã được xác nhận. Xem xác nhận đơn hàng.</value></data>
+  <data name="Notification_PaymentSuccessSimple_Message" xml:space="preserve"><value>Thanh toán của bạn đã được xác nhận. Xem xác nhận đơn hàng.</value></data>
+  <data name="Notification_AuctionNowLive_Title" xml:space="preserve"><value>Phiên đấu giá đã bắt đầu</value></data>
+  <data name="Notification_AuctionNowLive_Message" xml:space="preserve"><value>{0} đã mở để đặt giá.</value></data>
+  <data name="Notification_ListingApproved_Title" xml:space="preserve"><value>Tin đăng đã được duyệt</value></data>
+  <data name="Notification_ListingApproved_Message" xml:space="preserve"><value>Tin đăng của bạn đã được duyệt và đang hiển thị trên sàn.</value></data>
+  <data name="Notification_ListingRejected_Title" xml:space="preserve"><value>Tin đăng bị từ chối</value></data>
+  <data name="Notification_ListingRejected_Message" xml:space="preserve"><value>Tin đăng của bạn bị từ chối. Lý do: {0}</value></data>
+  <data name="Notification_ListingSubmitted_Title" xml:space="preserve"><value>Đăng bán thành công</value></data>
+  <data name="Notification_ListingSubmitted_Message" xml:space="preserve"><value>Tin đăng đã được gửi để duyệt.</value></data>
+  <data name="Notification_ListingUpdated_Title" xml:space="preserve"><value>Cập nhật tin đăng</value></data>
+  <data name="Notification_ListingUpdated_Message" xml:space="preserve"><value>Tin đăng đã được cập nhật thành công.</value></data>
+  <data name="Notification_ListingCancelled_Title" xml:space="preserve"><value>Hủy tin đăng</value></data>
+  <data name="Notification_ListingCancelFailed_Title" xml:space="preserve"><value>Không thể hủy tin đăng</value></data>
+  <data name="Notification_ListingCancelled_Message" xml:space="preserve"><value>Đã hủy phiên đấu giá thành công.</value></data>
+  <data name="Notification_RefundSubmitted_Title" xml:space="preserve"><value>Đã gửi yêu cầu hoàn tiền</value></data>
+  <data name="Notification_RefundSubmitted_Message" xml:space="preserve"><value>Yêu cầu hoàn tiền {0} đã được nhận và đang chờ duyệt.</value></data>
+  <data name="Notification_RefundApproved_Title" xml:space="preserve"><value>Yêu cầu hoàn tiền đã được duyệt</value></data>
+  <data name="Notification_RefundApproved_Message" xml:space="preserve"><value>Yêu cầu hoàn tiền của bạn đã được duyệt.</value></data>
+  <data name="Notification_RefundRejected_Title" xml:space="preserve"><value>Yêu cầu hoàn tiền bị từ chối</value></data>
+  <data name="Notification_RefundRejected_Message" xml:space="preserve"><value>Yêu cầu hoàn tiền của bạn đã bị từ chối.</value></data>
+  <data name="Notification_RefundUnderReview_Title" xml:space="preserve"><value>Yêu cầu hoàn tiền đang được xem xét</value></data>
+  <data name="Notification_RefundUnderReview_Message" xml:space="preserve"><value>Yêu cầu hoàn tiền đang được xem xét. Chúng tôi sẽ cập nhật khi có quyết định.</value></data>
+  <data name="Notification_RefundClosed_Title" xml:space="preserve"><value>Yêu cầu hoàn tiền đã đóng</value></data>
+  <data name="Notification_RefundClosed_Message" xml:space="preserve"><value>Yêu cầu hoàn tiền của bạn đã được đóng.</value></data>
+  <data name="Notification_BidFailed_Title" xml:space="preserve"><value>Đặt giá thất bại</value></data>
+  <data name="Notification_BidPlaced_Title" xml:space="preserve"><value>Đặt giá thành công</value></data>
+  <data name="Notification_BidPlaced_Message" xml:space="preserve"><value>Bạn đã đặt giá ${0} cho {1}.</value></data>
+  <data name="Notification_NewBid_Title" xml:space="preserve"><value>Có giá mới trên tin đăng</value></data>
+  <data name="Notification_NewBid_Message" xml:space="preserve"><value>Có người đặt giá ${0} cho {1}.</value></data>
+  <data name="Notification_Outbid_Title" xml:space="preserve"><value>Bạn đã bị vượt giá</value></data>
+  <data name="Notification_Outbid_Message" xml:space="preserve"><value>Có người đặt giá cao hơn cho {0}.</value></data>
+  <data name="Notification_PaymentDeadlineExpired_Title" xml:space="preserve"><value>Hết hạn thanh toán</value></data>
+  <data name="Notification_PaymentDeadlineExpiredForfeited_Message" xml:space="preserve"><value>Bạn chưa thanh toán {0} trong 48 giờ. Tiền cọc đăng ký ${1} đã bị tịch thu theo chính sách.</value></data>
+  <data name="Notification_PaymentDeadlineExpired_Message" xml:space="preserve"><value>Bạn chưa thanh toán {0} trong 48 giờ. Quyền thắng đấu giá đã hết hạn.</value></data>
+  <data name="Notification_SecondChance_Title" xml:space="preserve"><value>Cơ hội thắng thứ hai</value></data>
+  <data name="Notification_SecondChance_Message" xml:space="preserve"><value>Người thắng ban đầu không thanh toán {0}. Bạn hiện là người đặt giá cao nhất hợp lệ. Thanh toán trong {1} giờ.</value></data>
+  <data name="Notification_BuyerDidNotPay_Title" xml:space="preserve"><value>Người mua chưa thanh toán</value></data>
+  <data name="Notification_BuyerDidNotPaySecondChance_Message" xml:space="preserve"><value>Người thắng chưa thanh toán {0}. Đã gửi cơ hội thứ hai cho người đặt giá cao kế tiếp.</value></data>
+  <data name="Notification_BuyerDidNotPayRelist_Title" xml:space="preserve"><value>Người mua chưa thanh toán — có thể đăng lại</value></data>
+  <data name="Notification_BuyerDidNotPayRelist_Message" xml:space="preserve"><value>Người thắng chưa thanh toán {0}. Không có người đặt giá thứ hai phù hợp. Bạn có thể đăng lại tin.</value></data>
+  <data name="Notification_DepositRequestCreated_Title" xml:space="preserve"><value>Yêu cầu đặt cọc đã tạo</value></data>
+  <data name="Notification_DepositRequestCreated_Message" xml:space="preserve"><value>Đã tạo yêu cầu đặt cọc. Vui lòng thanh toán qua PayPal.</value></data>
+  <data name="Notification_DepositPaid_Title" xml:space="preserve"><value>Đặt cọc thành công</value></data>
+  <data name="Notification_DepositPaid_Message" xml:space="preserve"><value>Bạn đã được duyệt đăng ký đấu giá cho {0}. Số tiền cọc: ${1}.</value></data>
+  <data name="Notification_DepositCancelled_Title" xml:space="preserve"><value>Đã hủy đặt cọc</value></data>
+  <data name="Notification_DepositCancelled_Message" xml:space="preserve"><value>Bạn đã hủy thanh toán tiền cọc.</value></data>
+  <data name="Notification_DepositFailed_Title" xml:space="preserve"><value>Đặt cọc thất bại</value></data>
+  <data name="Notification_PayPalAnomalyAutoRefund_Title" xml:space="preserve"><value>Bất thường PayPal đã tự hoàn tiền</value></data>
+  <data name="Notification_PayPalAnomalyManual_Title" xml:space="preserve"><value>Bất thường PayPal cần xử lý thủ công</value></data>
+  <data name="Notification_PayPalAnomaly_Message" xml:space="preserve"><value>Flow={0}; PayPalOrderId={1}; CaptureId={2}; Expected={3}; Captured={4}; Reason={5}; RefundSucceeded={6}; RefundError={7}</value></data>
 </root>

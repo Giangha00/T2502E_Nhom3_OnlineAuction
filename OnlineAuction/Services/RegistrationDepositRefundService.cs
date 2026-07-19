@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -11,17 +12,20 @@ public class RegistrationDepositRefundService : IRegistrationDepositRefundServic
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IPayPalService _payPalService;
     private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<RegistrationDepositRefundService> _logger;
 
     public RegistrationDepositRefundService(
         AuctionHouseDbContext dbContext,
         IPayPalService payPalService,
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         ILogger<RegistrationDepositRefundService> logger)
     {
         _dbContext = dbContext;
         _payPalService = payPalService;
         _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
     }
 
@@ -131,8 +135,8 @@ public class RegistrationDepositRefundService : IRegistrationDepositRefundServic
             var productName = deposit.Auction?.Product?.Name ?? "the auction";
             await _notificationService.CreateAndPushAsync(
                 deposit.UserId,
-                "Deposit refunded",
-                $"Your deposit refund of ${refundAmount:N0} for {productName} has been processed.",
+                _notifyLocalizer[NotificationKeys.DepositRefundedTitle],
+                _notifyLocalizer.Format(NotificationKeys.DepositRefundedMessage, refundAmount, productName),
                 NotificationType.Refund,
                 $"/Auction/Detail/{deposit.AuctionId}",
                 NotificationReferenceTypes.AuctionDepositRefunded,

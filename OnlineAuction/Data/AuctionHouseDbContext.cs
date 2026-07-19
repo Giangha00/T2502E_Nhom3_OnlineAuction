@@ -57,6 +57,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<WinnerNonPaymentLog> WinnerNonPaymentLogs => Set<WinnerNonPaymentLog>();
 
+    public DbSet<UserSandboxWallet> UserSandboxWallets => Set<UserSandboxWallet>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         
@@ -83,6 +85,37 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureWatchlistItems(builder);
         ConfigureComplaints(builder);
         ConfigureWinnerNonPaymentLogs(builder);
+        ConfigureUserSandboxWallets(builder);
+    }
+
+    private static void ConfigureUserSandboxWallets(ModelBuilder builder)
+    {
+        builder.Entity<UserSandboxWallet>(entity =>
+        {
+            entity.ToTable("user_sandbox_wallets");
+
+            entity.Property(wallet => wallet.Id).HasColumnName("id");
+            entity.Property(wallet => wallet.UserId).HasColumnName("user_id");
+            entity.Property(wallet => wallet.Balance)
+                .HasColumnName("balance")
+                .HasPrecision(18, 2);
+
+            entity.HasIndex(wallet => wallet.UserId)
+                .IsUnique()
+                .HasDatabaseName("ix_user_sandbox_wallets_user_id");
+
+            entity.HasOne(wallet => wallet.User)
+                .WithMany()
+                .HasForeignKey(wallet => wallet.UserId)
+                .HasConstraintName("fk_user_sandbox_wallets_user")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.ToTable(table => table.HasCheckConstraint(
+                "chk_user_sandbox_wallets_balance",
+                "balance >= 0"));
+
+            ConfigureAuditableEntity(entity, "user_sandbox_wallets");
+        });
     }
 
     private static void ConfigureWinnerNonPaymentLogs(ModelBuilder builder)

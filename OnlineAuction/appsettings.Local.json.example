@@ -6,7 +6,8 @@
   "PayPal": {
     "ClientId": "YOUR_SANDBOX_CLIENT_ID",
     "ClientSecret": "YOUR_SANDBOX_CLIENT_SECRET",
-    "WebhookId": "YOUR_PAYPAL_WEBHOOK_ID"
+    "WebhookId": "YOUR_PAYPAL_WEBHOOK_ID",
+    "SandboxInitialWalletBalance": 1000
   },
   "PasswordResetOtp": {
     "UseMockOtpSender": true
@@ -73,5 +74,11 @@
     "BuyerCheckoutFeePercent": 2.5,
     "SellerSuccessFeePercent": 10.0,
     "MinimumRegistrationDeposit": 1.0
+  },
+  "SeedData": {
+    "RefreshTestAuctionsOnStartup": false,
+    "RefreshTestAuctionsInDevelopment": false,
+    "SyncCatalogOnStartup": false,
+    "SyncCatalogInDevelopment": true
   }
 }
