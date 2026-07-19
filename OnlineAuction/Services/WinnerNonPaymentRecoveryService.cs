@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -13,6 +14,7 @@ public class WinnerNonPaymentRecoveryService : IWinnerNonPaymentRecoveryService
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IOrderCreationService _orderCreationService;
     private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly IRealtimePublisher _realtimePublisher;
     private readonly IBidService _bidService;
     private readonly WinnerNonPaymentSettings _settings;
@@ -22,6 +24,7 @@ public class WinnerNonPaymentRecoveryService : IWinnerNonPaymentRecoveryService
         AuctionHouseDbContext dbContext,
         IOrderCreationService orderCreationService,
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         IRealtimePublisher realtimePublisher,
         IBidService bidService,
         IOptions<WinnerNonPaymentSettings> settings,
@@ -30,6 +33,7 @@ public class WinnerNonPaymentRecoveryService : IWinnerNonPaymentRecoveryService
         _dbContext = dbContext;
         _orderCreationService = orderCreationService;
         _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _realtimePublisher = realtimePublisher;
         _bidService = bidService;
         _settings = settings.Value;
@@ -94,11 +98,10 @@ public class WinnerNonPaymentRecoveryService : IWinnerNonPaymentRecoveryService
 
         await _notificationService.CreateAndPushAsync(
             defaultingUserId,
-            "Payment deadline expired",
-            $"You did not complete payment for {productName} within 48 hours. " +
-            (forfeitedDeposit is not null
-                ? $"Your registration deposit of ${forfeitedDeposit.Amount:N0} has been forfeited per platform policy."
-                : "This auction win has expired."),
+            _notifyLocalizer[NotificationKeys.PaymentDeadlineExpiredTitle],
+            forfeitedDeposit is not null
+                ? _notifyLocalizer.Format(NotificationKeys.PaymentDeadlineExpiredForfeitedMessage, productName, forfeitedDeposit.Amount)
+                : _notifyLocalizer.Format(NotificationKeys.PaymentDeadlineExpiredMessage, productName),
             NotificationType.Payment,
             "/Order",
             NotificationReferenceTypes.AuctionPaymentExpired,
@@ -158,9 +161,8 @@ public class WinnerNonPaymentRecoveryService : IWinnerNonPaymentRecoveryService
 
                 await _notificationService.CreateAndPushAsync(
                     runnerUp.BidderId,
-                    "Second chance to win",
-                    $"The original winner did not pay for {productName}. You are now the highest eligible bidder. " +
-                    $"Complete payment within {_settings.SecondChancePaymentHours} hours.",
+                    _notifyLocalizer[NotificationKeys.SecondChanceTitle],
+                    _notifyLocalizer.Format(NotificationKeys.SecondChanceMessage, productName, _settings.SecondChancePaymentHours),
                     NotificationType.Winning,
                     "/Order",
                     NotificationReferenceTypes.AuctionSecondChanceOffered,
@@ -169,8 +171,8 @@ public class WinnerNonPaymentRecoveryService : IWinnerNonPaymentRecoveryService
 
                 await _notificationService.CreateAndPushAsync(
                     sellerId,
-                    "Buyer did not pay",
-                    $"The winning buyer did not pay for {productName}. A second-chance offer has been sent to the next highest bidder.",
+                    _notifyLocalizer[NotificationKeys.BuyerDidNotPayTitle],
+                    _notifyLocalizer.Format(NotificationKeys.BuyerDidNotPaySecondChanceMessage, productName),
                     NotificationType.Auction,
                     $"/Sell/MyAuctions",
                     NotificationReferenceTypes.AuctionPaymentExpired,
@@ -221,8 +223,8 @@ public class WinnerNonPaymentRecoveryService : IWinnerNonPaymentRecoveryService
 
         await _notificationService.CreateAndPushAsync(
             sellerId,
-            "Buyer did not pay — relist available",
-            $"The winning buyer did not pay for {productName}. No eligible second-chance bidder was available. You can relist this item.",
+            _notifyLocalizer[NotificationKeys.BuyerDidNotPayRelistTitle],
+            _notifyLocalizer.Format(NotificationKeys.BuyerDidNotPayRelistMessage, productName),
             NotificationType.Auction,
             "/Sell/MyAuctions",
             NotificationReferenceTypes.AuctionRelistRecommended,

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -16,15 +17,21 @@ public class UserAuctionController : Controller
 {
     private readonly AuctionHouseDbContext _db;
     private readonly ISellerAuctionService _sellerAuctionService;
+    private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly UserManager<ApplicationUser> _userManager;
 
     public UserAuctionController(
         AuctionHouseDbContext db,
         ISellerAuctionService sellerAuctionService,
+        INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         UserManager<ApplicationUser> userManager)
     {
         _db = db;
         _sellerAuctionService = sellerAuctionService;
+        _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _userManager = userManager;
     }
 
@@ -80,7 +87,16 @@ public class UserAuctionController : Controller
             return View(model);
         }
 
-        TempData["SuccessMessage"] = result.Message;
+        await _notificationService.CreateAndPushAsync(
+            sellerId.Value,
+            _notifyLocalizer[NotificationKeys.ListingUpdatedTitle],
+            _notifyLocalizer[NotificationKeys.ListingUpdatedMessage],
+            NotificationType.Auction,
+            $"/Auction/Detail/{auctionId}",
+            NotificationReferenceTypes.ListingUpdated,
+            auctionId,
+            debounceWindow: TimeSpan.FromMinutes(2));
+
         return await RedirectToProfileAsync(sellerId.Value, auctionId);
     }
 
@@ -102,7 +118,17 @@ public class UserAuctionController : Controller
 
         var result = await _sellerAuctionService.CancelAsync(auctionId, sellerId.Value);
 
-        TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+        await _notificationService.CreateAndPushAsync(
+            sellerId.Value,
+            result.Success
+                ? _notifyLocalizer[NotificationKeys.ListingCancelledTitle]
+                : _notifyLocalizer[NotificationKeys.ListingCancelFailedTitle],
+            result.Success ? _notifyLocalizer[NotificationKeys.ListingCancelledMessage] : result.Message,
+            result.Success ? NotificationType.Auction : NotificationType.System,
+            $"/User/Detail/{sellerId.Value}",
+            NotificationReferenceTypes.ListingCancelled,
+            auctionId,
+            debounceWindow: TimeSpan.FromMinutes(2));
 
         return await RedirectToProfileAsync(sellerId.Value, auctionId);
     }

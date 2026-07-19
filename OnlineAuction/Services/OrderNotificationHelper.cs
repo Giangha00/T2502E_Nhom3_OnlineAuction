@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -13,6 +14,7 @@ public static class OrderNotificationHelper
 {
     public static async Task NotifySellerAwaitingPaymentAsync(
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         AuctionHouseDbContext dbContext,
         AuctionOrder order,
         CancellationToken cancellationToken = default)
@@ -25,8 +27,8 @@ public static class OrderNotificationHelper
 
         await notificationService.CreateAndPushAsync(
             context.SellerId,
-            "Item sold - awaiting payment",
-            $"{context.ProductName} has a winning buyer. Order {context.OrderReference} is awaiting payment.",
+            notifyLocalizer[NotificationKeys.SellerAwaitingPaymentTitle],
+            notifyLocalizer.Format(NotificationKeys.SellerAwaitingPaymentMessage, context.ProductName, context.OrderReference),
             NotificationType.Auction,
             "/Sell/MyAuctions",
             NotificationReferenceTypes.SellerAwaitingPayment,
@@ -36,6 +38,7 @@ public static class OrderNotificationHelper
 
     public static async Task NotifySellerPaymentReceivedAsync(
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         AuctionHouseDbContext dbContext,
         int orderId,
         string paymentMethodLabel,
@@ -59,8 +62,8 @@ public static class OrderNotificationHelper
 
         await notificationService.CreateAndPushAsync(
             context.SellerId,
-            "Payment received",
-            $"Payment for {context.ProductName} on order {context.OrderReference} was confirmed via {paymentMethodLabel}.",
+            notifyLocalizer[NotificationKeys.SellerPaymentReceivedTitle],
+            notifyLocalizer.Format(NotificationKeys.SellerPaymentReceivedMessage, context.ProductName, context.OrderReference, paymentMethodLabel),
             NotificationType.Payment,
             "/Sell/MyAuctions",
             NotificationReferenceTypes.SellerPaymentReceived,
@@ -70,6 +73,7 @@ public static class OrderNotificationHelper
 
     public static async Task NotifyPaymentOverdueCancelledAsync(
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         AuctionHouseDbContext dbContext,
         AuctionOrder order,
         CancellationToken cancellationToken = default)
@@ -82,8 +86,8 @@ public static class OrderNotificationHelper
 
         await notificationService.CreateAndPushAsync(
             order.BuyerId,
-            "Order cancelled",
-            $"Order {orderReference} for {productName} was cancelled because the payment deadline passed.",
+            notifyLocalizer[NotificationKeys.OrderCancelledTitle],
+            notifyLocalizer.Format(NotificationKeys.OrderCancelledBuyerMessage, orderReference, productName),
             NotificationType.Payment,
             "/Order",
             NotificationReferenceTypes.OrderCancelledPaymentOverdue,
@@ -97,8 +101,8 @@ public static class OrderNotificationHelper
 
         await notificationService.CreateAndPushAsync(
             context.SellerId,
-            "Order cancelled",
-            $"Order {orderReference} for {productName} was cancelled because the buyer did not pay before the deadline.",
+            notifyLocalizer[NotificationKeys.OrderCancelledTitle],
+            notifyLocalizer.Format(NotificationKeys.OrderCancelledSellerMessage, orderReference, productName),
             NotificationType.Auction,
             "/Sell/MyAuctions",
             NotificationReferenceTypes.OrderCancelledPaymentOverdue,

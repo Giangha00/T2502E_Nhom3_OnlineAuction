@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OnlineAuction.Configurations;
+using OnlineAuction.Entities;
 using OnlineAuction.Helpers;
+using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
@@ -19,7 +21,9 @@ public class AuctionController : Controller
     private readonly IBidRateLimitService _bidRateLimitService;
     private readonly IBidChallengeService _bidChallengeService;
     private readonly IBidShadowBanService _bidShadowBanService;
+    private readonly INotificationService _notificationService;
     private readonly IStringLocalizer<SharedResource> _localizer;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<AuctionController> _logger;
 
     public AuctionController(
@@ -31,7 +35,9 @@ public class AuctionController : Controller
         IBidRateLimitService bidRateLimitService,
         IBidChallengeService bidChallengeService,
         IBidShadowBanService bidShadowBanService,
+        INotificationService notificationService,
         IStringLocalizer<SharedResource> localizer,
+        INotificationLocalizer notifyLocalizer,
         ILogger<AuctionController> logger)
     {
         _auctionService = auctionService;
@@ -42,7 +48,9 @@ public class AuctionController : Controller
         _bidRateLimitService = bidRateLimitService;
         _bidChallengeService = bidChallengeService;
         _bidShadowBanService = bidShadowBanService;
+        _notificationService = notificationService;
         _localizer = localizer;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
     }
 
@@ -61,6 +69,17 @@ public class AuctionController : Controller
         }
 
         return View(product);
+    }
+
+    public async Task<IActionResult> BidHistory(int id, int page = 1, CancellationToken cancellationToken = default)
+    {
+        var model = await _bidService.GetAuctionBidHistoryPageAsync(id, page, cancellationToken);
+        if (model is null)
+        {
+            return NotFound();
+        }
+
+        return View(model);
     }
 
     [HttpGet]
@@ -87,7 +106,8 @@ public class AuctionController : Controller
                 amount = bid.Amount,
                 bidTime = bid.BidTime,
                 isWinning = bid.IsWinning,
-                status = bid.Status
+                status = bid.Status,
+                isBidderProfilePublic = bid.IsBidderProfilePublic
             })
         });
     }
@@ -253,16 +273,7 @@ public class AuctionController : Controller
             userId.Value,
             token);
 
-        var detailAuctionId = result.AuctionId ?? (id > 0 ? id : null);
-
-        if (!result.Success)
-        {
-            TempData["ErrorMessage"] = result.Message;
-            return RedirectToAuctionDetailOrIndex(detailAuctionId);
-        }
-
-        TempData["SuccessMessage"] = result.Message;
-        return RedirectToAuctionDetailOrIndex(detailAuctionId);
+        return RedirectToAuctionDetailOrIndex(result.AuctionId ?? (id > 0 ? id : null));
     }
 
     [HttpGet]
@@ -282,8 +293,6 @@ public class AuctionController : Controller
         var result = await _registrationDepositService.CancelDepositAsync(
             userId.Value,
             token);
-
-        TempData["ErrorMessage"] = result.Message;
 
         return RedirectToAuctionDetailOrIndex(result.AuctionId ?? (id > 0 ? id : null));
     }
@@ -311,6 +320,7 @@ public class AuctionController : Controller
         var result = await _registrationService.CancelRegistrationAsync(auctionId, userId.Value);
         if (!result.Success)
         {
+            await NotifyAuctionIssueAsync(userId.Value, auctionId, _notifyLocalizer[NotificationKeys.RegistrationCancelFailedTitle], result.Message);
             return BadRequest(new { success = false, message = result.Message });
         }
 
@@ -342,12 +352,14 @@ public class AuctionController : Controller
 
         if (await _bidShadowBanService.IsShadowBannedAsync(bidderId))
         {
+            var shadowMessage = _localizer["Bid_ShadowBan_Message"].Value;
+            await NotifyAuctionIssueAsync(bidderId, auctionId, _notifyLocalizer[NotificationKeys.BidFailedTitle], shadowMessage);
             return StatusCode(
                 StatusCodes.Status403Forbidden,
                 new
                 {
                     success = false,
-                    message = _localizer["Bid_ShadowBan_Message"].Value
+                    message = shadowMessage
                 });
         }
 
@@ -361,9 +373,11 @@ public class AuctionController : Controller
                 bidderId,
                 ipAddress);
 
+            var rateLimitMessage = _localizer["Bid_RateLimit_Message"].Value;
+            await NotifyAuctionIssueAsync(bidderId, auctionId, _notifyLocalizer[NotificationKeys.BidFailedTitle], rateLimitMessage);
             return StatusCode(
                 StatusCodes.Status429TooManyRequests,
-                new { success = false, message = _localizer["Bid_RateLimit_Message"].Value });
+                new { success = false, message = rateLimitMessage });
         }
 
         var challengeRequirement = await _bidChallengeService.GetRequirementAsync(
@@ -393,6 +407,8 @@ public class AuctionController : Controller
         var result = await _bidService.PlaceBidAsync(auctionId, bidderId, amount);
         if (!result.Success)
         {
+            await NotifyAuctionIssueAsync(bidderId, auctionId, _notifyLocalizer[NotificationKeys.BidFailedTitle], result.Message);
+
             return result.StatusCode switch
             {
                 404 => NotFound(new { success = false, message = result.Message }),
@@ -422,9 +438,28 @@ public class AuctionController : Controller
                 amount = bid.Amount,
                 bidTime = bid.BidTime,
                 isWinning = bid.IsWinning,
-                status = bid.Status
+                status = bid.Status,
+                isBidderProfilePublic = bid.IsBidderProfilePublic
             })
         });
+    }
+
+    private async Task NotifyAuctionIssueAsync(int userId, int auctionId, string title, string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        await _notificationService.CreateAndPushAsync(
+            userId,
+            title,
+            message,
+            NotificationType.Auction,
+            auctionId > 0 ? $"/Auction/Detail/{auctionId}" : null,
+            NotificationReferenceTypes.AuctionBidFailed,
+            auctionId > 0 ? auctionId : null,
+            debounceWindow: TimeSpan.FromMinutes(2));
     }
 
     private int? GetCurrentUserId()

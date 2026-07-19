@@ -79,7 +79,8 @@ public class RealtimePublisher : IRealtimePublisher
                     amount = bid.Amount,
                     bidTime = bid.BidTime,
                     isWinning = bid.IsWinning,
-                    status = bid.Status
+                    status = bid.Status,
+                    isBidderProfilePublic = bid.IsBidderProfilePublic
                 })
             };
 

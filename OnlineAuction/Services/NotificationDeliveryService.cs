@@ -12,17 +12,20 @@ public sealed class NotificationDeliveryService : INotificationDeliveryService
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IFcmService _fcmService;
     private readonly IRealtimePublisher _realtimePublisher;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<NotificationDeliveryService> _logger;
 
     public NotificationDeliveryService(
         AuctionHouseDbContext dbContext,
         IFcmService fcmService,
         IRealtimePublisher realtimePublisher,
+        INotificationLocalizer notifyLocalizer,
         ILogger<NotificationDeliveryService> logger)
     {
         _dbContext = dbContext;
         _fcmService = fcmService;
         _realtimePublisher = realtimePublisher;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
     }
 
@@ -102,8 +105,8 @@ public sealed class NotificationDeliveryService : INotificationDeliveryService
         var notification = new Notification
         {
             UserId = userId,
-            Title = "You've been outbid",
-            Message = $"Someone placed a higher bid on {productName}.",
+            Title = _notifyLocalizer[NotificationKeys.OutbidTitle],
+            Message = _notifyLocalizer.Format(NotificationKeys.OutbidMessage, productName),
             Type = NotificationType.Auction.ToString().ToLowerInvariant(),
             RelatedUrl = relatedUrl,
             IsRead = false,

@@ -298,6 +298,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderCreationService, OrderCreationService>();
 builder.Services.AddScoped<IWinnerNonPaymentRecoveryService, WinnerNonPaymentRecoveryService>();
 builder.Services.AddScoped<IOrderPaymentService, OrderPaymentService>();
+builder.Services.AddScoped<ISandboxPayPalWalletService, SandboxPayPalWalletService>();
 builder.Services.AddScoped<IPayPalCaptureGuardService, PayPalCaptureGuardService>();
 builder.Services.AddHostedService<AuctionFinalizationWorker>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
@@ -314,6 +315,7 @@ builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IAdminProductService, AdminProductService>();
 builder.Services.AddScoped<IAdminComplaintService, AdminComplaintService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<INotificationLocalizer, NotificationLocalizer>();
 builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
 builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
 builder.Services.AddScoped<IRegistrationDepositRefundService, RegistrationDepositRefundService>();
@@ -364,9 +366,11 @@ using (var scope = app.Services.CreateScope())
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    // Default: keep seeded product/auction IDs stable across restarts.
+    // Opt into wipe+reseed with SeedData:RefreshTestAuctions* = true.
     var refreshTestAuctions = configuration.GetValue("SeedData:RefreshTestAuctionsOnStartup", false)
         || (app.Environment.IsDevelopment()
-            && configuration.GetValue("SeedData:RefreshTestAuctionsInDevelopment", true));
+            && configuration.GetValue("SeedData:RefreshTestAuctionsInDevelopment", false));
     var syncCatalog = !refreshTestAuctions && (
         configuration.GetValue("SeedData:SyncCatalogOnStartup", false)
         || (app.Environment.IsDevelopment()

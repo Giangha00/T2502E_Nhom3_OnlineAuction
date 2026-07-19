@@ -8,6 +8,11 @@ public class BidHistoryItemViewModel
     public DateTime BidTime { get; set; }
     public string Status { get; set; } = "OUTBID";
     public bool IsWinning => Status == "WINNING";
+
+    /// <summary>
+    /// When false (live auction), bidder identity stays masked and unlinked.
+    /// </summary>
+    public bool IsBidderProfilePublic { get; set; }
 }
 
 public class GradingScoreViewModel

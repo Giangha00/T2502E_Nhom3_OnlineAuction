@@ -809,6 +809,7 @@
   <data name="Order_AuthenticityDesc" xml:space="preserve"><value>Vaultセキュリティで保護。発送前にすべての落札品を二重検証します。</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>入札中…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>入札できませんでした。もう一度お試しください。</value></data>
+  <data name="Js_ProductDetail_BidTooLow" xml:space="preserve"><value>入札額は少なくとも {0} 以上である必要があります。最低入札額より高い金額を入力してください。</value></data>
   <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>入札が完了しました！</value></data>
   <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>オークション終了</value></data>
   <data name="Js_ProductDetail_Registering" xml:space="preserve"><value>登録中…</value></data>
@@ -903,4 +904,86 @@
 <data name="Layout_Footer_Address" xml:space="preserve">
     <value>FPT Polytechnicビル、Trinh Van Bo、Xuan Phuong、ハノイ 100000、ベトナム</value>
   </data>
+  <data name="Notification_AuctionWonDepositCovered_Message" xml:space="preserve"><value>おめでとうございます！{0} の落札に成功しました。登録デポジットで注文がカバーされました。</value></data>
+  <data name="Notification_BuyNowOrderCreated_Title" xml:space="preserve"><value>注文が作成されました</value></data>
+  <data name="Notification_BuyNowOrderCreated_Message" xml:space="preserve"><value>{0} が注文に追加されました。期限までに支払いを完了してください。</value></data>
+  <data name="Notification_DepositRefunded_Title" xml:space="preserve"><value>デポジットが返金されました</value></data>
+  <data name="Notification_DepositRefunded_Message" xml:space="preserve"><value>{1} のデポジット返金 ${0} が処理されました。</value></data>
+  <data name="Notification_RegistrationCancelled_Title" xml:space="preserve"><value>登録がキャンセルされました</value></data>
+  <data name="Notification_RegistrationCancelledWithRefund_Message" xml:space="preserve"><value>{0} の登録がキャンセルされ、デポジット ${1} が返金されました。</value></data>
+  <data name="Notification_RegistrationCancelledNoRefund_Message" xml:space="preserve"><value>{0} の登録がキャンセルされました。</value></data>
+  <data name="Notification_RegistrationCancelFailed_Title" xml:space="preserve"><value>登録をキャンセルできませんでした</value></data>
+  <data name="Notification_AuctionEndingSoon_Title" xml:space="preserve"><value>オークションまもなく終了</value></data>
+  <data name="Notification_AuctionEndingSoon_Message" xml:space="preserve"><value>{0} は1時間以内に終了します。</value></data>
+  <data name="Notification_AuctionStartingSoon_Title" xml:space="preserve"><value>オークションまもなく開始</value></data>
+  <data name="Notification_AuctionStartingSoon_Message" xml:space="preserve"><value>{0} は {1} に開始します。入札の準備をしましょう。</value></data>
+  <data name="Notification_PaymentFailed_Title" xml:space="preserve"><value>支払いに失敗しました</value></data>
+  <data name="Notification_PaymentCancelled_Title" xml:space="preserve"><value>支払いがキャンセルされました</value></data>
+  <data name="Notification_PaymentCancelled_Message" xml:space="preserve"><value>PayPal決済がキャンセルされました。注文は未払いのままです。</value></data>
+  <data name="Notification_PaymentMissingToken_Message" xml:space="preserve"><value>PayPal から有効なチェックアウトトークンが返りませんでした。</value></data>
+  <data name="Notification_PaymentCouldNotComplete_Message" xml:space="preserve"><value>支払いを完了できませんでした。</value></data>
+  <data name="Notification_PaymentUnableStartCheckout_Message" xml:space="preserve"><value>PayPalチェックアウトを開始できません。</value></data>
+  <data name="Notification_PaymentCompleteFields_Message" xml:space="preserve"><value>必須項目をすべて入力してください。</value></data>
+  <data name="Notification_PaymentSuccessCod_Message" xml:space="preserve"><value>代金引換注文が確認されました。注文確認をご確認ください。</value></data>
+  <data name="Notification_PaymentSuccessSimple_Message" xml:space="preserve"><value>お支払いが確認されました。注文確認をご確認ください。</value></data>
+  <data name="Notification_AuctionNowLive_Title" xml:space="preserve"><value>オークションが開始されました</value></data>
+  <data name="Notification_AuctionNowLive_Message" xml:space="preserve"><value>{0} の入札が開始されました。</value></data>
+  <data name="Notification_ListingApproved_Title" xml:space="preserve"><value>出品が承認されました</value></data>
+  <data name="Notification_ListingApproved_Message" xml:space="preserve"><value>出品が承認され、マーケットプレイスに公開されました。</value></data>
+  <data name="Notification_ListingRejected_Title" xml:space="preserve"><value>出品が却下されました</value></data>
+  <data name="Notification_ListingRejected_Message" xml:space="preserve"><value>出品が却下されました。理由: {0}</value></data>
+  <data name="Notification_ListingSubmitted_Title" xml:space="preserve"><value>出品を送信しました</value></data>
+  <data name="Notification_ListingSubmitted_Message" xml:space="preserve"><value>出品が審査に送信されました。</value></data>
+  <data name="Notification_ListingUpdated_Title" xml:space="preserve"><value>出品が更新されました</value></data>
+  <data name="Notification_ListingUpdated_Message" xml:space="preserve"><value>出品が正常に更新されました。</value></data>
+  <data name="Notification_ListingCancelled_Title" xml:space="preserve"><value>出品がキャンセルされました</value></data>
+  <data name="Notification_ListingCancelFailed_Title" xml:space="preserve"><value>出品をキャンセルできませんでした</value></data>
+  <data name="Notification_ListingCancelled_Message" xml:space="preserve"><value>オークションが正常にキャンセルされました。</value></data>
+  <data name="Notification_RefundSubmitted_Title" xml:space="preserve"><value>返金リクエストを送信しました</value></data>
+  <data name="Notification_RefundSubmitted_Message" xml:space="preserve"><value>返金リクエスト {0} を受け取り、審査待ちです。</value></data>
+  <data name="Notification_RefundApproved_Title" xml:space="preserve"><value>返金リクエストが承認されました</value></data>
+  <data name="Notification_RefundApproved_Message" xml:space="preserve"><value>返金リクエストが承認されました。</value></data>
+  <data name="Notification_RefundRejected_Title" xml:space="preserve"><value>返金リクエストが却下されました</value></data>
+  <data name="Notification_RefundRejected_Message" xml:space="preserve"><value>返金リクエストが却下されました。</value></data>
+  <data name="Notification_RefundUnderReview_Title" xml:space="preserve"><value>返金リクエスト審査中</value></data>
+  <data name="Notification_RefundUnderReview_Message" xml:space="preserve"><value>返金リクエストは現在審査中です。結果が出次第お知らせします。</value></data>
+  <data name="Notification_RefundClosed_Title" xml:space="preserve"><value>返金リクエストが終了しました</value></data>
+  <data name="Notification_RefundClosed_Message" xml:space="preserve"><value>返金リクエストは終了しました。</value></data>
+  <data name="Notification_BidFailed_Title" xml:space="preserve"><value>入札に失敗しました</value></data>
+  <data name="Notification_BidPlaced_Title" xml:space="preserve"><value>入札が完了しました</value></data>
+  <data name="Notification_BidPlaced_Message" xml:space="preserve"><value>{1} に ${0} の入札が正常に行われました。</value></data>
+  <data name="Notification_NewBid_Title" xml:space="preserve"><value>出品に新しい入札があります</value></data>
+  <data name="Notification_NewBid_Message" xml:space="preserve"><value>{1} に ${0} の入札がありました。</value></data>
+  <data name="Notification_Outbid_Title" xml:space="preserve"><value>入札が更新されました</value></data>
+  <data name="Notification_Outbid_Message" xml:space="preserve"><value>{0} にあなたより高い入札がありました。</value></data>
+  <data name="Notification_PaymentDeadlineExpired_Title" xml:space="preserve"><value>支払い期限切れ</value></data>
+  <data name="Notification_PaymentDeadlineExpiredForfeited_Message" xml:space="preserve"><value>{0} の支払いが48時間以内に完了しませんでした。登録デポジット ${1} は規約により没収されました。</value></data>
+  <data name="Notification_PaymentDeadlineExpired_Message" xml:space="preserve"><value>{0} の支払いが48時間以内に完了しませんでした。落札は失効しました。</value></data>
+  <data name="Notification_SecondChance_Title" xml:space="preserve"><value>再落札のチャンス</value></data>
+  <data name="Notification_SecondChance_Message" xml:space="preserve"><value>当初の落札者が {0} の支払いをしませんでした。あなたが最高額入札者です。{1} 時間以内に支払ってください。</value></data>
+  <data name="Notification_BuyerDidNotPay_Title" xml:space="preserve"><value>購入者が支払いをしていません</value></data>
+  <data name="Notification_BuyerDidNotPaySecondChance_Message" xml:space="preserve"><value>{0} の落札者が支払いをしませんでした。次点入札者に再チャンスを送りました。</value></data>
+  <data name="Notification_BuyerDidNotPayRelist_Title" xml:space="preserve"><value>購入未払い — 再出品可能</value></data>
+  <data name="Notification_BuyerDidNotPayRelist_Message" xml:space="preserve"><value>{0} の落札者が支払いをしませんでした。再チャンス対象者がいないため再出品できます。</value></data>
+  <data name="Notification_DepositRequestCreated_Title" xml:space="preserve"><value>デポジット手続きが作成されました</value></data>
+  <data name="Notification_DepositRequestCreated_Message" xml:space="preserve"><value>デポジット手続きが作成されました。PayPalでお支払いください。</value></data>
+  <data name="Notification_DepositPaid_Title" xml:space="preserve"><value>デポジット支払い完了</value></data>
+  <data name="Notification_DepositPaid_Message" xml:space="preserve"><value>{0} の登録が確認されました。デポジット ${1} を受領しました。</value></data>
+  <data name="Notification_DepositCancelled_Title" xml:space="preserve"><value>デポジットがキャンセルされました</value></data>
+  <data name="Notification_DepositCancelled_Message" xml:space="preserve"><value>デポジット支払いをキャンセルしました。</value></data>
+  <data name="Notification_DepositFailed_Title" xml:space="preserve"><value>デポジットに失敗しました</value></data>
+  <data name="Notification_PayPalAnomalyAutoRefund_Title" xml:space="preserve"><value>PayPalキャプチャ異常（自動返金済み）</value></data>
+  <data name="Notification_PayPalAnomalyManual_Title" xml:space="preserve"><value>PayPalキャプチャ異常（手動対応が必要）</value></data>
+  <data name="Notification_PayPalAnomaly_Message" xml:space="preserve"><value>Flow={0}; PayPalOrderId={1}; CaptureId={2}; Expected={3}; Captured={4}; Reason={5}; RefundSucceeded={6}; RefundError={7}</value></data>
+  <data name="Notification_AuctionWon_Title" xml:space="preserve"><value>オークションに落札しました！</value></data>
+  <data name="Notification_AuctionWon_Message" xml:space="preserve"><value>おめでとうございます！{0} の落札に成功しました。48時間以内にお支払いください。</value></data>
+  <data name="Notification_SellerAwaitingPayment_Title" xml:space="preserve"><value>売却済み — 支払い待ち</value></data>
+  <data name="Notification_SellerAwaitingPayment_Message" xml:space="preserve"><value>{0} に落札者がいます。注文 {1} は支払い待ちです。</value></data>
+  <data name="Notification_PaymentSuccess_Title" xml:space="preserve"><value>支払いが完了しました</value></data>
+  <data name="Notification_PaymentSuccess_Message" xml:space="preserve"><value>注文 {1} の {0} 決済が確認されました。</value></data>
+  <data name="Notification_SellerPaymentReceived_Title" xml:space="preserve"><value>入金を確認しました</value></data>
+  <data name="Notification_SellerPaymentReceived_Message" xml:space="preserve"><value>注文 {1} の {0} への支払いが {2} で確認されました。</value></data>
+  <data name="Notification_OrderCancelled_Title" xml:space="preserve"><value>注文がキャンセルされました</value></data>
+  <data name="Notification_OrderCancelledBuyer_Message" xml:space="preserve"><value>{0} の注文 {1} は支払い期限切れのためキャンセルされました。</value></data>
+  <data name="Notification_OrderCancelledSeller_Message" xml:space="preserve"><value>{0} の注文 {1} は落札者が期限内に支払わなかったためキャンセルされました。</value></data>
 </root>

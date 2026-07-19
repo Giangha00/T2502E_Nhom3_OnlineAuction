@@ -460,26 +460,11 @@
   }
 
   function showSuccess(name) {
-    showTopToast('success', tf(t('successCreated', 'Your listing "{0}" has been created successfully!'), name));
     try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
   }
 
   function showTopToast(type, message) {
-    var banner = $('successBanner');
-    var text = $('successMessageText');
-    if (text) text.textContent = message;
-    if (banner) {
-      banner.className = 'fixed left-1/2 top-24 z-9999 w-[min(92vw,520px)] -translate-x-1/2 rounded-xl border px-5 py-4 text-sm font-semibold shadow-lg';
-      if (type === 'success') {
-        banner.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-800');
-      } else {
-        banner.classList.add('border-red-200', 'bg-red-50', 'text-red-700');
-      }
-      banner.classList.remove('hidden');
-      window.setTimeout(function () {
-        banner.classList.add('hidden');
-      }, 5000);
-    }
+    // Server pushes FCM / in-app notifications; keep form-level status only.
   }
 
   function showSubmitStatus(type, message) {

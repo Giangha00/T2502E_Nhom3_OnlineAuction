@@ -17,6 +17,7 @@ public class OrderCreationService : IOrderCreationService
     private readonly AuctionHouseDbContext _dbContext;
     private readonly ILogger<OrderCreationService> _logger;
     private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly IRegistrationDepositRefundService _depositRefundService;
     private readonly IRealtimePublisher _realtimePublisher;
     private readonly IBidService _bidService;
@@ -26,6 +27,7 @@ public class OrderCreationService : IOrderCreationService
         AuctionHouseDbContext dbContext,
         ILogger<OrderCreationService> logger,
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         IRegistrationDepositRefundService depositRefundService,
         IRealtimePublisher realtimePublisher,
         IBidService bidService,
@@ -34,6 +36,7 @@ public class OrderCreationService : IOrderCreationService
         _dbContext = dbContext;
         _logger = logger;
         _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _depositRefundService = depositRefundService;
         _realtimePublisher = realtimePublisher;
         _bidService = bidService;
@@ -415,10 +418,10 @@ public class OrderCreationService : IOrderCreationService
     {
         await _notificationService.CreateAndPushAsync(
             winningBidderId,
-            "You won the auction!",
+            _notifyLocalizer[NotificationKeys.AuctionWonTitle],
             paidByDeposit
-                ? $"Congratulations! You won {auction.Product.Name}. Your registration deposit covered the order."
-                : $"Congratulations! You won {auction.Product.Name}. Complete payment within 48 hours.",
+                ? _notifyLocalizer.Format(NotificationKeys.AuctionWonDepositCoveredMessage, auction.Product.Name)
+                : _notifyLocalizer.Format(NotificationKeys.AuctionWonMessage, auction.Product.Name),
             NotificationType.Winning,
             paidByDeposit ? "/Account/PurchaseHistory" : "/Order",
             NotificationReferenceTypes.AuctionWon,
@@ -429,6 +432,7 @@ public class OrderCreationService : IOrderCreationService
         {
             await OrderNotificationHelper.NotifySellerPaymentReceivedAsync(
                 _notificationService,
+                _notifyLocalizer,
                 _dbContext,
                 order.Id,
                 "deposit",
@@ -438,6 +442,7 @@ public class OrderCreationService : IOrderCreationService
         {
             await OrderNotificationHelper.NotifySellerAwaitingPaymentAsync(
                 _notificationService,
+                _notifyLocalizer,
                 _dbContext,
                 order,
                 cancellationToken);
@@ -589,8 +594,8 @@ public class OrderCreationService : IOrderCreationService
 
         await _notificationService.CreateAndPushAsync(
             buyerId,
-            "Order created",
-            $"{auction.Product.Name} was added to your orders. Complete payment before the deadline.",
+            _notifyLocalizer[NotificationKeys.BuyNowOrderCreatedTitle],
+            _notifyLocalizer.Format(NotificationKeys.BuyNowOrderCreatedMessage, auction.Product.Name),
             NotificationType.Payment,
             "/Order",
             NotificationReferenceTypes.BuyNowOrderCreated,
@@ -599,6 +604,7 @@ public class OrderCreationService : IOrderCreationService
 
         await OrderNotificationHelper.NotifySellerAwaitingPaymentAsync(
             _notificationService,
+            _notifyLocalizer,
             _dbContext,
             order,
             cancellationToken);

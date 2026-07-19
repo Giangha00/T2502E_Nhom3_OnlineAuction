@@ -75,7 +75,9 @@ public static class AuctionCatalogSeeder
 
         var sportsSellerId = sportsSeller?.Id;
 
-        var existingProducts = refreshInDevelopment || !syncCatalog
+        // When not wiping, always load existing seeded products so restarts UPDATE
+        // (stable IDs) instead of INSERT duplicates / burning identity values.
+        var existingProducts = refreshInDevelopment
             ? new Dictionary<string, Product>(StringComparer.OrdinalIgnoreCase)
             : await GetExistingSeededProductsByNameAsync(dbContext);
         var now = DateTime.UtcNow;
@@ -275,7 +277,9 @@ public static class AuctionCatalogSeeder
                 .ThenInclude(auction => auction.Bids)
             .Include(product => product.Category)
             .Where(product =>
+                product.DeletedAt == null &&
                 product.Auctions.Any(auction =>
+                    auction.DeletedAt == null &&
                     auction.AuctionEventName != null &&
                     LegacySeedEventNames.Contains(auction.AuctionEventName)))
             .ToListAsync();
@@ -283,7 +287,11 @@ public static class AuctionCatalogSeeder
         return products
             .Where(product => !string.IsNullOrWhiteSpace(product.Name))
             .GroupBy(product => product.Name, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(group => group.Key, group => group.First(), StringComparer.OrdinalIgnoreCase);
+            // Prefer the oldest row so we keep a stable identity when duplicates already exist.
+            .ToDictionary(
+                group => group.Key,
+                group => group.OrderBy(product => product.Id).First(),
+                StringComparer.OrdinalIgnoreCase);
     }
 
     private static async Task SyncSeededEntryAsync(

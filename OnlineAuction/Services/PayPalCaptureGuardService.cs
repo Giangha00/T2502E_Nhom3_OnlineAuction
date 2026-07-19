@@ -20,17 +20,20 @@ public class PayPalCaptureGuardService : IPayPalCaptureGuardService
     private readonly IPayPalService _payPalService;
     private readonly AuctionHouseDbContext _dbContext;
     private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<PayPalCaptureGuardService> _logger;
 
     public PayPalCaptureGuardService(
         IPayPalService payPalService,
         AuctionHouseDbContext dbContext,
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         ILogger<PayPalCaptureGuardService> logger)
     {
         _payPalService = payPalService;
         _dbContext = dbContext;
         _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
     }
 
@@ -255,11 +258,19 @@ public class PayPalCaptureGuardService : IPayPalCaptureGuardService
         }
 
         var title = refundSucceeded
-            ? "PayPal capture anomaly auto-refunded"
-            : "PayPal capture anomaly requires manual recovery";
+            ? _notifyLocalizer[NotificationKeys.PayPalAnomalyAutoRefundTitle]
+            : _notifyLocalizer[NotificationKeys.PayPalAnomalyManualTitle];
 
-        var message =
-            $"Flow={context.Flow}; PayPalOrderId={payPalOrderId}; CaptureId={captureId}; Expected={expectedAmount:0.00}; Captured={capturedAmount:0.00}; Reason={reason}; RefundSucceeded={refundSucceeded}; RefundError={refundError ?? "none"}";
+        var message = _notifyLocalizer.Format(
+            NotificationKeys.PayPalAnomalyMessage,
+            context.Flow,
+            payPalOrderId,
+            captureId,
+            expectedAmount,
+            capturedAmount,
+            reason,
+            refundSucceeded,
+            refundError ?? "none");
 
         foreach (var adminId in adminIds)
         {

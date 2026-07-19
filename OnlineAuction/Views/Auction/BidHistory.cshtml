@@ -1,0 +1,193 @@
+@model OnlineAuction.Models.AuctionBidHistoryPageViewModel
+@{
+    ViewData["Title"] = Localizer["Product_BidHistory"].Value;
+    var currentPage = Model.Page <= 0 ? 1 : Model.Page;
+    var totalPages = Model.TotalPages <= 0 ? 1 : Model.TotalPages;
+    var startPage = Math.Max(1, currentPage - 2);
+    var endPage = Math.Min(totalPages, startPage + 4);
+    if (endPage - startPage < 4)
+    {
+        startPage = Math.Max(1, endPage - 4);
+    }
+    var rowStart = (currentPage - 1) * Model.PageSize;
+}
+
+<div class="rarecard-page min-h-screen bg-slate-50">
+  <div class="w-full px-4 py-8 sm:px-8 lg:px-12 lg:py-10">
+    <nav class="mb-6 text-sm text-slate-500" aria-label="Breadcrumb">
+      <ol class="flex flex-wrap items-center gap-2">
+        <li>
+          <a asp-controller="Auction" asp-action="Index" class="transition hover:text-slate-800">@Localizer["Auction"]</a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li>
+          <a asp-controller="Auction" asp-action="Detail" asp-route-id="@Model.AuctionId" class="transition hover:text-slate-800">
+            @Model.ProductName
+          </a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li class="font-medium text-slate-800">@Localizer["Product_BidHistory"]</li>
+      </ol>
+    </nav>
+
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-start gap-4">
+        @if (!string.IsNullOrWhiteSpace(Model.ProductImageUrl))
+        {
+          <img src="@Model.ProductImageUrl"
+               alt="@Model.ProductName"
+               class="h-16 w-16 rounded-lg object-cover shadow-sm"/>
+        }
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-slate-900">@Localizer["Product_BidHistory"]</h1>
+          <p class="mt-1 text-sm text-slate-600">@Model.ProductName</p>
+          <p class="mt-1 text-sm text-slate-500">
+            @Localizer["Product_BidsCount", Model.BidCount]
+            · @Localizer["Product_CurrentBid"]:
+            <span class="font-semibold tabular-nums text-slate-800">$@Model.CurrentPrice.ToString("N0")</span>
+          </p>
+        </div>
+      </div>
+      <a asp-controller="Auction"
+         asp-action="Detail"
+         asp-route-id="@Model.AuctionId"
+         class="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
+        ← @Model.ProductName
+      </a>
+    </div>
+
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-left text-sm">
+          <thead class="border-b border-slate-100 bg-slate-50 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <tr>
+              <th class="px-5 py-3">#</th>
+              <th class="px-5 py-3">@Localizer["Product_Bidder"]</th>
+              <th class="px-5 py-3">@Localizer["Product_BidAmount"]</th>
+              <th class="px-5 py-3">@Localizer["Product_DateTime"]</th>
+              <th class="px-5 py-3">@Localizer["Product_Status"]</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @if (Model.Bids.Count == 0)
+            {
+              <tr>
+                <td colspan="5" class="px-5 py-10 text-center text-sm text-slate-400">@Localizer["Product_NoBidsYet"]</td>
+              </tr>
+            }
+            else
+            {
+              var row = rowStart + 1;
+              @foreach (var bid in Model.Bids)
+              {
+                <tr>
+                  <td class="px-5 py-4 tabular-nums text-slate-400">@row</td>
+                  <td class="px-5 py-4 font-medium text-slate-800">
+                    @if (bid.IsBidderProfilePublic && bid.BidderId > 0)
+                    {
+                      <a asp-controller="User"
+                         asp-action="Detail"
+                         asp-route-id="@bid.BidderId"
+                         class="text-slate-800 underline-offset-2 transition hover:text-blue-700 hover:underline">
+                        @bid.BidderName
+                      </a>
+                    }
+                    else
+                    {
+                      <span>@bid.BidderName</span>
+                    }
+                  </td>
+                  <td class="px-5 py-4 font-bold tabular-nums text-slate-900">$@bid.Amount.ToString("N0")</td>
+                  <td class="px-5 py-4 text-slate-500">@bid.BidTime.ToLocalTime().ToString("MMM dd, yyyy · HH:mm")</td>
+                  <td class="px-5 py-4">
+                    @if (bid.IsWinning)
+                    {
+                      <span class="inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700">@Localizer["Product_Winning"]</span>
+                    }
+                    else if (bid.Status == "RAISED")
+                    {
+                      <span class="inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-blue-700">@Localizer["Product_Raised"]</span>
+                    }
+                    else
+                    {
+                      <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-500">@Localizer["Product_Outbid"]</span>
+                    }
+                  </td>
+                </tr>
+                row++;
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (totalPages > 1)
+      {
+        <div class="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <p class="text-sm text-slate-500">
+            @Localizer["Admin_BidHistory_Pagination_PageOf", currentPage, totalPages]
+          </p>
+          <nav class="flex flex-wrap items-center gap-2" aria-label="Pagination">
+            @if (currentPage > 1)
+            {
+              <a asp-controller="Auction"
+                 asp-action="BidHistory"
+                 asp-route-id="@Model.AuctionId"
+                 asp-route-page="@(currentPage - 1)"
+                 class="inline-flex items-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
+                @Localizer["Admin_BidHistory_Pagination_Previous"]
+              </a>
+            }
+            else
+            {
+              <span class="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-300">
+                @Localizer["Admin_BidHistory_Pagination_Previous"]
+              </span>
+            }
+
+            @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
+            {
+              if (pageNumber == currentPage)
+              {
+                <span class="inline-flex min-w-[2.5rem] items-center justify-center rounded-md border border-slate-800 bg-slate-800 px-3 py-2 text-sm font-semibold text-white">
+                  @pageNumber
+                </span>
+              }
+              else
+              {
+                <a asp-controller="Auction"
+                   asp-action="BidHistory"
+                   asp-route-id="@Model.AuctionId"
+                   asp-route-page="@pageNumber"
+                   class="inline-flex min-w-[2.5rem] items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
+                  @pageNumber
+                </a>
+              }
+            }
+
+            @if (currentPage < totalPages)
+            {
+              <a asp-controller="Auction"
+                 asp-action="BidHistory"
+                 asp-route-id="@Model.AuctionId"
+                 asp-route-page="@(currentPage + 1)"
+                 class="inline-flex items-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
+                @Localizer["Admin_BidHistory_Pagination_Next"]
+              </a>
+            }
+            else
+            {
+              <span class="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-300">
+                @Localizer["Admin_BidHistory_Pagination_Next"]
+              </span>
+            }
+          </nav>
+        </div>
+      }
+
+      <div class="border-t border-slate-100 px-5 py-3">
+        <p class="text-xs leading-relaxed text-slate-400">@Localizer["Product_BidHistoryNote"]</p>
+      </div>
+    </div>
+  </div>
+</div>

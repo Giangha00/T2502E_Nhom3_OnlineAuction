@@ -22,15 +22,18 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
 
     private readonly AuctionHouseDbContext _dbContext;
     private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<AdminAuctionVerificationService> _logger;
 
     public AdminAuctionVerificationService(
         AuctionHouseDbContext dbContext,
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         ILogger<AdminAuctionVerificationService> logger)
     {
         _dbContext = dbContext;
         _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
     }
 
@@ -258,8 +261,8 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
 
         await NotifySellerAsync(
             auction,
-            "Listing approved",
-            "Your listing has been approved and is now live on the marketplace.",
+            _notifyLocalizer[NotificationKeys.ListingApprovedTitle],
+            _notifyLocalizer[NotificationKeys.ListingApprovedMessage],
             "/Account/Selling?tab=active",
             NotificationReferenceTypes.AuctionNowLive,
             cancellationToken);
@@ -316,8 +319,8 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
 
         await NotifySellerAsync(
             auction,
-            "Listing rejected",
-            $"Your listing was rejected. Reason: {rejectReason.Trim()}",
+            _notifyLocalizer[NotificationKeys.ListingRejectedTitle],
+            _notifyLocalizer.Format(NotificationKeys.ListingRejectedMessage, rejectReason.Trim()),
             "/Account/Selling?tab=active",
             referenceType: null,
             cancellationToken);
@@ -372,8 +375,8 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             {
                 await _notificationService.CreateAndPushAsync(
                     userId,
-                    "Auction is now live",
-                    $"{productName} is now open for bidding.",
+                    _notifyLocalizer[NotificationKeys.AuctionNowLiveTitle],
+                    _notifyLocalizer.Format(NotificationKeys.AuctionNowLiveMessage, productName),
                     NotificationType.Auction,
                     relatedUrl,
                     NotificationReferenceTypes.AuctionNowLive,

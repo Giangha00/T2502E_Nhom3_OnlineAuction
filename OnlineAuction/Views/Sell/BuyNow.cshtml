@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = Localizer["SellBuyNow_PageTitle"];
     ViewData["DocumentSectionNumber"] = 5;
-    var successMessage = TempData["SuccessMessage"] as string;
     var buyNowI18n = new Dictionary<string, string>
     {
         ["productNameDefault"] = Localizer["Sell_Preview_ProductNameDefault"].Value,
@@ -28,22 +27,6 @@
 
 <div class="sell-page min-h-screen bg-slate-50">
   <section class="site-shell px-4 py-8 sm:px-6 lg:py-10">
-    <style>
-      #successBanner a {
-        display: none;
-      }
-    </style>
-    <div id="successBanner" data-auto-dismiss="5000" class="@(string.IsNullOrEmpty(successMessage) ? "hidden" : "") fixed left-1/2 top-24 z-9999 w-[min(92vw,520px)] -translate-x-1/2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800 shadow-lg">
-      <div class="flex items-start gap-3">
-        <svg class="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-        </svg>
-        <div>
-          <p id="successMessageText" class="font-semibold">@(successMessage ?? Localizer["SellBuyNow_SubmittedForReview"].Value)</p>
-        </div>
-      </div>
-    </div>
-
     <div id="draftBanner" class="mb-6 hidden rounded-xl border border-blue-200 bg-blue-50 px-5 py-3 text-sm text-blue-800">
       @Localizer["Sell_DraftSaved"]
     </div>

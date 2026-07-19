@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Configurations;
+using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
+using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.Extensions.Hosting;
@@ -14,15 +17,21 @@ public class PaymentController : Controller
 {
     private readonly IPaymentService _paymentService;
     private readonly IOrderPaymentService _orderPaymentService;
+    private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly IHostEnvironment _env;
 
     public PaymentController(
         IPaymentService paymentService,
         IOrderPaymentService orderPaymentService,
+        INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         IHostEnvironment env)
     {
         _paymentService = paymentService;
         _orderPaymentService = orderPaymentService;
+        _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _env = env;
     }
 
@@ -188,18 +197,21 @@ public async Task<IActionResult> PayPalIpn()
 
         if (string.IsNullOrWhiteSpace(token))
         {
-            TempData["OrderError"] = "PayPal did not return a valid checkout token.";
+            await NotifyPaymentIssueAsync(
+                userId.Value,
+                _notifyLocalizer[NotificationKeys.PaymentMissingTokenMessage]);
             return RedirectToAction("Index", "Order");
         }
 
         var captureResult = await _orderPaymentService.CapturePayPalCheckoutAsync(userId.Value, token);
         if (!captureResult.Success)
         {
-            TempData["OrderError"] = captureResult.ErrorMessage ?? "Payment could not be completed.";
+            await NotifyPaymentIssueAsync(
+                userId.Value,
+                captureResult.ErrorMessage ?? _notifyLocalizer[NotificationKeys.PaymentCouldNotCompleteMessage]);
             return RedirectToAction("Index", "Order");
         }
 
-        TempData["PaymentSuccess"] = true;
         return RedirectToAction(nameof(Confirmation), new { orderId = captureResult.PrimaryOrderId });
     }
     
@@ -211,10 +223,36 @@ public async Task<IActionResult> PayPalIpn()
         if (userId.HasValue)
         {
             await _orderPaymentService.CancelPayPalCheckoutAsync(userId.Value, token);
+            await NotifyPaymentIssueAsync(
+                userId.Value,
+                _notifyLocalizer[NotificationKeys.PaymentCancelledMessage],
+                NotificationReferenceTypes.PaymentCancelled);
         }
 
-        TempData["OrderError"] = "PayPal payment was cancelled. Your order is still pending payment.";
         return RedirectToAction("Index", "Order");
+    }
+
+    private async Task NotifyPaymentIssueAsync(
+        int userId,
+        string message,
+        string referenceType = NotificationReferenceTypes.PaymentFailed)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        await _notificationService.CreateAndPushAsync(
+            userId,
+            referenceType == NotificationReferenceTypes.PaymentCancelled
+                ? _notifyLocalizer[NotificationKeys.PaymentCancelledTitle]
+                : _notifyLocalizer[NotificationKeys.PaymentFailedTitle],
+            message,
+            NotificationType.Payment,
+            "/Order",
+            referenceType,
+            userId,
+            debounceWindow: TimeSpan.FromMinutes(2));
     }
 
     private int? GetCurrentUserId()

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Messaging.Messages;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
@@ -25,6 +26,7 @@ public sealed class BidPlacedMessageHandler : IBidPlacedMessageHandler
     private readonly IRealtimePublisher _realtimePublisher;
     private readonly INotificationDeliveryService _notificationDelivery;
     private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<BidPlacedMessageHandler> _logger;
 
     public BidPlacedMessageHandler(
@@ -33,6 +35,7 @@ public sealed class BidPlacedMessageHandler : IBidPlacedMessageHandler
         IRealtimePublisher realtimePublisher,
         INotificationDeliveryService notificationDelivery,
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         ILogger<BidPlacedMessageHandler> logger)
     {
         _dbContext = dbContext;
@@ -40,6 +43,7 @@ public sealed class BidPlacedMessageHandler : IBidPlacedMessageHandler
         _realtimePublisher = realtimePublisher;
         _notificationDelivery = notificationDelivery;
         _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
     }
 
@@ -95,8 +99,8 @@ public sealed class BidPlacedMessageHandler : IBidPlacedMessageHandler
 
         await _notificationService.CreateAndPushAsync(
             message.BidderId,
-            "Bid placed",
-            $"Your bid of ${message.Amount:N0} on {message.ProductName} was placed successfully.",
+            _notifyLocalizer[NotificationKeys.BidPlacedTitle],
+            _notifyLocalizer.Format(NotificationKeys.BidPlacedMessage, message.Amount, message.ProductName),
             NotificationType.Auction,
             relatedUrl,
             NotificationReferenceTypes.AuctionBidPlaced,
@@ -108,8 +112,8 @@ public sealed class BidPlacedMessageHandler : IBidPlacedMessageHandler
         {
             await _notificationService.CreateAndPushAsync(
                 message.SellerId,
-                "New bid on your listing",
-                $"Someone bid ${message.Amount:N0} on {message.ProductName}.",
+                _notifyLocalizer[NotificationKeys.NewBidTitle],
+                _notifyLocalizer.Format(NotificationKeys.NewBidMessage, message.Amount, message.ProductName),
                 NotificationType.Auction,
                 relatedUrl,
                 NotificationReferenceTypes.AuctionNewBid,
