@@ -210,10 +210,10 @@
       };
     }
 
-    if (!isNaN(regEnd) && now >= regEnd) {
+    if (!isNaN(regEnd) && now >= regEnd && (isNaN(liveStart) || now < liveStart)) {
       return {
-        label: t('phaseRegistrationClosed', 'Awaiting Live'),
-        badgeClass: 'bg-amber-500 text-white',
+        label: t('phaseUpcoming', 'Upcoming'),
+        badgeClass: 'bg-slate-600 text-white',
         countdownLabel: t('countdownLiveStart', 'Live starts in'),
         countdownTarget: data.startDate,
         endingSoon: false
