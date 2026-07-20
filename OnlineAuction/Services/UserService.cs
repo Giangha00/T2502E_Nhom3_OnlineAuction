@@ -39,10 +39,15 @@ public class UserService : IUserService
 
     public async Task<PublicUserDetailViewModel?> GetPublicProfileAsync(int id, int? viewerUserId = null)
     {
-        // User Detail bay gio doc seller tu bang users trong MySQL thay vi mock data.
+        var isOwner = viewerUserId.HasValue && viewerUserId.Value == id;
+
+        // Public profile: active, non-deleted users only. Owner can still open own inactive account.
         var seller = await _dbContext.Users
             .AsNoTracking()
-            .Where(user => user.Id == id)
+            .Where(user =>
+                user.Id == id &&
+                user.DeletedAt == null &&
+                (isOwner || user.Status == UserStatus.Active))
             .Select(user => new
             {
                 user.Id,
@@ -52,6 +57,7 @@ public class UserService : IUserService
                 user.PhoneNumber,
                 user.AvatarUrl,
                 user.Role,
+                user.EmailConfirmed,
                 user.CreatedAt
             })
             .FirstOrDefaultAsync();
@@ -61,9 +67,6 @@ public class UserService : IUserService
             return null;
         }
 
-        var isOwner = viewerUserId.HasValue && viewerUserId.Value == id;
-
-        // Lay danh sach tin dang theo loai: dau gia va mua ngay.
         var auctions = await _sellerAuctionService.GetSellerAuctionsAsync(
             id,
             ListingTypes.Auction,
@@ -75,11 +78,20 @@ public class UserService : IUserService
             forPublicProfile: true,
             includeOwnerDrafts: isOwner);
 
+        // Keep completed / history scoped to auction listings so success rate uses one denominator.
         var completedAuctions = await _dbContext.Auctions
             .AsNoTracking()
             .CountAsync(auction =>
                 auction.Product.SellerId == id &&
+                auction.ListingType == ListingTypes.Auction &&
                 auction.Status == AuctionStatuses.Completed);
+
+        var totalAuctionHistory = await _dbContext.Auctions
+            .AsNoTracking()
+            .CountAsync(auction =>
+                auction.Product.SellerId == id &&
+                auction.ListingType == ListingTypes.Auction &&
+                auction.Status != AuctionStatuses.Cancelled);
 
         var paidOrderEarnings = await _dbContext.OrderItems
             .AsNoTracking()
@@ -106,17 +118,11 @@ public class UserService : IUserService
         var sellerFees = uniquePaidOrders.Sum(row => row.SellerFee);
         var netProceeds = uniquePaidOrders.Sum(row => row.SellerProceeds);
 
-        var totalAuctionHistory = await _dbContext.Auctions
-            .AsNoTracking()
-            .CountAsync(auction =>
-                auction.Product.SellerId == id &&
-                auction.ListingType == ListingTypes.Auction &&
-                auction.Status != AuctionStatuses.Cancelled);
-
         var relatedRows = await _dbContext.Auctions
             .AsNoTracking()
             .Where(auction =>
                 auction.Product.SellerId != id &&
+                auction.Product.DeletedAt == null &&
                 auction.Status == AuctionStatuses.Live &&
                 auction.ListingType == ListingTypes.Auction)
             .OrderByDescending(auction => auction.CreatedAt)
@@ -165,13 +171,15 @@ public class UserService : IUserService
                 FullName = seller.FullName,
                 AvatarUrl = seller.AvatarUrl ?? "/admin/images/user/user-01.jpg",
                 Role = seller.Role.ToString(),
+                EmailConfirmed = seller.EmailConfirmed,
                 MemberSince = seller.CreatedAt.Year
             },
             BasicInfo = new UserBasicInfoViewModel
             {
                 FullName = seller.FullName,
-                Email = seller.Email ?? string.Empty,
-                PhoneNumber = seller.PhoneNumber ?? string.Empty
+                CanViewContactInfo = isOwner,
+                Email = isOwner ? (seller.Email ?? string.Empty) : string.Empty,
+                PhoneNumber = isOwner ? (seller.PhoneNumber ?? string.Empty) : string.Empty
             },
             Statistics = new SellerStatisticsViewModel
             {
@@ -180,19 +188,12 @@ public class UserService : IUserService
                 TotalBuyNowListings = buyNowListings.Count,
                 CompletedAuctions = completedAuctions,
                 TotalSales = uniquePaidOrders.Count,
-                GrossSales = grossSales,
-                SellerFees = sellerFees,
-                NetProceeds = netProceeds,
-                Rating = 0
+                GrossSales = isOwner ? grossSales : 0m,
+                SellerFees = isOwner ? sellerFees : 0m,
+                NetProceeds = isOwner ? netProceeds : 0m
             },
             Auctions = auctions,
             BuyNowListings = buyNowListings,
-            Rating = new SellerRatingViewModel
-            {
-                AverageRating = 0,
-                ReviewCount = 0,
-                Reviews = []
-            },
             RelatedAuctions = related
         };
     }
@@ -339,7 +340,7 @@ public class UserService : IUserService
                 AvatarUrl = user.AvatarUrl,
                 Role = user.Role,
                 Status = user.Status,
-                AuctionCount = user.Products.Count(),
+                AuctionCount = user.Products.Count(p => p.DeletedAt == null),
                 HasActiveAuctionOrTransaction =
                     user.Products.Any(p => p.Auctions.Any(a =>
                         a.Status == AuctionStatuses.Live ||

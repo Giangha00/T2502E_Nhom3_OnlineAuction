@@ -557,7 +557,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_auctions_status",
-                "status IN ('pending_review','rejected','scheduled','live','ending_soon','ended','awaiting_payment','completed','cancelled')"));
+                "status IN ('confirming','rejected','scheduled','live','ending_soon','ended','awaiting_payment','completed','cancelled')"));
 
             ConfigureAuditableEntity(entity, "auctions");
         });

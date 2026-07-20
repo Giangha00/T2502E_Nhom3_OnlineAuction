@@ -300,11 +300,12 @@ public class AuctionRegistrationService : IAuctionRegistrationService
             return "This auction does not require registration. You can place a bid directly.";
         }
 
-        if (auction.Status is AuctionStatuses.PendingReview or AuctionStatuses.Rejected or AuctionStatuses.Cancelled)
+        if (auction.Status is AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview
+            or AuctionStatuses.Rejected or AuctionStatuses.Cancelled)
         {
             return auction.Status switch
             {
-                AuctionStatuses.PendingReview => "This auction is pending review.",
+                AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview => "This auction is confirming and not yet open for registration.",
                 AuctionStatuses.Rejected => "This auction listing was rejected.",
                 AuctionStatuses.Cancelled => "This auction has been cancelled.",
                 _ => "This auction is not open for registration."

@@ -11,7 +11,6 @@ public class UserDetailViewModel
     public SellerStatisticsViewModel Statistics { get; set; } = new();
     public List<AuctionItemViewModel> Auctions { get; set; } = [];
     public List<AuctionItemViewModel> BuyNowListings { get; set; } = [];
-    public SellerRatingViewModel Rating { get; set; } = new();
     public List<AuctionItemViewModel> RelatedAuctions { get; set; } = [];
 }
 
@@ -22,7 +21,8 @@ public class UserProfileViewModel
     public string Username { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public string AvatarUrl { get; set; } = string.Empty;
-    public string Role { get; set; } = "Seller";
+    public string Role { get; set; } = string.Empty;
+    public bool EmailConfirmed { get; set; }
     public int MemberSince { get; set; }
 }
 
@@ -37,6 +37,7 @@ public class SellerListingListViewModel
 public class UserBasicInfoViewModel
 {
     public string FullName { get; set; } = string.Empty;
+    public bool CanViewContactInfo { get; set; }
     public string Email { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
 }
@@ -58,8 +59,6 @@ public class SellerStatisticsViewModel
     public decimal SellerFees { get; set; }
 
     public decimal NetProceeds { get; set; }
-
-    public double Rating { get; set; }
 }
 
 public class SellerListingCardViewModel
@@ -74,19 +73,4 @@ public class EmptyListingStateViewModel
     public bool IsOwner { get; set; }
 
     public string Channel { get; set; } = ListingTypes.Auction;
-}
-
-public class SellerRatingViewModel
-{
-    public double AverageRating { get; set; }
-    public int ReviewCount { get; set; }
-    public List<SellerReviewViewModel> Reviews { get; set; } = [];
-}
-
-public class SellerReviewViewModel
-{
-    public string ReviewerName { get; set; } = string.Empty;
-    public double Rating { get; set; }
-    public string Comment { get; set; } = string.Empty;
-    public DateTime ReviewDate { get; set; }
 }

@@ -82,23 +82,13 @@ public sealed class RabbitMqPublisher : IRabbitMqPublisher, IDisposable
             _connection?.Dispose();
             _topologyDeclared = false;
 
-            var factory = new ConnectionFactory
-            {
-                HostName = _settings.HostName,
-                Port = _settings.Port,
-                UserName = _settings.UserName,
-                Password = _settings.Password,
-                VirtualHost = _settings.VirtualHost,
-                DispatchConsumersAsync = true,
-                AutomaticRecoveryEnabled = true,
-                NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
-            };
-
+            var factory = _settings.CreateConnectionFactory();
             _connection = factory.CreateConnection("online-auction-publisher");
             _logger.LogInformation(
-                "RabbitMQ publisher connected to {Host}:{Port}.",
+                "RabbitMQ publisher connected to {Host}:{Port} (ssl={UseSsl}).",
                 _settings.HostName,
-                _settings.Port);
+                _settings.Port,
+                _settings.UseSsl);
 
             return _connection;
         }

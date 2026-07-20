@@ -71,11 +71,6 @@
           SectionId = "seller-buynow",
           Listings = Model.BuyNowListings
         })
-        @if (Model.Rating.ReviewCount > 0 || Model.Rating.Reviews.Count > 0)
-        {
-          <div class="border-t border-slate-100"></div>
-          @await Html.PartialAsync("Partials/_RatingSection", Model.Rating)
-        }
       </div>
 
       <aside class="hidden lg:block">

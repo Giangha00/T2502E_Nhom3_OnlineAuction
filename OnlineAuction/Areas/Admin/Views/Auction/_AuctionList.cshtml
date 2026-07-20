@@ -6,7 +6,19 @@
     var startPage = Math.Max(1, currentPage - 2);
     var endPage = Math.Min(totalPages, currentPage + 2);
 
-    string FormatStatus(string status) => status.Replace('_', ' ');
+    string FormatStatus(string status) => status switch
+    {
+        "confirming" or "pending_review" => "Confirming",
+        "rejected" => "Rejected",
+        "scheduled" => "Scheduled",
+        "live" => "Live",
+        "ending_soon" => "Ending soon",
+        "ended" => "Ended",
+        "awaiting_payment" => "Awaiting payment",
+        "completed" => "Completed",
+        "cancelled" => "Cancelled",
+        _ => status.Replace('_', ' ')
+    };
 }
 
 <form id="auctionBulkDeleteForm"

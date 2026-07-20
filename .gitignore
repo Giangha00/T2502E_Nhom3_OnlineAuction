@@ -4,6 +4,7 @@
 [Ll]og/
 [Ll]ogs/
 .tmp/
+.azure-tmp/
 
 # Visual Studio / Rider
 .vs/

@@ -42,7 +42,7 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             .CountAsync(
                 auction => auction.DeletedAt == null
                            && auction.Product.DeletedAt == null
-                           && auction.Status == AuctionStatuses.PendingReview,
+                           && AuctionStatuses.ConfirmingStatuses.Contains(auction.Status),
                 cancellationToken);
 
     public async Task<AuctionVerificationListViewModel> GetPendingVerificationsAsync(
@@ -56,7 +56,7 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             .Where(auction =>
                 auction.DeletedAt == null
                 && auction.Product.DeletedAt == null
-                && auction.Status == AuctionStatuses.PendingReview);
+                && AuctionStatuses.ConfirmingStatuses.Contains(auction.Status));
 
         if (!string.IsNullOrWhiteSpace(filter.Search))
         {
@@ -143,7 +143,7 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
                 a => a.Id == auctionId
                      && a.DeletedAt == null
                      && a.Product.DeletedAt == null
-                     && a.Status == AuctionStatuses.PendingReview,
+                     && AuctionStatuses.ConfirmingStatuses.Contains(a.Status),
                 cancellationToken);
 
         if (auction is null)
@@ -263,9 +263,9 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             return (true, "This auction is already approved and active.");
         }
 
-        if (auction.Status != AuctionStatuses.PendingReview)
+        if (!AuctionStatuses.IsConfirming(auction.Status))
         {
-            return (false, "Only auctions pending review can be approved.");
+            return (false, "Only confirming auctions can be approved.");
         }
 
         var validationError = ValidateForApproval(auction);
@@ -356,9 +356,9 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             return (true, "This auction is already rejected.");
         }
 
-        if (auction.Status != AuctionStatuses.PendingReview)
+        if (!AuctionStatuses.IsConfirming(auction.Status))
         {
-            return (false, "Only auctions pending review can be rejected.");
+            return (false, "Only confirming auctions can be rejected.");
         }
 
         var now = DateTime.UtcNow;

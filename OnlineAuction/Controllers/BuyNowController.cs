@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Configurations;
@@ -29,7 +30,8 @@ public class BuyNowController : Controller
     public async Task<IActionResult> Detail(int id)
     {
         var currentUserId = GetCurrentUserId();
-        var product = await _auctionService.GetProductDetailAsync(id, currentUserId);
+        var isAdmin = (await HttpContext.AuthenticateAsync(AuthSchemes.Admin)).Succeeded;
+        var product = await _auctionService.GetProductDetailAsync(id, currentUserId, isAdmin);
         if (product is null || !product.HasBuyNow || !CanViewBuyNowDetail(product))
         {
             return NotFound();

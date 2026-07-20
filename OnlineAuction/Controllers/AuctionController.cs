@@ -62,7 +62,8 @@ public class AuctionController : Controller
 
     public async Task<IActionResult> Detail(int id)
     {
-        var product = await _auctionService.GetProductDetailAsync(id, GetCurrentUserId());
+        var isAdmin = (await HttpContext.AuthenticateAsync(AuthSchemes.Admin)).Succeeded;
+        var product = await _auctionService.GetProductDetailAsync(id, GetCurrentUserId(), isAdmin);
         if (product is null)
         {
             return NotFound();
@@ -129,6 +130,17 @@ public class AuctionController : Controller
         if (auctionItem is null)
         {
             return NotFound(new { success = false, message = "Auction not found." });
+        }
+
+        if (auctionItem.Status is "Confirming" or "Rejected" or "Cancelled")
+        {
+            var blockedMessage = auctionItem.Status switch
+            {
+                "Confirming" => "This auction is confirming and not yet open for registration.",
+                "Rejected" => "This auction listing was rejected.",
+                _ => "This auction has been cancelled."
+            };
+            return BadRequest(new { success = false, message = blockedMessage });
         }
 
         if (auctionItem.RequiresRegistration)

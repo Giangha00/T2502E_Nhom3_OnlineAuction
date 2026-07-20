@@ -1,0 +1,207 @@
+@model BuyNowDetailViewModel
+
+@{
+    ViewData["Title"] = "Buy Now Details";
+    ViewData["AdminPage"] = "buy-now";
+
+    string FormatStatus(string status) => status.Replace('_', ' ');
+}
+
+<div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Buy Now Details</h2>
+            <p class="text-theme-sm text-gray-500 dark:text-gray-400">Listing #@Model.Id · @FormatStatus(Model.Status)</p>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+            @if (Model.CanManage && Model.CanEdit)
+            {
+                <a asp-area="Admin"
+                   asp-controller="BuyNow"
+                   asp-action="Edit"
+                   asp-route-id="@Model.Id"
+                   class="admin-icon-action admin-icon-action--edit admin-icon-action--lg"
+                   title="Edit"
+                   aria-label="Edit">
+                    <partial name="_AdminIcon" model='"pencil"' />
+                </a>
+            }
+
+            @if (Model.IsPublicLive)
+            {
+                <a href="@Url.Action("Detail", "BuyNow", new { area = "", id = Model.Id })"
+                   target="_blank"
+                   rel="noopener"
+                   class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg"
+                   title="View public listing"
+                   aria-label="View public listing">
+                    <partial name="_AdminIcon" model='"external"' />
+                </a>
+            }
+
+            @if (Model.Status == AuctionStatuses.PendingReview)
+            {
+                <a asp-area="Admin"
+                   asp-controller="AuctionVerification"
+                   asp-action="Details"
+                   asp-route-id="@Model.Id"
+                   class="rounded-lg border border-brand-200 px-3 py-2 text-theme-sm font-medium text-brand-700 hover:bg-brand-50">
+                    Open verification
+                </a>
+            }
+
+            <a asp-area="Admin"
+               asp-controller="BuyNow"
+               asp-action="Index"
+               class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg"
+               title="Back"
+               aria-label="Back">
+                <partial name="_AdminIcon" model='"arrow-left"' />
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] is not null)
+    {
+        <div class="mb-4 rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-theme-sm text-success-700">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] is not null)
+    {
+        <div class="mb-4 rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-theme-sm text-error-700">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="flex flex-col gap-6 md:flex-row">
+            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl"
+                     alt="@Model.ProductName"
+                     class="h-40 w-40 rounded-xl object-cover" />
+            }
+
+            <div class="flex-1">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white/90">@Model.ProductName</h3>
+                <p class="mt-1 text-theme-sm capitalize text-gray-500 dark:text-gray-400">
+                    @Model.AvailabilityLabel · @Model.CategoryName
+                </p>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="prose prose-sm mt-6 max-w-none rounded-xl border border-gray-100 bg-gray-50 p-4 text-theme-sm text-gray-700 dark:border-gray-800 dark:bg-white/[0.02] dark:text-gray-300">
+                @Html.Raw(Model.Description)
+            </div>
+        }
+
+        <dl class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Seller</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.SellerName</dd>
+                <dd class="text-theme-xs text-gray-500">@Model.SellerEmail</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Buy Now Price</dt>
+                <dd class="mt-1 text-theme-sm font-semibold text-gray-800 dark:text-white/90">$@Model.BuyNowPrice.ToString("N0")</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Status</dt>
+                <dd class="mt-1 text-theme-sm capitalize text-gray-800 dark:text-white/90">@FormatStatus(Model.Status)</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Schedule</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
+                    @Model.StartDate.ToString("dd/MM/yyyy HH:mm") - @Model.EndDate.ToString("dd/MM/yyyy HH:mm")
+                </dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Created</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Verified</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
+                    @(Model.VerifiedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Not verified")
+                </dd>
+                @if (!string.IsNullOrWhiteSpace(Model.VerifierName))
+                {
+                    <dd class="text-theme-xs text-gray-500">by @Model.VerifierName</dd>
+                }
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Product ID</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.ProductId</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Public catalog</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
+                    @(Model.IsPublicLive ? "Visible on /BuyNow" : "Hidden from public Buy Now catalog")
+                </dd>
+            </div>
+        </dl>
+
+        @if (Model.CanManage && Model.CanCancel)
+        {
+            <form asp-area="Admin"
+                  asp-controller="BuyNow"
+                  asp-action="Cancel"
+                  asp-route-id="@Model.Id"
+                  method="post"
+                  class="mt-6 border-t border-gray-100 pt-6 dark:border-gray-800"
+                  onsubmit="return confirm('Cancel this Buy Now listing? It will be removed from the public catalog.');">
+                @Html.AntiForgeryToken()
+                <button type="submit"
+                        class="rounded-lg border border-error-200 bg-error-50 px-4 py-2 text-theme-sm font-medium text-error-700 hover:bg-error-100">
+                    Cancel listing
+                </button>
+            </form>
+        }
+    </div>
+
+    @if (Model.RelatedOrders.Count > 0)
+    {
+        <div class="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+            <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-800">
+                <h3 class="text-theme-sm font-semibold text-gray-800 dark:text-white/90">Related Buy Now orders</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[720px]">
+                    <thead>
+                    <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
+                        <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Order</th>
+                        <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Buyer</th>
+                        <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Status</th>
+                        <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Total</th>
+                        <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Created</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                    @foreach (var order in Model.RelatedOrders)
+                    {
+                        <tr>
+                            <td class="px-5 py-4 text-theme-sm text-gray-800 dark:text-white/90">@order.OrderReference</td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@order.BuyerName</td>
+                            <td class="px-5 py-4 text-theme-sm capitalize text-gray-700 dark:text-gray-300">@FormatStatus(order.Status)</td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-800 dark:text-white/90">$@order.TotalAmount.ToString("N0")</td>
+                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

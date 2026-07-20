@@ -25,10 +25,10 @@ public class ProductDocumentDownloadTests
     }
 
     [Fact]
-    public async Task GetDownloadAsync_PendingReview_DeniesAnonymousDownload()
+    public async Task GetDownloadAsync_Confirming_DeniesAnonymousDownload()
     {
         await using var db = await CreateContextAsync();
-        var documentId = await SeedDocumentAsync(db, AuctionStatuses.PendingReview);
+        var documentId = await SeedDocumentAsync(db, AuctionStatuses.Confirming);
 
         var service = new ProductDocumentDownloadService(db);
         var result = await service.GetDownloadAsync(documentId, isAdminRequest: false);
@@ -51,10 +51,10 @@ public class ProductDocumentDownloadTests
     }
 
     [Fact]
-    public async Task GetDownloadAsync_Admin_AllowsPendingReviewDocument()
+    public async Task GetDownloadAsync_Admin_AllowsConfirmingDocument()
     {
         await using var db = await CreateContextAsync();
-        var documentId = await SeedDocumentAsync(db, AuctionStatuses.PendingReview);
+        var documentId = await SeedDocumentAsync(db, AuctionStatuses.Confirming);
 
         var service = new ProductDocumentDownloadService(db);
         var result = await service.GetDownloadAsync(documentId, isAdminRequest: true);

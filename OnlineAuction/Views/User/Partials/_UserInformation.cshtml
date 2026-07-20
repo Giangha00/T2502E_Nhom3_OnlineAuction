@@ -9,7 +9,11 @@
     </div>
     <div>
       <h2 class="text-base font-bold text-slate-900">@Localizer["User_BasicInformation"]</h2>
-      <p class="text-xs text-slate-500">@Localizer["User_BasicInformation_Desc"]</p>
+      <p class="text-xs text-slate-500">
+        @(Model.CanViewContactInfo
+            ? Localizer["User_BasicInformation_Desc"]
+            : Localizer["User_BasicInformation_PublicDesc"])
+      </p>
     </div>
   </div>
 
@@ -19,15 +23,27 @@
       <input type="text" readonly value="@Model.FullName"
              class="user-detail-field__input"/>
     </div>
-    <div>
-      <label class="user-detail-field__label">@Localizer["User_Email"]</label>
-      <input type="text" readonly value="@Model.Email"
-             class="user-detail-field__input"/>
-    </div>
-    <div>
-      <label class="user-detail-field__label">@Localizer["User_PhoneNumber"]</label>
-      <input type="text" readonly value="@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? Localizer["User_NotUpdated"].Value : Model.PhoneNumber)"
-             class="user-detail-field__input @(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "user-detail-field__input--placeholder" : "")"/>
-    </div>
+    @if (Model.CanViewContactInfo)
+    {
+      <div>
+        <label class="user-detail-field__label">@Localizer["User_Email"]</label>
+        <input type="text" readonly value="@(string.IsNullOrWhiteSpace(Model.Email) ? Localizer["User_NotUpdated"].Value : Model.Email)"
+               class="user-detail-field__input @(string.IsNullOrWhiteSpace(Model.Email) ? "user-detail-field__input--placeholder" : "")"/>
+      </div>
+      <div>
+        <label class="user-detail-field__label">@Localizer["User_PhoneNumber"]</label>
+        <input type="text" readonly value="@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? Localizer["User_NotUpdated"].Value : Model.PhoneNumber)"
+               class="user-detail-field__input @(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "user-detail-field__input--placeholder" : "")"/>
+      </div>
+    }
+    else
+    {
+      <div class="sm:col-span-1">
+        <label class="user-detail-field__label">@Localizer["User_ContactInfo"]</label>
+        <p class="user-detail-field__input user-detail-field__input--placeholder flex items-center">
+          @Localizer["User_ContactPrivate"]
+        </p>
+      </div>
+    }
   </div>
 </section>

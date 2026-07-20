@@ -224,7 +224,7 @@
   </data>
   <data name="Sell_PageTitle" xml:space="preserve"><value>Sell Your Card</value></data>
   <data name="Sell_SuccessMessage" xml:space="preserve"><value>Your auction has been created successfully!</value></data>
-  <data name="Sell_SubmittedForReview" xml:space="preserve"><value>Listing submitted for review. Our specialists will verify it before it goes live.</value></data>
+  <data name="Sell_SubmittedForReview" xml:space="preserve"><value>Your listing is confirming / awaiting admin confirmation. Our specialists will verify it before it goes live.</value></data>
   <data name="Sell_ViewAuctions" xml:space="preserve"><value>View auctions →</value></data>
   <data name="Sell_DraftSaved" xml:space="preserve"><value>Draft saved locally. You can continue editing anytime.</value></data>
   <data name="Sell_Heading" xml:space="preserve"><value>List Your Rare Collectible</value></data>
@@ -966,9 +966,20 @@
   <data name="User_Stat_Completed" xml:space="preserve"><value>Completed</value></data>
   <data name="User_Stat_TotalSales" xml:space="preserve"><value>Total Sales</value></data>
   <data name="User_Stat_SuccessRate" xml:space="preserve"><value>Success Rate</value></data>
+  <data name="User_Stat_PaidOrders" xml:space="preserve"><value>Paid Orders</value></data>
+  <data name="User_Stat_GrossSales" xml:space="preserve"><value>Gross Sales</value></data>
+  <data name="User_Stat_SellerFee" xml:space="preserve"><value>Seller Fees</value></data>
+  <data name="User_Stat_NetProceeds" xml:space="preserve"><value>Net Proceeds</value></data>
+  <data name="User_Stat_NetProceedsNote" xml:space="preserve"><value>After platform fees on paid orders</value></data>
+  <data name="User_Role_User" xml:space="preserve"><value>Member</value></data>
+  <data name="User_Role_Admin" xml:space="preserve"><value>Admin</value></data>
+  <data name="User_ContactInfo" xml:space="preserve"><value>Contact</value></data>
+  <data name="User_ContactPrivate" xml:space="preserve"><value>Only visible to the account owner</value></data>
+  <data name="User_BasicInformation_PublicDesc" xml:space="preserve"><value>Public profile information</value></data>
   <data name="User_NotUpdated" xml:space="preserve"><value>Not updated</value></data>
   <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
-  <data name="User_Status_PendingReview" xml:space="preserve"><value>Pending Review</value></data>
+  <data name="User_Status_PendingReview" xml:space="preserve"><value>Confirming</value></data>
+  <data name="User_Status_Confirming" xml:space="preserve"><value>Confirming</value></data>
   <data name="User_Status_Rejected" xml:space="preserve"><value>Rejected</value></data>
   <data name="User_Status_Scheduled" xml:space="preserve"><value>Scheduled</value></data>
   <data name="User_RejectReason" xml:space="preserve"><value>Rejected: {0}</value></data>
@@ -986,7 +997,7 @@
   <data name="SellBuyNow_ReadyToPublish" xml:space="preserve"><value>Your listing will appear on Buy Now immediately.</value></data>
   <data name="SellBuyNow_CreateListing" xml:space="preserve"><value>Publish Listing</value></data>
   <data name="SellBuyNow_SuccessMessage" xml:space="preserve"><value>Buy now listing created successfully.</value></data>
-  <data name="SellBuyNow_SubmittedForReview" xml:space="preserve"><value>Listing submitted for review. Our specialists will verify it before it goes live.</value></data>
+  <data name="SellBuyNow_SubmittedForReview" xml:space="preserve"><value>Your listing is confirming / awaiting admin confirmation. Our specialists will verify it before it goes live.</value></data>
   <data name="SellBuyNow_Success_Created" xml:space="preserve"><value>Your listing "{0}" has been created successfully!</value></data>
   <data name="SellBuyNow_Error_CreateFailed" xml:space="preserve"><value>Could not create listing.</value></data>
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>Price must be greater than 0</value></data>
@@ -1057,7 +1068,8 @@
   <data name="Admin_Dashboard_Kpi_OngoingAuctions" xml:space="preserve"><value>Ongoing Auctions</value></data>
   <data name="Admin_Dashboard_Kpi_EndedAuctions" xml:space="preserve"><value>Ended Auctions</value></data>
   <data name="Admin_Dashboard_Kpi_CancelledAuctions" xml:space="preserve"><value>Cancelled Auctions</value></data>
-  <data name="Admin_Dashboard_Kpi_PendingReview" xml:space="preserve"><value>Pending Review</value></data>
+  <data name="Admin_Dashboard_Kpi_PendingReview" xml:space="preserve"><value>Confirming</value></data>
+  <data name="Admin_Auction_Status_Confirming" xml:space="preserve"><value>Confirming</value></data>
   <data name="Admin_Dashboard_Kpi_SuccessRate" xml:space="preserve"><value>Success Rate</value></data>
   <data name="Admin_Dashboard_SuccessRate_Tooltip" xml:space="preserve"><value>Sold listings / total listed auctions × 100. Paid or delivered orders only.</value></data>
   <data name="Admin_Dashboard_SuccessRate_Hint" xml:space="preserve"><value>Sold listings / total listed</value></data>
@@ -1337,8 +1349,8 @@
   <data name="Notification_ListingApproved_Message" xml:space="preserve"><value>Your listing has been approved and is now live on the marketplace.</value></data>
   <data name="Notification_ListingRejected_Title" xml:space="preserve"><value>Listing rejected</value></data>
   <data name="Notification_ListingRejected_Message" xml:space="preserve"><value>Your listing was rejected. Reason: {0}</value></data>
-  <data name="Notification_ListingSubmitted_Title" xml:space="preserve"><value>Listing submitted</value></data>
-  <data name="Notification_ListingSubmitted_Message" xml:space="preserve"><value>Listing submitted for review.</value></data>
+  <data name="Notification_ListingSubmitted_Title" xml:space="preserve"><value>Listing confirming</value></data>
+  <data name="Notification_ListingSubmitted_Message" xml:space="preserve"><value>Your listing is confirming / awaiting admin confirmation.</value></data>
   <data name="Notification_ListingUpdated_Title" xml:space="preserve"><value>Listing updated</value></data>
   <data name="Notification_ListingUpdated_Message" xml:space="preserve"><value>Your listing was updated successfully.</value></data>
   <data name="Notification_ListingCancelled_Title" xml:space="preserve"><value>Listing cancelled</value></data>

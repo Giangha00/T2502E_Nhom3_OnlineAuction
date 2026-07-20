@@ -636,7 +636,9 @@ public class WinnerNonPaymentRecoveryIntegrationTests
         public string this[string name] => name;
 
         public string Format(string name, params object[] args) =>
-            args.Length == 0 ? name : string.Format(name, args);
+            args.Length == 0
+                ? name
+                : string.Format(System.Globalization.CultureInfo.InvariantCulture, name, args);
     }
 
     private sealed class NoOpRealtimePublisher : IRealtimePublisher
