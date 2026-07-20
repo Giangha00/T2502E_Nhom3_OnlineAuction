@@ -732,8 +732,86 @@ footer .footer-link--active:visited {
 }
 
 .rarecard-category-tile {
-  display: block;
-  min-height: 10rem;
+  display: flex;
+  min-height: 14rem;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.rarecard-category-tile:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.rarecard-category-tile__visual {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  padding: 1.75rem 1.5rem 1.25rem;
+}
+
+.rarecard-category-tile__logo {
+  width: auto;
+  height: auto;
+  max-width: 88%;
+  max-height: 7.5rem;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.rarecard-category-tile:hover .rarecard-category-tile__logo {
+  transform: scale(1.04);
+}
+
+.rarecard-category-tile__footer {
+  border-top: 1px solid #f1f5f9;
+  background: #fff;
+  padding: 0.875rem 1.25rem 1rem;
+}
+
+.rarecard-category-tile__title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #0f172a;
+}
+
+.rarecard-category-tile__count {
+  margin-top: 0.125rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+@media (min-width: 640px) {
+  .rarecard-category-tile {
+    min-height: 15.5rem;
+  }
+
+  .rarecard-category-tile__visual {
+    padding: 2rem 1.5rem 1.5rem;
+  }
+
+  .rarecard-category-tile__logo {
+    max-height: 8.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .rarecard-category-tile {
+    min-height: 16.5rem;
+  }
+
+  .rarecard-category-tile__logo {
+    max-height: 9rem;
+  }
 }
 
 .rarecard-auction-grid {

@@ -120,7 +120,7 @@ public class SellerAuctionService : ISellerAuctionService
                 a.RegistrationStartDate > now),
 
             // Active: admin-approved listings in marketplace phases:
-            // registration open, registration closed (awaiting live), live, ending soon.
+            // registration open, pre-live, live, ending soon.
             // PendingReview stays on Account/Submissions (and owner profile).
             _ => query.Where(a =>
                 a.Status == AuctionStatuses.Live ||

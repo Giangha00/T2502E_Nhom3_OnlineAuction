@@ -5,7 +5,6 @@ namespace OnlineAuction.Helpers;
 public static class AuctionListingPhases
 {
     public const string RegistrationOpen = "registration_open";
-    public const string RegistrationClosed = "registration_closed";
     public const string LiveAuction = "live_auction";
     public const string LiveEndingSoon = "live_ending_soon";
     public const string Upcoming = "upcoming";
@@ -114,7 +113,7 @@ public static class AuctionScheduleHelper
             now < liveStart)
         {
             return new AuctionListingPhaseInfo(
-                AuctionListingPhases.RegistrationClosed,
+                AuctionListingPhases.Upcoming,
                 liveStart,
                 "live_start");
         }
@@ -136,7 +135,7 @@ public static class AuctionScheduleHelper
         }
 
         return new AuctionListingPhaseInfo(
-            AuctionListingPhases.RegistrationClosed,
+            AuctionListingPhases.Upcoming,
             liveStart,
             "live_start");
     }
