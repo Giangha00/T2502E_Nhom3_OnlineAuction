@@ -61,20 +61,13 @@ public sealed class RabbitMqConsumerHostedService : BackgroundService
 
     private Task ConnectAndConsumeAsync(CancellationToken stoppingToken)
     {
-        var factory = new ConnectionFactory
-        {
-            HostName = _settings.HostName,
-            Port = _settings.Port,
-            UserName = _settings.UserName,
-            Password = _settings.Password,
-            VirtualHost = _settings.VirtualHost,
-            DispatchConsumersAsync = true,
-            AutomaticRecoveryEnabled = true,
-            NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
-        };
-
+        var factory = _settings.CreateConnectionFactory();
         _connection = factory.CreateConnection("online-auction-consumers");
-        _logger.LogInformation("RabbitMQ consumers connected to {Host}:{Port}.", _settings.HostName, _settings.Port);
+        _logger.LogInformation(
+            "RabbitMQ consumers connected to {Host}:{Port} (ssl={UseSsl}).",
+            _settings.HostName,
+            _settings.Port,
+            _settings.UseSsl);
 
         using (var setupChannel = _connection.CreateModel())
         {

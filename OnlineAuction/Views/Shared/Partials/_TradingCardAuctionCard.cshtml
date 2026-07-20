@@ -9,6 +9,8 @@
     var isBuyNow = string.Equals(Model.CardMode, "buynow", StringComparison.OrdinalIgnoreCase);
     var isEndingSoon = item.ListingPhase == AuctionListingPhases.LiveEndingSoon || item.Status == "Ending Soon";
     var isWon = item.Status == "Won";
+    var isConfirming = string.Equals(item.Status, "Confirming", StringComparison.OrdinalIgnoreCase);
+    var isRejected = string.Equals(item.Status, "Rejected", StringComparison.OrdinalIgnoreCase);
     var phaseLabelKey = $"Auction_Phase_{item.ListingPhase}";
     var phaseLabel = Localizer[phaseLabelKey];
     var phaseLabelText = phaseLabel.ResourceNotFound
@@ -32,6 +34,29 @@
         AuctionListingPhases.Upcoming => "bg-slate-600 text-white",
         _ => "bg-slate-600 text-white"
     };
+
+    // Confirming / Rejected must win over schedule-phase preview labels.
+    string statusBadgeText;
+    string statusBadgeClass;
+    if (isConfirming)
+    {
+        statusBadgeText = Localizer["User_Status_Confirming"].ResourceNotFound
+            ? "Confirming"
+            : Localizer["User_Status_Confirming"].Value;
+        statusBadgeClass = "bg-amber-500 text-white";
+    }
+    else if (isRejected)
+    {
+        statusBadgeText = Localizer["User_Status_Rejected"].ResourceNotFound
+            ? "Rejected"
+            : Localizer["User_Status_Rejected"].Value;
+        statusBadgeClass = "bg-red-600 text-white";
+    }
+    else
+    {
+        statusBadgeText = phaseLabelText;
+        statusBadgeClass = phaseBadgeClass;
+    }
     var countdownLabelKey = item.PhaseCountdownKind switch
     {
         "registration_end" => "Auction_Countdown_RegistrationEnd",
@@ -126,8 +151,8 @@ else if (variant == "home")
                     <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" class="rarecard-card__image object-contain transition duration-500 group-hover:scale-[1.03]"/>
                     @if (!isBuyNow && !string.IsNullOrWhiteSpace(item.ListingPhase))
                     {
-                        <span class="absolute left-2.5 top-2.5 max-w-[calc(100%-3rem)] rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide shadow @phaseBadgeClass">
-                            @phaseLabelText
+                        <span class="absolute left-2.5 top-2.5 max-w-[calc(100%-3rem)] rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide shadow @statusBadgeClass">
+                            @statusBadgeText
                         </span>
                     }
                     else if (isBuyNow)
@@ -203,8 +228,8 @@ else if (variant == "related")
                     <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" class="h-full w-full object-cover"/>
                     @if (!isBuyNow && !string.IsNullOrWhiteSpace(item.ListingPhase))
                     {
-                        <span class="absolute left-2 top-2 max-w-[calc(100%-1rem)] rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide shadow @phaseBadgeClass">
-                            @phaseLabelText
+                        <span class="absolute left-2 top-2 max-w-[calc(100%-1rem)] rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide shadow @statusBadgeClass">
+                            @statusBadgeText
                         </span>
                     }
                     else if (isBuyNow)
@@ -248,8 +273,8 @@ else
                     <img src="@item.ImageUrl" alt="@item.Name" loading="lazy" class="rarecard-card__image object-contain transition duration-500 group-hover:scale-[1.03]"/>
                     @if (!isBuyNow && !string.IsNullOrWhiteSpace(item.ListingPhase))
                     {
-                        <span class="absolute left-3 top-3 max-w-[calc(100%-3.5rem)] rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide shadow @phaseBadgeClass">
-                            @phaseLabelText
+                        <span class="absolute left-3 top-3 max-w-[calc(100%-3.5rem)] rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide shadow @statusBadgeClass">
+                            @statusBadgeText
                         </span>
                     }
                     else if (isBuyNow)

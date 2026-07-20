@@ -3,7 +3,7 @@
 @{
     var normalized = Model?.ToLowerInvariant() switch
     {
-        "pending_review" => (Localizer["User_Status_PendingReview"].Value, "bg-amber-500"),
+        "confirming" or "pending_review" => (Localizer["User_Status_Confirming"].Value, "bg-amber-500"),
         "rejected" => (Localizer["User_Status_Rejected"].Value, "bg-red-600"),
         "scheduled" => (Localizer["User_Status_Scheduled"].Value, "bg-sky-600"),
         "live" or "active" => (Localizer["User_Status_Live"].Value, "bg-blue-700"),

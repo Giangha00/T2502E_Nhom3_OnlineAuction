@@ -465,7 +465,7 @@ namespace OnlineAuction.Migrations
 
                             t.HasCheckConstraint("chk_auctions_prices", "starting_price > 0 AND bid_step > 0 AND current_price >= 0 AND (buy_now_price IS NULL OR buy_now_price > starting_price)");
 
-                            t.HasCheckConstraint("chk_auctions_status", "status IN ('pending_review','rejected','scheduled','live','ending_soon','ended','awaiting_payment','completed','cancelled')");
+                            t.HasCheckConstraint("chk_auctions_status", "status IN ('confirming','rejected','scheduled','live','ending_soon','ended','awaiting_payment','completed','cancelled')");
                         });
                 });
 

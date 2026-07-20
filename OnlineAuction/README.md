@@ -135,7 +135,7 @@ After deploy, clear old Identity cookies in the browser if both areas still appe
 
 ## Auction listing verification
 
-Seller submissions from `/Sell` start as **`pending_review`** and are hidden from public `/Auction` and Home DB sections until an admin approves them.
+Seller submissions from `/Sell` start as **`confirming`** (formerly `pending_review`) and are hidden from public `/Auction` and Home DB sections until an admin approves them.
 
 | Who | Flow |
 |-----|------|

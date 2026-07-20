@@ -83,5 +83,4 @@ public class SellerViewModel
     public string AvatarUrl { get; set; } = string.Empty;
     public int AuctionCount { get; set; }
     public int SuccessfulSales { get; set; }
-    public double Rating { get; set; }
 }

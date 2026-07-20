@@ -56,6 +56,14 @@ public static class AuctionScheduleHelper
 
     public static bool IsPubliclyListed(Auction auction, DateTime? utcNow = null)
     {
+        if (auction.Status is AuctionStatuses.Confirming
+            or AuctionStatuses.LegacyPendingReview
+            or AuctionStatuses.Rejected
+            or AuctionStatuses.Cancelled)
+        {
+            return false;
+        }
+
         var now = utcNow ?? DateTime.UtcNow;
 
         if (!DateTimeUtilities.IsInFutureUtc(auction.EndDate) &&

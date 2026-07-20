@@ -17,12 +17,9 @@
       <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">@Localizer["User_Stat_PaidOrders"]</p>
       <p class="mt-2 text-3xl font-bold text-slate-900">@Model.TotalSales</p>
     </div>
-    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm col-span-2 lg:col-span-1">
-      <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">@Localizer["User_Stat_Rating"]</p>
-      <div class="mt-2 flex flex-wrap items-center gap-2">
-        @await Html.PartialAsync("Partials/_StarRating", Model.Rating)
-        <span class="text-lg font-bold text-slate-900">@Model.Rating.ToString("0.0") / 5</span>
-      </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">@Localizer["User_Stat_TotalListings"]</p>
+      <p class="mt-2 text-3xl font-bold text-slate-900">@Model.TotalListings</p>
     </div>
   </div>
 
