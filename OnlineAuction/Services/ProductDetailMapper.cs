@@ -162,6 +162,7 @@ internal static class ProductDetailMapper
         var phaseInfo = ResolveDisplayPhase(auction);
         var status = MapListingStatus(auction, phaseInfo);
         var hasBuyNow = auction.BuyNowPrice.HasValue && auction.BuyNowPrice.Value > 0;
+        var (isPubliclyListed, publicListingReason) = ResolvePublicListingInfo(auction);
         var countdownTarget = forBuyNowCatalog || auction.ListingType == ListingTypes.BuyNow
             ? auction.EndDate
             : phaseInfo.CountdownTarget;
@@ -181,6 +182,9 @@ internal static class ProductDetailMapper
             Status = status,
             ListingPhase = phaseInfo.Phase,
             PhaseCountdownKind = phaseInfo.CountdownKind,
+            IsPubliclyListed = isPubliclyListed,
+            PublicListingStatus = isPubliclyListed ? "Yes" : "No",
+            PublicListingReason = publicListingReason,
             TimeRemaining = forBuyNowCatalog || auction.ListingType == ListingTypes.BuyNow
                 ? "In stock"
                 : FormatTimeRemaining(countdownTarget),
@@ -224,6 +228,51 @@ internal static class ProductDetailMapper
         {
             auction.Status = originalStatus;
         }
+    }
+
+    private static (bool IsPubliclyListed, string Reason) ResolvePublicListingInfo(Auction auction)
+    {
+        if (auction.DeletedAt is not null || auction.Product.DeletedAt is not null)
+        {
+            return (false, "Listing is deleted.");
+        }
+
+        if (auction.Status is AuctionStatuses.PendingReview)
+        {
+            return (false, "Pending admin approval.");
+        }
+
+        if (auction.Status is AuctionStatuses.Rejected)
+        {
+            return (false, "Rejected by admin.");
+        }
+
+        if (auction.Status is AuctionStatuses.Cancelled)
+        {
+            return (false, "Listing is cancelled.");
+        }
+
+        if (auction.ListingType == ListingTypes.BuyNow)
+        {
+            var visible = auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon &&
+                          DateTimeUtilities.IsInFutureUtc(auction.EndDate);
+
+            return visible
+                ? (true, "Visible on Buy Now.")
+                : (false, "Buy Now listing is not active.");
+        }
+
+        if (AuctionScheduleHelper.IsPubliclyListed(auction))
+        {
+            var phase = AuctionScheduleHelper.ResolveListingPhase(auction);
+            var reason = phase.Phase == AuctionListingPhases.Upcoming
+                ? $"Visible on Auction as Upcoming. Registration opens at {DateTimeUtilities.AsUtc(auction.RegistrationStartDate):yyyy-MM-dd HH:mm} UTC."
+                : "Visible on Auction.";
+
+            return (true, reason);
+        }
+
+        return (false, "Auction is not in a public listing window.");
     }
 
     private static string MapListingStatus(Auction auction, AuctionListingPhaseInfo phaseInfo) =>

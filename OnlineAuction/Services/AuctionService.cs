@@ -297,6 +297,9 @@ public class AuctionService : IAuctionService
                 .ThenInclude(p => p.Category)
             .Include(a => a.Bids)
             .Where(a =>
+                a.DeletedAt == null &&
+                a.Product.DeletedAt == null &&
+                a.ListingType == ListingTypes.BuyNow &&
                 a.BuyNowPrice != null &&
                 (a.Status == AuctionStatuses.Live || a.Status == AuctionStatuses.EndingSoon) &&
                 a.EndDate > now)
@@ -313,14 +316,15 @@ public class AuctionService : IAuctionService
                 .ThenInclude(p => p.Category)
             .Include(a => a.Bids)
             .Where(a =>
+                a.DeletedAt == null &&
+                a.Product.DeletedAt == null &&
                 a.ListingType == listingType &&
                 (
                     (a.Status == AuctionStatuses.Live || a.Status == AuctionStatuses.EndingSoon) &&
                     a.EndDate > now
                     ||
                     a.Status == AuctionStatuses.Scheduled &&
-                    a.RegistrationStartDate <= now &&
-                    a.StartDate > now
+                    a.EndDate > now
                 ))
             .ToListAsync();
 

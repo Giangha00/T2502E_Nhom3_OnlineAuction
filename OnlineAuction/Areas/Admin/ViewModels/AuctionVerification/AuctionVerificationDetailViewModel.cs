@@ -60,6 +60,10 @@ public class AuctionVerificationDetailViewModel
 
     public string Status { get; set; } = string.Empty;
 
+    public string AuctionPublicVisibility { get; set; } = "No";
+
+    public string AuctionPublicVisibilityReason { get; set; } = string.Empty;
+
     public DateTime? SubmittedAt { get; set; }
 
     public int SellerId { get; set; }

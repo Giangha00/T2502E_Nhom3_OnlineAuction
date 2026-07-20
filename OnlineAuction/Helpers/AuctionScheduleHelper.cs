@@ -57,9 +57,9 @@ public static class AuctionScheduleHelper
     public static bool IsPubliclyListed(Auction auction, DateTime? utcNow = null)
     {
         var now = utcNow ?? DateTime.UtcNow;
+        var liveEnd = DateTimeUtilities.AsUtc(auction.EndDate);
 
-        if (!DateTimeUtilities.IsInFutureUtc(auction.EndDate) &&
-            auction.Status is not (AuctionStatuses.Scheduled))
+        if (now >= liveEnd)
         {
             return false;
         }
@@ -74,10 +74,7 @@ public static class AuctionScheduleHelper
             return false;
         }
 
-        var registrationStart = DateTimeUtilities.AsUtc(auction.RegistrationStartDate);
-        var liveStart = DateTimeUtilities.AsUtc(auction.StartDate);
-
-        return now >= registrationStart && now < liveStart;
+        return true;
     }
 
     public static DateTime GetCountdownTarget(Auction auction, DateTime? utcNow = null) =>
