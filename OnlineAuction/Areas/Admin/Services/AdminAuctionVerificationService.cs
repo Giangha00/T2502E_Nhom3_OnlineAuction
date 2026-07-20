@@ -149,6 +149,7 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
         }
 
         var product = auction.Product;
+        var (isPubliclyVisible, publicVisibilityReason) = ResolveAuctionPublicVisibility(auction);
 
         return new AuctionVerificationDetailViewModel
         {
@@ -199,8 +200,43 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             SubmittedAt = auction.SubmittedAt,
             SellerId = product.SellerId,
             SellerName = product.Seller.FullName,
-            SellerEmail = product.Seller.Email ?? string.Empty
+            SellerEmail = product.Seller.Email ?? string.Empty,
+            AuctionPublicVisibility = isPubliclyVisible ? "Yes" : "No",
+            AuctionPublicVisibilityReason = publicVisibilityReason
         };
+    }
+
+    private static (bool IsVisible, string Reason) ResolveAuctionPublicVisibility(Auction auction)
+    {
+        if (auction.ListingType == ListingTypes.BuyNow)
+        {
+            return (false, "Buy Now listings appear on /BuyNow, not /Auction.");
+        }
+
+        if (auction.Status is AuctionStatuses.PendingReview)
+        {
+            return (false, "Pending admin approval.");
+        }
+
+        if (auction.Status is AuctionStatuses.Rejected)
+        {
+            return (false, "Rejected by admin.");
+        }
+
+        if (auction.Status is AuctionStatuses.Cancelled)
+        {
+            return (false, "Listing is cancelled.");
+        }
+
+        if (AuctionScheduleHelper.IsPubliclyListed(auction))
+        {
+            var phase = AuctionScheduleHelper.ResolveListingPhase(auction);
+            return phase.Phase == AuctionListingPhases.Upcoming
+                ? (true, $"Visible on /Auction as Upcoming. Registration opens at {DateTimeUtilities.AsUtc(auction.RegistrationStartDate):yyyy-MM-dd HH:mm} UTC.")
+                : (true, "Visible on /Auction.");
+        }
+
+        return (false, "Auction is not in a public listing window.");
     }
 
     public async Task<(bool Success, string Message)> ApproveAsync(
@@ -242,7 +278,9 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
             var now = DateTime.UtcNow;
-            auction.Status = auction.StartDate <= now && auction.EndDate > now
+            var startDate = DateTimeUtilities.AsUtc(auction.StartDate);
+            var endDate = DateTimeUtilities.AsUtc(auction.EndDate);
+            auction.Status = startDate <= now && endDate > now
                 ? AuctionStatuses.Live
                 : AuctionStatuses.Scheduled;
             auction.VerifiedAt = now;
@@ -259,16 +297,33 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
         await NotifySellerAsync(
             auction,
             "Listing approved",
-            "Your listing has been approved and is now live on the marketplace.",
-            "/Account/Selling?tab=active",
+            BuildApprovalNotificationMessage(auction),
+            auction.Status == AuctionStatuses.Scheduled && auction.RegistrationStartDate > DateTime.UtcNow
+                ? "/Account/Selling?tab=scheduled"
+                : "/Account/Selling?tab=active",
             NotificationReferenceTypes.AuctionNowLive,
             cancellationToken);
 
         var statusMessage = auction.Status == AuctionStatuses.Scheduled
-            ? "Auction approved and scheduled to go live at the start date."
-            : "Auction approved and is now live.";
+            ? $"Auction approved and visible on /Auction as Upcoming. Registration opens at {DateTimeUtilities.AsUtc(auction.RegistrationStartDate):yyyy-MM-dd HH:mm} UTC."
+            : "Auction approved and is now live on /Auction.";
 
         return (true, statusMessage);
+    }
+
+    private string BuildApprovalNotificationMessage(Auction auction)
+    {
+        if (auction.ListingType == ListingTypes.BuyNow)
+        {
+            return "Your listing has been approved and is visible on Buy Now.";
+        }
+
+        if (auction.Status == AuctionStatuses.Scheduled)
+        {
+            return $"Your auction has been approved and is visible on Auction as Upcoming. Registration opens at {DateTimeUtilities.AsUtc(auction.RegistrationStartDate):yyyy-MM-dd HH:mm} UTC.";
+        }
+
+        return "Your auction has been approved and is now visible on Auction.";
     }
 
     public async Task<(bool Success, string Message)> RejectAsync(

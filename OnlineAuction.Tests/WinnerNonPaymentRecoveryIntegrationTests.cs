@@ -208,6 +208,7 @@ public class WinnerNonPaymentRecoveryIntegrationTests
         var winnerSettings = Options.Create(new WinnerNonPaymentSettings { SecondChancePaymentHours = 48 });
 
         var notificationService = new NoOpNotificationService();
+        var notificationLocalizer = new NoOpNotificationLocalizer();
         var realtimePublisher = new NoOpRealtimePublisher();
         var bidService = new NoOpBidService();
         var depositRefundService = new NoOpRegistrationDepositRefundService();
@@ -218,6 +219,7 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             db,
             orderCreationService,
             notificationService,
+            notificationLocalizer,
             realtimePublisher,
             bidService,
             winnerSettings,
@@ -235,6 +237,7 @@ public class WinnerNonPaymentRecoveryIntegrationTests
     {
         var feeSettings = Options.Create(new PlatformFeeSettings());
         var notificationService = new NoOpNotificationService();
+        var notificationLocalizer = new NoOpNotificationLocalizer();
         var realtimePublisher = new NoOpRealtimePublisher();
         var bidService = new NoOpBidService();
 
@@ -242,6 +245,7 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             db,
             NullLogger<OrderCreationService>.Instance,
             notificationService,
+            notificationLocalizer,
             depositRefundService,
             realtimePublisher,
             bidService,
@@ -627,6 +631,14 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             => Task.CompletedTask;
     }
 
+    private sealed class NoOpNotificationLocalizer : INotificationLocalizer
+    {
+        public string this[string name] => name;
+
+        public string Format(string name, params object[] args) =>
+            args.Length == 0 ? name : string.Format(name, args);
+    }
+
     private sealed class NoOpRealtimePublisher : IRealtimePublisher
     {
         public Task SendNotificationToUserAsync(
@@ -658,6 +670,12 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             int auctionId,
             CancellationToken cancellationToken = default)
             => Task.FromResult<AuctionBidStateViewModel?>(null);
+
+        public Task<AuctionBidHistoryPageViewModel?> GetAuctionBidHistoryPageAsync(
+            int auctionId,
+            int page = 1,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<AuctionBidHistoryPageViewModel?>(null);
     }
 
     private sealed class NoOpRegistrationDepositRefundService : IRegistrationDepositRefundService

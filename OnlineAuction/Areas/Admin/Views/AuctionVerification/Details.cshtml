@@ -106,6 +106,7 @@
                     <div><dt class="text-theme-xs uppercase text-gray-400">Event</dt><dd class="mt-1 text-theme-sm">@(Model.AuctionEventName ?? "—")</dd></div>
                     <div><dt class="text-theme-xs uppercase text-gray-400">Registration</dt><dd class="mt-1 text-theme-sm">@(Model.ListingType == ListingTypes.Auction ? "Registration required" : "Not applicable")</dd></div>
                     <div><dt class="text-theme-xs uppercase text-gray-400">Listing type</dt><dd class="mt-1 text-theme-sm capitalize">@Model.ListingType</dd></div>
+                    <div class="sm:col-span-2"><dt class="text-theme-xs uppercase text-gray-400">Visible on /Auction</dt><dd class="mt-1 text-theme-sm"><span class="font-semibold">@Model.AuctionPublicVisibility</span> @Model.AuctionPublicVisibilityReason</dd></div>
                 </dl>
             </section>
 

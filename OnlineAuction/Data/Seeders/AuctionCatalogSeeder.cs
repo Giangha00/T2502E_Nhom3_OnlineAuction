@@ -93,8 +93,8 @@ public static class AuctionCatalogSeeder
         int seedIndex)
     {
         var category = await GetOrCreateCategoryAsync(dbContext, entry.CategoryName, categoryCache);
-        var bidStep = SpreadsheetAuctionCatalog.ComputeBidStep(entry.StartingPrice);
-        var buyNowPrice = SpreadsheetAuctionCatalog.TryGetBuyNowPrice(entry.Name);
+        var startingPrice = ResolveValidStartingPrice(entry);
+        var bidStep = SpreadsheetAuctionCatalog.ComputeBidStep(startingPrice);
 
         var product = new Product
         {
@@ -123,10 +123,10 @@ public static class AuctionCatalogSeeder
         var auction = new Auction
         {
             ProductId = product.Id,
-            StartingPrice = entry.StartingPrice,
+            StartingPrice = startingPrice,
             BidStep = bidStep,
-            CurrentPrice = entry.StartingPrice,
-            BuyNowPrice = buyNowPrice,
+            CurrentPrice = startingPrice,
+            BuyNowPrice = null,
             ListingType = ListingTypes.Auction,
             RequiresRegistration = true,
             AuctionEventName = SpreadsheetAuctionCatalog.TestAuctionEventName,
@@ -153,7 +153,7 @@ public static class AuctionCatalogSeeder
         }
 
         var bids = new List<Bid>();
-        var amount = entry.StartingPrice;
+        var amount = startingPrice;
 
         for (var i = 0; i < entry.ExistingBidCount; i++)
         {
@@ -173,6 +173,9 @@ public static class AuctionCatalogSeeder
         await dbContext.SaveChangesAsync();
     }
 
+    private static decimal ResolveValidStartingPrice(SpreadsheetAuctionCatalog.Entry entry) =>
+        entry.StartingPrice > 0 ? entry.StartingPrice : 1m;
+
     private static async Task BackfillBuyNowPricesAsync(AuctionHouseDbContext dbContext)
     {
         var priceMap = SpreadsheetAuctionCatalog.GetBuyNowPriceMap();
@@ -185,6 +188,7 @@ public static class AuctionCatalogSeeder
         var auctions = await dbContext.Auctions
             .Include(auction => auction.Product)
             .Where(auction =>
+                auction.ListingType == ListingTypes.BuyNow &&
                 auction.BuyNowPrice == null &&
                 auction.Product.Name != null &&
                 productNames.Contains(auction.Product.Name))
@@ -198,7 +202,8 @@ public static class AuctionCatalogSeeder
         var changed = false;
         foreach (var auction in auctions)
         {
-            if (priceMap.TryGetValue(auction.Product.Name, out var buyNowPrice))
+            if (priceMap.TryGetValue(auction.Product.Name, out var buyNowPrice) &&
+                buyNowPrice > auction.StartingPrice)
             {
                 auction.BuyNowPrice = buyNowPrice;
                 auction.UpdatedAt = DateTime.UtcNow;
