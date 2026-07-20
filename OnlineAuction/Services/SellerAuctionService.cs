@@ -61,45 +61,23 @@ public class SellerAuctionService : ISellerAuctionService
             query = ApplySellerTabFilter(query, tab);
         }
 
-        var rows = await query
+        var auctions = await query
+            .Include(auction => auction.Product)
+                .ThenInclude(product => product.Category)
+            .Include(auction => auction.Bids)
             .OrderByDescending(auction => auction.CreatedAt)
-            .Select(auction => new
-            {
-                auction.Id,
-                auction.StartingPrice,
-                auction.CurrentPrice,
-                auction.Status,
-                auction.RejectReason,
-                auction.EndDate,
-                auction.ListingType,
-                ProductName = auction.Product.Name,
-                CategoryName = auction.Product.Category.Name,
-                ImageUrl = auction.Product.PrimaryImage,
-                Grade = auction.Product.GradeLabel,
-                Condition = auction.Product.Condition,
-                Year = auction.Product.Year
-            })
             .ToListAsync();
 
-        return rows.Select(auction => new AuctionItemViewModel
-        {
-            Id = auction.Id,
-            Name = auction.ProductName,
-            Category = auction.CategoryName,
-            ImageUrl = auction.ImageUrl,
-            StartingPrice = auction.StartingPrice,
-            CurrentPrice = auction.CurrentPrice,
-            Status = auction.Status,
-            RejectReason = auction.RejectReason,
-            Grade = auction.Grade ?? string.Empty,
-            Condition = auction.Condition,
-            Year = auction.Year ?? 0,
-            ListingType = auction.ListingType,
-            EndDate = auction.EndDate,
-            TimeRemaining = auction.ListingType == ListingTypes.BuyNow
-                ? string.Empty
-                : FormatAuctionTimeRemaining(auction.EndDate)
-        }).ToList();
+        return auctions
+            .Select(auction =>
+            {
+                var item = ProductDetailMapper.MapToAuctionItem(
+                    auction,
+                    forBuyNowCatalog: auction.ListingType == ListingTypes.BuyNow);
+                item.RejectReason = auction.RejectReason;
+                return item;
+            })
+            .ToList();
     }
 
     private static readonly string[] ProfilePublicVisibleStatuses =
@@ -117,21 +95,41 @@ public class SellerAuctionService : ISellerAuctionService
         AuctionStatuses.Scheduled
     ];
 
-    private static IQueryable<Auction> ApplySellerTabFilter(IQueryable<Auction> query, string tab) =>
-        tab.ToLowerInvariant() switch
+    private static IQueryable<Auction> ApplySellerTabFilter(IQueryable<Auction> query, string tab)
+    {
+        var now = DateTime.UtcNow;
+
+        return tab.ToLowerInvariant() switch
         {
-            "sold" => query.Where(a => a.Status == AuctionStatuses.Completed),
+            // Sold: completed sales, winner awaiting payment, or ended with a winner.
+            "sold" => query.Where(a =>
+                a.Status == AuctionStatuses.Completed ||
+                a.Status == AuctionStatuses.AwaitingPayment ||
+                (a.Status == AuctionStatuses.Ended &&
+                 (a.WinnerId != null || a.Bids.Any(b => b.IsWinning)))),
+
+            // Unsold: ended with nobody winning / no sale completed.
             "unsold" => query.Where(a =>
-                a.Status == AuctionStatuses.Ended ||
-                a.Status == AuctionStatuses.Rejected),
+                a.Status == AuctionStatuses.Ended &&
+                a.WinnerId == null &&
+                !a.Bids.Any(b => b.IsWinning)),
+
+            // Scheduled: approved but not yet at registration start (Upcoming).
             "scheduled" => query.Where(a =>
-                a.Status == AuctionStatuses.Scheduled ||
-                a.Status == AuctionStatuses.PendingReview),
+                a.Status == AuctionStatuses.Scheduled &&
+                a.RegistrationStartDate > now),
+
+            // Active: admin-approved listings in marketplace phases:
+            // registration open, registration closed (awaiting live), live, ending soon.
+            // PendingReview stays on Account/Submissions (and owner profile).
             _ => query.Where(a =>
                 a.Status == AuctionStatuses.Live ||
                 a.Status == AuctionStatuses.EndingSoon ||
-                a.Status == AuctionStatuses.AwaitingPayment)
+                (a.Status == AuctionStatuses.Scheduled &&
+                 a.RegistrationStartDate <= now &&
+                 a.EndDate > now))
         };
+    }
 
     public async Task<(bool Success, string Message, int? AuctionId)> CreateAsync(
         CreateAuctionViewModel model,
@@ -472,6 +470,8 @@ public class SellerAuctionService : ISellerAuctionService
                 StartingPrice = model.Price,
                 BidStep = 0.01m,
                 CurrentPrice = model.Price,
+                BuyNowPrice = model.Price,
+                RequiresRegistration = false,
                 RegistrationStartDate = buyNowScheduleStart,
                 RegistrationEndDate = buyNowLiveStart,
                 StartDate = buyNowLiveStart,
@@ -657,27 +657,6 @@ public class SellerAuctionService : ISellerAuctionService
         await _db.SaveChangesAsync();
 
         return (true, "Auction cancelled successfully.");
-    }
-
-    private static string FormatAuctionTimeRemaining(DateTime endDate)
-    {
-        var remaining = DateTimeUtilities.RemainingUtc(endDate);
-        if (remaining <= TimeSpan.Zero)
-        {
-            return "Ended";
-        }
-
-        if (remaining.TotalDays >= 1)
-        {
-            return $"{(int)remaining.TotalDays} days left";
-        }
-
-        if (remaining.TotalHours >= 1)
-        {
-            return $"{(int)remaining.TotalHours} hours left";
-        }
-
-        return $"{Math.Max(1, (int)remaining.TotalMinutes)} minutes left";
     }
 
     private async Task<Category> GetOrCreateCategoryAsync(string categoryName)

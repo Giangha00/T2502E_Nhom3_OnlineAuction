@@ -35,27 +35,11 @@
         ["confirmCancelRegistrationNote"] = Localizer["ConfirmModal_CancelRegistration_Note"].Value,
         ["confirmCancelRegistrationConfirm"] = Localizer["Product_CancelRegistration"].Value
     };
-    var flashMessage = TempData["SuccessMessage"] as string ?? TempData["ErrorMessage"] as string;
-    var flashMessageType = TempData["SuccessMessage"] is not null
-        ? "success"
-        : TempData["ErrorMessage"] is not null
-            ? "error"
-            : null;
 }
 
 <div class="rarecard-page bg-white">
   <div class="w-full px-4 py-8 sm:px-8 lg:px-12 lg:py-10">
     @await Html.PartialAsync("Partials/_Breadcrumb", Model)
-
-    @if (!string.IsNullOrWhiteSpace(flashMessage))
-    {
-      <div id="auctionFlashMessage"
-           class="mb-6 rounded-lg border px-4 py-3 text-sm font-medium @(flashMessageType == "success" ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-red-200 bg-red-50 text-red-800")"
-           role="status"
-           aria-live="polite">
-        @flashMessage
-      </div>
-    }
 
     <div class="product-detail-hero">
       <div class="product-detail-hero__media">
@@ -82,8 +66,6 @@
       requiresRegistration: @(Model.RequiresRegistration ? "true" : "false"),
       registrationDepositAmount: @Model.RegistrationDepositAmount.ToString(System.Globalization.CultureInfo.InvariantCulture),
       productName: @Html.Raw(JsonSerializer.Serialize(Model.Name)),
-      flashMessage: @Html.Raw(JsonSerializer.Serialize(flashMessage)),
-      flashMessageType: @Html.Raw(JsonSerializer.Serialize(flashMessageType)),
       i18n: @Html.Raw(JsonSerializer.Serialize(productDetailI18n))
     };
   </script>

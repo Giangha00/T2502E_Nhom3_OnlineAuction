@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Areas.Admin.ViewModels.Complaints;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -13,15 +14,18 @@ public class AdminComplaintService : IAdminComplaintService
 {
     private readonly AuctionHouseDbContext _dbContext;
     private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<AdminComplaintService> _logger;
 
     public AdminComplaintService(
         AuctionHouseDbContext dbContext,
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         ILogger<AdminComplaintService> logger)
     {
         _dbContext = dbContext;
         _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
     }
 
@@ -341,7 +345,10 @@ public class AdminComplaintService : IAdminComplaintService
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        if (normalizedAction is ComplaintStatusActions.Approve or ComplaintStatusActions.Reject)
+        if (normalizedAction is ComplaintStatusActions.Approve
+            or ComplaintStatusActions.Reject
+            or ComplaintStatusActions.UnderReview
+            or ComplaintStatusActions.Close)
         {
             await TryNotifyBuyerAsync(complaint, normalizedAction, cancellationToken);
         }
@@ -369,8 +376,8 @@ public class AdminComplaintService : IAdminComplaintService
             {
                 await _notificationService.CreateAndPushAsync(
                     complaint.BuyerId,
-                    "Refund request approved",
-                    complaint.ResolutionNote ?? "Your refund request has been approved.",
+                    _notifyLocalizer[NotificationKeys.RefundApprovedTitle],
+                    complaint.ResolutionNote ?? _notifyLocalizer[NotificationKeys.RefundApprovedMessage],
                     NotificationType.Refund,
                     "/Refund/Confirmation?requestId=" + Uri.EscapeDataString(complaint.RequestReference),
                     NotificationReferenceTypes.RefundApproved,
@@ -381,11 +388,35 @@ public class AdminComplaintService : IAdminComplaintService
             {
                 await _notificationService.CreateAndPushAsync(
                     complaint.BuyerId,
-                    "Refund request rejected",
-                    complaint.ResolutionNote ?? "Your refund request has been rejected.",
+                    _notifyLocalizer[NotificationKeys.RefundRejectedTitle],
+                    complaint.ResolutionNote ?? _notifyLocalizer[NotificationKeys.RefundRejectedMessage],
                     NotificationType.Refund,
                     "/Refund",
                     NotificationReferenceTypes.RefundRejected,
+                    complaint.Id,
+                    cancellationToken: cancellationToken);
+            }
+            else if (action == ComplaintStatusActions.UnderReview)
+            {
+                await _notificationService.CreateAndPushAsync(
+                    complaint.BuyerId,
+                    _notifyLocalizer[NotificationKeys.RefundUnderReviewTitle],
+                    _notifyLocalizer[NotificationKeys.RefundUnderReviewMessage],
+                    NotificationType.Refund,
+                    "/Refund",
+                    NotificationReferenceTypes.RefundUnderReview,
+                    complaint.Id,
+                    cancellationToken: cancellationToken);
+            }
+            else if (action == ComplaintStatusActions.Close)
+            {
+                await _notificationService.CreateAndPushAsync(
+                    complaint.BuyerId,
+                    _notifyLocalizer[NotificationKeys.RefundClosedTitle],
+                    complaint.ResolutionNote ?? _notifyLocalizer[NotificationKeys.RefundClosedMessage],
+                    NotificationType.Refund,
+                    "/Refund",
+                    NotificationReferenceTypes.RefundClosed,
                     complaint.Id,
                     cancellationToken: cancellationToken);
             }

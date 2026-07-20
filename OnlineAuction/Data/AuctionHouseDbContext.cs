@@ -57,6 +57,8 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
     public DbSet<WinnerNonPaymentLog> WinnerNonPaymentLogs => Set<WinnerNonPaymentLog>();
 
+    public DbSet<UserSandboxWallet> UserSandboxWallets => Set<UserSandboxWallet>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         
@@ -83,6 +85,37 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         ConfigureWatchlistItems(builder);
         ConfigureComplaints(builder);
         ConfigureWinnerNonPaymentLogs(builder);
+        ConfigureUserSandboxWallets(builder);
+    }
+
+    private static void ConfigureUserSandboxWallets(ModelBuilder builder)
+    {
+        builder.Entity<UserSandboxWallet>(entity =>
+        {
+            entity.ToTable("user_sandbox_wallets");
+
+            entity.Property(wallet => wallet.Id).HasColumnName("id");
+            entity.Property(wallet => wallet.UserId).HasColumnName("user_id");
+            entity.Property(wallet => wallet.Balance)
+                .HasColumnName("balance")
+                .HasPrecision(18, 2);
+
+            entity.HasIndex(wallet => wallet.UserId)
+                .IsUnique()
+                .HasDatabaseName("ix_user_sandbox_wallets_user_id");
+
+            entity.HasOne(wallet => wallet.User)
+                .WithMany()
+                .HasForeignKey(wallet => wallet.UserId)
+                .HasConstraintName("fk_user_sandbox_wallets_user")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.ToTable(table => table.HasCheckConstraint(
+                "chk_user_sandbox_wallets_balance",
+                "balance >= 0"));
+
+            ConfigureAuditableEntity(entity, "user_sandbox_wallets");
+        });
     }
 
     private static void ConfigureWinnerNonPaymentLogs(ModelBuilder builder)
@@ -405,11 +438,11 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_products_import_price",
-                "`import_price` IS NULL OR `import_price` >= 0"));
+                "import_price IS NULL OR import_price >= 0"));
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_products_estimated_value",
-                "`estimated_value` IS NULL OR `estimated_value` >= 0"));
+                "estimated_value IS NULL OR estimated_value >= 0"));
 
             ConfigureAuditableEntity(entity, "products");
         });
@@ -502,29 +535,29 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
                 .WithMany(u => u.WonAuctions)
                 .HasForeignKey(a => a.WinnerId)
                 .HasConstraintName("fk_auctions_winner")
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             entity.HasOne(a => a.Verifier)
                 .WithMany()
                 .HasForeignKey(a => a.VerifiedBy)
                 .HasConstraintName("fk_auctions_verified_by")
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_auctions_prices",
-                "`starting_price` > 0 AND `bid_step` > 0 AND `current_price` >= 0 AND (`buy_now_price` IS NULL OR `buy_now_price` > `starting_price`)"));
+                "starting_price > 0 AND bid_step > 0 AND current_price >= 0 AND (buy_now_price IS NULL OR buy_now_price > starting_price)"));
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_auctions_dates",
-                "`end_date` > `start_date`"));
+                "end_date > start_date"));
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_auctions_listing_type",
-                "`listing_type` IN ('auction', 'buynow')"));
+                "listing_type IN ('auction', 'buynow')"));
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_auctions_status",
-                "`status` IN ('pending_review','rejected','scheduled','live','ending_soon','ended','awaiting_payment','completed','cancelled')"));
+                "status IN ('pending_review','rejected','scheduled','live','ending_soon','ended','awaiting_payment','completed','cancelled')"));
 
             ConfigureAuditableEntity(entity, "auctions");
         });
@@ -565,11 +598,11 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
                 .WithMany()
                 .HasForeignKey(r => r.ReviewedBy)
                 .HasConstraintName("fk_registrations_reviewed_by")
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_registrations_status",
-                "`status` IN ('pending', 'approved', 'rejected', 'cancelled')"));
+                "status IN ('pending', 'approved', 'rejected', 'cancelled')"));
 
             ConfigureAuditableEntity(entity, "registrations");
         });
@@ -611,11 +644,11 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_bids_amount",
-                "`amount` > 0"));
+                "amount > 0"));
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_bids_bid_type",
-                "`bid_type` IN ('manual', 'buy_now')"));
+                "bid_type IN ('manual', 'buy_now')"));
 
             ConfigureAuditableEntity(entity, "bids");
         });
@@ -654,27 +687,27 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
                 .WithMany(b => b.FraudAlerts)
                 .HasForeignKey(a => a.BidId)
                 .HasConstraintName("fk_fraud_alerts_bid")
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             entity.HasOne(a => a.User)
                 .WithMany()
                 .HasForeignKey(a => a.UserId)
                 .HasConstraintName("fk_fraud_alerts_user")
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             entity.HasOne(a => a.Reviewer)
                 .WithMany()
                 .HasForeignKey(a => a.ReviewedBy)
                 .HasConstraintName("fk_fraud_alerts_reviewed_by")
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_fraud_alerts_severity",
-                "`severity` IN ('low','medium','high')"));
+                "severity IN ('low','medium','high')"));
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_fraud_alerts_status",
-                "`status` IN ('open','reviewed','dismissed')"));
+                "status IN ('open','reviewed','dismissed')"));
         });
     }
 
@@ -716,7 +749,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_orders_amounts",
-                "`subtotal` > 0 AND `total_amount` >= 0"));
+                "subtotal > 0 AND total_amount >= 0"));
 
             ConfigureAuditableEntity(entity, "orders");
         });
@@ -752,7 +785,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_order_items_winning_bid",
-                "`winning_bid` > 0"));
+                "winning_bid > 0"));
 
             ConfigureAuditableEntity(entity, "order_items");
         });
@@ -785,7 +818,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_payments_amount",
-                "`amount` > 0"));
+                "amount > 0"));
 
             ConfigureAuditableEntity(entity, "payments");
         });
@@ -924,11 +957,11 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_complaints_status",
-                "`status` IN ('pending','under_review','approved','rejected','closed')"));
+                "status IN ('pending','under_review','approved','rejected','closed')"));
 
             entity.ToTable(t => t.HasCheckConstraint(
                 "chk_complaints_type",
-                "`complaint_type` IN ('refund','dispute','authenticity','other')"));
+                "complaint_type IN ('refund','dispute','authenticity','other')"));
 
             ConfigureAuditableEntity(entity, "complaints");
         });
@@ -954,23 +987,24 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
         EntityTypeBuilder<TEntity> entity,
         string tableName) where TEntity : class
     {
+        // NoAction: SQL Server rejects multiple SetNull/Cascade paths to the same table.
         entity.HasOne<ApplicationUser>()
             .WithMany()
             .HasForeignKey(nameof(AuditableEntity.CreatedBy))
             .HasConstraintName($"fk_{tableName}_created_by")
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.NoAction);
 
         entity.HasOne<ApplicationUser>()
             .WithMany()
             .HasForeignKey(nameof(AuditableEntity.UpdatedBy))
             .HasConstraintName($"fk_{tableName}_updated_by")
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.NoAction);
 
         entity.HasOne<ApplicationUser>()
             .WithMany()
             .HasForeignKey(nameof(AuditableEntity.DeletedBy))
             .HasConstraintName($"fk_{tableName}_deleted_by")
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 
     private static void ConfigureWatchlistItems(ModelBuilder builder)
@@ -1000,7 +1034,7 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
                 .WithMany(a => a.WatchlistItems)
                 .HasForeignKey(w => w.AuctionId)
                 .HasConstraintName("fk_watchlist_auction")
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
         });
     }
 }

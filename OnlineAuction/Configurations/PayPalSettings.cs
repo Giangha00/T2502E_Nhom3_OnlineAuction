@@ -19,6 +19,12 @@ public class PayPalSettings
 
     public string CurrencyCode { get; set; } = "USD";
 
+    /// <summary>
+    /// Starting balance for each user's simulated PayPal sandbox wallet.
+    /// Only used when <see cref="IsSandbox"/> is true. PayPal does not expose real buyer balances.
+    /// </summary>
+    public decimal SandboxInitialWalletBalance { get; set; } = 1000m;
+
     public bool IsConfigured =>
         HasValidCredential(ClientId) && HasValidCredential(ClientSecret);
 

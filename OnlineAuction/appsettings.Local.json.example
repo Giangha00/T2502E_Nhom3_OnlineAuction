@@ -1,11 +1,13 @@
 {
+  "DatabaseProvider": "SqlServer",
   "ConnectionStrings": {
-    "DefaultConnection": "server=localhost;port=3306;database=online_auction;user=root;password=;"
+    "DefaultConnection": "Server=localhost,1434;Database=online_auction;User Id=sa;Password=OnlineAuction@123;TrustServerCertificate=True;Encrypt=False;"
   },
   "PayPal": {
     "ClientId": "YOUR_SANDBOX_CLIENT_ID",
     "ClientSecret": "YOUR_SANDBOX_CLIENT_SECRET",
-    "WebhookId": "YOUR_PAYPAL_WEBHOOK_ID"
+    "WebhookId": "YOUR_PAYPAL_WEBHOOK_ID",
+    "SandboxInitialWalletBalance": 1000
   },
   "PasswordResetOtp": {
     "UseMockOtpSender": true
@@ -76,5 +78,11 @@
     "SellerSuccessFeePercent": 10.0,
     "MinimumRegistrationDeposit": 1.0,
     "UseMockRegistrationDepositPayment": true
+  },
+  "SeedData": {
+    "RefreshTestAuctionsOnStartup": false,
+    "RefreshTestAuctionsInDevelopment": false,
+    "SyncCatalogOnStartup": false,
+    "SyncCatalogInDevelopment": true
   }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using OnlineAuction.Configurations;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -19,6 +20,8 @@ public class OrderService : IOrderService
     private readonly AuctionHouseDbContext _dbContext;
     private readonly PlatformFeeSettings _feeSettings;
     private readonly IWinnerNonPaymentRecoveryService _winnerNonPaymentRecoveryService;
+    private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
 
     private sealed class NullWinnerNonPaymentRecoveryService : IWinnerNonPaymentRecoveryService
     {
@@ -29,14 +32,67 @@ public class OrderService : IOrderService
             => Task.CompletedTask;
     }
 
+    private sealed class NullNotificationService : INotificationService
+    {
+        public Task<NotificationItemViewModel?> CreateAndPushAsync(
+            int userId,
+            string title,
+            string message,
+            NotificationType type,
+            string? relatedUrl,
+            string? referenceType = null,
+            int? referenceId = null,
+            TimeSpan? debounceWindow = null,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<NotificationItemViewModel?>(null);
+
+        public Task<IReadOnlyList<NotificationItemViewModel>> GetRecentForUserAsync(
+            int userId,
+            int limit = 20,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<NotificationItemViewModel>>([]);
+
+        public Task<int> GetUnreadCountAsync(int userId, CancellationToken cancellationToken = default)
+            => Task.FromResult(0);
+
+        public Task<bool> MarkAsReadAsync(int userId, int notificationId, CancellationToken cancellationToken = default)
+            => Task.FromResult(false);
+
+        public Task MarkAllAsReadAsync(int userId, CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
+
+        public Task RegisterDeviceTokenAsync(
+            int userId,
+            string fcmToken,
+            string? deviceInfo,
+            CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
+
+        public Task UnregisterDeviceTokenAsync(
+            int userId,
+            string fcmToken,
+            CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
+
+        public Task ProcessAuctionEndingSoonNotificationsAsync(CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
+
+        public Task ProcessAuctionStartingSoonNotificationsAsync(CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
+    }
+
     public OrderService(
         AuctionHouseDbContext dbContext,
         IOptions<PlatformFeeSettings> feeSettings,
-        IWinnerNonPaymentRecoveryService? winnerNonPaymentRecoveryService = null)
+        IWinnerNonPaymentRecoveryService? winnerNonPaymentRecoveryService = null,
+        INotificationService? notificationService = null,
+        INotificationLocalizer? notifyLocalizer = null)
     {
         _dbContext = dbContext;
         _feeSettings = feeSettings.Value;
         _winnerNonPaymentRecoveryService = winnerNonPaymentRecoveryService ?? new NullWinnerNonPaymentRecoveryService();
+        _notificationService = notificationService ?? new NullNotificationService();
+        _notifyLocalizer = notifyLocalizer ?? new NullNotificationLocalizer();
     }
 
     public async Task<OrderPageViewModel?> BuildOrderPageAsync(int buyerId)
@@ -249,6 +305,25 @@ public class OrderService : IOrderService
 
         if (string.Equals(paymentMethod, "cod", StringComparison.OrdinalIgnoreCase))
         {
+            foreach (var order in checkoutOrders)
+            {
+                await _notificationService.CreateAndPushAsync(
+                    buyerId,
+                _notifyLocalizer[NotificationKeys.PaymentSuccessTitle],
+                _notifyLocalizer[NotificationKeys.PaymentSuccessCodMessage],
+                    NotificationType.Payment,
+                    $"/Payment/Confirmation?orderId={order.Id}",
+                    NotificationReferenceTypes.PaymentSuccess,
+                    order.Id);
+
+                await OrderNotificationHelper.NotifySellerPaymentReceivedAsync(
+                    _notificationService,
+                    _notifyLocalizer,
+                    _dbContext,
+                    order.Id,
+                    "COD");
+            }
+
             var references = string.Join(", ", checkoutOrders.Select(order => order.OrderReference));
             return (true, $"Thanh toán thành công! Đã xác nhận {checkoutOrders.Count} hóa đơn ({references}).");
         }
@@ -275,11 +350,22 @@ public class OrderService : IOrderService
             else
             {
                 await OrderCancellationHelper.ApplyCancellationSideEffectsAsync(_dbContext, order, now);
+                await OrderNotificationHelper.NotifyPaymentOverdueCancelledAsync(
+                    _notificationService,
+                    _notifyLocalizer,
+                    _dbContext,
+                    order);
             }
         }
 
         await _dbContext.SaveChangesAsync();
         return expiredOrders.Count;
+    }
+
+    private sealed class NullNotificationLocalizer : INotificationLocalizer
+    {
+        public string this[string name] => name;
+        public string Format(string name, params object[] args) => string.Format(name, args);
     }
 
     private static void ApplySummary(OrderPageViewModel model, IReadOnlyList<WonOrderItem> selectedItems)

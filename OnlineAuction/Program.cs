@@ -20,8 +20,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region MVC + Localization
 
-builder.Configuration.AddJsonFile("appsettings.json.example", optional: true, reloadOnChange: true);
-builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+// Local/example overrides must NOT run in Production — they would override Azure App Settings
+// (e.g. ConnectionStrings__DefaultConnection) and break App Service startup.
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddJsonFile("appsettings.json.example", optional: true, reloadOnChange: true);
+    builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+}
+
 var mvcBuilder = builder.Services.AddControllersWithViews()
     .AddViewLocalization()
     .AddDataAnnotationsLocalization(options =>
@@ -108,6 +114,15 @@ builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
         options.UseSqlite(connectionString, sqlite =>
         {
             sqlite.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+        });
+    }
+    else if (dbProvider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
+    {
+        options.UseSqlServer(connectionString, sqlServer =>
+        {
+            sqlServer.MigrationsHistoryTable("__ef_migrations_history");
+            sqlServer.EnableRetryOnFailure();
+            sqlServer.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
         });
     }
     else
@@ -285,6 +300,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderCreationService, OrderCreationService>();
 builder.Services.AddScoped<IWinnerNonPaymentRecoveryService, WinnerNonPaymentRecoveryService>();
 builder.Services.AddScoped<IOrderPaymentService, OrderPaymentService>();
+builder.Services.AddScoped<ISandboxPayPalWalletService, SandboxPayPalWalletService>();
 builder.Services.AddScoped<IPayPalCaptureGuardService, PayPalCaptureGuardService>();
 builder.Services.AddHostedService<AuctionFinalizationWorker>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
@@ -301,6 +317,7 @@ builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IAdminProductService, AdminProductService>();
 builder.Services.AddScoped<IAdminComplaintService, AdminComplaintService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<INotificationLocalizer, NotificationLocalizer>();
 builder.Services.AddScoped<IFcmService, FirebaseMessagingService>();
 builder.Services.AddScoped<IRegistrationDepositService, RegistrationDepositService>();
 builder.Services.AddScoped<IRegistrationDepositRefundService, RegistrationDepositRefundService>();
@@ -351,9 +368,11 @@ using (var scope = app.Services.CreateScope())
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    // Default: keep seeded product/auction IDs stable across restarts.
+    // Opt into wipe+reseed with SeedData:RefreshTestAuctions* = true.
     var refreshTestAuctions = configuration.GetValue("SeedData:RefreshTestAuctionsOnStartup", false)
         || (app.Environment.IsDevelopment()
-            && configuration.GetValue("SeedData:RefreshTestAuctionsInDevelopment", true));
+            && configuration.GetValue("SeedData:RefreshTestAuctionsInDevelopment", false));
     var syncCatalog = !refreshTestAuctions && (
         configuration.GetValue("SeedData:SyncCatalogOnStartup", false)
         || (app.Environment.IsDevelopment()

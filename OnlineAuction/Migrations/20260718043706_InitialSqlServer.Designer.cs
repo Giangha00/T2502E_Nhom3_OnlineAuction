@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineAuction.Data;
 
@@ -11,9 +12,11 @@ using OnlineAuction.Data;
 namespace OnlineAuction.Migrations
 {
     [DbContext(typeof(AuctionHouseDbContext))]
-    partial class AuctionHouseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260718043706_InitialSqlServer")]
+    partial class InitialSqlServer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2131,69 +2134,6 @@ namespace OnlineAuction.Migrations
                     b.ToTable("user_permissions", (string)null);
                 });
 
-            modelBuilder.Entity("OnlineAuction.Entities.UserSandboxWallet", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Balance")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("balance");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
-
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<int?>("DeletedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("deleted_by");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("updated_by");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("DeletedAt")
-                        .HasDatabaseName("ix_user_sandbox_wallets_deleted_at");
-
-                    b.HasIndex("DeletedBy");
-
-                    b.HasIndex("UpdatedBy");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_user_sandbox_wallets_user_id");
-
-                    b.ToTable("user_sandbox_wallets", null, t =>
-                        {
-                            t.HasCheckConstraint("chk_user_sandbox_wallets_balance", "balance >= 0");
-                        });
-                });
-
             modelBuilder.Entity("OnlineAuction.Entities.WatchlistItem", b =>
                 {
                     b.Property<long>("Id")
@@ -2971,36 +2911,6 @@ namespace OnlineAuction.Migrations
                         .HasConstraintName("fk_user_permissions_user");
 
                     b.Navigation("Permission");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("OnlineAuction.Entities.UserSandboxWallet", b =>
-                {
-                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .HasConstraintName("fk_user_sandbox_wallets_created_by");
-
-                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("DeletedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .HasConstraintName("fk_user_sandbox_wallets_deleted_by");
-
-                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .HasConstraintName("fk_user_sandbox_wallets_updated_by");
-
-                    b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_sandbox_wallets_user");
 
                     b.Navigation("User");
                 });

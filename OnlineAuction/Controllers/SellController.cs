@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using OnlineAuction.Configurations;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -13,15 +14,21 @@ public class SellController : Controller
 {
     private readonly ISellService _sellService;
     private readonly ISellerAuctionService _sellerAuctionService;
+    private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly UserManager<ApplicationUser> _userManager;
 
     public SellController(
         ISellService sellService,
         ISellerAuctionService sellerAuctionService,
+        INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         UserManager<ApplicationUser> userManager)
     {
         _sellService = sellService;
         _sellerAuctionService = sellerAuctionService;
+        _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _userManager = userManager;
     }
 
@@ -79,7 +86,6 @@ public class SellController : Controller
                 return BadRequest(new { success = false, message });
             }
 
-            TempData["ErrorMessage"] = message;
             return View(model);
         }
 
@@ -96,7 +102,12 @@ public class SellController : Controller
             return View(model);
         }
 
-        TempData["SuccessMessage"] = result.Message;
+        await NotifyListingAsync(
+            sellerId.Value,
+            _notifyLocalizer[NotificationKeys.ListingSubmittedTitle],
+            _notifyLocalizer[NotificationKeys.ListingSubmittedMessage],
+            NotificationReferenceTypes.ListingSubmitted,
+            result.AuctionId);
 
         if (Request.Headers.ContainsKey("X-Requested-With"))
         {
@@ -165,7 +176,6 @@ public class SellController : Controller
                 return BadRequest(new { success = false, message });
             }
 
-            TempData["ErrorMessage"] = message;
             return View(model);
         }
 
@@ -182,7 +192,12 @@ public class SellController : Controller
             return View(model);
         }
 
-        TempData["SuccessMessage"] = result.Message;
+        await NotifyListingAsync(
+            sellerId.Value,
+            _notifyLocalizer[NotificationKeys.ListingSubmittedTitle],
+            _notifyLocalizer[NotificationKeys.ListingSubmittedMessage],
+            NotificationReferenceTypes.ListingSubmitted,
+            result.AuctionId);
 
         if (Request.Headers.ContainsKey("X-Requested-With"))
         {
@@ -195,6 +210,24 @@ public class SellController : Controller
         }
 
         return RedirectToAction("Detail", "User", new { id = sellerId.Value }, fragment: "seller-buynow");
+    }
+
+    private async Task NotifyListingAsync(
+        int userId,
+        string title,
+        string message,
+        string referenceType,
+        int? auctionId)
+    {
+        await _notificationService.CreateAndPushAsync(
+            userId,
+            title,
+            message,
+            NotificationType.Auction,
+            auctionId is > 0 ? $"/Auction/Detail/{auctionId.Value}" : "/User/Detail/" + userId,
+            referenceType,
+            auctionId,
+            debounceWindow: TimeSpan.FromMinutes(2));
     }
 
     private async Task<int?> GetCurrentSellerIdAsync()

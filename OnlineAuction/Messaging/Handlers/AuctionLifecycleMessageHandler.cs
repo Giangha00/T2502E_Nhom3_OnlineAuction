@@ -3,6 +3,7 @@ using OnlineAuction.Areas.Admin.Services;
 using OnlineAuction.Data;
 using OnlineAuction.Messaging.Messages;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -19,6 +20,7 @@ public sealed class AuctionLifecycleMessageHandler : IAuctionLifecycleMessageHan
     private readonly IOrderCreationService _orderCreationService;
     private readonly IOrderService _orderService;
     private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly IAdminAuctionVerificationService _verificationService;
     private readonly IRegistrationDepositRefundService _depositRefundService;
     private readonly IOrderPaymentService _orderPaymentService;
@@ -29,6 +31,7 @@ public sealed class AuctionLifecycleMessageHandler : IAuctionLifecycleMessageHan
         IOrderCreationService orderCreationService,
         IOrderService orderService,
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         IAdminAuctionVerificationService verificationService,
         IRegistrationDepositRefundService depositRefundService,
         IOrderPaymentService orderPaymentService,
@@ -38,6 +41,7 @@ public sealed class AuctionLifecycleMessageHandler : IAuctionLifecycleMessageHan
         _orderCreationService = orderCreationService;
         _orderService = orderService;
         _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _verificationService = verificationService;
         _depositRefundService = depositRefundService;
         _orderPaymentService = orderPaymentService;
@@ -126,13 +130,23 @@ public sealed class AuctionLifecycleMessageHandler : IAuctionLifecycleMessageHan
             .Distinct()
             .ToListAsync(cancellationToken);
 
-        var watcherIds = await _dbContext.AuctionRegistrations
+        var registrantIds = await _dbContext.AuctionRegistrations
             .AsNoTracking()
             .Where(r => r.AuctionId == auctionId && r.Status == AuctionRegistrationStatuses.Approved)
             .Select(r => r.UserId)
             .ToListAsync(cancellationToken);
 
-        var recipientIds = bidderIds.Concat(watcherIds).Distinct().ToList();
+        var watchlistIds = await _dbContext.WatchlistItems
+            .AsNoTracking()
+            .Where(w => w.AuctionId == auctionId)
+            .Select(w => w.UserId)
+            .ToListAsync(cancellationToken);
+
+        var recipientIds = bidderIds
+            .Concat(registrantIds)
+            .Concat(watchlistIds)
+            .Distinct()
+            .ToList();
         var productName = auction.Product?.Name ?? "an auction";
         var relatedUrl = $"/Auction/Detail/{auction.Id}";
 
@@ -140,8 +154,8 @@ public sealed class AuctionLifecycleMessageHandler : IAuctionLifecycleMessageHan
         {
             await _notificationService.CreateAndPushAsync(
                 userId,
-                "Auction ending soon",
-                $"{productName} ends within the next hour.",
+                _notifyLocalizer[NotificationKeys.AuctionEndingSoonTitle],
+                _notifyLocalizer.Format(NotificationKeys.AuctionEndingSoonMessage, productName),
                 NotificationType.Auction,
                 relatedUrl,
                 NotificationReferenceTypes.AuctionEndingSoon,

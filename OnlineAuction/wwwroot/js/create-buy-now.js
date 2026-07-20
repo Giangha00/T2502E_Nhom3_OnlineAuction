@@ -112,22 +112,14 @@
     var grade = data.grade || composeGradeLabel(data.authenticator, data.gradeValue);
     if (grade) parts.push(grade);
     if (data.year) parts.push(data.year);
-    return parts.length ? parts.join(' · ') : '—';
+    return parts.length ? parts.join(' · ') : '\u00a0';
   }
 
-  function setPreviewGradeBadge(grade) {
-    $all('previewGrade').forEach(function (badge) {
-      var showGrade = grade && /^(PSA|BGS|CGC)\s/i.test(grade);
-      if (showGrade) {
-        badge.textContent = grade;
-        badge.classList.remove('hidden');
-      } else if (grade) {
-        badge.textContent = grade;
-        badge.classList.remove('hidden');
-      } else {
-        badge.textContent = '';
-        badge.classList.add('hidden');
-      }
+  function setPreviewBadge() {
+    $all('previewBadge').forEach(function (badge) {
+      badge.textContent = t('inStock', 'In Stock');
+      badge.classList.remove('bg-slate-900');
+      badge.classList.add('bg-emerald-600');
     });
   }
 
@@ -149,10 +141,11 @@
 
   function updatePreview() {
     var data = getFormData();
+    setPreviewText('previewCategory', data.category || t('categoryDefault', '—'));
     setPreviewText('previewName', data.productName || t('productNameDefault', 'Product Name'));
     setPreviewText('previewSubtitle', buildPreviewSubtitle(data));
     setPreviewText('previewPrice', formatCardMoney(data.price));
-    setPreviewGradeBadge(data.grade);
+    setPreviewBadge();
     setPreviewMainImage(state.images.length > 0 ? state.images[0].url : '');
   }
 
@@ -460,26 +453,11 @@
   }
 
   function showSuccess(name) {
-    showTopToast('success', tf(t('successCreated', 'Your listing "{0}" has been created successfully!'), name));
     try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
   }
 
   function showTopToast(type, message) {
-    var banner = $('successBanner');
-    var text = $('successMessageText');
-    if (text) text.textContent = message;
-    if (banner) {
-      banner.className = 'fixed left-1/2 top-24 z-9999 w-[min(92vw,520px)] -translate-x-1/2 rounded-xl border px-5 py-4 text-sm font-semibold shadow-lg';
-      if (type === 'success') {
-        banner.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-800');
-      } else {
-        banner.classList.add('border-red-200', 'bg-red-50', 'text-red-700');
-      }
-      banner.classList.remove('hidden');
-      window.setTimeout(function () {
-        banner.classList.add('hidden');
-      }, 5000);
-    }
+    // Server pushes FCM / in-app notifications; keep form-level status only.
   }
 
   function showSubmitStatus(type, message) {

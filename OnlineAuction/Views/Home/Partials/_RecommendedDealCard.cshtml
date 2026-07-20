@@ -1,40 +1,16 @@
 @model OnlineAuction.Models.AuctionItemViewModel
+@using OnlineAuction.Entities
 @{
-    var isBuyNow = string.Equals(Model.ListingType, OnlineAuction.Entities.ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
-    var dealBadgeClass = Model.DealLabel switch
-    {
-        "Great Deal" => "deal-badge--great",
-        "Fair Deal" => "deal-badge--fair",
-        _ => "deal-badge--good"
-    };
-    var title = string.IsNullOrWhiteSpace(Model.DisplayTitle) ? Model.Name : Model.DisplayTitle;
+    var isBuyNow = string.Equals(Model.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
 }
 
-<article class="rarecard-card rarecard-card--home recommended-deal-card group h-full">
-  <div class="rarecard-card__shell overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition duration-300 group-hover:shadow-lg">
-    <a asp-controller="@(isBuyNow ? "BuyNow" : "Auction")"
-       asp-action="Detail"
-       asp-route-id="@Model.Id"
-       class="flex flex-1 flex-col">
-      <div class="rarecard-card__image-wrap relative bg-stone-50">
-        <img src="@Model.ImageUrl" alt="@title" loading="lazy" class="rarecard-card__image object-contain transition duration-500 group-hover:scale-[1.03]"/>
-      </div>
-      <div class="rarecard-card__body flex flex-1 flex-col p-3">
-        <h3 class="line-clamp-2 min-h-[2.25rem] text-sm font-semibold leading-snug text-stone-900">@title</h3>
-        <div class="rarecard-card__price-row mt-auto border-t border-stone-100 pt-2.5">
-          <p class="text-lg font-bold tabular-nums text-blue-700">$@Model.CurrentPrice.ToString("N0")</p>
-          <div class="recommended-deal-card__meta mt-2">
-            @if (!string.IsNullOrWhiteSpace(Model.DealLabel))
-            {
-              <span class="deal-badge @dealBadgeClass">@Model.DealLabel</span>
-            }
-            @if (!string.IsNullOrWhiteSpace(Model.DealNote))
-            {
-              <span class="recommended-deal-card__note">@Model.DealNote</span>
-            }
-          </div>
-        </div>
-      </div>
-    </a>
-  </div>
-</article>
+<partial name="~/Views/Shared/Partials/_TradingCardAuctionCard.cshtml"
+         model="@(new AuctionCardViewModel
+         {
+             Item = Model,
+             Variant = "home",
+             CardMode = isBuyNow ? "buynow" : "auction",
+             ShowBidLink = true,
+             ShowWatchlistButton = false,
+             ShowTimeRemaining = !isBuyNow
+         })"/>

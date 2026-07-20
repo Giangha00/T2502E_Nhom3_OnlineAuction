@@ -1,5 +1,5 @@
 {
-  "DatabaseProvider": "MySql",
+  "DatabaseProvider": "SqlServer",
   "Logging": {
     "LogLevel": {
       "Default": "Information",
@@ -8,11 +8,11 @@
   },
   "AllowedHosts": "*",
   "ConnectionStrings": {
-    "DefaultConnection": "server=localhost;port=3306;database=online_auction;user=root;password=;"
+    "DefaultConnection": "Server=localhost,1434;Database=online_auction;User Id=sa;Password=OnlineAuction@123;TrustServerCertificate=True;Encrypt=False;"
   },
   "SeedData": {
     "RefreshTestAuctionsOnStartup": false,
-    "RefreshTestAuctionsInDevelopment": true,
+    "RefreshTestAuctionsInDevelopment": false,
     "SyncCatalogOnStartup": false,
     "SyncCatalogInDevelopment": true
   },
@@ -27,7 +27,8 @@
     "Mode": "sandbox",
     "ReturnUrl": "http://localhost:5006/Payment/PayPalReturn",
     "CancelUrl": "http://localhost:5006/Payment/PayPalCancel",
-    "CurrencyCode": "USD"
+    "CurrencyCode": "USD",
+    "SandboxInitialWalletBalance": 1000
   },
   "FirebaseSettings": {
     "ProjectId": "YOUR_FIREBASE_PROJECT_ID",

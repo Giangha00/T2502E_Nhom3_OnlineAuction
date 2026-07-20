@@ -2,6 +2,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Configurations;
+using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -13,15 +15,21 @@ public class OrderController : Controller
     private readonly IOrderService _orderService;
     private readonly IOrderCreationService _orderCreationService;
     private readonly IOrderPaymentService _orderPaymentService;
+    private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
 
     public OrderController(
         IOrderService orderService,
         IOrderCreationService orderCreationService,
-        IOrderPaymentService orderPaymentService)
+        IOrderPaymentService orderPaymentService,
+        INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer)
     {
         _orderService = orderService;
         _orderCreationService = orderCreationService;
         _orderPaymentService = orderPaymentService;
+        _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
     }
 
     public async Task<IActionResult> Index()
@@ -58,16 +66,16 @@ public class OrderController : Controller
                 .SelectMany(value => value.Errors)
                 .Select(error => error.ErrorMessage)
                 .FirstOrDefault(message => !string.IsNullOrWhiteSpace(message))
-                ?? "Please complete all required fields.";
+                ?? _notifyLocalizer[NotificationKeys.PaymentCompleteFieldsMessage];
 
-            TempData["OrderError"] = error;
+            await NotifyPaymentIssueAsync(userId.Value, error);
             return RedirectToAction(nameof(Index));
         }
 
         var result = await _orderService.CompleteOrderAsync(userId.Value, request);
         if (!result.Success)
         {
-            TempData["OrderError"] = result.Message;
+            await NotifyPaymentIssueAsync(userId.Value, result.Message);
             return RedirectToAction(nameof(Index));
         }
 
@@ -83,15 +91,35 @@ public class OrderController : Controller
 
             if (!paypalResult.Success || string.IsNullOrWhiteSpace(paypalResult.ApprovalUrl))
             {
-                TempData["OrderError"] = paypalResult.ErrorMessage ?? "Unable to start PayPal checkout.";
+                await NotifyPaymentIssueAsync(
+                    userId.Value,
+                    paypalResult.ErrorMessage ?? _notifyLocalizer[NotificationKeys.PaymentUnableStartCheckoutMessage]);
                 return RedirectToAction(nameof(Index));
             }
 
             return Redirect(paypalResult.ApprovalUrl);
         }
 
-        TempData["OrderMessage"] = result.Message;
+        // COD success is already pushed inside OrderService.CompleteOrderAsync.
         return RedirectToAction(nameof(Index));
+    }
+
+    private async Task NotifyPaymentIssueAsync(int userId, string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        await _notificationService.CreateAndPushAsync(
+            userId,
+            _notifyLocalizer[NotificationKeys.PaymentFailedTitle],
+            message,
+            NotificationType.Payment,
+            "/Order",
+            NotificationReferenceTypes.PaymentFailed,
+            userId,
+            debounceWindow: TimeSpan.FromMinutes(2));
     }
 
     protected int? GetCurrentUserId()

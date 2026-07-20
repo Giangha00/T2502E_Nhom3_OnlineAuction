@@ -17,6 +17,7 @@ public class PayPalService : IPayPalService
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+        PropertyNameCaseInsensitive = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
@@ -192,6 +193,20 @@ public class PayPalService : IPayPalService
             var capture = ParseCapture(body);
             if (capture is null)
             {
+                // Some capture payloads omit purchase_units[].amount; fall back to GET order.
+                _logger.LogWarning(
+                    "PayPal capture parse failed for order {PayPalOrderId}. Falling back to order details. Body={Body}",
+                    payPalOrderId,
+                    TruncateForLog(body));
+
+                var details = await FetchOrderDetailsAsync(payPalOrderId, token, cancellationToken);
+                if (details is not null && !string.IsNullOrWhiteSpace(details.Value.CaptureId))
+                {
+                    return PayPalCaptureResult.Ok(
+                        details.Value.CaptureId,
+                        details.Value.CapturedAmount ?? details.Value.OrderAmount);
+                }
+
                 return PayPalCaptureResult.Fail("PayPal capture response was invalid.");
             }
 
@@ -465,32 +480,45 @@ public class PayPalService : IPayPalService
         }
 
         var purchaseUnit = order.PurchaseUnits?.FirstOrDefault();
-        if (purchaseUnit?.Amount?.Value is null
-            || !decimal.TryParse(
+        var capture = purchaseUnit?.Payments?.Captures?
+            .FirstOrDefault(item => item is not null && !string.IsNullOrWhiteSpace(item.Id));
+
+        decimal? capturedAmount = null;
+        if (capture?.Amount?.Value is not null
+            && decimal.TryParse(
+                capture.Amount.Value,
+                NumberStyles.Number,
+                CultureInfo.InvariantCulture,
+                out var parsedCapturedAmount))
+        {
+            capturedAmount = parsedCapturedAmount;
+        }
+
+        decimal? orderAmount = null;
+        if (purchaseUnit?.Amount?.Value is not null
+            && decimal.TryParse(
                 purchaseUnit.Amount.Value,
                 NumberStyles.Number,
                 CultureInfo.InvariantCulture,
-                out var orderAmount))
+                out var parsedOrderAmount))
+        {
+            orderAmount = parsedOrderAmount;
+        }
+
+        // Capture responses sometimes omit purchase_units[].amount and only include
+        // payments.captures[].amount — accept either source.
+        var resolvedAmount = orderAmount ?? capturedAmount;
+        if (resolvedAmount is null)
         {
             return null;
         }
 
-        var capture = purchaseUnit.Payments?.Captures?.FirstOrDefault(item => item is not null);
         if (capture is null || string.IsNullOrWhiteSpace(capture.Id))
         {
-            return (order.Status, orderAmount, null, null);
+            return (order.Status, resolvedAmount.Value, null, null);
         }
 
-        if (!decimal.TryParse(
-                capture.Amount?.Value,
-                NumberStyles.Number,
-                CultureInfo.InvariantCulture,
-                out var capturedAmount))
-        {
-            return (order.Status, orderAmount, capture.Id, orderAmount);
-        }
-
-        return (order.Status, orderAmount, capture.Id, capturedAmount);
+        return (order.Status, resolvedAmount.Value, capture.Id, capturedAmount ?? resolvedAmount);
     }
 
     private static (string CaptureId, decimal Amount)? ParseCapture(string body)
@@ -504,6 +532,16 @@ public class PayPalService : IPayPalService
         return (parsed.Value.CaptureId, parsed.Value.CapturedAmount ?? parsed.Value.OrderAmount);
     }
 
+    private static string TruncateForLog(string? value, int maxLength = 2000)
+    {
+        if (string.IsNullOrEmpty(value) || value.Length <= maxLength)
+        {
+            return value ?? string.Empty;
+        }
+
+        return value[..maxLength] + "…";
+    }
+
     private static string FormatAmount(decimal amount) =>
         amount.ToString("0.00", CultureInfo.InvariantCulture);
 
@@ -514,55 +552,73 @@ public class PayPalService : IPayPalService
 
     private sealed class PayPalTokenResponse
     {
+        [JsonPropertyName("access_token")]
         public string AccessToken { get; set; } = string.Empty;
 
+        [JsonPropertyName("expires_in")]
         public int ExpiresIn { get; set; }
     }
 
     private sealed class PayPalOrderResponse
     {
+        [JsonPropertyName("id")]
         public string Id { get; set; } = string.Empty;
 
+        [JsonPropertyName("status")]
         public string Status { get; set; } = string.Empty;
 
+        [JsonPropertyName("links")]
         public List<PayPalLink> Links { get; set; } = [];
 
+        [JsonPropertyName("purchase_units")]
         public List<PayPalPurchaseUnit> PurchaseUnits { get; set; } = [];
     }
 
     private sealed class PayPalLink
     {
+        [JsonPropertyName("href")]
         public string Href { get; set; } = string.Empty;
 
+        [JsonPropertyName("rel")]
         public string Rel { get; set; } = string.Empty;
     }
 
     private sealed class PayPalPurchaseUnit
     {
+        [JsonPropertyName("amount")]
         public PayPalMoney? Amount { get; set; }
 
+        [JsonPropertyName("payments")]
         public PayPalPayments? Payments { get; set; }
     }
 
     private sealed class PayPalPayments
     {
+        [JsonPropertyName("captures")]
         public List<PayPalCapture>? Captures { get; set; }
     }
 
     private sealed class PayPalCapture
     {
+        [JsonPropertyName("id")]
         public string Id { get; set; } = string.Empty;
 
+        [JsonPropertyName("amount")]
         public PayPalMoney? Amount { get; set; }
     }
 
     private sealed class PayPalMoney
     {
+        [JsonPropertyName("currency_code")]
+        public string CurrencyCode { get; set; } = string.Empty;
+
+        [JsonPropertyName("value")]
         public string Value { get; set; } = string.Empty;
     }
 
     private sealed class PayPalWebhookVerificationResponse
     {
+        [JsonPropertyName("verification_status")]
         public string VerificationStatus { get; set; } = string.Empty;
     }
 
