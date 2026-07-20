@@ -4,7 +4,19 @@
     ViewData["Title"] = "Auction Details";
     ViewData["AdminPage"] = "auctions";
 
-    string FormatStatus(string status) => status.Replace('_', ' ');
+    string FormatStatus(string status) => status switch
+    {
+        "confirming" or "pending_review" => "Confirming",
+        "rejected" => "Rejected",
+        "scheduled" => "Scheduled",
+        "live" => "Live",
+        "ending_soon" => "Ending soon",
+        "ended" => "Ended",
+        "awaiting_payment" => "Awaiting payment",
+        "completed" => "Completed",
+        "cancelled" => "Cancelled",
+        _ => status.Replace('_', ' ')
+    };
 }
 
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">

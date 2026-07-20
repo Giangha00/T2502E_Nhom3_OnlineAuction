@@ -38,7 +38,7 @@
     "ChallengeAfterBidsPerMinute": 8,
     "ChallengeAfterFraudAlert": true,
     "ChallengeRequiredMinutes": 15,
-    "StubChallengeAcceptedTokens": [ "stub-ok" ]
+    "StubChallengeAcceptedTokens": ["stub-ok"]
   },
   "Email": {
     "Gmail": {
@@ -47,7 +47,6 @@
       "RefreshToken": "YOUR_GOOGLE_REFRESH_TOKEN",
       "SenderEmail": "gianghacd@gmail.com",
       "SenderName": "RareCard Auction House"
-      
     }
   },
   "FirebaseSettings": {
@@ -61,11 +60,12 @@
   },
   "RabbitMq": {
     "Enabled": true,
-    "HostName": "localhost",
-    "Port": 5672,
-    "UserName": "guest",
-    "Password": "guest",
-    "VirtualHost": "/",
+    "HostName": "lizard.lmq.cloudamqp.com",
+    "Port": 5671,
+    "UserName": "YOUR_CLOUDAMQP_USER",
+    "Password": "YOUR_CLOUDAMQP_PASSWORD",
+    "VirtualHost": "YOUR_CLOUDAMQP_VHOST",
+    "UseSsl": true,
     "ExchangeName": "online-auction.direct",
     "PrefetchCount": 10
   },

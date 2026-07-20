@@ -86,6 +86,23 @@ public class RegistrationDepositService : IRegistrationDepositService
                 cancellationToken: cancellationToken);
         }
 
+        if (auction.Status is AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview
+            or AuctionStatuses.Rejected or AuctionStatuses.Cancelled)
+        {
+            var message = auction.Status switch
+            {
+                AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview => "This auction is confirming and not yet open for registration.",
+                AuctionStatuses.Rejected => "This auction listing was rejected.",
+                _ => "This auction has been cancelled."
+            };
+
+            return await FailAndNotifyAsync(
+                userId,
+                message,
+                auctionId,
+                cancellationToken: cancellationToken);
+        }
+
         // Chỉ cho đăng ký trong khung thời gian đăng ký
         var now = DateTime.UtcNow;
         if (!AuctionScheduleHelper.IsRegistrationOpen(auction, now))

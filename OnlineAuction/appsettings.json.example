@@ -74,7 +74,7 @@
     "ChallengeAfterBidsPerMinute": 8,
     "ChallengeAfterFraudAlert": true,
     "ChallengeRequiredMinutes": 15,
-    "StubChallengeAcceptedTokens": [ "stub-ok" ]
+    "StubChallengeAcceptedTokens": ["stub-ok"]
   },
   "Email": {
     "Gmail": {
@@ -92,6 +92,7 @@
     "UserName": "guest",
     "Password": "guest",
     "VirtualHost": "/",
+    "UseSsl": false,
     "ExchangeName": "online-auction.direct",
     "PrefetchCount": 10
   },

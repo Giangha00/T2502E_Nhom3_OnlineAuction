@@ -858,9 +858,20 @@
   <data name="User_Stat_Completed" xml:space="preserve"><value>완료</value></data>
   <data name="User_Stat_TotalSales" xml:space="preserve"><value>총 매출</value></data>
   <data name="User_Stat_SuccessRate" xml:space="preserve"><value>성공률</value></data>
+  <data name="User_Stat_PaidOrders" xml:space="preserve"><value>결제된 주문</value></data>
+  <data name="User_Stat_GrossSales" xml:space="preserve"><value>총 매출</value></data>
+  <data name="User_Stat_SellerFee" xml:space="preserve"><value>판매자 수수료</value></data>
+  <data name="User_Stat_NetProceeds" xml:space="preserve"><value>실수령액</value></data>
+  <data name="User_Stat_NetProceedsNote" xml:space="preserve"><value>결제된 주문의 플랫폼 수수료 차감 후</value></data>
+  <data name="User_Role_User" xml:space="preserve"><value>회원</value></data>
+  <data name="User_Role_Admin" xml:space="preserve"><value>관리자</value></data>
+  <data name="User_ContactInfo" xml:space="preserve"><value>연락처</value></data>
+  <data name="User_ContactPrivate" xml:space="preserve"><value>계정 소유자만 볼 수 있습니다</value></data>
+  <data name="User_BasicInformation_PublicDesc" xml:space="preserve"><value>공개 프로필 정보</value></data>
   <data name="User_NotUpdated" xml:space="preserve"><value>미업데이트</value></data>
   <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
-  <data name="User_Status_PendingReview" xml:space="preserve"><value>검토 대기</value></data>
+  <data name="User_Status_PendingReview" xml:space="preserve"><value>확인 중</value></data>
+  <data name="User_Status_Confirming" xml:space="preserve"><value>확인 중</value></data>
   <data name="User_Status_Rejected" xml:space="preserve"><value>거부됨</value></data>
   <data name="User_Status_Scheduled" xml:space="preserve"><value>예약됨</value></data>
   <data name="User_RejectReason" xml:space="preserve"><value>거부 사유: {0}</value></data>

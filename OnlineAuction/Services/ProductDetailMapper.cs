@@ -151,8 +151,7 @@ internal static class ProductDetailMapper
             FullName = seller.FullName,
             AvatarUrl = seller.AvatarUrl ?? "/admin/images/user/user-01.jpg",
             AuctionCount = auctionCount,
-            SuccessfulSales = successfulSales,
-            Rating = 0
+            SuccessfulSales = successfulSales
         };
 
     public static AuctionItemViewModel MapToAuctionItem(Auction auction, bool forBuyNowCatalog = false)
@@ -160,7 +159,14 @@ internal static class ProductDetailMapper
         var product = auction.Product;
         var bidCount = auction.Bids?.Count ?? 0;
         var phaseInfo = ResolveDisplayPhase(auction);
-        var status = MapListingStatus(auction, phaseInfo);
+        var status = AuctionStatuses.IsConfirming(auction.Status)
+            ? "Confirming"
+            : auction.Status switch
+            {
+                AuctionStatuses.Rejected => "Rejected",
+                AuctionStatuses.Cancelled => "Cancelled",
+                _ => MapListingStatus(auction, phaseInfo)
+            };
         var hasBuyNow = auction.BuyNowPrice.HasValue && auction.BuyNowPrice.Value > 0;
         var countdownTarget = forBuyNowCatalog || auction.ListingType == ListingTypes.BuyNow
             ? auction.EndDate
@@ -209,7 +215,8 @@ internal static class ProductDetailMapper
     /// </summary>
     private static AuctionListingPhaseInfo ResolveDisplayPhase(Auction auction)
     {
-        if (auction.Status != AuctionStatuses.PendingReview)
+        if (auction.Status != AuctionStatuses.Confirming &&
+            auction.Status != AuctionStatuses.LegacyPendingReview)
         {
             return AuctionScheduleHelper.ResolveListingPhase(auction);
         }
@@ -556,7 +563,7 @@ internal static class ProductDetailMapper
 
         return status switch
         {
-            AuctionStatuses.PendingReview => ("Pending Review", "bg-amber-500 text-white"),
+            _ when AuctionStatuses.IsConfirming(status) => ("Confirming", "bg-amber-500 text-white"),
             AuctionStatuses.Rejected => ("Rejected", "bg-red-600 text-white"),
             AuctionStatuses.Scheduled => ("Scheduled", "bg-sky-600 text-white"),
             AuctionStatuses.Live => ("Active Auction", "bg-emerald-600 text-white"),
@@ -590,9 +597,9 @@ internal static class ProductDetailMapper
             return "Cancelled";
         }
 
-        if (auction.Status == AuctionStatuses.PendingReview)
+        if (AuctionStatuses.IsConfirming(auction.Status))
         {
-            return "Pending Review";
+            return "Confirming";
         }
 
         if (auction.Status == AuctionStatuses.Rejected)

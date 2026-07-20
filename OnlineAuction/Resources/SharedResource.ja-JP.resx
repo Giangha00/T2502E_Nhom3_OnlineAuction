@@ -858,9 +858,20 @@
   <data name="User_Stat_Completed" xml:space="preserve"><value>完了</value></data>
   <data name="User_Stat_TotalSales" xml:space="preserve"><value>総売上</value></data>
   <data name="User_Stat_SuccessRate" xml:space="preserve"><value>成功率</value></data>
+  <data name="User_Stat_PaidOrders" xml:space="preserve"><value>支払済み注文</value></data>
+  <data name="User_Stat_GrossSales" xml:space="preserve"><value>総売上</value></data>
+  <data name="User_Stat_SellerFee" xml:space="preserve"><value>出品者手数料</value></data>
+  <data name="User_Stat_NetProceeds" xml:space="preserve"><value>手取り</value></data>
+  <data name="User_Stat_NetProceedsNote" xml:space="preserve"><value>支払済み注文のプラットフォーム手数料控除後</value></data>
+  <data name="User_Role_User" xml:space="preserve"><value>会員</value></data>
+  <data name="User_Role_Admin" xml:space="preserve"><value>管理者</value></data>
+  <data name="User_ContactInfo" xml:space="preserve"><value>連絡先</value></data>
+  <data name="User_ContactPrivate" xml:space="preserve"><value>アカウント所有者のみ表示</value></data>
+  <data name="User_BasicInformation_PublicDesc" xml:space="preserve"><value>公開プロフィール情報</value></data>
   <data name="User_NotUpdated" xml:space="preserve"><value>未更新</value></data>
   <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
-  <data name="User_Status_PendingReview" xml:space="preserve"><value>審査待ち</value></data>
+  <data name="User_Status_PendingReview" xml:space="preserve"><value>確認中</value></data>
+  <data name="User_Status_Confirming" xml:space="preserve"><value>確認中</value></data>
   <data name="User_Status_Rejected" xml:space="preserve"><value>却下</value></data>
   <data name="User_Status_Scheduled" xml:space="preserve"><value>予定</value></data>
   <data name="User_RejectReason" xml:space="preserve"><value>却下理由: {0}</value></data>

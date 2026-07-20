@@ -20,7 +20,7 @@ public class AdminAuctionService
 
     private static readonly string[] AllowedStatuses =
     [
-        AuctionStatuses.PendingReview,
+        AuctionStatuses.Confirming,
         AuctionStatuses.Rejected,
         AuctionStatuses.Scheduled,
         AuctionStatuses.Live,
@@ -67,7 +67,14 @@ public class AdminAuctionService
 
         if (!string.IsNullOrWhiteSpace(filter.Status))
         {
-            query = query.Where(auction => auction.Status == filter.Status);
+            if (AuctionStatuses.IsConfirming(filter.Status))
+            {
+                query = query.Where(auction => AuctionStatuses.ConfirmingStatuses.Contains(auction.Status));
+            }
+            else
+            {
+                query = query.Where(auction => auction.Status == filter.Status);
+            }
         }
 
         if (filter.CategoryId.HasValue)
@@ -754,10 +761,20 @@ public class AdminAuctionService
         filter.PageSize = Math.Min(filter.PageSize, 50);
     }
 
-    private static string FormatStatusLabel(string status)
-    {
-        return status.Replace(' '.ToString(), ' '.ToString(), StringComparison.Ordinal);
-    }
+    private static string FormatStatusLabel(string status) =>
+        status switch
+        {
+            AuctionStatuses.Confirming => "Confirming",
+            AuctionStatuses.Rejected => "Rejected",
+            AuctionStatuses.Scheduled => "Scheduled",
+            AuctionStatuses.Live => "Live",
+            AuctionStatuses.EndingSoon => "Ending soon",
+            AuctionStatuses.Ended => "Ended",
+            AuctionStatuses.AwaitingPayment => "Awaiting payment",
+            AuctionStatuses.Completed => "Completed",
+            AuctionStatuses.Cancelled => "Cancelled",
+            _ => status.Replace('_', ' ')
+        };
 
     private static string TruncatePlainText(string value, int maxLength)
     {

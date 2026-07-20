@@ -133,7 +133,7 @@ public class AuctionService : IAuctionService
     public AuctionViewModel GetAuctionIndex(string listingType = ListingTypes.Auction) =>
         GetAuctionIndexAsync(listingType).GetAwaiter().GetResult();
 
-    public async Task<ProductDetailViewModel?> GetProductDetailAsync(int id, int? currentUserId = null)
+    public async Task<ProductDetailViewModel?> GetProductDetailAsync(int id, int? currentUserId = null, bool isAdmin = false)
     {
         var auction = await _dbContext.Auctions
             .AsNoTracking()
@@ -154,6 +154,15 @@ public class AuctionService : IAuctionService
             return null;
         }
 
+        if (AuctionStatuses.IsConfirming(auction.Status) || auction.Status == AuctionStatuses.Rejected)
+        {
+            var isOwner = currentUserId.HasValue && auction.Product.SellerId == currentUserId.Value;
+            if (!isOwner && !isAdmin)
+            {
+                return null;
+            }
+        }
+
         var registrationCount = await AuctionRegistrationService.CountApprovedRegistrationsAsync(_dbContext, id);
 
         string? userRegistrationStatus = null;
@@ -172,13 +181,19 @@ public class AuctionService : IAuctionService
         var sellerId = auction.Product.SellerId;
         var auctionCount = await _dbContext.Products
             .AsNoTracking()
-            .CountAsync(p => p.SellerId == sellerId);
+            .CountAsync(p => p.SellerId == sellerId && p.DeletedAt == null);
 
-        var successfulSales = await _dbContext.Auctions
+        // Align with user detail: count paid/delivered orders, not completed auctions.
+        var successfulSales = await _dbContext.OrderItems
             .AsNoTracking()
-            .CountAsync(a =>
-                a.Product.SellerId == sellerId &&
-                a.Status == AuctionStatuses.Completed);
+            .Where(item =>
+                item.DeletedAt == null &&
+                item.Order.DeletedAt == null &&
+                item.Auction.Product.SellerId == sellerId &&
+                (item.Order.Status == OrderStatuses.Paid || item.Order.Status == OrderStatuses.Delivered))
+            .Select(item => item.OrderId)
+            .Distinct()
+            .CountAsync();
 
         var seller = ProductDetailMapper.MapSeller(
             auction.Product.Seller,

@@ -90,7 +90,8 @@ public class SellerAuctionService : ISellerAuctionService
     [
         AuctionStatuses.Live,
         AuctionStatuses.EndingSoon,
-        AuctionStatuses.PendingReview,
+        AuctionStatuses.Confirming,
+        AuctionStatuses.LegacyPendingReview,
         AuctionStatuses.Rejected,
         AuctionStatuses.Scheduled
     ];
@@ -120,8 +121,13 @@ public class SellerAuctionService : ISellerAuctionService
                 a.RegistrationStartDate > now),
 
             // Active: admin-approved listings in marketplace phases:
+<<<<<<< HEAD
+            // registration open, registration closed (awaiting live), live, ending soon.
+            // Confirming stays on Account/Submissions (and owner profile).
+=======
             // registration open, pre-live, live, ending soon.
             // PendingReview stays on Account/Submissions (and owner profile).
+>>>>>>> main
             _ => query.Where(a =>
                 a.Status == AuctionStatuses.Live ||
                 a.Status == AuctionStatuses.EndingSoon ||
@@ -301,7 +307,7 @@ public class SellerAuctionService : ISellerAuctionService
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
                 ListingType = ListingTypes.Auction,
-                Status = AuctionStatuses.PendingReview,
+                Status = AuctionStatuses.Confirming,
                 SubmittedAt = now,
                 CreatedAt = now
             };
@@ -310,7 +316,7 @@ public class SellerAuctionService : ISellerAuctionService
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return (true, "Listing submitted for review.", auction.Id);
+            return (true, "Your listing is confirming / awaiting admin confirmation.", auction.Id);
         }
         catch
         {
@@ -477,7 +483,7 @@ public class SellerAuctionService : ISellerAuctionService
                 StartDate = buyNowLiveStart,
                 EndDate = now.AddYears(1),
                 ListingType = ListingTypes.BuyNow,
-                Status = AuctionStatuses.PendingReview,
+                Status = AuctionStatuses.Confirming,
                 SubmittedAt = now,
                 CreatedAt = now
             };
@@ -486,7 +492,7 @@ public class SellerAuctionService : ISellerAuctionService
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return (true, "Listing submitted for review.", auction.Id);
+            return (true, "Your listing is confirming / awaiting admin confirmation.", auction.Id);
         }
         catch
         {
@@ -555,7 +561,7 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "Cannot edit auction that already has bids.");
         }
 
-        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.PendingReview or AuctionStatuses.Rejected)
+        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview or AuctionStatuses.Rejected)
             || (auction.Status == AuctionStatuses.Live && !DateTimeUtilities.IsInFutureUtc(auction.EndDate)))
         {
             return (false, "Only pending or live listings can be edited.");
@@ -603,7 +609,7 @@ public class SellerAuctionService : ISellerAuctionService
 
         if (auction.Status == AuctionStatuses.Rejected)
         {
-            auction.Status = AuctionStatuses.PendingReview;
+            auction.Status = AuctionStatuses.Confirming;
             auction.SubmittedAt = DateTime.UtcNow;
             auction.RejectReason = null;
             auction.VerifiedAt = null;
@@ -612,8 +618,8 @@ public class SellerAuctionService : ISellerAuctionService
 
         await _db.SaveChangesAsync();
 
-        var message = auction.Status == AuctionStatuses.PendingReview
-            ? "Listing updated and resubmitted for review."
+        var message = AuctionStatuses.IsConfirming(auction.Status)
+            ? "Listing updated and resubmitted for admin confirmation."
             : "Auction updated successfully.";
 
         return (true, message);
@@ -646,7 +652,7 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "Cannot cancel auction that already has a pending or paid order.");
         }
 
-        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.PendingReview or AuctionStatuses.Rejected)
+        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview or AuctionStatuses.Rejected)
             || (auction.Status == AuctionStatuses.Live && !DateTimeUtilities.IsInFutureUtc(auction.EndDate)))
         {
             return (false, "This listing cannot be cancelled.");
