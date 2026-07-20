@@ -6,8 +6,8 @@ public static class CategoryImages
     {
         ["Pokémon"] = "/images/categories/pokemon.png",
         ["One Piece"] = "/images/categories/one-piece.png",
-        ["Yu-Gi-Oh!"] = "/images/categories/yu-gi-oh.jpg",
-        ["Sports"] = "/images/categories/sports.jpg",
+        ["Yu-Gi-Oh!"] = "/images/categories/yu-gi-oh.png",
+        ["Sports"] = "/images/categories/sports.png",
         ["Magic: The Gathering"] =
             "https://cards.scryfall.io/large/front/b/0/b0faa7f2-b547-42c4-a810-839da50dadfe.jpg?1559591477"
     };
