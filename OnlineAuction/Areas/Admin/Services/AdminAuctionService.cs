@@ -51,7 +51,10 @@ public class AdminAuctionService
 
         var query = _dbContext.Auctions
             .AsNoTracking()
-            .Where(auction => auction.DeletedAt == null && auction.Product.DeletedAt == null);
+            .Where(auction =>
+                auction.DeletedAt == null &&
+                auction.Product.DeletedAt == null &&
+                auction.ListingType == ListingTypes.Auction);
 
         if (!string.IsNullOrWhiteSpace(filter.Search))
         {

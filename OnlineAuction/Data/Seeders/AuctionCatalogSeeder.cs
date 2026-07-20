@@ -125,6 +125,14 @@ public static class AuctionCatalogSeeder
 
         await BackfillSeededProductTemplatesAsync(dbContext, templateCache);
         await SyncBuyNowPricesAsync(dbContext);
+        await EnsureDedicatedBuyNowListingsAsync(
+            dbContext,
+            onePieceSeller.Id,
+            yugiohSeller.Id,
+            sportsSellerId,
+            categoryCache,
+            templateCache,
+            now);
         await EnsureFullFlowDemoScheduleAsync(dbContext, DateTime.UtcNow);
         await SyncSeedCategoriesAsync(dbContext);
 
@@ -713,6 +721,133 @@ public static class AuctionCatalogSeeder
         {
             await dbContext.SaveChangesAsync();
         }
+    }
+
+    private const string DedicatedBuyNowEventName = "RareCard Vault Buy Now";
+
+    private static string BuildDedicatedBuyNowProductName(string catalogName) =>
+        $"{catalogName} [Buy Now]";
+
+    private static decimal ResolveDedicatedBuyNowStartingPrice(decimal buyNowPrice) =>
+        buyNowPrice <= 0.01m ? 0.01m : buyNowPrice - 0.01m;
+
+    private static async Task EnsureDedicatedBuyNowListingsAsync(
+        AuctionHouseDbContext dbContext,
+        int onePieceSellerId,
+        int yugiohSellerId,
+        int? sportsSellerId,
+        Dictionary<string, Category> categoryCache,
+        Dictionary<string, ProductTemplate> templateCache,
+        DateTime now)
+    {
+        var existingCount = await dbContext.Auctions
+            .AsNoTracking()
+            .CountAsync(auction =>
+                auction.DeletedAt == null &&
+                auction.ListingType == ListingTypes.BuyNow);
+
+        if (existingCount > 0)
+        {
+            return;
+        }
+
+        var entriesByName = SpreadsheetAuctionCatalog.GetEntries()
+            .ToDictionary(entry => entry.Name, StringComparer.OrdinalIgnoreCase);
+
+        var index = 0;
+        foreach (var (catalogName, buyNowPrice) in SpreadsheetAuctionCatalog.GetBuyNowPriceMap())
+        {
+            if (!entriesByName.TryGetValue(catalogName, out var entry))
+            {
+                continue;
+            }
+
+            var sellerId = ResolveSellerId(
+                entry.CategoryName,
+                onePieceSellerId,
+                yugiohSellerId,
+                sportsSellerId);
+
+            if (!sellerId.HasValue)
+            {
+                continue;
+            }
+
+            var category = await GetOrCreateCategoryAsync(dbContext, entry.CategoryName, categoryCache);
+            var template = await GetOrCreateTemplateFromEntryAsync(dbContext, entry, category, templateCache, now);
+            var productName = BuildDedicatedBuyNowProductName(entry.Name);
+            var startingPrice = ResolveDedicatedBuyNowStartingPrice(buyNowPrice);
+            var liveStart = now.AddMinutes(-5);
+            var status = ResolveSeededBuyNowStatus(index);
+
+            var product = new Product
+            {
+                Category = category,
+                CreatedAt = now
+            };
+
+            ApplyProductFieldsFromEntry(product, entry, sellerId.Value, category.Id, template.Id);
+            product.Name = productName;
+            product.ShortDescription = TruncatePlainText(entry.Description, 300);
+            product.DescriptionHtml = entry.Description;
+
+            dbContext.Products.Add(product);
+            await dbContext.SaveChangesAsync();
+
+            SyncProductImages(dbContext, product, entry, now);
+            await dbContext.SaveChangesAsync();
+
+            var auction = new Auction
+            {
+                ProductId = product.Id,
+                StartingPrice = startingPrice,
+                BidStep = 0.01m,
+                CurrentPrice = buyNowPrice,
+                BuyNowPrice = buyNowPrice,
+                ListingType = ListingTypes.BuyNow,
+                RequiresRegistration = false,
+                AuctionEventName = DedicatedBuyNowEventName,
+                RegistrationStartDate = liveStart.AddMinutes(-1),
+                RegistrationEndDate = liveStart,
+                StartDate = liveStart,
+                EndDate = now.AddYears(1),
+                Status = status,
+                SubmittedAt = status == AuctionStatuses.PendingReview ? now : null,
+                VerifiedAt = status is AuctionStatuses.Live or AuctionStatuses.EndingSoon or AuctionStatuses.Completed
+                    ? now
+                    : null,
+                CreatedAt = now
+            };
+
+            dbContext.Auctions.Add(auction);
+            await dbContext.SaveChangesAsync();
+            index++;
+
+            if (index >= 12)
+            {
+                break;
+            }
+        }
+    }
+
+    private static string ResolveSeededBuyNowStatus(int index) =>
+        index switch
+        {
+            < 8 => AuctionStatuses.Live,
+            < 10 => AuctionStatuses.PendingReview,
+            10 => AuctionStatuses.Completed,
+            _ => AuctionStatuses.Cancelled
+        };
+
+    private static string TruncatePlainText(string value, int maxLength)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        var plain = value.Trim();
+        return plain.Length <= maxLength ? plain : plain[..maxLength];
     }
 
     private static async Task EnsureFullFlowDemoScheduleAsync(AuctionHouseDbContext dbContext, DateTime now)
