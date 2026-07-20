@@ -218,6 +218,7 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             db,
             orderCreationService,
             notificationService,
+            new NoOpNotificationLocalizer(),
             realtimePublisher,
             bidService,
             winnerSettings,
@@ -242,6 +243,7 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             db,
             NullLogger<OrderCreationService>.Instance,
             notificationService,
+            new NoOpNotificationLocalizer(),
             depositRefundService,
             realtimePublisher,
             bidService,
@@ -627,6 +629,14 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             => Task.CompletedTask;
     }
 
+    private sealed class NoOpNotificationLocalizer : INotificationLocalizer
+    {
+        public string this[string name] => name;
+
+        public string Format(string name, params object[] args) =>
+            string.Format(System.Globalization.CultureInfo.InvariantCulture, name, args);
+    }
+
     private sealed class NoOpRealtimePublisher : IRealtimePublisher
     {
         public Task SendNotificationToUserAsync(
@@ -658,6 +668,12 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             int auctionId,
             CancellationToken cancellationToken = default)
             => Task.FromResult<AuctionBidStateViewModel?>(null);
+
+        public Task<AuctionBidHistoryPageViewModel?> GetAuctionBidHistoryPageAsync(
+            int auctionId,
+            int page = 1,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult<AuctionBidHistoryPageViewModel?>(null);
     }
 
     private sealed class NoOpRegistrationDepositRefundService : IRegistrationDepositRefundService
