@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Options;
 using OnlineAuction.Authorization;
 using OnlineAuction.Configurations;
@@ -109,6 +110,9 @@ if (string.IsNullOrWhiteSpace(connectionString))
 
 builder.Services.AddDbContext<AuctionHouseDbContext>(options =>
 {
+    options.ConfigureWarnings(warnings =>
+        warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+
     if (dbProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
     {
         options.UseSqlite(connectionString, sqlite =>
@@ -348,7 +352,8 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
 
-    if (db.Database.ProviderName?.Contains("Sqlite") == true)
+    if (db.Database.ProviderName?.Contains("Sqlite") == true
+        || db.Database.ProviderName?.Contains("SqlServer") == true)
     {
         await db.Database.EnsureCreatedAsync();
     }
