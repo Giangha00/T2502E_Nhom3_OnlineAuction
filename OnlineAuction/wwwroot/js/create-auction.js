@@ -174,6 +174,71 @@
     return tf(t('timeLeftHours', '{0}h {1}m left'), hours, mins);
   }
 
+  function parseDateMs(value) {
+    if (!value) return NaN;
+    var date = new Date(value);
+    return isNaN(date.getTime()) ? NaN : date.getTime();
+  }
+
+  function resolvePreviewPhase(data) {
+    var now = Date.now();
+    var regStart = parseDateMs(data.registrationStartDate);
+    var regEnd = parseDateMs(data.registrationEndDate);
+    var liveStart = parseDateMs(data.startDate);
+    var liveEnd = parseDateMs(data.endDate);
+
+    if (!isNaN(liveEnd) && now >= liveEnd) {
+      return {
+        label: t('timeEnded', 'Ended'),
+        badgeClass: 'bg-slate-600 text-white',
+        countdownLabel: t('countdownLiveEnd', 'Live ends in'),
+        countdownTarget: data.endDate,
+        endingSoon: false
+      };
+    }
+
+    if (!isNaN(liveStart) && now >= liveStart) {
+      var endingSoon = !isNaN(liveEnd) && (liveEnd - now) <= 24 * 60 * 60 * 1000;
+      return {
+        label: endingSoon
+          ? t('phaseLiveEndingSoon', 'Ending Soon')
+          : t('phaseLiveAuction', 'Live Now'),
+        badgeClass: endingSoon ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white',
+        countdownLabel: t('countdownLiveEnd', 'Live ends in'),
+        countdownTarget: data.endDate,
+        endingSoon: endingSoon
+      };
+    }
+
+    if (!isNaN(regEnd) && now >= regEnd) {
+      return {
+        label: t('phaseRegistrationClosed', 'Awaiting Live'),
+        badgeClass: 'bg-amber-500 text-white',
+        countdownLabel: t('countdownLiveStart', 'Live starts in'),
+        countdownTarget: data.startDate,
+        endingSoon: false
+      };
+    }
+
+    if (!isNaN(regStart) && now >= regStart) {
+      return {
+        label: t('phaseRegistrationOpen', 'Registration Open'),
+        badgeClass: 'bg-sky-600 text-white',
+        countdownLabel: t('countdownRegistrationEnd', 'Registration ends in'),
+        countdownTarget: data.registrationEndDate,
+        endingSoon: false
+      };
+    }
+
+    return {
+      label: t('phaseUpcoming', 'Upcoming'),
+      badgeClass: 'bg-slate-600 text-white',
+      countdownLabel: t('countdownRegistrationStart', 'Registration opens in'),
+      countdownTarget: data.registrationStartDate || data.startDate,
+      endingSoon: false
+    };
+  }
+
   function buildPreviewSubtitle(data) {
     if (data.subtitle) return data.subtitle;
     var parts = [];
@@ -181,22 +246,27 @@
     var grade = data.grade || composeGradeLabel(data.authenticator, data.gradeValue);
     if (grade) parts.push(grade);
     if (data.year) parts.push(data.year);
-    return parts.length ? parts.join(' · ') : '—';
+    return parts.length ? parts.join(' · ') : '\u00a0';
   }
 
-  function setPreviewGradeBadge(grade) {
-    $all('previewGrade').forEach(function (badge) {
-      var showGrade = grade && /^(PSA|BGS|CGC)\s/i.test(grade);
-      if (showGrade) {
-        badge.textContent = grade;
-        badge.classList.remove('hidden');
-      } else if (grade) {
-        badge.textContent = grade;
-        badge.classList.remove('hidden');
-      } else {
-        badge.textContent = '';
-        badge.classList.add('hidden');
-      }
+  var PHASE_BADGE_CLASSES = [
+    'bg-sky-600',
+    'bg-amber-500',
+    'bg-emerald-600',
+    'bg-red-600',
+    'bg-slate-600',
+    'text-white'
+  ];
+
+  function setPreviewPhaseBadge(phase) {
+    $all('previewPhaseBadge').forEach(function (badge) {
+      PHASE_BADGE_CLASSES.forEach(function (cls) {
+        badge.classList.remove(cls);
+      });
+      phase.badgeClass.split(/\s+/).forEach(function (cls) {
+        if (cls) badge.classList.add(cls);
+      });
+      badge.textContent = phase.label;
     });
   }
 
@@ -218,12 +288,21 @@
 
   function updatePreview() {
     var data = getFormData();
+    var phase = resolvePreviewPhase(data);
 
+    setPreviewText('previewCategory', data.category || t('categoryDefault', '—'));
     setPreviewText('previewName', data.productName || t('productNameDefault', 'Product Name'));
     setPreviewText('previewSubtitle', buildPreviewSubtitle(data));
     setPreviewText('previewCurrentBid', formatCardMoney(data.startingPrice));
-    setPreviewText('previewTimeRemaining', formatTimeRemaining(data.endDate || data.startDate));
-    setPreviewGradeBadge(data.grade);
+    setPreviewText('previewCountdownLabel', phase.countdownLabel);
+    setPreviewText('previewTimeRemaining', formatTimeRemaining(phase.countdownTarget));
+
+    $all('previewTimeRemaining').forEach(function (el) {
+      el.classList.toggle('text-red-600', phase.endingSoon);
+      el.classList.toggle('text-stone-700', !phase.endingSoon);
+    });
+
+    setPreviewPhaseBadge(phase);
     setPreviewMainImage(state.images.length > 0 ? state.images[0].url : '');
   }
 

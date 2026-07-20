@@ -75,11 +75,12 @@ public class PhotoService : IPhotoService
         {
             File = new FileDescription(file.FileName, stream),
             Folder = folder,
-            // Cloudinary se resize/crop anh de anh listing nhe va deu khung.
+            // Keep the full uploaded image (no edge crop). Preview uses the original
+            // blob, so listing delivery must not use fill/crop either.
             Transformation = new Transformation()
-                .Width(900)
-                .Height(900)
-                .Crop("fill")
+                .Width(1200)
+                .Height(1500)
+                .Crop("limit")
                 .Quality("auto")
                 .FetchFormat("auto")
         };

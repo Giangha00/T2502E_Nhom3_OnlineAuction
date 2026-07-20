@@ -453,6 +453,8 @@
   <data name="Auction_Phase_registration_closed" xml:space="preserve"><value>Awaiting Live</value></data>
   <data name="Auction_Phase_live_auction" xml:space="preserve"><value>Live Now</value></data>
   <data name="Auction_Phase_live_ending_soon" xml:space="preserve"><value>Ending Soon</value></data>
+  <data name="Auction_Phase_upcoming" xml:space="preserve"><value>Upcoming</value></data>
+  <data name="Auction_Phase_ended" xml:space="preserve"><value>Ended</value></data>
   <data name="Auction_Countdown_RegistrationStart" xml:space="preserve"><value>Registration opens in</value></data>
   <data name="Auction_Countdown_RegistrationEnd" xml:space="preserve"><value>Registration closes in</value></data>
   <data name="Auction_Countdown_LiveStart" xml:space="preserve"><value>Live starts in</value></data>
@@ -977,6 +979,7 @@
   <data name="SellBuyNow_Section3_Desc" xml:space="preserve"><value>Set the fixed price for your product</value></data>
   <data name="SellBuyNow_Price" xml:space="preserve"><value>Price</value></data>
   <data name="SellBuyNow_PriceHint" xml:space="preserve"><value>This is the price buyers will pay to purchase instantly.</value></data>
+  <data name="SellBuyNow_Preview_Title" xml:space="preserve"><value>Product Preview</value></data>
   <data name="SellBuyNow_Preview_Desc" xml:space="preserve"><value>Preview how your listing will appear on Buy Now</value></data>
   <data name="SellBuyNow_Preview_ReviewNote" xml:space="preserve"><value>Review your listing details before publishing. Fixed-price listings appear on the Buy Now marketplace.</value></data>
   <data name="SellBuyNow_ReadyToPublish_Highlight" xml:space="preserve"><value>Ready to publish?</value></data>

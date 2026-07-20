@@ -934,6 +934,7 @@
   <data name="SellBuyNow_Section3_Desc" xml:space="preserve"><value>Set the fixed price for your product</value></data>
   <data name="SellBuyNow_Price" xml:space="preserve"><value>Price</value></data>
   <data name="SellBuyNow_PriceHint" xml:space="preserve"><value>This is the price buyers will pay to purchase instantly.</value></data>
+  <data name="SellBuyNow_Preview_Title" xml:space="preserve"><value>Product Preview</value></data>
   <data name="SellBuyNow_Preview_Desc" xml:space="preserve"><value>Preview how your listing will appear on Buy Now</value></data>
   <data name="SellBuyNow_Preview_ReviewNote" xml:space="preserve"><value>Review your listing details before publishing. Fixed-price listings appear on the Buy Now marketplace.</value></data>
   <data name="SellBuyNow_ReadyToPublish_Highlight" xml:space="preserve"><value>Ready to publish?</value></data>

@@ -29,6 +29,7 @@ public class AccountListingsViewModel
     public IReadOnlyList<(string Key, string Label)>? Tabs { get; set; }
     public string CardMode { get; set; } = "auction";
     public bool ShowWatchlistButton { get; set; }
+    public bool ShowWatchlistPlaceholder { get; set; }
     public bool ShowBidLink { get; set; } = true;
     public bool ShowTimeRemaining { get; set; } = true;
     public IReadOnlySet<int> WatchedAuctionIds { get; set; } = new HashSet<int>();

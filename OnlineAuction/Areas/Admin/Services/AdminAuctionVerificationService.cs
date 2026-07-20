@@ -263,7 +263,9 @@ public class AdminAuctionVerificationService : IAdminAuctionVerificationService
             auction,
             _notifyLocalizer[NotificationKeys.ListingApprovedTitle],
             _notifyLocalizer[NotificationKeys.ListingApprovedMessage],
-            "/Account/Selling?tab=active",
+            auction.Status == AuctionStatuses.Scheduled && auction.RegistrationStartDate > DateTime.UtcNow
+                ? "/Account/Selling?tab=scheduled"
+                : "/Account/Selling?tab=active",
             NotificationReferenceTypes.AuctionNowLive,
             cancellationToken);
 

@@ -112,22 +112,14 @@
     var grade = data.grade || composeGradeLabel(data.authenticator, data.gradeValue);
     if (grade) parts.push(grade);
     if (data.year) parts.push(data.year);
-    return parts.length ? parts.join(' · ') : '—';
+    return parts.length ? parts.join(' · ') : '\u00a0';
   }
 
-  function setPreviewGradeBadge(grade) {
-    $all('previewGrade').forEach(function (badge) {
-      var showGrade = grade && /^(PSA|BGS|CGC)\s/i.test(grade);
-      if (showGrade) {
-        badge.textContent = grade;
-        badge.classList.remove('hidden');
-      } else if (grade) {
-        badge.textContent = grade;
-        badge.classList.remove('hidden');
-      } else {
-        badge.textContent = '';
-        badge.classList.add('hidden');
-      }
+  function setPreviewBadge() {
+    $all('previewBadge').forEach(function (badge) {
+      badge.textContent = t('inStock', 'In Stock');
+      badge.classList.remove('bg-slate-900');
+      badge.classList.add('bg-emerald-600');
     });
   }
 
@@ -149,10 +141,11 @@
 
   function updatePreview() {
     var data = getFormData();
+    setPreviewText('previewCategory', data.category || t('categoryDefault', '—'));
     setPreviewText('previewName', data.productName || t('productNameDefault', 'Product Name'));
     setPreviewText('previewSubtitle', buildPreviewSubtitle(data));
     setPreviewText('previewPrice', formatCardMoney(data.price));
-    setPreviewGradeBadge(data.grade);
+    setPreviewBadge();
     setPreviewMainImage(state.images.length > 0 ? state.images[0].url : '');
   }
 

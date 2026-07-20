@@ -463,6 +463,8 @@
   <data name="Auction_Phase_registration_closed" xml:space="preserve"><value>Chờ live</value></data>
   <data name="Auction_Phase_live_auction" xml:space="preserve"><value>Đang live</value></data>
   <data name="Auction_Phase_live_ending_soon" xml:space="preserve"><value>Sắp kết thúc</value></data>
+  <data name="Auction_Phase_upcoming" xml:space="preserve"><value>Sắp mở</value></data>
+  <data name="Auction_Phase_ended" xml:space="preserve"><value>Đã kết thúc</value></data>
   <data name="Auction_Countdown_RegistrationStart" xml:space="preserve"><value>Mở đăng ký sau</value></data>
   <data name="Auction_Countdown_RegistrationEnd" xml:space="preserve"><value>Đóng đăng ký sau</value></data>
   <data name="Auction_Countdown_LiveStart" xml:space="preserve"><value>Bắt đầu live sau</value></data>
@@ -987,6 +989,7 @@
   <data name="SellBuyNow_Section3_Desc" xml:space="preserve"><value>Nhập giá cố định cho sản phẩm</value></data>
   <data name="SellBuyNow_Price" xml:space="preserve"><value>Giá</value></data>
   <data name="SellBuyNow_PriceHint" xml:space="preserve"><value>Đây là giá người mua sẽ trả để mua ngay.</value></data>
+  <data name="SellBuyNow_Preview_Title" xml:space="preserve"><value>Xem trước sản phẩm</value></data>
   <data name="SellBuyNow_Preview_Desc" xml:space="preserve"><value>Xem trước tin đăng trên trang Mua ngay</value></data>
   <data name="SellBuyNow_Preview_ReviewNote" xml:space="preserve"><value>Kiểm tra thông tin trước khi đăng. Tin giá cố định sẽ hiển thị trên Mua ngay.</value></data>
   <data name="SellBuyNow_ReadyToPublish_Highlight" xml:space="preserve"><value>Sẵn sàng đăng?</value></data>

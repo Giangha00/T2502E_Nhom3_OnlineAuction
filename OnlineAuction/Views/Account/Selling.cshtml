@@ -76,8 +76,18 @@
         <div class="rarecard-auction-grid mt-10">
           @foreach (var item in Model.Listings)
           {
+            var isBuyNow = Model.Channel == "buynow";
             <partial name="~/Views/Shared/Partials/_TradingCardAuctionCard.cshtml"
-                     model="@(new AuctionCardViewModel { Item = item, Variant = "grid", CardMode = Model.Channel == "buynow" ? "buynow" : "auction" })"/>
+                     model="@(new AuctionCardViewModel
+                     {
+                         Item = item,
+                         Variant = "grid",
+                         CardMode = isBuyNow ? "buynow" : "auction",
+                         ShowBidLink = false,
+                         ShowWatchlistButton = false,
+                         ShowWatchlistPlaceholder = true,
+                         ShowTimeRemaining = !isBuyNow
+                     })"/>
           }
         </div>
       }

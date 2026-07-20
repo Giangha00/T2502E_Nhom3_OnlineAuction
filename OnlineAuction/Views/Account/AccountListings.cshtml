@@ -64,9 +64,10 @@
                        Variant = "grid",
                        CardMode = isBuyNow ? "buynow" : Model.CardMode,
                        ShowWatchlistButton = Model.ShowWatchlistButton,
+                       ShowWatchlistPlaceholder = Model.ShowWatchlistPlaceholder,
                        IsWatched = Model.WatchedAuctionIds.Contains(item.Id),
                        ShowBidLink = Model.ShowBidLink,
-                       ShowTimeRemaining = Model.ShowTimeRemaining
+                       ShowTimeRemaining = isBuyNow ? false : Model.ShowTimeRemaining
                      })"/>
           }
         </div>
@@ -77,4 +78,5 @@
 
 @section Scripts {
   <script src="~/js/watchlist.js" asp-append-version="true"></script>
+  <script src="~/js/buy-now-cart.js" asp-append-version="true"></script>
 }

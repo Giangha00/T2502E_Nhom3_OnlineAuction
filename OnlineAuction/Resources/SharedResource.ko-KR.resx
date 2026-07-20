@@ -871,6 +871,7 @@
   <data name="SellBuyNow_Section3_Desc" xml:space="preserve"><value>상품의 고정가를 설정하세요</value></data>
   <data name="SellBuyNow_Price" xml:space="preserve"><value>가격</value></data>
   <data name="SellBuyNow_PriceHint" xml:space="preserve"><value>즉시 구매 시 구매자가 지불할 가격입니다.</value></data>
+  <data name="SellBuyNow_Preview_Title" xml:space="preserve"><value>상품 미리보기</value></data>
   <data name="SellBuyNow_Preview_Desc" xml:space="preserve"><value>즉시 구매 페이지 미리보기</value></data>
   <data name="SellBuyNow_Preview_ReviewNote" xml:space="preserve"><value>등록 전 내용을 확인하세요. 고정가 상품은 즉시 구매에 표시됩니다.</value></data>
   <data name="SellBuyNow_ReadyToPublish_Highlight" xml:space="preserve"><value>등록할 준비가 되셨나요?</value></data>

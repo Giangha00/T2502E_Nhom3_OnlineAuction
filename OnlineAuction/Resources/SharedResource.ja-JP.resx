@@ -871,6 +871,7 @@
   <data name="SellBuyNow_Section3_Desc" xml:space="preserve"><value>商品の固定価格を設定</value></data>
   <data name="SellBuyNow_Price" xml:space="preserve"><value>価格</value></data>
   <data name="SellBuyNow_PriceHint" xml:space="preserve"><value>即購入時に支払う価格です。</value></data>
+  <data name="SellBuyNow_Preview_Title" xml:space="preserve"><value>商品プレビュー</value></data>
   <data name="SellBuyNow_Preview_Desc" xml:space="preserve"><value>即購入ページでの表示プレビュー</value></data>
   <data name="SellBuyNow_Preview_ReviewNote" xml:space="preserve"><value>公開前に内容を確認してください。固定価格出品は即購入に表示されます。</value></data>
   <data name="SellBuyNow_ReadyToPublish_Highlight" xml:space="preserve"><value>公開の準備はできましたか？</value></data>
