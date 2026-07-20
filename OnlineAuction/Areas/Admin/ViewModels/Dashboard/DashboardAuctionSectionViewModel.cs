@@ -8,6 +8,8 @@ public class DashboardAuctionSectionViewModel
 
     public DashboardKpiCardViewModel CancelledKpi { get; set; } = new();
 
+    public DashboardKpiCardViewModel PendingVerificationKpi { get; set; } = new();
+
     public DashboardKpiCardViewModel SuccessRateKpi { get; set; } = new();
 
     public IReadOnlyList<DashboardCategoryBreakdownViewModel> CategoryBreakdown { get; set; } = [];

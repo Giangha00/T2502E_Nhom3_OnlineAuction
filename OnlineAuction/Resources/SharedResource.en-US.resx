@@ -1034,7 +1034,7 @@
   <data name="Admin_Dashboard_Filter_Error_DateFromAfterDateTo" xml:space="preserve"><value>The start date must be on or before the end date.</value></data>
   <data name="Admin_Dashboard_Filter_Error_RangeTooLong" xml:space="preserve"><value>Date range cannot exceed 365 days.</value></data>
   <data name="Admin_Dashboard_Filter_Loading" xml:space="preserve"><value>Loading...</value></data>
-  <data name="Admin_Dashboard_Snapshot_Note" xml:space="preserve"><value>At current time</value></data>
+  <data name="Admin_Dashboard_Snapshot_Note" xml:space="preserve"><value>As of now (not filtered by date range)</value></data>
   <data name="Admin_Dashboard_FilteredPeriod_Note" xml:space="preserve"><value>Within selected date range</value></data>
   <data name="Admin_Dashboard_ChangeVsPrevious" xml:space="preserve"><value>vs previous period</value></data>
   <data name="Admin_Dashboard_NoData" xml:space="preserve"><value>No data for selected period</value></data>
@@ -1089,8 +1089,10 @@
   <data name="Admin_Dashboard_Kpi_CompletedOrders" xml:space="preserve"><value>Completed Orders</value></data>
   <data name="Admin_Dashboard_RevenueSection_Title" xml:space="preserve"><value>Revenue</value></data>
   <data name="Admin_Dashboard_RevenueSection_Description" xml:space="preserve"><value>Total transaction value and marketplace commission.</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Commission = buyer checkout fees + seller success fees from paid/delivered orders.</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV is the sum of successful payments in the period. Commission is marketplace fees only: buyer checkout fees (PlatformFee) + seller success fees (SellerFee) on paid/delivered orders. Registration deposits are not included.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>GMV ≠ profit. Commission = buyer + seller fees on paid/delivered orders. Deposits excluded.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV = SUM(successful payments.amount in period) + paid/delivered orders without a success payment row (COD gap). Commission = PlatformFee + SellerFee on those paid orders. Seller Proceeds = SUM(seller_proceeds). Registration deposits are never included in GMV or commission.</value></data>
+  <data name="Admin_Dashboard_Gmv_Hint" xml:space="preserve"><value>Gross merchandise volume in the selected period (not platform profit).</value></data>
+  <data name="Admin_Dashboard_Kpi_PendingVerification" xml:space="preserve"><value>Pending verification</value></data>
   <data name="Admin_Dashboard_Revenue_NoFeeData" xml:space="preserve"><value>No platform fee data yet</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Title" xml:space="preserve"><value>GMV vs Platform Revenue</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Description" xml:space="preserve"><value>Click a point to filter the detail table by day.</value></data>
