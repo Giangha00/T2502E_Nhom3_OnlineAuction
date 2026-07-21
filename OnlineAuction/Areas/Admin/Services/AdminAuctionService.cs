@@ -31,6 +31,17 @@ public class AdminAuctionService
         AuctionStatuses.Cancelled
     ];
 
+    private static readonly string[] AllowedListingPhases =
+    [
+        AuctionListingPhases.Upcoming,
+        AuctionListingPhases.RegistrationOpen,
+        AuctionListingPhases.RegistrationClosed,
+        AuctionListingPhases.LiveAuction,
+        AuctionListingPhases.LiveEndingSoon,
+        AuctionListingPhases.Ended,
+        AuctionListingPhases.NotListed
+    ];
+
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IPhotoService _photoService;
     private readonly ILogger<AdminAuctionService> _logger;
@@ -53,8 +64,12 @@ public class AdminAuctionService
             .AsNoTracking()
             .Where(auction =>
                 auction.DeletedAt == null &&
-                auction.Product.DeletedAt == null &&
-                auction.ListingType == ListingTypes.Auction);
+                auction.Product.DeletedAt == null);
+
+        if (!string.IsNullOrWhiteSpace(filter.ListingType))
+        {
+            query = query.Where(auction => auction.ListingType == filter.ListingType);
+        }
 
         if (!string.IsNullOrWhiteSpace(filter.Search))
         {
@@ -94,17 +109,7 @@ public class AdminAuctionService
             _ => query.OrderByDescending(auction => auction.CreatedAt)
         };
 
-        var totalItems = await query.CountAsync();
-        var totalPages = totalItems == 0 ? 1 : (int)Math.Ceiling(totalItems / (double)filter.PageSize);
-
-        if (filter.Page > totalPages)
-        {
-            filter.Page = totalPages;
-        }
-
         var auctions = await query
-            .Skip((filter.Page - 1) * filter.PageSize)
-            .Take(filter.PageSize)
             .Select(auction => new AuctionListItemViewModel
             {
                 Id = auction.Id,
@@ -113,15 +118,46 @@ public class AdminAuctionService
                 SellerName = auction.Product.Seller.FullName,
                 StartingPrice = auction.StartingPrice,
                 CurrentPrice = auction.CurrentPrice,
+                BidStep = auction.BidStep,
                 Status = auction.Status,
                 ListingType = auction.ListingType,
+                RegistrationStartDate = auction.RegistrationStartDate,
+                RegistrationEndDate = auction.RegistrationEndDate,
                 StartDate = auction.StartDate,
                 EndDate = auction.EndDate,
                 BidCount = auction.Bids.Count(bid => bid.DeletedAt == null),
+                RegistrationCount = auction.Registrations.Count(registration => registration.DeletedAt == null),
                 ImageUrl = auction.Product.PrimaryImage,
+                VerifiedAt = auction.VerifiedAt,
                 CreatedAt = auction.CreatedAt
             })
             .ToListAsync();
+
+        var now = DateTime.UtcNow;
+        foreach (var auction in auctions)
+        {
+            ApplyListingDisplayInfo(auction, now);
+        }
+
+        if (!string.IsNullOrWhiteSpace(filter.ListingPhase))
+        {
+            auctions = auctions
+                .Where(auction => auction.ListingPhase == filter.ListingPhase)
+                .ToList();
+        }
+
+        var totalItems = auctions.Count;
+        var totalPages = totalItems == 0 ? 1 : (int)Math.Ceiling(totalItems / (double)filter.PageSize);
+
+        if (filter.Page > totalPages)
+        {
+            filter.Page = totalPages;
+        }
+
+        auctions = auctions
+            .Skip((filter.Page - 1) * filter.PageSize)
+            .Take(filter.PageSize)
+            .ToList();
 
         return new AuctionListViewModel
         {
@@ -157,12 +193,34 @@ public class AdminAuctionService
                 Status = item.Status,
                 ListingType = item.ListingType,
                 RequiresRegistration = item.RequiresRegistration,
+                RegistrationStartDate = item.RegistrationStartDate,
+                RegistrationEndDate = item.RegistrationEndDate,
                 StartDate = item.StartDate,
                 EndDate = item.EndDate,
                 ImageUrl = item.Product.PrimaryImage,
                 BidCount = item.Bids.Count(bid => bid.DeletedAt == null),
                 RegistrationCount = item.Registrations.Count(registration => registration.DeletedAt == null),
                 WinnerName = item.Winner != null ? item.Winner.FullName : null,
+                OrderId = item.OrderItems
+                    .Where(orderItem => orderItem.DeletedAt == null)
+                    .Select(orderItem => (int?)orderItem.OrderId)
+                    .FirstOrDefault(),
+                OrderReference = item.OrderItems
+                    .Where(orderItem => orderItem.DeletedAt == null)
+                    .Select(orderItem => orderItem.Order.OrderReference)
+                    .FirstOrDefault(),
+                OrderStatus = item.OrderItems
+                    .Where(orderItem => orderItem.DeletedAt == null)
+                    .Select(orderItem => orderItem.Order.Status)
+                    .FirstOrDefault(),
+                PaymentDeadline = item.OrderItems
+                    .Where(orderItem => orderItem.DeletedAt == null)
+                    .Select(orderItem => (DateTime?)orderItem.Order.PaymentDeadline)
+                    .FirstOrDefault(),
+                SubmittedAt = item.SubmittedAt,
+                VerifiedAt = item.VerifiedAt,
+                VerifiedByName = item.Verifier != null ? item.Verifier.FullName : null,
+                RejectReason = item.RejectReason,
                 CreatedAt = item.CreatedAt,
                 UpdatedAt = item.UpdatedAt
             })
@@ -175,6 +233,7 @@ public class AdminAuctionService
 
         auction.ShowFlaggedBidsOnly = flaggedOnly;
         auction.FraudAlerts = await LoadFraudAlertsAsync(id);
+        ApplyListingDisplayInfo(auction, DateTime.UtcNow);
 
         var bidQuery = _dbContext.Bids
             .AsNoTracking()
@@ -759,7 +818,160 @@ public class AdminAuctionService
         }
 
         filter.PageSize = Math.Min(filter.PageSize, 50);
+
+        if (!string.IsNullOrWhiteSpace(filter.ListingPhase) &&
+            !AllowedListingPhases.Contains(filter.ListingPhase))
+        {
+            filter.ListingPhase = null;
+        }
+
+        if (!string.IsNullOrWhiteSpace(filter.ListingType) &&
+            filter.ListingType is not (ListingTypes.Auction or ListingTypes.BuyNow))
+        {
+            filter.ListingType = null;
+        }
     }
+
+    private static void ApplyListingDisplayInfo(AuctionListItemViewModel model, DateTime now)
+    {
+        var auction = BuildScheduleAuction(
+            model.Status,
+            model.ListingType,
+            model.RegistrationStartDate,
+            model.RegistrationEndDate,
+            model.StartDate,
+            model.EndDate);
+
+        ApplyListingDisplayInfo(
+            model.Status,
+            auction,
+            now,
+            phase => model.ListingPhase = phase,
+            isPublic => model.IsPubliclyListed = isPublic,
+            countdownTarget => model.CountdownTargetDate = countdownTarget,
+            countdownKind => model.PhaseCountdownKind = countdownKind,
+            timeRemaining => model.TimeRemaining = timeRemaining);
+        model.ListingPhaseLabel = FormatListingPhaseLabel(model.ListingPhase);
+    }
+
+    private static void ApplyListingDisplayInfo(AuctionDetailViewModel model, DateTime now)
+    {
+        var auction = BuildScheduleAuction(
+            model.Status,
+            model.ListingType,
+            model.RegistrationStartDate,
+            model.RegistrationEndDate,
+            model.StartDate,
+            model.EndDate);
+
+        ApplyListingDisplayInfo(
+            model.Status,
+            auction,
+            now,
+            phase => model.ListingPhase = phase,
+            isPublic => model.IsPubliclyListed = isPublic,
+            countdownTarget => model.CountdownTargetDate = countdownTarget,
+            countdownKind => model.PhaseCountdownKind = countdownKind,
+            timeRemaining => model.TimeRemaining = timeRemaining);
+        model.ListingPhaseLabel = FormatListingPhaseLabel(model.ListingPhase);
+    }
+
+    private static void ApplyListingDisplayInfo(
+        string status,
+        Auction auction,
+        DateTime now,
+        Action<string> setPhase,
+        Action<bool> setIsPublic,
+        Action<DateTime?> setCountdownTarget,
+        Action<string> setCountdownKind,
+        Action<string> setTimeRemaining)
+    {
+        if (IsNotListedLifecycleStatus(status))
+        {
+            setPhase(AuctionListingPhases.NotListed);
+            setIsPublic(false);
+            setCountdownTarget(null);
+            setCountdownKind(string.Empty);
+            setTimeRemaining("n/a");
+            return;
+        }
+
+        if (status is AuctionStatuses.Ended or AuctionStatuses.AwaitingPayment or AuctionStatuses.Completed)
+        {
+            setPhase(AuctionListingPhases.Ended);
+            setIsPublic(false);
+            setCountdownTarget(auction.EndDate);
+            setCountdownKind("live_end");
+            setTimeRemaining("Ended");
+            return;
+        }
+
+        var phaseInfo = AuctionScheduleHelper.ResolveListingPhase(auction, now);
+        setPhase(phaseInfo.Phase);
+        setIsPublic(AuctionScheduleHelper.IsPubliclyListed(auction, now));
+        setCountdownTarget(phaseInfo.CountdownTarget);
+        setCountdownKind(phaseInfo.CountdownKind);
+        setTimeRemaining(FormatTimeRemaining(phaseInfo.CountdownTarget, now));
+    }
+
+    private static Auction BuildScheduleAuction(
+        string status,
+        string listingType,
+        DateTime registrationStartDate,
+        DateTime registrationEndDate,
+        DateTime startDate,
+        DateTime endDate) =>
+        new()
+        {
+            Status = status,
+            ListingType = listingType,
+            RequiresRegistration = listingType == ListingTypes.Auction,
+            RegistrationStartDate = registrationStartDate,
+            RegistrationEndDate = registrationEndDate,
+            StartDate = startDate,
+            EndDate = endDate
+        };
+
+    private static bool IsNotListedLifecycleStatus(string status) =>
+        AuctionStatuses.IsConfirming(status) ||
+        status is AuctionStatuses.Rejected or AuctionStatuses.Cancelled;
+
+    private static string FormatTimeRemaining(DateTime target, DateTime now)
+    {
+        target = DateTimeUtilities.AsUtc(target);
+        now = DateTimeUtilities.AsUtc(now);
+
+        if (target <= now)
+        {
+            return "Ended";
+        }
+
+        var remaining = target - now;
+        if (remaining.TotalDays >= 1)
+        {
+            return $"{(int)remaining.TotalDays}d {remaining.Hours}h";
+        }
+
+        if (remaining.TotalHours >= 1)
+        {
+            return $"{(int)remaining.TotalHours}h {remaining.Minutes}m";
+        }
+
+        return $"{Math.Max(0, remaining.Minutes)}m";
+    }
+
+    private static string FormatListingPhaseLabel(string phase) =>
+        phase switch
+        {
+            AuctionListingPhases.RegistrationOpen => "Registration Open",
+            AuctionListingPhases.RegistrationClosed => "Awaiting Live",
+            AuctionListingPhases.LiveAuction => "Live Now",
+            AuctionListingPhases.LiveEndingSoon => "Ending Soon",
+            AuctionListingPhases.Upcoming => "Upcoming",
+            AuctionListingPhases.Ended => "Ended",
+            AuctionListingPhases.NotListed => "Not listed",
+            _ => phase.Replace('_', ' ')
+        };
 
     private static string FormatStatusLabel(string status) =>
         status switch

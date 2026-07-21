@@ -465,6 +465,7 @@
   <data name="Auction_Phase_live_ending_soon" xml:space="preserve"><value>Sắp kết thúc</value></data>
   <data name="Auction_Phase_upcoming" xml:space="preserve"><value>Sắp mở</value></data>
   <data name="Auction_Phase_ended" xml:space="preserve"><value>Đã kết thúc</value></data>
+  <data name="Auction_Phase_not_listed" xml:space="preserve"><value>Không hiển thị</value></data>
   <data name="Auction_Countdown_RegistrationStart" xml:space="preserve"><value>Mở đăng ký sau</value></data>
   <data name="Auction_Countdown_RegistrationEnd" xml:space="preserve"><value>Đóng đăng ký sau</value></data>
   <data name="Auction_Countdown_LiveStart" xml:space="preserve"><value>Bắt đầu live sau</value></data>

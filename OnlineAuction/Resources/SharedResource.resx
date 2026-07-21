@@ -455,6 +455,7 @@
   <data name="Auction_Phase_live_ending_soon" xml:space="preserve"><value>Ending Soon</value></data>
   <data name="Auction_Phase_upcoming" xml:space="preserve"><value>Upcoming</value></data>
   <data name="Auction_Phase_ended" xml:space="preserve"><value>Ended</value></data>
+  <data name="Auction_Phase_not_listed" xml:space="preserve"><value>Not listed</value></data>
   <data name="Auction_Countdown_RegistrationStart" xml:space="preserve"><value>Registration opens in</value></data>
   <data name="Auction_Countdown_RegistrationEnd" xml:space="preserve"><value>Registration closes in</value></data>
   <data name="Auction_Countdown_LiveStart" xml:space="preserve"><value>Live starts in</value></data>

@@ -288,6 +288,7 @@ internal static class ProductDetailMapper
             AuctionListingPhases.LiveEndingSoon => "Ending Soon",
             AuctionListingPhases.LiveAuction => "Live",
             AuctionListingPhases.RegistrationOpen => "Registration Open",
+            AuctionListingPhases.RegistrationClosed => "Awaiting Live",
             AuctionListingPhases.Upcoming => "Upcoming",
             AuctionListingPhases.Ended => "Ended",
             _ => MapCardStatus(auction)
