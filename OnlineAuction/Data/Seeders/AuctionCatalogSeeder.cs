@@ -490,8 +490,8 @@ public static class AuctionCatalogSeeder
     {
         var category = await GetOrCreateCategoryAsync(dbContext, entry.CategoryName, categoryCache);
         var template = await GetOrCreateTemplateFromEntryAsync(dbContext, entry, category, templateCache, now);
-        var bidStep = SpreadsheetAuctionCatalog.ComputeBidStep(entry.StartingPrice);
-        var buyNowPrice = SpreadsheetAuctionCatalog.TryGetBuyNowPrice(entry.Name);
+        var startingPrice = ResolveValidStartingPrice(entry);
+        var bidStep = SpreadsheetAuctionCatalog.ComputeBidStep(startingPrice);
 
         var product = new Product
         {
@@ -510,10 +510,10 @@ public static class AuctionCatalogSeeder
         var auction = new Auction
         {
             ProductId = product.Id,
-            StartingPrice = entry.StartingPrice,
+            StartingPrice = startingPrice,
             BidStep = bidStep,
-            CurrentPrice = entry.StartingPrice,
-            BuyNowPrice = buyNowPrice,
+            CurrentPrice = startingPrice,
+            BuyNowPrice = null,
             ListingType = ListingTypes.Auction,
             RequiresRegistration = true,
             AuctionEventName = SpreadsheetAuctionCatalog.TestAuctionEventName,
@@ -540,7 +540,7 @@ public static class AuctionCatalogSeeder
         }
 
         var bids = new List<Bid>();
-        var amount = entry.StartingPrice;
+        var amount = startingPrice;
 
         for (var i = 0; i < entry.ExistingBidCount; i++)
         {
@@ -559,6 +559,9 @@ public static class AuctionCatalogSeeder
         dbContext.Bids.AddRange(bids);
         await dbContext.SaveChangesAsync();
     }
+
+    private static decimal ResolveValidStartingPrice(SpreadsheetAuctionCatalog.Entry entry) =>
+        entry.StartingPrice > 0 ? entry.StartingPrice : 1m;
 
     private static async Task BackfillSeededProductTemplatesAsync(
         AuctionHouseDbContext dbContext,

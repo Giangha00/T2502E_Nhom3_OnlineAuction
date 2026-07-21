@@ -208,6 +208,7 @@ public class WinnerNonPaymentRecoveryIntegrationTests
         var winnerSettings = Options.Create(new WinnerNonPaymentSettings { SecondChancePaymentHours = 48 });
 
         var notificationService = new NoOpNotificationService();
+        var notificationLocalizer = new NoOpNotificationLocalizer();
         var realtimePublisher = new NoOpRealtimePublisher();
         var bidService = new NoOpBidService();
         var depositRefundService = new NoOpRegistrationDepositRefundService();
@@ -218,7 +219,7 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             db,
             orderCreationService,
             notificationService,
-            new NoOpNotificationLocalizer(),
+            notificationLocalizer,
             realtimePublisher,
             bidService,
             winnerSettings,
@@ -236,6 +237,7 @@ public class WinnerNonPaymentRecoveryIntegrationTests
     {
         var feeSettings = Options.Create(new PlatformFeeSettings());
         var notificationService = new NoOpNotificationService();
+        var notificationLocalizer = new NoOpNotificationLocalizer();
         var realtimePublisher = new NoOpRealtimePublisher();
         var bidService = new NoOpBidService();
 
@@ -243,7 +245,7 @@ public class WinnerNonPaymentRecoveryIntegrationTests
             db,
             NullLogger<OrderCreationService>.Instance,
             notificationService,
-            new NoOpNotificationLocalizer(),
+            notificationLocalizer,
             depositRefundService,
             realtimePublisher,
             bidService,
@@ -634,7 +636,9 @@ public class WinnerNonPaymentRecoveryIntegrationTests
         public string this[string name] => name;
 
         public string Format(string name, params object[] args) =>
-            string.Format(System.Globalization.CultureInfo.InvariantCulture, name, args);
+            args.Length == 0
+                ? name
+                : string.Format(System.Globalization.CultureInfo.InvariantCulture, name, args);
     }
 
     private sealed class NoOpRealtimePublisher : IRealtimePublisher

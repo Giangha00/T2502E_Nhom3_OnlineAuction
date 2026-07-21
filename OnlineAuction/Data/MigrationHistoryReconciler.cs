@@ -140,15 +140,17 @@ public static class MigrationHistoryReconciler
         string columnName,
         CancellationToken cancellationToken)
     {
+        var (schemaColumn, schemaExpression) = GetInformationSchemaDatabaseFilter(db);
+        var countExpression = GetCountExpression(db);
         var count = await db.Database
             .SqlQueryRaw<long>(
-                """
-                SELECT COUNT(*) AS Value
+                $@"
+                SELECT {countExpression} AS Value
                 FROM information_schema.COLUMNS
-                WHERE TABLE_SCHEMA = DATABASE()
-                  AND TABLE_NAME = {0}
-                  AND COLUMN_NAME = {1}
-                """,
+                WHERE {schemaColumn} = {schemaExpression}
+                  AND TABLE_NAME = {{0}}
+                  AND COLUMN_NAME = {{1}}
+                ",
                 tableName,
                 columnName)
             .FirstOrDefaultAsync(cancellationToken);
@@ -162,16 +164,18 @@ public static class MigrationHistoryReconciler
         string constraintName,
         CancellationToken cancellationToken)
     {
+        var (schemaColumn, schemaExpression) = GetInformationSchemaConstraintFilter(db);
+        var countExpression = GetCountExpression(db);
         var count = await db.Database
             .SqlQueryRaw<long>(
-                """
-                SELECT COUNT(*) AS Value
+                $@"
+                SELECT {countExpression} AS Value
                 FROM information_schema.TABLE_CONSTRAINTS
-                WHERE CONSTRAINT_SCHEMA = DATABASE()
-                  AND TABLE_NAME = {0}
-                  AND CONSTRAINT_NAME = {1}
+                WHERE {schemaColumn} = {schemaExpression}
+                  AND TABLE_NAME = {{0}}
+                  AND CONSTRAINT_NAME = {{1}}
                   AND CONSTRAINT_TYPE = 'FOREIGN KEY'
-                """,
+                ",
                 tableName,
                 constraintName)
             .FirstOrDefaultAsync(cancellationToken);
@@ -184,19 +188,36 @@ public static class MigrationHistoryReconciler
         string tableName,
         CancellationToken cancellationToken)
     {
+        var (schemaColumn, schemaExpression) = GetInformationSchemaDatabaseFilter(db);
+        var countExpression = GetCountExpression(db);
         var count = await db.Database
             .SqlQueryRaw<long>(
-                """
-                SELECT COUNT(*) AS Value
+                $@"
+                SELECT {countExpression} AS Value
                 FROM information_schema.TABLES
-                WHERE TABLE_SCHEMA = DATABASE()
-                  AND TABLE_NAME = {0}
-                """,
+                WHERE {schemaColumn} = {schemaExpression}
+                  AND TABLE_NAME = {{0}}
+                ",
                 tableName)
             .FirstOrDefaultAsync(cancellationToken);
 
         return count > 0;
     }
+
+    private static (string SchemaColumn, string SchemaExpression) GetInformationSchemaDatabaseFilter(AuctionHouseDbContext db) =>
+        db.Database.ProviderName?.Contains("SqlServer", StringComparison.OrdinalIgnoreCase) == true
+            ? ("TABLE_CATALOG", "DB_NAME()")
+            : ("TABLE_SCHEMA", "DATABASE()");
+
+    private static (string SchemaColumn, string SchemaExpression) GetInformationSchemaConstraintFilter(AuctionHouseDbContext db) =>
+        db.Database.ProviderName?.Contains("SqlServer", StringComparison.OrdinalIgnoreCase) == true
+            ? ("CONSTRAINT_CATALOG", "DB_NAME()")
+            : ("CONSTRAINT_SCHEMA", "DATABASE()");
+
+    private static string GetCountExpression(AuctionHouseDbContext db) =>
+        db.Database.ProviderName?.Contains("SqlServer", StringComparison.OrdinalIgnoreCase) == true
+            ? "COUNT_BIG(*)"
+            : "COUNT(*)";
 
     private static async Task<bool> MigrationAppliedAsync(
         AuctionHouseDbContext db,

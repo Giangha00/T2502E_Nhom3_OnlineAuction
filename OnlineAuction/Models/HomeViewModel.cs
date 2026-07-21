@@ -53,6 +53,9 @@ public class AuctionItemViewModel
     public string Status { get; set; } = string.Empty;
     public string ListingPhase { get; set; } = string.Empty;
     public string PhaseCountdownKind { get; set; } = string.Empty;
+    public bool IsPubliclyListed { get; set; }
+    public string PublicListingStatus { get; set; } = "No";
+    public string PublicListingReason { get; set; } = string.Empty;
     public string? RejectReason { get; set; }
     public string TimeRemaining { get; set; } = string.Empty;
     public DateTime? EndDate { get; set; }

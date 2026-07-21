@@ -77,17 +77,26 @@
           @foreach (var item in Model.Listings)
           {
             var isBuyNow = Model.Channel == "buynow";
-            <partial name="~/Views/Shared/Partials/_TradingCardAuctionCard.cshtml"
-                     model="@(new AuctionCardViewModel
-                     {
-                         Item = item,
-                         Variant = "grid",
-                         CardMode = isBuyNow ? "buynow" : "auction",
-                         ShowBidLink = false,
-                         ShowWatchlistButton = false,
-                         ShowWatchlistPlaceholder = true,
-                         ShowTimeRemaining = !isBuyNow
-                     })"/>
+            <div>
+              <partial name="~/Views/Shared/Partials/_TradingCardAuctionCard.cshtml"
+                       model="@(new AuctionCardViewModel
+                       {
+                           Item = item,
+                           Variant = "grid",
+                           CardMode = isBuyNow ? "buynow" : "auction",
+                           ShowBidLink = false,
+                           ShowWatchlistButton = false,
+                           ShowWatchlistPlaceholder = true,
+                           ShowTimeRemaining = !isBuyNow
+                       })"/>
+              <div class="mt-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
+                <span class="font-semibold text-slate-800">Public listing: @item.PublicListingStatus</span>
+                @if (!string.IsNullOrWhiteSpace(item.PublicListingReason))
+                {
+                  <span class="ml-1">@item.PublicListingReason</span>
+                }
+              </div>
+            </div>
           }
         </div>
       }
