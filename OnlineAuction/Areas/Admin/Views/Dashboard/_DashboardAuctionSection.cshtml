@@ -10,10 +10,11 @@
             <span class="admin-dashboard-period-badge">@Localizer["Admin_Dashboard_Snapshot_Note"]</span>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             @await Html.PartialAsync("_DashboardKpiCard", Model.AuctionSection.OngoingKpi, new ViewDataDictionary(ViewData) { ["Label"] = Localizer["Admin_Dashboard_Kpi_OngoingAuctions"].Value, ["Tone"] = "brand", ["Hint"] = Localizer["Admin_Dashboard_Snapshot_Note"].Value })
             @await Html.PartialAsync("_DashboardKpiCard", Model.AuctionSection.EndedKpi, new ViewDataDictionary(ViewData) { ["Label"] = Localizer["Admin_Dashboard_Kpi_EndedAuctions"].Value, ["Tone"] = "success", ["Hint"] = Localizer["Admin_Dashboard_Snapshot_Note"].Value })
             @await Html.PartialAsync("_DashboardKpiCard", Model.AuctionSection.CancelledKpi, new ViewDataDictionary(ViewData) { ["Label"] = Localizer["Admin_Dashboard_Kpi_CancelledAuctions"].Value, ["Tone"] = "danger", ["Hint"] = Localizer["Admin_Dashboard_Snapshot_Note"].Value })
+            @await Html.PartialAsync("_DashboardKpiCard", Model.AuctionSection.PendingVerificationKpi, new ViewDataDictionary(ViewData) { ["Label"] = Localizer["Admin_Dashboard_Kpi_PendingVerification"].Value, ["Tone"] = "warning", ["Hint"] = Localizer["Admin_Dashboard_Snapshot_Note"].Value })
         </div>
     </div>
 

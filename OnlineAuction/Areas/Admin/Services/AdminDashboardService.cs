@@ -95,14 +95,20 @@ public class AdminDashboardService : IAdminDashboardService
         };
     }
 
-    public Task<decimal> SumGmvAsync(
+    public async Task<decimal> SumGmvAsync(
         DashboardFilterViewModel filter,
         CancellationToken cancellationToken = default)
     {
         var rangeStart = filter.DateFrom.Date;
         var rangeEndExclusive = filter.DateTo.Date.AddDays(1);
 
-        return SumSuccessfulPaymentsAsync(rangeStart, rangeEndExclusive, cancellationToken);
+        var paymentsGmv = await SumSuccessfulPaymentsAsync(rangeStart, rangeEndExclusive, cancellationToken);
+        var orphanPaidOrdersGmv = await SumOrphanPaidOrderTotalsAsync(
+            rangeStart,
+            rangeEndExclusive,
+            cancellationToken);
+
+        return paymentsGmv + orphanPaidOrdersGmv;
     }
 
     public async Task<decimal> SumCommissionAsync(
@@ -159,10 +165,12 @@ public class AdminDashboardService : IAdminDashboardService
 
         var newRegistrationsCurrent = await GetNewUserRegistrationsCountAsync(filter, cancellationToken);
         var newRegistrationsPrevious = await GetNewUserRegistrationsCountAsync(previousRange, cancellationToken);
-        var activeUsersCount = await GetActiveUsersCountAsync(filter, cancellationToken);
+        var activeUsersCurrent = await GetActiveUsersCountAsync(filter, cancellationToken);
+        var activeUsersPrevious = await GetActiveUsersCountAsync(previousRange, cancellationToken);
 
         var registrationDates = await GetRegistrationDatesAsync(filter, cancellationToken);
         var statusCounts = await GetAuctionStatusCountsAsync(cancellationToken);
+        var pendingVerification = await GetPendingVerificationCountAsync(cancellationToken);
         var successRate = await GetAuctionSuccessRateAsync(cancellationToken);
         var revenueSection = await BuildRevenueSectionAsync(filter, previousRange, cancellationToken);
 
@@ -177,10 +185,11 @@ public class AdminDashboardService : IAdminDashboardService
                     FormatInteger(newRegistrationsCurrent),
                     newRegistrationsCurrent,
                     newRegistrationsPrevious),
-                ActiveUsersKpi = BuildSnapshotKpi(
+                ActiveUsersKpi = BuildKpiCard(
                     "Active Users",
-                    FormatInteger(activeUsersCount),
-                    activeUsersCount),
+                    FormatInteger(activeUsersCurrent),
+                    activeUsersCurrent,
+                    activeUsersPrevious),
                 RegistrationByDay = BuildRegistrationSeries(registrationDates, "day", filter),
                 RegistrationByWeek = BuildRegistrationSeries(registrationDates, "week", filter),
                 RegistrationByMonth = BuildRegistrationSeries(registrationDates, "month", filter),
@@ -201,6 +210,10 @@ public class AdminDashboardService : IAdminDashboardService
                     "Cancelled Auctions",
                     FormatInteger(statusCounts.Cancelled),
                     statusCounts.Cancelled),
+                PendingVerificationKpi = BuildSnapshotKpi(
+                    "Pending Verification",
+                    FormatInteger(pendingVerification),
+                    pendingVerification),
                 SuccessRateKpi = BuildSnapshotKpi(
                     "Success Rate",
                     successRate.HasValue ? $"{successRate.Value:0.0}%" : "N/A",
@@ -235,6 +248,7 @@ public class AdminDashboardService : IAdminDashboardService
 
         var bidderIds = await _dbContext.Bids.AsNoTracking()
             .Where(bid => bid.DeletedAt == null
+                          && bid.Bidder.DeletedAt == null
                           && bid.PlacedAt >= rangeStart
                           && bid.PlacedAt < rangeEndExclusive)
             .Select(bid => bid.BidderId)
@@ -243,6 +257,7 @@ public class AdminDashboardService : IAdminDashboardService
 
         var buyerIds = await _dbContext.Orders.AsNoTracking()
             .Where(order => order.DeletedAt == null
+                            && order.Buyer.DeletedAt == null
                             && PaidOrderStatuses.Contains(order.Status)
                             && order.CreatedAt >= rangeStart
                             && order.CreatedAt < rangeEndExclusive)
@@ -262,6 +277,7 @@ public class AdminDashboardService : IAdminDashboardService
 
         return await _dbContext.Bids.AsNoTracking()
             .Where(bid => bid.DeletedAt == null
+                          && bid.Bidder.DeletedAt == null
                           && bid.PlacedAt >= rangeStart
                           && bid.PlacedAt < rangeEndExclusive)
             .GroupBy(bid => new { bid.BidderId, bid.Bidder.FullName })
@@ -332,7 +348,7 @@ public class AdminDashboardService : IAdminDashboardService
         }
 
         var sellerNames = await _dbContext.Users.AsNoTracking()
-            .Where(user => sellerIds.Contains(user.Id))
+            .Where(user => sellerIds.Contains(user.Id) && user.DeletedAt == null)
             .Select(user => new { user.Id, user.FullName })
             .ToDictionaryAsync(user => user.Id, user => user.FullName, cancellationToken);
 
@@ -373,11 +389,22 @@ public class AdminDashboardService : IAdminDashboardService
         return (ongoing, ended, cancelled);
     }
 
+    public Task<int> GetPendingVerificationCountAsync(CancellationToken cancellationToken = default)
+    {
+        return _dbContext.Auctions.AsNoTracking()
+            .CountAsync(
+                auction => auction.DeletedAt == null
+                           && auction.Product.DeletedAt == null
+                           && auction.Status == AuctionStatuses.PendingReview,
+                cancellationToken);
+    }
+
     public async Task<decimal?> GetAuctionSuccessRateAsync(CancellationToken cancellationToken = default)
     {
         var denominator = await _dbContext.Auctions.AsNoTracking()
             .CountAsync(
                 auction => auction.DeletedAt == null
+                           && auction.Product.DeletedAt == null
                            && SuccessRateDenominatorStatuses.Contains(auction.Status),
                 cancellationToken);
 
@@ -389,6 +416,7 @@ public class AdminDashboardService : IAdminDashboardService
         var numerator = await _dbContext.Auctions.AsNoTracking()
             .CountAsync(
                 auction => auction.DeletedAt == null
+                           && auction.Product.DeletedAt == null
                            && SuccessRateDenominatorStatuses.Contains(auction.Status)
                            && auction.OrderItems.Any(item =>
                                item.DeletedAt == null
@@ -408,6 +436,8 @@ public class AdminDashboardService : IAdminDashboardService
 
         var grouped = await _dbContext.Bids.AsNoTracking()
             .Where(bid => bid.DeletedAt == null
+                          && bid.Auction.DeletedAt == null
+                          && bid.Auction.Product.DeletedAt == null
                           && bid.PlacedAt >= rangeStart
                           && bid.PlacedAt < rangeEndExclusive)
             .GroupBy(bid => new
@@ -504,6 +534,7 @@ public class AdminDashboardService : IAdminDashboardService
         AddOverviewMetric("Ongoing Auctions", dashboard.AuctionSection.OngoingKpi.DisplayValue);
         AddOverviewMetric("Ended Auctions", dashboard.AuctionSection.EndedKpi.DisplayValue);
         AddOverviewMetric("Cancelled Auctions", dashboard.AuctionSection.CancelledKpi.DisplayValue);
+        AddOverviewMetric("Pending Verification", dashboard.AuctionSection.PendingVerificationKpi.DisplayValue);
         AddOverviewMetric("Success Rate", dashboard.AuctionSection.SuccessRateKpi.DisplayValue);
 
         var revenueSheet = workbook.Worksheets.Add("Revenue");
@@ -529,10 +560,12 @@ public class AdminDashboardService : IAdminDashboardService
         auctionsSheet.Cell(3, 2).Value = dashboard.AuctionSection.EndedKpi.DisplayValue;
         auctionsSheet.Cell(4, 1).Value = "Cancelled Auctions";
         auctionsSheet.Cell(4, 2).Value = dashboard.AuctionSection.CancelledKpi.DisplayValue;
-        auctionsSheet.Cell(5, 1).Value = "Success Rate";
-        auctionsSheet.Cell(5, 2).Value = dashboard.AuctionSection.SuccessRateKpi.DisplayValue;
+        auctionsSheet.Cell(5, 1).Value = "Pending Verification";
+        auctionsSheet.Cell(5, 2).Value = dashboard.AuctionSection.PendingVerificationKpi.DisplayValue;
+        auctionsSheet.Cell(6, 1).Value = "Success Rate";
+        auctionsSheet.Cell(6, 2).Value = dashboard.AuctionSection.SuccessRateKpi.DisplayValue;
 
-        var categoryHeaderRow = 7;
+        var categoryHeaderRow = 8;
         auctionsSheet.Cell(categoryHeaderRow, 1).Value = "Category Breakdown";
         auctionsSheet.Cell(categoryHeaderRow + 1, 1).Value = "Category";
         auctionsSheet.Cell(categoryHeaderRow + 1, 2).Value = "Bid Count";
@@ -594,7 +627,7 @@ public class AdminDashboardService : IAdminDashboardService
         return stream.ToArray();
     }
 
-    public async Task<byte[]> ExportSummaryCsvAsync(int periodDays = 7, CancellationToken cancellationToken = default)
+    public async Task<byte[]> ExportSummaryCsvAsync(int periodDays = 30, CancellationToken cancellationToken = default)
     {
         var filter = NormalizeFilter(
             DateTime.UtcNow.Date.AddDays(-(periodDays - 1)),
@@ -663,13 +696,19 @@ public class AdminDashboardService : IAdminDashboardService
         DateTime endExclusive,
         CancellationToken cancellationToken)
     {
-        return await _dbContext.Payments.AsNoTracking()
+        var fromPayments = await _dbContext.Payments.AsNoTracking()
             .Where(payment => payment.DeletedAt == null
+                              && payment.Order.DeletedAt == null
                               && payment.Status == PaymentStatuses.Success
                               && payment.PaidAt >= startInclusive
                               && payment.PaidAt < endExclusive
                               && PaidOrderStatuses.Contains(payment.Order.Status))
             .SumAsync(payment => payment.Order.PlatformFee, cancellationToken);
+
+        var fromOrphanOrders = await OrphanPaidOrdersQuery(startInclusive, endExclusive)
+            .SumAsync(order => order.PlatformFee, cancellationToken);
+
+        return fromPayments + fromOrphanOrders;
     }
 
     private async Task<decimal> SumPaidOrderSellerFeesAsync(
@@ -677,13 +716,19 @@ public class AdminDashboardService : IAdminDashboardService
         DateTime endExclusive,
         CancellationToken cancellationToken)
     {
-        return await _dbContext.Payments.AsNoTracking()
+        var fromPayments = await _dbContext.Payments.AsNoTracking()
             .Where(payment => payment.DeletedAt == null
+                              && payment.Order.DeletedAt == null
                               && payment.Status == PaymentStatuses.Success
                               && payment.PaidAt >= startInclusive
                               && payment.PaidAt < endExclusive
                               && PaidOrderStatuses.Contains(payment.Order.Status))
             .SumAsync(payment => payment.Order.SellerFee, cancellationToken);
+
+        var fromOrphanOrders = await OrphanPaidOrdersQuery(startInclusive, endExclusive)
+            .SumAsync(order => order.SellerFee, cancellationToken);
+
+        return fromPayments + fromOrphanOrders;
     }
 
     private async Task<decimal> SumPaidOrderSellerProceedsAsync(
@@ -691,13 +736,45 @@ public class AdminDashboardService : IAdminDashboardService
         DateTime endExclusive,
         CancellationToken cancellationToken)
     {
-        return await _dbContext.Payments.AsNoTracking()
+        var fromPayments = await _dbContext.Payments.AsNoTracking()
             .Where(payment => payment.DeletedAt == null
+                              && payment.Order.DeletedAt == null
                               && payment.Status == PaymentStatuses.Success
                               && payment.PaidAt >= startInclusive
                               && payment.PaidAt < endExclusive
                               && PaidOrderStatuses.Contains(payment.Order.Status))
             .SumAsync(payment => payment.Order.SellerProceeds, cancellationToken);
+
+        var fromOrphanOrders = await OrphanPaidOrdersQuery(startInclusive, endExclusive)
+            .SumAsync(order => order.SellerProceeds, cancellationToken);
+
+        return fromPayments + fromOrphanOrders;
+    }
+
+    /// <summary>
+    /// Paid/delivered orders in period that have no successful payment row
+    /// (COD / legacy gap). Avoids double-counting when a success payment exists.
+    /// </summary>
+    private IQueryable<AuctionOrder> OrphanPaidOrdersQuery(DateTime startInclusive, DateTime endExclusive)
+    {
+        return _dbContext.Orders.AsNoTracking()
+            .Where(order => order.DeletedAt == null
+                            && PaidOrderStatuses.Contains(order.Status)
+                            && order.CreatedAt >= startInclusive
+                            && order.CreatedAt < endExclusive
+                            && !_dbContext.Payments.Any(payment =>
+                                payment.OrderId == order.Id
+                                && payment.DeletedAt == null
+                                && payment.Status == PaymentStatuses.Success));
+    }
+
+    private Task<decimal> SumOrphanPaidOrderTotalsAsync(
+        DateTime startInclusive,
+        DateTime endExclusive,
+        CancellationToken cancellationToken)
+    {
+        return OrphanPaidOrdersQuery(startInclusive, endExclusive)
+            .SumAsync(order => order.TotalAmount, cancellationToken);
     }
 
     private async Task<List<DateTime>> GetRegistrationDatesAsync(
@@ -873,6 +950,7 @@ public class AdminDashboardService : IAdminDashboardService
     {
         return await _dbContext.Payments.AsNoTracking()
             .Where(payment => payment.DeletedAt == null
+                              && payment.Order.DeletedAt == null
                               && payment.Status == PaymentStatuses.Success
                               && payment.PaidAt >= startInclusive
                               && payment.PaidAt < endExclusive)

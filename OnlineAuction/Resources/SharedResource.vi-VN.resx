@@ -1100,7 +1100,7 @@
   <data name="Admin_Dashboard_Filter_Error_DateFromAfterDateTo" xml:space="preserve"><value>Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.</value></data>
   <data name="Admin_Dashboard_Filter_Error_RangeTooLong" xml:space="preserve"><value>Khoảng ngày không được vượt quá 365 ngày.</value></data>
   <data name="Admin_Dashboard_Filter_Loading" xml:space="preserve"><value>Đang tải...</value></data>
-  <data name="Admin_Dashboard_Snapshot_Note" xml:space="preserve"><value>Tại thời điểm hiện tại</value></data>
+  <data name="Admin_Dashboard_Snapshot_Note" xml:space="preserve"><value>Tại thời điểm hiện tại (không theo bộ lọc ngày)</value></data>
   <data name="Admin_Dashboard_FilteredPeriod_Note" xml:space="preserve"><value>Trong khoảng ngày đã chọn</value></data>
   <data name="Admin_Dashboard_ChangeVsPrevious" xml:space="preserve"><value>so với kỳ trước</value></data>
   <data name="Admin_Dashboard_NoData" xml:space="preserve"><value>Không có dữ liệu trong khoảng đã chọn</value></data>
@@ -1156,8 +1156,10 @@
   <data name="Admin_Dashboard_Kpi_CompletedOrders" xml:space="preserve"><value>Đơn hoàn tất</value></data>
   <data name="Admin_Dashboard_RevenueSection_Title" xml:space="preserve"><value>Doanh thu</value></data>
   <data name="Admin_Dashboard_RevenueSection_Description" xml:space="preserve"><value>Tổng giá trị giao dịch và phí sàn (commission).</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Phí sàn = phí thanh toán người mua + phí thành công người bán từ đơn đã thanh toán/giao.</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV là tổng thanh toán thành công trong kỳ. Phí sàn (commission) chỉ gồm phí marketplace: phí người mua (PlatformFee) + phí người bán (SellerFee) trên đơn paid/delivered. Không gồm tiền cọc đăng ký.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>GMV ≠ lợi nhuận sàn. Commission = phí buyer + seller trên đơn paid/delivered. Không gồm tiền cọc.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV = tổng payments.success trong kỳ + đơn paid/delivered không có payment success (lỗ hổng COD). Commission = PlatformFee + SellerFee. Seller Proceeds = seller_proceeds. Tiền cọc đăng ký không tính vào GMV/commission.</value></data>
+  <data name="Admin_Dashboard_Gmv_Hint" xml:space="preserve"><value>Tổng giá trị giao dịch trong kỳ đã chọn (không phải lợi nhuận sàn).</value></data>
+  <data name="Admin_Dashboard_Kpi_PendingVerification" xml:space="preserve"><value>Chờ duyệt listing</value></data>
   <data name="Admin_Dashboard_Revenue_NoFeeData" xml:space="preserve"><value>Chưa có dữ liệu phí</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Title" xml:space="preserve"><value>GMV vs Doanh thu sàn</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Description" xml:space="preserve"><value>Click điểm trên biểu đồ để lọc bảng theo ngày.</value></data>

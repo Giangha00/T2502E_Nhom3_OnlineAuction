@@ -53,6 +53,9 @@ public interface IAdminDashboardService
     Task<(int Ongoing, int Ended, int Cancelled)> GetAuctionStatusCountsAsync(
         CancellationToken cancellationToken = default);
 
+    /// <summary>Snapshot: auctions awaiting admin verification (pending_review).</summary>
+    Task<int> GetPendingVerificationCountAsync(CancellationToken cancellationToken = default);
+
     Task<decimal?> GetAuctionSuccessRateAsync(CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<DashboardCategoryBreakdownViewModel>> GetCategoryBidBreakdownAsync(
@@ -63,5 +66,5 @@ public interface IAdminDashboardService
         DashboardFilterViewModel filter,
         CancellationToken cancellationToken = default);
 
-    Task<byte[]> ExportSummaryCsvAsync(int periodDays = 7, CancellationToken cancellationToken = default);
+    Task<byte[]> ExportSummaryCsvAsync(int periodDays = 30, CancellationToken cancellationToken = default);
 }
