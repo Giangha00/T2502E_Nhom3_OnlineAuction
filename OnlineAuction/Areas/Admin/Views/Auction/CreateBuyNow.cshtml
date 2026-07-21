@@ -1,0 +1,15 @@
+@model AuctionFormViewModel
+
+@{
+    ViewData["Title"] = "Create Buy Now";
+    ViewData["AdminPage"] = "auctions";
+    ViewBag.PreviewPartial = "~/Views/Sell/Partials/_BuyNowPreviewCard.cshtml";
+    ViewBag.FormAction = "CreateBuyNow";
+    ViewBag.SubmitLabel = "Create Buy Now";
+}
+
+<partial name="_ListingFormShell" model="Model" />
+
+@section Scripts {
+    <partial name="_ListingFormScripts" model="Model" />
+}

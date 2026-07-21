@@ -1,0 +1,60 @@
+@model AuctionFormViewModel
+@using System.Text.Json
+
+@{
+    var sellI18n = new Dictionary<string, string>
+    {
+        ["productNameDefault"] = Localizer["Sell_Preview_ProductNameDefault"].Value,
+        ["categoryDefault"] = "—",
+        ["timeEnded"] = Localizer["Sell_Preview_TimeEnded"].Value,
+        ["timeLeftDays"] = Localizer["Sell_Preview_TimeLeftDays"].Value,
+        ["timeLeftHours"] = Localizer["Sell_Preview_TimeLeftHours"].Value,
+        ["phaseRegistrationOpen"] = Localizer["Auction_Phase_registration_open"].Value,
+        ["phaseLiveAuction"] = Localizer["Auction_Phase_live_auction"].Value,
+        ["phaseLiveEndingSoon"] = Localizer["Auction_Phase_live_ending_soon"].Value,
+        ["phaseUpcoming"] = Localizer["Auction_Phase_upcoming"].Value,
+        ["countdownRegistrationEnd"] = Localizer["Auction_Countdown_RegistrationEnd"].Value,
+        ["countdownLiveStart"] = Localizer["Auction_Countdown_LiveStart"].Value,
+        ["countdownLiveEnd"] = Localizer["Auction_Countdown_LiveEnd"].Value,
+        ["countdownRegistrationStart"] = Localizer["Auction_Countdown_RegistrationStart"].Value,
+        ["editorPlaceholder"] = Localizer["Sell_Editor_Placeholder"].Value,
+        ["remove"] = Localizer["Sell_Remove"].Value,
+        ["errorProductNameRequired"] = Localizer["Sell_Error_ProductNameRequired"].Value,
+        ["errorCategoryRequired"] = Localizer["Sell_Error_CategoryRequired"].Value,
+        ["errorSellerRequired"] = "Please select a seller.",
+        ["errorPrimaryImageRequired"] = "Primary image is required.",
+        ["errorStartingPriceRequired"] = Localizer["Sell_Error_StartingPriceRequired"].Value,
+        ["errorBidStepRequired"] = Localizer["Sell_Error_BidStepRequired"].Value,
+        ["errorBuyNowPriceInvalid"] = Localizer["Sell_Error_BuyNowPriceInvalid"].Value,
+        ["errorBuyNowPriceGreater"] = Localizer["Sell_Error_BuyNowPriceGreater"].Value,
+        ["errorRegistrationStartRequired"] = Localizer["Sell_Error_RegistrationStartRequired"].Value,
+        ["errorRegistrationStartPast"] = Localizer["Sell_Error_RegistrationStartPast"].Value,
+        ["errorRegistrationEndRequired"] = Localizer["Sell_Error_RegistrationEndRequired"].Value,
+        ["errorRegistrationEndAfterStart"] = Localizer["Sell_Error_RegistrationEndAfterStart"].Value,
+        ["errorLiveStartRequired"] = Localizer["Sell_Error_LiveStartRequired"].Value,
+        ["errorLiveStartAfterRegistration"] = Localizer["Sell_Error_LiveStartAfterRegistration"].Value,
+        ["errorLiveEndRequired"] = Localizer["Sell_Error_LiveEndRequired"].Value,
+        ["errorLiveEndAfterStart"] = Localizer["Sell_Error_LiveEndAfterStart"].Value,
+        ["errorYearRequired"] = Localizer["Sell_Error_YearRequired"].Value,
+        ["errorYearInvalid"] = Localizer["Sell_Error_YearInvalid"].Value,
+        ["errorAuthenticatorRequired"] = Localizer["Sell_Error_AuthenticatorRequired"].Value,
+        ["errorGradeRequired"] = Localizer["Sell_Error_GradeRequired"].Value,
+        ["errorPriceRequired"] = Localizer["SellBuyNow_Error_PriceRequired"].Value,
+        ["errorDocInvalidFormat"] = Localizer["Sell_Error_DocInvalidFormat"].Value,
+        ["errorDocSizeLimit"] = Localizer["Sell_Error_DocSizeLimit"].Value,
+        ["errorDocMaxCount"] = "You can upload up to 5 documents per product."
+    };
+}
+
+<script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+<script>
+    window.adminListingConfig = {
+        listingType: @Html.Raw(JsonSerializer.Serialize(Model.ListingType)),
+        isEdit: @Html.Raw(JsonSerializer.Serialize(Model.IsEdit)),
+        i18n: @Html.Raw(JsonSerializer.Serialize(sellI18n))
+    };
+</script>
+<script src="~/js/sell-numeric-input.js" asp-append-version="true"></script>
+<script src="~/admin/js/product-image-uploader.js" asp-append-version="true"></script>
+<script src="~/admin/js/admin-listing-form.js" asp-append-version="true"></script>
+<partial name="_ValidationScriptsPartial" />

@@ -119,7 +119,7 @@ public class PayPalCaptureFlowTests
         var result = await service.CapturePayPalCheckoutAsync(1, PayPalOrderId);
 
         Assert.False(result.Success);
-        Assert.Contains("không đủ", result.ErrorMessage, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("nhỏ hơn", result.ErrorMessage, StringComparison.OrdinalIgnoreCase);
         Assert.Equal(0, payPal.CaptureCallCount);
         Assert.Equal(OrderStatuses.PendingPayment, (await db.Orders.SingleAsync()).Status);
     }
