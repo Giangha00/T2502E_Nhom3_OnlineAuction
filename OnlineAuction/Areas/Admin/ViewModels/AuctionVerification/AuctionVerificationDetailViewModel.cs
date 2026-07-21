@@ -8,6 +8,8 @@ public class AuctionVerificationDetailViewModel
 
     public string ProductName { get; set; } = string.Empty;
 
+    public string? Subtitle { get; set; }
+
     public string? ShortDescription { get; set; }
 
     public string? DescriptionHtml { get; set; }
@@ -48,6 +50,10 @@ public class AuctionVerificationDetailViewModel
 
     public decimal? BuyNowPrice { get; set; }
 
+    public DateTime RegistrationStartDate { get; set; }
+
+    public DateTime RegistrationEndDate { get; set; }
+
     public DateTime StartDate { get; set; }
 
     public DateTime EndDate { get; set; }
@@ -71,6 +77,46 @@ public class AuctionVerificationDetailViewModel
     public string SellerName { get; set; } = string.Empty;
 
     public string SellerEmail { get; set; } = string.Empty;
+
+    public bool IsBuyNow =>
+        string.Equals(ListingType, Entities.ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
+
+    public bool IsAuction => !IsBuyNow;
+
+    public bool HasSubGrades =>
+        !string.IsNullOrWhiteSpace(GradingCentering)
+        || !string.IsNullOrWhiteSpace(GradingCorners)
+        || !string.IsNullOrWhiteSpace(GradingEdges)
+        || !string.IsNullOrWhiteSpace(GradingSurface);
+
+    public bool HasAuctionEvent => !string.IsNullOrWhiteSpace(AuctionEventName);
+
+    public decimal DisplayPrice =>
+        IsBuyNow
+            ? (BuyNowPrice ?? StartingPrice)
+            : StartingPrice;
+
+    public bool HasRealPrimaryImage =>
+        !string.IsNullOrWhiteSpace(PrimaryImage)
+        && !PrimaryImage.Contains("placeholder", StringComparison.OrdinalIgnoreCase)
+        && !PrimaryImage.Contains("via.placeholder", StringComparison.OrdinalIgnoreCase);
+
+    public bool HasDescription =>
+        !string.IsNullOrWhiteSpace(ShortDescription)
+        || !string.IsNullOrWhiteSpace(DescriptionHtml);
+
+    public bool HasDocuments => Documents.Count > 0;
+
+    public bool HasValidPricing =>
+        IsBuyNow
+            ? DisplayPrice > 0
+            : StartingPrice > 0 && BidStep > 0;
+
+    public bool HasValidSchedule =>
+        IsBuyNow
+            || (RegistrationStartDate < RegistrationEndDate
+                && RegistrationEndDate <= StartDate
+                && StartDate < EndDate);
 }
 
 public class VerificationDocumentViewModel

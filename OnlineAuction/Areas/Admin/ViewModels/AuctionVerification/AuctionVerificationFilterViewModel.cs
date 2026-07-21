@@ -42,9 +42,19 @@ public class AuctionVerificationListItemViewModel
 
     public decimal StartingPrice { get; set; }
 
+    public decimal? BuyNowPrice { get; set; }
+
     public DateTime? SubmittedAt { get; set; }
 
     public string ListingType { get; set; } = string.Empty;
 
     public string? ImageUrl { get; set; }
+
+    public bool IsBuyNow =>
+        string.Equals(ListingType, Entities.ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
+
+    public decimal DisplayPrice =>
+        IsBuyNow
+            ? (BuyNowPrice ?? StartingPrice)
+            : StartingPrice;
 }
