@@ -20,7 +20,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region MVC + Localization
 
-builder.Configuration.AddJsonFile("appsettings.json.example", optional: true, reloadOnChange: true);
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 var mvcBuilder = builder.Services.AddControllersWithViews()
     .AddViewLocalization()
