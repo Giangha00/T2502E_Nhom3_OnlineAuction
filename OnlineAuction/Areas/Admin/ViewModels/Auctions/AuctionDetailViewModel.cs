@@ -26,9 +26,25 @@ public class AuctionDetailViewModel
 
     public string Status { get; set; } = string.Empty;
 
+    public string ListingPhase { get; set; } = string.Empty;
+
+    public string ListingPhaseLabel { get; set; } = string.Empty;
+
+    public bool IsPubliclyListed { get; set; }
+
+    public DateTime? CountdownTargetDate { get; set; }
+
+    public string PhaseCountdownKind { get; set; } = string.Empty;
+
+    public string TimeRemaining { get; set; } = string.Empty;
+
     public string ListingType { get; set; } = string.Empty;
 
     public bool RequiresRegistration { get; set; }
+
+    public DateTime RegistrationStartDate { get; set; }
+
+    public DateTime RegistrationEndDate { get; set; }
 
     public DateTime StartDate { get; set; }
 
@@ -41,6 +57,22 @@ public class AuctionDetailViewModel
     public int RegistrationCount { get; set; }
 
     public string? WinnerName { get; set; }
+
+    public int? OrderId { get; set; }
+
+    public string? OrderReference { get; set; }
+
+    public string? OrderStatus { get; set; }
+
+    public DateTime? PaymentDeadline { get; set; }
+
+    public DateTime? SubmittedAt { get; set; }
+
+    public DateTime? VerifiedAt { get; set; }
+
+    public string? VerifiedByName { get; set; }
+
+    public string? RejectReason { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
