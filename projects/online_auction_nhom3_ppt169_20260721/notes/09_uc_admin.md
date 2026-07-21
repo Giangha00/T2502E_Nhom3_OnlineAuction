@@ -1,0 +1,1 @@
+Use Case Actor Admin: đăng nhập, quản lý user/danh mục/sản phẩm/phiên, khiếu nại, thống kê báo cáo.

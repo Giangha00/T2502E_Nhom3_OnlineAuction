@@ -1,0 +1,446 @@
+{
+  "schema": "ppt-master.svg-quality-report.v1",
+  "stage": "final",
+  "target": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721",
+  "source_fingerprint": {
+    "algorithm": "sha256",
+    "digest": "5d551921c3e5c0a62980981e46623ab6e064d7bf31b16a9b08aea707f8298eba",
+    "file_count": 12,
+    "files": [
+      {
+        "file": "01_cover.svg",
+        "sha256": "7446d3c7d56f18a73eeb8a64dec4f12ec1d29d65d8eb9a349696767bf4a85e6e"
+      },
+      {
+        "file": "02_toc.svg",
+        "sha256": "1788d4bd6a3daa16ffda3e407c1b7444089fc29783f3f7e5d7937872960033a5"
+      },
+      {
+        "file": "03_team.svg",
+        "sha256": "59fdabbb0ee0a285195f2c84cfbd5f18440b63e61b6ca442dfae20183d0a010f"
+      },
+      {
+        "file": "04_overview.svg",
+        "sha256": "624756907ccaba22798c9d3753abfc1df3a2766712e132308d7eeede87c6ca06"
+      },
+      {
+        "file": "05_objectives.svg",
+        "sha256": "5a90e253aad954725cd375ebcadb462e8d307a5d025c5be1a47cdf856ff0a04a"
+      },
+      {
+        "file": "06_tech.svg",
+        "sha256": "ec0e0e8e15769aef2424856574575e8ec74a3c99b3118f38087214d268b50a16"
+      },
+      {
+        "file": "07_timeline.svg",
+        "sha256": "2df223c962286a1afffe0accc5c7f74a736f7f5e14642b62970b763242cc2d0a"
+      },
+      {
+        "file": "08_usecase.svg",
+        "sha256": "37ea9a660595edc17372b0c8d6c4c77f6b62eae310e7dc15f3f8bfd9a4a9ee38"
+      },
+      {
+        "file": "09_activity.svg",
+        "sha256": "16d0b323c70c660cf0593931fafea439ce8b0f20ed0557cb2b97c02816fc0f53"
+      },
+      {
+        "file": "10_database.svg",
+        "sha256": "aca6fa7fbf675d59df2da2873b4b73e6d66d7c1208c8705a9ec82a0180f5ef77"
+      },
+      {
+        "file": "11_conclusion.svg",
+        "sha256": "e10216eb32d65132e99327654552faaf2c1f05851ceca82bf61a1a3a778f9784"
+      },
+      {
+        "file": "12_thanks.svg",
+        "sha256": "34332f6e6ba21185a44ca88502823e5696c27acebb3dd7191d7dec9e55f18612"
+      }
+    ]
+  },
+  "summary": {
+    "total": 12,
+    "passed": 7,
+    "warnings": 5,
+    "errors": 0
+  },
+  "issue_types": {},
+  "categories": {
+    "blocking": {
+      "count": 0,
+      "issues": []
+    },
+    "introduced": {
+      "count": 5,
+      "issues": [
+        {
+          "file": "01_cover.svg",
+          "message": "spec_lock typography-size review: 3 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+        },
+        {
+          "file": "04_overview.svg",
+          "message": "spec_lock typography-size review: 1 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+        },
+        {
+          "file": "05_objectives.svg",
+          "message": "spec_lock typography-size review: 1 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+        },
+        {
+          "file": "11_conclusion.svg",
+          "message": "spec_lock typography-size review: 1 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+        },
+        {
+          "file": "12_thanks.svg",
+          "message": "spec_lock typography-size review: 1 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+        }
+      ]
+    },
+    "inherited": {
+      "count": 0,
+      "issues": []
+    },
+    "source-import": {
+      "count": 0,
+      "summary": {
+        "warning_count": 0,
+        "by_code": {}
+      }
+    }
+  },
+  "drift": {
+    "colors": {
+      "#FDE68A": [
+        "01_cover.svg",
+        "02_toc.svg",
+        "03_team.svg",
+        "04_overview.svg",
+        "05_objectives.svg",
+        "06_tech.svg",
+        "08_usecase.svg",
+        "09_activity.svg",
+        "10_database.svg",
+        "11_conclusion.svg",
+        "12_thanks.svg"
+      ],
+      "#FFFFFF": [
+        "01_cover.svg",
+        "02_toc.svg",
+        "03_team.svg",
+        "04_overview.svg",
+        "05_objectives.svg",
+        "06_tech.svg",
+        "08_usecase.svg",
+        "09_activity.svg",
+        "10_database.svg",
+        "11_conclusion.svg",
+        "12_thanks.svg"
+      ]
+    },
+    "fonts": {},
+    "sizes": {
+      "22": [
+        "01_cover.svg",
+        "04_overview.svg",
+        "05_objectives.svg"
+      ],
+      "24": [
+        "11_conclusion.svg"
+      ],
+      "28": [
+        "01_cover.svg"
+      ],
+      "48": [
+        "01_cover.svg",
+        "12_thanks.svg"
+      ]
+    }
+  },
+  "project_issues": {
+    "template": [],
+    "animation": [],
+    "illustration": [],
+    "communication_trace": [],
+    "pptx_structure": []
+  },
+  "files": [
+    {
+      "file": "01_cover.svg",
+      "path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/svg_output/01_cover.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [
+        "spec_lock typography-size review: 3 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+      ],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "fonts": [
+          "Arial, sans-serif"
+        ],
+        "text_elements": 10,
+        "tspan_elements": 0,
+        "contextual_values": {
+          "colors": [
+            "#FDE68A",
+            "#FFFFFF"
+          ]
+        }
+      },
+      "passed": true,
+      "source_sha256": "7446d3c7d56f18a73eeb8a64dec4f12ec1d29d65d8eb9a349696767bf4a85e6e"
+    },
+    {
+      "file": "02_toc.svg",
+      "path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/svg_output/02_toc.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "fonts": [
+          "Arial, sans-serif"
+        ],
+        "text_elements": 28,
+        "tspan_elements": 0,
+        "contextual_values": {
+          "colors": [
+            "#FDE68A",
+            "#FFFFFF"
+          ]
+        }
+      },
+      "passed": true,
+      "source_sha256": "1788d4bd6a3daa16ffda3e407c1b7444089fc29783f3f7e5d7937872960033a5"
+    },
+    {
+      "file": "03_team.svg",
+      "path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/svg_output/03_team.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "fonts": [
+          "Arial, sans-serif"
+        ],
+        "text_elements": 23,
+        "tspan_elements": 0,
+        "contextual_values": {
+          "colors": [
+            "#FDE68A",
+            "#FFFFFF"
+          ]
+        }
+      },
+      "passed": true,
+      "source_sha256": "59fdabbb0ee0a285195f2c84cfbd5f18440b63e61b6ca442dfae20183d0a010f"
+    },
+    {
+      "file": "04_overview.svg",
+      "path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/svg_output/04_overview.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [
+        "spec_lock typography-size review: 1 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+      ],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "fonts": [
+          "Arial, sans-serif"
+        ],
+        "text_elements": 24,
+        "tspan_elements": 3,
+        "contextual_values": {
+          "colors": [
+            "#FDE68A",
+            "#FFFFFF"
+          ]
+        }
+      },
+      "passed": true,
+      "source_sha256": "624756907ccaba22798c9d3753abfc1df3a2766712e132308d7eeede87c6ca06"
+    },
+    {
+      "file": "05_objectives.svg",
+      "path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/svg_output/05_objectives.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [
+        "spec_lock typography-size review: 1 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+      ],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "fonts": [
+          "Arial, sans-serif"
+        ],
+        "text_elements": 16,
+        "tspan_elements": 6,
+        "contextual_values": {
+          "colors": [
+            "#FDE68A",
+            "#FFFFFF"
+          ]
+        }
+      },
+      "passed": true,
+      "source_sha256": "5a90e253aad954725cd375ebcadb462e8d307a5d025c5be1a47cdf856ff0a04a"
+    },
+    {
+      "file": "06_tech.svg",
+      "path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/svg_output/06_tech.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "fonts": [
+          "Arial, sans-serif"
+        ],
+        "text_elements": 22,
+        "tspan_elements": 0,
+        "contextual_values": {
+          "colors": [
+            "#FDE68A",
+            "#FFFFFF"
+          ]
+        }
+      },
+      "passed": true,
+      "source_sha256": "ec0e0e8e15769aef2424856574575e8ec74a3c99b3118f38087214d268b50a16"
+    },
+    {
+      "file": "07_timeline.svg",
+      "path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/svg_output/07_timeline.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "fonts": [
+          "Arial, sans-serif"
+        ],
+        "text_elements": 30,
+        "tspan_elements": 0
+      },
+      "passed": true,
+      "source_sha256": "2df223c962286a1afffe0accc5c7f74a736f7f5e14642b62970b763242cc2d0a"
+    },
+    {
+      "file": "08_usecase.svg",
+      "path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/svg_output/08_usecase.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "fonts": [
+          "Arial, sans-serif"
+        ],
+        "text_elements": 22,
+        "tspan_elements": 0,
+        "contextual_values": {
+          "colors": [
+            "#FDE68A",
+            "#FFFFFF"
+          ]
+        }
+      },
+      "passed": true,
+      "source_sha256": "37ea9a660595edc17372b0c8d6c4c77f6b62eae310e7dc15f3f8bfd9a4a9ee38"
+    },
+    {
+      "file": "09_activity.svg",
+      "path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/svg_output/09_activity.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "fonts": [
+          "Arial, sans-serif"
+        ],
+        "text_elements": 21,
+        "tspan_elements": 0,
+        "contextual_values": {
+          "colors": [
+            "#FDE68A",
+            "#FFFFFF"
+          ]
+        }
+      },
+      "passed": true,
+      "source_sha256": "16d0b323c70c660cf0593931fafea439ce8b0f20ed0557cb2b97c02816fc0f53"
+    },
+    {
+      "file": "10_database.svg",
+      "path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/svg_output/10_database.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "fonts": [
+          "Arial, sans-serif"
+        ],
+        "text_elements": 34,
+        "tspan_elements": 0,
+        "contextual_values": {
+          "colors": [
+            "#FDE68A",
+            "#FFFFFF"
+          ]
+        }
+      },
+      "passed": true,
+      "source_sha256": "aca6fa7fbf675d59df2da2873b4b73e6d66d7c1208c8705a9ec82a0180f5ef77"
+    },
+    {
+      "file": "11_conclusion.svg",
+      "path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/svg_output/11_conclusion.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [
+        "spec_lock typography-size review: 1 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+      ],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "fonts": [
+          "Arial, sans-serif"
+        ],
+        "text_elements": 13,
+        "tspan_elements": 0,
+        "contextual_values": {
+          "colors": [
+            "#FDE68A",
+            "#FFFFFF"
+          ]
+        }
+      },
+      "passed": true,
+      "source_sha256": "e10216eb32d65132e99327654552faaf2c1f05851ceca82bf61a1a3a778f9784"
+    },
+    {
+      "file": "12_thanks.svg",
+      "path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/svg_output/12_thanks.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [
+        "spec_lock typography-size review: 1 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+      ],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "fonts": [
+          "Arial, sans-serif"
+        ],
+        "text_elements": 7,
+        "tspan_elements": 0,
+        "contextual_values": {
+          "colors": [
+            "#FDE68A",
+            "#FFFFFF"
+          ]
+        }
+      },
+      "passed": true,
+      "source_sha256": "34332f6e6ba21185a44ca88502823e5696c27acebb3dd7191d7dec9e55f18612"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+Các entity chính: User, Product, Auction, Bid, AuctionRegistration, AuctionOrder và quan hệ giữa chúng.

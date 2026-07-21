@@ -1,0 +1,1 @@
+Chào hội đồng. Nhóm 3 xin trình bày đề tài CardMarket — RareCard Vault.

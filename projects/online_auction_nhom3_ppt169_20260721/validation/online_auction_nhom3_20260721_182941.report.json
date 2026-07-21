@@ -1,0 +1,235 @@
+{
+  "schema": "ppt-master.pptx-postflight-report.v1",
+  "status": "passed-with-warnings",
+  "output": {
+    "path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/exports/online_auction_nhom3_20260721_182941.pptx",
+    "bytes": 208076
+  },
+  "source": {
+    "svg_slide_count": 17,
+    "layout_definition_count": 0,
+    "fingerprint": {
+      "algorithm": "sha256",
+      "digest": "fd9085efd0dc8bc4c7b481827896141d1b592488723cfcb9fa065b9351ebe5eb",
+      "file_count": 17,
+      "files": [
+        {
+          "file": "01_cover.svg",
+          "sha256": "85a80611bc3b2a030d5a2f65a5792d55da1d843e0633fb9b86a5b7fd31eb4655"
+        },
+        {
+          "file": "02_toc.svg",
+          "sha256": "606d40ddc682a49d6bb0c463fc3ab110772d46cafac4526c0c2f3cd6299c6ee7"
+        },
+        {
+          "file": "03_team.svg",
+          "sha256": "8db80199c494858ec9dc7d18c31514c93be20f60de8d73dfc1a8875a462b0a51"
+        },
+        {
+          "file": "04_overview.svg",
+          "sha256": "4ec31b6e561b09bea6af1e4dfd2fcb2e62293aee4d3100b1a666e0d1560131b0"
+        },
+        {
+          "file": "05_objectives.svg",
+          "sha256": "2d2f73a1230e634a422a0457a485e74eb112db8d3e1806d1167976d394ef5a3a"
+        },
+        {
+          "file": "06_tech.svg",
+          "sha256": "3641f7ac3bd9ec1da5398551b31677b0a4447b4360703c4fbd1ca1b68fa5467a"
+        },
+        {
+          "file": "07_timeline.svg",
+          "sha256": "726fc713ce3cdff79c39c0561031f1dce4c56c1b17274b98af0b4e3983c3667e"
+        },
+        {
+          "file": "08_uc_user.svg",
+          "sha256": "be70d48732f38d2c839198a23c949d9560342dbca842a6849b49c0bd5ba15ec9"
+        },
+        {
+          "file": "09_uc_admin.svg",
+          "sha256": "40def6de9f94ca80c6aaff1e94be69dcec66913297c9e4da343a6d8d72d0820e"
+        },
+        {
+          "file": "10_act_auth.svg",
+          "sha256": "4945ffe245f10a95a5822efa5676541419006506d2583e1c1744198a02b676fa"
+        },
+        {
+          "file": "11_act_sell_verify.svg",
+          "sha256": "60dfe8ec8ccd25565e2f893c741df44e8a8708def1bfe683c78ff4ea5c5552f5"
+        },
+        {
+          "file": "12_act_bid.svg",
+          "sha256": "1086ba31263badabebe7bce7141685d82b88f82244974f4ec85136b49e3d4f95"
+        },
+        {
+          "file": "13_act_checkout.svg",
+          "sha256": "918584eb3673b0ca2a7bdba2360a2502f1ee385aff5b3395365b2a23e641df6b"
+        },
+        {
+          "file": "14_act_buynow.svg",
+          "sha256": "c27d0124eb1948078821c79d961bec18c8c875a1d854523141acee2ef0e7d31f"
+        },
+        {
+          "file": "15_database.svg",
+          "sha256": "355068f897fb0a274a98071db65f6387d3e79c5bdc6e95fa7e398a544556b51d"
+        },
+        {
+          "file": "16_conclusion.svg",
+          "sha256": "01a8f376f2a85e8dd7144823a53be8f571e00bc7ab5f18b97041dd59f21d6ce2"
+        },
+        {
+          "file": "17_thanks.svg",
+          "sha256": "98a16e6cd25e6c5bc006c397a00e6034e30f841d4f20337d7a9b791892a7928c"
+        }
+      ]
+    }
+  },
+  "package": {
+    "zip_integrity": "passed",
+    "corrupt_member": null,
+    "slides": 17,
+    "notes": 17,
+    "masters": 1,
+    "layouts": 1
+  },
+  "checks": {
+    "zip_integrity": "passed",
+    "slide_count": "passed",
+    "internal_relationships": "enforced-at-build",
+    "structured_package": "not-applicable",
+    "transitions": "enforced-at-build",
+    "animations": "enforced-at-build",
+    "quality_gate": "stale",
+    "quality_warnings": "warning",
+    "template_tokens": "passed",
+    "external_images": "passed",
+    "font_portability": "passed"
+  },
+  "quality": {
+    "status": "loaded",
+    "path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/validation/svg_quality_report.json",
+    "schema": "ppt-master.svg-quality-report.v1",
+    "stage": "final",
+    "source_match": "mismatch",
+    "source_fingerprint": {
+      "algorithm": "sha256",
+      "digest": "5d551921c3e5c0a62980981e46623ab6e064d7bf31b16a9b08aea707f8298eba",
+      "file_count": 12,
+      "files": [
+        {
+          "file": "01_cover.svg",
+          "sha256": "7446d3c7d56f18a73eeb8a64dec4f12ec1d29d65d8eb9a349696767bf4a85e6e"
+        },
+        {
+          "file": "02_toc.svg",
+          "sha256": "1788d4bd6a3daa16ffda3e407c1b7444089fc29783f3f7e5d7937872960033a5"
+        },
+        {
+          "file": "03_team.svg",
+          "sha256": "59fdabbb0ee0a285195f2c84cfbd5f18440b63e61b6ca442dfae20183d0a010f"
+        },
+        {
+          "file": "04_overview.svg",
+          "sha256": "624756907ccaba22798c9d3753abfc1df3a2766712e132308d7eeede87c6ca06"
+        },
+        {
+          "file": "05_objectives.svg",
+          "sha256": "5a90e253aad954725cd375ebcadb462e8d307a5d025c5be1a47cdf856ff0a04a"
+        },
+        {
+          "file": "06_tech.svg",
+          "sha256": "ec0e0e8e15769aef2424856574575e8ec74a3c99b3118f38087214d268b50a16"
+        },
+        {
+          "file": "07_timeline.svg",
+          "sha256": "2df223c962286a1afffe0accc5c7f74a736f7f5e14642b62970b763242cc2d0a"
+        },
+        {
+          "file": "08_usecase.svg",
+          "sha256": "37ea9a660595edc17372b0c8d6c4c77f6b62eae310e7dc15f3f8bfd9a4a9ee38"
+        },
+        {
+          "file": "09_activity.svg",
+          "sha256": "16d0b323c70c660cf0593931fafea439ce8b0f20ed0557cb2b97c02816fc0f53"
+        },
+        {
+          "file": "10_database.svg",
+          "sha256": "aca6fa7fbf675d59df2da2873b4b73e6d66d7c1208c8705a9ec82a0180f5ef77"
+        },
+        {
+          "file": "11_conclusion.svg",
+          "sha256": "e10216eb32d65132e99327654552faaf2c1f05851ceca82bf61a1a3a778f9784"
+        },
+        {
+          "file": "12_thanks.svg",
+          "sha256": "34332f6e6ba21185a44ca88502823e5696c27acebb3dd7191d7dec9e55f18612"
+        }
+      ]
+    },
+    "summary": {
+      "total": 12,
+      "passed": 7,
+      "warnings": 5,
+      "errors": 0
+    },
+    "categories": {
+      "blocking": {
+        "count": 0,
+        "issues": []
+      },
+      "introduced": {
+        "count": 5,
+        "issues": [
+          {
+            "file": "01_cover.svg",
+            "message": "spec_lock typography-size review: 3 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+          },
+          {
+            "file": "04_overview.svg",
+            "message": "spec_lock typography-size review: 1 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+          },
+          {
+            "file": "05_objectives.svg",
+            "message": "spec_lock typography-size review: 1 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+          },
+          {
+            "file": "11_conclusion.svg",
+            "message": "spec_lock typography-size review: 1 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+          },
+          {
+            "file": "12_thanks.svg",
+            "message": "spec_lock typography-size review: 1 font-size value(s) fall outside ±2px of every declared role anchor (see anchor comparison summary)"
+          }
+        ]
+      },
+      "inherited": {
+        "count": 0,
+        "issues": []
+      },
+      "source-import": {
+        "count": 0,
+        "summary": {
+          "warning_count": 0,
+          "by_code": {}
+        }
+      }
+    }
+  },
+  "resources": {
+    "unresolved_template_tokens": [],
+    "fonts": {
+      "stacks": [
+        "Arial, sans-serif"
+      ],
+      "generic_only_stacks": []
+    },
+    "images": {
+      "data_uri": 0,
+      "local": 2,
+      "external": 0,
+      "external_references": []
+    }
+  },
+  "backup_path": "/Users/macbook/RiderProjects/Nhom3/projects/online_auction_nhom3_ppt169_20260721/backup/20260721_182941/svg_output",
+  "conversion_trace_path": null
+}

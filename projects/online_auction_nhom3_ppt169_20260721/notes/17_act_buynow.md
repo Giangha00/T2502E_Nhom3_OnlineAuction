@@ -1,0 +1,1 @@
+Add to cart → invoice deadline 7 ngày → thanh toán hoặc hủy/hết hạn.

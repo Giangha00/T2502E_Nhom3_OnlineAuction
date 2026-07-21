@@ -1,0 +1,1 @@
+Buyer đăng ký, đặt cọc, place bid; System anti-fraud & SignalR.

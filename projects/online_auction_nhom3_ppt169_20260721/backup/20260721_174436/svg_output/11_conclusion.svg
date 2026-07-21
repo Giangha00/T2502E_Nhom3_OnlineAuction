@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#FFFBEB"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 36 1184 72">
+    <rect x="48" y="44" width="8" height="40" rx="4" fill="#B45309"/>
+    <text x="72" y="72" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#1C1917">Kết luận</text>
+    <text x="72" y="100" font-family="Arial, sans-serif" font-size="14" fill="#78716C">Điểm nổi bật của CardMarket</text>
+  </g>
+  <g id="highlight-1" data-pptx-bounds="48 140 580 170">
+    <rect x="48" y="140" width="580" height="170" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <rect x="48" y="140" width="12" height="170" rx="6" fill="#B45309"/>
+    <text x="96" y="195" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1C1917">Dual Auth</text>
+    <text x="96" y="240" font-family="Arial, sans-serif" font-size="16" fill="#292524">Cookie User và Admin độc lập — tách phiên an toàn.</text>
+  </g>
+  <g id="highlight-2" data-pptx-bounds="660 140 580 170">
+    <rect x="660" y="140" width="580" height="170" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <rect x="660" y="140" width="12" height="170" rx="6" fill="#B45309"/>
+    <text x="708" y="195" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1C1917">Verify Listing</text>
+    <text x="708" y="240" font-family="Arial, sans-serif" font-size="16" fill="#292524">Admin duyệt trước khi listing công khai.</text>
+  </g>
+  <g id="highlight-3" data-pptx-bounds="48 340 580 170">
+    <rect x="48" y="340" width="580" height="170" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <rect x="48" y="340" width="12" height="170" rx="6" fill="#B45309"/>
+    <text x="96" y="395" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1C1917">Realtime</text>
+    <text x="96" y="440" font-family="Arial, sans-serif" font-size="16" fill="#292524">SignalR + Firebase push + RabbitMQ.</text>
+  </g>
+  <g id="highlight-4" data-pptx-bounds="660 340 580 170">
+    <rect x="660" y="340" width="580" height="170" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <rect x="660" y="340" width="12" height="170" rx="6" fill="#B45309"/>
+    <text x="708" y="395" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1C1917">Đa ngôn ngữ</text>
+    <text x="708" y="440" font-family="Arial, sans-serif" font-size="16" fill="#292524">4 locale: vi · en · ja · ko.</text>
+  </g>
+  <g id="conclusion-tag" data-pptx-bounds="48 560 1184 70">
+    <rect x="48" y="560" width="1184" height="70" rx="16" fill="#FEF3C7"/>
+    <text x="640" y="603" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#292524">Vòng đời đấu giá thẻ bài hoàn chỉnh trên ASP.NET Core 8</text>
+  </g>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="12" fill="#78716C">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#78716C">11 / 12</text>
+  </g>
+</svg>

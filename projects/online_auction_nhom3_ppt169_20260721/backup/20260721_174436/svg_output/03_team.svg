@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#FFFBEB"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 36 1184 72">
+    <rect x="48" y="44" width="8" height="40" rx="4" fill="#B45309"/>
+    <text x="72" y="72" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#1C1917">Giới thiệu thành viên</text>
+    <text x="72" y="100" font-family="Arial, sans-serif" font-size="14" fill="#78716C">Nhóm 3 · CardMarket</text>
+  </g>
+  <g id="member-1" data-pptx-bounds="48 140 360 140">
+    <rect x="48" y="140" width="360" height="140" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <circle cx="98" cy="195" r="28" fill="#FEF3C7"/>
+    <text x="98" y="201" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">01</text>
+    <text x="143" y="190" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#1C1917">Giang Hà</text>
+    <text x="143" y="220" font-family="Arial, sans-serif" font-size="14" fill="#78716C">Thành viên chính</text>
+  </g>
+  <g id="member-2" data-pptx-bounds="460 140 360 140">
+    <rect x="460" y="140" width="360" height="140" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <circle cx="510" cy="195" r="28" fill="#FEF3C7"/>
+    <text x="510" y="201" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">02</text>
+    <text x="555" y="190" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#1C1917">Nguyễn Hưng</text>
+    <text x="555" y="220" font-family="Arial, sans-serif" font-size="14" fill="#78716C">Thành viên</text>
+  </g>
+  <g id="member-3" data-pptx-bounds="872 140 360 140">
+    <rect x="872" y="140" width="360" height="140" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <circle cx="922" cy="195" r="28" fill="#FEF3C7"/>
+    <text x="922" y="201" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">03</text>
+    <text x="967" y="190" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#1C1917">Phạm Việt Anh</text>
+    <text x="967" y="220" font-family="Arial, sans-serif" font-size="14" fill="#78716C">Thành viên</text>
+  </g>
+  <g id="member-4" data-pptx-bounds="250 320 360 140">
+    <rect x="250" y="320" width="360" height="140" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <circle cx="300" cy="375" r="28" fill="#FEF3C7"/>
+    <text x="300" y="381" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">04</text>
+    <text x="345" y="370" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#1C1917">Nguyễn Hữu Quân</text>
+    <text x="345" y="400" font-family="Arial, sans-serif" font-size="14" fill="#78716C">Thành viên</text>
+  </g>
+  <g id="member-5" data-pptx-bounds="670 320 360 140">
+    <rect x="670" y="320" width="360" height="140" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <circle cx="720" cy="375" r="28" fill="#FEF3C7"/>
+    <text x="720" y="381" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">05</text>
+    <text x="765" y="370" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#1C1917">azhai4123</text>
+    <text x="765" y="400" font-family="Arial, sans-serif" font-size="14" fill="#B45309">Cần xác nhận vai trò</text>
+    <text x="690" y="438" font-family="Arial, sans-serif" font-size="12" fill="#B45309">※ Ghi chú: cần xác nhận</text>  </g>
+  <g id="team-note" data-pptx-bounds="48 500 1184 120">
+    <rect x="48" y="500" width="1184" height="120" rx="16" fill="#FEF3C7"/>
+    <text x="80" y="545" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#B45309">Lưu ý</text>
+    <text x="80" y="575" font-family="Arial, sans-serif" font-size="15" fill="#292524">Danh sách theo lịch sử git của repository. Vai trò chi tiết cần nhóm xác nhận trước khi nộp.</text>
+    <text x="80" y="600" font-family="Arial, sans-serif" font-size="14" fill="#78716C">Không dùng nhân vật giả trên trang About (Julian Thorne…) làm thành viên nhóm.</text>
+  </g>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="12" fill="#78716C">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#78716C">03 / 12</text>
+  </g>
+</svg>

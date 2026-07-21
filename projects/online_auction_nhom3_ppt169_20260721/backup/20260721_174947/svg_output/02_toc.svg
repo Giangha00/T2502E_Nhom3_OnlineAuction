@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="toc">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#FFFBEB"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 20 1184 48">
+    <rect x="48" y="24" width="8" height="36" rx="4" fill="#B45309"/>
+    <text x="72" y="50" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#1C1917">Mục lục</text>
+    <text x="220" y="50" font-family="Arial, sans-serif" font-size="14" fill="#78716C">20 trang · Use Case &amp; Activity mỗi luồng 1 slide</text>
+  </g>
+
+  <!-- Col 1 -->
+  <rect x="48" y="90" width="380" height="560" rx="16" fill="#FFFFFF" stroke="#FDE68A"/>
+  <text x="72" y="120" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#B45309">PHẦN CHUNG</text>
+  <text x="72" y="155" font-family="Arial, sans-serif" font-size="15" fill="#292524">01  Tên đề tài</text>
+  <text x="72" y="185" font-family="Arial, sans-serif" font-size="15" fill="#292524">02  Mục lục</text>
+  <text x="72" y="215" font-family="Arial, sans-serif" font-size="15" fill="#292524">03  Giới thiệu thành viên</text>
+  <text x="72" y="245" font-family="Arial, sans-serif" font-size="15" fill="#292524">04  Tổng quan</text>
+  <text x="72" y="275" font-family="Arial, sans-serif" font-size="15" fill="#292524">05  Mục tiêu đề tài</text>
+  <text x="72" y="305" font-family="Arial, sans-serif" font-size="15" fill="#292524">06  Công nghệ</text>
+  <text x="72" y="335" font-family="Arial, sans-serif" font-size="15" fill="#292524">07  Phân bố thời gian</text>
+  <text x="72" y="385" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#B45309">KẾT</text>
+  <text x="72" y="420" font-family="Arial, sans-serif" font-size="15" fill="#292524">18  Database Diagram</text>
+  <text x="72" y="450" font-family="Arial, sans-serif" font-size="15" fill="#292524">19  Kết luận</text>
+  <text x="72" y="480" font-family="Arial, sans-serif" font-size="15" fill="#292524">20  Lời cảm ơn</text>
+
+  <!-- Col 2 Use Case -->
+  <rect x="450" y="90" width="380" height="560" rx="16" fill="#FFFFFF" stroke="#FDE68A"/>
+  <text x="474" y="120" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#B45309">USE CASE (mỗi luồng 1 trang)</text>
+  <text x="474" y="165" font-family="Arial, sans-serif" font-size="15" fill="#292524">08  UC · Đăng ký / Đăng nhập</text>
+  <text x="474" y="205" font-family="Arial, sans-serif" font-size="15" fill="#292524">09  UC · Đăng bán &amp; Duyệt</text>
+  <text x="474" y="245" font-family="Arial, sans-serif" font-size="15" fill="#292524">10  UC · Đăng ký đấu giá &amp; Bid</text>
+  <text x="474" y="285" font-family="Arial, sans-serif" font-size="15" fill="#292524">11  UC · Kết thúc &amp; Thanh toán</text>
+  <text x="474" y="325" font-family="Arial, sans-serif" font-size="15" fill="#292524">12  UC · Buy Now</text>
+  <rect x="474" y="370" width="330" height="80" rx="12" fill="#FEF3C7"/>
+  <text x="494" y="405" font-family="Arial, sans-serif" font-size="13" fill="#78716C">5 luồng nghiệp vụ chính</text>
+  <text x="494" y="428" font-family="Arial, sans-serif" font-size="13" fill="#78716C">UML Use Case Diagram</text>
+
+  <!-- Col 3 Activity -->
+  <rect x="852" y="90" width="380" height="560" rx="16" fill="#FFFFFF" stroke="#FDE68A"/>
+  <text x="876" y="120" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#B45309">ACTIVITY (mỗi luồng 1 trang)</text>
+  <text x="876" y="165" font-family="Arial, sans-serif" font-size="15" fill="#292524">13  Act · Auth</text>
+  <text x="876" y="205" font-family="Arial, sans-serif" font-size="15" fill="#292524">14  Act · Đăng bán &amp; Duyệt</text>
+  <text x="876" y="245" font-family="Arial, sans-serif" font-size="15" fill="#292524">15  Act · Đăng ký &amp; Bid</text>
+  <text x="876" y="285" font-family="Arial, sans-serif" font-size="15" fill="#292524">16  Act · Kết thúc &amp; Thanh toán</text>
+  <text x="876" y="325" font-family="Arial, sans-serif" font-size="15" fill="#292524">17  Act · Buy Now</text>
+  <rect x="876" y="370" width="330" height="80" rx="12" fill="#FEF3C7"/>
+  <text x="896" y="405" font-family="Arial, sans-serif" font-size="13" fill="#78716C">Swimlane + Decision</text>
+  <text x="896" y="428" font-family="Arial, sans-serif" font-size="13" fill="#78716C">UML Activity Diagram</text>
+
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="12" fill="#78716C">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#78716C">02 / 20</text>
+  </g>
+</svg>

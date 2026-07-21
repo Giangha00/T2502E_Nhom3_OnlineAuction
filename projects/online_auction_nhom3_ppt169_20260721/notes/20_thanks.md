@@ -1,0 +1,1 @@
+Cảm ơn hội đồng, xin hỏi đáp.

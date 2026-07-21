@@ -1,0 +1,1 @@
+Use Case Actor User: đăng ký, đăng nhập, khám phá, đăng bán, đấu giá, thông báo, đánh giá, thanh toán.

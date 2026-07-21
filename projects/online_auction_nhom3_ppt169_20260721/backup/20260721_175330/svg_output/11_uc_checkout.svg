@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 20 1184 50">
+    <rect x="48" y="24" width="8" height="36" rx="4" fill="#1D4ED8"/>
+    <text x="72" y="50" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#0F172A">Use Case — Kết thúc phiên &amp; Thanh toán</text>
+    <text x="72" y="72" font-family="Arial, sans-serif" font-size="13" fill="#64748B">Luồng chính 4/5 · Finalize order → PayPal / COD</text>
+  </g>
+  <rect x="280" y="110" width="720" height="520" rx="8" fill="#FFFFFF" stroke="#1D4ED8" stroke-width="2" stroke-dasharray="8 4"/>
+  <text x="640" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#1D4ED8">CardMarket · Checkout</text>
+  <g>
+    <circle cx="120" cy="250" r="12" fill="none" stroke="#1D4ED8" stroke-width="2"/>
+    <line x1="120" y1="262" x2="120" y2="298" stroke="#1D4ED8" stroke-width="2"/>
+    <line x1="98" y1="276" x2="142" y2="276" stroke="#1D4ED8" stroke-width="2"/>
+    <line x1="120" y1="298" x2="104" y2="328" stroke="#1D4ED8" stroke-width="2"/>
+    <line x1="120" y1="298" x2="136" y2="328" stroke="#1D4ED8" stroke-width="2"/>
+    <text x="120" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1D4ED8">Buyer</text>
+  </g>
+  <g>
+    <circle cx="120" cy="480" r="12" fill="none" stroke="#64748B" stroke-width="2"/>
+    <line x1="120" y1="492" x2="120" y2="528" stroke="#64748B" stroke-width="2"/>
+    <line x1="98" y1="506" x2="142" y2="506" stroke="#64748B" stroke-width="2"/>
+    <line x1="120" y1="528" x2="104" y2="558" stroke="#64748B" stroke-width="2"/>
+    <line x1="120" y1="528" x2="136" y2="558" stroke="#64748B" stroke-width="2"/>
+    <text x="120" y="580" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#64748B">System</text>
+  </g>
+  <g>
+    <circle cx="1160" cy="320" r="12" fill="none" stroke="#0F172A" stroke-width="2"/>
+    <line x1="1160" y1="332" x2="1160" y2="368" stroke="#0F172A" stroke-width="2"/>
+    <line x1="1138" y1="346" x2="1182" y2="346" stroke="#0F172A" stroke-width="2"/>
+    <line x1="1160" y1="368" x2="1144" y2="398" stroke="#0F172A" stroke-width="2"/>
+    <line x1="1160" y1="368" x2="1176" y2="398" stroke="#0F172A" stroke-width="2"/>
+    <text x="1160" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#0F172A">Payment</text>
+  </g>
+  <ellipse cx="520" cy="200" rx="140" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="520" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Nhận thông báo thắng</text>
+  <ellipse cx="520" cy="290" rx="140" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="520" y="295" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Mở Payment Center</text>
+  <ellipse cx="520" cy="380" rx="140" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="520" y="385" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Chọn shipping</text>
+  <ellipse cx="520" cy="470" rx="140" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="520" y="475" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Thanh toán PayPal</text>
+  <ellipse cx="520" cy="560" rx="140" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="520" y="565" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Thanh toán COD</text>
+  <ellipse cx="800" cy="240" rx="140" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="800" y="245" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Finalization Worker</text>
+  <ellipse cx="800" cy="340" rx="140" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="800" y="345" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Tạo Order auction_win</text>
+  <ellipse cx="800" cy="440" rx="140" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="800" y="445" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Capture / IPN</text>
+  <ellipse cx="800" cy="540" rx="140" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="800" y="545" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Ghi nhận hoàn tiền</text>
+<line x1="170" y1="270" x2="380" y2="200" stroke="#64748B" stroke-width="1.2"/>
+<line x1="170" y1="280" x2="380" y2="290" stroke="#64748B" stroke-width="1.2"/>
+<line x1="170" y1="290" x2="380" y2="380" stroke="#64748B" stroke-width="1.2"/>
+<line x1="170" y1="300" x2="380" y2="470" stroke="#64748B" stroke-width="1.2"/>
+<line x1="170" y1="310" x2="380" y2="560" stroke="#64748B" stroke-width="1.2"/>
+<line x1="170" y1="500" x2="380" y2="240" stroke="#64748B" stroke-width="1.2"/>
+<line x1="170" y1="510" x2="380" y2="340" stroke="#64748B" stroke-width="1.2"/>
+<line x1="1110" y1="320" x2="940" y2="440" stroke="#64748B" stroke-width="1.2"/>
+<line x1="1110" y1="340" x2="940" y2="540" stroke="#64748B" stroke-width="1.2"/>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="12" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#64748B">11 / 20</text>
+  </g>
+</svg>

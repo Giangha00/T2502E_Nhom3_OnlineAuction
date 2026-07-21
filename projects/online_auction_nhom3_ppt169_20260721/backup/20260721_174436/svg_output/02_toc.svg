@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="toc">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#FFFBEB"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 36 1184 72">
+    <rect x="48" y="44" width="8" height="40" rx="4" fill="#B45309"/>
+    <text x="72" y="72" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#1C1917">Mục lục</text>
+    <text x="72" y="100" font-family="Arial, sans-serif" font-size="14" fill="#78716C">Nội dung thuyết trình · 12 phần</text>
+  </g>
+  <g id="toc-left" data-pptx-bounds="48 130 540 500">
+    <rect x="48" y="130" width="540" height="500" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <circle cx="96" cy="170" r="22" fill="#FEF3C7"/>
+    <text x="96" y="176" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">01</text>
+    <text x="138" y="176" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#292524">Tên đề tài</text>
+    <line x1="138" y1="200" x2="548" y2="200" stroke="#FEF3C7" stroke-width="1"/>
+    <circle cx="96" cy="242" r="22" fill="#FEF3C7"/>
+    <text x="96" y="248" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">02</text>
+    <text x="138" y="248" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#292524">Mục lục</text>
+    <line x1="138" y1="272" x2="548" y2="272" stroke="#FEF3C7" stroke-width="1"/>
+    <circle cx="96" cy="314" r="22" fill="#FEF3C7"/>
+    <text x="96" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">03</text>
+    <text x="138" y="320" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#292524">Giới thiệu thành viên</text>
+    <line x1="138" y1="344" x2="548" y2="344" stroke="#FEF3C7" stroke-width="1"/>
+    <circle cx="96" cy="386" r="22" fill="#FEF3C7"/>
+    <text x="96" y="392" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">04</text>
+    <text x="138" y="392" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#292524">Tổng quan hệ thống</text>
+    <line x1="138" y1="416" x2="548" y2="416" stroke="#FEF3C7" stroke-width="1"/>
+    <circle cx="96" cy="458" r="22" fill="#FEF3C7"/>
+    <text x="96" y="464" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">05</text>
+    <text x="138" y="464" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#292524">Mục tiêu đề tài</text>
+    <line x1="138" y1="488" x2="548" y2="488" stroke="#FEF3C7" stroke-width="1"/>
+    <circle cx="96" cy="530" r="22" fill="#FEF3C7"/>
+    <text x="96" y="536" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">06</text>
+    <text x="138" y="536" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#292524">Công nghệ</text>
+  </g>
+  <g id="toc-right" data-pptx-bounds="612 130 540 500">
+    <rect x="612" y="130" width="540" height="500" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <circle cx="660" cy="170" r="22" fill="#FEF3C7"/>
+    <text x="660" y="176" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">07</text>
+    <text x="702" y="176" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#292524">Phân bố thời gian</text>
+    <line x1="702" y1="200" x2="1112" y2="200" stroke="#FEF3C7" stroke-width="1"/>
+    <circle cx="660" cy="242" r="22" fill="#FEF3C7"/>
+    <text x="660" y="248" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">08</text>
+    <text x="702" y="248" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#292524">Use Case</text>
+    <line x1="702" y1="272" x2="1112" y2="272" stroke="#FEF3C7" stroke-width="1"/>
+    <circle cx="660" cy="314" r="22" fill="#FEF3C7"/>
+    <text x="660" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">09</text>
+    <text x="702" y="320" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#292524">Activity Diagram</text>
+    <line x1="702" y1="344" x2="1112" y2="344" stroke="#FEF3C7" stroke-width="1"/>
+    <circle cx="660" cy="386" r="22" fill="#FEF3C7"/>
+    <text x="660" y="392" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">10</text>
+    <text x="702" y="392" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#292524">Database Diagram</text>
+    <line x1="702" y1="416" x2="1112" y2="416" stroke="#FEF3C7" stroke-width="1"/>
+    <circle cx="660" cy="458" r="22" fill="#FEF3C7"/>
+    <text x="660" y="464" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">11</text>
+    <text x="702" y="464" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#292524">Kết luận</text>
+    <line x1="702" y1="488" x2="1112" y2="488" stroke="#FEF3C7" stroke-width="1"/>
+    <circle cx="660" cy="530" r="22" fill="#FEF3C7"/>
+    <text x="660" y="536" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">12</text>
+    <text x="702" y="536" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#292524">Lời cảm ơn</text>
+  </g>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="12" fill="#78716C">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#78716C">02 / 12</text>
+  </g>
+</svg>

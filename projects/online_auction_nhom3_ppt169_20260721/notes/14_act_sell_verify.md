@@ -1,0 +1,1 @@
+Submit → confirming → Approve/Reject → live; Seller có thể sửa gửi lại.

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="cover">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#FFFBEB"/>
+    <circle cx="1180" cy="80" r="220" fill="#FEF3C7"/>
+    <circle cx="-40" cy="640" r="180" fill="#FEF3C7"/>
+  </g>
+
+  <g id="brand-badge" data-pptx-bounds="80 120 200 36">
+    <rect x="80" y="120" width="168" height="36" rx="18" fill="#FEF3C7"/>
+    <text x="164" y="144" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">NHÓM 3</text>
+  </g>
+
+  <g id="cover-title" data-pptx-bounds="80 200 900 180">
+    <text x="80" y="260" font-family="Arial, sans-serif" font-size="64" font-weight="700" fill="#1C1917">CardMarket</text>
+    <text x="80" y="310" font-family="Arial, sans-serif" font-size="28" fill="#B45309">RareCard Vault</text>
+    <text x="80" y="360" font-family="Arial, sans-serif" font-size="22" fill="#292524">Nền tảng đấu giá thẻ bài trực tuyến</text>
+  </g>
+
+  <g id="cover-subtitle" data-pptx-bounds="80 400 640 48">
+    <rect x="80" y="400" width="420" height="4" rx="2" fill="#B45309"/>
+    <text x="80" y="440" font-family="Arial, sans-serif" font-size="18" fill="#78716C">Đồ án ASP.NET Core 8 · Nhóm 3</text>
+  </g>
+
+  <g id="cover-card" data-pptx-bounds="900 240 280 280">
+    <rect x="900" y="240" width="280" height="280" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="2"/>
+    <rect x="930" y="270" width="220" height="140" rx="12" fill="#FEF3C7"/>
+    <text x="1040" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="700" fill="#B45309">TCG</text>
+    <text x="1040" y="460" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1C1917">Auction &amp; Buy Now</text>
+    <text x="1040" y="488" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#78716C">Thẻ bài sưu tầm · Online</text>
+  </g>
+
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="12" fill="#78716C">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#78716C">01 / 12</text>
+  </g>
+</svg>

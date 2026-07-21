@@ -1,0 +1,1 @@
+Finalization, Order, thanh toán PayPal/COD.

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="ending">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+    <circle cx="160" cy="120" r="160" fill="#DBEAFE"/>
+    <circle cx="1120" cy="600" r="200" fill="#DBEAFE"/>
+  </g>
+
+  <g id="thanks-card" data-pptx-bounds="240 160 800 360">
+    <rect x="240" y="160" width="800" height="360" rx="16" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="2"/>
+    <text x="640" y="260" text-anchor="middle" font-family="Arial, sans-serif" font-size="56" font-weight="700" fill="#0F172A">Cảm ơn quý thầy cô</text>
+    <text x="640" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="56" font-weight="700" fill="#0F172A">và hội đồng!</text>
+    <rect x="540" y="350" width="200" height="4" rx="2" fill="#1D4ED8"/>
+    <text x="640" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#334155">Cảm ơn các thành viên nhóm và những người</text>
+    <text x="640" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#334155">đã hỗ trợ trong quá trình phát triển dự án.</text>
+    <text x="640" y="480" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#1D4ED8">CardMarket · Nhóm 3</text>
+  </g>
+
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="16" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#64748B">20 / 20</text>
+  </g>
+</svg>

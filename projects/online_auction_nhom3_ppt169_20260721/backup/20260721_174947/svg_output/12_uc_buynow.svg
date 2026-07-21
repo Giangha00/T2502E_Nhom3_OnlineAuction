@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#FFFBEB"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 20 1184 50">
+    <rect x="48" y="24" width="8" height="36" rx="4" fill="#B45309"/>
+    <text x="72" y="50" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#1C1917">Use Case — Buy Now (Mua ngay)</text>
+    <text x="72" y="72" font-family="Arial, sans-serif" font-size="13" fill="#78716C">Luồng chính 5/5 · Add to cart → Invoice → Thanh toán (7 ngày)</text>
+  </g>
+  <rect x="300" y="110" width="680" height="520" rx="8" fill="#FFFFFF" stroke="#B45309" stroke-width="2" stroke-dasharray="8 4"/>
+  <text x="640" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#B45309">CardMarket · Buy Now</text>
+  <g>
+    <circle cx="120" cy="300" r="12" fill="none" stroke="#B45309" stroke-width="2"/>
+    <line x1="120" y1="312" x2="120" y2="348" stroke="#B45309" stroke-width="2"/>
+    <line x1="98" y1="326" x2="142" y2="326" stroke="#B45309" stroke-width="2"/>
+    <line x1="120" y1="348" x2="104" y2="378" stroke="#B45309" stroke-width="2"/>
+    <line x1="120" y1="348" x2="136" y2="378" stroke="#B45309" stroke-width="2"/>
+    <text x="120" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#B45309">Buyer</text>
+  </g>
+  <g>
+    <circle cx="1160" cy="300" r="12" fill="none" stroke="#1C1917" stroke-width="2"/>
+    <line x1="1160" y1="312" x2="1160" y2="348" stroke="#1C1917" stroke-width="2"/>
+    <line x1="1138" y1="326" x2="1182" y2="326" stroke="#1C1917" stroke-width="2"/>
+    <line x1="1160" y1="348" x2="1144" y2="378" stroke="#1C1917" stroke-width="2"/>
+    <line x1="1160" y1="348" x2="1176" y2="378" stroke="#1C1917" stroke-width="2"/>
+    <text x="1160" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1C1917">System</text>
+  </g>
+  <ellipse cx="640" cy="200" rx="150" ry="32" fill="#FEF3C7" stroke="#B45309" stroke-width="1.5"/>
+  <text x="640" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Xem listing Buy Now</text>
+  <ellipse cx="640" cy="280" rx="150" ry="32" fill="#FEF3C7" stroke="#B45309" stroke-width="1.5"/>
+  <text x="640" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Thêm vào giỏ (Cart)</text>
+  <ellipse cx="640" cy="360" rx="150" ry="32" fill="#FEF3C7" stroke="#B45309" stroke-width="1.5"/>
+  <text x="640" y="365" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Tạo hóa đơn buy_now</text>
+  <ellipse cx="640" cy="440" rx="150" ry="32" fill="#FEF3C7" stroke="#B45309" stroke-width="1.5"/>
+  <text x="640" y="445" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Thanh toán trong 7 ngày</text>
+  <ellipse cx="640" cy="520" rx="150" ry="32" fill="#FEF3C7" stroke="#B45309" stroke-width="1.5"/>
+  <text x="640" y="525" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Hủy / hết hạn invoice</text>
+  <ellipse cx="640" cy="600" rx="150" ry="28" fill="#FEF3C7" stroke="#B45309" stroke-width="1.5"/>
+  <text x="640" y="605" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Nhận thông báo</text>
+<line x1="170" y1="320" x2="490" y2="200" stroke="#78716C" stroke-width="1.2"/>
+<line x1="170" y1="330" x2="490" y2="280" stroke="#78716C" stroke-width="1.2"/>
+<line x1="170" y1="340" x2="490" y2="360" stroke="#78716C" stroke-width="1.2"/>
+<line x1="170" y1="350" x2="490" y2="440" stroke="#78716C" stroke-width="1.2"/>
+<line x1="170" y1="360" x2="490" y2="520" stroke="#78716C" stroke-width="1.2"/>
+<line x1="1110" y1="300" x2="790" y2="360" stroke="#78716C" stroke-width="1.2"/>
+<line x1="1110" y1="320" x2="790" y2="520" stroke="#78716C" stroke-width="1.2"/>
+<line x1="1110" y1="340" x2="790" y2="600" stroke="#78716C" stroke-width="1.2"/>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="12" fill="#78716C">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#78716C">12 / 20</text>
+  </g>
+</svg>

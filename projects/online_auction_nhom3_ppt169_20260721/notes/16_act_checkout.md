@@ -1,0 +1,1 @@
+Hết giờ → Worker tạo Order → Buyer thanh toán PayPal hoặc COD.

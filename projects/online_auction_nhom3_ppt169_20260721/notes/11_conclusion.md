@@ -1,0 +1,1 @@
+Điểm nổi bật: dual auth, verify listing, chống gian lận bid, SignalR, đa ngôn ngữ 4 locale, PayPal end-to-end.

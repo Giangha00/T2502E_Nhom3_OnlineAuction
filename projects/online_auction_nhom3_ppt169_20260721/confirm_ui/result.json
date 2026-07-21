@@ -1,0 +1,13 @@
+{
+  "canvas": "ppt169",
+  "audience": "Giảng viên và hội đồng đánh giá đồ án; các thành viên nhóm đã quen với dự án.",
+  "communication_intent": "Báo cáo và giải thích đề tài CardMarket (RareCard Vault): giới thiệu nhóm, tổng quan hệ thống, mục tiêu, công nghệ, timeline, Use Case, Activity Diagram, DB diagram; thuyết phục hội đồng rằng hệ thống hoàn chỉnh và khả thi.",
+  "audience_outcome": "Hiểu rõ sản phẩm, kiến trúc và quy trình nghiệp vụ; đánh giá được phạm vi kỹ thuật và mức độ hoàn thiện của nhóm.",
+  "core_message": "CardMarket mô phỏng đầy đủ vòng đời đấu giá thẻ bài trực tuyến — từ duyệt listing, đặt cọc/bid realtime đến thanh toán PayPal — trên ASP.NET Core 8.",
+  "delivery_context": "Thuyết trình nhóm ~10–15 phút, có người dẫn; slide dùng làm khung trình bày và tài liệu nộp kèm.",
+  "artifact_afterlife": "Nộp bài / lưu trữ đồ án; nhóm có thể chỉnh sửa lại sau buổi thuyết trình.",
+  "content_divergence": "Giữ đúng 12 mục cấu trúc người dùng chỉ định (Tên đề tài → Mục lục → Thành viên → Tổng quan → Mục tiêu → Công nghệ → Phân bố thời gian → Use Case → Activity Diagram → Db diagram → Kết luận → Lời cảm ơn). Được phép cô đọng wording cho rõ slide; không thêm/bớt/đổi thứ tự mục. Timeline không có trong repo — dùng khung gợi ý đã ghi rõ là scenario.",
+  "stage": "stage1",
+  "status": "stage1-confirmed",
+  "confirmed_at": "2026-07-21T17:23:55"
+}

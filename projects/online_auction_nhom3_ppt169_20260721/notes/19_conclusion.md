@@ -1,0 +1,1 @@
+Điểm nổi bật dual auth, verify, realtime, i18n.

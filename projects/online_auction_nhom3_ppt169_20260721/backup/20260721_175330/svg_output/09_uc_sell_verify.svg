@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 20 1184 50">
+    <rect x="48" y="24" width="8" height="36" rx="4" fill="#1D4ED8"/>
+    <text x="72" y="50" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#0F172A">Use Case — Đăng bán &amp; Duyệt listing</text>
+    <text x="72" y="72" font-family="Arial, sans-serif" font-size="13" fill="#64748B">Luồng chính 2/5 · Seller submit → Admin verify</text>
+  </g>
+  <rect x="300" y="110" width="680" height="520" rx="8" fill="#FFFFFF" stroke="#1D4ED8" stroke-width="2" stroke-dasharray="8 4"/>
+  <text x="640" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#1D4ED8">CardMarket · Listing</text>
+  <g>
+    <circle cx="120" cy="300" r="12" fill="none" stroke="#1D4ED8" stroke-width="2"/>
+    <line x1="120" y1="312" x2="120" y2="348" stroke="#1D4ED8" stroke-width="2"/>
+    <line x1="98" y1="326" x2="142" y2="326" stroke="#1D4ED8" stroke-width="2"/>
+    <line x1="120" y1="348" x2="104" y2="378" stroke="#1D4ED8" stroke-width="2"/>
+    <line x1="120" y1="348" x2="136" y2="378" stroke="#1D4ED8" stroke-width="2"/>
+    <text x="120" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1D4ED8">Seller</text>
+  </g>
+  <g>
+    <circle cx="1160" cy="300" r="12" fill="none" stroke="#0F172A" stroke-width="2"/>
+    <line x1="1160" y1="312" x2="1160" y2="348" stroke="#0F172A" stroke-width="2"/>
+    <line x1="1138" y1="326" x2="1182" y2="326" stroke="#0F172A" stroke-width="2"/>
+    <line x1="1160" y1="348" x2="1144" y2="378" stroke="#0F172A" stroke-width="2"/>
+    <line x1="1160" y1="348" x2="1176" y2="378" stroke="#0F172A" stroke-width="2"/>
+    <text x="1160" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#0F172A">Admin</text>
+  </g>
+  <ellipse cx="520" cy="210" rx="130" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="520" y="215" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Tạo Auction</text>
+  <ellipse cx="520" cy="290" rx="130" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="520" y="295" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Tạo Buy Now</text>
+  <ellipse cx="520" cy="370" rx="130" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="520" y="375" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Upload ảnh sản phẩm</text>
+  <ellipse cx="520" cy="450" rx="130" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="520" y="455" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Theo dõi submission</text>
+  <ellipse cx="520" cy="530" rx="130" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="520" y="535" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Sửa &amp; gửi lại</text>
+  <ellipse cx="760" cy="250" rx="130" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="760" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Xem hàng chờ duyệt</text>
+  <ellipse cx="760" cy="340" rx="130" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="760" y="345" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Approve listing</text>
+  <ellipse cx="760" cy="430" rx="130" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="760" y="435" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Reject + lý do</text>
+  <ellipse cx="760" cy="520" rx="130" ry="30" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="760" y="525" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Tạo listing trực tiếp</text>
+<line x1="170" y1="320" x2="390" y2="210" stroke="#64748B" stroke-width="1.2"/>
+<line x1="170" y1="330" x2="390" y2="290" stroke="#64748B" stroke-width="1.2"/>
+<line x1="170" y1="340" x2="390" y2="370" stroke="#64748B" stroke-width="1.2"/>
+<line x1="170" y1="350" x2="390" y2="450" stroke="#64748B" stroke-width="1.2"/>
+<line x1="170" y1="360" x2="390" y2="530" stroke="#64748B" stroke-width="1.2"/>
+<line x1="1110" y1="300" x2="890" y2="250" stroke="#64748B" stroke-width="1.2"/>
+<line x1="1110" y1="310" x2="890" y2="340" stroke="#64748B" stroke-width="1.2"/>
+<line x1="1110" y1="320" x2="890" y2="430" stroke="#64748B" stroke-width="1.2"/>
+<line x1="1110" y1="330" x2="890" y2="520" stroke="#64748B" stroke-width="1.2"/>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="12" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#64748B">09 / 20</text>
+  </g>
+</svg>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 20 1184 50">
+    <rect x="48" y="24" width="8" height="36" rx="4" fill="#1D4ED8"/>
+    <text x="72" y="50" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#0F172A">Use Case — Đăng ký / Đăng nhập</text>
+    <text x="72" y="72" font-family="Arial, sans-serif" font-size="13" fill="#64748B">Luồng chính 1/5 · Auth (dual session User &amp; Admin)</text>
+  </g>
+  <rect x="320" y="110" width="640" height="520" rx="8" fill="#FFFFFF" stroke="#1D4ED8" stroke-width="2" stroke-dasharray="8 4"/>
+  <text x="640" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#1D4ED8">CardMarket · Auth</text>
+  <g>
+    <circle cx="120" cy="280" r="12" fill="none" stroke="#1D4ED8" stroke-width="2"/>
+    <line x1="120" y1="292" x2="120" y2="328" stroke="#1D4ED8" stroke-width="2"/>
+    <line x1="98" y1="306" x2="142" y2="306" stroke="#1D4ED8" stroke-width="2"/>
+    <line x1="120" y1="328" x2="104" y2="358" stroke="#1D4ED8" stroke-width="2"/>
+    <line x1="120" y1="328" x2="136" y2="358" stroke="#1D4ED8" stroke-width="2"/>
+    <text x="120" y="380" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1D4ED8">Guest / User</text>
+  </g>
+  <g>
+    <circle cx="1160" cy="280" r="12" fill="none" stroke="#0F172A" stroke-width="2"/>
+    <line x1="1160" y1="292" x2="1160" y2="328" stroke="#0F172A" stroke-width="2"/>
+    <line x1="1138" y1="306" x2="1182" y2="306" stroke="#0F172A" stroke-width="2"/>
+    <line x1="1160" y1="328" x2="1144" y2="358" stroke="#0F172A" stroke-width="2"/>
+    <line x1="1160" y1="328" x2="1176" y2="358" stroke="#0F172A" stroke-width="2"/>
+    <text x="1160" y="380" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#0F172A">Admin</text>
+  </g>
+  <ellipse cx="640" cy="200" rx="140" ry="32" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="640" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Đăng ký tài khoản</text>
+  <ellipse cx="640" cy="280" rx="140" ry="32" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="640" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Xác nhận email</text>
+  <ellipse cx="640" cy="360" rx="140" ry="32" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="640" y="365" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Đăng nhập User</text>
+  <ellipse cx="640" cy="440" rx="140" ry="32" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="640" y="445" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Quên mật khẩu (OTP)</text>
+  <ellipse cx="640" cy="520" rx="140" ry="32" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="640" y="525" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Đăng nhập Admin</text>
+  <ellipse cx="640" cy="590" rx="140" ry="28" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="640" y="595" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#334155">Đăng xuất</text>
+<line x1="170" y1="300" x2="500" y2="200" stroke="#64748B" stroke-width="1.2"/>
+<line x1="170" y1="310" x2="500" y2="280" stroke="#64748B" stroke-width="1.2"/>
+<line x1="170" y1="320" x2="500" y2="360" stroke="#64748B" stroke-width="1.2"/>
+<line x1="170" y1="330" x2="500" y2="440" stroke="#64748B" stroke-width="1.2"/>
+<line x1="170" y1="350" x2="500" y2="590" stroke="#64748B" stroke-width="1.2"/>
+<line x1="1110" y1="300" x2="780" y2="520" stroke="#64748B" stroke-width="1.2"/>
+<line x1="1110" y1="320" x2="780" y2="590" stroke="#64748B" stroke-width="1.2"/>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="12" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#64748B">08 / 20</text>
+  </g>
+</svg>

@@ -1,0 +1,1 @@
+Mua ngay: cart → invoice → thanh toán trong 7 ngày.

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#FFFBEB"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 36 1184 72">
+    <rect x="48" y="44" width="8" height="40" rx="4" fill="#B45309"/>
+    <text x="72" y="72" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#1C1917">Use Case</text>
+    <text x="72" y="100" font-family="Arial, sans-serif" font-size="14" fill="#78716C">Actors: Guest · Buyer · Seller · Admin</text>
+  </g>
+  <g id="actor-guest" data-pptx-bounds="48 120 292 500">
+    <rect x="48" y="120" width="292" height="500" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <rect x="48" y="120" width="292" height="64" rx="16" fill="#FEF3C7"/>
+    <rect x="48" y="152" width="292" height="32" fill="#FEF3C7"/>
+    <text x="194" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#B45309">Guest</text>
+    <ellipse cx="194" cy="240" rx="36" ry="48" fill="none" stroke="#B45309" stroke-width="2"/>
+    <circle cx="194" cy="220" r="14" fill="none" stroke="#B45309" stroke-width="2"/>
+    <line x1="194" y1="268" x2="194" y2="310" stroke="#B45309" stroke-width="2"/>
+    <line x1="168" y1="285" x2="220" y2="285" stroke="#B45309" stroke-width="2"/>
+    <line x1="194" y1="310" x2="168" y2="350" stroke="#B45309" stroke-width="2"/>
+    <line x1="194" y1="310" x2="220" y2="350" stroke="#B45309" stroke-width="2"/>
+    <ellipse cx="194" cy="390" rx="120" ry="18" fill="#FEF3C7" stroke="#FDE68A"/>
+    <text x="194" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Xem Home / Auction / Buy Now</text>
+    <ellipse cx="194" cy="438" rx="120" ry="18" fill="#FEF3C7" stroke="#FDE68A"/>
+    <text x="194" y="443" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">FAQ · About · Contact</text>
+    <ellipse cx="194" cy="486" rx="120" ry="18" fill="#FEF3C7" stroke="#FDE68A"/>
+    <text x="194" y="491" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Đổi ngôn ngữ</text>
+  </g>
+  <g id="actor-buyer" data-pptx-bounds="356 120 292 500">
+    <rect x="356" y="120" width="292" height="500" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <rect x="356" y="120" width="292" height="64" rx="16" fill="#FEF3C7"/>
+    <rect x="356" y="152" width="292" height="32" fill="#FEF3C7"/>
+    <text x="502" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#B45309">Buyer</text>
+    <ellipse cx="502" cy="240" rx="36" ry="48" fill="none" stroke="#B45309" stroke-width="2"/>
+    <circle cx="502" cy="220" r="14" fill="none" stroke="#B45309" stroke-width="2"/>
+    <line x1="502" y1="268" x2="502" y2="310" stroke="#B45309" stroke-width="2"/>
+    <line x1="476" y1="285" x2="528" y2="285" stroke="#B45309" stroke-width="2"/>
+    <line x1="502" y1="310" x2="476" y2="350" stroke="#B45309" stroke-width="2"/>
+    <line x1="502" y1="310" x2="528" y2="350" stroke="#B45309" stroke-width="2"/>
+    <ellipse cx="502" cy="390" rx="120" ry="18" fill="#FEF3C7" stroke="#FDE68A"/>
+    <text x="502" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Đăng ký / Đăng nhập</text>
+    <ellipse cx="502" cy="438" rx="120" ry="18" fill="#FEF3C7" stroke="#FDE68A"/>
+    <text x="502" y="443" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Đăng ký đấu giá + cọc</text>
+    <ellipse cx="502" cy="486" rx="120" ry="18" fill="#FEF3C7" stroke="#FDE68A"/>
+    <text x="502" y="491" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Bid · Buy Now · Watchlist</text>
+    <ellipse cx="502" cy="534" rx="120" ry="18" fill="#FEF3C7" stroke="#FDE68A"/>
+    <text x="502" y="539" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Payment · Hoàn tiền</text>
+  </g>
+  <g id="actor-seller" data-pptx-bounds="664 120 292 500">
+    <rect x="664" y="120" width="292" height="500" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <rect x="664" y="120" width="292" height="64" rx="16" fill="#FEF3C7"/>
+    <rect x="664" y="152" width="292" height="32" fill="#FEF3C7"/>
+    <text x="810" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#B45309">Seller</text>
+    <ellipse cx="810" cy="240" rx="36" ry="48" fill="none" stroke="#B45309" stroke-width="2"/>
+    <circle cx="810" cy="220" r="14" fill="none" stroke="#B45309" stroke-width="2"/>
+    <line x1="810" y1="268" x2="810" y2="310" stroke="#B45309" stroke-width="2"/>
+    <line x1="784" y1="285" x2="836" y2="285" stroke="#B45309" stroke-width="2"/>
+    <line x1="810" y1="310" x2="784" y2="350" stroke="#B45309" stroke-width="2"/>
+    <line x1="810" y1="310" x2="836" y2="350" stroke="#B45309" stroke-width="2"/>
+    <ellipse cx="810" cy="390" rx="120" ry="18" fill="#FEF3C7" stroke="#FDE68A"/>
+    <text x="810" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Tạo Auction / Buy Now</text>
+    <ellipse cx="810" cy="438" rx="120" ry="18" fill="#FEF3C7" stroke="#FDE68A"/>
+    <text x="810" y="443" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Theo dõi submissions</text>
+    <ellipse cx="810" cy="486" rx="120" ry="18" fill="#FEF3C7" stroke="#FDE68A"/>
+    <text x="810" y="491" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Quản lý listing</text>
+  </g>
+  <g id="actor-admin" data-pptx-bounds="972 120 292 500">
+    <rect x="972" y="120" width="292" height="500" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <rect x="972" y="120" width="292" height="64" rx="16" fill="#B45309"/>
+    <rect x="972" y="152" width="292" height="32" fill="#B45309"/>
+    <text x="1118" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">Admin</text>
+    <ellipse cx="1118" cy="240" rx="36" ry="48" fill="none" stroke="#B45309" stroke-width="2"/>
+    <circle cx="1118" cy="220" r="14" fill="none" stroke="#B45309" stroke-width="2"/>
+    <line x1="1118" y1="268" x2="1118" y2="310" stroke="#B45309" stroke-width="2"/>
+    <line x1="1092" y1="285" x2="1144" y2="285" stroke="#B45309" stroke-width="2"/>
+    <line x1="1118" y1="310" x2="1092" y2="350" stroke="#B45309" stroke-width="2"/>
+    <line x1="1118" y1="310" x2="1144" y2="350" stroke="#B45309" stroke-width="2"/>
+    <ellipse cx="1118" cy="390" rx="120" ry="18" fill="#FEF3C7" stroke="#FDE68A"/>
+    <text x="1118" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Login /Admin riêng</text>
+    <ellipse cx="1118" cy="438" rx="120" ry="18" fill="#FEF3C7" stroke="#FDE68A"/>
+    <text x="1118" y="443" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Duyệt listing</text>
+    <ellipse cx="1118" cy="486" rx="120" ry="18" fill="#FEF3C7" stroke="#FDE68A"/>
+    <text x="1118" y="491" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">CRUD · Permission</text>
+    <ellipse cx="1118" cy="534" rx="120" ry="18" fill="#FEF3C7" stroke="#FDE68A"/>
+    <text x="1118" y="539" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#292524">Complaint · Dashboard</text>
+  </g>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="12" fill="#78716C">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#78716C">08 / 12</text>
+  </g>
+</svg>

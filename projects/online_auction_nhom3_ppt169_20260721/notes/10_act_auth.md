@@ -1,0 +1,1 @@
+Activity dual cookie User / Admin.

@@ -1,0 +1,1 @@
+Deposit → Place Bid → validate/fraud → SignalR cập nhật giá.

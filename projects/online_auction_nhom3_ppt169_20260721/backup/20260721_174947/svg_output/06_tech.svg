@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#FFFBEB"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 36 1184 72">
+    <rect x="48" y="44" width="8" height="40" rx="4" fill="#B45309"/>
+    <text x="72" y="72" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#1C1917">Công nghệ</text>
+    <text x="72" y="100" font-family="Arial, sans-serif" font-size="14" fill="#78716C">Stack kỹ thuật chính của dự án</text>
+  </g>
+  <g id="tech-table" data-pptx-bounds="48 120 1184 500">
+    <rect x="48" y="120" width="1184" height="500" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+    <rect x="48" y="120" width="1184" height="56" rx="16" fill="#FEF3C7"/>
+    <rect x="48" y="148" width="1184" height="28" fill="#FEF3C7"/>
+    <text x="80" y="156" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#B45309">Nhóm</text>
+    <text x="320" y="156" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#B45309">Công nghệ / Stack</text>
+    <text x="80" y="190" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1C1917">Backend</text>
+    <text x="320" y="190" font-family="Arial, sans-serif" font-size="16" fill="#292524">ASP.NET Core 8 MVC · EF Core · Identity</text>
+    <rect x="64" y="214" width="1152" height="48" rx="8" fill="#FFFBEB"/>
+    <text x="80" y="242" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1C1917">Database</text>
+    <text x="320" y="242" font-family="Arial, sans-serif" font-size="16" fill="#292524">MySQL (Pomelo) · SQL Server / SQLite</text>
+    <text x="80" y="294" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1C1917">Auth</text>
+    <text x="320" y="294" font-family="Arial, sans-serif" font-size="16" fill="#292524">Dual cookie: User / Admin session</text>
+    <rect x="64" y="318" width="1152" height="48" rx="8" fill="#FFFBEB"/>
+    <text x="80" y="346" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1C1917">Thanh toán</text>
+    <text x="320" y="346" font-family="Arial, sans-serif" font-size="16" fill="#292524">PayPal Sandbox · COD</text>
+    <text x="80" y="398" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1C1917">Realtime</text>
+    <text x="320" y="398" font-family="Arial, sans-serif" font-size="16" fill="#292524">SignalR · Firebase FCM</text>
+    <rect x="64" y="422" width="1152" height="48" rx="8" fill="#FFFBEB"/>
+    <text x="80" y="450" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1C1917">Messaging</text>
+    <text x="320" y="450" font-family="Arial, sans-serif" font-size="16" fill="#292524">RabbitMQ</text>
+    <text x="80" y="502" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1C1917">Media</text>
+    <text x="320" y="502" font-family="Arial, sans-serif" font-size="16" fill="#292524">Cloudinary</text>
+    <rect x="64" y="526" width="1152" height="48" rx="8" fill="#FFFBEB"/>
+    <text x="80" y="554" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1C1917">Frontend</text>
+    <text x="320" y="554" font-family="Arial, sans-serif" font-size="16" fill="#292524">Razor · Tailwind CSS 4 · jQuery</text>
+  </g>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="12" fill="#78716C">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#78716C">06 / 20</text>
+  </g>
+</svg>

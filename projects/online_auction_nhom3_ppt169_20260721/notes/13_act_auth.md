@@ -1,0 +1,1 @@
+Activity dual cookie: nhánh User và nhánh Admin độc lập.

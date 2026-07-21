@@ -1,0 +1,1 @@
+Luồng chính: đăng bán → duyệt → đăng ký/cọc → bid realtime → kết thúc phiên → thanh toán.

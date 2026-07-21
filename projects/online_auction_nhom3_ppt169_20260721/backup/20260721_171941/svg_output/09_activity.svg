@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#FFFBEB"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 36 1184 72">
+    <rect x="48" y="44" width="8" height="40" rx="4" fill="#B45309"/>
+    <text x="72" y="72" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#1C1917">Activity Diagram</text>
+    <text x="72" y="100" font-family="Arial, sans-serif" font-size="14" fill="#78716C">Đăng bán → Duyệt → Đăng ký/Cọc → Bid → Thanh toán</text>
+  </g>
+
+  <g id="lane-headers" data-pptx-bounds="48 120 1184 48">
+    <rect x="48" y="120" width="220" height="48" rx="12" fill="#FEF3C7"/>
+    <text x="158" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">Seller</text>
+    <rect x="280" y="120" width="220" height="48" rx="12" fill="#FEF3C7"/>
+    <text x="390" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">Admin</text>
+    <rect x="512" y="120" width="220" height="48" rx="12" fill="#FEF3C7"/>
+    <text x="622" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">Buyer</text>
+    <rect x="744" y="120" width="220" height="48" rx="12" fill="#FEF3C7"/>
+    <text x="854" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">System</text>
+    <rect x="976" y="120" width="256" height="48" rx="12" fill="#FEF3C7"/>
+    <text x="1104" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#B45309">Payment</text>
+  </g>
+
+  <g id="activity-flow" data-pptx-bounds="48 190 1184 430">
+    <rect x="48" y="190" width="1184" height="430" rx="16" fill="#FFFFFF" stroke="#FDE68A" stroke-width="1.5"/>
+
+    <!-- Seller -->
+    <rect x="68" y="230" width="180" height="56" rx="12" fill="#FEF3C7"/>
+    <text x="158" y="264" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#1C1917">Đăng bán listing</text>
+
+    <!-- arrow to Admin -->
+    <line x1="248" y1="258" x2="300" y2="258" stroke="#B45309" stroke-width="2"/>
+    <polygon points="300,252 312,258 300,264" fill="#B45309"/>
+
+    <!-- Admin -->
+    <rect x="312" y="230" width="180" height="56" rx="12" fill="#B45309"/>
+    <text x="402" y="264" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#FFFFFF">Duyệt listing</text>
+
+    <!-- down to scheduled -->
+    <line x1="402" y1="286" x2="402" y2="340" stroke="#B45309" stroke-width="2"/>
+    <polygon points="396,340 402,352 408,340" fill="#B45309"/>
+
+    <rect x="312" y="352" width="180" height="48" rx="12" fill="#FEF3C7"/>
+    <text x="402" y="382" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#292524">scheduled / live</text>
+
+    <!-- to Buyer register -->
+    <line x1="492" y1="376" x2="540" y2="376" stroke="#B45309" stroke-width="2"/>
+    <polygon points="540,370 552,376 540,382" fill="#B45309"/>
+
+    <rect x="552" y="348" width="180" height="56" rx="12" fill="#FEF3C7"/>
+    <text x="642" y="372" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#1C1917">Đăng ký + Cọc</text>
+    <text x="642" y="392" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#78716C">Deposit PayPal</text>
+
+    <!-- to Bid -->
+    <line x1="642" y1="404" x2="642" y2="460" stroke="#B45309" stroke-width="2"/>
+    <polygon points="636,460 642,472 648,460" fill="#B45309"/>
+
+    <rect x="552" y="472" width="180" height="56" rx="12" fill="#B45309"/>
+    <text x="642" y="506" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#FFFFFF">Place Bid</text>
+
+    <!-- to System finalize -->
+    <line x1="732" y1="500" x2="780" y2="500" stroke="#B45309" stroke-width="2"/>
+    <polygon points="780,494 792,500 780,506" fill="#B45309"/>
+
+    <rect x="792" y="472" width="180" height="56" rx="12" fill="#FEF3C7"/>
+    <text x="882" y="496" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#1C1917">Finalization</text>
+    <text x="882" y="516" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#78716C">SignalR cập nhật</text>
+
+    <!-- to Payment -->
+    <line x1="972" y1="500" x2="1010" y2="500" stroke="#B45309" stroke-width="2"/>
+    <polygon points="1010,494 1022,500 1010,506" fill="#B45309"/>
+
+    <rect x="1022" y="472" width="180" height="56" rx="12" fill="#B45309"/>
+    <text x="1112" y="496" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#FFFFFF">Thanh toán</text>
+    <text x="1112" y="516" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#FEF3C7">PayPal / COD</text>
+
+    <!-- side note anti-fraud -->
+    <rect x="68" y="520" width="280" height="72" rx="12" fill="#FFFBEB" stroke="#FDE68A"/>
+    <text x="88" y="550" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#B45309">Anti-snipe / Fraud</text>
+    <text x="88" y="575" font-family="Arial, sans-serif" font-size="12" fill="#292524">Kiểm tra gian lận trong lúc bid</text>
+  </g>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="12" fill="#78716C">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#78716C">09 / 12</text>
+  </g>
+</svg>

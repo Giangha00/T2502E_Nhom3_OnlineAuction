@@ -1,0 +1,1 @@
+Bốn actor: Guest, Buyer, Seller, Admin — mỗi actor có các use case tương ứng trên hệ thống.

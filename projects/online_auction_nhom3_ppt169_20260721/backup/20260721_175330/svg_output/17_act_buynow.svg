@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 20 1184 50">
+    <rect x="48" y="24" width="8" height="36" rx="4" fill="#1D4ED8"/>
+    <text x="72" y="50" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#0F172A">Activity — Buy Now (Mua ngay)</text>
+    <text x="72" y="72" font-family="Arial, sans-serif" font-size="13" fill="#64748B">Luồng chính 5/5 · Cart → Invoice → Thanh toán trong 7 ngày</text>
+  </g>
+<rect x="60" y="90" width="380" height="560" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1"/>
+<rect x="60" y="90" width="380" height="36" fill="#DBEAFE"/>
+<text x="250.0" y="114" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1D4ED8">Buyer</text>
+<rect x="440" y="90" width="380" height="560" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1"/>
+<rect x="440" y="90" width="380" height="36" fill="#0F172A"/>
+<text x="630.0" y="114" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">System</text>
+<rect x="820" y="90" width="380" height="560" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1"/>
+<rect x="820" y="90" width="380" height="36" fill="#1D4ED8"/>
+<text x="1010.0" y="114" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">Payment</text>
+<circle cx="250" cy="150" r="10" fill="#0F172A"/>
+  <line x1="250" y1="160" x2="250" y2="177" stroke="#0F172A" stroke-width="1.5"/>
+  <polygon points="246,177 250,185 254,177" fill="#0F172A"/>
+  <rect x="150" y="185" width="200" height="40" rx="20" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="250.0" y="210.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Xem Buy Now</text>
+  <line x1="250" y1="225" x2="250" y2="247" stroke="#0F172A" stroke-width="1.5"/>
+  <polygon points="246,247 250,255 254,247" fill="#0F172A"/>
+  <rect x="150" y="255" width="200" height="40" rx="20" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="250.0" y="280.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Add to Cart</text>
+  <line x1="350" y1="275" x2="492" y2="275" stroke="#0F172A" stroke-width="1.5"/>
+  <polygon points="492,271 500,275 492,279" fill="#0F172A"/>
+  <rect x="500" y="255" width="220" height="40" rx="20" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="610.0" y="280.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Tạo invoice buy_now</text>
+  <line x1="610" y1="295" x2="610" y2="332" stroke="#0F172A" stroke-width="1.5"/>
+  <polygon points="606,332 610,340 614,332" fill="#0F172A"/>
+  <rect x="500" y="340" width="220" height="42" rx="21" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="610.0" y="366.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Deadline 7 ngày</text>
+  <line x1="610" y1="382" x2="610" y2="412" stroke="#0F172A" stroke-width="1.5"/>
+  <polygon points="606,412 610,420 614,412" fill="#0F172A"/>
+  <polygon points="610,428 642,460 610,492 578,460" fill="#FFFFFF" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="610" y="464" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#1D4ED8">Pay?</text>
+  <line x1="642" y1="460" x2="872" y2="460" stroke="#16A34A" stroke-width="1.5"/>
+  <polygon points="872,456 880,460 872,464" fill="#16A34A"/>
+  <text x="700" y="450" font-family="Arial, sans-serif" font-size="10" fill="#16A34A">Thanh toán</text>
+  <rect x="880" y="440" width="260" height="40" rx="20" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.5"/>
+  <text x="1010.0" y="465.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="600" fill="#166534">PayPal / COD</text>
+  <line x1="1010" y1="480" x2="1010" y2="532" stroke="#0F172A" stroke-width="1.5"/>
+  <polygon points="1006,532 1010,540 1014,532" fill="#0F172A"/>
+  <rect x="880" y="540" width="260" height="40" rx="20" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.5"/>
+  <text x="1010.0" y="565.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="600" fill="#166534">Order completed</text>
+  <line x1="1010" y1="580" x2="1010" y2="622" stroke="#0F172A" stroke-width="1.5"/>
+  <polygon points="1006,622 1010,630 1014,622" fill="#0F172A"/>
+  <circle cx="1010" cy="655" r="12" fill="none" stroke="#0F172A" stroke-width="3"/>
+  <circle cx="1010" cy="655" r="6" fill="#0F172A"/>
+  <path d="M578 460 L300 460 L300 380" fill="none" stroke="#DC2626" stroke-width="1.5"/>
+  <polygon points="296,382 300,372 304,382" fill="#DC2626"/>
+  <text x="340" y="450" font-family="Arial, sans-serif" font-size="10" fill="#DC2626">Hủy / hết hạn</text>
+  <rect x="150" y="350" width="200" height="40" rx="20" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="250.0" y="375.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="600" fill="#991B1B">Hủy invoice</text>
+  <line x1="250" y1="390" x2="250" y2="442" stroke="#0F172A" stroke-width="1.5"/>
+  <polygon points="246,442 250,450 254,442" fill="#0F172A"/>
+  <circle cx="250" cy="470" r="12" fill="none" stroke="#0F172A" stroke-width="3"/>
+  <circle cx="250" cy="470" r="6" fill="#0F172A"/>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="12" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#64748B">17 / 20</text>
+  </g>
+</svg>
