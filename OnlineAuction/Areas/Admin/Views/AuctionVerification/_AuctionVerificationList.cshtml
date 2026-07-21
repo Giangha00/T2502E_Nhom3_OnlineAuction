@@ -7,6 +7,8 @@
     var endPage = Math.Min(totalPages, currentPage + 2);
 }
 
+<link rel="stylesheet" href="~/admin/css/admin-auction-verification.css" asp-append-version="true" />
+
 <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
     @if (Model.Items.Count == 0)
     {
@@ -23,16 +25,18 @@
                     <tr>
                         <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Product</th>
                         <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Seller</th>
-                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Category</th>
-                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Starting price</th>
-                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Submitted</th>
                         <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Type</th>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Price</th>
+                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Submitted</th>
                         <th class="px-4 py-3 text-right text-theme-xs font-semibold uppercase text-gray-500">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
                     @foreach (var item in Model.Items)
                     {
+                        var typeClass = item.IsBuyNow ? "av-list-type av-list-type--buynow" : "av-list-type av-list-type--auction";
+                        var typeLabel = item.IsBuyNow ? "Buy Now" : "Auction";
+                        var priceLabel = item.IsBuyNow ? "Buy Now" : "Start";
                         <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
                             <td class="px-4 py-3">
                                 <div class="flex items-center gap-3">
@@ -40,23 +44,30 @@
                                     {
                                         <img src="@item.ImageUrl" alt="@item.ProductName" class="h-10 w-10 rounded-lg object-cover" />
                                     }
-                                    <span class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@item.ProductName</span>
+                                    <div class="min-w-0">
+                                        <span class="block truncate text-theme-sm font-medium text-gray-800 dark:text-white/90">@item.ProductName</span>
+                                        <span class="block text-theme-xs text-gray-500">@item.CategoryName</span>
+                                    </div>
                                 </div>
                             </td>
                             <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@item.SellerName</td>
-                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@item.CategoryName</td>
-                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">$@item.StartingPrice.ToString("N0")</td>
+                            <td class="px-4 py-3">
+                                <span class="@typeClass">@typeLabel</span>
+                            </td>
+                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">
+                                <span class="font-medium">$@item.DisplayPrice.ToString("N0")</span>
+                                <span class="ml-1 text-theme-xs text-gray-400">@priceLabel</span>
+                            </td>
                             <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">
                                 @(item.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "—")
                             </td>
-                            <td class="px-4 py-3 text-theme-sm capitalize text-gray-700 dark:text-gray-300">@item.ListingType</td>
                             <td class="px-4 py-3 text-right">
                                 <a asp-action="Details"
                                    asp-route-id="@item.Id"
-                                   class="admin-icon-action admin-icon-action--review"
-                                   title="Review"
-                                   aria-label="Review">
-                                    <partial name="_AdminIcon" model='"review"' />
+                                   class="av-review-cta"
+                                   title="Review listing"
+                                   aria-label="Review listing">
+                                    Review
                                 </a>
                             </td>
                         </tr>

@@ -1,0 +1,645 @@
+/* Admin Auction Verification — Review Listing layout */
+
+.av-review-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (min-width: 1280px) {
+  .av-review-layout {
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    gap: 1.5rem;
+  }
+
+  .av-review-aside {
+    order: 0;
+  }
+
+  .av-review-main {
+    order: 0;
+  }
+}
+
+/* Mobile: decision first for faster Approve/Reject */
+@media (max-width: 1279px) {
+  .av-review-aside {
+    order: -1;
+  }
+}
+
+.av-panel,
+.av-decision {
+  border-radius: 1rem;
+  border: 1px solid rgb(229 231 235);
+  background: #fff;
+  padding: 1.25rem;
+}
+
+.dark .av-panel,
+.dark .av-decision {
+  border-color: rgb(31 41 55);
+  background: rgb(255 255 255 / 0.03);
+}
+
+.av-panel-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: rgb(31 41 55);
+}
+
+.dark .av-panel-title {
+  color: rgb(255 255 255 / 0.9);
+}
+
+.av-section-label {
+  margin-bottom: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(156 163 175);
+}
+
+.av-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.av-badge--auction {
+  background: rgb(219 234 254);
+  color: rgb(29 78 216);
+}
+
+.av-badge--buynow {
+  background: rgb(209 250 229);
+  color: rgb(4 120 87);
+}
+
+.av-badge--status {
+  background: rgb(254 243 199);
+  color: rgb(180 83 9);
+}
+
+.dark .av-badge--auction {
+  background: rgb(30 58 138 / 0.35);
+  color: rgb(147 197 253);
+}
+
+.dark .av-badge--buynow {
+  background: rgb(6 78 59 / 0.4);
+  color: rgb(110 231 183);
+}
+
+.dark .av-badge--status {
+  background: rgb(120 53 15 / 0.4);
+  color: rgb(252 211 77);
+}
+
+/* Hero media */
+.av-hero-primary {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.85rem;
+  background: rgb(249 250 251);
+  border: 1px solid rgb(243 244 246);
+  cursor: zoom-in;
+  padding: 0;
+}
+
+.dark .av-hero-primary {
+  background: rgb(17 24 39);
+  border-color: rgb(55 65 81);
+}
+
+.av-hero-primary img {
+  display: block;
+  width: 100%;
+  max-height: 28rem;
+  object-fit: contain;
+  background: rgb(249 250 251);
+}
+
+.dark .av-hero-primary img {
+  background: rgb(17 24 39);
+}
+
+.av-hero-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.av-hero-thumb {
+  width: 4.25rem;
+  height: 4.25rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 2px solid transparent;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.av-hero-thumb.is-active {
+  border-color: rgb(59 130 246);
+}
+
+.av-hero-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.av-hero-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 12rem;
+  border-radius: 0.85rem;
+  border: 1px dashed rgb(209 213 219);
+  color: rgb(156 163 175);
+  font-size: 0.875rem;
+}
+
+.av-product-head {
+  margin-top: 1.1rem;
+}
+
+.av-product-name {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: rgb(31 41 55);
+}
+
+.dark .av-product-name {
+  color: rgb(255 255 255 / 0.92);
+}
+
+.av-product-subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  color: rgb(107 114 128);
+}
+
+.dark .av-product-subtitle {
+  color: rgb(156 163 175);
+}
+
+.av-product-meta {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: rgb(107 114 128);
+}
+
+.av-product-short {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: rgb(55 65 81);
+}
+
+.dark .av-product-short {
+  color: rgb(209 213 219);
+}
+
+/* Mini catalog card preview */
+.av-catalog-preview {
+  margin-top: 1.25rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid rgb(243 244 246);
+}
+
+.dark .av-catalog-preview {
+  border-top-color: rgb(55 65 81);
+}
+
+.av-mini-card {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 20rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(229 231 235);
+  background: rgb(249 250 251);
+  padding: 0.65rem;
+}
+
+.dark .av-mini-card {
+  border-color: rgb(55 65 81);
+  background: rgb(17 24 39 / 0.6);
+}
+
+.av-mini-card__media {
+  width: 4.5rem;
+  height: 4.5rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: rgb(229 231 235);
+}
+
+.av-mini-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.av-mini-card__name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: rgb(31 41 55);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.dark .av-mini-card__name {
+  color: rgb(255 255 255 / 0.9);
+}
+
+.av-mini-card__grade {
+  margin-top: 0.15rem;
+  font-size: 0.7rem;
+  color: rgb(107 114 128);
+}
+
+.av-mini-card__price {
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: rgb(31 41 55);
+}
+
+.dark .av-mini-card__price {
+  color: rgb(255 255 255 / 0.9);
+}
+
+.av-mini-card__price-label {
+  margin-left: 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgb(156 163 175);
+}
+
+/* Specs */
+.av-spec-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .av-spec-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.av-spec-grid dt {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgb(156 163 175);
+}
+
+.av-spec-grid dd {
+  margin-top: 0.2rem;
+  font-size: 0.875rem;
+  color: rgb(31 41 55);
+  word-break: break-word;
+}
+
+.dark .av-spec-grid dd {
+  color: rgb(229 231 235);
+}
+
+.av-price {
+  font-size: 1.1rem !important;
+  font-weight: 700;
+}
+
+.av-subgrades {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(243 244 246);
+}
+
+.dark .av-subgrades {
+  border-top-color: rgb(55 65 81);
+}
+
+.av-subgrades-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+@media (min-width: 640px) {
+  .av-subgrades-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.av-subgrades-grid div {
+  border-radius: 0.65rem;
+  border: 1px solid rgb(243 244 246);
+  padding: 0.65rem;
+  text-align: center;
+}
+
+.dark .av-subgrades-grid div {
+  border-color: rgb(55 65 81);
+}
+
+.av-subgrades-grid span {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgb(156 163 175);
+}
+
+.av-subgrades-grid strong {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 1.1rem;
+  color: rgb(31 41 55);
+}
+
+.dark .av-subgrades-grid strong {
+  color: rgb(255 255 255 / 0.9);
+}
+
+/* Timeline */
+.av-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  border-left: 2px solid rgb(229 231 235);
+  margin-left: 0.45rem;
+  padding-left: 1rem;
+}
+
+.dark .av-timeline {
+  border-left-color: rgb(55 65 81);
+}
+
+.av-timeline-step {
+  position: relative;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.av-timeline-dot {
+  position: absolute;
+  left: -1.35rem;
+  top: 0.35rem;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 9999px;
+  background: rgb(59 130 246);
+  box-shadow: 0 0 0 3px rgb(219 234 254);
+}
+
+.av-timeline-dot--live {
+  background: rgb(16 185 129);
+  box-shadow: 0 0 0 3px rgb(209 250 229);
+}
+
+.dark .av-timeline-dot {
+  box-shadow: 0 0 0 3px rgb(30 58 138 / 0.5);
+}
+
+.dark .av-timeline-dot--live {
+  box-shadow: 0 0 0 3px rgb(6 78 59 / 0.5);
+}
+
+.av-timeline-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgb(107 114 128);
+}
+
+.av-timeline-range {
+  margin-top: 0.15rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgb(31 41 55);
+}
+
+.dark .av-timeline-range {
+  color: rgb(229 231 235);
+}
+
+.av-note {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: rgb(107 114 128);
+}
+
+.dark .av-note {
+  color: rgb(156 163 175);
+}
+
+/* Description collapse */
+.av-desc-summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.av-desc-summary::-webkit-details-marker {
+  display: none;
+}
+
+.av-desc-hint {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgb(59 130 246);
+}
+
+.av-desc[open] .av-desc-hint {
+  display: none;
+}
+
+/* Checklist + decision */
+.av-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.av-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: rgb(55 65 81);
+}
+
+.dark .av-checklist li {
+  color: rgb(209 213 219);
+}
+
+.av-check-icon {
+  flex-shrink: 0;
+  width: 0.85rem;
+  height: 0.85rem;
+  margin-top: 0.15rem;
+  border-radius: 9999px;
+  background: rgb(209 213 219);
+}
+
+.av-checklist li.is-ok .av-check-icon {
+  background: rgb(16 185 129);
+}
+
+.av-checklist li.is-warn .av-check-icon {
+  background: rgb(245 158 11);
+}
+
+.av-checklist li.is-optional .av-check-icon {
+  background: rgb(156 163 175);
+}
+
+.av-reject-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.av-chip {
+  border-radius: 9999px;
+  border: 1px solid rgb(229 231 235);
+  background: rgb(249 250 251);
+  padding: 0.25rem 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgb(55 65 81);
+  cursor: pointer;
+}
+
+.av-chip:hover {
+  border-color: rgb(147 197 253);
+  background: rgb(239 246 255);
+}
+
+.dark .av-chip {
+  border-color: rgb(55 65 81);
+  background: rgb(17 24 39);
+  color: rgb(209 213 219);
+}
+
+.dark .av-chip:hover {
+  border-color: rgb(59 130 246);
+  background: rgb(30 58 138 / 0.35);
+}
+
+.av-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.65rem;
+  padding: 0.7rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.av-btn svg,
+.av-btn .admin-icon-action__svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.av-btn--approve {
+  background: rgb(16 185 129);
+  color: #fff;
+}
+
+.av-btn--approve:hover {
+  background: rgb(5 150 105);
+}
+
+.av-btn--reject {
+  background: rgb(239 68 68);
+  color: #fff;
+}
+
+.av-btn--reject:hover {
+  background: rgb(220 38 38);
+}
+
+/* Index list badges */
+.av-list-type {
+  display: inline-flex;
+  border-radius: 9999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.av-list-type--auction {
+  background: rgb(219 234 254);
+  color: rgb(29 78 216);
+}
+
+.av-list-type--buynow {
+  background: rgb(209 250 229);
+  color: rgb(4 120 87);
+}
+
+.dark .av-list-type--auction {
+  background: rgb(30 58 138 / 0.35);
+  color: rgb(147 197 253);
+}
+
+.dark .av-list-type--buynow {
+  background: rgb(6 78 59 / 0.4);
+  color: rgb(110 231 183);
+}
+
+.av-review-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 0.5rem;
+  background: rgb(59 130 246);
+  color: #fff !important;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+.av-review-cta:hover {
+  background: rgb(37 99 235);
+}

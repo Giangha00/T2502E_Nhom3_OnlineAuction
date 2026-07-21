@@ -353,8 +353,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AuctionHouseDbContext>();
 
-    if (db.Database.ProviderName?.Contains("Sqlite") == true
-        || db.Database.ProviderName?.Contains("SqlServer") == true)
+    if (db.Database.ProviderName?.Contains("Sqlite") == true)
     {
         await db.Database.EnsureCreatedAsync();
     }

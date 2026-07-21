@@ -815,8 +815,11 @@ public static class AuctionCatalogSeeder
                 StartDate = liveStart,
                 EndDate = now.AddYears(1),
                 Status = status,
-                SubmittedAt = status == AuctionStatuses.PendingReview ? now : null,
-                VerifiedAt = status is AuctionStatuses.Live or AuctionStatuses.EndingSoon or AuctionStatuses.Completed
+                SubmittedAt = null,
+                VerifiedAt = status is AuctionStatuses.Scheduled
+                    or AuctionStatuses.Live
+                    or AuctionStatuses.EndingSoon
+                    or AuctionStatuses.Completed
                     ? now
                     : null,
                 CreatedAt = now
@@ -837,7 +840,7 @@ public static class AuctionCatalogSeeder
         index switch
         {
             < 8 => AuctionStatuses.Live,
-            < 10 => AuctionStatuses.PendingReview,
+            < 10 => AuctionStatuses.Scheduled,
             10 => AuctionStatuses.Completed,
             _ => AuctionStatuses.Cancelled
         };
