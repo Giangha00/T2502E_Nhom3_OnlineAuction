@@ -541,11 +541,17 @@
   <data name="AboutUs_Team_Title" xml:space="preserve"><value>The curators</value></data>
   <data name="AboutUs_Team_Desc" xml:space="preserve"><value>Our team brings over 30 years of combined experience in the global collectibles market.</value></data>
   <data name="AboutUs_Team_Member1_Title" xml:space="preserve"><value>Founder &amp; CEO</value></data>
-  <data name="AboutUs_Team_Member1_Bio" xml:space="preserve"><value>Former auction house director with 20 years in high-value collectibles. Julian founded CardMarket to bridge traditional heritage and digital precision.</value></data>
+  <data name="AboutUs_Team_Member1_Bio" xml:space="preserve"><value>Leads product vision and marketplace strategy for CardMarket. Phạm Việt Anh connects collectors with trusted high-value listings.</value></data>
   <data name="AboutUs_Team_Member2_Title" xml:space="preserve"><value>Head of curation</value></data>
-  <data name="AboutUs_Team_Member2_Bio" xml:space="preserve"><value>Expert in modern TCG history. Elena leads specialists vetting every listing for historical significance.</value></data>
+  <data name="AboutUs_Team_Member2_Bio" xml:space="preserve"><value>Oversees listing quality and collectible authenticity standards. Danil Fomin Long ensures every card meets vault-grade criteria.</value></data>
   <data name="AboutUs_Team_Member3_Title" xml:space="preserve"><value>Technical director</value></data>
-  <data name="AboutUs_Team_Member3_Bio" xml:space="preserve"><value>Architect of our authentication engine. Marcus ensures every transaction is backed by immutable verification.</value></data>
+  <data name="AboutUs_Team_Member3_Bio" xml:space="preserve"><value>Owns platform architecture and auction reliability. Nguyễn Văn Hưng keeps bidding, payments, and verification running smoothly.</value></data>
+  <data name="AboutUs_Team_Member4_Title" xml:space="preserve"><value>Marketplace operations</value></data>
+  <data name="AboutUs_Team_Member4_Bio" xml:space="preserve"><value>Coordinates seller onboarding and live auction operations. Đinh Văn Hải keeps the marketplace moving day to day.</value></data>
+  <data name="AboutUs_Team_Member5_Title" xml:space="preserve"><value>Trust &amp; compliance</value></data>
+  <data name="AboutUs_Team_Member5_Bio" xml:space="preserve"><value>Focuses on fraud prevention and listing verification. Nguyễn Hữu Quân protects buyers and sellers across every deal.</value></data>
+  <data name="AboutUs_Team_Member6_Title" xml:space="preserve"><value>Growth &amp; community</value></data>
+  <data name="AboutUs_Team_Member6_Bio" xml:space="preserve"><value>Builds collector community and go-to-market programs. Nguyễn Giang Hà helps new sellers and bidders succeed on CardMarket.</value></data>
   <data name="AboutUs_Newsletter_Title" xml:space="preserve"><value>Stay informed on the next big drop</value></data>
   <data name="AboutUs_Newsletter_Desc" xml:space="preserve"><value>Join our newsletter for early access to curated collections and market insights.</value></data>
   <data name="AboutUs_Newsletter_Placeholder" xml:space="preserve"><value>Your email address</value></data>

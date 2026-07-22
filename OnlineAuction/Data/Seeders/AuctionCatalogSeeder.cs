@@ -23,12 +23,12 @@ public static class AuctionCatalogSeeder
 
     private static readonly (string Email, string UserName, string FullName, string AvatarUrl)[] BestSellerProfiles =
     [
-        ("giangha@auctionhouse.local", "giangha", "Nguyễn Giang Hà", "/admin/images/user/user-01.jpg"),
-        ("nguyen.hai@auctionhouse.local", "nguyen.hai", "Đinh Văn Hải", "/admin/images/user/user-02.jpg"),
-        ("viet.anh@auctionhouse.local", "viet.anh", "Phạm Việt Anh", "/admin/images/user/user-03.jpg"),
-        ("dan.long@auctionhouse.local", "dan.long", "Cậu Đan Long", "/admin/images/user/user-04.jpg"),
-        ("huu.quan@auctionhouse.local", "huu.quan", "Nguyễn Hữu Quân", "/admin/images/user/user-05.jpg"),
-        ("van.hung@auctionhouse.local", "van.hung", "Nguyễn Văn Hưng", "/admin/images/user/user-06.jpg")
+        ("viet.anh@auctionhouse.local", "viet.anh", "Phạm Việt Anh", "/images/team/pham-viet-anh.png"),
+        ("dan.long@auctionhouse.local", "dan.long", "Danil Fomin Long", "/images/team/danil-fomin-long.png"),
+        ("van.hung@auctionhouse.local", "van.hung", "Nguyễn Văn Hưng", "/images/team/nguyen-van-hung.png"),
+        ("nguyen.hai@auctionhouse.local", "nguyen.hai", "Đinh Văn Hải", "/images/team/dinh-van-hai.png"),
+        ("huu.quan@auctionhouse.local", "huu.quan", "Nguyễn Hữu Quân", "/images/team/nguyen-huu-quan.png"),
+        ("giangha@auctionhouse.local", "giangha", "Nguyễn Giang Hà", "/images/team/nguyen-giang-ha.png")
     ];
 
     private static bool IsExpiredSeededListing(Auction auction, DateTime now) =>

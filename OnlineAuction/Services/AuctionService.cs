@@ -16,32 +16,42 @@ public class AuctionService : IAuctionService
 
     private static readonly string[] CuratedBestSellerEmails =
     [
-        "giangha@auctionhouse.local",
-        "nguyen.hai@auctionhouse.local",
         "viet.anh@auctionhouse.local",
         "dan.long@auctionhouse.local",
+        "van.hung@auctionhouse.local",
+        "nguyen.hai@auctionhouse.local",
         "huu.quan@auctionhouse.local",
-        "van.hung@auctionhouse.local"
+        "giangha@auctionhouse.local"
     ];
 
     private static readonly string[] CuratedBestSellerUserNames =
     [
-        "giangha",
-        "nguyen.hai",
         "viet.anh",
         "dan.long",
+        "van.hung",
+        "nguyen.hai",
         "huu.quan",
-        "van.hung"
+        "giangha"
     ];
 
     private static readonly string[] CuratedBestSellerNames =
     [
-        "Nguyễn Giang Hà",
-        "Đinh Văn Hải",
         "Phạm Việt Anh",
-        "Cậu Đan Long",
+        "Danil Fomin Long",
+        "Nguyễn Văn Hưng",
+        "Đinh Văn Hải",
         "Nguyễn Hữu Quân",
-        "Nguyễn Văn Hưng"
+        "Nguyễn Giang Hà"
+    ];
+
+    private static readonly string[] CuratedBestSellerAvatarUrls =
+    [
+        "/images/team/pham-viet-anh.png",
+        "/images/team/danil-fomin-long.png",
+        "/images/team/nguyen-van-hung.png",
+        "/images/team/dinh-van-hai.png",
+        "/images/team/nguyen-huu-quan.png",
+        "/images/team/nguyen-giang-ha.png"
     ];
 
     private readonly AuctionHouseDbContext _dbContext;
@@ -380,12 +390,14 @@ public class AuctionService : IAuctionService
             {
                 sellersByUserName.TryGetValue(userName, out user);
             }
+
+            if (user is null)
             {
                 result.Add(new SellerViewModel
                 {
                     FullName = displayName,
                     Username = displayName,
-                    AvatarUrl = $"/admin/images/user/user-{((index % 37) + 1):D2}.jpg"
+                    AvatarUrl = CuratedBestSellerAvatarUrls[index]
                 });
                 continue;
             }
@@ -397,11 +409,8 @@ public class AuctionService : IAuctionService
             var completedCount = auctions.Count(auction => auction.Status == AuctionStatuses.Completed);
 
             var seller = ProductDetailMapper.MapSeller(user, liveCount, completedCount);
-            if (string.IsNullOrWhiteSpace(seller.FullName))
-            {
-                seller.FullName = displayName;
-            }
-
+            seller.FullName = displayName;
+            seller.AvatarUrl = CuratedBestSellerAvatarUrls[index];
             result.Add(seller);
         }
 

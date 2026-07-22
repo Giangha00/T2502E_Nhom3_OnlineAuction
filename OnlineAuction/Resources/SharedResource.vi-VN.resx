@@ -578,11 +578,17 @@
   <data name="AboutUs_Team_Title" xml:space="preserve"><value>Đội ngũ curators</value></data>
   <data name="AboutUs_Team_Desc" xml:space="preserve"><value>Đội ngũ có hơn 30 năm kinh nghiệm kết hợp trong thị trường collectibles toàn cầu.</value></data>
   <data name="AboutUs_Team_Member1_Title" xml:space="preserve"><value>Nhà sáng lập &amp; CEO</value></data>
-  <data name="AboutUs_Team_Member1_Bio" xml:space="preserve"><value>Cựu giám đốc nhà đấu giá với 20 năm collectibles giá trị cao. Julian sáng lập CardMarket để kết nối di sản truyền thống và độ chính xác số.</value></data>
+  <data name="AboutUs_Team_Member1_Bio" xml:space="preserve"><value>Dẫn dắt tầm nhìn sản phẩm và chiến lược marketplace của CardMarket. Phạm Việt Anh kết nối collector với các listing giá trị cao đáng tin cậy.</value></data>
   <data name="AboutUs_Team_Member2_Title" xml:space="preserve"><value>Trưởng phòng curation</value></data>
-  <data name="AboutUs_Team_Member2_Bio" xml:space="preserve"><value>Chuyên gia lịch sử TCG hiện đại. Elena dẫn dắt đội chuyên gia kiểm duyệt mọi listing về giá trị lịch sử.</value></data>
+  <data name="AboutUs_Team_Member2_Bio" xml:space="preserve"><value>Phụ trách chất lượng listing và tiêu chuẩn xác thực collectibles. Danil Fomin Long đảm bảo mọi thẻ đạt chuẩn vault-grade.</value></data>
   <data name="AboutUs_Team_Member3_Title" xml:space="preserve"><value>Giám đốc kỹ thuật</value></data>
-  <data name="AboutUs_Team_Member3_Bio" xml:space="preserve"><value>Kiến trúc sư engine xác thực. Marcus đảm bảo mọi giao dịch có xác minh bất biến.</value></data>
+  <data name="AboutUs_Team_Member3_Bio" xml:space="preserve"><value>Phụ trách kiến trúc nền tảng và độ tin cậy đấu giá. Nguyễn Văn Hưng giữ bidding, thanh toán và xác minh vận hành ổn định.</value></data>
+  <data name="AboutUs_Team_Member4_Title" xml:space="preserve"><value>Vận hành marketplace</value></data>
+  <data name="AboutUs_Team_Member4_Bio" xml:space="preserve"><value>Điều phối onboarding seller và vận hành đấu giá live. Đinh Văn Hải giữ marketplace chạy mượt mỗi ngày.</value></data>
+  <data name="AboutUs_Team_Member5_Title" xml:space="preserve"><value>Tin cậy &amp; tuân thủ</value></data>
+  <data name="AboutUs_Team_Member5_Bio" xml:space="preserve"><value>Tập trung chống gian lận và xác minh listing. Nguyễn Hữu Quân bảo vệ buyer và seller trong mọi giao dịch.</value></data>
+  <data name="AboutUs_Team_Member6_Title" xml:space="preserve"><value>Tăng trưởng &amp; cộng đồng</value></data>
+  <data name="AboutUs_Team_Member6_Bio" xml:space="preserve"><value>Xây dựng cộng đồng collector và chương trình go-to-market. Nguyễn Giang Hà hỗ trợ seller và bidder mới thành công trên CardMarket.</value></data>
   <data name="AboutUs_Newsletter_Title" xml:space="preserve"><value>Cập nhật drop lớn tiếp theo</value></data>
   <data name="AboutUs_Newsletter_Desc" xml:space="preserve"><value>Đăng ký newsletter để được truy cập sớm bộ sưu tập và thông tin thị trường.</value></data>
   <data name="AboutUs_Newsletter_Placeholder" xml:space="preserve"><value>Địa chỉ email của bạn</value></data>
