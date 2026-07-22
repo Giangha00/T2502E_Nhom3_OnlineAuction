@@ -151,6 +151,13 @@ public class AuctionController : BaseAdminController
         {
             ModelState.AddModelError(string.Empty, result.Message);
             await _auctionService.PopulateFormOptionsAsync(model);
+            var refreshed = await _auctionService.GetEditFormAsync(model.Id);
+            if (refreshed is not null)
+            {
+                model.IsScheduleLocked = refreshed.IsScheduleLocked;
+                model.IsStartingPriceLocked = refreshed.IsStartingPriceLocked;
+            }
+
             return View(model);
         }
 
@@ -205,9 +212,19 @@ public class AuctionController : BaseAdminController
     [HttpPost]
     [ValidateAntiForgeryToken]
     [RequirePermission(PermissionCodes.AuctionsManage)]
+    public async Task<IActionResult> Cancel(int id)
+    {
+        var result = await _auctionService.CancelAsync(id, GetCurrentAdminId());
+        TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _auctionService.DeleteAsync(id);
+        var result = await _auctionService.DeleteAsync(id, GetCurrentAdminId());
 
         if (result.Success)
         {
@@ -275,7 +292,7 @@ public class AuctionController : BaseAdminController
     [RequirePermission(PermissionCodes.AuctionsManage)]
     public async Task<IActionResult> BulkDelete(AuctionBulkDeleteViewModel model)
     {
-        var result = await _auctionService.BulkDeleteAsync(model.SelectedAuctionIds);
+        var result = await _auctionService.BulkDeleteAsync(model.SelectedAuctionIds, GetCurrentAdminId());
 
         if (result.Success)
         {

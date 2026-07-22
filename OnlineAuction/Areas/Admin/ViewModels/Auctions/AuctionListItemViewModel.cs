@@ -49,4 +49,12 @@ public class AuctionListItemViewModel
     public string ImageUrl { get; set; } = string.Empty;
 
     public DateTime CreatedAt { get; set; }
+
+    public bool CanDelete { get; set; } = true;
+
+    public bool CanCancel { get; set; }
+
+    public string? DeleteBlockReason { get; set; }
+
+    public int OrderItemCount { get; set; }
 }

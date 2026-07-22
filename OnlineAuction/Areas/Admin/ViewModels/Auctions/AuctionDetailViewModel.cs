@@ -95,4 +95,12 @@ public class AuctionDetailViewModel
     public IReadOnlyList<AdminWinnerNonPaymentLogViewModel> WinnerNonPaymentLogs { get; set; } = [];
 
     public IReadOnlyList<AdminForfeitedDepositViewModel> ForfeitedDeposits { get; set; } = [];
+
+    public bool CanDelete { get; set; } = true;
+
+    public bool CanCancel { get; set; }
+
+    public string? DeleteBlockReason { get; set; }
+
+    public int OrderItemCount { get; set; }
 }

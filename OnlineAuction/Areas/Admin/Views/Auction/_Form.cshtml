@@ -176,7 +176,9 @@
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
                 <label asp-for="StartingPrice" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <input asp-for="StartingPrice" id="startingPrice" type="number" step="0.01" min="0.01" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <input asp-for="StartingPrice" id="startingPrice" type="number" step="0.01" min="0.01"
+                       readonly="@(Model.IsStartingPriceLocked ? "readonly" : null)"
+                       class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 @(Model.IsStartingPriceLocked ? "bg-gray-50 dark:bg-gray-800" : string.Empty)" />
                 <span asp-validation-for="StartingPrice" class="text-theme-xs text-error-600"></span>
                 <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="startingPrice"></p>
             </div>
@@ -201,19 +203,25 @@
             }
             <div>
                 <label asp-for="RegistrationStartDate" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <input asp-for="RegistrationStartDate" id="registrationStartDate" type="datetime-local" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <input asp-for="RegistrationStartDate" id="registrationStartDate" type="datetime-local"
+                       readonly="@(Model.IsScheduleLocked ? "readonly" : null)"
+                       class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 @(Model.IsScheduleLocked ? "bg-gray-50 dark:bg-gray-800" : string.Empty)" />
                 <span asp-validation-for="RegistrationStartDate" class="text-theme-xs text-error-600"></span>
                 <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="registrationStartDate"></p>
             </div>
             <div>
                 <label asp-for="RegistrationEndDate" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <input asp-for="RegistrationEndDate" id="registrationEndDate" type="datetime-local" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <input asp-for="RegistrationEndDate" id="registrationEndDate" type="datetime-local"
+                       readonly="@(Model.IsScheduleLocked ? "readonly" : null)"
+                       class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 @(Model.IsScheduleLocked ? "bg-gray-50 dark:bg-gray-800" : string.Empty)" />
                 <span asp-validation-for="RegistrationEndDate" class="text-theme-xs text-error-600"></span>
                 <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="registrationEndDate"></p>
             </div>
             <div>
                 <label asp-for="StartDate" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <input asp-for="StartDate" id="liveStartDate" type="datetime-local" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                <input asp-for="StartDate" id="liveStartDate" type="datetime-local"
+                       readonly="@(Model.IsScheduleLocked ? "readonly" : null)"
+                       class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 @(Model.IsScheduleLocked ? "bg-gray-50 dark:bg-gray-800" : string.Empty)" />
                 <span asp-validation-for="StartDate" class="text-theme-xs text-error-600"></span>
                 <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="liveStartDate"></p>
             </div>
@@ -296,7 +304,13 @@ else
         </div>
         <div>
             <label asp-for="Status" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <select asp-for="Status" asp-items="Model.StatusOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></select>
+            <select asp-for="Status" asp-items="Model.StatusOptions"
+                    disabled="@(Model.IsScheduleLocked ? "disabled" : null)"
+                    class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 @(Model.IsScheduleLocked ? "bg-gray-50 dark:bg-gray-800" : string.Empty)"></select>
+            @if (Model.IsScheduleLocked)
+            {
+                <input type="hidden" asp-for="Status" />
+            }
             <span asp-validation-for="Status" class="text-theme-xs text-error-600"></span>
         </div>
     </div>
