@@ -1,0 +1,1 @@
+Activity place bid: auth, rate limit, fraud, SignalR, anti-snipe.

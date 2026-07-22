@@ -1,0 +1,1 @@
+User + PayPal: đăng ký phiên, đặt cọc, bid.

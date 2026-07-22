@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+  </g>
+  <rect x="48" y="28" width="8" height="36" rx="4" fill="#1D4ED8"/>
+  <text x="72" y="54" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#0F172A">Giới thiệu dự án</text>
+  <text x="72" y="82" font-family="Arial, sans-serif" font-size="15" fill="#64748B">CardMarket (RareCard Vault) - giao diện người dùng</text>
+
+  <rect x="48" y="110" width="720" height="520" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <image href="../images/project_ui.jpg" x="68" y="130" width="680" height="480" preserveAspectRatio="xMidYMid meet"/>
+
+  <rect x="800" y="110" width="432" height="520" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <text x="828" y="170" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#1D4ED8">CardMarket là gì?</text>
+  <text x="828" y="220" font-family="Arial, sans-serif" font-size="16" fill="#334155">Website đấu giá và mua ngay</text>
+  <text x="828" y="248" font-family="Arial, sans-serif" font-size="16" fill="#334155">thẻ bài sưu tầm (TCG / sports).</text>
+  <text x="828" y="300" font-family="Arial, sans-serif" font-size="16" fill="#334155">Người bán đăng listing, Admin</text>
+  <text x="828" y="328" font-family="Arial, sans-serif" font-size="16" fill="#334155">duyệt, người mua đặt cọc &amp; bid</text>
+  <text x="828" y="356" font-family="Arial, sans-serif" font-size="16" fill="#334155">realtime, thanh toán PayPal/COD.</text>
+  <rect x="828" y="400" width="360" height="1" fill="#BFDBFE"/>
+  <text x="828" y="450" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">Đối tượng</text>
+  <text x="828" y="482" font-family="Arial, sans-serif" font-size="15" fill="#64748B">Buyer · Seller · Admin</text>
+  <text x="828" y="530" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">Nền tảng</text>
+  <text x="828" y="562" font-family="Arial, sans-serif" font-size="15" fill="#64748B">ASP.NET Core 8 MVC</text>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">02 / 30</text>
+  </g>
+</svg>

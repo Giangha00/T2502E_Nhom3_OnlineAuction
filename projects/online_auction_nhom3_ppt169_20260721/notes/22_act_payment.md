@@ -1,0 +1,1 @@
+Activity thanh toán PayPal/COD tại Payment Center.

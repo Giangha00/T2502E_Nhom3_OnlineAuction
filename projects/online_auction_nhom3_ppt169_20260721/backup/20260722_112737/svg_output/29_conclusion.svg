@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+  </g>
+  <rect x="48" y="24" width="8" height="36" rx="4" fill="#1D4ED8"/>
+  <text x="72" y="50" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#0F172A">Kết luận</text>
+  <text x="220" y="50" font-family="Arial, sans-serif" font-size="15" fill="#64748B">Về đề tài CardMarket</text>
+
+  <rect x="48" y="90" width="1184" height="100" rx="14" fill="#1D4ED8"/>
+  <text x="80" y="135" font-family="Arial, sans-serif" font-size="18" fill="#DBEAFE">Đề tài đã xây dựng được nền tảng đấu giá thẻ bài trực tuyến hoàn chỉnh,</text>
+  <text x="80" y="165" font-family="Arial, sans-serif" font-size="18" fill="#FFFFFF">mô phỏng đúng quy trình thương mại từ đăng bán đến thanh toán.</text>
+
+  <rect x="48" y="220" width="580" height="160" rx="14" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <text x="80" y="270" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1D4ED8">1. Đạt mục tiêu chức năng</text>
+  <text x="80" y="310" font-family="Arial, sans-serif" font-size="15" fill="#334155">Hỗ trợ Auction &amp; Buy Now, đăng ký/cọc,</text>
+  <text x="80" y="338" font-family="Arial, sans-serif" font-size="15" fill="#334155">bid realtime, PayPal/COD, khu vực Admin.</text>
+
+  <rect x="652" y="220" width="580" height="160" rx="14" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <text x="684" y="270" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1D4ED8">2. An toàn &amp; kiểm soát</text>
+  <text x="684" y="310" font-family="Arial, sans-serif" font-size="15" fill="#334155">Dual-session User/Admin, duyệt listing,</text>
+  <text x="684" y="338" font-family="Arial, sans-serif" font-size="15" fill="#334155">chống gian lận bid, phân quyền động.</text>
+
+  <rect x="48" y="410" width="580" height="160" rx="14" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <text x="80" y="460" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1D4ED8">3. Trải nghiệm người dùng</text>
+  <text x="80" y="500" font-family="Arial, sans-serif" font-size="15" fill="#334155">Cập nhật giá realtime (SignalR), push,</text>
+  <text x="80" y="528" font-family="Arial, sans-serif" font-size="15" fill="#334155">đa ngôn ngữ, giao diện Tailwind hiện đại.</text>
+
+  <rect x="652" y="410" width="580" height="160" rx="14" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <text x="684" y="460" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1D4ED8">4. Hướng phát triển</text>
+  <text x="684" y="500" font-family="Arial, sans-serif" font-size="15" fill="#334155">Mở rộng thanh toán, đánh giá người dùng,</text>
+  <text x="684" y="528" font-family="Arial, sans-serif" font-size="15" fill="#334155">tối ưu mobile và vận hành production.</text>
+
+  <rect x="48" y="600" width="1184" height="50" rx="12" fill="#DBEAFE"/>
+  <text x="640" y="632" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#0F172A">CardMarket chứng minh tính khả thi của hệ thống đấu giá TCG trên ASP.NET Core 8</text>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">29 / 30</text>
+  </g>
+</svg>

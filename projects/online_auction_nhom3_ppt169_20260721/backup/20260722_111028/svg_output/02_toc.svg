@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="toc">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+  </g>
+  <g id="header" data-pptx-bounds="40 12 1200 36">
+    <rect x="40" y="14" width="8" height="28" rx="4" fill="#1D4ED8"/>
+    <text x="60" y="36" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#0F172A">Mục lục</text>
+    <text x="170" y="36" font-family="Arial, sans-serif" font-size="14" fill="#64748B">29 trang · 10 Use Case · 9 Activity Diagram</text>
+  </g>
+
+  <rect x="32" y="60" width="280" height="590" rx="10" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <text x="48" y="88" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1D4ED8">PHẦN CHUNG + KẾT</text>
+  <text x="48" y="120" font-family="Arial, sans-serif" font-size="14" fill="#0F172A">01  Tên đề tài</text>
+  <text x="48" y="148" font-family="Arial, sans-serif" font-size="14" fill="#0F172A">02  Mục lục</text>
+  <text x="48" y="176" font-family="Arial, sans-serif" font-size="14" fill="#0F172A">03  Thành viên</text>
+  <text x="48" y="204" font-family="Arial, sans-serif" font-size="14" fill="#0F172A">04  Tổng quan</text>
+  <text x="48" y="232" font-family="Arial, sans-serif" font-size="14" fill="#0F172A">05  Mục tiêu</text>
+  <text x="48" y="260" font-family="Arial, sans-serif" font-size="14" fill="#0F172A">06  Công nghệ</text>
+  <text x="48" y="288" font-family="Arial, sans-serif" font-size="14" fill="#0F172A">07  Phân bố thời gian</text>
+  <text x="48" y="340" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1D4ED8">KẾT</text>
+  <text x="48" y="372" font-family="Arial, sans-serif" font-size="14" fill="#0F172A">27  Database</text>
+  <text x="48" y="400" font-family="Arial, sans-serif" font-size="14" fill="#0F172A">28  Kết luận</text>
+  <text x="48" y="428" font-family="Arial, sans-serif" font-size="14" fill="#0F172A">29  Lời cảm ơn</text>
+
+  <rect x="328" y="60" width="440" height="590" rx="10" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <text x="348" y="88" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1D4ED8">USE CASE (08-17)</text>
+  <text x="348" y="120" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">08  Manage Account</text>
+  <text x="348" y="148" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">09  Manage Personal Activity</text>
+  <text x="348" y="176" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">10  Participate In Auction</text>
+  <text x="348" y="204" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">11  Purchase Product</text>
+  <text x="348" y="232" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">12  Manage Own Listings</text>
+  <text x="348" y="260" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">13  Admin Dashboard</text>
+  <text x="348" y="288" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">14  Manage Users &amp; Permissions</text>
+  <text x="348" y="316" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">15  Manage Auctions</text>
+  <text x="348" y="344" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">16  Verify Listings</text>
+  <text x="348" y="372" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">17  Manage Buy Now</text>
+
+  <rect x="788" y="60" width="460" height="590" rx="10" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <text x="808" y="88" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1D4ED8">ACTIVITY (18-26)</text>
+  <text x="808" y="120" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">18  Đăng ký (Sign Up)</text>
+  <text x="808" y="148" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">19  Đăng nhập (Login)</text>
+  <text x="808" y="176" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">20  Tạo đấu giá</text>
+  <text x="808" y="204" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">21  Place Bid</text>
+  <text x="808" y="232" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">22  Thanh toán (Payment)</text>
+  <text x="808" y="260" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">23  Duyệt listing (Verify)</text>
+  <text x="808" y="288" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">24  Duyệt listing (chi tiết)</text>
+  <text x="808" y="316" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">25  Quản lý Category</text>
+  <text x="808" y="344" font-family="Arial, sans-serif" font-size="13" fill="#0F172A">26  Quản lý Product</text>
+
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="13" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#64748B">02 / 29</text>
+  </g>
+</svg>

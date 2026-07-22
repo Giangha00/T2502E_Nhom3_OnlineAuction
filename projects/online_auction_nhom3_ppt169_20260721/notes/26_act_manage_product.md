@@ -1,0 +1,1 @@
+Activity Admin quản lý Template và Product instance.

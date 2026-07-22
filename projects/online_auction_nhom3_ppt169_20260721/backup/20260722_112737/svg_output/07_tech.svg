@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+  </g>
+  <rect x="48" y="24" width="8" height="36" rx="4" fill="#1D4ED8"/>
+  <text x="72" y="50" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#0F172A">Công nghệ</text>
+  <text x="240" y="50" font-family="Arial, sans-serif" font-size="15" fill="#64748B">Stack kỹ thuật dự án</text>
+  <rect x="48" y="100" width="276" height="220" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="48" y="100" width="276" height="56" rx="16" fill="#1D4ED8"/>
+  <rect x="48" y="128" width="276" height="28" fill="#1D4ED8"/>
+  <text x="186" y="136" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Backend</text>
+  <text x="186" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">ASP.NET Core 8 MVC</text>
+  <text x="186" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#64748B">EF Core · Identity</text>
+  <rect x="340" y="100" width="276" height="220" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="340" y="100" width="276" height="56" rx="16" fill="#1D4ED8"/>
+  <rect x="340" y="128" width="276" height="28" fill="#1D4ED8"/>
+  <text x="478" y="136" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Database</text>
+  <text x="478" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">MySQL (Pomelo)</text>
+  <text x="478" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#64748B">SQL Server / SQLite</text>
+  <rect x="632" y="100" width="276" height="220" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="632" y="100" width="276" height="56" rx="16" fill="#1D4ED8"/>
+  <rect x="632" y="128" width="276" height="28" fill="#1D4ED8"/>
+  <text x="770" y="136" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Auth</text>
+  <text x="770" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">Dual cookie session</text>
+  <text x="770" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#64748B">User · Admin tách biệt</text>
+  <rect x="924" y="100" width="276" height="220" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="924" y="100" width="276" height="56" rx="16" fill="#1D4ED8"/>
+  <rect x="924" y="128" width="276" height="28" fill="#1D4ED8"/>
+  <text x="1062" y="136" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Thanh toán</text>
+  <text x="1062" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">PayPal Sandbox</text>
+  <text x="1062" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#64748B">COD hỗ trợ</text>
+  <rect x="48" y="360" width="276" height="220" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="48" y="360" width="276" height="56" rx="16" fill="#1D4ED8"/>
+  <rect x="48" y="388" width="276" height="28" fill="#1D4ED8"/>
+  <text x="186" y="396" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Realtime</text>
+  <text x="186" y="480" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">SignalR hub</text>
+  <text x="186" y="515" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Firebase FCM push</text>
+  <rect x="340" y="360" width="276" height="220" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="340" y="360" width="276" height="56" rx="16" fill="#1D4ED8"/>
+  <rect x="340" y="388" width="276" height="28" fill="#1D4ED8"/>
+  <text x="478" y="396" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Messaging</text>
+  <text x="478" y="480" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">RabbitMQ</text>
+  <text x="478" y="515" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Outbid / event bus</text>
+  <rect x="632" y="360" width="276" height="220" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="632" y="360" width="276" height="56" rx="16" fill="#1D4ED8"/>
+  <rect x="632" y="388" width="276" height="28" fill="#1D4ED8"/>
+  <text x="770" y="396" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Media</text>
+  <text x="770" y="480" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">Cloudinary</text>
+  <text x="770" y="515" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Ảnh · document</text>
+  <rect x="924" y="360" width="276" height="220" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="924" y="360" width="276" height="56" rx="16" fill="#1D4ED8"/>
+  <rect x="924" y="388" width="276" height="28" fill="#1D4ED8"/>
+  <text x="1062" y="396" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Frontend</text>
+  <text x="1062" y="480" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">Razor Views</text>
+  <text x="1062" y="515" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Tailwind CSS 4</text>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">07 / 30</text>
+  </g>
+</svg>

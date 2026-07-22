@@ -1,0 +1,517 @@
+// OnlineAuction — DBML for https://dbdiagram.io
+// Source: Entities + AuctionHouseDbContext + ModelSnapshot
+// Omits ASP.NET Identity plumbing: user_claims, user_logins, user_tokens, role_claims
+// Audit FKs (created_by / updated_by / deleted_by) are columns only — no Ref lines
+
+// =============================================================================
+// Identity & Auth
+// =============================================================================
+
+Table users {
+  id int [pk, increment]
+  full_name nvarchar(120) [not null]
+  email nvarchar(160) [not null, unique]
+  normalized_email nvarchar(160)
+  phone_number nvarchar(20) [not null]
+  username nvarchar(50) [not null, unique]
+  normalized_username nvarchar(50) [unique]
+  password_hash nvarchar(255)
+  security_stamp nvarchar(256)
+  concurrency_stamp nvarchar(256)
+  email_confirmed bit [not null, default: false]
+  phone_number_confirmed bit [not null, default: false]
+  two_factor_enabled bit [not null, default: false]
+  lockout_end datetimeoffset
+  lockout_enabled bit [not null]
+  access_failed_count int [not null, default: 0]
+  role tinyint [not null, note: 'UserRole: 1=User, 2=Admin']
+  is_super_admin bit [not null, default: false]
+  status tinyint [not null, note: 'UserStatus: 0=Inactive, 1=Active']
+  avatar_url nvarchar(260)
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+
+  Note: 'ApplicationUser (IdentityUser<int>)'
+}
+
+Table roles {
+  Id int [pk, increment]
+  Name nvarchar(256)
+  NormalizedName nvarchar(256) [unique]
+  ConcurrencyStamp nvarchar(max)
+
+  Note: 'ASP.NET IdentityRole<int> — PascalCase columns'
+}
+
+Table user_roles {
+  UserId int [pk]
+  RoleId int [pk]
+
+  Note: 'IdentityUserRole<int> — N-N users ↔ roles'
+}
+
+Table permissions {
+  id int [pk, increment]
+  code nvarchar(100) [not null, unique]
+  name nvarchar(150) [not null]
+  module nvarchar(50) [not null]
+  description nvarchar(500)
+}
+
+Table role_permissions {
+  role_id int [pk]
+  permission_id int [pk]
+
+  Note: 'N-N roles ↔ permissions'
+}
+
+Table user_permissions {
+  user_id int [pk]
+  permission_id int [pk]
+
+  Note: 'N-N users ↔ permissions'
+}
+
+Table user_otp_codes {
+  id int [pk, increment]
+  user_id int [not null]
+  code_hash nvarchar(128) [not null]
+  salt nvarchar(64) [not null]
+  purpose nvarchar(40) [not null]
+  expires_at datetime2 [not null]
+  attempt_count int [not null]
+  max_attempts int [not null]
+  is_used bit [not null]
+  created_at datetime2 [not null]
+}
+
+Table user_device_tokens {
+  id int [pk, increment]
+  user_id int [not null]
+  fcm_token nvarchar(512) [not null, unique]
+  device_info nvarchar(260)
+  created_at datetime2 [not null]
+  last_used_at datetime2 [not null]
+}
+
+Table user_sandbox_wallets {
+  id int [pk, increment]
+  user_id int [not null, unique, note: '1-1 with users']
+  balance decimal(18,2) [not null, note: 'CHECK >= 0']
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+}
+
+// =============================================================================
+// Catalog
+// =============================================================================
+
+Table categories {
+  id int [pk, increment]
+  name nvarchar(50) [not null, unique]
+  slug nvarchar(60) [not null, unique]
+  sort_order int [not null]
+  is_active bit [not null]
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+}
+
+Table product_templates {
+  id int [pk, increment]
+  name nvarchar(255) [not null]
+  category_id int [not null]
+  set_name nvarchar(100)
+  card_number nvarchar(50)
+  grade_label nvarchar(50)
+  year int
+  language nvarchar(50)
+  short_description text
+  description_html text
+  primary_image nvarchar(500) [not null]
+  is_active bit [not null, default: true]
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+}
+
+Table products {
+  id int [pk, increment]
+  seller_id int [not null]
+  category_id int [not null]
+  product_template_id int
+  name nvarchar(120) [not null]
+  short_description nvarchar(300)
+  subtitle nvarchar(160)
+  description_html nvarchar(max)
+  condition nvarchar(20) [not null, default: 'graded']
+  product_origin nvarchar(120)
+  year int
+  set_name nvarchar(120)
+  language nvarchar(20)
+  card_number nvarchar(30)
+  grade_label nvarchar(20)
+  cert_number nvarchar(50)
+  grading_centering nvarchar(10)
+  grading_corners nvarchar(10)
+  grading_edges nvarchar(10)
+  grading_surface nvarchar(10)
+  primary_image nvarchar(500) [not null]
+  estimated_value decimal(18,2)
+  import_price decimal(18,2)
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+}
+
+Table product_images {
+  id int [pk, increment]
+  product_id int [not null]
+  image_url nvarchar(500) [not null]
+  sort_order int [not null]
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+}
+
+Table product_documents {
+  id int [pk, increment]
+  product_id int [not null]
+  name nvarchar(160) [not null]
+  file_url nvarchar(500) [not null]
+  file_type nvarchar(20) [not null]
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+}
+
+// =============================================================================
+// Auction
+// =============================================================================
+
+Table auctions {
+  id int [pk, increment]
+  product_id int [not null]
+  starting_price decimal(18,2) [not null]
+  bid_step decimal(18,2) [not null]
+  current_price decimal(18,2) [not null]
+  buy_now_price decimal(18,2)
+  listing_type nvarchar(20) [not null, note: 'auction | buynow']
+  requires_registration bit [not null, default: true]
+  status nvarchar(20) [not null, note: 'confirming|rejected|scheduled|live|ending_soon|ended|awaiting_payment|completed|cancelled']
+  submitted_at datetime2
+  verified_at datetime2
+  verified_by int
+  reject_reason nvarchar(500)
+  registration_start_date datetime2 [not null]
+  registration_end_date datetime2 [not null]
+  start_date datetime2 [not null]
+  end_date datetime2 [not null]
+  auction_event_name nvarchar(160)
+  winner_id int
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+}
+
+Table auction_registrations {
+  id bigint [pk, increment]
+  auction_id int [not null]
+  user_id int [not null]
+  status nvarchar(20) [not null, note: 'pending|approved|rejected|cancelled']
+  registered_at datetime2 [not null]
+  reviewed_at datetime2
+  reviewed_by int
+  reject_reason nvarchar(300)
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+
+  indexes {
+    (auction_id, user_id) [unique, name: 'uk_registrations_auction_user']
+  }
+}
+
+Table auction_registration_deposits {
+  id bigint [pk, increment]
+  auction_id int [not null]
+  user_id int [not null]
+  auction_registration_id bigint [not null]
+  amount decimal(18,2) [not null]
+  status nvarchar(30) [not null, note: 'pending|paid|cancelled|refunded|failed|applied|forfeited']
+  paypal_order_id nvarchar(120)
+  paypal_capture_id nvarchar(120)
+  paypal_refund_id nvarchar(120)
+  paid_at datetime2
+  refunded_at datetime2
+  forfeited_at datetime2
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+}
+
+Table bids {
+  id bigint [pk, increment]
+  auction_id int [not null]
+  bidder_id int [not null]
+  amount decimal(18,2) [not null]
+  bid_type nvarchar(20) [not null, note: 'manual | buy_now']
+  is_winning bit [not null]
+  placed_at datetime2 [not null]
+  ip_address nvarchar(45)
+  user_agent nvarchar(512)
+  is_flagged bit [not null, default: false]
+  flag_reason nvarchar(255)
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+}
+
+Table bid_fraud_alerts {
+  id bigint [pk, increment]
+  auction_id int [not null]
+  bid_id bigint
+  user_id int
+  alert_type nvarchar(50) [not null]
+  severity nvarchar(20) [not null, note: 'low|medium|high']
+  message text [not null]
+  metadata_json text
+  status nvarchar(20) [not null, note: 'open|reviewed|dismissed']
+  reviewed_by int
+  reviewed_at datetime2
+  created_at datetime2 [not null]
+}
+
+Table watchlist_items {
+  id bigint [pk, increment]
+  user_id int [not null]
+  auction_id int [not null]
+  added_at datetime2 [not null]
+
+  indexes {
+    (user_id, auction_id) [unique, name: 'ux_watchlist_user_auction']
+  }
+}
+
+Table winner_non_payment_logs {
+  id bigint [pk, increment]
+  auction_id int [not null]
+  cancelled_order_id int [note: 'no EF FK']
+  defaulting_user_id int [note: 'no EF FK']
+  forfeited_deposit_id bigint [note: 'no EF FK']
+  second_chance_order_id int [note: 'no EF FK']
+  second_chance_user_id int [note: 'no EF FK']
+  action nvarchar(50) [not null, note: 'payment_expired|deposit_forfeited|second_chance_offered|relist_recommended']
+  details nvarchar(1000) [not null]
+  forfeited_amount decimal(18,2)
+  created_at datetime2 [not null]
+}
+
+// =============================================================================
+// Orders & Payments
+// =============================================================================
+
+Table orders {
+  id int [pk, increment]
+  buyer_id int [not null]
+  order_reference nvarchar(30) [not null, unique]
+  order_source nvarchar(20) [not null, note: 'auction_win | buy_now']
+  status nvarchar(20) [not null, note: 'pending_payment|paid|shipped|delivered|cancelled']
+  subtotal decimal(18,2) [not null]
+  shipping_fee decimal(18,2) [not null]
+  vault_insurance decimal(18,2) [not null]
+  total_amount decimal(18,2) [not null]
+  platform_fee decimal(18,2) [not null]
+  seller_fee decimal(18,2) [not null]
+  seller_proceeds decimal(18,2) [not null]
+  deposit_applied decimal(18,2) [not null]
+  payment_deadline datetime2
+  payment_method nvarchar(30)
+  shipping_full_name nvarchar(120)
+  shipping_phone nvarchar(20)
+  shipping_address nvarchar(300)
+  shipping_city nvarchar(100)
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+
+  Note: 'AuctionOrder entity'
+}
+
+Table order_items {
+  id int [pk, increment]
+  order_id int [not null]
+  auction_id int [not null]
+  item_name nvarchar(160) [not null]
+  item_grade nvarchar(20)
+  item_image_url nvarchar(500)
+  winning_bid decimal(18,2) [not null]
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+
+  indexes {
+    (order_id, auction_id) [unique, name: 'uk_order_items_order_auction']
+  }
+}
+
+Table payments {
+  id int [pk, increment]
+  order_id int [not null]
+  amount decimal(18,2) [not null]
+  status nvarchar(20) [not null, note: 'pending|success|failed|cancelled']
+  transaction_id nvarchar(100)
+  paypal_order_id nvarchar(50)
+  paid_at datetime2
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+}
+
+// =============================================================================
+// Supporting
+// =============================================================================
+
+Table notifications {
+  id int [pk, increment]
+  user_id int [not null]
+  title nvarchar(200) [not null]
+  message nvarchar(500) [not null]
+  type nvarchar(30) [not null]
+  related_url nvarchar(260)
+  is_read bit [not null]
+  read_at datetime2
+  reference_type nvarchar(50)
+  reference_id int
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+}
+
+Table complaints {
+  id int [pk, increment]
+  request_reference nvarchar(40) [not null, unique]
+  order_id int
+  order_reference nvarchar(30)
+  buyer_id int [not null]
+  complaint_type nvarchar(20) [not null, note: 'refund|dispute|authenticity|other']
+  reason_code nvarchar(40) [not null]
+  status nvarchar(20) [not null, note: 'pending|under_review|approved|rejected|closed']
+  contact_name nvarchar(120) [not null]
+  contact_email nvarchar(256) [not null]
+  description text [not null]
+  requested_amount decimal(18,2)
+  evidence_urls text
+  admin_notes text
+  resolution_note text
+  reviewed_by int
+  reviewed_at datetime2
+  created_at datetime2 [not null]
+  updated_at datetime2
+  created_by int
+  updated_by int
+  deleted_at datetime2
+  deleted_by int
+}
+
+// =============================================================================
+// Relationships (business FKs only)
+// =============================================================================
+
+// Identity
+Ref: user_roles.UserId > users.id
+Ref: user_roles.RoleId > roles.Id
+Ref: role_permissions.role_id > roles.Id
+Ref: role_permissions.permission_id > permissions.id
+Ref: user_permissions.user_id > users.id
+Ref: user_permissions.permission_id > permissions.id
+Ref: user_otp_codes.user_id > users.id
+Ref: user_device_tokens.user_id > users.id
+Ref: user_sandbox_wallets.user_id - users.id
+
+// Catalog
+Ref: product_templates.category_id > categories.id
+Ref: products.seller_id > users.id
+Ref: products.category_id > categories.id
+Ref: products.product_template_id > product_templates.id
+Ref: product_images.product_id > products.id
+Ref: product_documents.product_id > products.id
+
+// Auction
+Ref: auctions.product_id > products.id
+Ref: auctions.winner_id > users.id
+Ref: auctions.verified_by > users.id
+Ref: auction_registrations.auction_id > auctions.id
+Ref: auction_registrations.user_id > users.id
+Ref: auction_registrations.reviewed_by > users.id
+Ref: auction_registration_deposits.auction_id > auctions.id
+Ref: auction_registration_deposits.user_id > users.id
+Ref: auction_registration_deposits.auction_registration_id > auction_registrations.id
+Ref: bids.auction_id > auctions.id
+Ref: bids.bidder_id > users.id
+Ref: bid_fraud_alerts.auction_id > auctions.id
+Ref: bid_fraud_alerts.bid_id > bids.id
+Ref: bid_fraud_alerts.user_id > users.id
+Ref: bid_fraud_alerts.reviewed_by > users.id
+Ref: watchlist_items.user_id > users.id
+Ref: watchlist_items.auction_id > auctions.id
+Ref: winner_non_payment_logs.auction_id > auctions.id
+
+// Orders
+Ref: orders.buyer_id > users.id
+Ref: order_items.order_id > orders.id
+Ref: order_items.auction_id > auctions.id
+Ref: payments.order_id > orders.id
+
+// Supporting
+Ref: notifications.user_id > users.id
+Ref: complaints.order_id > orders.id
+Ref: complaints.buyer_id > users.id
+Ref: complaints.reviewed_by > users.id

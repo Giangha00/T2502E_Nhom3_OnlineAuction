@@ -1,0 +1,1 @@
+Activity Admin quản lý danh mục: Create/Edit/Delete.

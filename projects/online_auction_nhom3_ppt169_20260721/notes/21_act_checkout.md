@@ -1,0 +1,1 @@
+Finalize → Order → PayPal/COD.

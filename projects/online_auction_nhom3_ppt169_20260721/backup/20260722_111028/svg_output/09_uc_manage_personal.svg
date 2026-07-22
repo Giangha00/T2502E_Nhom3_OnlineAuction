@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#FFFFFF"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 12 1184 40">
+    <rect x="48" y="16" width="8" height="32" rx="4" fill="#1D4ED8"/>
+    <text x="72" y="40" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#0F172A">Use Case - Manage Personal Activity</text>
+    <text x="72" y="62" font-family="Arial, sans-serif" font-size="14" fill="#64748B">User · Online Auction System</text>
+  </g>
+  <g id="diagram" data-pptx-bounds="40 72 1200 580">
+    <rect x="40" y="72" width="1200" height="580" rx="8" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+    <image href="../images/uc_manage_personal.jpg" x="70" y="82" width="1140" height="560" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">09 / 29</text>
+  </g>
+</svg>

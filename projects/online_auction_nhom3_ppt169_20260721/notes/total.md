@@ -1,52 +1,46 @@
-# Speaker Notes — CardMarket Nhóm 3
+# CardMarket - Thuyết trình Nhóm 3 (30 slides)
 
-## P01 — Tên đề tài
-Chào hội đồng. Nhóm 3 xin trình bày đề tài CardMarket — RareCard Vault.
+## 01. Tên đề tài (Cover)
+CardMarket / RareCard Vault - nền tảng đấu giá thẻ bài trực tuyến. Có ảnh dự án.
 
-## P02 — Mục lục
-17 trang: phần chung, 2 Use Case (User/Admin), 5 Activity, DB, kết luận.
+## 02. Giới thiệu dự án
+Screenshot giao diện + mô tả ngắn: Auction, Buy Now, Admin duyệt, PayPal/COD.
 
-## P03 — Giới thiệu thành viên
-Nhóm trưởng: Nguyễn Giang Hà. Thành viên: Nguyễn Văn Hưng, Đinh Văn Hải, Phạm Việt Anh, Nguyễn Hữu Quân, Danil Famil Long.
+## 03. Mục lục
+Theo cấu trúc: Tên đề tài, Giới thiệu, Mục lục, Thành viên, Tổng quan, Mục tiêu, Công nghệ, Thời gian, Use Case, Activity, DB, Kết luận, Cảm ơn.
 
-## P04 — Tổng quan
-Tổng quan hệ thống đấu giá & Buy Now.
+## 04. Giới thiệu thành viên
+6 thành viên + khung chèn ảnh (dashed).
+1. Nguyễn Giang Hà (nhóm trưởng)
+2. Nguyễn Văn Hưng
+3. Đinh Văn Hải
+4. Phạm Việt Anh
+5. Nguyễn Hữu Quân
+6. Danil Famil Long
 
-## P05 — Mục tiêu đề tài
-Bốn mục tiêu chính của đề tài.
+## 05. Tổng quan
+3 vai trò Buyer/Seller/Admin + luồng 5 bước.
 
-## P06 — Công nghệ
-Stack ASP.NET Core 8, Identity, PayPal, SignalR…
+## 06. Mục tiêu đề tài
+Mục tiêu chức năng và kỹ thuật của hệ thống.
 
-## P07 — Phân bố thời gian
-Khung giai đoạn phát triển.
+## 07. Công nghệ
+8 khối: Backend, DB, Auth, Thanh toán, Realtime, Messaging, Media, Frontend.
 
-## P08 — UC User
-Use Case Actor User: đăng ký, đăng nhập, khám phá, đăng bán, đấu giá, thông báo, đánh giá, thanh toán.
+## 08. Phân bố thời gian
+Gantt 12 tuần / 6 giai đoạn (mỗi giai đoạn 2 tuần).
 
-## P09 — UC Admin
-Use Case Actor Admin: đăng nhập, quản lý user/danh mục/sản phẩm/phiên, khiếu nại, thống kê báo cáo.
+## 09-18. Use Case
+Các use case chi tiết theo screenshot draw.io.
 
-## P10 — Act Auth
-Activity dual cookie User / Admin.
+## 19-27. Activity Diagram
+Các activity diagram chi tiết theo screenshot.
 
-## P11 — Act Đăng bán & Duyệt
-Submit → confirming → Approve/Reject → live.
+## 28. Db diagram
+Sơ đồ cơ sở dữ liệu.
 
-## P12 — Act Bid
-Deposit → Place Bid → SignalR / Fraud.
+## 29. Kết luận
+Kết luận đúng đề tài: chức năng, an toàn, UX, hướng phát triển.
 
-## P13 — Act Checkout
-Finalize → Order → PayPal/COD.
-
-## P14 — Act Buy Now
-Cart → Invoice 7 ngày → Thanh toán.
-
-## P15 — Database
-ER các entity chính.
-
-## P16 — Kết luận
-Điểm nổi bật dual auth, verify, realtime, i18n.
-
-## P17 — Lời cảm ơn
-Cảm ơn hội đồng, xin hỏi đáp.
+## 30. Lời cảm ơn
+Cảm ơn hội đồng / giảng viên / khán giả.

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 24 1184 56">
+    <rect x="48" y="28" width="8" height="40" rx="4" fill="#1D4ED8"/>
+    <text x="72" y="58" font-family="Arial, sans-serif" font-size="36" font-weight="700" fill="#0F172A">Giới thiệu thành viên</text>
+    <text x="520" y="58" font-family="Arial, sans-serif" font-size="18" fill="#64748B">Nhóm 3 · CardMarket</text>
+  </g>
+
+  <!-- Row 1: 3 members -->
+  <g id="m1">
+    <rect x="48" y="110" width="380" height="200" rx="16" fill="#FFFFFF" stroke="#1D4ED8" stroke-width="2.5"/>
+    <rect x="48" y="110" width="380" height="48" rx="16" fill="#1D4ED8"/>
+    <rect x="48" y="134" width="380" height="24" fill="#1D4ED8"/>
+    <text x="238" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">NHÓM TRƯỞNG</text>
+    <circle cx="120" cy="230" r="36" fill="#DBEAFE"/>
+    <text x="120" y="238" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1D4ED8">01</text>
+    <text x="175" y="225" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#0F172A">Nguyễn Giang Hà</text>
+    <text x="175" y="255" font-family="Arial, sans-serif" font-size="16" fill="#1D4ED8">Nhóm trưởng</text>
+  </g>
+  <g id="m2">
+    <rect x="450" y="110" width="380" height="200" rx="16" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.5"/>
+    <circle cx="522" cy="210" r="36" fill="#DBEAFE"/>
+    <text x="522" y="218" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1D4ED8">02</text>
+    <text x="580" y="205" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#0F172A">Nguyễn Văn Hưng</text>
+    <text x="580" y="235" font-family="Arial, sans-serif" font-size="16" fill="#64748B">Thành viên</text>
+  </g>
+  <g id="m3">
+    <rect x="852" y="110" width="380" height="200" rx="16" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.5"/>
+    <circle cx="924" cy="210" r="36" fill="#DBEAFE"/>
+    <text x="924" y="218" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1D4ED8">03</text>
+    <text x="982" y="205" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#0F172A">Đinh Văn Hải</text>
+    <text x="982" y="235" font-family="Arial, sans-serif" font-size="16" fill="#64748B">Thành viên</text>
+  </g>
+
+  <!-- Row 2: 3 members -->
+  <g id="m4">
+    <rect x="48" y="340" width="380" height="200" rx="16" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.5"/>
+    <circle cx="120" cy="440" r="36" fill="#DBEAFE"/>
+    <text x="120" y="448" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1D4ED8">04</text>
+    <text x="175" y="435" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#0F172A">Phạm Việt Anh</text>
+    <text x="175" y="465" font-family="Arial, sans-serif" font-size="16" fill="#64748B">Thành viên</text>
+  </g>
+  <g id="m5">
+    <rect x="450" y="340" width="380" height="200" rx="16" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.5"/>
+    <circle cx="522" cy="440" r="36" fill="#DBEAFE"/>
+    <text x="522" y="448" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1D4ED8">05</text>
+    <text x="580" y="435" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#0F172A">Nguyễn Hữu Quân</text>
+    <text x="580" y="465" font-family="Arial, sans-serif" font-size="16" fill="#64748B">Thành viên</text>
+  </g>
+  <g id="m6">
+    <rect x="852" y="340" width="380" height="200" rx="16" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.5"/>
+    <circle cx="924" cy="440" r="36" fill="#DBEAFE"/>
+    <text x="924" y="448" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1D4ED8">06</text>
+    <text x="982" y="435" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#0F172A">Danil Famil Long</text>
+    <text x="982" y="465" font-family="Arial, sans-serif" font-size="16" fill="#64748B">Thành viên</text>
+  </g>
+
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">03 / 25</text>
+  </g>
+</svg>

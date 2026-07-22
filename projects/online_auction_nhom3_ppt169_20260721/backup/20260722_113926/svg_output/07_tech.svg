@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+  </g>
+  <rect x="48" y="24" width="8" height="36" rx="4" fill="#1D4ED8"/>
+  <text x="72" y="50" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#0F172A">Công nghệ</text>
+  <rect x="48" y="100" width="276" height="240" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="126" y="136" width="120" height="120" rx="16" fill="#F8FAFC"/>
+  <image href="../images/tech_dotnet.png" x="141" y="151" width="90" height="90" preserveAspectRatio="xMidYMid meet"/>
+  <text x="186" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">ASP.NET Core 8</text>
+  <rect x="340" y="100" width="276" height="240" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="418" y="136" width="120" height="120" rx="16" fill="#F8FAFC"/>
+  <image href="../images/tech_mysql.png" x="433" y="151" width="90" height="90" preserveAspectRatio="xMidYMid meet"/>
+  <text x="478" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">MySQL</text>
+  <rect x="632" y="100" width="276" height="240" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="710" y="136" width="120" height="120" rx="16" fill="#F8FAFC"/>
+  <image href="../images/tech_paypal.png" x="725" y="151" width="90" height="90" preserveAspectRatio="xMidYMid meet"/>
+  <text x="770" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">PayPal</text>
+  <rect x="924" y="100" width="276" height="240" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="1002" y="136" width="120" height="120" rx="16" fill="#F8FAFC"/>
+  <image href="../images/tech_signalr2.png" x="1017" y="151" width="90" height="90" preserveAspectRatio="xMidYMid meet"/>
+  <text x="1062" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">SignalR</text>
+  <rect x="48" y="370" width="276" height="240" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="126" y="406" width="120" height="120" rx="16" fill="#F8FAFC"/>
+  <image href="../images/tech_firebase.png" x="141" y="421" width="90" height="90" preserveAspectRatio="xMidYMid meet"/>
+  <text x="186" y="570" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">Firebase</text>
+  <rect x="340" y="370" width="276" height="240" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="418" y="406" width="120" height="120" rx="16" fill="#F8FAFC"/>
+  <image href="../images/tech_rabbitmq.png" x="433" y="421" width="90" height="90" preserveAspectRatio="xMidYMid meet"/>
+  <text x="478" y="570" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">RabbitMQ</text>
+  <rect x="632" y="370" width="276" height="240" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="710" y="406" width="120" height="120" rx="16" fill="#F8FAFC"/>
+  <image href="../images/tech_cloudinary.png" x="725" y="421" width="90" height="90" preserveAspectRatio="xMidYMid meet"/>
+  <text x="770" y="570" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">Cloudinary</text>
+  <rect x="924" y="370" width="276" height="240" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <rect x="1002" y="406" width="120" height="120" rx="16" fill="#F8FAFC"/>
+  <image href="../images/tech_tailwind.png" x="1017" y="421" width="90" height="90" preserveAspectRatio="xMidYMid meet"/>
+  <text x="1062" y="570" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">Tailwind CSS</text>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">07 / 30</text>
+  </g>
+</svg>

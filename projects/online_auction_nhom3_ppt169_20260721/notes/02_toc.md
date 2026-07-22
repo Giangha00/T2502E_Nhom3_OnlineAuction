@@ -1,1 +1,1 @@
-17 trang: phần chung, 2 Use Case (User/Admin), 5 Activity, DB, kết luận.
+29 trang: phần chung, 10 Use Case, 9 Activity Diagram, DB, kết luận.

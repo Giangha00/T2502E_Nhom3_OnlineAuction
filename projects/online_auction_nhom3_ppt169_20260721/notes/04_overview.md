@@ -1,1 +1,1 @@
-Tổng quan hệ thống đấu giá & Buy Now.
+Tổng quan hệ thống đấu giá và Buy Now.

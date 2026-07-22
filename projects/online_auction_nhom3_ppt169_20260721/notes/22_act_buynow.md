@@ -1,0 +1,1 @@
+Cart → Invoice 7 ngày → Thanh toán.

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#FFFFFF"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 20 1184 50">
+    <rect x="48" y="24" width="8" height="36" rx="4" fill="#000000"/>
+    <text x="72" y="50" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#000000">Activity — Đăng ký / Đăng nhập</text>
+    <text x="72" y="72" font-family="Arial, sans-serif" font-size="17" fill="#333333">Luồng chính 1/5 · Dual cookie: User vs Admin</text>
+  </g>
+
+  <!-- Lanes -->
+  <rect x="60" y="90" width="380" height="560" fill="#FFFFFF" stroke="#000000"/>
+  <rect x="440" y="90" width="380" height="560" fill="#FFFFFF" stroke="#000000"/>
+  <rect x="820" y="90" width="380" height="560" fill="#FFFFFF" stroke="#000000"/>
+  <rect x="60" y="90" width="380" height="36" fill="#000000"/>
+  <text x="250" y="114" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">User</text>
+  <rect x="440" y="90" width="380" height="36" fill="#000000"/>
+  <text x="630" y="114" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">System</text>
+  <rect x="820" y="90" width="380" height="36" fill="#000000"/>
+  <text x="1010" y="114" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">Admin</text>
+
+  <!-- Start -->
+  <circle cx="250" cy="160" r="10" fill="#000000"/>
+  <line x1="250" y1="170" x2="250" y2="195" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="246,193 250,201 254,193" fill="#000000"/>
+
+  <rect x="150" y="201" width="200" height="40" rx="20" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="250" y="226" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#000000">Đăng ký / Login</text>
+
+  <line x1="250" y1="241" x2="250" y2="275" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="246,273 250,281 254,273" fill="#000000"/>
+
+  <polygon points="250,281 282,313 250,345 218,313" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="250" y="317" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#000000">Loại?</text>
+
+  <!-- User branch -->
+  <line x1="282" y1="313" x2="520" y2="313" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="518,309 528,313 518,317" fill="#000000"/>
+  <text x="360" y="305" font-family="Arial, sans-serif" font-size="14" fill="#000000">User</text>
+
+  <rect x="520" y="293" width="220" height="40" rx="20" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="630" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#000000">Validate credential</text>
+
+  <line x1="630" y1="333" x2="630" y2="375" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="626,373 630,381 634,373" fill="#000000"/>
+
+  <rect x="520" y="381" width="220" height="40" rx="20" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="630" y="406" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#000000">Set User cookie</text>
+
+  <line x1="630" y1="421" x2="630" y2="470" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="626,468 630,476 634,468" fill="#000000"/>
+
+  <rect x="520" y="476" width="220" height="40" rx="20" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="630" y="501" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#000000">Redirect trang User</text>
+
+  <line x1="630" y1="516" x2="630" y2="575" stroke="#000000" stroke-width="1.5"/>
+  <circle cx="630" cy="595" r="12" fill="none" stroke="#000000" stroke-width="3"/>
+  <circle cx="630" cy="595" r="6" fill="#000000"/>
+
+  <!-- Admin branch -->
+  <path d="M250 345 L250 400 L900 400" fill="none" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="898,396 908,400 898,404" fill="#000000"/>
+  <text x="280" y="385" font-family="Arial, sans-serif" font-size="14" fill="#000000">Admin</text>
+
+  <rect x="900" y="380" width="220" height="40" rx="20" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="1010" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#000000">Login /Admin</text>
+
+  <line x1="1010" y1="420" x2="1010" y2="470" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="1006,468 1010,476 1014,468" fill="#000000"/>
+
+  <rect x="900" y="476" width="220" height="40" rx="20" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="1010" y="501" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#000000">Set Admin cookie</text>
+
+  <line x1="1010" y1="516" x2="1010" y2="575" stroke="#000000" stroke-width="1.5"/>
+  <circle cx="1010" cy="595" r="12" fill="none" stroke="#000000" stroke-width="3"/>
+  <circle cx="1010" cy="595" r="6" fill="#000000"/>
+
+  <!-- Note -->
+  <rect x="150" y="520" width="200" height="70" rx="12" fill="#FFFFFF" stroke="#000000"/>
+  <text x="250" y="548" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#000000">Dual session</text>
+  <text x="250" y="570" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333333">2 cookie độc lập</text>
+
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="16" fill="#333333">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#333333">18 / 25</text>
+  </g>
+</svg>

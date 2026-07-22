@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 36 1184 72">
+    <rect x="48" y="44" width="8" height="40" rx="4" fill="#1D4ED8"/>
+    <text x="72" y="72" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#0F172A">Mục tiêu đề tài</text>
+    <text x="72" y="100" font-family="Arial, sans-serif" font-size="18" fill="#64748B">Bốn mục tiêu chính của CardMarket</text>
+  </g>
+  <g id="objective-1" data-pptx-bounds="48 130 580 220">
+    <rect x="48" y="130" width="580" height="220" rx="16" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.5"/>
+    <circle cx="96" cy="178" r="28" fill="#1D4ED8"/>
+    <text x="96" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">01</text>
+    <text x="144" y="185" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#0F172A">Hệ thống hoàn chỉnh</text>
+    <text x="88" y="240" font-family="Arial, sans-serif" font-size="20" fill="#334155">Xây dựng nền tảng đấu giá online đầy đủ:<tspan x="88" dy="30">MVC, Identity, database và luồng nghiệp vụ</tspan><tspan x="88" dy="30">end-to-end.</tspan></text>
+  </g>
+  <g id="objective-2" data-pptx-bounds="660 130 580 220">
+    <rect x="660" y="130" width="580" height="220" rx="16" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.5"/>
+    <circle cx="708" cy="178" r="28" fill="#1D4ED8"/>
+    <text x="708" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">02</text>
+    <text x="756" y="185" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#0F172A">Quy trình thương mại</text>
+    <text x="700" y="240" font-family="Arial, sans-serif" font-size="20" fill="#334155">Mô phỏng thực tế: xác thực listing, cọc<tspan x="700" dy="30">đăng ký, chống gian lận bid, thanh toán</tspan><tspan x="700" dy="30">và phí nền tảng.</tspan></text>
+  </g>
+  <g id="objective-3" data-pptx-bounds="48 380 580 220">
+    <rect x="48" y="380" width="580" height="220" rx="16" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.5"/>
+    <circle cx="96" cy="428" r="28" fill="#1D4ED8"/>
+    <text x="96" y="435" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">03</text>
+    <text x="144" y="435" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#0F172A">Bảo mật tách lớp</text>
+    <text x="88" y="490" font-family="Arial, sans-serif" font-size="20" fill="#334155">Tách bảo mật Admin / User bằng<tspan x="88" dy="30">dual-session cookies và phân quyền động.</tspan></text>
+  </g>
+  <g id="objective-4" data-pptx-bounds="660 380 580 220">
+    <rect x="660" y="380" width="580" height="220" rx="16" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.5"/>
+    <circle cx="708" cy="428" r="28" fill="#1D4ED8"/>
+    <text x="708" y="435" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">04</text>
+    <text x="756" y="435" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#0F172A">Trải nghiệm người dùng</text>
+    <text x="700" y="490" font-family="Arial, sans-serif" font-size="20" fill="#334155">Realtime (SignalR / push) và đa ngôn ngữ<tspan x="700" dy="30">để phục vụ người dùng quốc tế.</tspan></text>
+  </g>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="16" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#64748B">06 / 30</text>
+  </g>
+</svg>

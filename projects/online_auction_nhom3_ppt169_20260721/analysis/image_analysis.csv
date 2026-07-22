@@ -1,3 +1,23 @@
 No,Filename,Width,Height,AspectRatio,PixelAspectRatio,RatioSource,UsageCount,DisplayRatioVariants,AssetKind,SvgRenderable,PptxNativeSupported,SizeKB,Category,ImageArea_SxS,TextArea_SxS
-1,uc_admin.jpg,1024,815,1.26,1.26,pixel,1,,bitmap,True,True,80.4,Standard landscape,754x600,386x600
-2,uc_user.jpg,1024,875,1.17,1.17,pixel,1,,bitmap,True,True,92.6,Near square,702x600,438x600
+1,act_create_auction.jpg,1013,1024,0.99,0.99,pixel,1,,bitmap,True,True,72.3,Near square,594x600,546x600
+2,act_login.jpg,1024,520,1.97,1.97,pixel,1,,bitmap,True,True,43.9,Wide landscape,812x412,328x600
+3,act_manage_category.jpg,1024,610,1.68,1.68,pixel,1,,bitmap,True,True,58.0,Wide landscape,812x484,328x600
+4,act_manage_product.jpg,1024,653,1.57,1.57,pixel,1,,bitmap,True,True,55.9,Wide landscape,812x518,328x600
+5,act_payment.jpg,1024,848,1.21,1.21,pixel,1,,bitmap,True,True,63.7,Standard landscape,725x600,415x600
+6,act_place_bid.jpg,1024,909,1.13,1.13,pixel,1,,bitmap,True,True,63.6,Near square,676x600,464x600
+7,act_signup.jpg,1024,875,1.17,1.17,pixel,1,,bitmap,True,True,63.0,Near square,702x600,438x600
+8,act_verify_listings.jpg,1024,805,1.27,1.27,pixel,1,,bitmap,True,True,65.3,Standard landscape,763x600,377x600
+9,act_verify_listings_2.jpg,1024,810,1.26,1.26,pixel,1,,bitmap,True,True,67.1,Standard landscape,759x600,381x600
+10,uc_admin.jpg,1024,815,1.26,1.26,pixel,1,,bitmap,True,True,80.4,Standard landscape,754x600,386x600
+11,uc_admin_dashboard.jpg,1024,565,1.81,1.81,pixel,1,,bitmap,True,True,49.2,Wide landscape,812x448,328x600
+12,uc_browse_marketplace.jpg,1024,562,1.82,1.82,pixel,1,,bitmap,True,True,50.6,Wide landscape,812x446,328x600
+13,uc_manage_account.jpg,1024,698,1.47,1.47,pixel,1,,bitmap,True,True,53.0,Standard landscape,812x553,328x600
+14,uc_manage_auctions.jpg,1024,663,1.54,1.54,pixel,1,,bitmap,True,True,57.5,Wide landscape,812x526,328x600
+15,uc_manage_buynow.jpg,1024,544,1.88,1.88,pixel,1,,bitmap,True,True,46.8,Wide landscape,812x431,328x600
+16,uc_manage_listings.jpg,1024,635,1.61,1.61,pixel,1,,bitmap,True,True,54.5,Wide landscape,812x504,328x600
+17,uc_manage_personal.jpg,1024,645,1.59,1.59,pixel,1,,bitmap,True,True,56.7,Wide landscape,812x511,328x600
+18,uc_manage_users.jpg,1024,490,2.09,2.09,pixel,1,,bitmap,True,True,45.4,Ultra-wide,812x389,328x600
+19,uc_participate_auction.jpg,1024,578,1.77,1.77,pixel,1,,bitmap,True,True,49.7,Wide landscape,812x458,328x600
+20,uc_purchase_product.jpg,1024,616,1.66,1.66,pixel,1,,bitmap,True,True,53.5,Wide landscape,812x488,328x600
+21,uc_user.jpg,1024,875,1.17,1.17,pixel,1,,bitmap,True,True,92.6,Near square,702x600,438x600
+22,uc_verify_listings.jpg,1024,344,2.98,2.98,pixel,1,,bitmap,True,True,35.7,Ultra-wide,1160x390,1160x190

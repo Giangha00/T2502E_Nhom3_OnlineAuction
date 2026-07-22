@@ -1,0 +1,1 @@
+User: đăng ký, xác nhận email, login/logout, reset OTP, dashboard.

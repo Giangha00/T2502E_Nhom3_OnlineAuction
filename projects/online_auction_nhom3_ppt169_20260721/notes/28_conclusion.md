@@ -1,0 +1,1 @@
+Dual auth, verify listing, realtime, đa ngôn ngữ.

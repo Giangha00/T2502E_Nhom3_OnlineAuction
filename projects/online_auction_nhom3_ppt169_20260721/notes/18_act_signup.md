@@ -1,0 +1,1 @@
+Activity đăng ký tài khoản + xác thực email.

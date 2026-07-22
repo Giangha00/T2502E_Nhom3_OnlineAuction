@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#FFFFFF"/>
+  </g>
+  <g id="header" data-pptx-bounds="48 20 1184 50">
+    <rect x="48" y="24" width="8" height="36" rx="4" fill="#000000"/>
+    <text x="72" y="50" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#000000">Activity — Đăng bán &amp; Duyệt listing</text>
+    <text x="72" y="72" font-family="Arial, sans-serif" font-size="17" fill="#333333">Luồng chính 2/5 · confirming → Approve/Reject → live</text>
+  </g>
+<rect x="60" y="90" width="380" height="560" fill="#FFFFFF" stroke="#000000" stroke-width="1"/>
+<rect x="60" y="90" width="380" height="36" fill="#000000"/>
+<text x="250.0" y="114" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">Seller</text>
+<rect x="440" y="90" width="380" height="560" fill="#FFFFFF" stroke="#000000" stroke-width="1"/>
+<rect x="440" y="90" width="380" height="36" fill="#000000"/>
+<text x="630.0" y="114" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">Admin</text>
+<rect x="820" y="90" width="380" height="560" fill="#FFFFFF" stroke="#000000" stroke-width="1"/>
+<rect x="820" y="90" width="380" height="36" fill="#000000"/>
+<text x="1010.0" y="114" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">System</text>
+<circle cx="250" cy="150" r="10" fill="#000000"/>
+  <line x1="250" y1="160" x2="250" y2="177" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="246,177 250,185 254,177" fill="#000000"/>
+  <rect x="150" y="185" width="200" height="42" rx="21" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="250.0" y="211.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#000000">Điền form /Sell</text>
+  <line x1="250" y1="227" x2="250" y2="252" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="246,252 250,260 254,252" fill="#000000"/>
+  <rect x="150" y="260" width="200" height="42" rx="21" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="250.0" y="286.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#000000">Submit listing</text>
+  <line x1="350" y1="281" x2="492" y2="281" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="492,277 500,281 492,285" fill="#000000"/>
+  <rect x="500" y="260" width="220" height="42" rx="21" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="610.0" y="286.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#000000">Nhận status confirming</text>
+  <line x1="610" y1="302" x2="610" y2="342" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="606,342 610,350 614,342" fill="#000000"/>
+  <rect x="500" y="350" width="220" height="42" rx="21" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="610.0" y="376.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#000000">Duyệt hàng chờ</text>
+  <line x1="610" y1="392" x2="610" y2="422" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="606,422 610,430 614,422" fill="#000000"/>
+  <polygon points="610,438 642,470 610,502 578,470" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="610" y="474" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#000000">OK?</text>
+  <path d="M578 470 L300 470 L300 380" fill="none" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="296,382 300,372 304,382" fill="#000000"/>
+  <text x="340" y="460" font-family="Arial, sans-serif" font-size="14" fill="#000000">Reject</text>
+  <rect x="150" y="350" width="200" height="42" rx="21" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="250.0" y="376.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#000000">Nhận lý do từ chối</text>
+  <path d="M250 350 L250 320" fill="none" stroke="#000000" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="100" y="330" font-family="Arial, sans-serif" font-size="14" fill="#000000">Sửa &amp; gửi lại</text>
+  <line x1="610" y1="502" x2="610" y2="537" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="606,537 610,545 614,537" fill="#000000"/>
+  <text x="630" y="530" font-family="Arial, sans-serif" font-size="14" fill="#000000">Approve</text>
+  <rect x="500" y="545" width="220" height="42" rx="21" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="610.0" y="571.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#000000">Approve</text>
+  <line x1="720" y1="566" x2="872" y2="566" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="872,562 880,566 872,570" fill="#000000"/>
+  <rect x="880" y="545" width="260" height="42" rx="21" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
+  <text x="1010.0" y="571.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#000000">scheduled / live</text>
+  <line x1="1010" y1="587" x2="1010" y2="612" stroke="#000000" stroke-width="1.5"/>
+  <polygon points="1006,612 1010,620 1014,612" fill="#000000"/>
+  <circle cx="1010" cy="640" r="12" fill="none" stroke="#000000" stroke-width="3"/>
+  <circle cx="1010" cy="640" r="6" fill="#000000"/>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="16" fill="#333333">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#333333">19 / 25</text>
+  </g>
+</svg>
