@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="toc">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+  </g>
+  <rect x="48" y="28" width="8" height="36" rx="4" fill="#1D4ED8"/>
+  <text x="72" y="54" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#0F172A">Mục lục</text>
+  <text x="220" y="54" font-family="Arial, sans-serif" font-size="15" fill="#64748B">Theo cấu trúc thuyết trình</text>
+  <rect x="48" y="100" width="580" height="520" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <circle cx="100" cy="150" r="22" fill="#DBEAFE"/>
+  <text x="100" y="156" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#1D4ED8">01</text>
+  <text x="140" y="156" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">Tên đề tài</text>
+  <text x="560" y="156" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">01</text>
+  <circle cx="100" cy="220" r="22" fill="#DBEAFE"/>
+  <text x="100" y="226" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#1D4ED8">02</text>
+  <text x="140" y="226" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">Giới thiệu dự án</text>
+  <text x="560" y="226" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">02</text>
+  <circle cx="100" cy="290" r="22" fill="#DBEAFE"/>
+  <text x="100" y="296" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#1D4ED8">03</text>
+  <text x="140" y="296" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">Mục lục</text>
+  <text x="560" y="296" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">03</text>
+  <circle cx="100" cy="360" r="22" fill="#DBEAFE"/>
+  <text x="100" y="366" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#1D4ED8">04</text>
+  <text x="140" y="366" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">Giới thiệu thành viên</text>
+  <text x="560" y="366" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">04</text>
+  <circle cx="100" cy="430" r="22" fill="#DBEAFE"/>
+  <text x="100" y="436" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#1D4ED8">05</text>
+  <text x="140" y="436" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">Tổng quan</text>
+  <text x="560" y="436" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">05</text>
+  <circle cx="100" cy="500" r="22" fill="#DBEAFE"/>
+  <text x="100" y="506" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#1D4ED8">06</text>
+  <text x="140" y="506" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">Mục tiêu đề tài</text>
+  <text x="560" y="506" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">06</text>
+  <rect x="652" y="100" width="580" height="520" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <circle cx="704" cy="150" r="22" fill="#DBEAFE"/>
+  <text x="704" y="156" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#1D4ED8">07</text>
+  <text x="744" y="156" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">Công nghệ</text>
+  <text x="1170" y="156" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">07</text>
+  <circle cx="704" cy="220" r="22" fill="#DBEAFE"/>
+  <text x="704" y="226" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#1D4ED8">08</text>
+  <text x="744" y="226" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">Phân bố thời gian</text>
+  <text x="1170" y="226" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">08</text>
+  <circle cx="704" cy="290" r="22" fill="#DBEAFE"/>
+  <text x="704" y="296" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#1D4ED8">09</text>
+  <text x="744" y="296" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">Use Case</text>
+  <text x="1170" y="296" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">09-18</text>
+  <circle cx="704" cy="360" r="22" fill="#DBEAFE"/>
+  <text x="704" y="366" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#1D4ED8">10</text>
+  <text x="744" y="366" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">Activity Diagram</text>
+  <text x="1170" y="366" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">19-27</text>
+  <circle cx="704" cy="430" r="22" fill="#DBEAFE"/>
+  <text x="704" y="436" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#1D4ED8">11</text>
+  <text x="744" y="436" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">Db diagram</text>
+  <text x="1170" y="436" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">28</text>
+  <circle cx="704" cy="500" r="22" fill="#DBEAFE"/>
+  <text x="704" y="506" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#1D4ED8">12</text>
+  <text x="744" y="506" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">Kết luận · Lời cảm ơn</text>
+  <text x="1170" y="506" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">29-30</text>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">03 / 30</text>
+  </g>
+</svg>

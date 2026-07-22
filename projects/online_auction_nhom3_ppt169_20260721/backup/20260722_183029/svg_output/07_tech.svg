@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+  </g>
+  <rect x="48" y="28" width="8" height="36" rx="4" fill="#1D4ED8"/>
+  <text x="72" y="54" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#0F172A">Công nghệ</text>
+  <image href="../images/tech_dotnet.png" x="225.0" y="160" width="110" height="110" preserveAspectRatio="xMidYMid meet"/>
+  <text x="280.0" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">ASP.NET Core 8</text>
+  <image href="../images/tech_sql.png" x="585.0" y="160" width="110" height="110" preserveAspectRatio="xMidYMid meet"/>
+  <text x="640.0" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">SQL</text>
+  <image href="../images/tech_paypal.png" x="945.0" y="160" width="110" height="110" preserveAspectRatio="xMidYMid meet"/>
+  <text x="1000.0" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">PayPal</text>
+  <image href="../images/tech_signalr2.png" x="225.0" y="400" width="110" height="110" preserveAspectRatio="xMidYMid meet"/>
+  <text x="280.0" y="558" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">SignalR</text>
+  <image href="../images/tech_cloudinary.png" x="585.0" y="400" width="110" height="110" preserveAspectRatio="xMidYMid meet"/>
+  <text x="640.0" y="558" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">Cloudinary</text>
+  <image href="../images/tech_tailwind.png" x="945.0" y="400" width="110" height="110" preserveAspectRatio="xMidYMid meet"/>
+  <text x="1000.0" y="558" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0F172A">Tailwind CSS</text>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">07 / 30</text>
+  </g>
+</svg>

@@ -5,7 +5,7 @@
   </g>
   <rect x="48" y="24" width="8" height="36" rx="4" fill="#1D4ED8"/>
   <text x="72" y="50" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#0F172A">Giới thiệu thành viên</text>
-  <text x="480" y="50" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Nhóm 3 · CardMarket</text>
+  <text x="480" y="50" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Chèn ảnh vào khung dashed bên dưới</text>
   <g id="m1">
     <rect x="48" y="100" width="380" height="250" rx="16" fill="#FFFFFF" stroke="#1D4ED8" stroke-width="2.5"/>
     <rect x="68" y="120" width="120" height="140" rx="12" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1"/>
@@ -15,8 +15,9 @@
   </g>
   <g id="m2">
     <rect x="450" y="100" width="380" height="250" rx="16" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.5"/>
-    <rect x="470" y="120" width="120" height="140" rx="12" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1"/>
-    <image href="../images/team_nguyen_van_hung.png" x="470" y="120" width="120" height="140" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="470" y="120" width="120" height="140" rx="12" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="530" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#94A3B8">Chèn ảnh</text>
+    <text x="530" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#CBD5E1">02</text>
     <text x="610" y="170" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">Nguyễn Văn Hưng</text>
     <text x="610" y="200" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Thành viên</text>
   </g>
@@ -29,22 +30,25 @@
   </g>
   <g id="m4">
     <rect x="48" y="380" width="380" height="250" rx="16" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.5"/>
-    <rect x="68" y="400" width="120" height="140" rx="12" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1"/>
-    <image href="../images/team_pham_viet_anh.png" x="68" y="400" width="120" height="140" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="68" y="400" width="120" height="140" rx="12" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="128" y="465" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#94A3B8">Chèn ảnh</text>
+    <text x="128" y="485" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#CBD5E1">04</text>
     <text x="208" y="450" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">Phạm Việt Anh</text>
     <text x="208" y="480" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Thành viên</text>
   </g>
   <g id="m5">
     <rect x="450" y="380" width="380" height="250" rx="16" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.5"/>
-    <rect x="470" y="400" width="120" height="140" rx="12" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1"/>
-    <image href="../images/team_nguyen_huu_quan.png" x="470" y="400" width="120" height="140" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="470" y="400" width="120" height="140" rx="12" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="530" y="465" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#94A3B8">Chèn ảnh</text>
+    <text x="530" y="485" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#CBD5E1">05</text>
     <text x="610" y="450" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">Nguyễn Hữu Quân</text>
     <text x="610" y="480" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Thành viên</text>
   </g>
   <g id="m6">
     <rect x="852" y="380" width="380" height="250" rx="16" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.5"/>
-    <rect x="872" y="400" width="120" height="140" rx="12" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1"/>
-    <image href="../images/team_danil_famil_long.png" x="872" y="400" width="120" height="140" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="872" y="400" width="120" height="140" rx="12" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="932" y="465" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#94A3B8">Chèn ảnh</text>
+    <text x="932" y="485" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#CBD5E1">06</text>
     <text x="1012" y="450" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">Danil Famil Long</text>
     <text x="1012" y="480" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Thành viên</text>
   </g>

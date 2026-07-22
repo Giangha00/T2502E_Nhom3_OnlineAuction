@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="content">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#F8FAFC"/>
+  </g>
+  <rect x="48" y="24" width="8" height="36" rx="4" fill="#1D4ED8"/>
+  <text x="72" y="50" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#0F172A">Tổng quan</text>
+  <text x="220" y="50" font-family="Arial, sans-serif" font-size="15" fill="#64748B">Hệ thống đấu giá thẻ bài trực tuyến</text>
+
+  <rect x="48" y="90" width="1184" height="90" rx="14" fill="#1D4ED8"/>
+  <text x="80" y="130" font-family="Arial, sans-serif" font-size="18" fill="#DBEAFE">CardMarket giúp người dùng mua - bán thẻ bài đã grading qua</text>
+  <text x="80" y="158" font-family="Arial, sans-serif" font-size="18" fill="#FFFFFF">hai kênh: Đấu giá (Auction) và Mua ngay (Buy Now), có Admin duyệt listing.</text>
+
+  <!-- 3 pillars -->
+  <rect x="48" y="210" width="370" height="200" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <circle cx="100" cy="260" r="24" fill="#DBEAFE"/>
+  <text x="100" y="266" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1D4ED8">01</text>
+  <text x="140" y="266" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#0F172A">Người bán</text>
+  <text x="80" y="320" font-family="Arial, sans-serif" font-size="16" fill="#334155">Tạo listing Auction / Buy Now,</text>
+  <text x="80" y="348" font-family="Arial, sans-serif" font-size="16" fill="#334155">upload ảnh, chờ Admin duyệt,</text>
+  <text x="80" y="376" font-family="Arial, sans-serif" font-size="16" fill="#334155">theo dõi trạng thái bán.</text>
+
+  <rect x="455" y="210" width="370" height="200" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <circle cx="507" cy="260" r="24" fill="#DBEAFE"/>
+  <text x="507" y="266" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1D4ED8">02</text>
+  <text x="547" y="266" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#0F172A">Người mua</text>
+  <text x="487" y="320" font-family="Arial, sans-serif" font-size="16" fill="#334155">Đăng ký phiên + đặt cọc,</text>
+  <text x="487" y="348" font-family="Arial, sans-serif" font-size="16" fill="#334155">đặt giá realtime, mua ngay,</text>
+  <text x="487" y="376" font-family="Arial, sans-serif" font-size="16" fill="#334155">thanh toán PayPal / COD.</text>
+
+  <rect x="862" y="210" width="370" height="200" rx="16" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <circle cx="914" cy="260" r="24" fill="#DBEAFE"/>
+  <text x="914" y="266" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1D4ED8">03</text>
+  <text x="954" y="266" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#0F172A">Admin</text>
+  <text x="894" y="320" font-family="Arial, sans-serif" font-size="16" fill="#334155">Duyệt listing, quản lý user,</text>
+  <text x="894" y="348" font-family="Arial, sans-serif" font-size="16" fill="#334155">phiên đấu giá, khiếu nại,</text>
+  <text x="894" y="376" font-family="Arial, sans-serif" font-size="16" fill="#334155">thống kê &amp; báo cáo.</text>
+
+  <!-- flow -->
+  <text x="48" y="460" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1D4ED8">LUỒNG CHÍNH</text>
+  <rect x="48" y="480" width="200" height="70" rx="12" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <text x="148" y="522" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">1. Đăng bán</text>
+  <text x="265" y="522" font-family="Arial, sans-serif" font-size="22" fill="#1D4ED8">→</text>
+  <rect x="290" y="480" width="200" height="70" rx="12" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <text x="390" y="522" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">2. Duyệt</text>
+  <text x="507" y="522" font-family="Arial, sans-serif" font-size="22" fill="#1D4ED8">→</text>
+  <rect x="532" y="480" width="200" height="70" rx="12" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <text x="632" y="522" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">3. Bid / Mua</text>
+  <text x="749" y="522" font-family="Arial, sans-serif" font-size="22" fill="#1D4ED8">→</text>
+  <rect x="774" y="480" width="200" height="70" rx="12" fill="#FFFFFF" stroke="#BFDBFE"/>
+  <text x="874" y="522" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">4. Thanh toán</text>
+  <text x="991" y="522" font-family="Arial, sans-serif" font-size="22" fill="#1D4ED8">→</text>
+  <rect x="1016" y="480" width="216" height="70" rx="12" fill="#1D4ED8"/>
+  <text x="1124" y="522" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">5. Hoàn tất</text>
+
+  <text x="48" y="600" font-family="Arial, sans-serif" font-size="15" fill="#64748B">Hỗ trợ: Watchlist · Thông báo realtime · Khiếu nại/hoàn tiền · Đa ngôn ngữ (vi/en/ja/ko)</text>
+  <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="14" fill="#64748B">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#64748B">05 / 30</text>
+  </g>
+</svg>

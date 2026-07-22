@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1280" height="720" viewBox="0 0 1280 720" data-pptx-page-role="cover">
+  <g id="bg" data-pptx-bounds="0 0 1280 720" data-pptx-role="background">
+    <rect width="1280" height="720" fill="#0F172A"/>
+  </g>
+  <image href="../images/project_hero.jpg" x="560" y="0" width="720" height="720" preserveAspectRatio="xMidYMid slice" opacity="0.55"/>
+  <rect x="560" y="0" width="720" height="720" fill="#0F172A" opacity="0.35"/>
+  <rect x="0" y="0" width="640" height="720" fill="#0F172A"/>
+  <text x="64" y="180" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#93C5FD">NHÓM 3</text>
+  <text x="64" y="270" font-family="Arial, sans-serif" font-size="56" font-weight="700" fill="#FFFFFF">CardMarket</text>
+  <text x="64" y="320" font-family="Arial, sans-serif" font-size="28" fill="#60A5FA">RareCard Vault</text>
+  <text x="64" y="380" font-family="Arial, sans-serif" font-size="20" fill="#CBD5E1">Nền tảng đấu giá thẻ bài trực tuyến</text>
+  <rect x="64" y="420" width="280" height="4" rx="2" fill="#1D4ED8"/>
+  <text x="64" y="470" font-family="Arial, sans-serif" font-size="18" fill="#94A3B8">Đồ án ASP.NET Core 8</text>
+  <text x="64" y="510" font-family="Arial, sans-serif" font-size="16" fill="#64748B">Auction · Buy Now · Admin Verify</text>
+    <g id="footer" data-pptx-bounds="48 680 1184 28" data-pptx-role="footer">
+    <text x="48" y="700" font-family="Arial, sans-serif" font-size="14" fill="#94A3B8">Nhóm 3 · CardMarket</text>
+    <text x="1232" y="700" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#94A3B8">01 / 30</text>
+  </g>
+</svg>

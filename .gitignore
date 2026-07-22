@@ -92,3 +92,6 @@ Thumbs.db
 
 # JetBrains Rider
 *.sln.iml
+
+# Local UI session artifact
+projects/online_auction_nhom3_ppt169_20260721/confirm_ui/session.json
