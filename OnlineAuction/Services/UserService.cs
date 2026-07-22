@@ -401,7 +401,7 @@ public class UserService : IUserService
 
         if (model.Role == UserRole.User)
         {
-            await _permissionService.UpdateUserPermissionsAsync(user.Id, model.AssignedPermissionIds);
+            await _permissionService.UpdateUserPermissionsAsync(user.Id, model.AssignedPermissionCodes);
         }
         else
         {
@@ -477,7 +477,7 @@ public class UserService : IUserService
 
         if (model.Role == UserRole.User)
         {
-            await _permissionService.UpdateUserPermissionsAsync(user.Id, model.AssignedPermissionIds);
+            await _permissionService.UpdateUserPermissionsAsync(user.Id, model.AssignedPermissionCodes);
         }
         else
         {
@@ -622,8 +622,8 @@ public class UserService : IUserService
     private async Task PopulatePermissionOptionsAsync(UserFormViewModel model, int? userId = null)
     {
         model.AvailablePermissions = (await _permissionService.GetPermissionCatalogAsync()).ToList();
-        model.AssignedPermissionIds = userId.HasValue
-            ? (await _permissionService.GetAssignedPermissionIdsForUserAsync(userId.Value)).ToList()
+        model.AssignedPermissionCodes = userId.HasValue
+            ? (await _permissionService.GetAssignedPermissionCodesForUserAsync(userId.Value)).ToList()
             : [];
     }
 

@@ -8,15 +8,13 @@ public class PermissionManagementViewModel
 
     public int? SelectedUserId { get; init; }
 
-    public IReadOnlyList<int> SelectedUserPermissionIds { get; init; } = [];
+    public IReadOnlyList<string> SelectedUserPermissionCodes { get; init; } = [];
 
     public bool CanManage { get; init; }
 }
 
 public class PermissionItemViewModel
 {
-    public int Id { get; init; }
-
     public string Code { get; init; } = string.Empty;
 
     public string Name { get; init; } = string.Empty;
@@ -34,5 +32,5 @@ public class UserPermissionRowViewModel
 
     public string Email { get; init; } = string.Empty;
 
-    public int AssignedPermissionCount { get; init; }
+    public int AssignedPermissionCount { get; set; }
 }

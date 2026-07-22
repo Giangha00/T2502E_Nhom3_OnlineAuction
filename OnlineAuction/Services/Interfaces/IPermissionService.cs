@@ -10,11 +10,11 @@ public interface IPermissionService
 
     Task<bool> UserHasAdminPanelAccessAsync(int userId, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<int>> GetAssignedPermissionIdsForUserAsync(int userId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<string>> GetAssignedPermissionCodesForUserAsync(int userId, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<PermissionItemViewModel>> GetPermissionCatalogAsync(CancellationToken cancellationToken = default);
 
-    Task UpdateUserPermissionsAsync(int userId, IReadOnlyList<int> permissionIds, CancellationToken cancellationToken = default);
+    Task UpdateUserPermissionsAsync(int userId, IReadOnlyList<string> permissionCodes, CancellationToken cancellationToken = default);
 
     Task<PermissionManagementViewModel> GetPermissionManagementViewModelAsync(
         bool canManage,
@@ -23,6 +23,6 @@ public interface IPermissionService
 
     Task<(bool Success, string Message)> SaveUserPermissionsAsync(
         int userId,
-        IReadOnlyList<int> permissionIds,
+        IReadOnlyList<string> permissionCodes,
         CancellationToken cancellationToken = default);
 }
