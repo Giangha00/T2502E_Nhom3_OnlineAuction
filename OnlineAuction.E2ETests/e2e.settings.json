@@ -1,0 +1,9 @@
+{
+  "BaseUrl": "http://localhost:5006",
+  "UserEmail": "user1@auctionhouse.local",
+  "UserPassword": "User@123",
+  "AdminEmail": "admin@auctionhouse.com",
+  "AdminPassword": "User@123",
+  "InactiveUserEmail": "user4@auctionhouse.local",
+  "InactiveUserPassword": "User@123"
+}

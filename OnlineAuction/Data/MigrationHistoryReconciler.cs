@@ -26,6 +26,7 @@ public static class MigrationHistoryReconciler
 
         await ReconcilePartialProductTemplatesMigrationAsync(db, logger, cancellationToken);
         await ReconcileMissingPlatformFeeColumnAsync(db, logger, cancellationToken);
+        await ReconcileMissingSellerProceedsColumnAsync(db, logger, cancellationToken);
 
         foreach (var (tableName, migrationId) in KnownOrphans)
         {
@@ -117,6 +118,28 @@ public static class MigrationHistoryReconciler
                 [AddPlatformFeeToOrdersMigrationId, ProductVersion],
                 cancellationToken);
         }
+    }
+
+    private static async Task ReconcileMissingSellerProceedsColumnAsync(
+        AuctionHouseDbContext db,
+        ILogger logger,
+        CancellationToken cancellationToken)
+    {
+        if (!await TableExistsAsync(db, "orders", cancellationToken)
+            || await ColumnExistsAsync(db, "orders", "seller_proceeds", cancellationToken))
+        {
+            return;
+        }
+
+        logger.LogWarning(
+            "Column orders.seller_proceeds is missing. Applying schema patch from InitialSqlServer orphan reconciliation.");
+
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            ALTER TABLE `orders`
+                ADD COLUMN `seller_proceeds` decimal(18,2) NOT NULL DEFAULT 0;
+            """,
+            cancellationToken);
     }
 
     private const string LinkProductsToTemplatesSql =
