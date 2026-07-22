@@ -70,6 +70,9 @@ build-check-out*/
 # Local run logs (dotnet watch / dev scripts)
 onlineauction-*.log
 
+# PPT confirm UI runtime session (local poll state)
+**/confirm_ui/session.json
+
 # OS
 .DS_Store
 .DS_Store?
