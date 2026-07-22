@@ -96,11 +96,11 @@
                 <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                     @foreach (var permission in Model.AvailablePermissions)
                     {
-                        var isChecked = Model.AssignedPermissionIds.Contains(permission.Id);
+                        var isChecked = Model.AssignedPermissionCodes.Contains(permission.Code);
                         <label class="flex items-start gap-3 rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-700">
                             <input type="checkbox"
-                                   name="AssignedPermissionIds"
-                                   value="@permission.Id"
+                                   name="AssignedPermissionCodes"
+                                   value="@permission.Code"
                                    checked="@isChecked"
                                    class="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500" />
                             <span>
