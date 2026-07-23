@@ -1,133 +1,147 @@
+@using System.Text.Json
 @model OnlineAuction.Models.SellerAuctionFormViewModel
-
 @{
     ViewData["Title"] = Localizer["UserAuction_EditTitle"];
+    ViewData["DocumentSectionNumber"] = 6;
+    ViewData["SellFooterMode"] = "edit";
+    var sellI18n = new Dictionary<string, string>
+    {
+        ["productNameDefault"] = Localizer["Sell_Preview_ProductNameDefault"].Value,
+        ["categoryDefault"] = "—",
+        ["timeEnded"] = Localizer["Sell_Preview_TimeEnded"].Value,
+        ["timeLeftDays"] = Localizer["Sell_Preview_TimeLeftDays"].Value,
+        ["timeLeftHours"] = Localizer["Sell_Preview_TimeLeftHours"].Value,
+        ["phaseRegistrationOpen"] = Localizer["Auction_Phase_registration_open"].Value,
+        ["phaseLiveAuction"] = Localizer["Auction_Phase_live_auction"].Value,
+        ["phaseLiveEndingSoon"] = Localizer["Auction_Phase_live_ending_soon"].Value,
+        ["phaseUpcoming"] = Localizer["Auction_Phase_upcoming"].Value,
+        ["countdownRegistrationEnd"] = Localizer["Auction_Countdown_RegistrationEnd"].Value,
+        ["countdownLiveStart"] = Localizer["Auction_Countdown_LiveStart"].Value,
+        ["countdownLiveEnd"] = Localizer["Auction_Countdown_LiveEnd"].Value,
+        ["countdownRegistrationStart"] = Localizer["Auction_Countdown_RegistrationStart"].Value,
+        ["editorPlaceholder"] = Localizer["Sell_Editor_Placeholder"].Value,
+        ["remove"] = Localizer["Sell_Remove"].Value,
+        ["successCreated"] = Localizer["UserAuction_SaveSuccess"].Value,
+        ["errorCreateFailed"] = Localizer["UserAuction_SaveFailed"].Value,
+        ["errorProductNameRequired"] = Localizer["Sell_Error_ProductNameRequired"].Value,
+        ["errorCategoryRequired"] = Localizer["Sell_Error_CategoryRequired"].Value,
+        ["errorConditionRequired"] = Localizer["Sell_Error_ConditionRequired"].Value,
+        ["errorStartingPriceRequired"] = Localizer["Sell_Error_StartingPriceRequired"].Value,
+        ["errorBidStepRequired"] = Localizer["Sell_Error_BidStepRequired"].Value,
+        ["errorBuyNowPriceInvalid"] = Localizer["Sell_Error_BuyNowPriceInvalid"].Value,
+        ["errorBuyNowPriceGreater"] = Localizer["Sell_Error_BuyNowPriceGreater"].Value,
+        ["errorStartDateRequired"] = Localizer["Sell_Error_StartDateRequired"].Value,
+        ["errorStartDatePast"] = Localizer["Sell_Error_StartDatePast"].Value,
+        ["errorEndDateRequired"] = Localizer["Sell_Error_EndDateRequired"].Value,
+        ["errorEndDateAfterStart"] = Localizer["Sell_Error_EndDateAfterStart"].Value,
+        ["errorRegistrationStartRequired"] = Localizer["Sell_Error_RegistrationStartRequired"].Value,
+        ["errorRegistrationStartPast"] = Localizer["Sell_Error_RegistrationStartPast"].Value,
+        ["errorRegistrationEndRequired"] = Localizer["Sell_Error_RegistrationEndRequired"].Value,
+        ["errorRegistrationEndAfterStart"] = Localizer["Sell_Error_RegistrationEndAfterStart"].Value,
+        ["errorLiveStartRequired"] = Localizer["Sell_Error_LiveStartRequired"].Value,
+        ["errorLiveStartAfterRegistration"] = Localizer["Sell_Error_LiveStartAfterRegistration"].Value,
+        ["errorLiveEndRequired"] = Localizer["Sell_Error_LiveEndRequired"].Value,
+        ["errorLiveEndAfterStart"] = Localizer["Sell_Error_LiveEndAfterStart"].Value,
+        ["errorImageInvalidFormat"] = Localizer["Sell_Error_ImageInvalidFormat"].Value,
+        ["errorImageSizeLimit"] = Localizer["Sell_Error_ImageSizeLimit"].Value,
+        ["errorDocInvalidFormat"] = Localizer["Sell_Error_DocInvalidFormat"].Value,
+        ["errorDocSizeLimit"] = Localizer["Sell_Error_DocSizeLimit"].Value,
+        ["errorYearInvalid"] = Localizer["Sell_Error_YearInvalid"].Value,
+        ["errorYearRequired"] = Localizer["Sell_Error_YearRequired"].Value,
+        ["errorAuthenticatorRequired"] = Localizer["Sell_Error_AuthenticatorRequired"].Value,
+        ["errorGradeRequired"] = Localizer["Sell_Error_GradeRequired"].Value,
+        ["confirmCreateTitle"] = Localizer["ConfirmModal_EditAuction_Title"].Value,
+        ["confirmCreateMessage"] = Localizer["ConfirmModal_EditAuction_Message"].Value,
+        ["confirmCreateNote"] = Localizer["ConfirmModal_EditAuction_Note"].Value,
+        ["confirmCreateConfirm"] = Localizer["UserAuction_SaveChanges"].Value
+    };
+
+    var existingImages = new List<object>();
+    if (!string.IsNullOrWhiteSpace(Model.ExistingPrimaryImage))
+    {
+        existingImages.Add(new { id = 0, url = Model.ExistingPrimaryImage, isPrimary = true });
+    }
+
+    existingImages.AddRange(Model.ExistingGalleryImages.Select(image => new
+    {
+        id = image.Id,
+        url = image.Url,
+        isPrimary = false
+    }));
+
+    var existingDocuments = Model.ExistingDocuments.Select(document => new
+    {
+        id = document.Id,
+        name = document.Name,
+        url = document.FileUrl
+    });
 }
 
-<div class="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
-    <div class="mx-auto max-w-3xl">
-        <div class="mb-6">
-            <h1 class="text-2xl font-bold text-slate-900">@Localizer["UserAuction_EditTitle"]</h1>
-            <p class="mt-1 text-sm text-slate-500">@Localizer["UserAuction_EditDesc"]</p>
+<div class="sell-page min-h-screen bg-slate-50">
+  <section class="site-shell px-4 py-8 sm:px-6 lg:py-10">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">@Localizer["UserAuction_EditTitle"]</h1>
+      <p class="mt-2 text-sm text-slate-500 sm:text-base">@Localizer["UserAuction_EditDesc"]</p>
+      @if (Model.LockRegistrationDates || Model.LockStartingPrice || Model.LockLiveStartDate)
+      {
+        <p class="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+          @Localizer["UserAuction_EditPhaseLockHint"]
+        </p>
+      }
+    </div>
+
+    <form id="createAuctionForm"
+          asp-controller="UserAuction"
+          asp-action="Edit"
+          asp-route-auctionId="@Model.AuctionId"
+          method="post"
+          enctype="multipart/form-data"
+          novalidate>
+      @Html.AntiForgeryToken()
+      <input asp-for="AuctionId" type="hidden" />
+      <input asp-for="ExistingPrimaryImage" type="hidden" />
+      <input asp-for="Status" type="hidden" />
+
+      <div class="grid gap-8 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px]">
+        <div class="space-y-6">
+          @await Html.PartialAsync("~/Views/Sell/Partials/_ProductForm.cshtml", Model)
+          @await Html.PartialAsync("~/Views/Sell/Partials/_ImageUploader.cshtml")
+          @await Html.PartialAsync("~/Views/Sell/Partials/_CardSpecsForm.cshtml", Model)
+          @await Html.PartialAsync("~/Views/Sell/Partials/_AuctionSetting.cshtml", Model)
+          @await Html.PartialAsync("~/Views/Sell/Partials/_AuctionDuration.cshtml", Model)
+          @await Html.PartialAsync("~/Views/Sell/Partials/_DocumentUploader.cshtml")
+
+          <div class="lg:hidden">
+            @await Html.PartialAsync("~/Views/Sell/Partials/_PreviewCard.cshtml")
+          </div>
         </div>
 
-        <form asp-controller="UserAuction"
-              asp-action="Edit"
-              asp-route-auctionId="@Model.AuctionId"
-              method="post"
-              enctype="multipart/form-data"
-              class="space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            @Html.AntiForgeryToken()
+        <div class="hidden lg:sticky lg:top-28 lg:block lg:self-start">
+          @await Html.PartialAsync("~/Views/Sell/Partials/_PreviewCard.cshtml")
+        </div>
+      </div>
 
-            <input asp-for="AuctionId" type="hidden" />
-            <input asp-for="PrimaryImage" type="hidden" />
-
-            <div asp-validation-summary="ModelOnly" class="text-sm text-red-600"></div>
-
-            <div>
-                <label asp-for="ProductName" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_ProductName"]</label>
-                <input asp-for="ProductName" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
-                <span asp-validation-for="ProductName" class="text-xs text-red-600"></span>
-            </div>
-
-            <div class="grid gap-4 sm:grid-cols-2">
-                <div>
-                    <label asp-for="Category" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["Sell_Category"]</label>
-                    <input asp-for="Category" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
-                    <span asp-validation-for="Category" class="text-xs text-red-600"></span>
-                </div>
-
-                <div>
-                    <label asp-for="Condition" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["Sell_Condition"]</label>
-                    <input asp-for="Condition" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
-                    <span asp-validation-for="Condition" class="text-xs text-red-600"></span>
-                </div>
-            </div>
-
-            <div>
-                <label asp-for="ShortDescription" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_ShortDescription"]</label>
-                <input asp-for="ShortDescription" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
-                <span asp-validation-for="ShortDescription" class="text-xs text-red-600"></span>
-            </div>
-
-            <div>
-                <label asp-for="DescriptionHtml" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["Product_Description"]</label>
-                <textarea asp-for="DescriptionHtml" rows="5" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"></textarea>
-            </div>
-
-            <div class="grid gap-4 sm:grid-cols-3">
-                <div>
-                    <label asp-for="Year" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["Product_Year"]</label>
-                    <input asp-for="Year" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
-                </div>
-
-                <div>
-                    <label asp-for="SetName" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_SetName"]</label>
-                    <input asp-for="SetName" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
-                </div>
-
-                <div>
-                    <label asp-for="GradeLabel" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_Grade"]</label>
-                    <input asp-for="GradeLabel" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
-                </div>
-            </div>
-
-            <div>
-                <label asp-for="CertNumber" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_CertNumber"]</label>
-                <input asp-for="CertNumber" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
-            </div>
-
-            <div class="rounded-lg border border-slate-200 p-4">
-                <p class="mb-3 text-sm font-medium text-slate-700">@Localizer["UserAuction_CurrentCover"]</p>
-                <img src="@Model.PrimaryImage" alt="@Model.ProductName" class="h-32 w-32 rounded-lg object-cover" />
-
-                <label asp-for="PrimaryImageFile" class="mt-4 mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_ReplaceCover"]</label>
-                <input asp-for="PrimaryImageFile"
-                       type="file"
-                       accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                       class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
-            </div>
-
-            <div class="grid gap-4 sm:grid-cols-2">
-                <div>
-                    <label asp-for="StartingPrice" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["Sell_StartingPrice"]</label>
-                    <input asp-for="StartingPrice" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
-                    <span asp-validation-for="StartingPrice" class="text-xs text-red-600"></span>
-                </div>
-
-                <div>
-                    <label asp-for="BidStep" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["Sell_BidStep"]</label>
-                    <input asp-for="BidStep" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
-                    <span asp-validation-for="BidStep" class="text-xs text-red-600"></span>
-                </div>
-            </div>
-
-            <div class="grid gap-4 sm:grid-cols-2">
-                <div>
-                    <label asp-for="StartDate" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_StartDate"]</label>
-                    <input asp-for="StartDate" type="datetime-local" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" readonly />
-                </div>
-
-                <div>
-                    <label asp-for="EndDate" class="mb-1 block text-sm font-medium text-slate-700">@Localizer["UserAuction_EndDate"]</label>
-                    <input asp-for="EndDate" type="datetime-local" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
-                    <span asp-validation-for="EndDate" class="text-xs text-red-600"></span>
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-3 border-t border-slate-100 pt-5">
-                <a href="javascript:history.back()"
-                   class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-                    @Localizer["Common_Cancel"]
-                </a>
-                <button type="submit" class="cursor-pointer rounded-lg bg-blue-700 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-800">
-                    @Localizer["UserAuction_SaveChanges"]
-                </button>
-            </div>
-        </form>
-    </div>
+      @await Html.PartialAsync("~/Views/Sell/Partials/_FooterActions.cshtml")
+    </form>
+  </section>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+  <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+  <script>
+    window.sellPageConfig = {
+      mode: 'edit',
+      i18n: @Html.Raw(JsonSerializer.Serialize(sellI18n)),
+      locks: {
+        registrationDates: @JsonSerializer.Serialize(Model.LockRegistrationDates),
+        liveStartDate: @JsonSerializer.Serialize(Model.LockLiveStartDate),
+        startingPrice: @JsonSerializer.Serialize(Model.LockStartingPrice),
+        bidStep: @JsonSerializer.Serialize(Model.LockBidStep)
+      },
+      existingImages: @Html.Raw(JsonSerializer.Serialize(existingImages)),
+      existingDocuments: @Html.Raw(JsonSerializer.Serialize(existingDocuments))
+    };
+  </script>
+  <script src="~/js/sell-numeric-input.js" asp-append-version="true"></script>
+  <script src="~/js/create-auction.js" asp-append-version="true"></script>
 }

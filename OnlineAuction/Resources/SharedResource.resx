@@ -874,7 +874,8 @@
   <data name="User_Status_EndingSoon" xml:space="preserve"><value>Ending Soon</value></data>
   <data name="User_Status_Completed" xml:space="preserve"><value>Completed</value></data>
   <data name="UserAuction_EditTitle" xml:space="preserve"><value>Edit Auction</value></data>
-  <data name="UserAuction_EditDesc" xml:space="preserve"><value>Only live auctions without bids can be edited.</value></data>
+  <data name="UserAuction_EditDesc" xml:space="preserve"><value>Update your listing details. Registration dates and starting price may be locked after registration opens or bids are placed.</value></data>
+  <data name="UserAuction_EditPhaseLockHint" xml:space="preserve"><value>Some schedule or pricing fields are locked for this phase. You can still extend the live end date.</value></data>
   <data name="UserAuction_ProductName" xml:space="preserve"><value>Product Name</value></data>
   <data name="UserAuction_ShortDescription" xml:space="preserve"><value>Short Description</value></data>
   <data name="UserAuction_SetName" xml:space="preserve"><value>Set Name</value></data>
@@ -885,6 +886,13 @@
   <data name="UserAuction_StartDate" xml:space="preserve"><value>Start Date</value></data>
   <data name="UserAuction_EndDate" xml:space="preserve"><value>End Date</value></data>
   <data name="UserAuction_SaveChanges" xml:space="preserve"><value>Save Changes</value></data>
+  <data name="UserAuction_SaveSuccess" xml:space="preserve"><value>Listing updated successfully.</value></data>
+  <data name="UserAuction_SaveFailed" xml:space="preserve"><value>Could not update the listing. Please try again.</value></data>
+  <data name="UserAuction_ReadyToSave_Highlight" xml:space="preserve"><value>Ready to save?</value></data>
+  <data name="UserAuction_ReadyToSave" xml:space="preserve"><value>Review the preview, then save your changes.</value></data>
+  <data name="ConfirmModal_EditAuction_Title" xml:space="preserve"><value>Save listing changes?</value></data>
+  <data name="ConfirmModal_EditAuction_Message" xml:space="preserve"><value>You are about to save updates for "{0}".</value></data>
+  <data name="ConfirmModal_EditAuction_Note" xml:space="preserve"><value>Rejected listings will be resubmitted for admin confirmation.</value></data>
   <data name="Sell_AuctionHeader_Label" xml:space="preserve"><value>Seller Dashboard</value></data>
   <data name="Sell_AuctionHeader_Title" xml:space="preserve"><value>Create New Auction</value></data>
   <data name="Sell_AuctionHeader_Desc" xml:space="preserve"><value>Sell your product through auction. Complete the form below and review your listing before publishing.</value></data>
