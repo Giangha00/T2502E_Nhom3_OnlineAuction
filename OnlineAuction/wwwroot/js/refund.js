@@ -22,6 +22,7 @@
       "emailError",
       "refundReasonError",
       "descriptionError",
+      "evidenceLinksError",
       "agreePolicyError",
       "formError",
     ].forEach(function (id) {
@@ -31,6 +32,24 @@
 
   function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function parseEvidenceLinks(value) {
+    return value
+      .split(/[\r\n,;]+/)
+      .map(function (url) {
+        return url.trim();
+      })
+      .filter(Boolean);
+  }
+
+  function isValidEvidenceUrl(value) {
+    try {
+      const url = new URL(value);
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+      return false;
+    }
   }
 
   if (orderSelect) {
@@ -72,6 +91,9 @@
     const reason = document.getElementById("refundReason")?.value || "";
     const description =
       document.getElementById("description")?.value.trim() || "";
+    const evidenceValue =
+      document.getElementById("evidenceLinks")?.value.trim() || "";
+    const evidenceLinks = parseEvidenceLinks(evidenceValue);
     const agreePolicy = document.getElementById("agreePolicy")?.checked;
     const amountValue = refundAmount?.value.trim() || "";
 
@@ -136,6 +158,18 @@
       );
       valid = false;
     }
+    if (
+      evidenceLinks.length > 5 ||
+      evidenceLinks.some(function (url) {
+        return !isValidEvidenceUrl(url);
+      })
+    ) {
+      setError(
+        "evidenceLinksError",
+        "Evidence links must be valid http/https URLs. Add no more than 5 links.",
+      );
+      valid = false;
+    }
 
     if (!valid) return;
 
@@ -150,6 +184,7 @@
     body.append("ContactEmail", email);
     body.append("ReasonCode", reason);
     body.append("Description", description);
+    if (evidenceLinks.length) body.append("EvidenceUrls", evidenceLinks.join("\n"));
     if (amountValue) body.append("RequestedAmount", amountValue);
 
     const submitButton = form.querySelector('button[type="submit"]');
