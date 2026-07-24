@@ -879,6 +879,8 @@
   <data name="User_Ends" xml:space="preserve"><value>Kết thúc</value></data>
   <data name="User_ViewDetail" xml:space="preserve"><value>Xem chi tiết</value></data>
   <data name="User_CancelListing" xml:space="preserve"><value>Hủy</value></data>
+  <data name="User_CancelListingConfirm" xml:space="preserve"><value>Hủy tin đăng này? Tin sẽ bị gỡ khỏi sàn.</value></data>
+  <data name="User_EditListing" xml:space="preserve"><value>Sửa</value></data>
   <data name="User_CancelConfirm" xml:space="preserve"><value>Hủy tin đấu giá này?</value></data>
   <data name="User_Status_Active" xml:space="preserve"><value>Đấu giá đang diễn ra</value></data>
   <data name="User_Status_EndingSoon" xml:space="preserve"><value>Sắp kết thúc</value></data>

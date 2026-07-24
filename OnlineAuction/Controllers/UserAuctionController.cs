@@ -141,6 +141,7 @@ public class UserAuctionController : Controller
             });
         }
 
+        TempData["SuccessMessage"] = result.Message;
         return await RedirectToProfileAsync(sellerId.Value, auctionId);
     }
 
@@ -174,6 +175,7 @@ public class UserAuctionController : Controller
             auctionId,
             debounceWindow: TimeSpan.FromMinutes(2));
 
+        TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
         return await RedirectToProfileAsync(sellerId.Value, auctionId);
     }
 

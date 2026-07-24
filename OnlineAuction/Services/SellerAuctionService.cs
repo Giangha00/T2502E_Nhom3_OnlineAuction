@@ -467,14 +467,16 @@ public class SellerAuctionService : ISellerAuctionService
 
             var buyNowScheduleStart = now;
             var buyNowLiveStart = buyNowScheduleStart.AddMinutes(1);
+            var buyNowPrice = model.Price;
+            var startingPrice = ResolveBuyNowStartingPrice(buyNowPrice);
 
             var auction = new Auction
             {
                 Product = product,
-                StartingPrice = model.Price,
+                StartingPrice = startingPrice,
                 BidStep = 0.01m,
-                CurrentPrice = model.Price,
-                BuyNowPrice = model.Price,
+                CurrentPrice = buyNowPrice,
+                BuyNowPrice = buyNowPrice,
                 RequiresRegistration = false,
                 RegistrationStartDate = buyNowScheduleStart,
                 RegistrationEndDate = buyNowLiveStart,
@@ -544,9 +546,15 @@ public class SellerAuctionService : ISellerAuctionService
             Grade = auction.Product.GradeLabel ?? GradeLabelHelper.Compose(authenticator, gradeValue),
             CertificateNumber = auction.Product.CertNumber,
             ExistingPrimaryImage = auction.Product.PrimaryImage,
-            StartingPrice = auction.StartingPrice,
-            BidStep = auction.BidStep,
-            BuyNowPrice = auction.BuyNowPrice,
+            StartingPrice = string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase)
+                ? ResolveBuyNowStartingPrice(auction.BuyNowPrice ?? auction.CurrentPrice)
+                : auction.StartingPrice,
+            BidStep = string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase)
+                ? 0.01m
+                : auction.BidStep,
+            BuyNowPrice = string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase)
+                ? auction.BuyNowPrice ?? auction.CurrentPrice
+                : auction.BuyNowPrice,
             StartDate = DateTimeUtilities.AsUtc(auction.StartDate),
             EndDate = DateTimeUtilities.AsUtc(auction.EndDate),
             RegistrationStartDate = DateTimeUtilities.AsUtc(auction.RegistrationStartDate),
@@ -862,7 +870,33 @@ public class SellerAuctionService : ISellerAuctionService
                 auction.BidStep = model.BidStep;
             }
 
-            auction.BuyNowPrice = model.BuyNowPrice;
+            if (string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase))
+            {
+                // CHECK chk_auctions_prices requires buy_now_price > starting_price.
+                var buyNowPrice = model.BuyNowPrice ?? model.StartingPrice;
+                if (buyNowPrice <= 0)
+                {
+                    await transaction.RollbackAsync();
+                    return (false, "Buy now price must be greater than 0.");
+                }
+
+                auction.BuyNowPrice = buyNowPrice;
+                auction.StartingPrice = ResolveBuyNowStartingPrice(buyNowPrice);
+                auction.BidStep = 0.01m;
+                if (!hasBids)
+                {
+                    auction.CurrentPrice = buyNowPrice;
+                }
+            }
+            else if (model.BuyNowPrice is not null && model.BuyNowPrice <= auction.StartingPrice)
+            {
+                await transaction.RollbackAsync();
+                return (false, "Buy now price must be greater than the starting price.");
+            }
+            else
+            {
+                auction.BuyNowPrice = model.BuyNowPrice;
+            }
 
             if (!model.LockRegistrationDates)
             {
@@ -963,8 +997,9 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "Cannot cancel auction that already has a pending or paid order.");
         }
 
-        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview or AuctionStatuses.Rejected)
-            || (auction.Status == AuctionStatuses.Live && !DateTimeUtilities.IsInFutureUtc(auction.EndDate)))
+        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.EndingSoon or AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview or AuctionStatuses.Rejected or AuctionStatuses.Scheduled)
+            || ((auction.Status == AuctionStatuses.Live || auction.Status == AuctionStatuses.EndingSoon)
+                && !DateTimeUtilities.IsInFutureUtc(auction.EndDate)))
         {
             return (false, "This listing cannot be cancelled.");
         }
@@ -1036,6 +1071,13 @@ public class SellerAuctionService : ISellerAuctionService
     }
 
     private const int MaxDocumentsPerProduct = 5;
+
+    /// <summary>
+    /// Buy Now listings store the visible price in buy_now_price/current_price.
+    /// starting_price must stay strictly lower to satisfy chk_auctions_prices.
+    /// </summary>
+    private static decimal ResolveBuyNowStartingPrice(decimal price) =>
+        price <= 0.01m ? 0.01m : price - 0.01m;
 
     private static string? ValidateDocumentFiles(IEnumerable<IFormFile> files)
     {

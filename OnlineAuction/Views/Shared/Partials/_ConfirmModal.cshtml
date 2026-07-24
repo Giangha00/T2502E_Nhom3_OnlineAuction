@@ -8,7 +8,10 @@
        aria-modal="true"
        aria-labelledby="confirmModalTitle"
        aria-describedby="confirmModalMessage">
-    <div id="confirmModalIconWrap" class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
+    <div id="confirmModalIconWrap"
+         data-class-default="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-100"
+         data-class-danger="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-100"
+         class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
       <svg id="confirmModalIconInfo" class="h-7 w-7 text-blue-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
       </svg>
@@ -29,6 +32,8 @@
       </button>
       <button type="button"
               id="confirmModalConfirmBtn"
+              data-class-default="inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto sm:min-w-[7.5rem]"
+              data-class-danger="inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700 sm:w-auto sm:min-w-[7.5rem]"
               class="inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto sm:min-w-[7.5rem]">
         @Localizer["ConfirmModal_Confirm"]
       </button>

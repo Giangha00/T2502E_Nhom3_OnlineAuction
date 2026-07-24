@@ -216,7 +216,11 @@
                                             class="admin-icon-action admin-icon-action--delete"
                                             title="Delete"
                                             aria-label="Delete"
-                                            onclick="return confirm('Are you sure you want to delete this auction?');">
+                                            data-confirm
+                                            data-confirm-variant="danger"
+                                            data-confirm-title="Delete auction?"
+                                            data-confirm-message="Are you sure you want to delete this auction?"
+                                            data-confirm-confirm="Delete">
                                         <partial name="_AdminIcon" model='"trash"' />
                                     </button>
                                 </div>

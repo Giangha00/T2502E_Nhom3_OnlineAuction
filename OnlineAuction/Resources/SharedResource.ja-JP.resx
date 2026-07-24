@@ -769,6 +769,8 @@
   <data name="User_Ends" xml:space="preserve"><value>終了</value></data>
   <data name="User_ViewDetail" xml:space="preserve"><value>詳細を見る</value></data>
   <data name="User_CancelListing" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="User_CancelListingConfirm" xml:space="preserve"><value>この出品をキャンセルしますか？マーケットから削除されます。</value></data>
+  <data name="User_EditListing" xml:space="preserve"><value>編集</value></data>
   <data name="User_CancelConfirm" xml:space="preserve"><value>このオークション出品をキャンセルしますか？</value></data>
   <data name="User_Status_Active" xml:space="preserve"><value>開催中オークション</value></data>
   <data name="User_Status_EndingSoon" xml:space="preserve"><value>まもなく終了</value></data>
@@ -781,8 +783,26 @@
   <data name="UserAuction_SetName" xml:space="preserve"><value>セット名</value></data>
   <data name="UserAuction_Grade" xml:space="preserve"><value>グレード</value></data>
   <data name="UserAuction_CertNumber" xml:space="preserve"><value>証明書番号</value></data>
+  <data name="UserAuction_Images" xml:space="preserve"><value>画像</value></data>
+  <data name="UserAuction_ImagesDesc" xml:space="preserve"><value>カバー変更、ギャラリー削除、またはドラッグ＆ドロップで追加。</value></data>
+  <data name="UserAuction_CurrentImages" xml:space="preserve"><value>現在の画像</value></data>
+  <data name="UserAuction_CoverBadge" xml:space="preserve"><value>カバー</value></data>
+  <data name="UserAuction_CoverPending" xml:space="preserve"><value>新しいカバー</value></data>
+  <data name="UserAuction_ChangeCover" xml:space="preserve"><value>カバー変更</value></data>
+  <data name="UserAuction_MarkedForRemoval" xml:space="preserve"><value>削除予定</value></data>
+  <data name="UserAuction_UndoRemove" xml:space="preserve"><value>元に戻す</value></data>
+  <data name="UserAuction_NewImage" xml:space="preserve"><value>新規</value></data>
+  <data name="UserAuction_GallerySlotsLeft" xml:space="preserve"><value>ギャラリー残り {0} 枠</value></data>
+  <data name="UserAuction_GalleryLimit" xml:space="preserve"><value>ギャラリー画像は最大 {0} 枚までです。</value></data>
+  <data name="UserAuction_ImageInvalidFormat" xml:space="preserve"><value>{0}: 無効な形式（JPG、PNG、WEBPのみ）</value></data>
+  <data name="UserAuction_ImageSizeLimit" xml:space="preserve"><value>{0}: 5MB制限を超えています</value></data>
   <data name="UserAuction_CurrentCover" xml:space="preserve"><value>現在のカバー</value></data>
   <data name="UserAuction_ReplaceCover" xml:space="preserve"><value>カバー画像を変更</value></data>
+  <data name="UserAuction_CurrentGallery" xml:space="preserve"><value>現在のギャラリー</value></data>
+  <data name="UserAuction_GalleryImage" xml:space="preserve"><value>ギャラリー画像</value></data>
+  <data name="UserAuction_AddGalleryImages" xml:space="preserve"><value>ギャラリー画像を追加</value></data>
+  <data name="UserAuction_RemoveImage" xml:space="preserve"><value>削除</value></data>
+  <data name="UserAuction_GalleryImagesHelp" xml:space="preserve"><value>カバー以外に最大4枚のギャラリー画像。JPG、PNG、またはWEBP。</value></data>
   <data name="UserAuction_StartDate" xml:space="preserve"><value>開始日</value></data>
   <data name="UserAuction_EndDate" xml:space="preserve"><value>終了日</value></data>
   <data name="UserAuction_SaveChanges" xml:space="preserve"><value>変更を保存</value></data>

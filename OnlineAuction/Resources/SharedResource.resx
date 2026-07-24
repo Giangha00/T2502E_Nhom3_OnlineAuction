@@ -869,6 +869,8 @@
   <data name="User_Ends" xml:space="preserve"><value>Ends</value></data>
   <data name="User_ViewDetail" xml:space="preserve"><value>View Detail</value></data>
   <data name="User_CancelListing" xml:space="preserve"><value>Cancel</value></data>
+  <data name="User_CancelListingConfirm" xml:space="preserve"><value>Cancel this listing? It will be removed from the marketplace.</value></data>
+  <data name="User_EditListing" xml:space="preserve"><value>Edit</value></data>
   <data name="User_CancelConfirm" xml:space="preserve"><value>Cancel this auction listing?</value></data>
   <data name="User_Status_Active" xml:space="preserve"><value>Active Auction</value></data>
   <data name="User_Status_EndingSoon" xml:space="preserve"><value>Ending Soon</value></data>

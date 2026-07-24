@@ -111,9 +111,9 @@ public class SellService : ISellService
             yield return error;
         }
 
-        if (model.Price <= 0)
+        if (model.Price <= 0.01m)
         {
-            yield return (nameof(model.Price), "Price must be greater than 0.");
+            yield return (nameof(model.Price), "Price must be greater than 0.01.");
         }
     }
 

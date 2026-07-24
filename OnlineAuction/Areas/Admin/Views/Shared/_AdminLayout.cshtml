@@ -36,6 +36,17 @@
         </div>
     </div>
 
+    <partial name="_ConfirmModal" />
+    <script>
+        window.confirmModalConfig = {
+            i18n: {
+                confirm: 'Confirm',
+                cancel: 'Cancel',
+                title: 'Confirm'
+            }
+        };
+    </script>
+    <script src="~/js/confirm-modal.js" asp-append-version="true"></script>
     <script src="~/admin/js/bundle.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
