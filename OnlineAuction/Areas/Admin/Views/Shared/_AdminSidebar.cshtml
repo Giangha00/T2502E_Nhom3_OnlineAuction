@@ -1,159 +1,235 @@
+@using OnlineAuction.Configurations
+@using OnlineAuction.Helpers
+@{
+    string MenuClass(string pageKey) =>
+        $"menu-item group {(string.Equals(ViewData["AdminPage"] as string, pageKey, StringComparison.OrdinalIgnoreCase) ? "menu-item-active" : "menu-item-inactive")}";
+
+    string IconClass(string pageKey) =>
+        string.Equals(ViewData["AdminPage"] as string, pageKey, StringComparison.OrdinalIgnoreCase)
+            ? "menu-item-icon-active"
+            : "menu-item-icon-inactive";
+}
+
 <aside :class="sidebarToggle ? 'translate-x-0 lg:w-[90px]' : '-translate-x-full'"
-    class="sidebar fixed left-0 top-0 z-9999 flex h-screen w-[290px] flex-col overflow-y-hidden border-r border-gray-200 bg-white px-5 dark:border-gray-800 dark:bg-black lg:static lg:translate-x-0">
+       class="admin-sidebar sidebar fixed left-0 top-0 z-9999 flex h-screen w-[290px] flex-col overflow-y-hidden border-r border-gray-200 bg-white px-4 dark:border-gray-800 dark:bg-gray-950 lg:static lg:translate-x-0">
     <div :class="sidebarToggle ? 'justify-center' : 'justify-between'"
-        class="sidebar-header flex items-center gap-2 pb-7 pt-8">
-        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+         class="sidebar-header flex items-center gap-2 border-b border-gray-100 pb-6 pt-7 dark:border-gray-800">
+        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="flex items-center gap-2">
             <span class="logo" :class="sidebarToggle ? 'hidden' : ''">
                 <img class="dark:hidden" src="~/admin/images/logo/logo.svg" alt="Auction House" />
                 <img class="hidden dark:block" src="~/admin/images/logo/logo-dark.svg" alt="Auction House" />
             </span>
             <img class="logo-icon" :class="sidebarToggle ? 'lg:block' : 'hidden'"
-                src="~/admin/images/logo/logo-icon.svg" alt="Auction House" />
+                 src="~/admin/images/logo/logo-icon.svg" alt="Auction House" />
         </a>
     </div>
 
-    <div class="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
-        <nav x-data="{ selected: $persist('Dashboard') }">
-            <div>
-                <h3 class="mb-4 text-xs uppercase leading-[20px] text-gray-400">
-                    <span class="menu-group-title" :class="sidebarToggle ? 'lg:hidden' : ''">MENU</span>
-                </h3>
+    <div class="no-scrollbar flex flex-1 flex-col overflow-y-auto py-5 duration-300 ease-linear">
+        <nav class="admin-sidebar-nav">
+            @if (AdminPermissionHelper.Can(User, PermissionCodes.DashboardView))
+            {
+                <div class="mb-5">
+                    <h3 class="menu-group-title mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-400"
+                        :class="sidebarToggle ? 'lg:hidden' : ''">
+                        Overview
+                    </h3>
+                    <ul class="flex flex-col gap-1">
+                        <li>
+                            <a asp-area="Admin"
+                               asp-controller="Dashboard"
+                               asp-action="Index"
+                               class="@MenuClass("dashboard")"
+                               data-admin-page="dashboard">
+                                <svg class="@IconClass("dashboard")" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                          d="M5.5 3.25C4.25736 3.25 3.25 4.25736 3.25 5.5V8.99998C3.25 10.2426 4.25736 11.25 5.5 11.25H9C10.2426 11.25 11.25 10.2426 11.25 8.99998V5.5C11.25 4.25736 10.2426 3.25 9 3.25H5.5ZM4.75 5.5C4.75 5.08579 5.08579 4.75 5.5 4.75H9C9.41421 4.75 9.75 5.08579 9.75 5.5V8.99998C9.75 9.41419 9.41421 9.74998 9 9.74998H5.5C5.08579 9.74998 4.75 9.41419 4.75 8.99998V5.5ZM5.5 12.75C4.25736 12.75 3.25 13.7574 3.25 15V18.5C3.25 19.7426 4.25736 20.75 5.5 20.75H9C10.2426 20.75 11.25 19.7427 11.25 18.5V15C11.25 13.7574 10.2426 12.75 9 12.75H5.5ZM4.75 15C4.75 14.5858 5.08579 14.25 5.5 14.25H9C9.41421 14.25 9.75 14.5858 9.75 15V18.5C9.75 18.9142 9.41421 19.25 9 19.25H5.5C5.08579 19.25 4.75 18.9142 4.75 18.5V15ZM12.75 5.5C12.75 4.25736 13.7574 3.25 15 3.25H18.5C19.7426 3.25 20.75 4.25736 20.75 5.5V8.99998C20.75 10.2426 19.7426 11.25 18.5 11.25H15C13.7574 11.25 12.75 10.2426 12.75 8.99998V5.5ZM15 4.75C14.5858 4.75 14.25 5.08579 14.25 5.5V8.99998C14.25 9.41419 14.5858 9.74998 15 9.74998H18.5C18.9142 9.74998 19.25 9.41419 19.25 8.99998V5.5C19.25 5.08579 18.9142 4.75 18.5 4.75H15ZM15 12.75C13.7574 12.75 12.75 13.7574 12.75 15V18.5C12.75 19.7426 13.7574 20.75 15 20.75H18.5C19.7426 20.75 20.75 19.7427 20.75 18.5V15C20.75 13.7574 19.7426 12.75 18.5 12.75H15ZM14.25 15C14.25 14.5858 14.5858 14.25 15 14.25H18.5C18.9142 14.25 19.25 14.5858 19.25 15V18.5C19.25 18.9142 18.9142 19.25 18.5 19.25H15C14.5858 19.25 14.25 18.9142 14.25 18.5V15Z"
+                                          fill="currentColor" />
+                                </svg>
+                                <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Dashboard</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            }
 
-                <ul class="mb-6 flex flex-col gap-4">
-                    @if (AdminPermissionHelper.Can(User, PermissionCodes.DashboardView))
-                    {
-                    <li>
-                        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
-                            class="menu-item group menu-item-active">
-                            <svg class="menu-item-icon-active" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M5.5 3.25C4.25736 3.25 3.25 4.25736 3.25 5.5V8.99998C3.25 10.2426 4.25736 11.25 5.5 11.25H9C10.2426 11.25 11.25 10.2426 11.25 8.99998V5.5C11.25 4.25736 10.2426 3.25 9 3.25H5.5ZM4.75 5.5C4.75 5.08579 5.08579 4.75 5.5 4.75H9C9.41421 4.75 9.75 5.08579 9.75 5.5V8.99998C9.75 9.41419 9.41421 9.74998 9 9.74998H5.5C5.08579 9.74998 4.75 9.41419 4.75 8.99998V5.5ZM5.5 12.75C4.25736 12.75 3.25 13.7574 3.25 15V18.5C3.25 19.7426 4.25736 20.75 5.5 20.75H9C10.2426 20.75 11.25 19.7427 11.25 18.5V15C11.25 13.7574 10.2426 12.75 9 12.75H5.5ZM4.75 15C4.75 14.5858 5.08579 14.25 5.5 14.25H9C9.41421 14.25 9.75 14.5858 9.75 15V18.5C9.75 18.9142 9.41421 19.25 9 19.25H5.5C5.08579 19.25 4.75 18.9142 4.75 18.5V15ZM12.75 5.5C12.75 4.25736 13.7574 3.25 15 3.25H18.5C19.7426 3.25 20.75 4.25736 20.75 5.5V8.99998C20.75 10.2426 19.7426 11.25 18.5 11.25H15C13.7574 11.25 12.75 10.2426 12.75 8.99998V5.5ZM15 4.75C14.5858 4.75 14.25 5.08579 14.25 5.5V8.99998C14.25 9.41419 14.5858 9.74998 15 9.74998H18.5C18.9142 9.74998 19.25 9.41419 19.25 8.99998V5.5C19.25 5.08579 18.9142 4.75 18.5 4.75H15ZM15 12.75C13.7574 12.75 12.75 13.7574 12.75 15V18.5C12.75 19.7426 13.7574 20.75 15 20.75H18.5C19.7426 20.75 20.75 19.7427 20.75 18.5V15C20.75 13.7574 19.7426 12.75 18.5 12.75H15ZM14.25 15C14.25 14.5858 14.5858 14.25 15 14.25H18.5C18.9142 14.25 19.25 14.5858 19.25 15V18.5C19.25 18.9142 18.9142 19.25 18.5 19.25H15C14.5858 19.25 14.25 18.9142 14.25 18.5V15Z"
-                                    fill="" />
-                            </svg>
-                            <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Dashboard</span>
-                        </a>
-                    </li>
-                    }
-                    @if (AdminPermissionHelper.Can(User, PermissionCodes.AuctionsView))
-                    {
-                    <li>
-                        <a asp-area="Admin" asp-controller="Auction" asp-action="Index" class="menu-item group menu-item-inactive">
-                            <svg class="menu-item-icon-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M11.665 3.75621C11.8762 3.65064 12.1247 3.65064 12.3358 3.75621L18.7807 6.97856L12.3358 10.2009C12.1247 10.3065 11.8762 10.3065 11.665 10.2009L5.22014 6.97856L11.665 3.75621ZM4.29297 8.19203V16.0946C4.29297 16.3787 4.45347 16.6384 4.70757 16.7654L11.25 20.0366V11.6513C11.1631 11.6205 11.0777 11.5843 10.9942 11.5426L4.29297 8.19203ZM12.75 20.037L19.2933 16.7654C19.5474 16.6384 19.7079 16.3787 19.7079 16.0946V8.19202L13.0066 11.5426C12.9229 11.5844 12.8372 11.6208 12.75 11.6516V20.037ZM13.0066 2.41456C12.3732 2.09786 11.6277 2.09786 10.9942 2.41456L4.03676 5.89319C3.27449 6.27432 2.79297 7.05342 2.79297 7.90566V16.0946C2.79297 16.9469 3.27448 17.726 4.03676 18.1071L10.9942 21.5857C11.6277 21.9024 12.3732 21.9024 13.0066 21.5857L19.9641 18.1071C20.7264 17.726 21.2079 16.9469 21.2079 16.0946V7.90566C21.2079 7.05342 20.7264 6.27432 19.9641 5.89319L13.0066 2.41456Z"
-                                    fill="" />
-                            </svg>
-                            <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Auctions</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-area="Admin" asp-controller="BuyNow" asp-action="Index" class="menu-item group menu-item-inactive">
-                            <svg class="menu-item-icon-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M2.25 3.75A.75.75 0 0 1 3 3h12a.75.75 0 0 1 .75.75v1.5H2.25v-1.5ZM2.25 7.5h13.5v10.5a2.25 2.25 0 0 1-2.25 2.25H4.5a2.25 2.25 0 0 1-2.25-2.25V7.5Zm3 3.75a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Zm0 3a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 0 1.5H6a.75.75 0 0 1-.75-.75Z"
-                                    fill="" />
-                            </svg>
-                            <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Buy Now</span>
-                        </a>
-                    </li>
-                    }
-                    @if (AdminPermissionHelper.Can(User, PermissionCodes.AuctionsVerify))
-                    {
-                    <li>
-                        <a asp-area="Admin" asp-controller="AuctionVerification" asp-action="Index"
-                           class="menu-item group menu-item-inactive flex items-center">
-                            <svg class="menu-item-icon-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                    fill="" />
-                            </svg>
-                            <span class="menu-item-text flex flex-1 items-center gap-2" :class="sidebarToggle ? 'lg:hidden' : ''">
-                                Verify Auctions
-                                @await Component.InvokeAsync("PendingVerificationBadge")
-                            </span>
-                        </a>
-                    </li>
-                    }
-                    @if (AdminPermissionHelper.Can(User, PermissionCodes.UsersView))
-                    {
-                    <li>
-                        <a asp-area="Admin" asp-controller="User" asp-action="Index" class="menu-item group menu-item-inactive">
-                            <svg class="menu-item-icon-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M8.80443 5.60156C7.59109 5.60156 6.60749 6.58517 6.60749 7.79851C6.60749 9.01185 7.59109 9.99545 8.80443 9.99545C10.0178 9.99545 11.0014 9.01185 11.0014 7.79851C11.0014 6.58517 10.0178 5.60156 8.80443 5.60156ZM5.10749 7.79851C5.10749 5.75674 6.76267 4.10156 8.80443 4.10156C10.8462 4.10156 12.5014 5.75674 12.5014 7.79851C12.5014 9.84027 10.8462 11.4955 8.80443 11.4955C6.76267 11.4955 5.10749 9.84027 5.10749 7.79851ZM4.07591 19.8987H13.4249C14.6071 19.8987 15.7658 18.8971 15.4446 17.5202C15.2207 16.5607 14.7397 15.2906 13.6937 14.2549C12.6292 13.2009 11.0448 12.455 8.75042 12.455C6.45602 12.455 4.87163 13.2009 3.8071 14.2549C2.76117 15.2906 2.28015 16.5607 2.05628 17.5202C1.73504 18.8971 2.89369 19.8987 4.07591 19.8987Z"
-                                    fill="" />
-                            </svg>
-                            <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Users</span>
-                        </a>
-                    </li>
-                    }
-                    @if (AdminPermissionHelper.Can(User, PermissionCodes.PermissionsView))
-                    {
-                    <li>
-                        <a asp-area="Admin" asp-controller="Permission" asp-action="Index" class="menu-item group menu-item-inactive">
-                            <svg class="menu-item-icon-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z"
-                                    fill="" />
-                            </svg>
-                            <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Permissions</span>
-                        </a>
-                    </li>
-                    }
-                    @if (AdminPermissionHelper.Can(User, PermissionCodes.CategoriesManage))
-                    {
-                    <li>
-                        <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="menu-item group menu-item-inactive">
-                            <svg class="menu-item-icon-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M12 2.25C6.62391 2.25 2.25 6.62391 2.25 12C2.25 17.3761 6.62391 21.75 12 21.75C17.3761 21.75 21.75 17.3761 21.75 12C21.75 6.62391 17.3761 2.25 12 2.25ZM3.75 12C3.75 7.44365 7.44365 3.75 12 3.75C16.5563 3.75 20.25 7.44365 20.25 12C20.25 16.5563 16.5563 20.25 12 20.25C7.44365 20.25 3.75 16.5563 3.75 12ZM12 7.5C11.5858 7.5 11.25 7.83579 11.25 8.25V12C11.25 12.4142 11.5858 12.75 12 12.75H15.75C16.1642 12.75 16.5 12.4142 16.5 12C16.5 11.5858 16.1642 11.25 15.75 11.25H12.75V8.25C12.75 7.83579 12.4142 7.5 12 7.5Z"
-                                    fill="" />
-                            </svg>
-                            <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Categories</span>
-                        </a>
-                    </li>
-                    }
-                    @if (AdminPermissionHelper.Can(User, PermissionCodes.ProductsManage))
-                    {
-                    <li>
-                        <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="menu-item group menu-item-inactive">
-                            <svg class="menu-item-icon-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M3.75 3.25C3.05964 3.25 2.5 3.80964 2.5 4.5V19.5C2.5 20.1904 3.05964 20.75 3.75 20.75H20.25C20.9404 20.75 21.5 20.1904 21.5 19.5V8.41421C21.5 8.08579 21.3683 7.77105 21.1339 7.53661L16.4634 2.86612C16.2289 2.63168 15.9142 2.5 15.5858 2.5H3.75ZM4 5H14.75V9.25C14.75 9.66421 15.0858 10 15.5 10H19.75V19H4V5ZM16.25 4.56066L18.1893 6.5H16.25V4.56066ZM7.25 12.75C6.83579 12.75 6.5 13.0858 6.5 13.5V16.5C6.5 16.9142 6.83579 17.25 7.25 17.25H16.75C17.1642 17.25 17.5 16.9142 17.5 16.5V13.5C17.5 13.0858 17.1642 12.75 16.75 12.75H7.25Z"
-                                    fill="" />
-                            </svg>
-                            <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Products</span>
-                        </a>
-                    </li>
-                    }
-                    @if (AdminPermissionHelper.Can(User, PermissionCodes.ComplaintsReview))
-                    {
-                    <li>
-                        <a asp-area="Admin" asp-controller="Complaint" asp-action="Index"
-                           class="menu-item group menu-item-inactive flex items-center">
-                            <svg class="menu-item-icon-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM10.125 8.25a1.875 1.875 0 1 1 3.75 0 1.875 1.875 0 0 1-3.75 0Zm1.875 3.375a.75.75 0 0 0-.75.75v4.125a.75.75 0 0 0 1.5 0v-4.125a.75.75 0 0 0-.75-.75Z"
-                                    fill="" />
-                            </svg>
-                            <span class="menu-item-text flex flex-1 items-center gap-2" :class="sidebarToggle ? 'lg:hidden' : ''">
-                                Complaints
-                                @await Component.InvokeAsync("PendingComplaintsBadge")
-                            </span>
-                        </a>
-                    </li>
-                    }
-                </ul>
-            </div>
+            @if (AdminPermissionHelper.Can(User, PermissionCodes.AuctionsView)
+                || AdminPermissionHelper.Can(User, PermissionCodes.AuctionsVerify))
+            {
+                <div class="mb-5">
+                    <h3 class="menu-group-title mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-400"
+                        :class="sidebarToggle ? 'lg:hidden' : ''">
+                        Listings
+                    </h3>
+                    <ul class="flex flex-col gap-1">
+                        @if (AdminPermissionHelper.Can(User, PermissionCodes.AuctionsView))
+                        {
+                            <li>
+                                <a asp-area="Admin"
+                                   asp-controller="Auction"
+                                   asp-action="Index"
+                                   class="@MenuClass("auctions")"
+                                   data-admin-page="auctions">
+                                    <svg class="@IconClass("auctions")" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M11.665 3.75621C11.8762 3.65064 12.1247 3.65064 12.3358 3.75621L18.7807 6.97856L12.3358 10.2009C12.1247 10.3065 11.8762 10.3065 11.665 10.2009L5.22014 6.97856L11.665 3.75621ZM4.29297 8.19203V16.0946C4.29297 16.3787 4.45347 16.6384 4.70757 16.7654L11.25 20.0366V11.6513C11.1631 11.6205 11.0777 11.5843 10.9942 11.5426L4.29297 8.19203ZM12.75 20.037L19.2933 16.7654C19.5474 16.6384 19.7079 16.3787 19.7079 16.0946V8.19202L13.0066 11.5426C12.9229 11.5844 12.8372 11.6208 12.75 11.6516V20.037ZM13.0066 2.41456C12.3732 2.09786 11.6277 2.09786 10.9942 2.41456L4.03676 5.89319C3.27449 6.27432 2.79297 7.05342 2.79297 7.90566V16.0946C2.79297 16.9469 3.27448 17.726 4.03676 18.1071L10.9942 21.5857C11.6277 21.9024 12.3732 21.9024 13.0066 21.5857L19.9641 18.1071C20.7264 17.726 21.2079 16.9469 21.2079 16.0946V7.90566C21.2079 7.05342 20.7264 6.27432 19.9641 5.89319L13.0066 2.41456Z"
+                                              fill="currentColor" />
+                                    </svg>
+                                    <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Auctions</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-area="Admin"
+                                   asp-controller="BuyNow"
+                                   asp-action="Index"
+                                   class="@MenuClass("buy-now")"
+                                   data-admin-page="buy-now">
+                                    <svg class="@IconClass("buy-now")" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M7.5 6V5.25A4.5 4.5 0 0 1 12 0.75a4.5 4.5 0 0 1 4.5 4.5V6h2.378c.828 0 1.5.672 1.5 1.5v12.75A2.25 2.25 0 0 1 18.128 22.5H5.872A2.25 2.25 0 0 1 3.622 20.25V7.5c0-.828.672-1.5 1.5-1.5H7.5Zm1.5 0h6V5.25a3 3 0 1 0-6 0V6ZM9 11.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z"
+                                              fill="currentColor" />
+                                    </svg>
+                                    <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Buy Now</span>
+                                </a>
+                            </li>
+                        }
+                        @if (AdminPermissionHelper.Can(User, PermissionCodes.AuctionsVerify))
+                        {
+                            <li>
+                                <a asp-area="Admin"
+                                   asp-controller="AuctionVerification"
+                                   asp-action="Index"
+                                   class="@MenuClass("verify-products") flex items-center"
+                                   data-admin-page="verify-products">
+                                    <svg class="@IconClass("verify-products")" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm4.28 7.47a.75.75 0 0 0-1.06-1.06l-4.72 4.72-1.72-1.72a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.06 0l5.25-5.25Z"
+                                              fill="currentColor" />
+                                    </svg>
+                                    <span class="menu-item-text admin-nav-label" :class="sidebarToggle ? 'lg:hidden' : ''">
+                                        <span class="admin-nav-label__text">Verify Products</span>
+                                        @await Component.InvokeAsync("PendingVerificationBadge")
+                                    </span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            @if (AdminPermissionHelper.Can(User, PermissionCodes.CategoriesManage)
+                || AdminPermissionHelper.Can(User, PermissionCodes.ProductsManage))
+            {
+                <div class="mb-5">
+                    <h3 class="menu-group-title mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-400"
+                        :class="sidebarToggle ? 'lg:hidden' : ''">
+                        Catalog
+                    </h3>
+                    <ul class="flex flex-col gap-1">
+                        @if (AdminPermissionHelper.Can(User, PermissionCodes.CategoriesManage))
+                        {
+                            <li>
+                                <a asp-area="Admin"
+                                   asp-controller="Category"
+                                   asp-action="Index"
+                                   class="@MenuClass("categories")"
+                                   data-admin-page="categories">
+                                    <svg class="@IconClass("categories")" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M12 2.25C6.62391 2.25 2.25 6.62391 2.25 12C2.25 17.3761 6.62391 21.75 12 21.75C17.3761 21.75 21.75 17.3761 21.75 12C21.75 6.62391 17.3761 2.25 12 2.25ZM3.75 12C3.75 7.44365 7.44365 3.75 12 3.75C16.5563 3.75 20.25 7.44365 20.25 12C20.25 16.5563 16.5563 20.25 12 20.25C7.44365 20.25 3.75 16.5563 3.75 12ZM12 7.5C11.5858 7.5 11.25 7.83579 11.25 8.25V12C11.25 12.4142 11.5858 12.75 12 12.75H15.75C16.1642 12.75 16.5 12.4142 16.5 12C16.5 11.5858 16.1642 11.25 15.75 11.25H12.75V8.25C12.75 7.83579 12.4142 7.5 12 7.5Z"
+                                              fill="currentColor" />
+                                    </svg>
+                                    <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Categories</span>
+                                </a>
+                            </li>
+                        }
+                        @if (AdminPermissionHelper.Can(User, PermissionCodes.ProductsManage))
+                        {
+                            <li>
+                                <a asp-area="Admin"
+                                   asp-controller="Product"
+                                   asp-action="Index"
+                                   class="@MenuClass("products")"
+                                   data-admin-page="products">
+                                    <svg class="@IconClass("products")" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M3.75 3.25C3.05964 3.25 2.5 3.80964 2.5 4.5V19.5C2.5 20.1904 3.05964 20.75 3.75 20.75H20.25C20.9404 20.75 21.5 20.1904 21.5 19.5V8.41421C21.5 8.08579 21.3683 7.77105 21.1339 7.53661L16.4634 2.86612C16.2289 2.63168 15.9142 2.5 15.5858 2.5H3.75ZM4 5H14.75V9.25C14.75 9.66421 15.0858 10 15.5 10H19.75V19H4V5ZM16.25 4.56066L18.1893 6.5H16.25V4.56066ZM7.25 12.75C6.83579 12.75 6.5 13.0858 6.5 13.5V16.5C6.5 16.9142 6.83579 17.25 7.25 17.25H16.75C17.1642 17.25 17.5 16.9142 17.5 16.5V13.5C17.5 13.0858 17.1642 12.75 16.75 12.75H7.25Z"
+                                              fill="currentColor" />
+                                    </svg>
+                                    <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Products</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            @if (AdminPermissionHelper.Can(User, PermissionCodes.UsersView)
+                || AdminPermissionHelper.Can(User, PermissionCodes.PermissionsView)
+                || AdminPermissionHelper.Can(User, PermissionCodes.ComplaintsReview))
+            {
+                <div class="mb-2">
+                    <h3 class="menu-group-title mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-400"
+                        :class="sidebarToggle ? 'lg:hidden' : ''">
+                        Management
+                    </h3>
+                    <ul class="flex flex-col gap-1">
+                        @if (AdminPermissionHelper.Can(User, PermissionCodes.UsersView))
+                        {
+                            <li>
+                                <a asp-area="Admin"
+                                   asp-controller="User"
+                                   asp-action="Index"
+                                   class="@MenuClass("users")"
+                                   data-admin-page="users">
+                                    <svg class="@IconClass("users")" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M8.80443 5.60156C7.59109 5.60156 6.60749 6.58517 6.60749 7.79851C6.60749 9.01185 7.59109 9.99545 8.80443 9.99545C10.0178 9.99545 11.0014 9.01185 11.0014 7.79851C11.0014 6.58517 10.0178 5.60156 8.80443 5.60156ZM5.10749 7.79851C5.10749 5.75674 6.76267 4.10156 8.80443 4.10156C10.8462 4.10156 12.5014 5.75674 12.5014 7.79851C12.5014 9.84027 10.8462 11.4955 8.80443 11.4955C6.76267 11.4955 5.10749 9.84027 5.10749 7.79851ZM4.07591 19.8987H13.4249C14.6071 19.8987 15.7658 18.8971 15.4446 17.5202C15.2207 16.5607 14.7397 15.2906 13.6937 14.2549C12.6292 13.2009 11.0448 12.455 8.75042 12.455C6.45602 12.455 4.87163 13.2009 3.8071 14.2549C2.76117 15.2906 2.28015 16.5607 2.05628 17.5202C1.73504 18.8971 2.89369 19.8987 4.07591 19.8987Z"
+                                              fill="currentColor" />
+                                    </svg>
+                                    <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Users</span>
+                                </a>
+                            </li>
+                        }
+                        @if (AdminPermissionHelper.Can(User, PermissionCodes.PermissionsView))
+                        {
+                            <li>
+                                <a asp-area="Admin"
+                                   asp-controller="Permission"
+                                   asp-action="Index"
+                                   class="@MenuClass("permissions")"
+                                   data-admin-page="permissions">
+                                    <svg class="@IconClass("permissions")" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M15.75 1.5a5.25 5.25 0 0 0-5.148 6.232L3.22 14.114A2.25 2.25 0 0 0 2.625 15.7v3.675c0 .621.504 1.125 1.125 1.125H7.5a.75.75 0 0 0 .75-.75V18h1.5a.75.75 0 0 0 .75-.75v-1.5h1.5a.75.75 0 0 0 .53-.22l.232-.232A5.25 5.25 0 1 0 15.75 1.5Zm0 3a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z"
+                                              fill="currentColor" />
+                                    </svg>
+                                    <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">Permissions</span>
+                                </a>
+                            </li>
+                        }
+                        @if (AdminPermissionHelper.Can(User, PermissionCodes.ComplaintsReview))
+                        {
+                            <li>
+                                <a asp-area="Admin"
+                                   asp-controller="Complaint"
+                                   asp-action="Index"
+                                   class="@MenuClass("complaints") flex items-center"
+                                   data-admin-page="complaints">
+                                    <svg class="@IconClass("complaints")" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM10.29 8.29a1.71 1.71 0 1 1 3.42 0 1.71 1.71 0 0 1-3.42 0Zm2.46 3.46a.75.75 0 0 0-.75.75v4.5a.75.75 0 0 0 1.5 0v-4.5a.75.75 0 0 0-.75-.75Z"
+                                              fill="currentColor" />
+                                    </svg>
+                                    <span class="menu-item-text admin-nav-label" :class="sidebarToggle ? 'lg:hidden' : ''">
+                                        <span class="admin-nav-label__text">Complaints</span>
+                                        @await Component.InvokeAsync("PendingComplaintsBadge")
+                                    </span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
         </nav>
     </div>
 </aside>

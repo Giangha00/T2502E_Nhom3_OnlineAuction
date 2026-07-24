@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -91,20 +92,64 @@ public class UserAuctionController : Controller
             return Forbid();
         }
 
-        foreach (var (key, message) in _sellService.ValidateCreateAuction(model))
+        var listingType = await _db.Auctions.AsNoTracking()
+            .Where(auction => auction.Id == auctionId)
+            .Select(auction => auction.ListingType)
+            .FirstOrDefaultAsync();
+        model.ListingType = listingType ?? ListingTypes.Auction;
+
+        if (model.IsBuyNow)
         {
-            if (key == nameof(model.RegistrationStartDate))
+            if (decimal.TryParse(
+                    Request.Form["Price"],
+                    NumberStyles.Number,
+                    CultureInfo.InvariantCulture,
+                    out var price))
             {
-                // Edit allows keeping an already-started registration window.
-                continue;
+                model.BuyNowPrice = price;
             }
 
-            ModelState.AddModelError(key, message);
-        }
+            var buyNowValidationModel = new CreateBuyNowViewModel
+            {
+                ProductName = model.ProductName,
+                Category = model.Category,
+                ShortDescription = model.ShortDescription,
+                Subtitle = model.Subtitle,
+                ProductDescription = model.ProductDescription,
+                Condition = model.Condition,
+                Year = model.Year,
+                SetName = model.SetName,
+                Language = model.Language,
+                CardNumber = model.CardNumber,
+                Authenticator = model.Authenticator,
+                GradeValue = model.GradeValue,
+                Grade = model.Grade,
+                CertificateNumber = model.CertificateNumber,
+                Price = model.BuyNowPrice ?? 0m
+            };
 
-        if (model.EndDate <= model.StartDate)
+            foreach (var (key, message) in _sellService.ValidateCreateBuyNow(buyNowValidationModel))
+            {
+                ModelState.AddModelError(key, message);
+            }
+        }
+        else
         {
-            ModelState.AddModelError(nameof(model.EndDate), "Live end must be greater than live start.");
+            foreach (var (key, message) in _sellService.ValidateCreateAuction(model))
+            {
+                if (key == nameof(model.RegistrationStartDate))
+                {
+                    // Edit allows keeping an already-started registration window.
+                    continue;
+                }
+
+                ModelState.AddModelError(key, message);
+            }
+
+            if (model.EndDate <= model.StartDate)
+            {
+                ModelState.AddModelError(nameof(model.EndDate), "Live end must be greater than live start.");
+            }
         }
 
         if (!ModelState.IsValid)
@@ -121,12 +166,16 @@ public class UserAuctionController : Controller
             return EditFailure(model, result.Message);
         }
 
+        var detailPath = model.IsBuyNow
+            ? $"/BuyNow/Detail/{auctionId}"
+            : $"/Auction/Detail/{auctionId}";
+
         await _notificationService.CreateAndPushAsync(
             sellerId.Value,
             _notifyLocalizer[NotificationKeys.ListingUpdatedTitle],
             _notifyLocalizer[NotificationKeys.ListingUpdatedMessage],
             NotificationType.Auction,
-            $"/Auction/Detail/{auctionId}",
+            detailPath,
             NotificationReferenceTypes.ListingUpdated,
             auctionId,
             debounceWindow: TimeSpan.FromMinutes(2));
@@ -137,7 +186,8 @@ public class UserAuctionController : Controller
             {
                 success = true,
                 message = result.Message,
-                redirectUrl = Url.Action("Detail", "User", new { id = sellerId.Value }) + "#seller-auctions"
+                redirectUrl = Url.Action("Detail", "User", new { id = sellerId.Value })
+                    + (model.IsBuyNow ? "#seller-buynow" : "#seller-auctions")
             });
         }
 
@@ -189,6 +239,7 @@ public class UserAuctionController : Controller
         }
 
         model.Status = fresh.Status;
+        model.ListingType = fresh.ListingType;
         model.HasBids = fresh.HasBids;
         model.CanEditFull = fresh.CanEditFull;
         model.LockRegistrationDates = fresh.LockRegistrationDates;
@@ -216,7 +267,7 @@ public class UserAuctionController : Controller
                         .SelectMany(entry => entry.Errors)
                         .Select(error => error.ErrorMessage)
                         .FirstOrDefault()
-                    ?? "Please check the auction form."
+                    ?? "Please check the form."
             });
         }
 

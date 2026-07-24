@@ -878,8 +878,8 @@
   <data name="User_CurrentBid" xml:space="preserve"><value>Giá hiện tại</value></data>
   <data name="User_Ends" xml:space="preserve"><value>Kết thúc</value></data>
   <data name="User_ViewDetail" xml:space="preserve"><value>Xem chi tiết</value></data>
-  <data name="User_CancelListing" xml:space="preserve"><value>Hủy</value></data>
-  <data name="User_CancelListingConfirm" xml:space="preserve"><value>Hủy tin đăng này? Tin sẽ bị gỡ khỏi sàn.</value></data>
+  <data name="User_CancelListing" xml:space="preserve"><value>Gỡ</value></data>
+  <data name="User_CancelListingConfirm" xml:space="preserve"><value>Gỡ tin đăng này? Tin sẽ bị gỡ khỏi sàn.</value></data>
   <data name="User_EditListing" xml:space="preserve"><value>Sửa</value></data>
   <data name="User_CancelConfirm" xml:space="preserve"><value>Hủy tin đấu giá này?</value></data>
   <data name="User_Status_Active" xml:space="preserve"><value>Đấu giá đang diễn ra</value></data>
@@ -888,6 +888,9 @@
   <data name="UserAuction_EditTitle" xml:space="preserve"><value>Sửa đấu giá</value></data>
   <data name="UserAuction_EditDesc" xml:space="preserve"><value>Cập nhật thông tin listing. Ngày đăng ký và giá khởi điểm có thể bị khóa sau khi mở đăng ký hoặc đã có bid.</value></data>
   <data name="UserAuction_EditPhaseLockHint" xml:space="preserve"><value>Một số trường lịch/giá đã bị khóa theo giai đoạn. Bạn vẫn có thể gia hạn ngày kết thúc live.</value></data>
+  <data name="UserBuyNow_EditTitle" xml:space="preserve"><value>Sửa Mua ngay</value></data>
+  <data name="UserBuyNow_EditDesc" xml:space="preserve"><value>Cập nhật thông tin và giá sản phẩm Mua ngay.</value></data>
+  <data name="UserBuyNow_EditPriceLockHint" xml:space="preserve"><value>Giá đang bị khóa ở giai đoạn này. Bạn vẫn có thể cập nhật thông tin sản phẩm và ảnh.</value></data>
   <data name="UserAuction_ProductName" xml:space="preserve"><value>Tên sản phẩm</value></data>
   <data name="UserAuction_ShortDescription" xml:space="preserve"><value>Mô tả ngắn</value></data>
   <data name="UserAuction_SetName" xml:space="preserve"><value>Tên bộ</value></data>

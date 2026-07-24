@@ -1,10 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using OnlineAuction.Entities;
 
 namespace OnlineAuction.Models;
 
 public class SellerAuctionFormViewModel : CreateAuctionViewModel
 {
     public string Status { get; set; } = string.Empty;
+
+    public string ListingType { get; set; } = ListingTypes.Auction;
+
+    public bool IsBuyNow =>
+        string.Equals(ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
 
     public bool HasBids { get; set; }
 

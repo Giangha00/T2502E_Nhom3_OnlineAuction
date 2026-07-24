@@ -48,13 +48,14 @@
 
     string PhaseBadgeClass(string phase) => phase switch
     {
-        AuctionListingPhases.RegistrationOpen => "bg-sky-600 text-white",
-        AuctionListingPhases.RegistrationClosed => "bg-amber-500 text-white",
-        AuctionListingPhases.LiveAuction => "bg-emerald-600 text-white",
-        AuctionListingPhases.LiveEndingSoon => "bg-red-600 text-white",
-        AuctionListingPhases.Ended => "bg-gray-600 text-white",
-        AuctionListingPhases.NotListed => "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
-        _ => "bg-slate-600 text-white"
+        AuctionListingPhases.RegistrationOpen => "admin-phase-chip admin-phase-chip--registration-open",
+        AuctionListingPhases.RegistrationClosed => "admin-phase-chip admin-phase-chip--registration-closed",
+        AuctionListingPhases.LiveAuction => "admin-phase-chip admin-phase-chip--live",
+        AuctionListingPhases.LiveEndingSoon => "admin-phase-chip admin-phase-chip--ending-soon",
+        AuctionListingPhases.Ended => "admin-phase-chip admin-phase-chip--ended",
+        AuctionListingPhases.NotListed => "admin-phase-chip admin-phase-chip--not-listed",
+        AuctionListingPhases.Upcoming => "admin-phase-chip admin-phase-chip--upcoming",
+        _ => "admin-phase-chip admin-phase-chip--default"
     };
 
     string StatusBadgeClass(string status) => status switch
@@ -95,22 +96,19 @@
 
     <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
         <div class="max-w-full overflow-x-auto">
-            <table class="w-full min-w-[1450px]">
+            <table class="admin-auction-table">
                 <thead>
                 <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
-                    <th class="w-12 px-5 py-3 text-left">
+                    <th class="w-10 text-left">
                         <input id="selectAllAuctions" type="checkbox" aria-label="Select all auctions" />
                     </th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Product</th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Category</th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Seller</th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Prices</th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">DB Status</th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Listing Phase</th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Schedule</th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Bids</th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Public</th>
-                    <th class="px-5 py-3 text-right text-theme-xs font-medium uppercase text-gray-500">Actions</th>
+                    <th class="text-left font-medium uppercase text-gray-500">Product</th>
+                    <th class="text-left font-medium uppercase text-gray-500">Seller</th>
+                    <th class="text-left font-medium uppercase text-gray-500">Price</th>
+                    <th class="text-left font-medium uppercase text-gray-500">Status</th>
+                    <th class="text-left font-medium uppercase text-gray-500">Schedule</th>
+                    <th class="text-left font-medium uppercase text-gray-500">Activity</th>
+                    <th class="text-right font-medium uppercase text-gray-500">Actions</th>
                 </tr>
                 </thead>
 
@@ -118,7 +116,7 @@
                 @if (Model.Auctions.Count == 0)
                 {
                     <tr>
-                        <td colspan="11" class="px-5 py-10 text-center text-theme-sm text-gray-500">No auctions found.</td>
+                        <td colspan="8" class="px-4 py-8 text-center text-sm text-gray-500">No auctions found.</td>
                     </tr>
                 }
                 else
@@ -126,61 +124,59 @@
                     @foreach (var auction in Model.Auctions)
                     {
                         <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
-                            <td class="px-5 py-4">
+                            <td>
                                 <input class="auction-checkbox" type="checkbox" name="SelectedAuctionIds" value="@auction.Id" @(canManage ? null : "disabled") />
                             </td>
-                            <td class="px-5 py-4">
-                                <div class="flex items-center gap-3">
+                            <td class="admin-auction-product">
+                                <div class="flex items-center gap-2.5">
                                     @if (!string.IsNullOrWhiteSpace(auction.ImageUrl))
                                     {
                                         <img src="@auction.ImageUrl"
                                              alt="@auction.ProductName"
-                                             class="h-12 w-12 rounded-lg object-cover" />
+                                             class="admin-auction-product__thumb" />
                                     }
-                                    <div>
-                                        <p class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@auction.ProductName</p>
-                                        <p class="text-theme-xs text-gray-500">ID: @auction.Id</p>
-                                        <span class="mt-1 inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium capitalize text-gray-700 dark:bg-gray-800 dark:text-gray-300">@auction.ListingType</span>
+                                    <div class="min-w-0">
+                                        <p class="admin-auction-product__name text-gray-800 dark:text-white/90" title="@auction.ProductName">@auction.ProductName</p>
+                                        <p class="admin-auction-muted">#@auction.Id · @auction.CategoryName</p>
+                                        <span class="admin-auction-chip mt-1 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">@auction.ListingType</span>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@auction.CategoryName</td>
-                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@auction.SellerName</td>
-                            <td class="px-5 py-4">
-                                <p class="text-theme-sm text-gray-800 dark:text-white/90">Current: @auction.CurrentPrice.ToString("N0")</p>
-                                <p class="text-theme-xs text-gray-500">Start: @auction.StartingPrice.ToString("N0")</p>
-                                <p class="text-theme-xs text-gray-500">Step: @auction.BidStep.ToString("N0")</p>
+                            <td>
+                                <p class="admin-auction-meta text-gray-700 dark:text-gray-300" title="@auction.SellerName">@auction.SellerName</p>
                             </td>
-                            <td class="px-5 py-4">
-                                <span class="rounded-full px-2.5 py-0.5 text-theme-xs font-medium capitalize @StatusBadgeClass(auction.Status)">
-                                    @FormatStatus(auction.Status)
-                                </span>
+                            <td>
+                                <p class="admin-auction-price text-gray-800 dark:text-white/90">$@auction.CurrentPrice.ToString("N0")</p>
+                                <p class="admin-auction-muted">Start $@auction.StartingPrice.ToString("N0") · Step $@auction.BidStep.ToString("N0")</p>
                             </td>
-                            <td class="px-5 py-4">
-                                <span class="rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wide @PhaseBadgeClass(auction.ListingPhase)">
-                                    @PhaseLabel(auction.ListingPhase)
-                                </span>
+                            <td>
+                                <div class="admin-auction-badge-row">
+                                    <span class="admin-auction-status @StatusBadgeClass(auction.Status)">@FormatStatus(auction.Status)</span>
+                                    <span class="@PhaseBadgeClass(auction.ListingPhase)">@PhaseLabel(auction.ListingPhase)</span>
+                                </div>
                                 @if (!string.IsNullOrWhiteSpace(auction.TimeRemaining) && auction.ListingPhase != AuctionListingPhases.NotListed)
                                 {
-                                    <p class="mt-1 text-theme-xs text-gray-500">@auction.TimeRemaining</p>
+                                    <p class="admin-auction-muted">@auction.TimeRemaining</p>
                                 }
                             </td>
-                            <td class="px-5 py-4">
-                                <p class="text-theme-xs text-gray-500">Reg: @auction.RegistrationStartDate.ToString("dd/MM/yyyy HH:mm")</p>
-                                <p class="text-theme-xs text-gray-500">to @auction.RegistrationEndDate.ToString("dd/MM/yyyy HH:mm")</p>
-                                <p class="mt-1 text-theme-xs text-gray-700 dark:text-gray-300">Live: @auction.StartDate.ToString("dd/MM/yyyy HH:mm")</p>
-                                <p class="text-theme-xs text-gray-500">to @auction.EndDate.ToString("dd/MM/yyyy HH:mm")</p>
+                            <td>
+                                <p class="admin-auction-meta text-gray-700 dark:text-gray-300">
+                                    Live @auction.StartDate.ToString("dd/MM/yyyy HH:mm")
+                                </p>
+                                <p class="admin-auction-meta text-gray-500">
+                                    → @auction.EndDate.ToString("dd/MM/yyyy HH:mm")
+                                </p>
+                                <p class="admin-auction-muted">
+                                    Reg @auction.RegistrationStartDate.ToString("dd/MM/yyyy") – @auction.RegistrationEndDate.ToString("dd/MM/yyyy")
+                                </p>
                             </td>
-                            <td class="px-5 py-4">
-                                <p class="text-theme-sm text-gray-700 dark:text-gray-300">@auction.BidCount</p>
-                                <p class="text-theme-xs text-gray-500">@auction.RegistrationCount reg.</p>
+                            <td>
+                                <p class="admin-auction-meta text-gray-800 dark:text-white/90">@auction.BidCount bids · @auction.RegistrationCount reg</p>
+                                <p class="admin-auction-muted @(auction.IsPubliclyListed ? "text-success-600" : "")">
+                                    @(auction.IsPubliclyListed ? "Public" : "Hidden")
+                                </p>
                             </td>
-                            <td class="px-5 py-4">
-                                <span class="rounded-full px-2.5 py-0.5 text-theme-xs font-medium @(auction.IsPubliclyListed ? "bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-400" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300")">
-                                    @(auction.IsPubliclyListed ? "Yes" : "No")
-                                </span>
-                            </td>
-                            <td class="px-5 py-4">
+                            <td class="admin-auction-actions">
                                 <div class="admin-icon-action-group">
                                     @if (auction.IsPubliclyListed)
                                     {
@@ -226,7 +222,11 @@
                                                     class="admin-icon-action admin-icon-action--delete"
                                                     title="Delete"
                                                     aria-label="Delete"
-                                                    onclick="return confirm('Bạn có chắc muốn xóa phiên #@auction.Id?');">
+                                                    data-confirm
+                                                    data-confirm-variant="danger"
+                                                    data-confirm-title="Delete auction?"
+                                                    data-confirm-message="Delete auction #@auction.Id?"
+                                                    data-confirm-confirm="Delete">
                                                 <partial name="_AdminIcon" model='"trash"' />
                                             </button>
                                         }
@@ -237,13 +237,17 @@
                                                     class="admin-icon-action admin-icon-action--neutral"
                                                     title="@auction.DeleteBlockReason"
                                                     aria-label="Cancel auction"
-                                                    onclick="return confirm('Hủy phiên #@auction.Id thay vì xóa?');">
+                                                    data-confirm
+                                                    data-confirm-variant="danger"
+                                                    data-confirm-title="Cancel auction?"
+                                                    data-confirm-message="Cancel auction #@auction.Id instead of deleting?"
+                                                    data-confirm-confirm="Cancel listing">
                                                 <partial name="_AdminIcon" model='"x-mark"' />
                                             </button>
                                         }
                                         else if (!string.IsNullOrWhiteSpace(auction.DeleteBlockReason))
                                         {
-                                            <span class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-gray-200 px-2 text-xs font-semibold text-gray-500"
+                                            <span class="inline-flex h-8 min-w-8 items-center justify-center rounded-lg border border-gray-200 px-2 text-xs font-semibold text-gray-500"
                                                   title="@auction.DeleteBlockReason">
                                                 !
                                             </span>

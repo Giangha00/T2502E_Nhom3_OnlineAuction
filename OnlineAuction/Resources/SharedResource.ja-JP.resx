@@ -768,8 +768,8 @@
   <data name="User_CurrentBid" xml:space="preserve"><value>現在の入札</value></data>
   <data name="User_Ends" xml:space="preserve"><value>終了</value></data>
   <data name="User_ViewDetail" xml:space="preserve"><value>詳細を見る</value></data>
-  <data name="User_CancelListing" xml:space="preserve"><value>キャンセル</value></data>
-  <data name="User_CancelListingConfirm" xml:space="preserve"><value>この出品をキャンセルしますか？マーケットから削除されます。</value></data>
+  <data name="User_CancelListing" xml:space="preserve"><value>削除</value></data>
+  <data name="User_CancelListingConfirm" xml:space="preserve"><value>この出品を削除しますか？マーケットから削除されます。</value></data>
   <data name="User_EditListing" xml:space="preserve"><value>編集</value></data>
   <data name="User_CancelConfirm" xml:space="preserve"><value>このオークション出品をキャンセルしますか？</value></data>
   <data name="User_Status_Active" xml:space="preserve"><value>開催中オークション</value></data>
@@ -778,6 +778,9 @@
   <data name="UserAuction_EditTitle" xml:space="preserve"><value>オークション編集</value></data>
   <data name="UserAuction_EditDesc" xml:space="preserve"><value>出品内容を更新します。登録開始後や入札がある場合、登録期間や開始価格はロックされることがあります。</value></data>
   <data name="UserAuction_EditPhaseLockHint" xml:space="preserve"><value>この段階では一部の日程・価格項目がロックされています。ライブ終了日時の延長は可能です。</value></data>
+  <data name="UserBuyNow_EditTitle" xml:space="preserve"><value>即購入の編集</value></data>
+  <data name="UserBuyNow_EditDesc" xml:space="preserve"><value>即購入出品の詳細と価格を更新します。</value></data>
+  <data name="UserBuyNow_EditPriceLockHint" xml:space="preserve"><value>この段階では価格がロックされています。商品情報と画像は更新できます。</value></data>
   <data name="UserAuction_ProductName" xml:space="preserve"><value>商品名</value></data>
   <data name="UserAuction_ShortDescription" xml:space="preserve"><value>短い説明</value></data>
   <data name="UserAuction_SetName" xml:space="preserve"><value>セット名</value></data>

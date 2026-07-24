@@ -768,8 +768,8 @@
   <data name="User_CurrentBid" xml:space="preserve"><value>현재 입찰가</value></data>
   <data name="User_Ends" xml:space="preserve"><value>종료</value></data>
   <data name="User_ViewDetail" xml:space="preserve"><value>상세 보기</value></data>
-  <data name="User_CancelListing" xml:space="preserve"><value>취소</value></data>
-  <data name="User_CancelListingConfirm" xml:space="preserve"><value>이 리스팅을 취소할까요? 마켓에서 제거됩니다.</value></data>
+  <data name="User_CancelListing" xml:space="preserve"><value>삭제</value></data>
+  <data name="User_CancelListingConfirm" xml:space="preserve"><value>이 리스팅을 삭제할까요? 마켓에서 제거됩니다.</value></data>
   <data name="User_EditListing" xml:space="preserve"><value>편집</value></data>
   <data name="User_CancelConfirm" xml:space="preserve"><value>이 경매 등록을 취소하시겠습니까?</value></data>
   <data name="User_Status_Active" xml:space="preserve"><value>진행 중 경매</value></data>
@@ -778,6 +778,9 @@
   <data name="UserAuction_EditTitle" xml:space="preserve"><value>경매 편집</value></data>
   <data name="UserAuction_EditDesc" xml:space="preserve"><value>리스팅 정보를 업데이트합니다. 등록이 열리거나 입찰이 있으면 등록 기간/시작가가 잠길 수 있습니다.</value></data>
   <data name="UserAuction_EditPhaseLockHint" xml:space="preserve"><value>이 단계에서는 일부 일정/가격 필드가 잠깁니다. 라이브 종료 시각은 연장할 수 있습니다.</value></data>
+  <data name="UserBuyNow_EditTitle" xml:space="preserve"><value>즉시 구매 편집</value></data>
+  <data name="UserBuyNow_EditDesc" xml:space="preserve"><value>즉시 구매 리스팅의 정보와 가격을 업데이트합니다.</value></data>
+  <data name="UserBuyNow_EditPriceLockHint" xml:space="preserve"><value>이 단계에서는 가격이 잠겨 있습니다. 상품 정보와 이미지는 계속 수정할 수 있습니다.</value></data>
   <data name="UserAuction_ProductName" xml:space="preserve"><value>상품명</value></data>
   <data name="UserAuction_ShortDescription" xml:space="preserve"><value>짧은 설명</value></data>
   <data name="UserAuction_SetName" xml:space="preserve"><value>세트명</value></data>

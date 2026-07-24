@@ -113,11 +113,22 @@
 @section Scripts {
     <script src="~/admin/js/admin-list-filter.js" asp-append-version="true"></script>
     <script>
+        function bindBuyNowBulkActions(container) {
+            AdminListFilter.bindBulkDelete(container, {
+                formId: 'buyNowBulkDeleteForm',
+                selectAllId: 'selectAllBuyNow',
+                checkboxClass: 'buynow-checkbox',
+                emptyMessage: 'Please select at least one Buy Now listing.',
+                confirmMessage: 'Are you sure you want to delete selected Buy Now listings?'
+            });
+        }
+
         AdminListFilter.init({
             formId: 'buyNowFilterForm',
             resultsId: 'buyNowListResults',
             searchInputId: 'buyNowSearchInput',
-            listUrl: '@Url.Action("Index", "BuyNow", new { area = "Admin" })'
+            listUrl: '@Url.Action("Index", "BuyNow", new { area = "Admin" })',
+            onUpdated: bindBuyNowBulkActions
         });
     </script>
 }

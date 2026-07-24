@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuction.Areas.Admin.Services;
 using OnlineAuction.Areas.Admin.ViewModels.BuyNow;
@@ -14,10 +15,12 @@ namespace OnlineAuction.Areas.Admin.Controllers;
 public class BuyNowController : BaseAdminController
 {
     private readonly IAdminBuyNowService _buyNowService;
+    private readonly AdminAuctionService _auctionService;
 
-    public BuyNowController(IAdminBuyNowService buyNowService)
+    public BuyNowController(IAdminBuyNowService buyNowService, AdminAuctionService auctionService)
     {
         _buyNowService = buyNowService;
+        _auctionService = auctionService;
     }
 
     [RequirePermission(PermissionCodes.AuctionsView)]
@@ -121,5 +124,30 @@ public class BuyNowController : BaseAdminController
         var result = await _buyNowService.CancelAsync(id);
         TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
         return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
+    public async Task<IActionResult> BulkDelete(BuyNowBulkDeleteViewModel model)
+    {
+        var result = await _auctionService.BulkDeleteAsync(model.SelectedBuyNowIds, GetCurrentAdminId());
+
+        if (result.Success)
+        {
+            TempData["SuccessMessage"] = result.Message;
+        }
+        else
+        {
+            TempData["ErrorMessage"] = result.Message;
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    private int GetCurrentAdminId()
+    {
+        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return int.TryParse(value, out var userId) ? userId : 0;
     }
 }

@@ -526,10 +526,12 @@ public class SellerAuctionService : ISellerAuctionService
         var hasBids = await _db.Bids.AnyAsync(b => b.AuctionId == auction.Id);
         GradeLabelHelper.Parse(auction.Product.GradeLabel, out var authenticator, out var gradeValue);
 
+        var isBuyNow = string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
         var model = new SellerAuctionFormViewModel
         {
             AuctionId = auction.Id,
             Status = auction.Status,
+            ListingType = auction.ListingType,
             HasBids = hasBids,
             ProductName = auction.Product.Name,
             Category = auction.Product.Category.Name,
@@ -546,13 +548,13 @@ public class SellerAuctionService : ISellerAuctionService
             Grade = auction.Product.GradeLabel ?? GradeLabelHelper.Compose(authenticator, gradeValue),
             CertificateNumber = auction.Product.CertNumber,
             ExistingPrimaryImage = auction.Product.PrimaryImage,
-            StartingPrice = string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase)
+            StartingPrice = isBuyNow
                 ? ResolveBuyNowStartingPrice(auction.BuyNowPrice ?? auction.CurrentPrice)
                 : auction.StartingPrice,
-            BidStep = string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase)
+            BidStep = isBuyNow
                 ? 0.01m
                 : auction.BidStep,
-            BuyNowPrice = string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase)
+            BuyNowPrice = isBuyNow
                 ? auction.BuyNowPrice ?? auction.CurrentPrice
                 : auction.BuyNowPrice,
             StartDate = DateTimeUtilities.AsUtc(auction.StartDate),
@@ -615,70 +617,133 @@ public class SellerAuctionService : ISellerAuctionService
 
         var hasBids = await _db.Bids.AnyAsync(b => b.AuctionId == auction.Id);
         ApplyEditLocks(model, auction, hasBids);
+        model.ListingType = auction.ListingType;
 
-        if (model.LockRegistrationDates)
+        var isBuyNow = string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
+        if (isBuyNow)
         {
+            // Buy Now has no editable schedule UI — keep the original window.
             model.RegistrationStartDate = auction.RegistrationStartDate;
             model.RegistrationEndDate = auction.RegistrationEndDate;
-        }
-
-        if (model.LockLiveStartDate)
-        {
             model.StartDate = auction.StartDate;
-        }
+            model.EndDate = auction.EndDate;
+            model.BidStep = 0.01m;
 
-        if (model.LockStartingPrice)
-        {
-            model.StartingPrice = auction.StartingPrice;
-        }
-
-        if (model.LockBidStep)
-        {
-            model.BidStep = auction.BidStep;
-        }
-
-        if (DateTimeUtilities.AsUtc(model.EndDate) < DateTimeUtilities.AsUtc(auction.EndDate))
-        {
-            return (false, "End date can only be extended, not shortened.");
-        }
-
-        SellService.NormalizeGradingFields(model);
-
-        foreach (var (key, message) in _sellService.ValidateCreateAuction(model))
-        {
-            // Past registration start is allowed on edit when dates are locked / already open.
-            if (model.LockRegistrationDates
-                && key == nameof(model.RegistrationStartDate))
+            if (model.LockStartingPrice)
             {
-                continue;
+                model.BuyNowPrice = auction.BuyNowPrice ?? auction.CurrentPrice;
+                model.StartingPrice = auction.StartingPrice;
+            }
+            else
+            {
+                var buyNowPrice = model.BuyNowPrice ?? 0m;
+                if (buyNowPrice <= 0.01m)
+                {
+                    return (false, "Price must be greater than 0.01.");
+                }
+
+                model.BuyNowPrice = buyNowPrice;
+                model.StartingPrice = ResolveBuyNowStartingPrice(buyNowPrice);
             }
 
-            if (key == nameof(model.RegistrationStartDate)
-                && DateTimeUtilities.AsUtc(model.RegistrationStartDate)
-                    == DateTimeUtilities.AsUtc(auction.RegistrationStartDate))
+            var buyNowValidationModel = new CreateBuyNowViewModel
             {
-                continue;
+                ProductName = model.ProductName,
+                Category = model.Category,
+                ShortDescription = model.ShortDescription,
+                Subtitle = model.Subtitle,
+                ProductDescription = model.ProductDescription,
+                Condition = model.Condition,
+                Year = model.Year,
+                SetName = model.SetName,
+                Language = model.Language,
+                CardNumber = model.CardNumber,
+                Authenticator = model.Authenticator,
+                GradeValue = model.GradeValue,
+                Grade = model.Grade,
+                CertificateNumber = model.CertificateNumber,
+                Price = model.BuyNowPrice ?? 0m,
+                Categories = model.Categories,
+                Authenticators = model.Authenticators,
+                GradeValues = model.GradeValues,
+                Languages = model.Languages
+            };
+
+            SellService.NormalizeGradingFields(buyNowValidationModel);
+            model.Grade = buyNowValidationModel.Grade;
+            model.Condition = buyNowValidationModel.Condition;
+
+            foreach (var (_, message) in _sellService.ValidateCreateBuyNow(buyNowValidationModel))
+            {
+                return (false, message);
+            }
+        }
+        else
+        {
+            if (model.LockRegistrationDates)
+            {
+                model.RegistrationStartDate = auction.RegistrationStartDate;
+                model.RegistrationEndDate = auction.RegistrationEndDate;
             }
 
-            return (false, message);
-        }
-
-        if (model.EndDate <= model.StartDate)
-        {
-            return (false, "Live end must be greater than live start.");
-        }
-
-        if (!model.LockRegistrationDates)
-        {
-            var scheduleError = AuctionScheduleHelper.ValidateSchedule(
-                model.RegistrationStartDate,
-                model.RegistrationEndDate,
-                model.StartDate,
-                model.EndDate);
-
-            if (scheduleError is not null)
+            if (model.LockLiveStartDate)
             {
-                return (false, scheduleError);
+                model.StartDate = auction.StartDate;
+            }
+
+            if (model.LockStartingPrice)
+            {
+                model.StartingPrice = auction.StartingPrice;
+            }
+
+            if (model.LockBidStep)
+            {
+                model.BidStep = auction.BidStep;
+            }
+
+            if (DateTimeUtilities.AsUtc(model.EndDate) < DateTimeUtilities.AsUtc(auction.EndDate))
+            {
+                return (false, "End date can only be extended, not shortened.");
+            }
+
+            SellService.NormalizeGradingFields(model);
+
+            foreach (var (key, message) in _sellService.ValidateCreateAuction(model))
+            {
+                // Past registration start is allowed on edit when dates are locked / already open.
+                if (model.LockRegistrationDates
+                    && key == nameof(model.RegistrationStartDate))
+                {
+                    continue;
+                }
+
+                if (key == nameof(model.RegistrationStartDate)
+                    && DateTimeUtilities.AsUtc(model.RegistrationStartDate)
+                        == DateTimeUtilities.AsUtc(auction.RegistrationStartDate))
+                {
+                    continue;
+                }
+
+                return (false, message);
+            }
+
+            if (model.EndDate <= model.StartDate)
+            {
+                return (false, "Live end must be greater than live start.");
+            }
+
+            if (!model.LockRegistrationDates)
+            {
+                var scheduleError = AuctionScheduleHelper.ValidateSchedule(
+                    model.RegistrationStartDate,
+                    model.RegistrationEndDate,
+                    model.StartDate,
+                    model.EndDate);
+
+                if (scheduleError is not null)
+                {
+                    return (false, scheduleError);
+                }
             }
         }
 

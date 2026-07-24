@@ -834,8 +834,8 @@
   <data name="User_CurrentBid" xml:space="preserve"><value>Current Bid</value></data>
   <data name="User_Ends" xml:space="preserve"><value>Ends</value></data>
   <data name="User_ViewDetail" xml:space="preserve"><value>View Detail</value></data>
-  <data name="User_CancelListing" xml:space="preserve"><value>Cancel</value></data>
-  <data name="User_CancelListingConfirm" xml:space="preserve"><value>Cancel this listing? It will be removed from the marketplace.</value></data>
+  <data name="User_CancelListing" xml:space="preserve"><value>Remove</value></data>
+  <data name="User_CancelListingConfirm" xml:space="preserve"><value>Remove this listing? It will be removed from the marketplace.</value></data>
   <data name="User_EditListing" xml:space="preserve"><value>Edit</value></data>
   <data name="User_CancelConfirm" xml:space="preserve"><value>Cancel this auction listing?</value></data>
   <data name="User_Status_Active" xml:space="preserve"><value>Active Auction</value></data>
@@ -844,6 +844,9 @@
   <data name="UserAuction_EditTitle" xml:space="preserve"><value>Edit Auction</value></data>
   <data name="UserAuction_EditDesc" xml:space="preserve"><value>Update your listing details. Registration dates and starting price may be locked after registration opens or bids are placed.</value></data>
   <data name="UserAuction_EditPhaseLockHint" xml:space="preserve"><value>Some schedule or pricing fields are locked for this phase. You can still extend the live end date.</value></data>
+  <data name="UserBuyNow_EditTitle" xml:space="preserve"><value>Edit Buy Now</value></data>
+  <data name="UserBuyNow_EditDesc" xml:space="preserve"><value>Update your Buy Now listing details and price.</value></data>
+  <data name="UserBuyNow_EditPriceLockHint" xml:space="preserve"><value>The price is locked for this listing phase. You can still update product details and images.</value></data>
   <data name="UserAuction_ProductName" xml:space="preserve"><value>Product Name</value></data>
   <data name="UserAuction_ShortDescription" xml:space="preserve"><value>Short Description</value></data>
   <data name="UserAuction_SetName" xml:space="preserve"><value>Set Name</value></data>

@@ -312,7 +312,7 @@ public class RefundComplaintService : IRefundComplaintService
         }
 
         var urls = rawEvidenceUrls
-            .Split(['\r', '\n', ',', ';'], StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Split(new[] { '\r', '\n', ',', ';' }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
 

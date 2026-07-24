@@ -14,7 +14,7 @@
       <label for="price" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["SellBuyNow_Price"] <span class="text-red-500">*</span></label>
       <div class="relative">
         <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">$</span>
-        <input type="text" id="price" name="Price" value="@(Model.Price > 0 ? Model.Price : "")" placeholder="500"
+        <input type="text" id="price" name="Price" value="@(Model.Price > 0 ? Model.Price.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) : "")" placeholder="500"
                inputmode="decimal" data-sell-numeric="decimal"
                class="field-input w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-7 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"/>
       </div>

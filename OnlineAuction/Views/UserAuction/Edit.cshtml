@@ -1,9 +1,63 @@
 @using System.Text.Json
 @model OnlineAuction.Models.SellerAuctionFormViewModel
 @{
-    ViewData["Title"] = Localizer["UserAuction_EditTitle"];
-    ViewData["DocumentSectionNumber"] = 6;
+    var isBuyNow = Model.IsBuyNow;
+    ViewData["Title"] = isBuyNow ? Localizer["UserBuyNow_EditTitle"] : Localizer["UserAuction_EditTitle"];
+    ViewData["DocumentSectionNumber"] = isBuyNow ? 5 : 6;
     ViewData["SellFooterMode"] = "edit";
+
+    var existingImages = new List<object>();
+    if (!string.IsNullOrWhiteSpace(Model.ExistingPrimaryImage))
+    {
+        existingImages.Add(new { id = 0, url = Model.ExistingPrimaryImage, isPrimary = true });
+    }
+
+    existingImages.AddRange(Model.ExistingGalleryImages.Select(image => new
+    {
+        id = image.Id,
+        url = image.Url,
+        isPrimary = false
+    }));
+
+    var existingDocuments = Model.ExistingDocuments.Select(document => new
+    {
+        id = document.Id,
+        name = document.Name,
+        url = document.FileUrl
+    });
+
+    var buyNowPricing = new CreateBuyNowViewModel
+    {
+        Price = Model.BuyNowPrice ?? 0m
+    };
+
+    var buyNowI18n = new Dictionary<string, string>
+    {
+        ["productNameDefault"] = Localizer["Sell_Preview_ProductNameDefault"].Value,
+        ["categoryDefault"] = "—",
+        ["inStock"] = Localizer["BuyNow_InStock"].Value,
+        ["editorPlaceholder"] = Localizer["Sell_Editor_Placeholder"].Value,
+        ["remove"] = Localizer["Sell_Remove"].Value,
+        ["successCreated"] = Localizer["UserAuction_SaveSuccess"].Value,
+        ["errorCreateFailed"] = Localizer["UserAuction_SaveFailed"].Value,
+        ["errorProductNameRequired"] = Localizer["Sell_Error_ProductNameRequired"].Value,
+        ["errorCategoryRequired"] = Localizer["Sell_Error_CategoryRequired"].Value,
+        ["errorConditionRequired"] = Localizer["Sell_Error_ConditionRequired"].Value,
+        ["errorPriceRequired"] = Localizer["SellBuyNow_Error_PriceRequired"].Value,
+        ["errorImageInvalidFormat"] = Localizer["Sell_Error_ImageInvalidFormat"].Value,
+        ["errorImageSizeLimit"] = Localizer["Sell_Error_ImageSizeLimit"].Value,
+        ["errorDocInvalidFormat"] = Localizer["Sell_Error_DocInvalidFormat"].Value,
+        ["errorDocSizeLimit"] = Localizer["Sell_Error_DocSizeLimit"].Value,
+        ["errorYearInvalid"] = Localizer["Sell_Error_YearInvalid"].Value,
+        ["errorYearRequired"] = Localizer["Sell_Error_YearRequired"].Value,
+        ["errorAuthenticatorRequired"] = Localizer["Sell_Error_AuthenticatorRequired"].Value,
+        ["errorGradeRequired"] = Localizer["Sell_Error_GradeRequired"].Value,
+        ["confirmCreateTitle"] = Localizer["ConfirmModal_EditAuction_Title"].Value,
+        ["confirmCreateMessage"] = Localizer["ConfirmModal_EditAuction_Message"].Value,
+        ["confirmCreateNote"] = Localizer["ConfirmModal_EditAuction_Note"].Value,
+        ["confirmCreateConfirm"] = Localizer["UserAuction_SaveChanges"].Value
+    };
+
     var sellI18n = new Dictionary<string, string>
     {
         ["productNameDefault"] = Localizer["Sell_Preview_ProductNameDefault"].Value,
@@ -55,93 +109,140 @@
         ["confirmCreateNote"] = Localizer["ConfirmModal_EditAuction_Note"].Value,
         ["confirmCreateConfirm"] = Localizer["UserAuction_SaveChanges"].Value
     };
-
-    var existingImages = new List<object>();
-    if (!string.IsNullOrWhiteSpace(Model.ExistingPrimaryImage))
-    {
-        existingImages.Add(new { id = 0, url = Model.ExistingPrimaryImage, isPrimary = true });
-    }
-
-    existingImages.AddRange(Model.ExistingGalleryImages.Select(image => new
-    {
-        id = image.Id,
-        url = image.Url,
-        isPrimary = false
-    }));
-
-    var existingDocuments = Model.ExistingDocuments.Select(document => new
-    {
-        id = document.Id,
-        name = document.Name,
-        url = document.FileUrl
-    });
 }
 
 <div class="sell-page min-h-screen bg-slate-50">
   <section class="site-shell px-4 py-8 sm:px-6 lg:py-10">
     <div class="mb-8">
-      <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">@Localizer["UserAuction_EditTitle"]</h1>
-      <p class="mt-2 text-sm text-slate-500 sm:text-base">@Localizer["UserAuction_EditDesc"]</p>
-      @if (Model.LockRegistrationDates || Model.LockStartingPrice || Model.LockLiveStartDate)
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">@ViewData["Title"]</h1>
+      <p class="mt-2 text-sm text-slate-500 sm:text-base">
+        @(isBuyNow ? Localizer["UserBuyNow_EditDesc"] : Localizer["UserAuction_EditDesc"])
+      </p>
+      @if (!isBuyNow && (Model.LockRegistrationDates || Model.LockStartingPrice || Model.LockLiveStartDate))
       {
         <p class="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
           @Localizer["UserAuction_EditPhaseLockHint"]
         </p>
       }
+      else if (isBuyNow && Model.LockStartingPrice)
+      {
+        <p class="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+          @Localizer["UserBuyNow_EditPriceLockHint"]
+        </p>
+      }
     </div>
 
-    <form id="createAuctionForm"
-          asp-controller="UserAuction"
-          asp-action="Edit"
-          asp-route-auctionId="@Model.AuctionId"
-          method="post"
-          enctype="multipart/form-data"
-          novalidate>
-      @Html.AntiForgeryToken()
-      <input asp-for="AuctionId" type="hidden" />
-      <input asp-for="ExistingPrimaryImage" type="hidden" />
-      <input asp-for="Status" type="hidden" />
+    @if (isBuyNow)
+    {
+      <form id="createBuyNowForm"
+            asp-controller="UserAuction"
+            asp-action="Edit"
+            asp-route-auctionId="@Model.AuctionId"
+            method="post"
+            enctype="multipart/form-data"
+            novalidate>
+        @Html.AntiForgeryToken()
+        <input asp-for="AuctionId" type="hidden" />
+        <input asp-for="ExistingPrimaryImage" type="hidden" />
+        <input asp-for="Status" type="hidden" />
+        <input asp-for="ListingType" type="hidden" />
 
-      <div class="grid gap-8 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px]">
-        <div class="space-y-6">
-          @await Html.PartialAsync("~/Views/Sell/Partials/_ProductForm.cshtml", Model)
-          @await Html.PartialAsync("~/Views/Sell/Partials/_ImageUploader.cshtml")
-          @await Html.PartialAsync("~/Views/Sell/Partials/_CardSpecsForm.cshtml", Model)
-          @await Html.PartialAsync("~/Views/Sell/Partials/_AuctionSetting.cshtml", Model)
-          @await Html.PartialAsync("~/Views/Sell/Partials/_AuctionDuration.cshtml", Model)
-          @await Html.PartialAsync("~/Views/Sell/Partials/_DocumentUploader.cshtml")
+        <div class="grid gap-8 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px]">
+          <div class="space-y-6">
+            @await Html.PartialAsync("~/Views/Sell/Partials/_ProductForm.cshtml", Model)
+            @await Html.PartialAsync("~/Views/Sell/Partials/_ImageUploader.cshtml")
+            @await Html.PartialAsync("~/Views/Sell/Partials/_CardSpecsForm.cshtml", Model)
+            @await Html.PartialAsync("~/Views/Sell/Partials/_BuyNowPricing.cshtml", buyNowPricing)
+            @await Html.PartialAsync("~/Views/Sell/Partials/_DocumentUploader.cshtml")
 
-          <div class="lg:hidden">
+            <div class="lg:hidden">
+              @await Html.PartialAsync("~/Views/Sell/Partials/_BuyNowPreviewCard.cshtml")
+            </div>
+          </div>
+
+          <div class="hidden lg:sticky lg:top-28 lg:block lg:self-start">
+            @await Html.PartialAsync("~/Views/Sell/Partials/_BuyNowPreviewCard.cshtml")
+          </div>
+        </div>
+
+        @await Html.PartialAsync("~/Views/Sell/Partials/_BuyNowFooterActions.cshtml")
+      </form>
+    }
+    else
+    {
+      <form id="createAuctionForm"
+            asp-controller="UserAuction"
+            asp-action="Edit"
+            asp-route-auctionId="@Model.AuctionId"
+            method="post"
+            enctype="multipart/form-data"
+            novalidate>
+        @Html.AntiForgeryToken()
+        <input asp-for="AuctionId" type="hidden" />
+        <input asp-for="ExistingPrimaryImage" type="hidden" />
+        <input asp-for="Status" type="hidden" />
+        <input asp-for="ListingType" type="hidden" />
+
+        <div class="grid gap-8 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px]">
+          <div class="space-y-6">
+            @await Html.PartialAsync("~/Views/Sell/Partials/_ProductForm.cshtml", Model)
+            @await Html.PartialAsync("~/Views/Sell/Partials/_ImageUploader.cshtml")
+            @await Html.PartialAsync("~/Views/Sell/Partials/_CardSpecsForm.cshtml", Model)
+            @await Html.PartialAsync("~/Views/Sell/Partials/_AuctionSetting.cshtml", Model)
+            @await Html.PartialAsync("~/Views/Sell/Partials/_AuctionDuration.cshtml", Model)
+            @await Html.PartialAsync("~/Views/Sell/Partials/_DocumentUploader.cshtml")
+
+            <div class="lg:hidden">
+              @await Html.PartialAsync("~/Views/Sell/Partials/_PreviewCard.cshtml")
+            </div>
+          </div>
+
+          <div class="hidden lg:sticky lg:top-28 lg:block lg:self-start">
             @await Html.PartialAsync("~/Views/Sell/Partials/_PreviewCard.cshtml")
           </div>
         </div>
 
-        <div class="hidden lg:sticky lg:top-28 lg:block lg:self-start">
-          @await Html.PartialAsync("~/Views/Sell/Partials/_PreviewCard.cshtml")
-        </div>
-      </div>
-
-      @await Html.PartialAsync("~/Views/Sell/Partials/_FooterActions.cshtml")
-    </form>
+        @await Html.PartialAsync("~/Views/Sell/Partials/_FooterActions.cshtml")
+      </form>
+    }
   </section>
 </div>
 
 @section Scripts {
   <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
-  <script>
-    window.sellPageConfig = {
-      mode: 'edit',
-      i18n: @Html.Raw(JsonSerializer.Serialize(sellI18n)),
-      locks: {
-        registrationDates: @JsonSerializer.Serialize(Model.LockRegistrationDates),
-        liveStartDate: @JsonSerializer.Serialize(Model.LockLiveStartDate),
-        startingPrice: @JsonSerializer.Serialize(Model.LockStartingPrice),
-        bidStep: @JsonSerializer.Serialize(Model.LockBidStep)
-      },
-      existingImages: @Html.Raw(JsonSerializer.Serialize(existingImages)),
-      existingDocuments: @Html.Raw(JsonSerializer.Serialize(existingDocuments))
-    };
-  </script>
-  <script src="~/js/sell-numeric-input.js" asp-append-version="true"></script>
-  <script src="~/js/create-auction.js" asp-append-version="true"></script>
+  @if (isBuyNow)
+  {
+    <script>
+      window.sellBuyNowPageConfig = {
+        mode: 'edit',
+        i18n: @Html.Raw(JsonSerializer.Serialize(buyNowI18n)),
+        locks: {
+          startingPrice: @JsonSerializer.Serialize(Model.LockStartingPrice)
+        },
+        existingImages: @Html.Raw(JsonSerializer.Serialize(existingImages)),
+        existingDocuments: @Html.Raw(JsonSerializer.Serialize(existingDocuments))
+      };
+    </script>
+    <script src="~/js/sell-numeric-input.js" asp-append-version="true"></script>
+    <script src="~/js/create-buy-now.js" asp-append-version="true"></script>
+  }
+  else
+  {
+    <script>
+      window.sellPageConfig = {
+        mode: 'edit',
+        i18n: @Html.Raw(JsonSerializer.Serialize(sellI18n)),
+        locks: {
+          registrationDates: @JsonSerializer.Serialize(Model.LockRegistrationDates),
+          liveStartDate: @JsonSerializer.Serialize(Model.LockLiveStartDate),
+          startingPrice: @JsonSerializer.Serialize(Model.LockStartingPrice),
+          bidStep: @JsonSerializer.Serialize(Model.LockBidStep)
+        },
+        existingImages: @Html.Raw(JsonSerializer.Serialize(existingImages)),
+        existingDocuments: @Html.Raw(JsonSerializer.Serialize(existingDocuments))
+      };
+    </script>
+    <script src="~/js/sell-numeric-input.js" asp-append-version="true"></script>
+    <script src="~/js/create-auction.js" asp-append-version="true"></script>
+  }
 }

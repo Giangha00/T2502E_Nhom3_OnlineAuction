@@ -15,7 +15,7 @@ public static class PermissionCatalog
         new(PermissionCodes.DashboardView, "View Dashboard", "Dashboard", "Access admin dashboard and exports"),
         new(PermissionCodes.AuctionsView, "View Auctions", "Auctions", "View auction list and details"),
         new(PermissionCodes.AuctionsManage, "Manage Auctions", "Auctions", "Create, edit, and delete auctions"),
-        new(PermissionCodes.AuctionsVerify, "Verify Auctions", "Auctions", "Approve or reject seller listings"),
+        new(PermissionCodes.AuctionsVerify, "Verify Products", "Auctions", "Approve or reject seller listings"),
         new(PermissionCodes.UsersView, "View Users", "Users", "View user list and profiles"),
         new(PermissionCodes.UsersManage, "Manage Users", "Users", "Create, edit, delete users and manage roles"),
         new(PermissionCodes.CategoriesManage, "Manage Categories", "Categories", "Full category CRUD"),

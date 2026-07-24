@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = Model.IsBuyNow ? "Edit Buy Now" : "Edit Auction";
-    ViewData["AdminPage"] = Model.IsBuyNow ? "buynow" : "auctions";
+    ViewData["AdminPage"] = Model.IsBuyNow ? "buy-now" : "auctions";
     ViewBag.PreviewPartial = Model.IsBuyNow
         ? "~/Views/Sell/Partials/_BuyNowPreviewCard.cshtml"
         : "~/Views/Sell/Partials/_PreviewCard.cshtml";
