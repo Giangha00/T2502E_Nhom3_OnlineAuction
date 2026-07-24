@@ -36,10 +36,17 @@ public class SellerListingListViewModel
 
 public class UserBasicInfoViewModel
 {
+    public bool IsOwner { get; set; }
+
     public string FullName { get; set; } = string.Empty;
+
     public bool CanViewContactInfo { get; set; }
+
     public string Email { get; set; } = string.Empty;
+
     public string PhoneNumber { get; set; } = string.Empty;
+
+    public string AvatarUrl { get; set; } = string.Empty;
 }
 
 public class SellerStatisticsViewModel

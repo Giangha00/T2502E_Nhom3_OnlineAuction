@@ -16,21 +16,21 @@ public class AuctionService : IAuctionService
 
     private static readonly string[] CuratedBestSellerEmails =
     [
-        "viet.anh@auctionhouse.local",
-        "dan.long@auctionhouse.local",
-        "van.hung@auctionhouse.local",
-        "nguyen.hai@auctionhouse.local",
-        "huu.quan@auctionhouse.local",
-        "giangha@auctionhouse.local"
+        "vietanh@yopmail.com",
+        "danil@yopmail.com",
+        "nguyenhung@yopmail.com",
+        "dinhhai@yopmail.com",
+        "huuquan@yopmail.com",
+        "giangha@yopmail.com"
     ];
 
     private static readonly string[] CuratedBestSellerUserNames =
     [
-        "viet.anh",
-        "dan.long",
-        "van.hung",
-        "nguyen.hai",
-        "huu.quan",
+        "vietanh",
+        "danil",
+        "nguyenhung",
+        "dinhhai",
+        "huuquan",
         "giangha"
     ];
 

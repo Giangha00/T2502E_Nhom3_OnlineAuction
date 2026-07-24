@@ -1007,6 +1007,14 @@
   <data name="User_ContactPrivate" xml:space="preserve"><value>Chỉ chủ tài khoản mới xem được</value></data>
   <data name="User_BasicInformation_PublicDesc" xml:space="preserve"><value>Thông tin hồ sơ công khai</value></data>
   <data name="User_NotUpdated" xml:space="preserve"><value>Chưa cập nhật</value></data>
+  <data name="User_BasicInformation_EditDesc" xml:space="preserve"><value>Cập nhật thông tin liên hệ và ảnh đại diện</value></data>
+  <data name="User_ChangeAvatar" xml:space="preserve"><value>Đổi ảnh</value></data>
+  <data name="User_EditProfileHint" xml:space="preserve"><value>Bấm icon máy ảnh để đổi avatar, rồi lưu ở mục Thông tin cơ bản.</value></data>
+  <data name="User_AvatarHint" xml:space="preserve"><value>JPG, PNG hoặc WEBP · tối đa 2MB</value></data>
+  <data name="User_PhoneHint" xml:space="preserve"><value>9–12 chữ số</value></data>
+  <data name="User_SaveProfile" xml:space="preserve"><value>Lưu thay đổi</value></data>
+  <data name="User_EditProfile" xml:space="preserve"><value>Chỉnh sửa</value></data>
+  <data name="User_CancelEditProfile" xml:space="preserve"><value>Hủy</value></data>
   <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
   <data name="User_Status_PendingReview" xml:space="preserve"><value>Đang chờ xác nhận</value></data>
   <data name="User_Status_Confirming" xml:space="preserve"><value>Đang chờ xác nhận</value></data>

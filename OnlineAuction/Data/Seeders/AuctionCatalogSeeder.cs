@@ -16,19 +16,61 @@ public static class AuctionCatalogSeeder
         "RareCard Vault Daily Auctions"
     ];
 
-    private const string OnePieceSellerEmail = "nguyen.hai@auctionhouse.local";
-    private const string YugiohSellerEmail = "nguyen.ha@auctionhouse.local";
-    private const string SportsSellerEmail = "viet.anh@auctionhouse.local";
-    private const string DemoPassword = "User@123";
+    /// <summary>6 public Buy Now pages × 12 cards per page.</summary>
+    private const int TargetLiveBuyNowCount = 72;
 
-    private static readonly (string Email, string UserName, string FullName, string AvatarUrl)[] BestSellerProfiles =
+    private sealed record BestSellerProfile(
+        string Email,
+        string UserName,
+        string FullName,
+        string AvatarUrl,
+        string Password,
+        string[] LegacyEmails);
+
+    private static readonly BestSellerProfile[] BestSellerProfiles =
     [
-        ("viet.anh@auctionhouse.local", "viet.anh", "Phạm Việt Anh", "/images/team/pham-viet-anh.png"),
-        ("dan.long@auctionhouse.local", "dan.long", "Danil Fomin Long", "/images/team/danil-fomin-long.png"),
-        ("van.hung@auctionhouse.local", "van.hung", "Nguyễn Văn Hưng", "/images/team/nguyen-van-hung.png"),
-        ("nguyen.hai@auctionhouse.local", "nguyen.hai", "Đinh Văn Hải", "/images/team/dinh-van-hai.png"),
-        ("huu.quan@auctionhouse.local", "huu.quan", "Nguyễn Hữu Quân", "/images/team/nguyen-huu-quan.png"),
-        ("giangha@auctionhouse.local", "giangha", "Nguyễn Giang Hà", "/images/team/nguyen-giang-ha.png")
+        new(
+            "vietanh@yopmail.com",
+            "vietanh",
+            "Phạm Việt Anh",
+            "/images/team/pham-viet-anh.png",
+            "Vietanh00",
+            ["viet.anh@auctionhouse.local"]),
+        new(
+            "giangha@yopmail.com",
+            "giangha",
+            "Nguyễn Giang Hà",
+            "/images/team/nguyen-giang-ha.png",
+            "Giangha00",
+            ["giangha@auctionhouse.local"]),
+        new(
+            "dinhhai@yopmail.com",
+            "dinhhai",
+            "Đinh Văn Hải",
+            "/images/team/dinh-van-hai.png",
+            "Dinhhai00",
+            ["nguyen.hai@auctionhouse.local"]),
+        new(
+            "nguyenhung@yopmail.com",
+            "nguyenhung",
+            "Nguyễn Văn Hưng",
+            "/images/team/nguyen-van-hung.png",
+            "Nguyenhung00",
+            ["van.hung@auctionhouse.local"]),
+        new(
+            "huuquan@yopmail.com",
+            "huuquan",
+            "Nguyễn Hữu Quân",
+            "/images/team/nguyen-huu-quan.png",
+            "Huuquan00",
+            ["huu.quan@auctionhouse.local"]),
+        new(
+            "danil@yopmail.com",
+            "danil",
+            "Danil Fomin Long",
+            "/images/team/danil-fomin-long.png",
+            "Danil00",
+            ["dan.long@auctionhouse.local"])
     ];
 
     private static bool IsExpiredSeededListing(Auction auction, DateTime now) =>
@@ -48,32 +90,15 @@ public static class AuctionCatalogSeeder
             await ClearSeededAuctionsAsync(dbContext);
         }
 
-        await EnsureBestSellersAsync(userManager);
-
-        var onePieceSeller = await userManager.FindByEmailAsync(OnePieceSellerEmail);
-
-        var yugiohSeller = await EnsureSellerAsync(
-            userManager,
-            YugiohSellerEmail,
-            "nguyen.ha",
-            "Nguyễn Hà");
-
-        var sportsSeller = await EnsureSellerAsync(
-            userManager,
-            SportsSellerEmail,
-            "viet.anh",
-            "Phạm Việt Anh");
-
-        var bidder = await dbContext.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Email == "user3@auctionhouse.local" && u.Status == UserStatus.Active);
-
-        if (onePieceSeller is null || yugiohSeller is null)
+        var sellerIds = await EnsureBestSellersAsync(userManager);
+        if (sellerIds.Count == 0)
         {
             return;
         }
 
-        var sportsSellerId = sportsSeller?.Id;
+        var bidder = await dbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email == "user3@auctionhouse.local" && u.Status == UserStatus.Active);
 
         // When not wiping, always load existing seeded products so restarts UPDATE
         // (stable IDs) instead of INSERT duplicates / burning identity values.
@@ -90,23 +115,14 @@ public static class AuctionCatalogSeeder
         {
             catalogNames.Add(entry.Name);
 
-            var sellerId = ResolveSellerId(
-                entry.CategoryName,
-                onePieceSeller.Id,
-                yugiohSeller.Id,
-                sportsSellerId);
-            if (!sellerId.HasValue)
-            {
-                continue;
-            }
-
+            var sellerId = ResolveSellerId(sellerIds, seedIndex);
             if (existingProducts.TryGetValue(entry.Name, out var existingProduct))
             {
                 await SyncSeededEntryAsync(
                     dbContext,
                     existingProduct,
                     entry,
-                    sellerId.Value,
+                    sellerId,
                     categoryCache,
                     templateCache,
                     now);
@@ -114,7 +130,7 @@ public static class AuctionCatalogSeeder
                 continue;
             }
 
-            await SeedEntryAsync(dbContext, entry, sellerId.Value, bidder?.Id, categoryCache, templateCache, now, seedIndex);
+            await SeedEntryAsync(dbContext, entry, sellerId, bidder?.Id, categoryCache, templateCache, now, seedIndex);
             seedIndex++;
         }
 
@@ -127,9 +143,7 @@ public static class AuctionCatalogSeeder
         await SyncBuyNowPricesAsync(dbContext);
         await EnsureDedicatedBuyNowListingsAsync(
             dbContext,
-            onePieceSeller.Id,
-            yugiohSeller.Id,
-            sportsSellerId,
+            sellerIds,
             categoryCache,
             templateCache,
             now);
@@ -142,18 +156,8 @@ public static class AuctionCatalogSeeder
         }
     }
 
-    private static int? ResolveSellerId(
-        string categoryName,
-        int onePieceSellerId,
-        int yugiohSellerId,
-        int? sportsSellerId) =>
-        categoryName switch
-        {
-            _ when categoryName.Equals("Yu-Gi-Oh!", StringComparison.OrdinalIgnoreCase) => yugiohSellerId,
-            _ when categoryName.Equals("Pokémon", StringComparison.OrdinalIgnoreCase) => yugiohSellerId,
-            _ when categoryName.Equals("Sports", StringComparison.OrdinalIgnoreCase) => sportsSellerId,
-            _ => onePieceSellerId
-        };
+    private static int ResolveSellerId(IReadOnlyList<int> sellerIds, int seedIndex) =>
+        sellerIds[seedIndex % sellerIds.Count];
 
     private static async Task SyncSeedCategoriesAsync(AuctionHouseDbContext dbContext)
     {
@@ -192,40 +196,68 @@ public static class AuctionCatalogSeeder
         }
     }
 
-    private static async Task EnsureBestSellersAsync(UserManager<ApplicationUser> userManager)
+    private static async Task<IReadOnlyList<int>> EnsureBestSellersAsync(UserManager<ApplicationUser> userManager)
     {
+        var sellerIds = new List<int>(BestSellerProfiles.Length);
+
         foreach (var profile in BestSellerProfiles)
         {
-            await EnsureSellerAsync(
-                userManager,
-                profile.Email,
-                profile.UserName,
-                profile.FullName,
-                profile.AvatarUrl);
+            var user = await EnsureSellerAsync(userManager, profile);
+            if (user is not null)
+            {
+                sellerIds.Add(user.Id);
+            }
         }
+
+        return sellerIds;
     }
 
     private static async Task<ApplicationUser?> EnsureSellerAsync(
         UserManager<ApplicationUser> userManager,
-        string email,
-        string userName,
-        string fullName,
-        string? avatarUrl = null)
+        BestSellerProfile profile)
     {
-        avatarUrl ??= "/admin/images/user/user-01.jpg";
-        var user = await userManager.FindByEmailAsync(email);
-        if (user is null)
+        var avatarUrl = string.IsNullOrWhiteSpace(profile.AvatarUrl)
+            ? "/admin/images/user/user-01.jpg"
+            : profile.AvatarUrl;
+
+        ApplicationUser? byEmail = await userManager.FindByEmailAsync(profile.Email);
+        ApplicationUser? byUserName = await userManager.FindByNameAsync(profile.UserName);
+        ApplicationUser? byLegacy = null;
+        foreach (var legacyEmail in profile.LegacyEmails)
         {
-            user = await userManager.FindByNameAsync(userName);
+            byLegacy = await userManager.FindByEmailAsync(legacyEmail);
+            if (byLegacy is not null)
+            {
+                break;
+            }
+        }
+
+        // Prefer username/legacy owner so existing catalog SellerId rows stay attached.
+        var user = byUserName ?? byLegacy ?? byEmail;
+
+        // If the target email already belongs to a different row, free it so we can
+        // move the published demo email onto the canonical seller account.
+        if (user is not null && byEmail is not null && byEmail.Id != user.Id)
+        {
+            byEmail.Email = $"migrated-{byEmail.Id}-{profile.UserName}@auctionhouse.local";
+            byEmail.NormalizedEmail = userManager.NormalizeEmail(byEmail.Email);
+            if (string.Equals(byEmail.UserName, profile.UserName, StringComparison.OrdinalIgnoreCase))
+            {
+                byEmail.UserName = $"migrated-{byEmail.Id}-{profile.UserName}";
+                byEmail.NormalizedUserName = userManager.NormalizeName(byEmail.UserName);
+            }
+
+            await userManager.UpdateAsync(byEmail);
+            byEmail = null;
         }
 
         if (user is null)
         {
             user = new ApplicationUser
             {
-                UserName = userName,
-                Email = email,
-                FullName = fullName,
+                UserName = profile.UserName,
+                Email = profile.Email,
+                FullName = profile.FullName,
                 PhoneNumber = "0900000000",
                 Role = UserRole.User,
                 Status = UserStatus.Active,
@@ -234,19 +266,47 @@ public static class AuctionCatalogSeeder
                 CreatedAt = DateTime.UtcNow
             };
 
-            var result = await userManager.CreateAsync(user, DemoPassword);
-            if (!result.Succeeded)
+            var result = await userManager.CreateAsync(user, profile.Password);
+            if (result.Succeeded)
+            {
+                return user;
+            }
+
+            user = await userManager.FindByEmailAsync(profile.Email)
+                ?? await userManager.FindByNameAsync(profile.UserName);
+            if (user is null)
             {
                 return null;
             }
-
-            return user;
         }
 
         var needsUpdate = false;
-        if (!string.Equals(user.FullName, fullName, StringComparison.Ordinal))
+
+        if (!string.Equals(user.Email, profile.Email, StringComparison.OrdinalIgnoreCase))
         {
-            user.FullName = fullName;
+            var emailOwner = await userManager.FindByEmailAsync(profile.Email);
+            if (emailOwner is null || emailOwner.Id == user.Id)
+            {
+                user.Email = profile.Email;
+                user.NormalizedEmail = userManager.NormalizeEmail(profile.Email);
+                needsUpdate = true;
+            }
+        }
+
+        if (!string.Equals(user.UserName, profile.UserName, StringComparison.OrdinalIgnoreCase))
+        {
+            var usernameOwner = await userManager.FindByNameAsync(profile.UserName);
+            if (usernameOwner is null || usernameOwner.Id == user.Id)
+            {
+                user.UserName = profile.UserName;
+                user.NormalizedUserName = userManager.NormalizeName(profile.UserName);
+                needsUpdate = true;
+            }
+        }
+
+        if (!string.Equals(user.FullName, profile.FullName, StringComparison.Ordinal))
+        {
+            user.FullName = profile.FullName;
             needsUpdate = true;
         }
 
@@ -273,7 +333,41 @@ public static class AuctionCatalogSeeder
             await userManager.UpdateAsync(user);
         }
 
+        // Always sync demo passwords (Remove+Add is more reliable than reset-token after email/username migration).
+        await SyncSellerPasswordAsync(userManager, user, profile.Password);
+
+        if (user.AccessFailedCount > 0 || user.LockoutEnd is not null)
+        {
+            await userManager.SetLockoutEndDateAsync(user, null);
+            await userManager.ResetAccessFailedCountAsync(user);
+        }
+
         return user;
+    }
+
+    private static async Task SyncSellerPasswordAsync(
+        UserManager<ApplicationUser> userManager,
+        ApplicationUser user,
+        string password)
+    {
+        if (await userManager.CheckPasswordAsync(user, password))
+        {
+            return;
+        }
+
+        if (await userManager.HasPasswordAsync(user))
+        {
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var reset = await userManager.ResetPasswordAsync(user, token, password);
+            if (reset.Succeeded)
+            {
+                return;
+            }
+
+            await userManager.RemovePasswordAsync(user);
+        }
+
+        await userManager.AddPasswordAsync(user, password);
     }
 
     private static async Task<Dictionary<string, Product>> GetExistingSeededProductsByNameAsync(
@@ -728,60 +822,111 @@ public static class AuctionCatalogSeeder
 
     private const string DedicatedBuyNowEventName = "RareCard Vault Buy Now";
 
-    private static string BuildDedicatedBuyNowProductName(string catalogName) =>
-        $"{catalogName} [Buy Now]";
+    private static string BuildDedicatedBuyNowProductName(string catalogName, int sequence) =>
+        sequence <= 1
+            ? $"{catalogName} [Buy Now]"
+            : $"{catalogName} [Buy Now] #{sequence}";
 
     private static decimal ResolveDedicatedBuyNowStartingPrice(decimal buyNowPrice) =>
         buyNowPrice <= 0.01m ? 0.01m : buyNowPrice - 0.01m;
 
+    private static decimal ResolveBuyNowPrice(SpreadsheetAuctionCatalog.Entry entry)
+    {
+        if (SpreadsheetAuctionCatalog.TryGetBuyNowPrice(entry.Name) is { } mapped)
+        {
+            return mapped;
+        }
+
+        // Fallback so CHECK(buy_now_price > starting_price) still holds after ResolveDedicatedBuyNowStartingPrice.
+        return Math.Max(entry.StartingPrice + 25m, 50m);
+    }
+
     private static async Task EnsureDedicatedBuyNowListingsAsync(
         AuctionHouseDbContext dbContext,
-        int onePieceSellerId,
-        int yugiohSellerId,
-        int? sportsSellerId,
+        IReadOnlyList<int> sellerIds,
         Dictionary<string, Category> categoryCache,
         Dictionary<string, ProductTemplate> templateCache,
         DateTime now)
     {
-        var existingCount = await dbContext.Auctions
-            .AsNoTracking()
-            .CountAsync(auction =>
-                auction.DeletedAt == null &&
-                auction.ListingType == ListingTypes.BuyNow);
-
-        if (existingCount > 0)
+        if (sellerIds.Count == 0)
         {
             return;
         }
 
-        var entriesByName = SpreadsheetAuctionCatalog.GetEntries()
-            .ToDictionary(entry => entry.Name, StringComparer.OrdinalIgnoreCase);
+        var dedicated = await dbContext.Auctions
+            .Include(auction => auction.Product)
+            .Where(auction =>
+                auction.DeletedAt == null &&
+                auction.Product.DeletedAt == null &&
+                auction.ListingType == ListingTypes.BuyNow &&
+                auction.AuctionEventName == DedicatedBuyNowEventName)
+            .OrderBy(auction => auction.Id)
+            .ToListAsync();
 
-        var index = 0;
-        foreach (var (catalogName, buyNowPrice) in SpreadsheetAuctionCatalog.GetBuyNowPriceMap())
+        for (var i = 0; i < dedicated.Count; i++)
         {
-            if (!entriesByName.TryGetValue(catalogName, out var entry))
+            var auction = dedicated[i];
+            auction.Product.SellerId = ResolveSellerId(sellerIds, i);
+            auction.Product.UpdatedAt = now;
+
+            if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.EndingSoon)
+                || auction.EndDate <= now)
             {
+                auction.Status = AuctionStatuses.Live;
+                auction.EndDate = now.AddYears(1);
+                auction.StartDate = now.AddMinutes(-5);
+                auction.RegistrationStartDate = auction.StartDate.AddMinutes(-1);
+                auction.RegistrationEndDate = auction.StartDate;
+                auction.VerifiedAt ??= now;
+                auction.UpdatedAt = now;
+            }
+        }
+
+        if (dedicated.Count > 0)
+        {
+            await dbContext.SaveChangesAsync();
+        }
+
+        var existingNames = dedicated
+            .Select(auction => auction.Product.Name)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var liveCount = dedicated.Count(auction =>
+            auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon
+            && auction.EndDate > now);
+
+        if (liveCount >= TargetLiveBuyNowCount)
+        {
+            return;
+        }
+
+        var catalogEntries = SpreadsheetAuctionCatalog.GetEntries();
+        if (catalogEntries.Count == 0)
+        {
+            return;
+        }
+
+        var createdIndex = dedicated.Count;
+        var safety = 0;
+        while (liveCount < TargetLiveBuyNowCount && safety < TargetLiveBuyNowCount * 3)
+        {
+            safety++;
+            var entry = catalogEntries[createdIndex % catalogEntries.Count];
+            var sequence = (createdIndex / catalogEntries.Count) + 1;
+            var productName = BuildDedicatedBuyNowProductName(entry.Name, sequence);
+            if (!existingNames.Add(productName))
+            {
+                createdIndex++;
                 continue;
             }
 
-            var sellerId = ResolveSellerId(
-                entry.CategoryName,
-                onePieceSellerId,
-                yugiohSellerId,
-                sportsSellerId);
-
-            if (!sellerId.HasValue)
-            {
-                continue;
-            }
-
+            var sellerId = ResolveSellerId(sellerIds, createdIndex);
+            var buyNowPrice = ResolveBuyNowPrice(entry);
+            var startingPrice = ResolveDedicatedBuyNowStartingPrice(buyNowPrice);
             var category = await GetOrCreateCategoryAsync(dbContext, entry.CategoryName, categoryCache);
             var template = await GetOrCreateTemplateFromEntryAsync(dbContext, entry, category, templateCache, now);
-            var productName = BuildDedicatedBuyNowProductName(entry.Name);
-            var startingPrice = ResolveDedicatedBuyNowStartingPrice(buyNowPrice);
             var liveStart = now.AddMinutes(-5);
-            var status = ResolveSeededBuyNowStatus(index);
 
             var product = new Product
             {
@@ -789,7 +934,7 @@ public static class AuctionCatalogSeeder
                 CreatedAt = now
             };
 
-            ApplyProductFieldsFromEntry(product, entry, sellerId.Value, category.Id, template.Id);
+            ApplyProductFieldsFromEntry(product, entry, sellerId, category.Id, template.Id);
             product.Name = productName;
             product.ShortDescription = TruncatePlainText(entry.Description, 300);
             product.DescriptionHtml = entry.Description;
@@ -814,36 +959,19 @@ public static class AuctionCatalogSeeder
                 RegistrationEndDate = liveStart,
                 StartDate = liveStart,
                 EndDate = now.AddYears(1),
-                Status = status,
+                Status = AuctionStatuses.Live,
                 SubmittedAt = null,
-                VerifiedAt = status is AuctionStatuses.Scheduled
-                    or AuctionStatuses.Live
-                    or AuctionStatuses.EndingSoon
-                    or AuctionStatuses.Completed
-                    ? now
-                    : null,
+                VerifiedAt = now,
                 CreatedAt = now
             };
 
             dbContext.Auctions.Add(auction);
             await dbContext.SaveChangesAsync();
-            index++;
 
-            if (index >= 12)
-            {
-                break;
-            }
+            createdIndex++;
+            liveCount++;
         }
     }
-
-    private static string ResolveSeededBuyNowStatus(int index) =>
-        index switch
-        {
-            < 8 => AuctionStatuses.Live,
-            < 10 => AuctionStatuses.Scheduled,
-            10 => AuctionStatuses.Completed,
-            _ => AuctionStatuses.Cancelled
-        };
 
     private static string TruncatePlainText(string value, int maxLength)
     {

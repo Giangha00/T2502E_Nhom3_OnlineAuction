@@ -6,7 +6,30 @@
     var startPage = Math.Max(1, currentPage - 2);
     var endPage = Math.Min(totalPages, currentPage + 2);
 
-    string FormatStatus(string status) => status.Replace('_', ' ');
+    string FormatStatus(string status) => status switch
+    {
+        "confirming" or "pending_review" => "Confirming",
+        "rejected" => "Rejected",
+        "scheduled" => "Scheduled",
+        "live" => "Live",
+        "ending_soon" => "Ending soon",
+        "ended" => "Ended",
+        "awaiting_payment" => "Awaiting payment",
+        "completed" => "Completed",
+        "cancelled" => "Cancelled",
+        _ => status.Replace('_', ' ')
+    };
+
+    string StatusBadgeClass(string status) => status switch
+    {
+        "confirming" or "pending_review" => "bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",
+        "rejected" or "cancelled" => "bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-400",
+        "live" => "bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-400",
+        "ending_soon" => "bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-400",
+        "awaiting_payment" => "bg-warning-50 text-warning-700 dark:bg-warning-500/15 dark:text-warning-400",
+        "completed" => "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400",
+        _ => "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+    };
 }
 
 <form id="buyNowBulkDeleteForm"
@@ -36,7 +59,7 @@
 
     <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
         <div class="max-w-full overflow-x-auto">
-            <table class="admin-auction-table" style="min-width: 980px;">
+            <table class="admin-auction-table">
                 <thead>
                 <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
                     <th class="w-10 text-left">
@@ -82,7 +105,7 @@
                                              alt="@listing.ProductName"
                                              class="admin-auction-product__thumb" />
                                     }
-                                    <div class="min-w-0">
+                                    <div class="admin-auction-product__body">
                                         <p class="admin-auction-product__name text-gray-800 dark:text-white/90" title="@listing.ProductName">@listing.ProductName</p>
                                         <p class="admin-auction-muted">#@listing.Id</p>
                                     </div>
@@ -98,7 +121,7 @@
                                 <p class="admin-auction-price text-gray-800 dark:text-white/90">$@listing.BuyNowPrice.ToString("N0")</p>
                             </td>
                             <td>
-                                <span class="admin-auction-status bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400">
+                                <span class="admin-auction-status @StatusBadgeClass(listing.Status)">
                                     @FormatStatus(listing.Status)
                                 </span>
                             </td>

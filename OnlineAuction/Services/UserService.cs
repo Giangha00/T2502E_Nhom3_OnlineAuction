@@ -176,10 +176,12 @@ public class UserService : IUserService
             },
             BasicInfo = new UserBasicInfoViewModel
             {
+                IsOwner = isOwner,
                 FullName = seller.FullName,
                 CanViewContactInfo = isOwner,
                 Email = isOwner ? (seller.Email ?? string.Empty) : string.Empty,
-                PhoneNumber = isOwner ? (seller.PhoneNumber ?? string.Empty) : string.Empty
+                PhoneNumber = isOwner ? (seller.PhoneNumber ?? string.Empty) : string.Empty,
+                AvatarUrl = seller.AvatarUrl ?? "/admin/images/user/user-01.jpg"
             },
             Statistics = new SellerStatisticsViewModel
             {
@@ -196,6 +198,49 @@ public class UserService : IUserService
             BuyNowListings = buyNowListings,
             RelatedAuctions = related
         };
+    }
+
+    public async Task<(bool Success, string Message)> UpdateOwnProfileAsync(int userId, UserProfileEditViewModel model)
+    {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId && u.DeletedAt == null);
+        if (user is null)
+        {
+            return (false, "User not found.");
+        }
+
+        var normalizedEmail = model.Email.Trim();
+        var existingEmailUser = await _userManager.FindByEmailAsync(normalizedEmail);
+        if (existingEmailUser is not null && existingEmailUser.Id != userId)
+        {
+            return (false, "Email already exists.");
+        }
+
+        try
+        {
+            var avatarUrl = await _avatarStorageService.SaveAvatarAsync(model.AvatarFile);
+            if (!string.IsNullOrWhiteSpace(avatarUrl))
+            {
+                user.AvatarUrl = avatarUrl;
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            return (false, ex.Message);
+        }
+
+        user.FullName = model.FullName.Trim();
+        user.Email = normalizedEmail;
+        user.NormalizedEmail = _userManager.NormalizeEmail(normalizedEmail);
+        user.PhoneNumber = model.PhoneNumber.Trim();
+        user.UpdatedAt = DateTime.UtcNow;
+
+        var updateResult = await _userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+        {
+            return (false, string.Join(" ", updateResult.Errors.Select(error => error.Description)));
+        }
+
+        return (true, "Profile updated successfully.");
     }
 
     public async Task<UserListViewModel> GetUsersAsync(UserFilterViewModel filter)

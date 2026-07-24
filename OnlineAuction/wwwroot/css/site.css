@@ -2445,6 +2445,17 @@ body.home-auth-open {
   color: #94a3b8;
 }
 
+.user-detail-field__input--editable {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.user-detail-field__input--editable:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
 .user-detail-auction-card {
   display: flex;
   flex-direction: column;

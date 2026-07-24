@@ -951,6 +951,14 @@
   <data name="User_ContactPrivate" xml:space="preserve"><value>Only visible to the account owner</value></data>
   <data name="User_BasicInformation_PublicDesc" xml:space="preserve"><value>Public profile information</value></data>
   <data name="User_NotUpdated" xml:space="preserve"><value>Not updated</value></data>
+  <data name="User_BasicInformation_EditDesc" xml:space="preserve"><value>Update your contact details and profile photo</value></data>
+  <data name="User_ChangeAvatar" xml:space="preserve"><value>Change photo</value></data>
+  <data name="User_EditProfileHint" xml:space="preserve"><value>Use the camera icon to change your avatar, then save below.</value></data>
+  <data name="User_AvatarHint" xml:space="preserve"><value>JPG, PNG, or WEBP · max 2MB</value></data>
+  <data name="User_PhoneHint" xml:space="preserve"><value>9–12 digits, numbers only</value></data>
+  <data name="User_SaveProfile" xml:space="preserve"><value>Save changes</value></data>
+  <data name="User_EditProfile" xml:space="preserve"><value>Edit</value></data>
+  <data name="User_CancelEditProfile" xml:space="preserve"><value>Cancel</value></data>
   <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
   <data name="User_Status_PendingReview" xml:space="preserve"><value>Confirming</value></data>
   <data name="User_Status_Confirming" xml:space="preserve"><value>Confirming</value></data>
