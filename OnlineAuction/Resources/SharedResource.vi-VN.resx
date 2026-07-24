@@ -880,18 +880,39 @@
   <data name="User_ViewDetail" xml:space="preserve"><value>Xem chi tiết</value></data>
   <data name="User_CancelListing" xml:space="preserve"><value>Hủy</value></data>
   <data name="User_CancelConfirm" xml:space="preserve"><value>Hủy tin đấu giá này?</value></data>
+  <data name="User_EditListing" xml:space="preserve"><value>Sửa</value></data>
+  <data name="User_CancelListingConfirm" xml:space="preserve"><value>Hủy tin đăng này? Tin sẽ bị gỡ khỏi sàn.</value></data>
   <data name="User_Status_Active" xml:space="preserve"><value>Đấu giá đang diễn ra</value></data>
   <data name="User_Status_EndingSoon" xml:space="preserve"><value>Sắp kết thúc</value></data>
   <data name="User_Status_Completed" xml:space="preserve"><value>Đã hoàn tất</value></data>
   <data name="UserAuction_EditTitle" xml:space="preserve"><value>Sửa đấu giá</value></data>
-  <data name="UserAuction_EditDesc" xml:space="preserve"><value>Chỉ sửa được đấu giá đang diễn ra và chưa có lượt đấu giá.</value></data>
+  <data name="UserAuction_EditBuyNowTitle" xml:space="preserve"><value>Sửa tin Buy Now</value></data>
+  <data name="UserAuction_EditDesc" xml:space="preserve"><value>Cập nhật sản phẩm cho tin chưa có bid. Tin bị từ chối sẽ được gửi lại để admin xác nhận.</value></data>
   <data name="UserAuction_ProductName" xml:space="preserve"><value>Tên sản phẩm</value></data>
   <data name="UserAuction_ShortDescription" xml:space="preserve"><value>Mô tả ngắn</value></data>
   <data name="UserAuction_SetName" xml:space="preserve"><value>Tên bộ</value></data>
   <data name="UserAuction_Grade" xml:space="preserve"><value>Điểm</value></data>
   <data name="UserAuction_CertNumber" xml:space="preserve"><value>Số chứng nhận</value></data>
+  <data name="UserAuction_Images" xml:space="preserve"><value>Hình ảnh</value></data>
+  <data name="UserAuction_ImagesDesc" xml:space="preserve"><value>Đổi ảnh bìa, xóa ảnh thư viện, hoặc kéo thả để thêm ảnh mới.</value></data>
+  <data name="UserAuction_CurrentImages" xml:space="preserve"><value>Ảnh hiện tại</value></data>
+  <data name="UserAuction_CoverBadge" xml:space="preserve"><value>Ảnh bìa</value></data>
+  <data name="UserAuction_CoverPending" xml:space="preserve"><value>Ảnh bìa mới</value></data>
+  <data name="UserAuction_ChangeCover" xml:space="preserve"><value>Đổi ảnh bìa</value></data>
+  <data name="UserAuction_MarkedForRemoval" xml:space="preserve"><value>Sẽ xóa</value></data>
+  <data name="UserAuction_UndoRemove" xml:space="preserve"><value>Hoàn tác</value></data>
+  <data name="UserAuction_NewImage" xml:space="preserve"><value>Mới</value></data>
+  <data name="UserAuction_GallerySlotsLeft" xml:space="preserve"><value>Còn {0} chỗ ảnh thư viện</value></data>
+  <data name="UserAuction_GalleryLimit" xml:space="preserve"><value>Bạn chỉ có thể tải tối đa {0} ảnh thư viện.</value></data>
+  <data name="UserAuction_ImageInvalidFormat" xml:space="preserve"><value>{0}: định dạng không hợp lệ (chỉ JPG, PNG, WEBP)</value></data>
+  <data name="UserAuction_ImageSizeLimit" xml:space="preserve"><value>{0}: vượt quá giới hạn 5MB</value></data>
   <data name="UserAuction_CurrentCover" xml:space="preserve"><value>Ảnh bìa hiện tại</value></data>
   <data name="UserAuction_ReplaceCover" xml:space="preserve"><value>Thay ảnh bìa</value></data>
+  <data name="UserAuction_CurrentGallery" xml:space="preserve"><value>Thư viện ảnh hiện tại</value></data>
+  <data name="UserAuction_GalleryImage" xml:space="preserve"><value>Ảnh thư viện</value></data>
+  <data name="UserAuction_AddGalleryImages" xml:space="preserve"><value>Thêm ảnh thư viện</value></data>
+  <data name="UserAuction_RemoveImage" xml:space="preserve"><value>Xóa</value></data>
+  <data name="UserAuction_GalleryImagesHelp" xml:space="preserve"><value>Tối đa 4 ảnh thư viện ngoài ảnh bìa. JPG, PNG hoặc WEBP.</value></data>
   <data name="UserAuction_StartDate" xml:space="preserve"><value>Ngày bắt đầu</value></data>
   <data name="UserAuction_EndDate" xml:space="preserve"><value>Ngày kết thúc</value></data>
   <data name="UserAuction_SaveChanges" xml:space="preserve"><value>Lưu thay đổi</value></data>

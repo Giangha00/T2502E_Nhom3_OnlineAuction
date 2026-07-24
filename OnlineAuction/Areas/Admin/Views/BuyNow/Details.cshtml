@@ -161,7 +161,11 @@
                   asp-route-id="@Model.Id"
                   method="post"
                   class="mt-6 border-t border-gray-100 pt-6 dark:border-gray-800"
-                  onsubmit="return confirm('Cancel this Buy Now listing? It will be removed from the public catalog.');">
+                  data-confirm
+                  data-confirm-variant="danger"
+                  data-confirm-title="Cancel listing?"
+                  data-confirm-message="Cancel this Buy Now listing? It will be removed from the public catalog."
+                  data-confirm-confirm="Cancel listing">
                 @Html.AntiForgeryToken()
                 <button type="submit"
                         class="rounded-lg border border-error-200 bg-error-50 px-4 py-2 text-theme-sm font-medium text-error-700 hover:bg-error-100">

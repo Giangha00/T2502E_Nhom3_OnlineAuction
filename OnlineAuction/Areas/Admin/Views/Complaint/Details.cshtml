@@ -257,7 +257,7 @@
                         <form asp-action="UpdateStatus"
                               method="post"
                               class="mt-4 space-y-3"
-                              onsubmit="return validateResolutionNote(this);">
+                              id="complaintDecisionForm">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="ComplaintId" value="@Model.Id" />
                             <label class="block text-theme-xs font-medium text-gray-500">Resolution note (required for approve/reject)</label>
@@ -274,8 +274,7 @@
                                         value="@ComplaintStatusActions.Approve"
                                         class="admin-icon-action admin-icon-action--approve admin-icon-action--lg mx-auto w-full max-w-none"
                                         title="Approve"
-                                        aria-label="Approve"
-                                        onclick="return confirm('Approve this refund request?');">
+                                        aria-label="Approve">
                                     <partial name="_AdminIcon" model='"check"' />
                                 </button>
                             }
@@ -296,15 +295,19 @@
 
                     @if (Model.CanClose)
                     {
-                        <form asp-action="UpdateStatus" method="post" class="mt-4">
+                        <form asp-action="UpdateStatus" method="post" class="mt-4"
+                              data-confirm
+                              data-confirm-variant="danger"
+                              data-confirm-title="Close complaint?"
+                              data-confirm-message="Close this complaint?"
+                              data-confirm-confirm="Close">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="ComplaintId" value="@Model.Id" />
                             <input type="hidden" name="Action" value="@ComplaintStatusActions.Close" />
                             <button type="submit"
                                     class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg mx-auto w-full max-w-none"
                                     title="Close complaint"
-                                    aria-label="Close complaint"
-                                    onclick="return confirm('Close this complaint?');">
+                                    aria-label="Close complaint">
                                 <partial name="_AdminIcon" model='"x-mark"' />
                             </button>
                         </form>
@@ -322,19 +325,60 @@
 
 @section Scripts {
     <script>
-        function validateResolutionNote(form) {
-            const action = document.activeElement?.value;
-            if (action !== '@ComplaintStatusActions.Approve' && action !== '@ComplaintStatusActions.Reject') {
-                return true;
+        (function () {
+            const form = document.getElementById('complaintDecisionForm');
+            if (!form) {
+                return;
             }
 
-            const note = form.querySelector('[name="ResolutionNote"]')?.value?.trim() ?? '';
-            if (note.length < 10) {
-                alert('Resolution note must be at least 10 characters.');
-                return false;
-            }
+            form.addEventListener('submit', function (event) {
+                if (form.dataset.confirmAccepted === '1') {
+                    delete form.dataset.confirmAccepted;
+                    return;
+                }
 
-            return true;
-        }
+                const submitter = event.submitter;
+                const action = submitter?.value;
+                if (action !== '@ComplaintStatusActions.Approve' && action !== '@ComplaintStatusActions.Reject') {
+                    return;
+                }
+
+                const note = form.querySelector('[name="ResolutionNote"]')?.value?.trim() ?? '';
+                if (note.length < 10) {
+                    event.preventDefault();
+                    alert('Resolution note must be at least 10 characters.');
+                    return;
+                }
+
+                if (action !== '@ComplaintStatusActions.Approve') {
+                    return;
+                }
+
+                event.preventDefault();
+                const confirmFn = typeof window.showConfirmModal === 'function'
+                    ? window.showConfirmModal
+                    : function (options) {
+                        return Promise.resolve(window.confirm(options.message || ''));
+                    };
+
+                confirmFn({
+                    title: 'Approve refund?',
+                    message: 'Approve this refund request?',
+                    confirmText: 'Approve',
+                    variant: 'default'
+                }).then(function (confirmed) {
+                    if (!confirmed) {
+                        return;
+                    }
+
+                    form.dataset.confirmAccepted = '1';
+                    if (typeof form.requestSubmit === 'function') {
+                        form.requestSubmit(submitter || undefined);
+                    } else {
+                        HTMLFormElement.prototype.submit.call(form);
+                    }
+                });
+            });
+        })();
     </script>
 }

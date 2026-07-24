@@ -1,10 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using OnlineAuction.Entities;
 
 namespace OnlineAuction.Models;
 
 public class SellerAuctionFormViewModel
 {
     public int? AuctionId { get; set; }
+
+    /// <summary>
+    /// auction | buynow — drives which pricing fields the edit form shows.
+    /// </summary>
+    public string ListingType { get; set; } = ListingTypes.Auction;
+
+    public bool IsBuyNow =>
+        string.Equals(ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
 
     [Required]
     [StringLength(120)]
@@ -41,13 +50,21 @@ public class SellerAuctionFormViewModel
     // Neu khong upload file moi thi Service giu nguyen PrimaryImage hien tai.
     public IFormFile? PrimaryImageFile { get; set; }
 
+    public List<IFormFile> GalleryImageFiles { get; set; } = [];
+
+    public List<SellerGalleryImageViewModel> ExistingGalleryImages { get; set; } = [];
+
+    public List<int> RemoveGalleryImageIds { get; set; } = [];
+
     [Required]
     [Range(0.01, double.MaxValue)]
     public decimal StartingPrice { get; set; }
 
-    [Required]
     [Range(0.01, double.MaxValue)]
-    public decimal BidStep { get; set; }
+    public decimal BidStep { get; set; } = 1m;
+
+    [Range(0.01, double.MaxValue)]
+    public decimal? BuyNowPrice { get; set; }
 
     [Required]
     public DateTime RegistrationStartDate { get; set; } = DateTime.UtcNow.AddHours(1);
@@ -60,4 +77,13 @@ public class SellerAuctionFormViewModel
 
     [Required]
     public DateTime EndDate { get; set; } = DateTime.UtcNow.AddDays(7).AddHours(1);
+}
+
+public class SellerGalleryImageViewModel
+{
+    public int Id { get; set; }
+
+    public string ImageUrl { get; set; } = string.Empty;
+
+    public int SortOrder { get; set; }
 }

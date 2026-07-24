@@ -13,6 +13,8 @@ public class SellerAuctionService : ISellerAuctionService
 
     private const string DocumentFolder = "auction-house/documents";
 
+    private const int MaxGalleryImages = 4;
+
     // Anh fallback giup products.primary_image khong bi null khi view hien tai chua gui file len server.
     // Khi view upload anh co name="PrimaryImageFile", Cloudinary URL se thay the gia tri nay.
     private const string DefaultProductImageUrl =
@@ -464,14 +466,16 @@ public class SellerAuctionService : ISellerAuctionService
 
             var buyNowScheduleStart = now;
             var buyNowLiveStart = buyNowScheduleStart.AddMinutes(1);
+            var buyNowPrice = model.Price;
+            var startingPrice = ResolveBuyNowStartingPrice(buyNowPrice);
 
             var auction = new Auction
             {
                 Product = product,
-                StartingPrice = model.Price,
+                StartingPrice = startingPrice,
                 BidStep = 0.01m,
-                CurrentPrice = model.Price,
-                BuyNowPrice = model.Price,
+                CurrentPrice = buyNowPrice,
+                BuyNowPrice = buyNowPrice,
                 RequiresRegistration = false,
                 RegistrationStartDate = buyNowScheduleStart,
                 RegistrationEndDate = buyNowLiveStart,
@@ -502,7 +506,9 @@ public class SellerAuctionService : ISellerAuctionService
         var auction = await _db.Auctions
             .AsNoTracking()
             .Include(a => a.Product)
-            .ThenInclude(product => product.Category)
+                .ThenInclude(product => product.Category)
+            .Include(a => a.Product)
+                .ThenInclude(product => product.Images)
             .FirstOrDefaultAsync(a => a.Id == auctionId && a.Product.SellerId == sellerId);
 
         if (auction is null)
@@ -513,6 +519,7 @@ public class SellerAuctionService : ISellerAuctionService
         return new SellerAuctionFormViewModel
         {
             AuctionId = auction.Id,
+            ListingType = auction.ListingType,
             ProductName = auction.Product.Name,
             Category = auction.Product.Category.Name,
             ShortDescription = auction.Product.ShortDescription,
@@ -523,8 +530,19 @@ public class SellerAuctionService : ISellerAuctionService
             GradeLabel = auction.Product.GradeLabel,
             CertNumber = auction.Product.CertNumber,
             PrimaryImage = auction.Product.PrimaryImage,
+            ExistingGalleryImages = auction.Product.Images
+                .Where(image => image.DeletedAt == null)
+                .OrderBy(image => image.SortOrder)
+                .Select(image => new SellerGalleryImageViewModel
+                {
+                    Id = image.Id,
+                    ImageUrl = image.ImageUrl,
+                    SortOrder = image.SortOrder
+                })
+                .ToList(),
             StartingPrice = auction.StartingPrice,
             BidStep = auction.BidStep,
+            BuyNowPrice = auction.BuyNowPrice ?? (auction.ListingType == ListingTypes.BuyNow ? auction.CurrentPrice : null),
             StartDate = auction.StartDate,
             EndDate = auction.EndDate,
             RegistrationStartDate = auction.RegistrationStartDate,
@@ -543,6 +561,7 @@ public class SellerAuctionService : ISellerAuctionService
 
         var auction = await _db.Auctions
             .Include(a => a.Product)
+                .ThenInclude(product => product.Images)
             .FirstOrDefaultAsync(a => a.Id == model.AuctionId && a.Product.SellerId == sellerId);
 
         if (auction is null)
@@ -556,15 +575,40 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "Cannot edit auction that already has bids.");
         }
 
-        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview or AuctionStatuses.Rejected)
-            || (auction.Status == AuctionStatuses.Live && !DateTimeUtilities.IsInFutureUtc(auction.EndDate)))
+        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.EndingSoon or AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview or AuctionStatuses.Rejected or AuctionStatuses.Scheduled)
+            || ((auction.Status == AuctionStatuses.Live || auction.Status == AuctionStatuses.EndingSoon)
+                && !DateTimeUtilities.IsInFutureUtc(auction.EndDate)))
         {
-            return (false, "Only pending or live listings can be edited.");
+            return (false, "Only pending, scheduled, or live listings can be edited.");
         }
 
         if (model.EndDate < auction.EndDate)
         {
             return (false, "End date can only be extended, not shortened.");
+        }
+
+        if (string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase))
+        {
+            if (model.BuyNowPrice is null or <= 0)
+            {
+                return (false, "Buy now price must be greater than 0.");
+            }
+        }
+        else if (model.BidStep <= 0)
+        {
+            return (false, "Bid step must be greater than 0.");
+        }
+
+        var newGalleryFiles = model.GalleryImageFiles
+            .Where(file => file is { Length: > 0 })
+            .Take(MaxGalleryImages)
+            .ToList();
+
+        var remainingGalleryCount = auction.Product.Images.Count(image =>
+            image.DeletedAt == null && !model.RemoveGalleryImageIds.Contains(image.Id));
+        if (remainingGalleryCount + newGalleryFiles.Count > MaxGalleryImages)
+        {
+            return (false, $"Gallery can contain at most {MaxGalleryImages} images.");
         }
 
         string? newImageUrl;
@@ -579,6 +623,7 @@ public class SellerAuctionService : ISellerAuctionService
         }
 
         var category = await GetOrCreateCategoryAsync(model.Category);
+        var now = DateTime.UtcNow;
 
         auction.Product.Name = model.ProductName.Trim();
         auction.Product.CategoryId = category.Id;
@@ -593,12 +638,41 @@ public class SellerAuctionService : ISellerAuctionService
         auction.Product.PrimaryImage = string.IsNullOrWhiteSpace(newImageUrl)
             ? model.PrimaryImage
             : newImageUrl;
+        auction.Product.UpdatedAt = now;
 
-        auction.StartingPrice = model.StartingPrice;
-        auction.CurrentPrice = model.StartingPrice;
-        auction.BidStep = model.BidStep;
-        auction.RegistrationStartDate = model.RegistrationStartDate;
-        auction.RegistrationEndDate = model.RegistrationEndDate;
+        try
+        {
+            await ApplyGalleryChangesAsync(auction.Product, model, newGalleryFiles, now);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return (false, ex.Message);
+        }
+
+        if (string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase))
+        {
+            var buyNowPrice = model.BuyNowPrice!.Value;
+            // CHECK chk_auctions_prices requires buy_now_price > starting_price.
+            auction.BuyNowPrice = buyNowPrice;
+            auction.StartingPrice = ResolveBuyNowStartingPrice(buyNowPrice);
+            auction.CurrentPrice = buyNowPrice;
+            auction.BidStep = 0.01m;
+        }
+        else
+        {
+            auction.StartingPrice = model.StartingPrice;
+            auction.CurrentPrice = model.StartingPrice;
+            auction.BidStep = model.BidStep;
+            auction.RegistrationStartDate = model.RegistrationStartDate;
+            auction.RegistrationEndDate = model.RegistrationEndDate;
+
+            // Keep optional buy-now only when it still satisfies the price CHECK.
+            if (auction.BuyNowPrice is not null && auction.BuyNowPrice <= model.StartingPrice)
+            {
+                auction.BuyNowPrice = null;
+            }
+        }
+
         auction.StartDate = model.StartDate;
         auction.EndDate = model.EndDate;
 
@@ -647,8 +721,9 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "Cannot cancel auction that already has a pending or paid order.");
         }
 
-        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview or AuctionStatuses.Rejected)
-            || (auction.Status == AuctionStatuses.Live && !DateTimeUtilities.IsInFutureUtc(auction.EndDate)))
+        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.EndingSoon or AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview or AuctionStatuses.Rejected or AuctionStatuses.Scheduled)
+            || ((auction.Status == AuctionStatuses.Live || auction.Status == AuctionStatuses.EndingSoon)
+                && !DateTimeUtilities.IsInFutureUtc(auction.EndDate)))
         {
             return (false, "This listing cannot be cancelled.");
         }
@@ -720,6 +795,48 @@ public class SellerAuctionService : ISellerAuctionService
     }
 
     private const int MaxDocumentsPerProduct = 5;
+
+    /// <summary>
+    /// Buy Now listings store the visible price in buy_now_price/current_price.
+    /// starting_price must stay strictly lower to satisfy chk_auctions_prices.
+    /// </summary>
+    private static decimal ResolveBuyNowStartingPrice(decimal price) =>
+        price <= 0.01m ? 0.01m : price - 0.01m;
+
+    private async Task ApplyGalleryChangesAsync(
+        Product product,
+        SellerAuctionFormViewModel model,
+        IReadOnlyList<IFormFile> newGalleryFiles,
+        DateTime now)
+    {
+        foreach (var image in product.Images.Where(image => model.RemoveGalleryImageIds.Contains(image.Id)))
+        {
+            image.DeletedAt = now;
+            image.UpdatedAt = now;
+        }
+
+        var maxSortOrder = product.Images
+            .Where(image => image.DeletedAt == null)
+            .Select(image => image.SortOrder)
+            .DefaultIfEmpty(0)
+            .Max();
+
+        foreach (var galleryFile in newGalleryFiles)
+        {
+            var galleryUrl = await _photoService.AddPhotoAsync(galleryFile, ProductImageFolder);
+            if (string.IsNullOrWhiteSpace(galleryUrl))
+            {
+                continue;
+            }
+
+            product.Images.Add(new ProductImage
+            {
+                ImageUrl = galleryUrl,
+                SortOrder = ++maxSortOrder,
+                CreatedAt = now
+            });
+        }
+    }
 
     private static string? ValidateDocumentFiles(IEnumerable<IFormFile> files)
     {
