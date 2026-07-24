@@ -1,8 +1,11 @@
 @model AuctionListViewModel
+@using OnlineAuction.Configurations
+@using OnlineAuction.Helpers
 
 @{
     ViewData["Title"] = "Auctions";
     ViewData["AdminPage"] = "auctions";
+    var canManage = AdminPermissionHelper.Can(User, PermissionCodes.AuctionsManage);
 }
 
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
@@ -15,26 +18,14 @@
         <a asp-area="Admin"
            asp-controller="Auction"
            asp-action="Create"
-           class="admin-icon-action admin-icon-action--primary admin-icon-action--lg"
+           class="admin-icon-action admin-icon-action--primary admin-icon-action--lg @(canManage ? string.Empty : "hidden")"
            title="Create Auction"
            aria-label="Create Auction">
             <partial name="_AdminIcon" model='"plus"' />
         </a>
     </div>
 
-    @if (TempData["SuccessMessage"] is not null)
-    {
-        <div class="mb-4 rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-theme-sm text-success-700">
-            @TempData["SuccessMessage"]
-        </div>
-    }
-
-    @if (TempData["ErrorMessage"] is not null)
-    {
-        <div class="mb-4 rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-theme-sm text-error-700">
-            @TempData["ErrorMessage"]
-        </div>
-    }
+    <partial name="_AdminFlashMessages" />
 
     <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
         <form id="auctionFilterForm" method="get" class="flex flex-wrap items-end gap-3 2xl:flex-nowrap">

@@ -508,6 +508,7 @@ public class AdminProductService : IAdminProductService
                     {
                         Id = auction.Id,
                         Status = auction.Status,
+                        ListingType = auction.ListingType,
                         StartingPrice = auction.StartingPrice,
                         CurrentPrice = auction.CurrentPrice,
                         StartDate = auction.StartDate,
@@ -523,6 +524,21 @@ public class AdminProductService : IAdminProductService
         if (product is null)
         {
             return null;
+        }
+
+        string? deleteBlockReason = null;
+        if (!product.CanDelete)
+        {
+            var blockingAuction = await _dbContext.Auctions
+                .AsNoTracking()
+                .Where(auction => auction.ProductId == id && auction.DeletedAt == null)
+                .FirstOrDefaultAsync(auction => BlockDeleteAuctionStatuses.Contains(auction.Status));
+
+            if (blockingAuction is not null)
+            {
+                deleteBlockReason =
+                    $"phiên đấu giá #{blockingAuction.Id} đang ở trạng thái {FormatStatusLabel(blockingAuction.Status)}.";
+            }
         }
 
         return new ProductDetailViewModel
@@ -559,6 +575,7 @@ public class AdminProductService : IAdminProductService
             Documents = product.Documents,
             LinkedAuctions = product.LinkedAuctions,
             CanDelete = product.CanDelete,
+            DeleteBlockReason = deleteBlockReason,
             CreatedAt = product.CreatedAt,
             UpdatedAt = product.UpdatedAt
         };

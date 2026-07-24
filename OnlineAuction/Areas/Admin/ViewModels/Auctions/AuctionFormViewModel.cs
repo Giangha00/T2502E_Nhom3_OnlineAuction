@@ -135,6 +135,10 @@ public class AuctionFormViewModel : IValidatableObject
 
     public bool IsEdit => Id > 0;
 
+    public bool IsScheduleLocked { get; set; }
+
+    public bool IsStartingPriceLocked { get; set; }
+
     public List<SelectListItem> CategoryOptions { get; set; } = [];
 
     public List<SelectListItem> SellerOptions { get; set; } = [];

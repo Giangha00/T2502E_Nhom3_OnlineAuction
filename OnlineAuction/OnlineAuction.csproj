@@ -87,6 +87,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Remove="scripts\spec-test\**" />
+      <None Remove="scripts\spec-test\**" />
+      <Content Remove="scripts\spec-test\**" />
+      <EmbeddedResource Remove="scripts\spec-test\**" />
+    </ItemGroup>
+
+    <ItemGroup>
       <_ContentIncludedByDefault Remove="Views\Auth\CheckEmail.cshtml" />
       <_ContentIncludedByDefault Remove="Views\Auth\ForgotPassword.cshtml" />
       <_ContentIncludedByDefault Remove="Views\Auth\Login.cshtml" />

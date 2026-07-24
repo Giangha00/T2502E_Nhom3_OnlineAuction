@@ -132,6 +132,7 @@ public class AdminAuctionService
                 EndDate = auction.EndDate,
                 BidCount = auction.Bids.Count(bid => bid.DeletedAt == null),
                 RegistrationCount = auction.Registrations.Count(registration => registration.DeletedAt == null),
+                OrderItemCount = auction.OrderItems.Count(orderItem => orderItem.DeletedAt == null),
                 ImageUrl = auction.Product.PrimaryImage,
                 VerifiedAt = auction.VerifiedAt,
                 CreatedAt = auction.CreatedAt
@@ -142,6 +143,13 @@ public class AdminAuctionService
         foreach (var auction in auctions)
         {
             ApplyListingDisplayInfo(auction, now);
+            AdminAuctionLifecycleHelper.ApplyMutationFlags(
+                auction.BidCount,
+                auction.OrderItemCount,
+                auction.Status,
+                canDelete => auction.CanDelete = canDelete,
+                canCancel => auction.CanCancel = canCancel,
+                reason => auction.DeleteBlockReason = reason);
         }
 
         if (!string.IsNullOrWhiteSpace(filter.ListingPhase))
@@ -205,6 +213,7 @@ public class AdminAuctionService
                 ImageUrl = item.Product.PrimaryImage,
                 BidCount = item.Bids.Count(bid => bid.DeletedAt == null),
                 RegistrationCount = item.Registrations.Count(registration => registration.DeletedAt == null),
+                OrderItemCount = item.OrderItems.Count(orderItem => orderItem.DeletedAt == null),
                 WinnerName = item.Winner != null ? item.Winner.FullName : null,
                 OrderId = item.OrderItems
                     .Where(orderItem => orderItem.DeletedAt == null)
@@ -253,6 +262,13 @@ public class AdminAuctionService
 
         auction.BidHistoryTotalCount = bidHistoryTotalCount;
         auction.BidCount = bidHistoryTotalCount;
+        AdminAuctionLifecycleHelper.ApplyMutationFlags(
+            auction.BidCount,
+            auction.OrderItemCount,
+            auction.Status,
+            canDelete => auction.CanDelete = canDelete,
+            canCancel => auction.CanCancel = canCancel,
+            reason => auction.DeleteBlockReason = reason);
         auction.BidHistoryPageSize = BidHistoryPageSize;
 
         if (bidPage <= 0)
@@ -408,6 +424,9 @@ public class AdminAuctionService
             BidCount = await _dbContext.Bids.CountAsync(bid => bid.AuctionId == id && bid.DeletedAt == null)
         };
 
+        model.IsScheduleLocked = AdminAuctionLifecycleHelper.IsScheduleLockedStatus(auction.Status);
+        model.IsStartingPriceLocked = model.BidCount > 0;
+
         await PopulateFormOptionsAsync(model);
         model.NormalizeGrading();
         return model;
@@ -533,6 +552,7 @@ public class AdminAuctionService
         }
 
         var now = DateTime.UtcNow;
+        var scheduleLocked = AdminAuctionLifecycleHelper.IsScheduleLockedStatus(auction.Status);
 
         ApplyProductFields(auction.Product, model);
         if (!string.IsNullOrWhiteSpace(newImageUrl))
@@ -558,18 +578,45 @@ public class AdminAuctionService
             {
                 auction.CurrentPrice = model.Price;
             }
+
+            if (!scheduleLocked)
+            {
+                auction.Status = model.Status;
+            }
         }
         else
         {
-            auction.StartingPrice = model.StartingPrice;
+            if (!model.IsStartingPriceLocked)
+            {
+                auction.StartingPrice = model.StartingPrice;
+            }
+            else if (model.StartingPrice > auction.CurrentPrice)
+            {
+                return (false, "Giá khởi điểm không được vượt giá hiện tại khi đã có bid.");
+            }
+
             auction.BidStep = model.BidStep;
             auction.BuyNowPrice = model.BuyNowPrice;
             auction.ListingType = ListingTypes.Auction;
             auction.RequiresRegistration = true;
-            auction.RegistrationStartDate = model.RegistrationStartDate;
-            auction.RegistrationEndDate = model.RegistrationEndDate;
-            auction.StartDate = model.StartDate;
-            auction.EndDate = model.EndDate;
+
+            if (scheduleLocked)
+            {
+                if (model.EndDate < auction.EndDate)
+                {
+                    return (false, "Không thể rút ngắn thời gian kết thúc khi phiên đang live.");
+                }
+
+                auction.EndDate = model.EndDate;
+            }
+            else
+            {
+                auction.RegistrationStartDate = model.RegistrationStartDate;
+                auction.RegistrationEndDate = model.RegistrationEndDate;
+                auction.StartDate = model.StartDate;
+                auction.EndDate = model.EndDate;
+                auction.Status = model.Status;
+            }
 
             if (bidCount == 0)
             {
@@ -577,7 +624,6 @@ public class AdminAuctionService
             }
         }
 
-        auction.Status = model.Status;
         auction.UpdatedAt = now;
 
         try
@@ -589,10 +635,50 @@ public class AdminAuctionService
             return (false, "Could not update listing. Check prices, dates, and selected references.");
         }
 
-        return (true, model.IsBuyNow ? "Buy Now listing updated successfully." : "Auction updated successfully.");
+        _logger.LogInformation("Admin updated auction {AuctionId}.", model.Id);
+
+        return (true, model.IsBuyNow ? "Buy Now listing updated successfully." : "Cập nhật phiên đấu giá thành công.");
     }
 
-    public async Task<(bool Success, string Message)> DeleteAsync(int id)
+    public async Task<(bool Success, string Message)> CancelAsync(int id, int adminId)
+    {
+        var auction = await _dbContext.Auctions
+            .Include(item => item.Bids)
+            .Include(item => item.OrderItems)
+            .FirstOrDefaultAsync(item => item.Id == id && item.DeletedAt == null);
+
+        if (auction is null)
+        {
+            return (false, "Không tìm thấy phiên đấu giá.");
+        }
+
+        var bidCount = auction.Bids.Count(bid => bid.DeletedAt == null);
+        var orderCount = auction.OrderItems.Count(item => item.DeletedAt == null);
+
+        if (orderCount > 0)
+        {
+            return (false, "Không thể hủy phiên đã liên kết order.");
+        }
+
+        if (!AdminAuctionLifecycleHelper.CanCancelStatus(auction.Status))
+        {
+            return (false, "Phiên này không thể hủy ở trạng thái hiện tại.");
+        }
+
+        auction.Status = AuctionStatuses.Cancelled;
+        auction.UpdatedAt = DateTime.UtcNow;
+        await _dbContext.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Admin {AdminId} cancelled auction {AuctionId} (bids={BidCount}).",
+            adminId,
+            id,
+            bidCount);
+
+        return (true, "Đã hủy phiên đấu giá thành công.");
+    }
+
+    public async Task<(bool Success, string Message)> DeleteAsync(int id, int adminId)
     {
         var auction = await _dbContext.Auctions
             .Include(item => item.Product)
@@ -606,15 +692,10 @@ public class AdminAuctionService
         }
 
         var activeBidCount = auction.Bids.Count(bid => bid.DeletedAt == null);
-        if (activeBidCount > 0)
-        {
-            return (false, $"Cannot delete this auction because it has {activeBidCount} bid(s). Cancel it instead.");
-        }
-
         var activeOrderCount = auction.OrderItems.Count(item => item.DeletedAt == null);
-        if (activeOrderCount > 0)
+        if (activeBidCount > 0 || activeOrderCount > 0)
         {
-            return (false, "Cannot delete this auction because it is linked to an order.");
+            return (false, AdminAuctionLifecycleHelper.BuildDeleteBlockedMessage(activeBidCount, activeOrderCount));
         }
 
         var now = DateTime.UtcNow;
@@ -625,10 +706,12 @@ public class AdminAuctionService
 
         await _dbContext.SaveChangesAsync();
 
-        return (true, "Auction deleted successfully.");
+        _logger.LogInformation("Admin {AdminId} soft-deleted auction {AuctionId}.", adminId, id);
+
+        return (true, "Đã xóa phiên đấu giá thành công.");
     }
 
-    public async Task<(bool Success, string Message)> BulkDeleteAsync(IReadOnlyList<int> auctionIds)
+    public async Task<(bool Success, string Message)> BulkDeleteAsync(IReadOnlyList<int> auctionIds, int adminId)
     {
         if (auctionIds.Count == 0)
         {
@@ -654,16 +737,13 @@ public class AdminAuctionService
         foreach (var auction in auctions)
         {
             var activeBidCount = auction.Bids.Count(bid => bid.DeletedAt == null);
-            if (activeBidCount > 0)
-            {
-                skippedMessages.Add($"#{auction.Id}: has {activeBidCount} bid(s)");
-                continue;
-            }
-
             var activeOrderCount = auction.OrderItems.Count(item => item.DeletedAt == null);
-            if (activeOrderCount > 0)
+            if (activeBidCount > 0 || activeOrderCount > 0)
             {
-                skippedMessages.Add($"#{auction.Id}: linked to an order");
+                skippedMessages.Add(AdminAuctionLifecycleHelper.BuildBulkSkipReason(
+                    auction.Id,
+                    activeBidCount,
+                    activeOrderCount));
                 continue;
             }
 
@@ -676,17 +756,18 @@ public class AdminAuctionService
 
         if (deletedCount == 0)
         {
-            return (false, string.Join(" ", skippedMessages));
+            return (false, AdminAuctionLifecycleHelper.BuildBulkDeleteSummary(0, auctionIds.Count, skippedMessages));
         }
 
         await _dbContext.SaveChangesAsync();
 
-        if (skippedMessages.Count == 0)
-        {
-            return (true, $"Deleted {deletedCount} auction(s) successfully.");
-        }
+        _logger.LogInformation(
+            "Admin {AdminId} bulk-deleted {DeletedCount}/{RequestedCount} auctions.",
+            adminId,
+            deletedCount,
+            auctionIds.Count);
 
-        return (true, $"Deleted {deletedCount} auction(s). Skipped {skippedMessages.Count}: {string.Join(" ", skippedMessages)}");
+        return (true, AdminAuctionLifecycleHelper.BuildBulkDeleteSummary(deletedCount, auctionIds.Count, skippedMessages));
     }
 
     public async Task PopulateFormOptionsAsync(AuctionFormViewModel model)
