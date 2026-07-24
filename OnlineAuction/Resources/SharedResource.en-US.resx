@@ -835,43 +835,32 @@
   <data name="User_Ends" xml:space="preserve"><value>Ends</value></data>
   <data name="User_ViewDetail" xml:space="preserve"><value>View Detail</value></data>
   <data name="User_CancelListing" xml:space="preserve"><value>Cancel</value></data>
-  <data name="User_CancelConfirm" xml:space="preserve"><value>Cancel this auction listing?</value></data>
-  <data name="User_EditListing" xml:space="preserve"><value>Edit</value></data>
   <data name="User_CancelListingConfirm" xml:space="preserve"><value>Cancel this listing? It will be removed from the marketplace.</value></data>
+  <data name="User_EditListing" xml:space="preserve"><value>Edit</value></data>
+  <data name="User_CancelConfirm" xml:space="preserve"><value>Cancel this auction listing?</value></data>
   <data name="User_Status_Active" xml:space="preserve"><value>Active Auction</value></data>
   <data name="User_Status_EndingSoon" xml:space="preserve"><value>Ending Soon</value></data>
   <data name="User_Status_Completed" xml:space="preserve"><value>Completed</value></data>
   <data name="UserAuction_EditTitle" xml:space="preserve"><value>Edit Auction</value></data>
-  <data name="UserAuction_EditBuyNowTitle" xml:space="preserve"><value>Edit Buy Now Listing</value></data>
-  <data name="UserAuction_EditDesc" xml:space="preserve"><value>Update product details for listings without bids. Rejected listings are resubmitted for admin confirmation.</value></data>
+  <data name="UserAuction_EditDesc" xml:space="preserve"><value>Update your listing details. Registration dates and starting price may be locked after registration opens or bids are placed.</value></data>
+  <data name="UserAuction_EditPhaseLockHint" xml:space="preserve"><value>Some schedule or pricing fields are locked for this phase. You can still extend the live end date.</value></data>
   <data name="UserAuction_ProductName" xml:space="preserve"><value>Product Name</value></data>
   <data name="UserAuction_ShortDescription" xml:space="preserve"><value>Short Description</value></data>
   <data name="UserAuction_SetName" xml:space="preserve"><value>Set Name</value></data>
   <data name="UserAuction_Grade" xml:space="preserve"><value>Grade</value></data>
   <data name="UserAuction_CertNumber" xml:space="preserve"><value>Certificate Number</value></data>
-  <data name="UserAuction_Images" xml:space="preserve"><value>Images</value></data>
-  <data name="UserAuction_ImagesDesc" xml:space="preserve"><value>Change the cover, remove gallery photos, or drag &amp; drop to add more.</value></data>
-  <data name="UserAuction_CurrentImages" xml:space="preserve"><value>Current images</value></data>
-  <data name="UserAuction_CoverBadge" xml:space="preserve"><value>Cover</value></data>
-  <data name="UserAuction_CoverPending" xml:space="preserve"><value>New cover</value></data>
-  <data name="UserAuction_ChangeCover" xml:space="preserve"><value>Change cover</value></data>
-  <data name="UserAuction_MarkedForRemoval" xml:space="preserve"><value>Will remove</value></data>
-  <data name="UserAuction_UndoRemove" xml:space="preserve"><value>Undo</value></data>
-  <data name="UserAuction_NewImage" xml:space="preserve"><value>New</value></data>
-  <data name="UserAuction_GallerySlotsLeft" xml:space="preserve"><value>{0} gallery slots left</value></data>
-  <data name="UserAuction_GalleryLimit" xml:space="preserve"><value>You can upload up to {0} gallery images.</value></data>
-  <data name="UserAuction_ImageInvalidFormat" xml:space="preserve"><value>{0}: invalid format (JPG, PNG, WEBP only)</value></data>
-  <data name="UserAuction_ImageSizeLimit" xml:space="preserve"><value>{0}: exceeds 5MB limit</value></data>
   <data name="UserAuction_CurrentCover" xml:space="preserve"><value>Current Cover</value></data>
   <data name="UserAuction_ReplaceCover" xml:space="preserve"><value>Replace Cover Image</value></data>
-  <data name="UserAuction_CurrentGallery" xml:space="preserve"><value>Current gallery</value></data>
-  <data name="UserAuction_GalleryImage" xml:space="preserve"><value>Gallery image</value></data>
-  <data name="UserAuction_AddGalleryImages" xml:space="preserve"><value>Add gallery images</value></data>
-  <data name="UserAuction_RemoveImage" xml:space="preserve"><value>Remove</value></data>
-  <data name="UserAuction_GalleryImagesHelp" xml:space="preserve"><value>Up to 4 gallery images in addition to the cover. JPG, PNG, or WEBP.</value></data>
   <data name="UserAuction_StartDate" xml:space="preserve"><value>Start Date</value></data>
   <data name="UserAuction_EndDate" xml:space="preserve"><value>End Date</value></data>
   <data name="UserAuction_SaveChanges" xml:space="preserve"><value>Save Changes</value></data>
+  <data name="UserAuction_SaveSuccess" xml:space="preserve"><value>Listing updated successfully.</value></data>
+  <data name="UserAuction_SaveFailed" xml:space="preserve"><value>Could not update the listing. Please try again.</value></data>
+  <data name="UserAuction_ReadyToSave_Highlight" xml:space="preserve"><value>Ready to save?</value></data>
+  <data name="UserAuction_ReadyToSave" xml:space="preserve"><value>Review the preview, then save your changes.</value></data>
+  <data name="ConfirmModal_EditAuction_Title" xml:space="preserve"><value>Save listing changes?</value></data>
+  <data name="ConfirmModal_EditAuction_Message" xml:space="preserve"><value>You are about to save updates for "{0}".</value></data>
+  <data name="ConfirmModal_EditAuction_Note" xml:space="preserve"><value>Rejected listings will be resubmitted for admin confirmation.</value></data>
   <data name="Sell_AuctionHeader_Label" xml:space="preserve"><value>Seller Dashboard</value></data>
   <data name="Sell_AuctionHeader_Title" xml:space="preserve"><value>Create New Auction</value></data>
   <data name="Sell_AuctionHeader_Desc" xml:space="preserve"><value>Sell your product through auction. Complete the form below and review your listing before publishing.</value></data>

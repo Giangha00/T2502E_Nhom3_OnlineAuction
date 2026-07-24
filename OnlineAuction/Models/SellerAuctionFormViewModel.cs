@@ -1,89 +1,49 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using OnlineAuction.Entities;
 
 namespace OnlineAuction.Models;
 
-public class SellerAuctionFormViewModel
+public class SellerAuctionFormViewModel : CreateAuctionViewModel
 {
-    public int? AuctionId { get; set; }
+    public string Status { get; set; } = string.Empty;
+
+    public bool HasBids { get; set; }
 
     /// <summary>
-    /// auction | buynow — drives which pricing fields the edit form shows.
+    /// confirming / rejected / scheduled before registration opens → full field edit.
     /// </summary>
-    public string ListingType { get; set; } = ListingTypes.Auction;
+    public bool CanEditFull { get; set; } = true;
 
-    public bool IsBuyNow =>
-        string.Equals(ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
+    public bool LockRegistrationDates { get; set; }
 
-    [Required]
-    [StringLength(120)]
-    public string ProductName { get; set; } = string.Empty;
+    public bool LockLiveStartDate { get; set; }
 
-    [Required]
-    [StringLength(50)]
-    public string Category { get; set; } = string.Empty;
+    public bool LockStartingPrice { get; set; }
 
-    [StringLength(300)]
-    public string? ShortDescription { get; set; }
+    public bool LockBidStep { get; set; }
 
-    public string? DescriptionHtml { get; set; }
+    public List<SellerAuctionExistingImageViewModel> ExistingGalleryImages { get; set; } = [];
 
-    [Required]
-    [StringLength(20)]
-    public string Condition { get; set; } = "graded";
+    public List<SellerAuctionExistingDocumentViewModel> ExistingDocuments { get; set; } = [];
 
-    public int? Year { get; set; }
+    public List<int> RemovedGalleryImageIds { get; set; } = [];
 
-    [StringLength(120)]
-    public string? SetName { get; set; }
-
-    [StringLength(20)]
-    public string? GradeLabel { get; set; }
-
-    [StringLength(50)]
-    public string? CertNumber { get; set; }
-
-    [Required]
-    public string PrimaryImage { get; set; } = string.Empty;
-
-    // File anh moi khi seller muon thay cover trong man hinh Edit.
-    // Neu khong upload file moi thi Service giu nguyen PrimaryImage hien tai.
-    public IFormFile? PrimaryImageFile { get; set; }
-
-    public List<IFormFile> GalleryImageFiles { get; set; } = [];
-
-    public List<SellerGalleryImageViewModel> ExistingGalleryImages { get; set; } = [];
-
-    public List<int> RemoveGalleryImageIds { get; set; } = [];
-
-    [Required]
-    [Range(0.01, double.MaxValue)]
-    public decimal StartingPrice { get; set; }
-
-    [Range(0.01, double.MaxValue)]
-    public decimal BidStep { get; set; } = 1m;
-
-    [Range(0.01, double.MaxValue)]
-    public decimal? BuyNowPrice { get; set; }
-
-    [Required]
-    public DateTime RegistrationStartDate { get; set; } = DateTime.UtcNow.AddHours(1);
-
-    [Required]
-    public DateTime RegistrationEndDate { get; set; } = DateTime.UtcNow.AddDays(7);
-
-    [Required]
-    public DateTime StartDate { get; set; } = DateTime.UtcNow.AddDays(7);
-
-    [Required]
-    public DateTime EndDate { get; set; } = DateTime.UtcNow.AddDays(7).AddHours(1);
+    public List<int> RemovedDocumentIds { get; set; } = [];
 }
 
-public class SellerGalleryImageViewModel
+public class SellerAuctionExistingImageViewModel
 {
     public int Id { get; set; }
 
-    public string ImageUrl { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
 
     public int SortOrder { get; set; }
+}
+
+public class SellerAuctionExistingDocumentViewModel
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; } = string.Empty;
+
+    public string FileUrl { get; set; } = string.Empty;
 }
