@@ -346,6 +346,11 @@
             }
 
             bulkForm.onsubmit = function (event) {
+                if (bulkForm.dataset.confirmAccepted === '1') {
+                    delete bulkForm.dataset.confirmAccepted;
+                    return;
+                }
+
                 if (event.submitter?.dataset[settings.submitDataAttr] !== 'true') {
                     return;
                 }
@@ -360,9 +365,33 @@
                     return;
                 }
 
-                if (!confirm(settings.confirmMessage)) {
-                    event.preventDefault();
-                }
+                event.preventDefault();
+                const submitter = event.submitter;
+                const confirmOptions = {
+                    title: settings.confirmTitle || 'Delete selected items?',
+                    message: settings.confirmMessage,
+                    confirmText: settings.confirmText || 'Delete',
+                    variant: 'danger'
+                };
+
+                const confirmFn = typeof window.showConfirmModal === 'function'
+                    ? window.showConfirmModal
+                    : function (options) {
+                        return Promise.resolve(window.confirm(options.message || ''));
+                    };
+
+                confirmFn(confirmOptions).then(function (confirmed) {
+                    if (!confirmed) {
+                        return;
+                    }
+
+                    bulkForm.dataset.confirmAccepted = '1';
+                    if (typeof bulkForm.requestSubmit === 'function') {
+                        bulkForm.requestSubmit(submitter || undefined);
+                    } else {
+                        HTMLFormElement.prototype.submit.call(bulkForm);
+                    }
+                });
             };
         }
     };

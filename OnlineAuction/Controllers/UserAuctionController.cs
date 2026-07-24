@@ -55,7 +55,11 @@ public class UserAuctionController : Controller
     [Authorize(Policy = "ListingOwner")]
     public async Task<IActionResult> Edit(int auctionId, SellerAuctionFormViewModel model)
     {
-        model.PrimaryImageFile ??= Request.Form.Files.FirstOrDefault();
+        model.PrimaryImageFile ??= Request.Form.Files
+            .FirstOrDefault(file => file.Name == "PrimaryImageFile");
+        model.GalleryImageFiles = Request.Form.Files
+            .Where(file => file.Name == "GalleryImageFiles")
+            .ToList();
 
         var sellerId = await GetCurrentSellerIdAsync();
         if (!sellerId.HasValue)
@@ -64,6 +68,15 @@ public class UserAuctionController : Controller
         }
 
         model.AuctionId = auctionId;
+
+        if (model.IsBuyNow && model.BuyNowPrice is > 0)
+        {
+            model.StartingPrice = model.BuyNowPrice.Value;
+            if (model.BidStep <= 0)
+            {
+                model.BidStep = 1m;
+            }
+        }
 
         if (!await IsAuctionOwnerAsync(auctionId, sellerId.Value))
         {
@@ -75,8 +88,14 @@ public class UserAuctionController : Controller
             ModelState.AddModelError(nameof(model.EndDate), "End date must be greater than start date.");
         }
 
+        if (model.IsBuyNow && model.BuyNowPrice is null or <= 0)
+        {
+            ModelState.AddModelError(nameof(model.BuyNowPrice), "Buy now price must be greater than 0.");
+        }
+
         if (!ModelState.IsValid)
         {
+            await RestoreEditGalleryAsync(model, auctionId, sellerId.Value);
             return View(model);
         }
 
@@ -84,6 +103,7 @@ public class UserAuctionController : Controller
         if (!result.Success)
         {
             ModelState.AddModelError(string.Empty, result.Message);
+            await RestoreEditGalleryAsync(model, auctionId, sellerId.Value);
             return View(model);
         }
 
@@ -97,6 +117,7 @@ public class UserAuctionController : Controller
             auctionId,
             debounceWindow: TimeSpan.FromMinutes(2));
 
+        TempData["SuccessMessage"] = result.Message;
         return await RedirectToProfileAsync(sellerId.Value, auctionId);
     }
 
@@ -130,6 +151,7 @@ public class UserAuctionController : Controller
             auctionId,
             debounceWindow: TimeSpan.FromMinutes(2));
 
+        TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
         return await RedirectToProfileAsync(sellerId.Value, auctionId);
     }
 
@@ -158,5 +180,25 @@ public class UserAuctionController : Controller
         return _db.Auctions.AnyAsync(auction =>
             auction.Id == auctionId &&
             auction.Product.SellerId == sellerId);
+    }
+
+    private async Task RestoreEditGalleryAsync(SellerAuctionFormViewModel model, int auctionId, int sellerId)
+    {
+        var existing = await _sellerAuctionService.GetEditFormAsync(auctionId, sellerId);
+        if (existing is null)
+        {
+            return;
+        }
+
+        model.ExistingGalleryImages = existing.ExistingGalleryImages;
+        if (string.IsNullOrWhiteSpace(model.PrimaryImage))
+        {
+            model.PrimaryImage = existing.PrimaryImage;
+        }
+
+        if (string.IsNullOrWhiteSpace(model.ListingType))
+        {
+            model.ListingType = existing.ListingType;
+        }
     }
 }

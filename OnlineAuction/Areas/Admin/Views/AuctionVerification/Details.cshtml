@@ -378,7 +378,11 @@
                       asp-route-id="@Model.Id"
                       method="post"
                       class="mt-5"
-                      onsubmit="return confirm('Approve this listing?');">
+                      data-confirm
+                      data-confirm-variant="default"
+                      data-confirm-title="Approve listing?"
+                      data-confirm-message="Approve this listing?"
+                      data-confirm-confirm="Approve">
                     @Html.AntiForgeryToken()
                     <button type="submit" class="av-btn av-btn--approve w-full">
                         <partial name="_AdminIcon" model='"check"' />
@@ -390,7 +394,7 @@
                       asp-route-id="@Model.Id"
                       method="post"
                       class="mt-4 space-y-3"
-                      onsubmit="return validateRejectReason();">
+                      id="rejectListingForm">
                     @Html.AntiForgeryToken()
                     <label for="rejectReason" class="block text-theme-xs font-medium text-gray-500 dark:text-gray-400">
                         Reject reason (min 10 characters)
@@ -424,14 +428,48 @@
 
 @section Scripts {
     <script>
-        function validateRejectReason() {
-            const value = document.getElementById('rejectReason').value.trim();
-            if (value.length < 10) {
-                alert('Reject reason must be at least 10 characters.');
-                return false;
+        (function () {
+            const rejectForm = document.getElementById('rejectListingForm');
+            if (rejectForm) {
+                rejectForm.addEventListener('submit', function (event) {
+                    if (rejectForm.dataset.confirmAccepted === '1') {
+                        delete rejectForm.dataset.confirmAccepted;
+                        return;
+                    }
+
+                    event.preventDefault();
+                    const value = (document.getElementById('rejectReason')?.value || '').trim();
+                    if (value.length < 10) {
+                        alert('Reject reason must be at least 10 characters.');
+                        return;
+                    }
+
+                    const confirmFn = typeof window.showConfirmModal === 'function'
+                        ? window.showConfirmModal
+                        : function (options) {
+                            return Promise.resolve(window.confirm(options.message || ''));
+                        };
+
+                    confirmFn({
+                        title: 'Reject listing?',
+                        message: 'Reject this listing? The seller will see your reason.',
+                        confirmText: 'Reject',
+                        variant: 'danger'
+                    }).then(function (confirmed) {
+                        if (!confirmed) {
+                            return;
+                        }
+
+                        rejectForm.dataset.confirmAccepted = '1';
+                        if (typeof rejectForm.requestSubmit === 'function') {
+                            rejectForm.requestSubmit();
+                        } else {
+                            HTMLFormElement.prototype.submit.call(rejectForm);
+                        }
+                    });
+                });
             }
-            return confirm('Reject this listing? The seller will see your reason.');
-        }
+        })();
 
         (function () {
             const lightbox = document.querySelector('[data-admin-image-lightbox]');

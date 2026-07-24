@@ -152,6 +152,11 @@
 
             if (bulkDeleteForm) {
                 bulkDeleteForm.onsubmit = function (event) {
+                    if (bulkDeleteForm.dataset.confirmAccepted === '1') {
+                        delete bulkDeleteForm.dataset.confirmAccepted;
+                        return;
+                    }
+
                     if (event.submitter?.dataset.bulkDelete !== 'true') {
                         return;
                     }
@@ -163,9 +168,31 @@
                         return;
                     }
 
-                    if (!confirm('@Localizer["AdminProduct.ConfirmBulkDeleteProducts"]')) {
-                        event.preventDefault();
-                    }
+                    event.preventDefault();
+                    const submitter = event.submitter;
+                    const confirmFn = typeof window.showConfirmModal === 'function'
+                        ? window.showConfirmModal
+                        : function (options) {
+                            return Promise.resolve(window.confirm(options.message || ''));
+                        };
+
+                    confirmFn({
+                        title: '@Localizer["AdminProduct.Delete"]',
+                        message: '@Localizer["AdminProduct.ConfirmBulkDeleteProducts"]',
+                        confirmText: '@Localizer["AdminProduct.Delete"]',
+                        variant: 'danger'
+                    }).then(function (confirmed) {
+                        if (!confirmed) {
+                            return;
+                        }
+
+                        bulkDeleteForm.dataset.confirmAccepted = '1';
+                        if (typeof bulkDeleteForm.requestSubmit === 'function') {
+                            bulkDeleteForm.requestSubmit(submitter || undefined);
+                        } else {
+                            HTMLFormElement.prototype.submit.call(bulkDeleteForm);
+                        }
+                    });
                 };
             }
         }

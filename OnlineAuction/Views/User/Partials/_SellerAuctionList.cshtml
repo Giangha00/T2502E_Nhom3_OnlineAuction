@@ -1,5 +1,6 @@
 @model OnlineAuction.Models.SellerListingListViewModel
 @using OnlineAuction.Entities
+@using OnlineAuction.Helpers
 @{
     var isBuyNow = string.Equals(Model.Channel, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
     var title = Model.IsOwner
@@ -49,10 +50,13 @@
     <div class="rarecard-auction-grid">
       @foreach (var listing in Model.Listings)
       {
+        var canManage = Model.IsOwner && SellerListingActions.CanManage(listing);
         @await Html.PartialAsync("Partials/_SellerListingCard", new SellerListingCardViewModel
         {
           Auction = listing,
-          IsOwner = Model.IsOwner
+          IsOwner = Model.IsOwner,
+          CanEdit = canManage,
+          CanDelete = canManage
         })
       }
     </div>
