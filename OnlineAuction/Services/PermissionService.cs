@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Areas.Admin.ViewModels.Permissions;
@@ -32,19 +33,20 @@ public class PermissionService : IPermissionService
             return [];
         }
 
-        if (user.Role == UserRole.Admin)
+        if (user.Role == UserRole.Admin || await _userManager.IsInRoleAsync(user, StaffRoleNames.Admin))
         {
             return PermissionCodes.All;
         }
 
-        return await (
-                from up in _dbContext.UserPermissions.AsNoTracking()
-                join permission in _dbContext.Permissions.AsNoTracking() on up.PermissionId equals permission.Id
-                where up.UserId == userId
-                select permission.Code)
+        var claims = await _userManager.GetClaimsAsync(user);
+        return claims
+            .Where(claim => claim.Type == PermissionClaimTypes.Permission
+                            && !string.IsNullOrWhiteSpace(claim.Value)
+                            && PermissionCatalog.IsKnown(claim.Value))
+            .Select(claim => claim.Value!)
             .Distinct()
             .OrderBy(code => code)
-            .ToListAsync(cancellationToken);
+            .ToList();
     }
 
     public async Task<bool> UserHasPermissionAsync(
@@ -66,72 +68,83 @@ public class PermissionService : IPermissionService
             return false;
         }
 
-        if (user.Role == UserRole.Admin)
+        if (user.Role == UserRole.Admin || await _userManager.IsInRoleAsync(user, StaffRoleNames.Admin))
         {
             return true;
         }
 
-        return await _dbContext.UserPermissions
-            .AsNoTracking()
-            .AnyAsync(up => up.UserId == userId, cancellationToken);
+        var claims = await _userManager.GetClaimsAsync(user);
+        return claims.Any(claim =>
+            claim.Type == PermissionClaimTypes.Permission
+            && !string.IsNullOrWhiteSpace(claim.Value)
+            && PermissionCatalog.IsKnown(claim.Value));
     }
 
-    public async Task<IReadOnlyList<int>> GetAssignedPermissionIdsForUserAsync(
+    public async Task<IReadOnlyList<string>> GetAssignedPermissionCodesForUserAsync(
         int userId,
         CancellationToken cancellationToken = default)
     {
-        return await _dbContext.UserPermissions
-            .AsNoTracking()
-            .Where(up => up.UserId == userId)
-            .Select(up => up.PermissionId)
-            .ToListAsync(cancellationToken);
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+        {
+            return [];
+        }
+
+        var claims = await _userManager.GetClaimsAsync(user);
+        return claims
+            .Where(claim => claim.Type == PermissionClaimTypes.Permission
+                            && !string.IsNullOrWhiteSpace(claim.Value)
+                            && PermissionCatalog.IsKnown(claim.Value))
+            .Select(claim => claim.Value!)
+            .Distinct()
+            .OrderBy(code => code)
+            .ToList();
     }
 
-    public async Task<IReadOnlyList<PermissionItemViewModel>> GetPermissionCatalogAsync(
+    public Task<IReadOnlyList<PermissionItemViewModel>> GetPermissionCatalogAsync(
         CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Permissions
-            .AsNoTracking()
-            .OrderBy(p => p.Module)
-            .ThenBy(p => p.Name)
-            .Select(p => new PermissionItemViewModel
-            {
-                Id = p.Id,
-                Code = p.Code,
-                Name = p.Name,
-                Module = p.Module,
-                Description = p.Description
-            })
-            .ToListAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(PermissionCatalog.All);
     }
 
     public async Task UpdateUserPermissionsAsync(
         int userId,
-        IReadOnlyList<int> permissionIds,
+        IReadOnlyList<string> permissionCodes,
         CancellationToken cancellationToken = default)
     {
-        var validPermissionIds = await _dbContext.Permissions
-            .AsNoTracking()
-            .Where(p => permissionIds.Contains(p.Id))
-            .Select(p => p.Id)
-            .ToListAsync(cancellationToken);
-
-        var existing = await _dbContext.UserPermissions
-            .Where(up => up.UserId == userId)
-            .ToListAsync(cancellationToken);
-
-        _dbContext.UserPermissions.RemoveRange(existing);
-
-        foreach (var permissionId in validPermissionIds.Distinct())
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
         {
-            _dbContext.UserPermissions.Add(new UserPermission
-            {
-                UserId = userId,
-                PermissionId = permissionId
-            });
+            return;
         }
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        var desired = permissionCodes
+            .Where(PermissionCatalog.IsKnown)
+            .Distinct(StringComparer.Ordinal)
+            .ToHashSet(StringComparer.Ordinal);
+
+        var existing = (await _userManager.GetClaimsAsync(user))
+            .Where(claim => claim.Type == PermissionClaimTypes.Permission)
+            .ToList();
+
+        foreach (var claim in existing.Where(claim =>
+                     string.IsNullOrWhiteSpace(claim.Value) || !desired.Contains(claim.Value)))
+        {
+            await _userManager.RemoveClaimAsync(user, claim);
+        }
+
+        var existingValues = existing
+            .Where(claim => !string.IsNullOrWhiteSpace(claim.Value))
+            .Select(claim => claim.Value!)
+            .ToHashSet(StringComparer.Ordinal);
+
+        foreach (var code in desired.Where(code => !existingValues.Contains(code)))
+        {
+            await _userManager.AddClaimAsync(
+                user,
+                new Claim(PermissionClaimTypes.Permission, code));
+        }
     }
 
     public async Task<PermissionManagementViewModel> GetPermissionManagementViewModelAsync(
@@ -141,24 +154,48 @@ public class PermissionService : IPermissionService
     {
         var permissions = await GetPermissionCatalogAsync(cancellationToken);
 
-        var assignableUsers = await (
-                from user in _dbContext.Users.AsNoTracking()
-                where user.Role == UserRole.User && user.DeletedAt == null
-                orderby user.FullName, user.Email
-                select new UserPermissionRowViewModel
-                {
-                    UserId = user.Id,
-                    FullName = user.FullName,
-                    Email = user.Email ?? string.Empty,
-                    AssignedPermissionCount = _dbContext.UserPermissions.Count(up => up.UserId == user.Id)
-                })
+        var assignableUsers = await _dbContext.Users
+            .AsNoTracking()
+            .Where(user => user.Role == UserRole.User && user.DeletedAt == null)
+            .OrderBy(user => user.FullName)
+            .ThenBy(user => user.Email)
+            .Select(user => new UserPermissionRowViewModel
+            {
+                UserId = user.Id,
+                FullName = user.FullName,
+                Email = user.Email ?? string.Empty
+            })
             .ToListAsync(cancellationToken);
 
-        IReadOnlyList<int> selectedUserPermissionIds = [];
+        if (assignableUsers.Count > 0)
+        {
+            var userIds = assignableUsers.Select(user => user.UserId).ToList();
+            var knownCodes = PermissionCodes.All;
+            var claimRows = await _dbContext.Set<IdentityUserClaim<int>>()
+                .AsNoTracking()
+                .Where(claim =>
+                    claim.ClaimType == PermissionClaimTypes.Permission
+                    && userIds.Contains(claim.UserId)
+                    && claim.ClaimValue != null)
+                .Select(claim => new { claim.UserId, claim.ClaimValue })
+                .ToListAsync(cancellationToken);
+
+            var counts = claimRows
+                .Where(claim => knownCodes.Contains(claim.ClaimValue!))
+                .GroupBy(claim => claim.UserId)
+                .ToDictionary(group => group.Key, group => group.Count());
+
+            foreach (var row in assignableUsers)
+            {
+                row.AssignedPermissionCount = counts.GetValueOrDefault(row.UserId);
+            }
+        }
+
+        IReadOnlyList<string> selectedUserPermissionCodes = [];
         if (selectedUserId.HasValue &&
             assignableUsers.Any(user => user.UserId == selectedUserId.Value))
         {
-            selectedUserPermissionIds = await GetAssignedPermissionIdsForUserAsync(
+            selectedUserPermissionCodes = await GetAssignedPermissionCodesForUserAsync(
                 selectedUserId.Value,
                 cancellationToken);
         }
@@ -172,14 +209,14 @@ public class PermissionService : IPermissionService
             Permissions = permissions,
             AssignableUsers = assignableUsers,
             SelectedUserId = selectedUserId,
-            SelectedUserPermissionIds = selectedUserPermissionIds,
+            SelectedUserPermissionCodes = selectedUserPermissionCodes,
             CanManage = canManage
         };
     }
 
     public async Task<(bool Success, string Message)> SaveUserPermissionsAsync(
         int userId,
-        IReadOnlyList<int> permissionIds,
+        IReadOnlyList<string> permissionCodes,
         CancellationToken cancellationToken = default)
     {
         var user = await _dbContext.Users
@@ -196,7 +233,7 @@ public class PermissionService : IPermissionService
             return (false, "Only accounts with role User can receive delegated permissions. Admin accounts always have full access.");
         }
 
-        await UpdateUserPermissionsAsync(userId, permissionIds, cancellationToken);
+        await UpdateUserPermissionsAsync(userId, permissionCodes, cancellationToken);
 
         return (true, $"Permissions updated for \"{user.FullName}\". They must sign out and sign in again at /Admin/Account/Login.");
     }

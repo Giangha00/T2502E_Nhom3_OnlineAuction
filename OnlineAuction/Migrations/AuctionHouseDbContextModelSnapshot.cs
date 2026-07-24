@@ -465,7 +465,7 @@ namespace OnlineAuction.Migrations
 
                             t.HasCheckConstraint("chk_auctions_prices", "starting_price > 0 AND bid_step > 0 AND current_price >= 0 AND (buy_now_price IS NULL OR buy_now_price > starting_price)");
 
-                            t.HasCheckConstraint("chk_auctions_status", "status IN ('pending_review','rejected','scheduled','live','ending_soon','ended','awaiting_payment','completed','cancelled')");
+                            t.HasCheckConstraint("chk_auctions_status", "status IN ('confirming','rejected','scheduled','live','ending_soon','ended','awaiting_payment','completed','cancelled')");
                         });
                 });
 
@@ -1531,47 +1531,6 @@ namespace OnlineAuction.Migrations
                         });
                 });
 
-            modelBuilder.Entity("OnlineAuction.Entities.Permission", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("code");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("description");
-
-                    b.Property<string>("Module")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("module");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)")
-                        .HasColumnName("name");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique()
-                        .HasDatabaseName("ux_permissions_code");
-
-                    b.ToTable("permissions", (string)null);
-                });
-
             modelBuilder.Entity("OnlineAuction.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -1986,27 +1945,6 @@ namespace OnlineAuction.Migrations
                     b.ToTable("product_templates", (string)null);
                 });
 
-            modelBuilder.Entity("OnlineAuction.Entities.RolePermission", b =>
-                {
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int")
-                        .HasColumnName("role_id");
-
-                    b.Property<int>("PermissionId")
-                        .HasColumnType("int")
-                        .HasColumnName("permission_id");
-
-                    b.HasKey("RoleId", "PermissionId");
-
-                    b.HasIndex("PermissionId");
-
-                    b.HasIndex("RoleId", "PermissionId")
-                        .IsUnique()
-                        .HasDatabaseName("ux_role_permissions_role_permission");
-
-                    b.ToTable("role_permissions", (string)null);
-                });
-
             modelBuilder.Entity("OnlineAuction.Entities.UserDeviceToken", b =>
                 {
                     b.Property<int>("Id")
@@ -2110,25 +2048,67 @@ namespace OnlineAuction.Migrations
                     b.ToTable("user_otp_codes", (string)null);
                 });
 
-            modelBuilder.Entity("OnlineAuction.Entities.UserPermission", b =>
+            modelBuilder.Entity("OnlineAuction.Entities.UserSandboxWallet", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Balance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("balance");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int")
+                        .HasColumnName("updated_by");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int")
                         .HasColumnName("user_id");
 
-                    b.Property<int>("PermissionId")
-                        .HasColumnType("int")
-                        .HasColumnName("permission_id");
+                    b.HasKey("Id");
 
-                    b.HasKey("UserId", "PermissionId");
+                    b.HasIndex("CreatedBy");
 
-                    b.HasIndex("PermissionId");
+                    b.HasIndex("DeletedAt")
+                        .HasDatabaseName("ix_user_sandbox_wallets_deleted_at");
 
-                    b.HasIndex("UserId", "PermissionId")
+                    b.HasIndex("DeletedBy");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.HasIndex("UserId")
                         .IsUnique()
-                        .HasDatabaseName("ux_user_permissions_user_permission");
+                        .HasDatabaseName("ix_user_sandbox_wallets_user_id");
 
-                    b.ToTable("user_permissions", (string)null);
+                    b.ToTable("user_sandbox_wallets", null, t =>
+                        {
+                            t.HasCheckConstraint("chk_user_sandbox_wallets_balance", "balance >= 0");
+                        });
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.WatchlistItem", b =>
@@ -2846,27 +2826,6 @@ namespace OnlineAuction.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("OnlineAuction.Entities.RolePermission", b =>
-                {
-                    b.HasOne("OnlineAuction.Entities.Permission", "Permission")
-                        .WithMany("RolePermissions")
-                        .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_role_permissions_permission");
-
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_role_permissions_role");
-
-                    b.Navigation("Permission");
-
-                    b.Navigation("Role");
-                });
-
             modelBuilder.Entity("OnlineAuction.Entities.UserDeviceToken", b =>
                 {
                     b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
@@ -2891,23 +2850,32 @@ namespace OnlineAuction.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("OnlineAuction.Entities.UserPermission", b =>
+            modelBuilder.Entity("OnlineAuction.Entities.UserSandboxWallet", b =>
                 {
-                    b.HasOne("OnlineAuction.Entities.Permission", "Permission")
-                        .WithMany("UserPermissions")
-                        .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_permissions_permission");
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("fk_user_sandbox_wallets_created_by");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("DeletedBy")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("fk_user_sandbox_wallets_deleted_by");
+
+                    b.HasOne("OnlineAuction.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("fk_user_sandbox_wallets_updated_by");
 
                     b.HasOne("OnlineAuction.Entities.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_user_permissions_user");
-
-                    b.Navigation("Permission");
+                        .HasConstraintName("fk_user_sandbox_wallets_user");
 
                     b.Navigation("User");
                 });
@@ -2993,13 +2961,6 @@ namespace OnlineAuction.Migrations
                     b.Navigation("ProductTemplates");
 
                     b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("OnlineAuction.Entities.Permission", b =>
-                {
-                    b.Navigation("RolePermissions");
-
-                    b.Navigation("UserPermissions");
                 });
 
             modelBuilder.Entity("OnlineAuction.Entities.Product", b =>

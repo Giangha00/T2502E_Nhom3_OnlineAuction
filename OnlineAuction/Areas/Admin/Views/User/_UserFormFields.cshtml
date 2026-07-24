@@ -1,0 +1,85 @@
+@model UserFormViewModel
+
+<input asp-for="Id" type="hidden" />
+<input asp-for="CurrentAvatarUrl" type="hidden" />
+
+<div asp-validation-summary="ModelOnly" class="mb-4 text-theme-sm text-error-600"></div>
+
+<div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+    <div>
+        <label asp-for="FullName" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+        <input asp-for="FullName" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+        <span asp-validation-for="FullName" class="text-theme-xs text-error-600"></span>
+    </div>
+
+    <div>
+        <label asp-for="Username" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+        <input asp-for="Username" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+        <span asp-validation-for="Username" class="text-theme-xs text-error-600"></span>
+    </div>
+
+    <div>
+        <label asp-for="Email" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+        <input asp-for="Email" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+        <span asp-validation-for="Email" class="text-theme-xs text-error-600"></span>
+    </div>
+
+    <div>
+        <label asp-for="PhoneNumber" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+        <input asp-for="PhoneNumber" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+        <span asp-validation-for="PhoneNumber" class="text-theme-xs text-error-600"></span>
+    </div>
+
+    <div>
+        <label asp-for="InitialPassword" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400">New Password</label>
+        <input asp-for="InitialPassword" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+        <span asp-validation-for="InitialPassword" class="text-theme-xs text-error-600"></span>
+        <p class="mt-1 text-theme-xs text-gray-500">Leave blank to keep the current password.</p>
+    </div>
+
+    <div>
+        <label asp-for="Role" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+        <select asp-for="Role" asp-items="Model.RoleOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></select>
+        <span asp-validation-for="Role" class="text-theme-xs text-error-600"></span>
+    </div>
+
+    <div>
+        <label asp-for="Status" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+        <select asp-for="Status" asp-items="Model.StatusOptions" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></select>
+        <span asp-validation-for="Status" class="text-theme-xs text-error-600"></span>
+    </div>
+
+    <div>
+        <label asp-for="AvatarFile" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400">Replace Avatar</label>
+        <input asp-for="AvatarFile" type="file" accept=".jpg,.jpeg,.png,.webp" class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+        <span asp-validation-for="AvatarFile" class="text-theme-xs text-error-600"></span>
+    </div>
+</div>
+
+@if (Model.ShowPermissionAssignment)
+{
+    <div class="mt-8 border-t border-gray-100 pt-6 dark:border-gray-800">
+        <h3 class="mb-2 text-theme-sm font-semibold text-gray-800 dark:text-white/90">Admin panel permissions</h3>
+        <p class="mb-4 text-theme-xs text-gray-500 dark:text-gray-400">
+            Grant module access for this user account. They can sign in at <code class="rounded bg-gray-100 px-1">/Admin/Account/Login</code>.
+        </p>
+
+        <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            @foreach (var permission in Model.AvailablePermissions)
+            {
+                var isChecked = Model.AssignedPermissionCodes.Contains(permission.Code);
+                <label class="flex items-start gap-3 rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-700">
+                    <input type="checkbox"
+                           name="AssignedPermissionCodes"
+                           value="@permission.Code"
+                           checked="@isChecked"
+                           class="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500" />
+                    <span>
+                        <span class="block text-theme-sm font-medium text-gray-800 dark:text-white/90">@permission.Name</span>
+                        <span class="block font-mono text-[11px] text-gray-500">@permission.Code</span>
+                    </span>
+                </label>
+            }
+        </div>
+    </div>
+}

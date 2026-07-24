@@ -2,7 +2,8 @@ namespace OnlineAuction.Helpers;
 
 public static class DashboardFilterValidator
 {
-    public const int DefaultFilterDays = 7;
+    /// <summary>Default dashboard window: last 30 UTC calendar days (inclusive).</summary>
+    public const int DefaultFilterDays = 30;
 
     public const int MaxFilterDays = 365;
 

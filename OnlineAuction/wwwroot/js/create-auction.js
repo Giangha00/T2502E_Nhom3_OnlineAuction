@@ -25,7 +25,13 @@
   var form = document.getElementById('createAuctionForm');
   if (!form) return;
 
-  var i18n = (window.sellPageConfig && window.sellPageConfig.i18n) || {};
+  var pageConfig = window.sellPageConfig || {};
+  var isEditMode = pageConfig.mode === 'edit';
+  var locks = pageConfig.locks || {};
+  var removedExistingImageIds = [];
+  var removedExistingDocumentIds = [];
+
+  var i18n = pageConfig.i18n || {};
 
   function t(key, fallback) {
     return i18n[key] || fallback || '';
@@ -174,6 +180,71 @@
     return tf(t('timeLeftHours', '{0}h {1}m left'), hours, mins);
   }
 
+  function parseDateMs(value) {
+    if (!value) return NaN;
+    var date = new Date(value);
+    return isNaN(date.getTime()) ? NaN : date.getTime();
+  }
+
+  function resolvePreviewPhase(data) {
+    var now = Date.now();
+    var regStart = parseDateMs(data.registrationStartDate);
+    var regEnd = parseDateMs(data.registrationEndDate);
+    var liveStart = parseDateMs(data.startDate);
+    var liveEnd = parseDateMs(data.endDate);
+
+    if (!isNaN(liveEnd) && now >= liveEnd) {
+      return {
+        label: t('timeEnded', 'Ended'),
+        badgeClass: 'bg-slate-600 text-white',
+        countdownLabel: t('countdownLiveEnd', 'Live ends in'),
+        countdownTarget: data.endDate,
+        endingSoon: false
+      };
+    }
+
+    if (!isNaN(liveStart) && now >= liveStart) {
+      var endingSoon = !isNaN(liveEnd) && (liveEnd - now) <= 24 * 60 * 60 * 1000;
+      return {
+        label: endingSoon
+          ? t('phaseLiveEndingSoon', 'Ending Soon')
+          : t('phaseLiveAuction', 'Live Now'),
+        badgeClass: endingSoon ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white',
+        countdownLabel: t('countdownLiveEnd', 'Live ends in'),
+        countdownTarget: data.endDate,
+        endingSoon: endingSoon
+      };
+    }
+
+    if (!isNaN(regEnd) && now >= regEnd && (isNaN(liveStart) || now < liveStart)) {
+      return {
+        label: t('phaseUpcoming', 'Upcoming'),
+        badgeClass: 'bg-slate-600 text-white',
+        countdownLabel: t('countdownLiveStart', 'Live starts in'),
+        countdownTarget: data.startDate,
+        endingSoon: false
+      };
+    }
+
+    if (!isNaN(regStart) && now >= regStart) {
+      return {
+        label: t('phaseRegistrationOpen', 'Registration Open'),
+        badgeClass: 'bg-sky-600 text-white',
+        countdownLabel: t('countdownRegistrationEnd', 'Registration ends in'),
+        countdownTarget: data.registrationEndDate,
+        endingSoon: false
+      };
+    }
+
+    return {
+      label: t('phaseUpcoming', 'Upcoming'),
+      badgeClass: 'bg-slate-600 text-white',
+      countdownLabel: t('countdownRegistrationStart', 'Registration opens in'),
+      countdownTarget: data.registrationStartDate || data.startDate,
+      endingSoon: false
+    };
+  }
+
   function buildPreviewSubtitle(data) {
     if (data.subtitle) return data.subtitle;
     var parts = [];
@@ -181,22 +252,27 @@
     var grade = data.grade || composeGradeLabel(data.authenticator, data.gradeValue);
     if (grade) parts.push(grade);
     if (data.year) parts.push(data.year);
-    return parts.length ? parts.join(' · ') : '—';
+    return parts.length ? parts.join(' · ') : '\u00a0';
   }
 
-  function setPreviewGradeBadge(grade) {
-    $all('previewGrade').forEach(function (badge) {
-      var showGrade = grade && /^(PSA|BGS|CGC)\s/i.test(grade);
-      if (showGrade) {
-        badge.textContent = grade;
-        badge.classList.remove('hidden');
-      } else if (grade) {
-        badge.textContent = grade;
-        badge.classList.remove('hidden');
-      } else {
-        badge.textContent = '';
-        badge.classList.add('hidden');
-      }
+  var PHASE_BADGE_CLASSES = [
+    'bg-sky-600',
+    'bg-amber-500',
+    'bg-emerald-600',
+    'bg-red-600',
+    'bg-slate-600',
+    'text-white'
+  ];
+
+  function setPreviewPhaseBadge(phase) {
+    $all('previewPhaseBadge').forEach(function (badge) {
+      PHASE_BADGE_CLASSES.forEach(function (cls) {
+        badge.classList.remove(cls);
+      });
+      phase.badgeClass.split(/\s+/).forEach(function (cls) {
+        if (cls) badge.classList.add(cls);
+      });
+      badge.textContent = phase.label;
     });
   }
 
@@ -218,12 +294,21 @@
 
   function updatePreview() {
     var data = getFormData();
+    var phase = resolvePreviewPhase(data);
 
+    setPreviewText('previewCategory', data.category || t('categoryDefault', '—'));
     setPreviewText('previewName', data.productName || t('productNameDefault', 'Product Name'));
     setPreviewText('previewSubtitle', buildPreviewSubtitle(data));
     setPreviewText('previewCurrentBid', formatCardMoney(data.startingPrice));
-    setPreviewText('previewTimeRemaining', formatTimeRemaining(data.endDate || data.startDate));
-    setPreviewGradeBadge(data.grade);
+    setPreviewText('previewCountdownLabel', phase.countdownLabel);
+    setPreviewText('previewTimeRemaining', formatTimeRemaining(phase.countdownTarget));
+
+    $all('previewTimeRemaining').forEach(function (el) {
+      el.classList.toggle('text-red-600', phase.endingSoon);
+      el.classList.toggle('text-stone-700', !phase.endingSoon);
+    });
+
+    setPreviewPhaseBadge(phase);
     setPreviewMainImage(state.images.length > 0 ? state.images[0].url : '');
   }
 
@@ -298,7 +383,16 @@
   function removeImage(id) {
     var idx = state.images.findIndex(function (i) { return i.id === id; });
     if (idx >= 0) {
-      URL.revokeObjectURL(state.images[idx].url);
+      var removed = state.images[idx];
+      if (removed.existingId) {
+        removedExistingImageIds.push(removed.existingId);
+      } else if (removed.url && String(removed.url).indexOf('blob:') === 0) {
+        URL.revokeObjectURL(removed.url);
+      }
+      if (idx === 0 && removed.existing && !removed.existingId) {
+        var existingPrimary = form.querySelector('[name="ExistingPrimaryImage"]');
+        if (existingPrimary) existingPrimary.value = '';
+      }
       state.images.splice(idx, 1);
     }
     var input = $('imageInput');
@@ -307,8 +401,16 @@
   }
 
   function clearAllImages() {
-    state.images.forEach(function (img) { URL.revokeObjectURL(img.url); });
+    state.images.forEach(function (img) {
+      if (img.existingId) {
+        removedExistingImageIds.push(img.existingId);
+      } else if (img.url && String(img.url).indexOf('blob:') === 0) {
+        URL.revokeObjectURL(img.url);
+      }
+    });
     state.images = [];
+    var existingPrimary = form.querySelector('[name="ExistingPrimaryImage"]');
+    if (existingPrimary) existingPrimary.value = '';
     var input = $('imageInput');
     if (input) input.value = '';
     renderImagePreviews();
@@ -323,7 +425,12 @@
     state.documents.forEach(function (doc) {
       var li = document.createElement('li');
       li.className = 'flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between';
-      var selectHtml = '<select data-doc-name="' + doc.id + '" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 sm:w-52">';
+      var fileLabel = doc.file ? doc.file.name : (doc.displayName || 'Document');
+      var fileMeta = doc.file
+        ? (doc.file.size / 1024).toFixed(1) + ' KB'
+        : (doc.existing ? 'Existing' : '');
+      var selectHtml = '<select data-doc-name="' + doc.id + '" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 sm:w-52"' +
+        (doc.existing ? ' disabled' : '') + '>';
       DOC_NAME_OPTIONS.forEach(function (option) {
         var selected = option === doc.displayName ? ' selected' : '';
         selectHtml += '<option value="' + option + '"' + selected + '>' + option + '</option>';
@@ -332,8 +439,8 @@
       li.innerHTML =
         '<div class="flex min-w-0 items-center gap-3">' +
         '<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-100 text-xs font-bold text-red-800">PDF</span>' +
-        '<div class="min-w-0"><p class="truncate text-sm font-medium text-slate-800">' + doc.file.name + '</p>' +
-        '<p class="text-xs text-slate-400">' + (doc.file.size / 1024).toFixed(1) + ' KB</p></div></div>' +
+        '<div class="min-w-0"><p class="truncate text-sm font-medium text-slate-800">' + fileLabel + '</p>' +
+        '<p class="text-xs text-slate-400">' + fileMeta + '</p></div></div>' +
         '<div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">' + selectHtml +
         '<button type="button" data-remove-doc="' + doc.id + '" class="shrink-0 cursor-pointer text-xs font-semibold text-red-600 hover:text-red-700">' + t('remove', 'Remove') + '</button></div>';
       list.appendChild(li);
@@ -343,13 +450,17 @@
       select.addEventListener('change', function () {
         var id = select.getAttribute('data-doc-name');
         var doc = state.documents.find(function (d) { return d.id === id; });
-        if (doc) doc.displayName = select.value;
+        if (doc && !doc.existing) doc.displayName = select.value;
       });
     });
 
     list.querySelectorAll('[data-remove-doc]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var id = btn.getAttribute('data-remove-doc');
+        var doc = state.documents.find(function (d) { return d.id === id; });
+        if (doc && doc.existingId) {
+          removedExistingDocumentIds.push(doc.existingId);
+        }
         state.documents = state.documents.filter(function (d) { return d.id !== id; });
         renderDocuments();
       });
@@ -509,7 +620,7 @@
       showError('registrationStartDate', t('errorRegistrationStartRequired', 'Registration start is required'));
       markInvalid($('registrationStartDate'));
       valid = false;
-    } else {
+    } else if (!isEditMode) {
       var registrationStart = new Date(data.registrationStartDate);
       if (registrationStart < now) {
         showError('registrationStartDate', t('errorRegistrationStartPast', 'Registration start cannot be in the past'));
@@ -564,6 +675,7 @@
   }
 
   function saveDraft() {
+    if (isEditMode) return;
     var data = getFormData();
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
@@ -578,6 +690,7 @@
   }
 
   function loadDraft() {
+    if (isEditMode) return;
     try {
       var raw = localStorage.getItem(DRAFT_KEY);
       if (!raw) return;
@@ -659,29 +772,11 @@
   }
 
   function showSuccess(name) {
-    showTopToast('success', tf(t('successCreated', 'Your auction "{0}" has been created successfully!'), name));
     try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
   }
 
   function showTopToast(type, message) {
-    var banner = $('successBanner');
-    var text = $('successMessageText');
-    var icon = banner ? banner.querySelector('svg') : null;
-    if (text) text.textContent = message;
-    if (banner) {
-      banner.className = 'fixed left-1/2 top-24 z-9999 w-[min(92vw,520px)] -translate-x-1/2 rounded-xl border px-5 py-4 text-sm font-semibold shadow-lg';
-      if (type === 'success') {
-        banner.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-800');
-        if (icon) icon.setAttribute('class', 'mt-0.5 h-5 w-5 shrink-0 text-emerald-600');
-      } else {
-        banner.classList.add('border-red-200', 'bg-red-50', 'text-red-700');
-        if (icon) icon.setAttribute('class', 'mt-0.5 h-5 w-5 shrink-0 text-red-600');
-      }
-      banner.classList.remove('hidden');
-      window.setTimeout(function () {
-        banner.classList.add('hidden');
-      }, 5000);
-    }
+    // Server pushes FCM / in-app notifications; keep form-level status only.
   }
 
   function showSubmitStatus(type, message) {
@@ -788,16 +883,49 @@
       var formData = new FormData(form);
 
       formData.delete('PrimaryImageFile');
-      if (state.images.length > 0) {
+      formData.delete('GalleryImageFiles');
+      formData.delete('DocumentFiles');
+      formData.delete('DocumentNames');
+      formData.delete('RemovedGalleryImageIds');
+      formData.delete('RemovedDocumentIds');
+
+      var newImages = state.images.filter(function (img) { return img.file; });
+      var keptPrimaryExisting = state.images.length > 0 && !state.images[0].file
+        ? state.images[0]
+        : null;
+
+      if (newImages.length > 0 && state.images[0] && state.images[0].file) {
         formData.append('PrimaryImageFile', state.images[0].file);
       }
-      for (var i = 1; i < state.images.length; i++) {
-        formData.append('GalleryImageFiles', state.images[i].file);
-      }
-      state.documents.forEach(function (doc) {
-        formData.append('DocumentFiles', doc.file);
-        formData.append('DocumentNames', doc.displayName || 'PSA Certificate');
+
+      state.images.slice(1).forEach(function (img) {
+        if (img.file) {
+          formData.append('GalleryImageFiles', img.file);
+        }
       });
+
+      // If primary was replaced and old primary was an existing gallery item, already tracked in removed list.
+      // Existing gallery removals:
+      removedExistingImageIds.forEach(function (id) {
+        if (id > 0) {
+          formData.append('RemovedGalleryImageIds', String(id));
+        }
+      });
+
+      state.documents.forEach(function (doc) {
+        if (doc.file) {
+          formData.append('DocumentFiles', doc.file);
+          formData.append('DocumentNames', doc.displayName || 'PSA Certificate');
+        }
+      });
+
+      removedExistingDocumentIds.forEach(function (id) {
+        formData.append('RemovedDocumentIds', String(id));
+      });
+
+      if (keptPrimaryExisting) {
+        // no-op: ExistingPrimaryImage hidden field already on form
+      }
 
       var productName = data.productName || t('productNameDefault', 'Product name');
 
@@ -817,8 +945,70 @@
     });
   }
 
+  function lockField(id) {
+    var el = $(id);
+    if (!el) return;
+    el.readOnly = true;
+    el.classList.add('bg-slate-100', 'cursor-not-allowed');
+    if (el.tagName === 'SELECT') {
+      el.disabled = true;
+    }
+  }
+
+  function applyEditLocks() {
+    if (!isEditMode) return;
+
+    if (locks.registrationDates) {
+      lockField('registrationStartDate');
+      lockField('registrationEndDate');
+    }
+
+    if (locks.liveStartDate) {
+      lockField('startDate');
+    }
+
+    if (locks.startingPrice) {
+      lockField('startingPrice');
+    }
+
+    if (locks.bidStep) {
+      lockField('bidStep');
+    }
+  }
+
+  function seedExistingMedia() {
+    if (!isEditMode) return;
+
+    var existingImages = pageConfig.existingImages || [];
+    existingImages.forEach(function (item, index) {
+      state.images.push({
+        id: 'existing_img_' + (item.id || index) + '_' + index,
+        existingId: item.isPrimary ? 0 : (item.id || 0),
+        file: null,
+        url: item.url,
+        existing: true
+      });
+    });
+
+    var existingDocuments = pageConfig.existingDocuments || [];
+    existingDocuments.forEach(function (item, index) {
+      state.documents.push({
+        id: 'existing_doc_' + item.id + '_' + index,
+        existingId: item.id,
+        file: null,
+        displayName: item.name || 'PSA Certificate',
+        existing: true
+      });
+    });
+
+    renderImagePreviews();
+    renderDocuments();
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     bindEvents();
+    applyEditLocks();
+    seedExistingMedia();
     initEditor();
     if (!state.editor) {
       loadDraft();

@@ -224,7 +224,7 @@
   </data>
   <data name="Sell_PageTitle" xml:space="preserve"><value>Sell Your Card</value></data>
   <data name="Sell_SuccessMessage" xml:space="preserve"><value>Your auction has been created successfully!</value></data>
-  <data name="Sell_SubmittedForReview" xml:space="preserve"><value>Listing submitted for review. Our specialists will verify it before it goes live.</value></data>
+  <data name="Sell_SubmittedForReview" xml:space="preserve"><value>Your listing is confirming / awaiting admin confirmation. Our specialists will verify it before it goes live.</value></data>
   <data name="Sell_ViewAuctions" xml:space="preserve"><value>View auctions →</value></data>
   <data name="Sell_DraftSaved" xml:space="preserve"><value>Draft saved locally. You can continue editing anytime.</value></data>
   <data name="Sell_Heading" xml:space="preserve"><value>List Your Rare Collectible</value></data>
@@ -453,6 +453,9 @@
   <data name="Auction_Phase_registration_closed" xml:space="preserve"><value>Awaiting Live</value></data>
   <data name="Auction_Phase_live_auction" xml:space="preserve"><value>Live Now</value></data>
   <data name="Auction_Phase_live_ending_soon" xml:space="preserve"><value>Ending Soon</value></data>
+  <data name="Auction_Phase_upcoming" xml:space="preserve"><value>Upcoming</value></data>
+  <data name="Auction_Phase_ended" xml:space="preserve"><value>Ended</value></data>
+  <data name="Auction_Phase_not_listed" xml:space="preserve"><value>Not listed</value></data>
   <data name="Auction_Countdown_RegistrationStart" xml:space="preserve"><value>Registration opens in</value></data>
   <data name="Auction_Countdown_RegistrationEnd" xml:space="preserve"><value>Registration closes in</value></data>
   <data name="Auction_Countdown_LiveStart" xml:space="preserve"><value>Live starts in</value></data>
@@ -565,11 +568,17 @@
   <data name="AboutUs_Team_Title" xml:space="preserve"><value>The curators</value></data>
   <data name="AboutUs_Team_Desc" xml:space="preserve"><value>Our team brings over 30 years of combined experience in the global collectibles market.</value></data>
   <data name="AboutUs_Team_Member1_Title" xml:space="preserve"><value>Founder &amp; CEO</value></data>
-  <data name="AboutUs_Team_Member1_Bio" xml:space="preserve"><value>Former auction house director with 20 years in high-value collectibles. Julian founded CardMarket to bridge traditional heritage and digital precision.</value></data>
+  <data name="AboutUs_Team_Member1_Bio" xml:space="preserve"><value>Leads product vision and marketplace strategy for CardMarket. Phạm Việt Anh connects collectors with trusted high-value listings.</value></data>
   <data name="AboutUs_Team_Member2_Title" xml:space="preserve"><value>Head of curation</value></data>
-  <data name="AboutUs_Team_Member2_Bio" xml:space="preserve"><value>Expert in modern TCG history. Elena leads specialists vetting every listing for historical significance.</value></data>
+  <data name="AboutUs_Team_Member2_Bio" xml:space="preserve"><value>Oversees listing quality and collectible authenticity standards. Danil Fomin Long ensures every card meets vault-grade criteria.</value></data>
   <data name="AboutUs_Team_Member3_Title" xml:space="preserve"><value>Technical director</value></data>
-  <data name="AboutUs_Team_Member3_Bio" xml:space="preserve"><value>Architect of our authentication engine. Marcus ensures every transaction is backed by immutable verification.</value></data>
+  <data name="AboutUs_Team_Member3_Bio" xml:space="preserve"><value>Owns platform architecture and auction reliability. Nguyễn Văn Hưng keeps bidding, payments, and verification running smoothly.</value></data>
+  <data name="AboutUs_Team_Member4_Title" xml:space="preserve"><value>Marketplace operations</value></data>
+  <data name="AboutUs_Team_Member4_Bio" xml:space="preserve"><value>Coordinates seller onboarding and live auction operations. Đinh Văn Hải keeps the marketplace moving day to day.</value></data>
+  <data name="AboutUs_Team_Member5_Title" xml:space="preserve"><value>Trust &amp; compliance</value></data>
+  <data name="AboutUs_Team_Member5_Bio" xml:space="preserve"><value>Focuses on fraud prevention and listing verification. Nguyễn Hữu Quân protects buyers and sellers across every deal.</value></data>
+  <data name="AboutUs_Team_Member6_Title" xml:space="preserve"><value>Growth &amp; community</value></data>
+  <data name="AboutUs_Team_Member6_Bio" xml:space="preserve"><value>Builds collector community and go-to-market programs. Nguyễn Giang Hà helps new sellers and bidders succeed on CardMarket.</value></data>
   <data name="AboutUs_Newsletter_Title" xml:space="preserve"><value>Stay informed on the next big drop</value></data>
   <data name="AboutUs_Newsletter_Desc" xml:space="preserve"><value>Join our newsletter for early access to curated collections and market insights.</value></data>
   <data name="AboutUs_Newsletter_Placeholder" xml:space="preserve"><value>Your email address</value></data>
@@ -859,13 +868,19 @@
   <data name="User_CurrentBid" xml:space="preserve"><value>Current Bid</value></data>
   <data name="User_Ends" xml:space="preserve"><value>Ends</value></data>
   <data name="User_ViewDetail" xml:space="preserve"><value>View Detail</value></data>
-  <data name="User_CancelListing" xml:space="preserve"><value>Cancel</value></data>
+  <data name="User_CancelListing" xml:space="preserve"><value>Remove</value></data>
+  <data name="User_CancelListingConfirm" xml:space="preserve"><value>Remove this listing? It will be removed from the marketplace.</value></data>
+  <data name="User_EditListing" xml:space="preserve"><value>Edit</value></data>
   <data name="User_CancelConfirm" xml:space="preserve"><value>Cancel this auction listing?</value></data>
   <data name="User_Status_Active" xml:space="preserve"><value>Active Auction</value></data>
   <data name="User_Status_EndingSoon" xml:space="preserve"><value>Ending Soon</value></data>
   <data name="User_Status_Completed" xml:space="preserve"><value>Completed</value></data>
   <data name="UserAuction_EditTitle" xml:space="preserve"><value>Edit Auction</value></data>
-  <data name="UserAuction_EditDesc" xml:space="preserve"><value>Only live auctions without bids can be edited.</value></data>
+  <data name="UserAuction_EditDesc" xml:space="preserve"><value>Update your listing details. Registration dates and starting price may be locked after registration opens or bids are placed.</value></data>
+  <data name="UserAuction_EditPhaseLockHint" xml:space="preserve"><value>Some schedule or pricing fields are locked for this phase. You can still extend the live end date.</value></data>
+  <data name="UserBuyNow_EditTitle" xml:space="preserve"><value>Edit Buy Now</value></data>
+  <data name="UserBuyNow_EditDesc" xml:space="preserve"><value>Update your Buy Now listing details and price.</value></data>
+  <data name="UserBuyNow_EditPriceLockHint" xml:space="preserve"><value>The price is locked for this listing phase. You can still update product details and images.</value></data>
   <data name="UserAuction_ProductName" xml:space="preserve"><value>Product Name</value></data>
   <data name="UserAuction_ShortDescription" xml:space="preserve"><value>Short Description</value></data>
   <data name="UserAuction_SetName" xml:space="preserve"><value>Set Name</value></data>
@@ -876,6 +891,13 @@
   <data name="UserAuction_StartDate" xml:space="preserve"><value>Start Date</value></data>
   <data name="UserAuction_EndDate" xml:space="preserve"><value>End Date</value></data>
   <data name="UserAuction_SaveChanges" xml:space="preserve"><value>Save Changes</value></data>
+  <data name="UserAuction_SaveSuccess" xml:space="preserve"><value>Listing updated successfully.</value></data>
+  <data name="UserAuction_SaveFailed" xml:space="preserve"><value>Could not update the listing. Please try again.</value></data>
+  <data name="UserAuction_ReadyToSave_Highlight" xml:space="preserve"><value>Ready to save?</value></data>
+  <data name="UserAuction_ReadyToSave" xml:space="preserve"><value>Review the preview, then save your changes.</value></data>
+  <data name="ConfirmModal_EditAuction_Title" xml:space="preserve"><value>Save listing changes?</value></data>
+  <data name="ConfirmModal_EditAuction_Message" xml:space="preserve"><value>You are about to save updates for "{0}".</value></data>
+  <data name="ConfirmModal_EditAuction_Note" xml:space="preserve"><value>Rejected listings will be resubmitted for admin confirmation.</value></data>
   <data name="Sell_AuctionHeader_Label" xml:space="preserve"><value>Seller Dashboard</value></data>
   <data name="Sell_AuctionHeader_Title" xml:space="preserve"><value>Create New Auction</value></data>
   <data name="Sell_AuctionHeader_Desc" xml:space="preserve"><value>Sell your product through auction. Complete the form below and review your listing before publishing.</value></data>
@@ -908,6 +930,7 @@
   <data name="Js_Order_NoSelection" xml:space="preserve"><value>Please select at least one product to pay.</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Placing bid…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Unable to place bid. Please try again.</value></data>
+  <data name="Js_ProductDetail_BidTooLow" xml:space="preserve"><value>Your bid must be at least {0}. Please enter a higher amount.</value></data>
   <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Bid placed successfully!</value></data>
   <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>Auction ended</value></data>
   <data name="Js_ProductDetail_Registering" xml:space="preserve"><value>Registering…</value></data>
@@ -963,9 +986,28 @@
   <data name="User_Stat_Completed" xml:space="preserve"><value>Completed</value></data>
   <data name="User_Stat_TotalSales" xml:space="preserve"><value>Total Sales</value></data>
   <data name="User_Stat_SuccessRate" xml:space="preserve"><value>Success Rate</value></data>
+  <data name="User_Stat_PaidOrders" xml:space="preserve"><value>Paid Orders</value></data>
+  <data name="User_Stat_GrossSales" xml:space="preserve"><value>Gross Sales</value></data>
+  <data name="User_Stat_SellerFee" xml:space="preserve"><value>Seller Fees</value></data>
+  <data name="User_Stat_NetProceeds" xml:space="preserve"><value>Net Proceeds</value></data>
+  <data name="User_Stat_NetProceedsNote" xml:space="preserve"><value>After platform fees on paid orders</value></data>
+  <data name="User_Role_User" xml:space="preserve"><value>Member</value></data>
+  <data name="User_Role_Admin" xml:space="preserve"><value>Admin</value></data>
+  <data name="User_ContactInfo" xml:space="preserve"><value>Contact</value></data>
+  <data name="User_ContactPrivate" xml:space="preserve"><value>Only visible to the account owner</value></data>
+  <data name="User_BasicInformation_PublicDesc" xml:space="preserve"><value>Public profile information</value></data>
   <data name="User_NotUpdated" xml:space="preserve"><value>Not updated</value></data>
+  <data name="User_BasicInformation_EditDesc" xml:space="preserve"><value>Update your contact details and profile photo</value></data>
+  <data name="User_ChangeAvatar" xml:space="preserve"><value>Change photo</value></data>
+  <data name="User_EditProfileHint" xml:space="preserve"><value>Use the camera icon to change your avatar, then save below.</value></data>
+  <data name="User_AvatarHint" xml:space="preserve"><value>JPG, PNG, or WEBP · max 2MB</value></data>
+  <data name="User_PhoneHint" xml:space="preserve"><value>9–12 digits, numbers only</value></data>
+  <data name="User_SaveProfile" xml:space="preserve"><value>Save changes</value></data>
+  <data name="User_EditProfile" xml:space="preserve"><value>Edit</value></data>
+  <data name="User_CancelEditProfile" xml:space="preserve"><value>Cancel</value></data>
   <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
-  <data name="User_Status_PendingReview" xml:space="preserve"><value>Pending Review</value></data>
+  <data name="User_Status_PendingReview" xml:space="preserve"><value>Confirming</value></data>
+  <data name="User_Status_Confirming" xml:space="preserve"><value>Confirming</value></data>
   <data name="User_Status_Rejected" xml:space="preserve"><value>Rejected</value></data>
   <data name="User_Status_Scheduled" xml:space="preserve"><value>Scheduled</value></data>
   <data name="User_RejectReason" xml:space="preserve"><value>Rejected: {0}</value></data>
@@ -976,13 +1018,14 @@
   <data name="SellBuyNow_Section3_Desc" xml:space="preserve"><value>Set the fixed price for your product</value></data>
   <data name="SellBuyNow_Price" xml:space="preserve"><value>Price</value></data>
   <data name="SellBuyNow_PriceHint" xml:space="preserve"><value>This is the price buyers will pay to purchase instantly.</value></data>
+  <data name="SellBuyNow_Preview_Title" xml:space="preserve"><value>Product Preview</value></data>
   <data name="SellBuyNow_Preview_Desc" xml:space="preserve"><value>Preview how your listing will appear on Buy Now</value></data>
   <data name="SellBuyNow_Preview_ReviewNote" xml:space="preserve"><value>Review your listing details before publishing. Fixed-price listings appear on the Buy Now marketplace.</value></data>
   <data name="SellBuyNow_ReadyToPublish_Highlight" xml:space="preserve"><value>Ready to publish?</value></data>
   <data name="SellBuyNow_ReadyToPublish" xml:space="preserve"><value>Your listing will appear on Buy Now immediately.</value></data>
   <data name="SellBuyNow_CreateListing" xml:space="preserve"><value>Publish Listing</value></data>
   <data name="SellBuyNow_SuccessMessage" xml:space="preserve"><value>Buy now listing created successfully.</value></data>
-  <data name="SellBuyNow_SubmittedForReview" xml:space="preserve"><value>Listing submitted for review. Our specialists will verify it before it goes live.</value></data>
+  <data name="SellBuyNow_SubmittedForReview" xml:space="preserve"><value>Your listing is confirming / awaiting admin confirmation. Our specialists will verify it before it goes live.</value></data>
   <data name="SellBuyNow_Success_Created" xml:space="preserve"><value>Your listing "{0}" has been created successfully!</value></data>
   <data name="SellBuyNow_Error_CreateFailed" xml:space="preserve"><value>Could not create listing.</value></data>
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>Price must be greater than 0</value></data>
@@ -1043,7 +1086,7 @@
   <data name="Admin_Dashboard_Filter_Error_DateFromAfterDateTo" xml:space="preserve"><value>The start date must be on or before the end date.</value></data>
   <data name="Admin_Dashboard_Filter_Error_RangeTooLong" xml:space="preserve"><value>Date range cannot exceed 365 days.</value></data>
   <data name="Admin_Dashboard_Filter_Loading" xml:space="preserve"><value>Loading...</value></data>
-  <data name="Admin_Dashboard_Snapshot_Note" xml:space="preserve"><value>At current time</value></data>
+  <data name="Admin_Dashboard_Snapshot_Note" xml:space="preserve"><value>As of now (not filtered by date range)</value></data>
   <data name="Admin_Dashboard_FilteredPeriod_Note" xml:space="preserve"><value>Within selected date range</value></data>
   <data name="Admin_Dashboard_ChangeVsPrevious" xml:space="preserve"><value>vs previous period</value></data>
   <data name="Admin_Dashboard_NoData" xml:space="preserve"><value>No data for selected period</value></data>
@@ -1053,7 +1096,8 @@
   <data name="Admin_Dashboard_Kpi_OngoingAuctions" xml:space="preserve"><value>Ongoing Auctions</value></data>
   <data name="Admin_Dashboard_Kpi_EndedAuctions" xml:space="preserve"><value>Ended Auctions</value></data>
   <data name="Admin_Dashboard_Kpi_CancelledAuctions" xml:space="preserve"><value>Cancelled Auctions</value></data>
-  <data name="Admin_Dashboard_Kpi_PendingReview" xml:space="preserve"><value>Pending Review</value></data>
+  <data name="Admin_Dashboard_Kpi_PendingReview" xml:space="preserve"><value>Confirming</value></data>
+  <data name="Admin_Auction_Status_Confirming" xml:space="preserve"><value>Confirming</value></data>
   <data name="Admin_Dashboard_Kpi_SuccessRate" xml:space="preserve"><value>Success Rate</value></data>
   <data name="Admin_Dashboard_SuccessRate_Tooltip" xml:space="preserve"><value>Sold listings / total listed auctions × 100. Paid or delivered orders only.</value></data>
   <data name="Admin_Dashboard_SuccessRate_Hint" xml:space="preserve"><value>Sold listings / total listed</value></data>
@@ -1098,8 +1142,10 @@
   <data name="Admin_Dashboard_Kpi_CompletedOrders" xml:space="preserve"><value>Completed Orders</value></data>
   <data name="Admin_Dashboard_RevenueSection_Title" xml:space="preserve"><value>Revenue</value></data>
   <data name="Admin_Dashboard_RevenueSection_Description" xml:space="preserve"><value>Total transaction value and marketplace commission.</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Commission = buyer checkout fees + seller success fees from paid/delivered orders.</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV is the sum of successful payments in the period. Commission is marketplace fees only: buyer checkout fees (PlatformFee) + seller success fees (SellerFee) on paid/delivered orders. Registration deposits are not included.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>GMV ≠ profit. Commission = buyer + seller fees on paid/delivered orders. Deposits excluded.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV = SUM(successful payments.amount in period) + paid/delivered orders without a success payment row (COD gap). Commission = PlatformFee + SellerFee on those paid orders. Seller Proceeds = SUM(seller_proceeds). Registration deposits are never included in GMV or commission.</value></data>
+  <data name="Admin_Dashboard_Gmv_Hint" xml:space="preserve"><value>Gross merchandise volume in the selected period (not platform profit).</value></data>
+  <data name="Admin_Dashboard_Kpi_PendingVerification" xml:space="preserve"><value>Pending verification</value></data>
   <data name="Admin_Dashboard_Revenue_NoFeeData" xml:space="preserve"><value>No platform fee data yet</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Title" xml:space="preserve"><value>GMV vs Platform Revenue</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Description" xml:space="preserve"><value>Click a point to filter the detail table by day.</value></data>
@@ -1305,4 +1351,75 @@
   <data name="Notification_OrderCancelled_Title" xml:space="preserve"><value>Order cancelled</value></data>
   <data name="Notification_OrderCancelledBuyer_Message" xml:space="preserve"><value>Order {1} for {0} was cancelled because the payment deadline passed.</value></data>
   <data name="Notification_OrderCancelledSeller_Message" xml:space="preserve"><value>Order {1} for {0} was cancelled because the winner did not pay before the deadline.</value></data>
+  <data name="Notification_AuctionWonDepositCovered_Message" xml:space="preserve"><value>Congratulations! You won {0}. Your registration deposit covered the order.</value></data>
+  <data name="Notification_BuyNowOrderCreated_Title" xml:space="preserve"><value>Order created</value></data>
+  <data name="Notification_BuyNowOrderCreated_Message" xml:space="preserve"><value>{0} was added to your orders. Complete payment before the deadline.</value></data>
+  <data name="Notification_DepositRefunded_Title" xml:space="preserve"><value>Deposit refunded</value></data>
+  <data name="Notification_DepositRefunded_Message" xml:space="preserve"><value>Your deposit refund of ${0} for {1} has been processed.</value></data>
+  <data name="Notification_RegistrationCancelled_Title" xml:space="preserve"><value>Registration cancelled</value></data>
+  <data name="Notification_RegistrationCancelledWithRefund_Message" xml:space="preserve"><value>Your registration for {0} was cancelled. Deposit of ${1} has been refunded.</value></data>
+  <data name="Notification_RegistrationCancelledNoRefund_Message" xml:space="preserve"><value>Your registration for {0} was cancelled.</value></data>
+  <data name="Notification_RegistrationCancelFailed_Title" xml:space="preserve"><value>Could not cancel registration</value></data>
+  <data name="Notification_AuctionEndingSoon_Title" xml:space="preserve"><value>Auction ending soon</value></data>
+  <data name="Notification_AuctionEndingSoon_Message" xml:space="preserve"><value>{0} ends within the next hour.</value></data>
+  <data name="Notification_AuctionStartingSoon_Title" xml:space="preserve"><value>Auction starting soon</value></data>
+  <data name="Notification_AuctionStartingSoon_Message" xml:space="preserve"><value>{0} goes live at {1}. Get ready to bid.</value></data>
+  <data name="Notification_PaymentFailed_Title" xml:space="preserve"><value>Payment failed</value></data>
+  <data name="Notification_PaymentCancelled_Title" xml:space="preserve"><value>Payment cancelled</value></data>
+  <data name="Notification_PaymentCancelled_Message" xml:space="preserve"><value>PayPal payment was cancelled. Your order is still pending payment.</value></data>
+  <data name="Notification_PaymentMissingToken_Message" xml:space="preserve"><value>PayPal did not return a valid checkout token.</value></data>
+  <data name="Notification_PaymentCouldNotComplete_Message" xml:space="preserve"><value>Payment could not be completed.</value></data>
+  <data name="Notification_PaymentUnableStartCheckout_Message" xml:space="preserve"><value>Unable to start PayPal checkout.</value></data>
+  <data name="Notification_PaymentCompleteFields_Message" xml:space="preserve"><value>Please complete all required fields.</value></data>
+  <data name="Notification_PaymentSuccessCod_Message" xml:space="preserve"><value>Your COD order has been confirmed. View your order confirmation.</value></data>
+  <data name="Notification_PaymentSuccessSimple_Message" xml:space="preserve"><value>Your payment has been confirmed. View your order confirmation.</value></data>
+  <data name="Notification_AuctionNowLive_Title" xml:space="preserve"><value>Auction is now live</value></data>
+  <data name="Notification_AuctionNowLive_Message" xml:space="preserve"><value>{0} is now open for bidding.</value></data>
+  <data name="Notification_ListingApproved_Title" xml:space="preserve"><value>Listing approved</value></data>
+  <data name="Notification_ListingApproved_Message" xml:space="preserve"><value>Your listing has been approved and is now live on the marketplace.</value></data>
+  <data name="Notification_ListingRejected_Title" xml:space="preserve"><value>Listing rejected</value></data>
+  <data name="Notification_ListingRejected_Message" xml:space="preserve"><value>Your listing was rejected. Reason: {0}</value></data>
+  <data name="Notification_ListingSubmitted_Title" xml:space="preserve"><value>Listing confirming</value></data>
+  <data name="Notification_ListingSubmitted_Message" xml:space="preserve"><value>Your listing is confirming / awaiting admin confirmation.</value></data>
+  <data name="Notification_ListingUpdated_Title" xml:space="preserve"><value>Listing updated</value></data>
+  <data name="Notification_ListingUpdated_Message" xml:space="preserve"><value>Your listing was updated successfully.</value></data>
+  <data name="Notification_ListingCancelled_Title" xml:space="preserve"><value>Listing cancelled</value></data>
+  <data name="Notification_ListingCancelFailed_Title" xml:space="preserve"><value>Could not cancel listing</value></data>
+  <data name="Notification_ListingCancelled_Message" xml:space="preserve"><value>Auction cancelled successfully.</value></data>
+  <data name="Notification_RefundSubmitted_Title" xml:space="preserve"><value>Refund request submitted</value></data>
+  <data name="Notification_RefundSubmitted_Message" xml:space="preserve"><value>Your refund request {0} has been received and is pending review.</value></data>
+  <data name="Notification_RefundApproved_Title" xml:space="preserve"><value>Refund request approved</value></data>
+  <data name="Notification_RefundApproved_Message" xml:space="preserve"><value>Your refund request has been approved.</value></data>
+  <data name="Notification_RefundRejected_Title" xml:space="preserve"><value>Refund request rejected</value></data>
+  <data name="Notification_RefundRejected_Message" xml:space="preserve"><value>Your refund request has been rejected.</value></data>
+  <data name="Notification_RefundUnderReview_Title" xml:space="preserve"><value>Refund request under review</value></data>
+  <data name="Notification_RefundUnderReview_Message" xml:space="preserve"><value>Your refund request is now under review. We will update you when a decision is made.</value></data>
+  <data name="Notification_RefundClosed_Title" xml:space="preserve"><value>Refund request closed</value></data>
+  <data name="Notification_RefundClosed_Message" xml:space="preserve"><value>Your refund request has been closed.</value></data>
+  <data name="Notification_BidFailed_Title" xml:space="preserve"><value>Bid failed</value></data>
+  <data name="Notification_BidPlaced_Title" xml:space="preserve"><value>Bid placed</value></data>
+  <data name="Notification_BidPlaced_Message" xml:space="preserve"><value>Your bid of ${0} on {1} was placed successfully.</value></data>
+  <data name="Notification_NewBid_Title" xml:space="preserve"><value>New bid on your listing</value></data>
+  <data name="Notification_NewBid_Message" xml:space="preserve"><value>Someone bid ${0} on {1}.</value></data>
+  <data name="Notification_Outbid_Title" xml:space="preserve"><value>You've been outbid</value></data>
+  <data name="Notification_Outbid_Message" xml:space="preserve"><value>Someone placed a higher bid on {0}.</value></data>
+  <data name="Notification_PaymentDeadlineExpired_Title" xml:space="preserve"><value>Payment deadline expired</value></data>
+  <data name="Notification_PaymentDeadlineExpiredForfeited_Message" xml:space="preserve"><value>You did not complete payment for {0} within 48 hours. Your registration deposit of ${1} has been forfeited per platform policy.</value></data>
+  <data name="Notification_PaymentDeadlineExpired_Message" xml:space="preserve"><value>You did not complete payment for {0} within 48 hours. This auction win has expired.</value></data>
+  <data name="Notification_SecondChance_Title" xml:space="preserve"><value>Second chance to win</value></data>
+  <data name="Notification_SecondChance_Message" xml:space="preserve"><value>The original winner did not pay for {0}. You are now the highest eligible bidder. Complete payment within {1} hours.</value></data>
+  <data name="Notification_BuyerDidNotPay_Title" xml:space="preserve"><value>Buyer did not pay</value></data>
+  <data name="Notification_BuyerDidNotPaySecondChance_Message" xml:space="preserve"><value>The winning buyer did not pay for {0}. A second-chance offer has been sent to the next highest bidder.</value></data>
+  <data name="Notification_BuyerDidNotPayRelist_Title" xml:space="preserve"><value>Buyer did not pay — relist available</value></data>
+  <data name="Notification_BuyerDidNotPayRelist_Message" xml:space="preserve"><value>The winning buyer did not pay for {0}. No eligible second-chance bidder was available. You can relist this item.</value></data>
+  <data name="Notification_DepositRequestCreated_Title" xml:space="preserve"><value>Deposit request created</value></data>
+  <data name="Notification_DepositRequestCreated_Message" xml:space="preserve"><value>Deposit request created. Please complete payment via PayPal.</value></data>
+  <data name="Notification_DepositPaid_Title" xml:space="preserve"><value>Deposit paid</value></data>
+  <data name="Notification_DepositPaid_Message" xml:space="preserve"><value>Your registration for {0} is confirmed. Deposit of ${1} was received.</value></data>
+  <data name="Notification_DepositCancelled_Title" xml:space="preserve"><value>Deposit cancelled</value></data>
+  <data name="Notification_DepositCancelled_Message" xml:space="preserve"><value>You cancelled the deposit payment.</value></data>
+  <data name="Notification_DepositFailed_Title" xml:space="preserve"><value>Deposit failed</value></data>
+  <data name="Notification_PayPalAnomalyAutoRefund_Title" xml:space="preserve"><value>PayPal capture anomaly auto-refunded</value></data>
+  <data name="Notification_PayPalAnomalyManual_Title" xml:space="preserve"><value>PayPal capture anomaly requires manual recovery</value></data>
+  <data name="Notification_PayPalAnomaly_Message" xml:space="preserve"><value>Flow={0}; PayPalOrderId={1}; CaptureId={2}; Expected={3}; Captured={4}; Reason={5}; RefundSucceeded={6}; RefundError={7}</value></data>
 </root>

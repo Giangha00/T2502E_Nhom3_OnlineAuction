@@ -68,7 +68,21 @@ public static class ListingTypes
 
 public static class AuctionStatuses
 {
-    public const string PendingReview = "pending_review";
+    /// <summary>
+    /// Awaiting admin confirmation; not publicly listed.
+    /// </summary>
+    public const string Confirming = "confirming";
+
+    /// <summary>
+    /// Temporary alias for <see cref="Confirming"/> during the pending_review → confirming rename.
+    /// </summary>
+    public const string PendingReview = Confirming;
+
+    /// <summary>
+    /// Legacy DB value before RenamePendingReviewToConfirming migration.
+    /// </summary>
+    public const string LegacyPendingReview = "pending_review";
+
     public const string Rejected = "rejected";
     public const string Scheduled = "scheduled";
     public const string Live = "live";
@@ -80,7 +94,7 @@ public static class AuctionStatuses
 
     public static readonly string[] All =
     [
-        PendingReview,
+        Confirming,
         Rejected,
         Scheduled,
         Live,
@@ -90,4 +104,17 @@ public static class AuctionStatuses
         Completed,
         Cancelled
     ];
+
+    /// <summary>
+    /// Statuses that mean "awaiting admin confirmation" (includes pre-migration rows).
+    /// </summary>
+    public static readonly string[] ConfirmingStatuses =
+    [
+        Confirming,
+        LegacyPendingReview
+    ];
+
+    public static bool IsConfirming(string? status) =>
+        !string.IsNullOrWhiteSpace(status) &&
+        ConfirmingStatuses.Contains(status, StringComparer.OrdinalIgnoreCase);
 }

@@ -1,4 +1,5 @@
 ﻿using OnlineAuction.Areas.Admin.ViewModels.Users;
+using OnlineAuction.Models;
 using AdminUserDetailViewModel = OnlineAuction.Areas.Admin.ViewModels.Users.UserDetailViewModel;
 using PublicUserDetailViewModel = OnlineAuction.Models.UserDetailViewModel;
 
@@ -7,6 +8,8 @@ namespace OnlineAuction.Services.Interfaces;
 public interface IUserService
 {
     Task<PublicUserDetailViewModel?> GetPublicProfileAsync(int id, int? viewerUserId = null);
+
+    Task<(bool Success, string Message)> UpdateOwnProfileAsync(int userId, UserProfileEditViewModel model);
 
     Task<UserListViewModel> GetUsersAsync(UserFilterViewModel filter);
 

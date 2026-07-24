@@ -7,6 +7,7 @@ using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Areas.Admin.Controllers;
 
+[RequirePermission(PermissionCodes.ProductsManage)]
 public class ProductController : BaseAdminController
 {
     private readonly IAdminProductService _productService;

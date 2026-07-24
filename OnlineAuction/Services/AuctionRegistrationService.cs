@@ -20,17 +20,20 @@ public class AuctionRegistrationService : IAuctionRegistrationService
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IRegistrationDepositRefundService _depositRefundService;
     private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<AuctionRegistrationService> _logger;
 
     public AuctionRegistrationService(
         AuctionHouseDbContext dbContext,
         IRegistrationDepositRefundService depositRefundService,
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         ILogger<AuctionRegistrationService> logger)
     {
         _dbContext = dbContext;
         _depositRefundService = depositRefundService;
         _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
     }
 
@@ -229,17 +232,20 @@ public class AuctionRegistrationService : IAuctionRegistrationService
             .Include(a => a.Product)
             .FirstOrDefaultAsync(a => a.Id == auctionId);
 
-        var productName = auctionForNotification?.Product?.Name ?? "the auction";
+        var productName = auctionForNotification?.Product?.Name ?? "phiên đấu giá";
         var notificationMessage = refundedAmount.HasValue
-            ? $"Your registration for {productName} was cancelled. Deposit of ${refundedAmount.Value:N0} has been refunded."
-            : $"Your registration for {productName} was cancelled.";
+            ? _notifyLocalizer.Format(NotificationKeys.RegistrationCancelledWithRefundMessage, productName, refundedAmount.Value)
+            : _notifyLocalizer.Format(NotificationKeys.RegistrationCancelledNoRefundMessage, productName);
 
         await _notificationService.CreateAndPushAsync(
             userId,
-            "Registration cancelled",
+            _notifyLocalizer[NotificationKeys.RegistrationCancelledTitle],
             notificationMessage,
             NotificationType.Auction,
             $"/Auction/Detail/{auctionId}",
+            NotificationReferenceTypes.AuctionRegistrationCancelled,
+            auctionId,
+            debounceWindow: TimeSpan.FromMinutes(2),
             cancellationToken: default);
 
         return AuctionRegistrationResult.Ok(
@@ -294,11 +300,12 @@ public class AuctionRegistrationService : IAuctionRegistrationService
             return "This auction does not require registration. You can place a bid directly.";
         }
 
-        if (auction.Status is AuctionStatuses.PendingReview or AuctionStatuses.Rejected or AuctionStatuses.Cancelled)
+        if (auction.Status is AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview
+            or AuctionStatuses.Rejected or AuctionStatuses.Cancelled)
         {
             return auction.Status switch
             {
-                AuctionStatuses.PendingReview => "This auction is pending review.",
+                AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview => "This auction is confirming and not yet open for registration.",
                 AuctionStatuses.Rejected => "This auction listing was rejected.",
                 AuctionStatuses.Cancelled => "This auction has been cancelled.",
                 _ => "This auction is not open for registration."

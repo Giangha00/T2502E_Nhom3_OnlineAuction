@@ -1,95 +1,122 @@
-@model OnlineAuction.Areas.Admin.ViewModels.Users.UserDetailViewModel
+@model OnlineAuction.Areas.Admin.ViewModels.Users.UserDetailsPageViewModel
+@using OnlineAuction.Enums
 
 @{
     ViewData["Title"] = "User Details";
     ViewData["AdminPage"] = "users";
+    var profile = Model.Profile;
+
+    string StatusClass(UserStatus status) => status switch
+    {
+        UserStatus.Active => "bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-500",
+        UserStatus.Inactive => "bg-warning-50 text-warning-700 dark:bg-warning-500/15 dark:text-warning-400",
+        _ => "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-gray-400"
+    };
+
+    string RoleClass(UserRole role) => role == UserRole.Admin
+        ? "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400"
+        : "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-gray-400";
 }
 
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">User Details</h2>
-            <p class="text-theme-sm text-gray-500 dark:text-gray-400">View account profile and activity summary.</p>
+            <p class="text-theme-sm text-gray-500 dark:text-gray-400">View and update this account’s profile.</p>
         </div>
 
-        <div class="flex gap-3">
-            <a asp-area="Admin"
-               asp-controller="User"
-               asp-action="Edit"
-               asp-route-id="@Model.Id"
-               class="admin-icon-action admin-icon-action--edit admin-icon-action--lg"
-               title="Edit"
-               aria-label="Edit">
-                <partial name="_AdminIcon" model='"pencil"' />
-            </a>
-
-            <a asp-area="Admin"
-               asp-controller="User"
-               asp-action="Index"
-               class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg"
-               title="Back"
-               aria-label="Back">
-                <partial name="_AdminIcon" model='"arrow-left"' />
-            </a>
-        </div>
+        <a asp-area="Admin"
+           asp-controller="User"
+           asp-action="Index"
+           class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg"
+           title="Back"
+           aria-label="Back">
+            <partial name="_AdminIcon" model='"arrow-left"' />
+        </a>
     </div>
 
-    <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-        <div class="mb-6 flex items-center gap-4">
-            <img src="@(Model.AvatarUrl ?? "/admin/images/user/user-01.jpg")"
-                 alt="@Model.FullName"
-                 class="h-20 w-20 rounded-full object-cover" />
+    <partial name="_AdminFlashMessages" />
 
-            <div>
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-white/90">@Model.FullName</h3>
-                <p class="text-theme-sm text-gray-500 dark:text-gray-400">@Model.Email</p>
+    <div class="mb-6 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-center gap-4">
+                <img src="@(profile.AvatarUrl ?? "/admin/images/user/user-01.jpg")"
+                     alt="@profile.FullName"
+                     class="h-20 w-20 rounded-full object-cover" />
+
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white/90">@profile.FullName</h3>
+                    <p class="text-theme-sm text-gray-500 dark:text-gray-400">@profile.Email</p>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        <span class="inline-flex rounded-full px-2.5 py-0.5 text-theme-xs font-medium @RoleClass(profile.Role)">@profile.Role</span>
+                        <span class="inline-flex rounded-full px-2.5 py-0.5 text-theme-xs font-medium @StatusClass(profile.Status)">@profile.Status</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <dl class="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Phone</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.PhoneNumber</dd>
-            </div>
-
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Role</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.Role</dd>
-            </div>
-
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Status</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.Status</dd>
-            </div>
-
+        <dl class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
             <div>
                 <dt class="text-theme-xs font-medium uppercase text-gray-400">Username</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.Username</dd>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@profile.Username</dd>
             </div>
-
             <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Created Date</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Phone</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@profile.PhoneNumber</dd>
             </div>
-
             <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Updated Date</dt>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Listings</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@profile.AuctionCount</dd>
+            </div>
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Active listing / order</dt>
                 <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    @(Model.UpdatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Not updated")
+                    @(profile.HasActiveAuctionOrTransaction ? "Yes" : "No")
                 </dd>
             </div>
-
             <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Auction Count</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.AuctionCount</dd>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Created</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@profile.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
             </div>
-
             <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Active Auction / Transaction</dt>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Updated</dt>
                 <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    @(Model.HasActiveAuctionOrTransaction ? "Yes" : "No")
+                    @(profile.UpdatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Not updated")
                 </dd>
             </div>
         </dl>
     </div>
+
+    @if (Model.CanEdit && Model.EditForm is not null)
+    {
+        <form asp-area="Admin"
+              asp-controller="User"
+              asp-action="Edit"
+              method="post"
+              enctype="multipart/form-data"
+              class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnToDetails" value="true" />
+
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Edit information</h3>
+                <p class="text-theme-sm text-gray-500 dark:text-gray-400">Update profile, credentials, role, and status for this user.</p>
+            </div>
+
+            <partial name="_UserFormFields" model="Model.EditForm" />
+
+            <div class="mt-6 flex justify-end gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
+                <button type="submit"
+                        class="admin-icon-action admin-icon-action--primary admin-icon-action--lg cursor-pointer"
+                        title="Save Changes"
+                        aria-label="Save Changes">
+                    <partial name="_AdminIcon" model='"save"' />
+                </button>
+            </div>
+        </form>
+    }
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

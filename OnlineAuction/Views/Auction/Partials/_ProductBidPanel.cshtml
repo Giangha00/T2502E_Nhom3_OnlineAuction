@@ -14,11 +14,10 @@
     var isLoggedIn = userAuth.Succeeded;
     var endDateIso = DateTimeUtilities.ToUtcIsoString(Model.CountdownTargetDate);
     var showRegistrationFlow = Model.RequiresRegistration && Model.CanRegister && !Model.IsSeller;
-    var showCancelRegistration = Model.RequiresRegistration && Model.CanRegister && !Model.IsSeller && Model.IsRegistered &&
-        Model.RegistrationStatus is AuctionRegistrationStatuses.Pending or AuctionRegistrationStatuses.Approved;
+    var showCancelRegistration = Model.RequiresRegistration && Model.CanRegister && !Model.IsSeller &&
+        Model.RegistrationStatus == AuctionRegistrationStatuses.Approved;
     var showRegistrationUi = Model.RequiresRegistration && !Model.IsSeller &&
         (showRegistrationFlow || showCancelRegistration ||
-         Model.RegistrationStatus == AuctionRegistrationStatuses.Pending ||
          Model.RegistrationStatus == AuctionRegistrationStatuses.Rejected);
     var showBidForm = !Model.IsSeller && Model.CanPlaceBid &&
         (!Model.RequiresRegistration || Model.RegistrationStatus == AuctionRegistrationStatuses.Approved);
@@ -110,23 +109,7 @@
     @if (showRegistrationUi)
     {
       <div id="registrationSection">
-        @if (Model.RegistrationStatus == AuctionRegistrationStatuses.Pending)
-        {
-          <div id="registrationBanner" class="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            @Localizer["Product_RegistrationPending"]
-          </div>
-        }
-        else if (Model.RegistrationStatus == AuctionRegistrationStatuses.Rejected)
-        {
-          <div id="registrationBanner" class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            @Localizer["Product_RegistrationRejected"]
-            @if (!string.IsNullOrWhiteSpace(Model.RegistrationRejectReason))
-            {
-              <span class="mt-1 block text-xs">@Model.RegistrationRejectReason</span>
-            }
-          </div>
-        }
-        else if (!Model.IsRegistered && showRegistrationFlow)
+        @if (!Model.IsRegistered && showRegistrationFlow)
         {
           <p class="mb-3 text-sm text-slate-600">@Localizer["Product_MustRegisterToBid"]</p>
           <button type="button" id="registerAuctionBtn"
@@ -137,21 +120,16 @@
 
         @if (showCancelRegistration)
         {
-          <div class="mt-4 rounded-lg border border-red-200 bg-red-50/80 p-4">
-            <p class="text-xs text-red-700">@Localizer["Product_CancelRegistrationHint"]</p>
-            <button type="button" id="cancelRegistrationBtn"
-                    class="mt-3 flex w-full items-center justify-center gap-2 rounded-md border border-red-300 bg-white px-4 py-3 text-sm font-semibold text-red-700 shadow-sm transition hover:border-red-400 hover:bg-red-50">
-              <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
-              </svg>
-              @Localizer["Product_CancelRegistration"]
-            </button>
-          </div>
+          <button type="button" id="cancelRegistrationBtn"
+                  class="mt-3 flex w-full items-center justify-center gap-2 rounded-md border border-red-300 bg-white px-4 py-3 text-sm font-semibold text-red-700 shadow-sm transition hover:border-red-400 hover:bg-red-50">
+            <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+            </svg>
+            @Localizer["Product_CancelRegistration"]
+          </button>
         }
       </div>
     }
-
-    <div id="registrationFeedback" class="mt-3 hidden rounded-md px-3 py-2 text-sm font-medium" role="status" aria-live="polite"></div>
 
     @if (showBidForm)
     {
@@ -192,9 +170,8 @@
             @Localizer["Product_MinBid"] <span id="minBidDisplay" class="font-semibold text-slate-600">$@minBid.ToString("N0")</span>
             · @Localizer["Product_Step"] <span class="font-semibold text-slate-600">$@Model.BidStep.ToString("N0")</span>
           </p>
+          <p id="bidFeedback" class="mt-2 hidden text-xs font-medium text-red-600" role="alert"></p>
         </div>
-
-        <div id="bidFeedback" class="mt-3 hidden rounded-md px-3 py-2 text-sm font-medium" role="status" aria-live="polite"></div>
 
         <button type="button" id="placeBidBtn"
                 class="mt-4 flex w-full items-center justify-center rounded-md bg-slate-900 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"

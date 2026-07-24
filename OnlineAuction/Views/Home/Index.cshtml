@@ -92,12 +92,17 @@
       @foreach (var category in Model.Categories.Take(4))
       {
         <a asp-controller="Auction" asp-action="Index" asp-fragment="category-@CategorySlug.ToSlug(category.Name)"
-           class="rarecard-category-tile group relative overflow-hidden rounded-2xl">
-          <img src="@category.ImageUrl" alt="@category.Name" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"/>
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent"></div>
-          <div class="relative flex min-h-[10rem] flex-col justify-end p-5 sm:min-h-[12rem]">
-            <h3 class="text-lg font-bold text-white">@category.Name</h3>
-            <p class="text-sm text-white/80">@(string.IsNullOrEmpty(category.DisplayCount) ? Localizer["Common_ItemsSuffix", category.ItemCount] : category.DisplayCount)</p>
+           class="rarecard-category-tile group">
+          <div class="rarecard-category-tile__visual">
+            <img src="@category.ImageUrl"
+                 alt="@category.Name"
+                 loading="lazy"
+                 asp-append-version="true"
+                 class="rarecard-category-tile__logo"/>
+          </div>
+          <div class="rarecard-category-tile__footer">
+            <h3 class="rarecard-category-tile__title">@category.Name</h3>
+            <p class="rarecard-category-tile__count">@(string.IsNullOrEmpty(category.DisplayCount) ? Localizer["Common_ItemsSuffix", category.ItemCount] : category.DisplayCount)</p>
           </div>
         </a>
       }

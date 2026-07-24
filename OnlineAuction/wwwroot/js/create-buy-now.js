@@ -24,7 +24,12 @@
   var form = document.getElementById('createBuyNowForm');
   if (!form) return;
 
-  var i18n = (window.sellBuyNowPageConfig && window.sellBuyNowPageConfig.i18n) || {};
+  var pageConfig = window.sellBuyNowPageConfig || {};
+  var i18n = pageConfig.i18n || {};
+  var isEditMode = pageConfig.mode === 'edit';
+  var locks = pageConfig.locks || {};
+  var removedExistingImageIds = [];
+  var removedExistingDocumentIds = [];
 
   function t(key, fallback) {
     return i18n[key] || fallback || '';
@@ -112,22 +117,14 @@
     var grade = data.grade || composeGradeLabel(data.authenticator, data.gradeValue);
     if (grade) parts.push(grade);
     if (data.year) parts.push(data.year);
-    return parts.length ? parts.join(' · ') : '—';
+    return parts.length ? parts.join(' · ') : '\u00a0';
   }
 
-  function setPreviewGradeBadge(grade) {
-    $all('previewGrade').forEach(function (badge) {
-      var showGrade = grade && /^(PSA|BGS|CGC)\s/i.test(grade);
-      if (showGrade) {
-        badge.textContent = grade;
-        badge.classList.remove('hidden');
-      } else if (grade) {
-        badge.textContent = grade;
-        badge.classList.remove('hidden');
-      } else {
-        badge.textContent = '';
-        badge.classList.add('hidden');
-      }
+  function setPreviewBadge() {
+    $all('previewBadge').forEach(function (badge) {
+      badge.textContent = t('inStock', 'In Stock');
+      badge.classList.remove('bg-slate-900');
+      badge.classList.add('bg-emerald-600');
     });
   }
 
@@ -149,10 +146,11 @@
 
   function updatePreview() {
     var data = getFormData();
+    setPreviewText('previewCategory', data.category || t('categoryDefault', '—'));
     setPreviewText('previewName', data.productName || t('productNameDefault', 'Product Name'));
     setPreviewText('previewSubtitle', buildPreviewSubtitle(data));
     setPreviewText('previewPrice', formatCardMoney(data.price));
-    setPreviewGradeBadge(data.grade);
+    setPreviewBadge();
     setPreviewMainImage(state.images.length > 0 ? state.images[0].url : '');
   }
 
@@ -249,7 +247,16 @@
   function removeImage(id) {
     var idx = state.images.findIndex(function (i) { return i.id === id; });
     if (idx >= 0) {
-      URL.revokeObjectURL(state.images[idx].url);
+      var removed = state.images[idx];
+      if (removed.existingId) {
+        removedExistingImageIds.push(removed.existingId);
+      } else if (removed.url && String(removed.url).indexOf('blob:') === 0) {
+        URL.revokeObjectURL(removed.url);
+      }
+      if (idx === 0 && removed.existing && !removed.existingId) {
+        var existingPrimary = form.querySelector('[name="ExistingPrimaryImage"]');
+        if (existingPrimary) existingPrimary.value = '';
+      }
       state.images.splice(idx, 1);
     }
     var input = $('imageInput');
@@ -258,8 +265,16 @@
   }
 
   function clearAllImages() {
-    state.images.forEach(function (img) { URL.revokeObjectURL(img.url); });
+    state.images.forEach(function (img) {
+      if (img.existingId) {
+        removedExistingImageIds.push(img.existingId);
+      } else if (img.url && String(img.url).indexOf('blob:') === 0) {
+        URL.revokeObjectURL(img.url);
+      }
+    });
     state.images = [];
+    var existingPrimary = form.querySelector('[name="ExistingPrimaryImage"]');
+    if (existingPrimary) existingPrimary.value = '';
     var input = $('imageInput');
     if (input) input.value = '';
     renderImagePreviews();
@@ -274,7 +289,12 @@
     state.documents.forEach(function (doc) {
       var li = document.createElement('li');
       li.className = 'flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between';
-      var selectHtml = '<select data-doc-name="' + doc.id + '" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 sm:w-52">';
+      var fileLabel = doc.file ? doc.file.name : (doc.displayName || 'Document');
+      var fileMeta = doc.file
+        ? (doc.file.size / 1024).toFixed(1) + ' KB'
+        : (doc.existing ? 'Existing' : '');
+      var selectHtml = '<select data-doc-name="' + doc.id + '" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 sm:w-52"' +
+        (doc.existing ? ' disabled' : '') + '>';
       DOC_NAME_OPTIONS.forEach(function (option) {
         var selected = option === doc.displayName ? ' selected' : '';
         selectHtml += '<option value="' + option + '"' + selected + '>' + option + '</option>';
@@ -283,8 +303,8 @@
       li.innerHTML =
         '<div class="flex min-w-0 items-center gap-3">' +
         '<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-100 text-xs font-bold text-red-800">PDF</span>' +
-        '<div class="min-w-0"><p class="truncate text-sm font-medium text-slate-800">' + doc.file.name + '</p>' +
-        '<p class="text-xs text-slate-400">' + (doc.file.size / 1024).toFixed(1) + ' KB</p></div></div>' +
+        '<div class="min-w-0"><p class="truncate text-sm font-medium text-slate-800">' + fileLabel + '</p>' +
+        '<p class="text-xs text-slate-400">' + fileMeta + '</p></div></div>' +
         '<div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">' + selectHtml +
         '<button type="button" data-remove-doc="' + doc.id + '" class="shrink-0 cursor-pointer text-xs font-semibold text-red-600 hover:text-red-700">' + t('remove', 'Remove') + '</button></div>';
       list.appendChild(li);
@@ -294,13 +314,17 @@
       select.addEventListener('change', function () {
         var id = select.getAttribute('data-doc-name');
         var doc = state.documents.find(function (d) { return d.id === id; });
-        if (doc) doc.displayName = select.value;
+        if (doc && !doc.existing) doc.displayName = select.value;
       });
     });
 
     list.querySelectorAll('[data-remove-doc]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var id = btn.getAttribute('data-remove-doc');
+        var doc = state.documents.find(function (d) { return d.id === id; });
+        if (doc && doc.existingId) {
+          removedExistingDocumentIds.push(doc.existingId);
+        }
         state.documents = state.documents.filter(function (d) { return d.id !== id; });
         renderDocuments();
       });
@@ -411,6 +435,7 @@
   }
 
   function saveDraft() {
+    if (isEditMode) return;
     var data = getFormData();
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
@@ -425,6 +450,7 @@
   }
 
   function loadDraft() {
+    if (isEditMode) return;
     try {
       var raw = localStorage.getItem(DRAFT_KEY);
       if (!raw) return;
@@ -460,26 +486,11 @@
   }
 
   function showSuccess(name) {
-    showTopToast('success', tf(t('successCreated', 'Your listing "{0}" has been created successfully!'), name));
     try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
   }
 
   function showTopToast(type, message) {
-    var banner = $('successBanner');
-    var text = $('successMessageText');
-    if (text) text.textContent = message;
-    if (banner) {
-      banner.className = 'fixed left-1/2 top-24 z-9999 w-[min(92vw,520px)] -translate-x-1/2 rounded-xl border px-5 py-4 text-sm font-semibold shadow-lg';
-      if (type === 'success') {
-        banner.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-800');
-      } else {
-        banner.classList.add('border-red-200', 'bg-red-50', 'text-red-700');
-      }
-      banner.classList.remove('hidden');
-      window.setTimeout(function () {
-        banner.classList.add('hidden');
-      }, 5000);
-    }
+    // Server pushes FCM / in-app notifications; keep form-level status only.
   }
 
   function showSubmitStatus(type, message) {
@@ -569,46 +580,137 @@
       var formData = new FormData(form);
 
       formData.delete('PrimaryImageFile');
-      if (state.images.length > 0) {
+      formData.delete('GalleryImageFiles');
+      formData.delete('DocumentFiles');
+      formData.delete('DocumentNames');
+      formData.delete('RemovedGalleryImageIds');
+      formData.delete('RemovedDocumentIds');
+
+      if (state.images.length > 0 && state.images[0].file) {
         formData.append('PrimaryImageFile', state.images[0].file);
       }
-      for (var i = 1; i < state.images.length; i++) {
-        formData.append('GalleryImageFiles', state.images[i].file);
-      }
-      state.documents.forEach(function (doc) {
-        formData.append('DocumentFiles', doc.file);
-        formData.append('DocumentNames', doc.displayName || 'PSA Certificate');
+
+      state.images.slice(1).forEach(function (img) {
+        if (img.file) {
+          formData.append('GalleryImageFiles', img.file);
+        }
       });
 
-      fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      })
-        .then(function (response) {
-          return response.json().then(function (payload) {
-            if (!response.ok || payload.success === false) {
-              throw new Error(payload.message || t('errorCreateFailed', 'Could not create listing.'));
+      removedExistingImageIds.forEach(function (id) {
+        if (id > 0) {
+          formData.append('RemovedGalleryImageIds', String(id));
+        }
+      });
+
+      state.documents.forEach(function (doc) {
+        if (doc.file) {
+          formData.append('DocumentFiles', doc.file);
+          formData.append('DocumentNames', doc.displayName || 'PSA Certificate');
+        }
+      });
+
+      removedExistingDocumentIds.forEach(function (id) {
+        formData.append('RemovedDocumentIds', String(id));
+      });
+
+      var productName = data.productName || t('productNameDefault', 'Product name');
+
+      function submitBuyNowForm() {
+        fetch(form.action, {
+          method: 'POST',
+          body: formData,
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+          .then(function (response) {
+            return response.json().then(function (payload) {
+              if (!response.ok || payload.success === false) {
+                throw new Error(payload.message || t('errorCreateFailed', 'Could not create listing.'));
+              }
+              return payload;
+            });
+          })
+          .then(function (payload) {
+            showSuccess(data.productName);
+            if (payload.redirectUrl) {
+              window.location.href = payload.redirectUrl;
             }
-            return payload;
+          })
+          .catch(function (error) {
+            showError('images', error.message);
+            showTopToast('error', error.message);
+            showSubmitStatus('error', error.message);
           });
-        })
-        .then(function (payload) {
-          showSuccess(data.productName);
-          if (payload.redirectUrl) {
-            window.location.href = payload.redirectUrl;
+      }
+
+      if (isEditMode && typeof window.showConfirmModal === 'function') {
+        window.showConfirmModal({
+          title: t('confirmCreateTitle', 'Save listing changes?'),
+          message: t('confirmCreateMessage', 'You are about to save updates for "{0}".'),
+          messageArgs: [productName],
+          note: t('confirmCreateNote', 'Rejected listings will be resubmitted for admin confirmation.'),
+          confirmText: t('confirmCreateConfirm', 'Save Changes')
+        }).then(function (confirmed) {
+          if (confirmed) {
+            submitBuyNowForm();
           }
-        })
-        .catch(function (error) {
-          showError('images', error.message);
-          showTopToast('error', error.message);
-          showSubmitStatus('error', error.message);
         });
+        return;
+      }
+
+      submitBuyNowForm();
     });
+  }
+
+  function lockField(id) {
+    var el = $(id);
+    if (!el) return;
+    el.readOnly = true;
+    el.classList.add('bg-slate-100', 'cursor-not-allowed');
+    if (el.tagName === 'SELECT') {
+      el.disabled = true;
+    }
+  }
+
+  function applyEditLocks() {
+    if (!isEditMode) return;
+    if (locks.startingPrice) {
+      lockField('price');
+    }
+  }
+
+  function seedExistingMedia() {
+    if (!isEditMode) return;
+
+    var existingImages = pageConfig.existingImages || [];
+    existingImages.forEach(function (item, index) {
+      state.images.push({
+        id: 'existing_img_' + (item.id || index) + '_' + index,
+        existingId: item.isPrimary ? 0 : (item.id || 0),
+        file: null,
+        url: item.url,
+        existing: true
+      });
+    });
+
+    var existingDocuments = pageConfig.existingDocuments || [];
+    existingDocuments.forEach(function (item, index) {
+      state.documents.push({
+        id: 'existing_doc_' + item.id + '_' + index,
+        existingId: item.id,
+        file: null,
+        displayName: item.name || 'PSA Certificate',
+        existing: true
+      });
+    });
+
+    renderImagePreviews();
+    renderDocuments();
   }
 
   document.addEventListener('DOMContentLoaded', function () {
     bindEvents();
+    applyEditLocks();
+    seedExistingMedia();
     initEditor();
     if (!state.editor) {
       loadDraft();

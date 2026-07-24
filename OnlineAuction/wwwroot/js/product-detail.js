@@ -19,7 +19,7 @@
   var registrationCountLabel = document.getElementById('registrationCountLabel');
   var minBidDisplay = document.getElementById('minBidDisplay');
   var bidFeedback = document.getElementById('bidFeedback');
-  var registrationFeedback = document.getElementById('registrationFeedback');
+  var registrationFeedback = null;
   var bidHistoryBody = document.getElementById('bidHistoryBody');
   var countdownSummary = document.getElementById('countdownSummary');
   var cdDays = document.getElementById('cdDays');
@@ -210,16 +210,17 @@
     var minBid = getMinBid();
 
     if (!bidStep || bidStep <= 0) {
-      return Number.isNaN(rawAmount) ? minBid : rawAmount;
+      return Number.isNaN(rawAmount) ? NaN : rawAmount;
     }
 
     var amount = Number(rawAmount);
     if (Number.isNaN(amount) || amount <= 0) {
-      return minBid;
+      return NaN;
     }
 
-    if (amount <= minBid) {
-      return minBid;
+    // Do not silently raise below-minimum bids — callers must validate and show an error.
+    if (amount < minBid) {
+      return amount;
     }
 
     var increment = amount - currentPrice;
@@ -229,6 +230,29 @@
     }
 
     return currentPrice + steps * bidStep;
+  }
+
+  function clearBidFeedback() {
+    if (!bidFeedback) {
+      return;
+    }
+
+    bidFeedback.textContent = '';
+    bidFeedback.classList.add('hidden');
+  }
+
+  function showBidFeedback(message) {
+    if (!bidFeedback) {
+      return;
+    }
+
+    bidFeedback.textContent = message || '';
+    bidFeedback.classList.toggle('hidden', !message);
+  }
+
+  function formatBidTooLowMessage(minBid) {
+    var template = i18n.bidTooLow || 'Your bid must be at least {0}. Please enter a higher amount.';
+    return template.replace('{0}', formatCurrency(minBid));
   }
 
   function formatBidInputValue(amount) {
@@ -258,9 +282,10 @@
       return;
     }
 
-    var amount = snapBidAmount(parseBidInput(bidInput ? bidInput.value : ''));
+    var rawAmount = parseBidInput(bidInput ? bidInput.value : '');
+    var amount = Number.isNaN(rawAmount) ? getMinBid() : snapBidAmount(rawAmount);
     var minBid = getMinBid();
-    bidDecreaseBtn.disabled = !canPlaceBid || amount <= minBid;
+    bidDecreaseBtn.disabled = !canPlaceBid || Number.isNaN(amount) || amount <= minBid;
     bidIncreaseBtn.disabled = !canPlaceBid;
   }
 
@@ -275,6 +300,30 @@
     if (minBidDisplay) {
       minBidDisplay.textContent = formatCurrency(minBid);
     }
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function renderBidderNameCell(bid) {
+    var name = escapeHtml(bid.bidderName || '');
+    var bidderId = Number(bid.bidderId);
+    var isPublic = bid.isBidderProfilePublic === true;
+    if (!isPublic || !bidderId) {
+      return '<td class="px-5 py-4 font-medium text-slate-800"><span>' + name + '</span></td>';
+    }
+
+    return '<td class="px-5 py-4 font-medium text-slate-800">' +
+      '<a href="/User/Detail/' + bidderId + '" ' +
+      'class="text-slate-800 underline-offset-2 transition hover:text-blue-700 hover:underline">' +
+      name +
+      '</a></td>';
   }
 
   function renderBidHistory(items) {
@@ -307,7 +356,7 @@
       }
 
       return '<tr>' +
-        '<td class="px-5 py-4 font-medium text-slate-800">' + bid.bidderName + '</td>' +
+        renderBidderNameCell(bid) +
         '<td class="px-5 py-4 font-bold tabular-nums text-slate-900">' + formatCurrency(bid.amount) + '</td>' +
         '<td class="px-5 py-4 text-slate-500">' + formatBidTime(bid.bidTime) + '</td>' +
         '<td class="px-5 py-4"><span class="' + badgeClass + '">' + statusLabel + '</span></td>' +
@@ -376,18 +425,9 @@
           throw new Error(i18n.registrationFailed || 'Unable to create deposit.');
         }
 
-        showFeedback(
-          registrationFeedback,
-          data.message || i18n.registrationSuccess || 'Redirecting to PayPal…',
-          true
-        );
-
         window.location.href = data.approvalUrl;
       })
-      .catch(function (error) {
-        showFeedback(registrationFeedback, error.message, false);
-      })
-      .finally(function () {
+      .catch(function () {
         registerAuctionBtn.disabled = false;
         registerAuctionBtn.textContent = i18n.registerForAuction || 'Register for auction';
       });
@@ -406,27 +446,10 @@
           return data;
         });
       })
-      .then(function (data) {
-        var message = data.message;
-        if (data.refundedAmount != null && data.refundedAmount > 0) {
-          var refundTemplate = i18n.registrationCancelledWithRefund ||
-            'Registration cancelled. Your deposit of {0} has been refunded.';
-          message = refundTemplate.replace('{0}', formatCurrency(data.refundedAmount));
-        } else {
-          message = data.message || i18n.registrationCancelled || 'Registration cancelled.';
-        }
-
-        showFeedback(registrationFeedback, message, true);
-        showPageToast(message, true);
-        window.setTimeout(function () {
-          window.location.reload();
-        }, 2000);
+      .then(function () {
+        window.location.reload();
       })
-      .catch(function (error) {
-        showFeedback(registrationFeedback, error.message, false);
-        showPageToast(error.message, false);
-      })
-      .finally(function () {
+      .catch(function () {
         cancelRegistrationBtn.disabled = false;
       });
   }
@@ -561,6 +584,7 @@
   }
 
   function applyBidSuccess(data) {
+    clearBidFeedback();
     var currentPrice = Number(data.currentPrice);
     var bidCount = Number(data.bidCount);
 
@@ -597,8 +621,6 @@
     if (Array.isArray(data.bidHistory)) {
       renderBidHistory(data.bidHistory);
     }
-
-    showFeedback(bidFeedback, data.message || i18n.bidSuccess || 'Bid placed successfully!', true);
   }
 
   function handleRegistrationSuccess(data) {
@@ -606,11 +628,7 @@
       updateRegistrationCount(data.registrationCount);
     }
 
-    showFeedback(registrationFeedback, data.message || i18n.registrationSuccess || 'Registration successful.', true);
-
-    window.setTimeout(function () {
-      window.location.reload();
-    }, 600);
+    window.location.reload();
   }
 
   if (mainImage && thumbs.length) {
@@ -667,7 +685,6 @@
 
       var auctionId = bidPanel.getAttribute('data-auction-id');
       if (!auctionId) {
-        showFeedback(registrationFeedback, i18n.registrationFailed || 'Unable to register.', false);
         return;
       }
 
@@ -714,17 +731,39 @@
 
   if (bidInput) {
     bidInput.addEventListener('blur', function () {
-      var snapped = snapBidAmount(parseBidInput(bidInput.value));
-      setBidInputValue(snapped);
+      var rawAmount = parseBidInput(bidInput.value);
+      var minBid = getMinBid();
+
+      if (Number.isNaN(rawAmount) || rawAmount < minBid) {
+        updateBidStepButtons();
+        return;
+      }
+
+      setBidInputValue(snapBidAmount(rawAmount));
+      clearBidFeedback();
     });
 
     bidInput.addEventListener('keydown', function (event) {
       if (event.key === 'Enter') {
         event.preventDefault();
-        var snapped = snapBidAmount(parseBidInput(bidInput.value));
-        setBidInputValue(snapped);
+        if (placeBidBtn) {
+          placeBidBtn.click();
+          return;
+        }
+
+        var rawAmount = parseBidInput(bidInput.value);
+        var minBid = getMinBid();
+        if (!Number.isNaN(rawAmount) && rawAmount >= minBid) {
+          setBidInputValue(snapBidAmount(rawAmount));
+        }
+
         bidInput.blur();
       }
+    });
+
+    bidInput.addEventListener('input', function () {
+      clearBidFeedback();
+      updateBidStepButtons();
     });
   }
 
@@ -734,9 +773,14 @@
         return;
       }
 
-      var current = snapBidAmount(parseBidInput(bidInput.value));
-      var next = Math.max(getMinBid(), current - bidStep);
+      var rawAmount = parseBidInput(bidInput.value);
+      var minBid = getMinBid();
+      var current = Number.isNaN(rawAmount) || rawAmount < minBid
+        ? minBid
+        : snapBidAmount(rawAmount);
+      var next = Math.max(minBid, current - bidStep);
       setBidInputValue(next);
+      clearBidFeedback();
     });
   }
 
@@ -746,8 +790,13 @@
         return;
       }
 
-      var current = snapBidAmount(parseBidInput(bidInput.value));
+      var rawAmount = parseBidInput(bidInput.value);
+      var minBid = getMinBid();
+      var current = Number.isNaN(rawAmount) || rawAmount < minBid
+        ? minBid
+        : snapBidAmount(rawAmount);
       setBidInputValue(current + bidStep);
+      clearBidFeedback();
     });
   }
 
@@ -764,16 +813,30 @@
       }
 
       if (requiresRegistration && !canBid) {
-        showFeedback(bidFeedback, i18n.mustRegisterToBid || 'You must register before placing a bid.', false);
         return;
       }
 
       var auctionId = bidPanel.getAttribute('data-auction-id');
-      var amount = bidInput ? snapBidAmount(parseBidInput(bidInput.value)) : null;
-      if (!auctionId || amount === null || Number.isNaN(amount)) {
+      var rawAmount = bidInput ? parseBidInput(bidInput.value) : NaN;
+      var minBid = getMinBid();
+
+      if (!auctionId || Number.isNaN(rawAmount) || rawAmount <= 0) {
+        showBidFeedback(i18n.bidFailed || 'Unable to place bid. Please try again.');
         return;
       }
 
+      if (rawAmount < minBid) {
+        showBidFeedback(formatBidTooLowMessage(minBid));
+        return;
+      }
+
+      var amount = snapBidAmount(rawAmount);
+      if (Number.isNaN(amount) || amount < minBid) {
+        showBidFeedback(formatBidTooLowMessage(minBid));
+        return;
+      }
+
+      clearBidFeedback();
       setBidInputValue(amount);
       placeBidBtn.disabled = true;
       placeBidBtn.textContent = i18n.placingBid || 'Placing bid…';
@@ -822,7 +885,7 @@
           applyBidSuccess(data);
         })
         .catch(function (error) {
-          showFeedback(bidFeedback, error.message || i18n.bidFailed || 'Unable to place bid. Please try again.', false);
+          showBidFeedback((error && error.message) || i18n.bidFailed || 'Unable to place bid. Please try again.');
         })
         .finally(function () {
           if (canPlaceBid && (!requiresRegistration || canBid)) {
@@ -851,11 +914,8 @@
 
   startCountdown();
 
-  if (config.flashMessage) {
-    showPageToast(config.flashMessage, config.flashMessageType !== 'error');
-  }
-
   if (bidInput && canPlaceBid) {
-    setBidInputValue(snapBidAmount(parseBidInput(bidInput.value)));
+    var initialAmount = snapBidAmount(parseBidInput(bidInput.value));
+    setBidInputValue(Number.isNaN(initialAmount) ? getMinBid() : initialAmount);
   }
 })();

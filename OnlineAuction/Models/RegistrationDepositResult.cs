@@ -31,13 +31,17 @@ public class RegistrationDepositResult
         };
     }
 
-    public static RegistrationDepositResult Fail(string message, int statusCode = 400)
+    public static RegistrationDepositResult Fail(
+        string message,
+        int statusCode = 400,
+        int? auctionId = null)
     {
         return new RegistrationDepositResult
         {
             Success = false,
             Message = message,
-            StatusCode = statusCode
+            StatusCode = statusCode,
+            AuctionId = auctionId
         };
     }
 }

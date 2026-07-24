@@ -2,12 +2,12 @@
 
 <a asp-controller="User" asp-action="Detail" asp-route-id="@Model.Id"
    class="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-200 hover:bg-blue-50/40">
-  <img src="@Model.AvatarUrl" alt="@Model.Username"
+  <img src="@Model.AvatarUrl" alt="@Model.DisplayName"
        class="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-blue-100 transition group-hover:ring-blue-200"/>
   <div class="min-w-0 flex-1">
     <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">@Localizer["Product_Seller"]</p>
-    <p class="truncate text-sm font-bold text-slate-900 transition group-hover:text-blue-700">@Model.Username</p>
-    <p class="mt-0.5 text-xs text-slate-500">@Model.Rating.ToString("0.0") ★ · @Localizer["Product_SalesCount", Model.SuccessfulSales]</p>
+    <p class="truncate text-sm font-bold text-slate-900 transition group-hover:text-blue-700">@Model.DisplayName</p>
+    <p class="mt-0.5 text-xs text-slate-500">@Localizer["Product_SalesCount", Model.SuccessfulSales]</p>
   </div>
   <span class="shrink-0 text-slate-400 transition group-hover:text-blue-600" aria-hidden="true">
     <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

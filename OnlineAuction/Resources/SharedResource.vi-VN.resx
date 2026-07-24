@@ -234,7 +234,7 @@
   </data>
   <data name="Sell_PageTitle" xml:space="preserve"><value>Đăng bán thẻ</value></data>
   <data name="Sell_SuccessMessage" xml:space="preserve"><value>Phiên đấu giá của bạn đã được tạo thành công!</value></data>
-  <data name="Sell_SubmittedForReview" xml:space="preserve"><value>Listing đã được gửi duyệt. Chuyên gia sẽ xem xét trước khi đăng công khai.</value></data>
+  <data name="Sell_SubmittedForReview" xml:space="preserve"><value>Listing đang chờ Admin xác nhận. Chuyên gia sẽ kiểm duyệt trước khi đưa lên sàn.</value></data>
   <data name="Sell_ViewAuctions" xml:space="preserve"><value>Xem đấu giá →</value></data>
   <data name="Sell_DraftSaved" xml:space="preserve"><value>Đã lưu bản nháp cục bộ. Bạn có thể tiếp tục chỉnh sửa bất cứ lúc nào.</value></data>
   <data name="Sell_Heading" xml:space="preserve"><value>Đăng bán vật phẩm sưu tầm hiếm</value></data>
@@ -463,6 +463,9 @@
   <data name="Auction_Phase_registration_closed" xml:space="preserve"><value>Chờ live</value></data>
   <data name="Auction_Phase_live_auction" xml:space="preserve"><value>Đang live</value></data>
   <data name="Auction_Phase_live_ending_soon" xml:space="preserve"><value>Sắp kết thúc</value></data>
+  <data name="Auction_Phase_upcoming" xml:space="preserve"><value>Sắp mở</value></data>
+  <data name="Auction_Phase_ended" xml:space="preserve"><value>Đã kết thúc</value></data>
+  <data name="Auction_Phase_not_listed" xml:space="preserve"><value>Không hiển thị</value></data>
   <data name="Auction_Countdown_RegistrationStart" xml:space="preserve"><value>Mở đăng ký sau</value></data>
   <data name="Auction_Countdown_RegistrationEnd" xml:space="preserve"><value>Đóng đăng ký sau</value></data>
   <data name="Auction_Countdown_LiveStart" xml:space="preserve"><value>Bắt đầu live sau</value></data>
@@ -575,11 +578,17 @@
   <data name="AboutUs_Team_Title" xml:space="preserve"><value>Đội ngũ curators</value></data>
   <data name="AboutUs_Team_Desc" xml:space="preserve"><value>Đội ngũ có hơn 30 năm kinh nghiệm kết hợp trong thị trường collectibles toàn cầu.</value></data>
   <data name="AboutUs_Team_Member1_Title" xml:space="preserve"><value>Nhà sáng lập &amp; CEO</value></data>
-  <data name="AboutUs_Team_Member1_Bio" xml:space="preserve"><value>Cựu giám đốc nhà đấu giá với 20 năm collectibles giá trị cao. Julian sáng lập CardMarket để kết nối di sản truyền thống và độ chính xác số.</value></data>
+  <data name="AboutUs_Team_Member1_Bio" xml:space="preserve"><value>Dẫn dắt tầm nhìn sản phẩm và chiến lược marketplace của CardMarket. Phạm Việt Anh kết nối collector với các listing giá trị cao đáng tin cậy.</value></data>
   <data name="AboutUs_Team_Member2_Title" xml:space="preserve"><value>Trưởng phòng curation</value></data>
-  <data name="AboutUs_Team_Member2_Bio" xml:space="preserve"><value>Chuyên gia lịch sử TCG hiện đại. Elena dẫn dắt đội chuyên gia kiểm duyệt mọi listing về giá trị lịch sử.</value></data>
+  <data name="AboutUs_Team_Member2_Bio" xml:space="preserve"><value>Phụ trách chất lượng listing và tiêu chuẩn xác thực collectibles. Danil Fomin Long đảm bảo mọi thẻ đạt chuẩn vault-grade.</value></data>
   <data name="AboutUs_Team_Member3_Title" xml:space="preserve"><value>Giám đốc kỹ thuật</value></data>
-  <data name="AboutUs_Team_Member3_Bio" xml:space="preserve"><value>Kiến trúc sư engine xác thực. Marcus đảm bảo mọi giao dịch có xác minh bất biến.</value></data>
+  <data name="AboutUs_Team_Member3_Bio" xml:space="preserve"><value>Phụ trách kiến trúc nền tảng và độ tin cậy đấu giá. Nguyễn Văn Hưng giữ bidding, thanh toán và xác minh vận hành ổn định.</value></data>
+  <data name="AboutUs_Team_Member4_Title" xml:space="preserve"><value>Vận hành marketplace</value></data>
+  <data name="AboutUs_Team_Member4_Bio" xml:space="preserve"><value>Điều phối onboarding seller và vận hành đấu giá live. Đinh Văn Hải giữ marketplace chạy mượt mỗi ngày.</value></data>
+  <data name="AboutUs_Team_Member5_Title" xml:space="preserve"><value>Tin cậy &amp; tuân thủ</value></data>
+  <data name="AboutUs_Team_Member5_Bio" xml:space="preserve"><value>Tập trung chống gian lận và xác minh listing. Nguyễn Hữu Quân bảo vệ buyer và seller trong mọi giao dịch.</value></data>
+  <data name="AboutUs_Team_Member6_Title" xml:space="preserve"><value>Tăng trưởng &amp; cộng đồng</value></data>
+  <data name="AboutUs_Team_Member6_Bio" xml:space="preserve"><value>Xây dựng cộng đồng collector và chương trình go-to-market. Nguyễn Giang Hà hỗ trợ seller và bidder mới thành công trên CardMarket.</value></data>
   <data name="AboutUs_Newsletter_Title" xml:space="preserve"><value>Cập nhật drop lớn tiếp theo</value></data>
   <data name="AboutUs_Newsletter_Desc" xml:space="preserve"><value>Đăng ký newsletter để được truy cập sớm bộ sưu tập và thông tin thị trường.</value></data>
   <data name="AboutUs_Newsletter_Placeholder" xml:space="preserve"><value>Địa chỉ email của bạn</value></data>
@@ -869,13 +878,19 @@
   <data name="User_CurrentBid" xml:space="preserve"><value>Giá hiện tại</value></data>
   <data name="User_Ends" xml:space="preserve"><value>Kết thúc</value></data>
   <data name="User_ViewDetail" xml:space="preserve"><value>Xem chi tiết</value></data>
-  <data name="User_CancelListing" xml:space="preserve"><value>Hủy</value></data>
+  <data name="User_CancelListing" xml:space="preserve"><value>Gỡ</value></data>
+  <data name="User_CancelListingConfirm" xml:space="preserve"><value>Gỡ tin đăng này? Tin sẽ bị gỡ khỏi sàn.</value></data>
+  <data name="User_EditListing" xml:space="preserve"><value>Sửa</value></data>
   <data name="User_CancelConfirm" xml:space="preserve"><value>Hủy tin đấu giá này?</value></data>
   <data name="User_Status_Active" xml:space="preserve"><value>Đấu giá đang diễn ra</value></data>
   <data name="User_Status_EndingSoon" xml:space="preserve"><value>Sắp kết thúc</value></data>
   <data name="User_Status_Completed" xml:space="preserve"><value>Đã hoàn tất</value></data>
   <data name="UserAuction_EditTitle" xml:space="preserve"><value>Sửa đấu giá</value></data>
-  <data name="UserAuction_EditDesc" xml:space="preserve"><value>Chỉ sửa được đấu giá đang diễn ra và chưa có lượt đấu giá.</value></data>
+  <data name="UserAuction_EditDesc" xml:space="preserve"><value>Cập nhật thông tin listing. Ngày đăng ký và giá khởi điểm có thể bị khóa sau khi mở đăng ký hoặc đã có bid.</value></data>
+  <data name="UserAuction_EditPhaseLockHint" xml:space="preserve"><value>Một số trường lịch/giá đã bị khóa theo giai đoạn. Bạn vẫn có thể gia hạn ngày kết thúc live.</value></data>
+  <data name="UserBuyNow_EditTitle" xml:space="preserve"><value>Sửa Mua ngay</value></data>
+  <data name="UserBuyNow_EditDesc" xml:space="preserve"><value>Cập nhật thông tin và giá sản phẩm Mua ngay.</value></data>
+  <data name="UserBuyNow_EditPriceLockHint" xml:space="preserve"><value>Giá đang bị khóa ở giai đoạn này. Bạn vẫn có thể cập nhật thông tin sản phẩm và ảnh.</value></data>
   <data name="UserAuction_ProductName" xml:space="preserve"><value>Tên sản phẩm</value></data>
   <data name="UserAuction_ShortDescription" xml:space="preserve"><value>Mô tả ngắn</value></data>
   <data name="UserAuction_SetName" xml:space="preserve"><value>Tên bộ</value></data>
@@ -886,6 +901,13 @@
   <data name="UserAuction_StartDate" xml:space="preserve"><value>Ngày bắt đầu</value></data>
   <data name="UserAuction_EndDate" xml:space="preserve"><value>Ngày kết thúc</value></data>
   <data name="UserAuction_SaveChanges" xml:space="preserve"><value>Lưu thay đổi</value></data>
+  <data name="UserAuction_SaveSuccess" xml:space="preserve"><value>Đã cập nhật listing thành công.</value></data>
+  <data name="UserAuction_SaveFailed" xml:space="preserve"><value>Không thể cập nhật listing. Vui lòng thử lại.</value></data>
+  <data name="UserAuction_ReadyToSave_Highlight" xml:space="preserve"><value>Sẵn sàng lưu?</value></data>
+  <data name="UserAuction_ReadyToSave" xml:space="preserve"><value>Xem lại preview rồi lưu thay đổi.</value></data>
+  <data name="ConfirmModal_EditAuction_Title" xml:space="preserve"><value>Lưu thay đổi listing?</value></data>
+  <data name="ConfirmModal_EditAuction_Message" xml:space="preserve"><value>Bạn sắp lưu cập nhật cho "{0}".</value></data>
+  <data name="ConfirmModal_EditAuction_Note" xml:space="preserve"><value>Listing bị từ chối sẽ được gửi lại để admin xác nhận.</value></data>
   <data name="Sell_AuctionHeader_Label" xml:space="preserve"><value>Bảng điều khiển người bán</value></data>
   <data name="Sell_AuctionHeader_Title" xml:space="preserve"><value>Tạo đấu giá mới</value></data>
   <data name="Sell_AuctionHeader_Desc" xml:space="preserve"><value>Bán sản phẩm qua đấu giá. Hoàn thành biểu mẫu và xem lại tin đăng trước khi xuất bản.</value></data>
@@ -918,6 +940,7 @@
   <data name="Js_Order_NoSelection" xml:space="preserve"><value>Vui lòng chọn ít nhất một sản phẩm để thanh toán.</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Đang đặt giá…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Không thể đặt giá. Vui lòng thử lại.</value></data>
+  <data name="Js_ProductDetail_BidTooLow" xml:space="preserve"><value>Giá đặt phải ít nhất {0}. Vui lòng nhập mức cao hơn mức tối thiểu.</value></data>
   <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Đặt giá thành công!</value></data>
   <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>Phiên đấu giá đã kết thúc</value></data>
   <data name="Js_ProductDetail_Registering" xml:space="preserve"><value>Đang đăng ký…</value></data>
@@ -973,9 +996,28 @@
   <data name="User_Stat_Completed" xml:space="preserve"><value>Hoàn tất</value></data>
   <data name="User_Stat_TotalSales" xml:space="preserve"><value>Tổng doanh số</value></data>
   <data name="User_Stat_SuccessRate" xml:space="preserve"><value>Tỷ lệ thành công</value></data>
+  <data name="User_Stat_PaidOrders" xml:space="preserve"><value>Đơn đã thanh toán</value></data>
+  <data name="User_Stat_GrossSales" xml:space="preserve"><value>Doanh thu gộp</value></data>
+  <data name="User_Stat_SellerFee" xml:space="preserve"><value>Phí nền tảng</value></data>
+  <data name="User_Stat_NetProceeds" xml:space="preserve"><value>Thực nhận</value></data>
+  <data name="User_Stat_NetProceedsNote" xml:space="preserve"><value>Sau phí nền tảng trên đơn đã thanh toán</value></data>
+  <data name="User_Role_User" xml:space="preserve"><value>Thành viên</value></data>
+  <data name="User_Role_Admin" xml:space="preserve"><value>Quản trị</value></data>
+  <data name="User_ContactInfo" xml:space="preserve"><value>Liên hệ</value></data>
+  <data name="User_ContactPrivate" xml:space="preserve"><value>Chỉ chủ tài khoản mới xem được</value></data>
+  <data name="User_BasicInformation_PublicDesc" xml:space="preserve"><value>Thông tin hồ sơ công khai</value></data>
   <data name="User_NotUpdated" xml:space="preserve"><value>Chưa cập nhật</value></data>
+  <data name="User_BasicInformation_EditDesc" xml:space="preserve"><value>Cập nhật thông tin liên hệ và ảnh đại diện</value></data>
+  <data name="User_ChangeAvatar" xml:space="preserve"><value>Đổi ảnh</value></data>
+  <data name="User_EditProfileHint" xml:space="preserve"><value>Bấm icon máy ảnh để đổi avatar, rồi lưu ở mục Thông tin cơ bản.</value></data>
+  <data name="User_AvatarHint" xml:space="preserve"><value>JPG, PNG hoặc WEBP · tối đa 2MB</value></data>
+  <data name="User_PhoneHint" xml:space="preserve"><value>9–12 chữ số</value></data>
+  <data name="User_SaveProfile" xml:space="preserve"><value>Lưu thay đổi</value></data>
+  <data name="User_EditProfile" xml:space="preserve"><value>Chỉnh sửa</value></data>
+  <data name="User_CancelEditProfile" xml:space="preserve"><value>Hủy</value></data>
   <data name="User_Status_Live" xml:space="preserve"><value>Live</value></data>
-  <data name="User_Status_PendingReview" xml:space="preserve"><value>Chờ duyệt</value></data>
+  <data name="User_Status_PendingReview" xml:space="preserve"><value>Đang chờ xác nhận</value></data>
+  <data name="User_Status_Confirming" xml:space="preserve"><value>Đang chờ xác nhận</value></data>
   <data name="User_Status_Rejected" xml:space="preserve"><value>Bị từ chối</value></data>
   <data name="User_Status_Scheduled" xml:space="preserve"><value>Đã lên lịch</value></data>
   <data name="User_RejectReason" xml:space="preserve"><value>Bị từ chối: {0}</value></data>
@@ -986,13 +1028,14 @@
   <data name="SellBuyNow_Section3_Desc" xml:space="preserve"><value>Nhập giá cố định cho sản phẩm</value></data>
   <data name="SellBuyNow_Price" xml:space="preserve"><value>Giá</value></data>
   <data name="SellBuyNow_PriceHint" xml:space="preserve"><value>Đây là giá người mua sẽ trả để mua ngay.</value></data>
+  <data name="SellBuyNow_Preview_Title" xml:space="preserve"><value>Xem trước sản phẩm</value></data>
   <data name="SellBuyNow_Preview_Desc" xml:space="preserve"><value>Xem trước tin đăng trên trang Mua ngay</value></data>
   <data name="SellBuyNow_Preview_ReviewNote" xml:space="preserve"><value>Kiểm tra thông tin trước khi đăng. Tin giá cố định sẽ hiển thị trên Mua ngay.</value></data>
   <data name="SellBuyNow_ReadyToPublish_Highlight" xml:space="preserve"><value>Sẵn sàng đăng?</value></data>
   <data name="SellBuyNow_ReadyToPublish" xml:space="preserve"><value>Tin đăng sẽ xuất hiện trên Mua ngay ngay lập tức.</value></data>
   <data name="SellBuyNow_CreateListing" xml:space="preserve"><value>Đăng tin</value></data>
   <data name="SellBuyNow_SuccessMessage" xml:space="preserve"><value>Đã tạo tin Mua ngay thành công.</value></data>
-  <data name="SellBuyNow_SubmittedForReview" xml:space="preserve"><value>Listing đã được gửi duyệt. Chuyên gia sẽ xem xét trước khi đăng công khai.</value></data>
+  <data name="SellBuyNow_SubmittedForReview" xml:space="preserve"><value>Listing đang chờ Admin xác nhận. Chuyên gia sẽ kiểm duyệt trước khi đưa lên sàn.</value></data>
   <data name="SellBuyNow_Success_Created" xml:space="preserve"><value>Tin đăng "{0}" đã được tạo thành công!</value></data>
   <data name="SellBuyNow_Error_CreateFailed" xml:space="preserve"><value>Không thể tạo tin đăng.</value></data>
   <data name="SellBuyNow_Error_PriceRequired" xml:space="preserve"><value>Giá phải lớn hơn 0</value></data>
@@ -1085,7 +1128,7 @@
   <data name="Admin_Dashboard_Filter_Error_DateFromAfterDateTo" xml:space="preserve"><value>Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.</value></data>
   <data name="Admin_Dashboard_Filter_Error_RangeTooLong" xml:space="preserve"><value>Khoảng ngày không được vượt quá 365 ngày.</value></data>
   <data name="Admin_Dashboard_Filter_Loading" xml:space="preserve"><value>Đang tải...</value></data>
-  <data name="Admin_Dashboard_Snapshot_Note" xml:space="preserve"><value>Tại thời điểm hiện tại</value></data>
+  <data name="Admin_Dashboard_Snapshot_Note" xml:space="preserve"><value>Tại thời điểm hiện tại (không theo bộ lọc ngày)</value></data>
   <data name="Admin_Dashboard_FilteredPeriod_Note" xml:space="preserve"><value>Trong khoảng ngày đã chọn</value></data>
   <data name="Admin_Dashboard_ChangeVsPrevious" xml:space="preserve"><value>so với kỳ trước</value></data>
   <data name="Admin_Dashboard_NoData" xml:space="preserve"><value>Không có dữ liệu trong khoảng đã chọn</value></data>
@@ -1095,7 +1138,8 @@
   <data name="Admin_Dashboard_Kpi_OngoingAuctions" xml:space="preserve"><value>Đang diễn ra</value></data>
   <data name="Admin_Dashboard_Kpi_EndedAuctions" xml:space="preserve"><value>Đã kết thúc</value></data>
   <data name="Admin_Dashboard_Kpi_CancelledAuctions" xml:space="preserve"><value>Bị hủy</value></data>
-  <data name="Admin_Dashboard_Kpi_PendingReview" xml:space="preserve"><value>Chờ duyệt</value></data>
+  <data name="Admin_Dashboard_Kpi_PendingReview" xml:space="preserve"><value>Đang xác nhận</value></data>
+  <data name="Admin_Auction_Status_Confirming" xml:space="preserve"><value>Đang xác nhận</value></data>
   <data name="Admin_Dashboard_Kpi_SuccessRate" xml:space="preserve"><value>Tỷ lệ thành công</value></data>
   <data name="Admin_Dashboard_SuccessRate_Tooltip" xml:space="preserve"><value>Số SP bán được / Tổng SP đăng bán × 100. Chỉ tính order paid hoặc delivered.</value></data>
   <data name="Admin_Dashboard_SuccessRate_Hint" xml:space="preserve"><value>SP bán được / tổng đăng bán</value></data>
@@ -1140,8 +1184,10 @@
   <data name="Admin_Dashboard_Kpi_CompletedOrders" xml:space="preserve"><value>Đơn hoàn tất</value></data>
   <data name="Admin_Dashboard_RevenueSection_Title" xml:space="preserve"><value>Doanh thu</value></data>
   <data name="Admin_Dashboard_RevenueSection_Description" xml:space="preserve"><value>Tổng giá trị giao dịch và phí sàn (commission).</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>Phí sàn = phí thanh toán người mua + phí thành công người bán từ đơn đã thanh toán/giao.</value></data>
-  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV là tổng thanh toán thành công trong kỳ. Phí sàn (commission) chỉ gồm phí marketplace: phí người mua (PlatformFee) + phí người bán (SellerFee) trên đơn paid/delivered. Không gồm tiền cọc đăng ký.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Short" xml:space="preserve"><value>GMV ≠ lợi nhuận sàn. Commission = phí buyer + seller trên đơn paid/delivered. Không gồm tiền cọc.</value></data>
+  <data name="Admin_Dashboard_Revenue_Rules_Tooltip" xml:space="preserve"><value>GMV = tổng payments.success trong kỳ + đơn paid/delivered không có payment success (lỗ hổng COD). Commission = PlatformFee + SellerFee. Seller Proceeds = seller_proceeds. Tiền cọc đăng ký không tính vào GMV/commission.</value></data>
+  <data name="Admin_Dashboard_Gmv_Hint" xml:space="preserve"><value>Tổng giá trị giao dịch trong kỳ đã chọn (không phải lợi nhuận sàn).</value></data>
+  <data name="Admin_Dashboard_Kpi_PendingVerification" xml:space="preserve"><value>Chờ duyệt listing</value></data>
   <data name="Admin_Dashboard_Revenue_NoFeeData" xml:space="preserve"><value>Chưa có dữ liệu phí</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Title" xml:space="preserve"><value>GMV vs Doanh thu sàn</value></data>
   <data name="Admin_Dashboard_RevenueLineChart_Description" xml:space="preserve"><value>Click điểm trên biểu đồ để lọc bảng theo ngày.</value></data>
@@ -1174,4 +1220,75 @@
   <data name="Notification_OrderCancelled_Title" xml:space="preserve"><value>Đơn hàng đã hủy</value></data>
   <data name="Notification_OrderCancelledBuyer_Message" xml:space="preserve"><value>Đơn {1} cho {0} đã bị hủy vì quá hạn thanh toán.</value></data>
   <data name="Notification_OrderCancelledSeller_Message" xml:space="preserve"><value>Đơn {1} cho {0} đã bị hủy vì người thắng không thanh toán đúng hạn.</value></data>
+  <data name="Notification_AuctionWonDepositCovered_Message" xml:space="preserve"><value>Chúc mừng! Bạn đã thắng {0}. Tiền cọc đăng ký đã đủ để thanh toán đơn hàng.</value></data>
+  <data name="Notification_BuyNowOrderCreated_Title" xml:space="preserve"><value>Đã tạo đơn hàng</value></data>
+  <data name="Notification_BuyNowOrderCreated_Message" xml:space="preserve"><value>{0} đã được thêm vào đơn hàng. Vui lòng thanh toán trước hạn.</value></data>
+  <data name="Notification_DepositRefunded_Title" xml:space="preserve"><value>Đã hoàn tiền cọc</value></data>
+  <data name="Notification_DepositRefunded_Message" xml:space="preserve"><value>Hoàn tiền cọc ${0} cho {1} đã được xử lý.</value></data>
+  <data name="Notification_RegistrationCancelled_Title" xml:space="preserve"><value>Đã hủy đăng ký</value></data>
+  <data name="Notification_RegistrationCancelledWithRefund_Message" xml:space="preserve"><value>Đã hủy đăng ký {0}. Tiền cọc ${1} đã được hoàn.</value></data>
+  <data name="Notification_RegistrationCancelledNoRefund_Message" xml:space="preserve"><value>Đã hủy đăng ký {0}.</value></data>
+  <data name="Notification_RegistrationCancelFailed_Title" xml:space="preserve"><value>Hủy đăng ký thất bại</value></data>
+  <data name="Notification_AuctionEndingSoon_Title" xml:space="preserve"><value>Phiên đấu giá sắp kết thúc</value></data>
+  <data name="Notification_AuctionEndingSoon_Message" xml:space="preserve"><value>{0} sẽ kết thúc trong vòng một giờ tới.</value></data>
+  <data name="Notification_AuctionStartingSoon_Title" xml:space="preserve"><value>Phiên đấu giá sắp bắt đầu</value></data>
+  <data name="Notification_AuctionStartingSoon_Message" xml:space="preserve"><value>{0} sẽ bắt đầu lúc {1}. Hãy sẵn sàng đặt giá.</value></data>
+  <data name="Notification_PaymentFailed_Title" xml:space="preserve"><value>Thanh toán thất bại</value></data>
+  <data name="Notification_PaymentCancelled_Title" xml:space="preserve"><value>Thanh toán đã hủy</value></data>
+  <data name="Notification_PaymentCancelled_Message" xml:space="preserve"><value>Thanh toán PayPal đã bị hủy. Đơn hàng vẫn đang chờ thanh toán.</value></data>
+  <data name="Notification_PaymentMissingToken_Message" xml:space="preserve"><value>PayPal không trả về token thanh toán hợp lệ.</value></data>
+  <data name="Notification_PaymentCouldNotComplete_Message" xml:space="preserve"><value>Không thể hoàn tất thanh toán.</value></data>
+  <data name="Notification_PaymentUnableStartCheckout_Message" xml:space="preserve"><value>Không thể bắt đầu thanh toán PayPal.</value></data>
+  <data name="Notification_PaymentCompleteFields_Message" xml:space="preserve"><value>Vui lòng điền đầy đủ các trường bắt buộc.</value></data>
+  <data name="Notification_PaymentSuccessCod_Message" xml:space="preserve"><value>Đơn COD của bạn đã được xác nhận. Xem xác nhận đơn hàng.</value></data>
+  <data name="Notification_PaymentSuccessSimple_Message" xml:space="preserve"><value>Thanh toán của bạn đã được xác nhận. Xem xác nhận đơn hàng.</value></data>
+  <data name="Notification_AuctionNowLive_Title" xml:space="preserve"><value>Phiên đấu giá đã bắt đầu</value></data>
+  <data name="Notification_AuctionNowLive_Message" xml:space="preserve"><value>{0} đã mở để đặt giá.</value></data>
+  <data name="Notification_ListingApproved_Title" xml:space="preserve"><value>Tin đăng đã được duyệt</value></data>
+  <data name="Notification_ListingApproved_Message" xml:space="preserve"><value>Tin đăng của bạn đã được duyệt và đang hiển thị trên sàn.</value></data>
+  <data name="Notification_ListingRejected_Title" xml:space="preserve"><value>Tin đăng bị từ chối</value></data>
+  <data name="Notification_ListingRejected_Message" xml:space="preserve"><value>Tin đăng của bạn bị từ chối. Lý do: {0}</value></data>
+  <data name="Notification_ListingSubmitted_Title" xml:space="preserve"><value>Listing đang xác nhận</value></data>
+  <data name="Notification_ListingSubmitted_Message" xml:space="preserve"><value>Listing đang chờ Admin xác nhận.</value></data>
+  <data name="Notification_ListingUpdated_Title" xml:space="preserve"><value>Cập nhật tin đăng</value></data>
+  <data name="Notification_ListingUpdated_Message" xml:space="preserve"><value>Tin đăng đã được cập nhật thành công.</value></data>
+  <data name="Notification_ListingCancelled_Title" xml:space="preserve"><value>Hủy tin đăng</value></data>
+  <data name="Notification_ListingCancelFailed_Title" xml:space="preserve"><value>Không thể hủy tin đăng</value></data>
+  <data name="Notification_ListingCancelled_Message" xml:space="preserve"><value>Đã hủy phiên đấu giá thành công.</value></data>
+  <data name="Notification_RefundSubmitted_Title" xml:space="preserve"><value>Đã gửi yêu cầu hoàn tiền</value></data>
+  <data name="Notification_RefundSubmitted_Message" xml:space="preserve"><value>Yêu cầu hoàn tiền {0} đã được nhận và đang chờ duyệt.</value></data>
+  <data name="Notification_RefundApproved_Title" xml:space="preserve"><value>Yêu cầu hoàn tiền đã được duyệt</value></data>
+  <data name="Notification_RefundApproved_Message" xml:space="preserve"><value>Yêu cầu hoàn tiền của bạn đã được duyệt.</value></data>
+  <data name="Notification_RefundRejected_Title" xml:space="preserve"><value>Yêu cầu hoàn tiền bị từ chối</value></data>
+  <data name="Notification_RefundRejected_Message" xml:space="preserve"><value>Yêu cầu hoàn tiền của bạn đã bị từ chối.</value></data>
+  <data name="Notification_RefundUnderReview_Title" xml:space="preserve"><value>Yêu cầu hoàn tiền đang được xem xét</value></data>
+  <data name="Notification_RefundUnderReview_Message" xml:space="preserve"><value>Yêu cầu hoàn tiền đang được xem xét. Chúng tôi sẽ cập nhật khi có quyết định.</value></data>
+  <data name="Notification_RefundClosed_Title" xml:space="preserve"><value>Yêu cầu hoàn tiền đã đóng</value></data>
+  <data name="Notification_RefundClosed_Message" xml:space="preserve"><value>Yêu cầu hoàn tiền của bạn đã được đóng.</value></data>
+  <data name="Notification_BidFailed_Title" xml:space="preserve"><value>Đặt giá thất bại</value></data>
+  <data name="Notification_BidPlaced_Title" xml:space="preserve"><value>Đặt giá thành công</value></data>
+  <data name="Notification_BidPlaced_Message" xml:space="preserve"><value>Bạn đã đặt giá ${0} cho {1}.</value></data>
+  <data name="Notification_NewBid_Title" xml:space="preserve"><value>Có giá mới trên tin đăng</value></data>
+  <data name="Notification_NewBid_Message" xml:space="preserve"><value>Có người đặt giá ${0} cho {1}.</value></data>
+  <data name="Notification_Outbid_Title" xml:space="preserve"><value>Bạn đã bị vượt giá</value></data>
+  <data name="Notification_Outbid_Message" xml:space="preserve"><value>Có người đặt giá cao hơn cho {0}.</value></data>
+  <data name="Notification_PaymentDeadlineExpired_Title" xml:space="preserve"><value>Hết hạn thanh toán</value></data>
+  <data name="Notification_PaymentDeadlineExpiredForfeited_Message" xml:space="preserve"><value>Bạn chưa thanh toán {0} trong 48 giờ. Tiền cọc đăng ký ${1} đã bị tịch thu theo chính sách.</value></data>
+  <data name="Notification_PaymentDeadlineExpired_Message" xml:space="preserve"><value>Bạn chưa thanh toán {0} trong 48 giờ. Quyền thắng đấu giá đã hết hạn.</value></data>
+  <data name="Notification_SecondChance_Title" xml:space="preserve"><value>Cơ hội thắng thứ hai</value></data>
+  <data name="Notification_SecondChance_Message" xml:space="preserve"><value>Người thắng ban đầu không thanh toán {0}. Bạn hiện là người đặt giá cao nhất hợp lệ. Thanh toán trong {1} giờ.</value></data>
+  <data name="Notification_BuyerDidNotPay_Title" xml:space="preserve"><value>Người mua chưa thanh toán</value></data>
+  <data name="Notification_BuyerDidNotPaySecondChance_Message" xml:space="preserve"><value>Người thắng chưa thanh toán {0}. Đã gửi cơ hội thứ hai cho người đặt giá cao kế tiếp.</value></data>
+  <data name="Notification_BuyerDidNotPayRelist_Title" xml:space="preserve"><value>Người mua chưa thanh toán — có thể đăng lại</value></data>
+  <data name="Notification_BuyerDidNotPayRelist_Message" xml:space="preserve"><value>Người thắng chưa thanh toán {0}. Không có người đặt giá thứ hai phù hợp. Bạn có thể đăng lại tin.</value></data>
+  <data name="Notification_DepositRequestCreated_Title" xml:space="preserve"><value>Yêu cầu đặt cọc đã tạo</value></data>
+  <data name="Notification_DepositRequestCreated_Message" xml:space="preserve"><value>Đã tạo yêu cầu đặt cọc. Vui lòng thanh toán qua PayPal.</value></data>
+  <data name="Notification_DepositPaid_Title" xml:space="preserve"><value>Đặt cọc thành công</value></data>
+  <data name="Notification_DepositPaid_Message" xml:space="preserve"><value>Bạn đã được duyệt đăng ký đấu giá cho {0}. Số tiền cọc: ${1}.</value></data>
+  <data name="Notification_DepositCancelled_Title" xml:space="preserve"><value>Đã hủy đặt cọc</value></data>
+  <data name="Notification_DepositCancelled_Message" xml:space="preserve"><value>Bạn đã hủy thanh toán tiền cọc.</value></data>
+  <data name="Notification_DepositFailed_Title" xml:space="preserve"><value>Đặt cọc thất bại</value></data>
+  <data name="Notification_PayPalAnomalyAutoRefund_Title" xml:space="preserve"><value>Bất thường PayPal đã tự hoàn tiền</value></data>
+  <data name="Notification_PayPalAnomalyManual_Title" xml:space="preserve"><value>Bất thường PayPal cần xử lý thủ công</value></data>
+  <data name="Notification_PayPalAnomaly_Message" xml:space="preserve"><value>Flow={0}; PayPalOrderId={1}; CaptureId={2}; Expected={3}; Captured={4}; Reason={5}; RefundSucceeded={6}; RefundError={7}</value></data>
 </root>

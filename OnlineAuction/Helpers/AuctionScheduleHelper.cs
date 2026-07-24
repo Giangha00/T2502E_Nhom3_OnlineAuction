@@ -10,6 +10,7 @@ public static class AuctionListingPhases
     public const string LiveEndingSoon = "live_ending_soon";
     public const string Upcoming = "upcoming";
     public const string Ended = "ended";
+    public const string NotListed = "not_listed";
 }
 
 public sealed record AuctionListingPhaseInfo(
@@ -50,16 +51,25 @@ public static class AuctionScheduleHelper
 
         var now = utcNow ?? DateTime.UtcNow;
         var liveStart = DateTimeUtilities.AsUtc(auction.StartDate);
+        var liveEnd = DateTimeUtilities.AsUtc(auction.EndDate);
 
-        return now >= liveStart && DateTimeUtilities.IsInFutureUtc(auction.EndDate);
+        return now >= liveStart && liveEnd > now;
     }
 
     public static bool IsPubliclyListed(Auction auction, DateTime? utcNow = null)
     {
-        var now = utcNow ?? DateTime.UtcNow;
+        if (auction.Status is AuctionStatuses.Confirming
+            or AuctionStatuses.LegacyPendingReview
+            or AuctionStatuses.Rejected
+            or AuctionStatuses.Cancelled)
+        {
+            return false;
+        }
 
-        if (!DateTimeUtilities.IsInFutureUtc(auction.EndDate) &&
-            auction.Status is not (AuctionStatuses.Scheduled))
+        var now = utcNow ?? DateTime.UtcNow;
+        var liveEnd = DateTimeUtilities.AsUtc(auction.EndDate);
+
+        if (now >= liveEnd)
         {
             return false;
         }
@@ -74,10 +84,7 @@ public static class AuctionScheduleHelper
             return false;
         }
 
-        var registrationStart = DateTimeUtilities.AsUtc(auction.RegistrationStartDate);
-        var liveStart = DateTimeUtilities.AsUtc(auction.StartDate);
-
-        return now >= registrationStart && now < liveStart;
+        return true;
     }
 
     public static DateTime GetCountdownTarget(Auction auction, DateTime? utcNow = null) =>
@@ -93,7 +100,7 @@ public static class AuctionScheduleHelper
 
         if (IsLiveOpen(auction, now))
         {
-            var remaining = DateTimeUtilities.RemainingUtc(liveEnd);
+            var remaining = liveEnd - now;
             var phase = remaining <= LiveEndingSoonThreshold
                 ? AuctionListingPhases.LiveEndingSoon
                 : AuctionListingPhases.LiveAuction;
@@ -136,7 +143,7 @@ public static class AuctionScheduleHelper
         }
 
         return new AuctionListingPhaseInfo(
-            AuctionListingPhases.RegistrationClosed,
+            AuctionListingPhases.Upcoming,
             liveStart,
             "live_start");
     }

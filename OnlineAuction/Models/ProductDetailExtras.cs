@@ -2,11 +2,17 @@ namespace OnlineAuction.Models;
 
 public class BidHistoryItemViewModel
 {
+    public int BidderId { get; set; }
     public string BidderName { get; set; } = string.Empty;
     public decimal Amount { get; set; }
     public DateTime BidTime { get; set; }
     public string Status { get; set; } = "OUTBID";
     public bool IsWinning => Status == "WINNING";
+
+    /// <summary>
+    /// When false (live auction), bidder identity stays masked and unlinked.
+    /// </summary>
+    public bool IsBidderProfilePublic { get; set; }
 }
 
 public class GradingScoreViewModel

@@ -73,16 +73,17 @@ dotnet run --launch-profile http
 | PayPal not configured | Set User Secrets (step 2); restart app; env must be `Development` |
 | Port 5006 in use | Kill old process or change port in `launchSettings.json` |
 | HTTPS redirect warning | Fixed — HTTPS redirect only runs in Production |
-| Seeder crash on startup | Fixed — FK cleanup before delete; set `RefreshTestAuctionsInDevelopment` to `false` to disable |
+| Seeder crash on startup | Fixed — FK cleanup before delete; refresh is off by default |
 
-In **Development**, sample auction listings (`RareCard Vault Test Auctions`) **auto-refresh on every app start** by default (`RefreshTestAuctionsInDevelopment: true`). Restart the app to load fresh auctions (7-day countdown). Some auctions also have `buy_now_price` set for the Buy Now catalog.
+In **Development**, sample auction listings (`RareCard Vault Test Auctions`) are seeded once and **updated in place** on later starts (stable product/auction IDs). Expired seeded listings are reactivated without recreating rows.
 
-To keep orders while testing PayPal, add to `appsettings.Local.json`:
+To wipe and reseed test auctions (IDs will jump), add to `appsettings.Local.json`:
 
 ```json
-{ "SeedData": { "RefreshTestAuctionsInDevelopment": false } }
+{ "SeedData": { "RefreshTestAuctionsInDevelopment": true } }
 ```
 
+`SyncCatalogInDevelopment` (default `true`) keeps catalog fields in sync and removes orphaned seed products; it does **not** recreate products that already exist.
 ### Release smoke (pre-merge / demo)
 
 Short pack (≤ 20 min): `AUTH-REG-01` → `AUTH-LOGIN-01` → `AUCTION_REG-03` → `BID-01`.  
@@ -134,7 +135,7 @@ After deploy, clear old Identity cookies in the browser if both areas still appe
 
 ## Auction listing verification
 
-Seller submissions from `/Sell` start as **`pending_review`** and are hidden from public `/Auction` and Home DB sections until an admin approves them.
+Seller submissions from `/Sell` start as **`confirming`** (formerly `pending_review`) and are hidden from public `/Auction` and Home DB sections until an admin approves them.
 
 | Who | Flow |
 |-----|------|

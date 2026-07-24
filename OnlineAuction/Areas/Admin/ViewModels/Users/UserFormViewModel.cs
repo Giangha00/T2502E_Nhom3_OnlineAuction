@@ -52,7 +52,7 @@ public class UserFormViewModel
 
     public List<PermissionItemViewModel> AvailablePermissions { get; set; } = [];
 
-    public List<int> AssignedPermissionIds { get; set; } = [];
+    public List<string> AssignedPermissionCodes { get; set; } = [];
 
     public bool ShowPermissionAssignment => Role == UserRole.User;
 }

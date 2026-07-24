@@ -16,32 +16,42 @@ public class AuctionService : IAuctionService
 
     private static readonly string[] CuratedBestSellerEmails =
     [
-        "giangha@auctionhouse.local",
-        "nguyen.hai@auctionhouse.local",
-        "viet.anh@auctionhouse.local",
-        "dan.long@auctionhouse.local",
-        "huu.quan@auctionhouse.local",
-        "van.hung@auctionhouse.local"
+        "vietanh@yopmail.com",
+        "danil@yopmail.com",
+        "nguyenhung@yopmail.com",
+        "dinhhai@yopmail.com",
+        "huuquan@yopmail.com",
+        "giangha@yopmail.com"
     ];
 
     private static readonly string[] CuratedBestSellerUserNames =
     [
-        "giangha",
-        "nguyen.hai",
-        "viet.anh",
-        "dan.long",
-        "huu.quan",
-        "van.hung"
+        "vietanh",
+        "danil",
+        "nguyenhung",
+        "dinhhai",
+        "huuquan",
+        "giangha"
     ];
 
     private static readonly string[] CuratedBestSellerNames =
     [
-        "Nguyễn Giang Hà",
-        "Đinh Văn Hải",
         "Phạm Việt Anh",
-        "Cậu Đan Long",
+        "Danil Fomin Long",
+        "Nguyễn Văn Hưng",
+        "Đinh Văn Hải",
         "Nguyễn Hữu Quân",
-        "Nguyễn Văn Hưng"
+        "Nguyễn Giang Hà"
+    ];
+
+    private static readonly string[] CuratedBestSellerAvatarUrls =
+    [
+        "/images/team/pham-viet-anh.png",
+        "/images/team/danil-fomin-long.png",
+        "/images/team/nguyen-van-hung.png",
+        "/images/team/dinh-van-hai.png",
+        "/images/team/nguyen-huu-quan.png",
+        "/images/team/nguyen-giang-ha.png"
     ];
 
     private readonly AuctionHouseDbContext _dbContext;
@@ -133,7 +143,7 @@ public class AuctionService : IAuctionService
     public AuctionViewModel GetAuctionIndex(string listingType = ListingTypes.Auction) =>
         GetAuctionIndexAsync(listingType).GetAwaiter().GetResult();
 
-    public async Task<ProductDetailViewModel?> GetProductDetailAsync(int id, int? currentUserId = null)
+    public async Task<ProductDetailViewModel?> GetProductDetailAsync(int id, int? currentUserId = null, bool isAdmin = false)
     {
         var auction = await _dbContext.Auctions
             .AsNoTracking()
@@ -154,6 +164,15 @@ public class AuctionService : IAuctionService
             return null;
         }
 
+        if (AuctionStatuses.IsConfirming(auction.Status) || auction.Status == AuctionStatuses.Rejected)
+        {
+            var isOwner = currentUserId.HasValue && auction.Product.SellerId == currentUserId.Value;
+            if (!isOwner && !isAdmin)
+            {
+                return null;
+            }
+        }
+
         var registrationCount = await AuctionRegistrationService.CountApprovedRegistrationsAsync(_dbContext, id);
 
         string? userRegistrationStatus = null;
@@ -172,13 +191,19 @@ public class AuctionService : IAuctionService
         var sellerId = auction.Product.SellerId;
         var auctionCount = await _dbContext.Products
             .AsNoTracking()
-            .CountAsync(p => p.SellerId == sellerId);
+            .CountAsync(p => p.SellerId == sellerId && p.DeletedAt == null);
 
-        var successfulSales = await _dbContext.Auctions
+        // Align with user detail: count paid/delivered orders, not completed auctions.
+        var successfulSales = await _dbContext.OrderItems
             .AsNoTracking()
-            .CountAsync(a =>
-                a.Product.SellerId == sellerId &&
-                a.Status == AuctionStatuses.Completed);
+            .Where(item =>
+                item.DeletedAt == null &&
+                item.Order.DeletedAt == null &&
+                item.Auction.Product.SellerId == sellerId &&
+                (item.Order.Status == OrderStatuses.Paid || item.Order.Status == OrderStatuses.Delivered))
+            .Select(item => item.OrderId)
+            .Distinct()
+            .CountAsync();
 
         var seller = ProductDetailMapper.MapSeller(
             auction.Product.Seller,
@@ -297,6 +322,9 @@ public class AuctionService : IAuctionService
                 .ThenInclude(p => p.Category)
             .Include(a => a.Bids)
             .Where(a =>
+                a.DeletedAt == null &&
+                a.Product.DeletedAt == null &&
+                a.ListingType == ListingTypes.BuyNow &&
                 a.BuyNowPrice != null &&
                 (a.Status == AuctionStatuses.Live || a.Status == AuctionStatuses.EndingSoon) &&
                 a.EndDate > now)
@@ -313,14 +341,15 @@ public class AuctionService : IAuctionService
                 .ThenInclude(p => p.Category)
             .Include(a => a.Bids)
             .Where(a =>
+                a.DeletedAt == null &&
+                a.Product.DeletedAt == null &&
                 a.ListingType == listingType &&
                 (
                     (a.Status == AuctionStatuses.Live || a.Status == AuctionStatuses.EndingSoon) &&
                     a.EndDate > now
                     ||
                     a.Status == AuctionStatuses.Scheduled &&
-                    a.RegistrationStartDate <= now &&
-                    a.StartDate > now
+                    a.EndDate > now
                 ))
             .ToListAsync();
 
@@ -361,12 +390,14 @@ public class AuctionService : IAuctionService
             {
                 sellersByUserName.TryGetValue(userName, out user);
             }
+
+            if (user is null)
             {
                 result.Add(new SellerViewModel
                 {
                     FullName = displayName,
                     Username = displayName,
-                    AvatarUrl = $"/admin/images/user/user-{((index % 37) + 1):D2}.jpg"
+                    AvatarUrl = CuratedBestSellerAvatarUrls[index]
                 });
                 continue;
             }
@@ -378,11 +409,8 @@ public class AuctionService : IAuctionService
             var completedCount = auctions.Count(auction => auction.Status == AuctionStatuses.Completed);
 
             var seller = ProductDetailMapper.MapSeller(user, liveCount, completedCount);
-            if (string.IsNullOrWhiteSpace(seller.FullName))
-            {
-                seller.FullName = displayName;
-            }
-
+            seller.FullName = displayName;
+            seller.AvatarUrl = CuratedBestSellerAvatarUrls[index];
             result.Add(seller);
         }
 

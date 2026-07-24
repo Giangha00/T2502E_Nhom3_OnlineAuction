@@ -30,11 +30,11 @@ public class PermissionController : BaseAdminController
     [HttpPost]
     [ValidateAntiForgeryToken]
     [RequirePermission(PermissionCodes.PermissionsManage)]
-    public async Task<IActionResult> SaveUser(int userId, List<int> permissionIds, CancellationToken cancellationToken)
+    public async Task<IActionResult> SaveUser(int userId, List<string> permissionCodes, CancellationToken cancellationToken)
     {
         var result = await _permissionService.SaveUserPermissionsAsync(
             userId,
-            permissionIds ?? [],
+            permissionCodes ?? [],
             cancellationToken);
 
         TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;

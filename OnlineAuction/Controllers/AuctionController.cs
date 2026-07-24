@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OnlineAuction.Configurations;
+using OnlineAuction.Entities;
 using OnlineAuction.Helpers;
+using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
@@ -19,7 +21,9 @@ public class AuctionController : Controller
     private readonly IBidRateLimitService _bidRateLimitService;
     private readonly IBidChallengeService _bidChallengeService;
     private readonly IBidShadowBanService _bidShadowBanService;
+    private readonly INotificationService _notificationService;
     private readonly IStringLocalizer<SharedResource> _localizer;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<AuctionController> _logger;
 
     public AuctionController(
@@ -31,7 +35,9 @@ public class AuctionController : Controller
         IBidRateLimitService bidRateLimitService,
         IBidChallengeService bidChallengeService,
         IBidShadowBanService bidShadowBanService,
+        INotificationService notificationService,
         IStringLocalizer<SharedResource> localizer,
+        INotificationLocalizer notifyLocalizer,
         ILogger<AuctionController> logger)
     {
         _auctionService = auctionService;
@@ -42,7 +48,9 @@ public class AuctionController : Controller
         _bidRateLimitService = bidRateLimitService;
         _bidChallengeService = bidChallengeService;
         _bidShadowBanService = bidShadowBanService;
+        _notificationService = notificationService;
         _localizer = localizer;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
     }
 
@@ -54,13 +62,25 @@ public class AuctionController : Controller
 
     public async Task<IActionResult> Detail(int id)
     {
-        var product = await _auctionService.GetProductDetailAsync(id, GetCurrentUserId());
+        var isAdmin = (await HttpContext.AuthenticateAsync(AuthSchemes.Admin)).Succeeded;
+        var product = await _auctionService.GetProductDetailAsync(id, GetCurrentUserId(), isAdmin);
         if (product is null)
         {
             return NotFound();
         }
 
         return View(product);
+    }
+
+    public async Task<IActionResult> BidHistory(int id, int page = 1, CancellationToken cancellationToken = default)
+    {
+        var model = await _bidService.GetAuctionBidHistoryPageAsync(id, page, cancellationToken);
+        if (model is null)
+        {
+            return NotFound();
+        }
+
+        return View(model);
     }
 
     [HttpGet]
@@ -82,11 +102,13 @@ public class AuctionController : Controller
             isEnded = state.IsEnded,
             bidHistory = state.BidHistory.Select(bid => new
             {
+                bidderId = bid.BidderId,
                 bidderName = bid.BidderName,
                 amount = bid.Amount,
                 bidTime = bid.BidTime,
                 isWinning = bid.IsWinning,
-                status = bid.Status
+                status = bid.Status,
+                isBidderProfilePublic = bid.IsBidderProfilePublic
             })
         });
     }
@@ -108,6 +130,17 @@ public class AuctionController : Controller
         if (auctionItem is null)
         {
             return NotFound(new { success = false, message = "Auction not found." });
+        }
+
+        if (auctionItem.Status is "Confirming" or "Rejected" or "Cancelled")
+        {
+            var blockedMessage = auctionItem.Status switch
+            {
+                "Confirming" => "This auction is confirming and not yet open for registration.",
+                "Rejected" => "This auction listing was rejected.",
+                _ => "This auction has been cancelled."
+            };
+            return BadRequest(new { success = false, message = blockedMessage });
         }
 
         if (auctionItem.RequiresRegistration)
@@ -167,130 +200,124 @@ public class AuctionController : Controller
         });
     }
     
-    
     [HttpPost]
-[Authorize]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> InitiateDeposit(int auctionId)
-{
-    // Lấy user hiện tại từ Claims
-    var userId = GetCurrentUserId();
-
-    if (!userId.HasValue)
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> InitiateDeposit(int auctionId)
     {
-        return Unauthorized(new
+        // Lấy user hiện tại từ Claims
+        var userId = GetCurrentUserId();
+
+        if (!userId.HasValue)
         {
-            success = false,
-            message = "Bạn cần đăng nhập để đăng ký đấu giá."
+            return Unauthorized(new
+            {
+                success = false,
+                message = "Bạn cần đăng nhập để đăng ký đấu giá."
+            });
+        }
+
+        // PayPal thanh toán thành công sẽ redirect về URL này.
+        // Dùng path /DepositPayPalReturn/{id} để auctionId không bị mất khi PayPal gắn ?token=
+        var returnUrl = Url.Action(
+            nameof(DepositPayPalReturn),
+            "Auction",
+            new { id = auctionId },
+            Request.Scheme)!;
+
+        // PayPal bị user hủy sẽ redirect về URL này
+        var cancelUrl = Url.Action(
+            nameof(DepositPayPalCancel),
+            "Auction",
+            new { id = auctionId },
+            Request.Scheme)!;
+
+        // Gọi service xử lý toàn bộ logic:
+        // validate auction
+        // tính tiền cọc
+        // tạo registration pending
+        // tạo deposit pending
+        // tạo PayPal order
+        var result = await _registrationDepositService.InitiateDepositAsync(
+            auctionId,
+            userId.Value,
+            returnUrl,
+            cancelUrl);
+
+        if (!result.Success)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = result.Message
+            });
+        }
+
+        // Trả approvalUrl cho frontend
+        // Frontend sẽ window.location.href = approvalUrl
+        return Json(new
+        {
+            success = true,
+            message = result.Message,
+            approvalUrl = result.ApprovalUrl,
+            depositAmount = result.DepositAmount
         });
     }
 
-    // PayPal thanh toán thành công sẽ redirect về URL này
-    var returnUrl = Url.Action(
-        nameof(DepositPayPalReturn),
-        "Auction",
-        null,
-        Request.Scheme)!;
-
-    // PayPal bị user hủy sẽ redirect về URL này
-    var cancelUrl = Url.Action(
-        nameof(DepositPayPalCancel),
-        "Auction",
-        null,
-        Request.Scheme)!;
-
-    // Gọi service xử lý toàn bộ logic:
-    // validate auction
-    // tính tiền cọc
-    // tạo registration pending
-    // tạo deposit pending
-    // tạo PayPal order
-    var result = await _registrationDepositService.InitiateDepositAsync(
-        auctionId,
-        userId.Value,
-        returnUrl,
-        cancelUrl);
-
-    if (!result.Success)
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> DepositPayPalReturn(int id, string token)
     {
-        return BadRequest(new
+        // token PayPal gửi về chính là PayPalOrderId
+        // id = auctionId (đặt trên path return URL)
+        var userId = GetCurrentUserId();
+
+        if (!userId.HasValue)
         {
-            success = false,
-            message = result.Message
-        });
+            return RedirectToAction("Login", "Auth");
+        }
+
+        // Capture tiền từ PayPal
+        // Nếu capture thành công:
+        // deposit.status = paid
+        // registration.status = approved
+        var result = await _registrationDepositService.CaptureDepositAsync(
+            userId.Value,
+            token);
+
+        return RedirectToAuctionDetailOrIndex(result.AuctionId ?? (id > 0 ? id : null));
     }
 
-    // Trả approvalUrl cho frontend
-    // Frontend sẽ window.location.href = approvalUrl
-    return Json(new
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> DepositPayPalCancel(int id, string token)
     {
-        success = true,
-        message = result.Message,
-        approvalUrl = result.ApprovalUrl,
-        depositAmount = result.DepositAmount
-    });
-}
+        var userId = GetCurrentUserId();
 
-[HttpGet]
-[Authorize]
-public async Task<IActionResult> DepositPayPalReturn(string token)
-{
-    // token PayPal gửi về chính là PayPalOrderId
-    var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return RedirectToAction("Login", "Auth");
+        }
 
-    if (!userId.HasValue)
-    {
-        return RedirectToAction("Login", "Account");
+        // User hủy thanh toán trên PayPal
+        // deposit.status = cancelled
+        // registration.status = cancelled
+        var result = await _registrationDepositService.CancelDepositAsync(
+            userId.Value,
+            token);
+
+        return RedirectToAuctionDetailOrIndex(result.AuctionId ?? (id > 0 ? id : null));
     }
 
-    // Capture tiền từ PayPal
-    // Nếu capture thành công:
-    // deposit.status = paid
-    // registration.status = approved
-    var result = await _registrationDepositService.CaptureDepositAsync(
-        userId.Value,
-        token);
-
-    if (!result.Success)
+    private IActionResult RedirectToAuctionDetailOrIndex(int? auctionId)
     {
-        TempData["ErrorMessage"] = result.Message;
+        if (auctionId is > 0)
+        {
+            return RedirectToAction(nameof(Detail), new { id = auctionId.Value });
+        }
+
         return RedirectToAction(nameof(Index));
     }
-
-    TempData["SuccessMessage"] = result.Message;
-
-    // Quay lại trang chi tiết phiên đấu giá
-    return RedirectToAction(nameof(Detail), new
-    {
-        id = result.AuctionId
-    });
-}
-
-[HttpGet]
-[Authorize]
-public async Task<IActionResult> DepositPayPalCancel(string token)
-{
-    var userId = GetCurrentUserId();
-
-    if (!userId.HasValue)
-    {
-        return RedirectToAction("Login", "Account");
-    }
-
-    // User hủy thanh toán trên PayPal
-    // deposit.status = cancelled
-    // registration.status = cancelled
-    var result = await _registrationDepositService.CancelDepositAsync(
-        userId.Value,
-        token);
-
-    TempData["ErrorMessage"] = result.Message;
-
-    return RedirectToAction(nameof(Detail), new
-    {
-        id = result.AuctionId
-    });
-}
     [HttpPost]
     [Authorize(AuthenticationSchemes = AuthSchemes.User)]
     [ValidateAntiForgeryToken]
@@ -305,6 +332,7 @@ public async Task<IActionResult> DepositPayPalCancel(string token)
         var result = await _registrationService.CancelRegistrationAsync(auctionId, userId.Value);
         if (!result.Success)
         {
+            await NotifyAuctionIssueAsync(userId.Value, auctionId, _notifyLocalizer[NotificationKeys.RegistrationCancelFailedTitle], result.Message);
             return BadRequest(new { success = false, message = result.Message });
         }
 
@@ -336,12 +364,14 @@ public async Task<IActionResult> DepositPayPalCancel(string token)
 
         if (await _bidShadowBanService.IsShadowBannedAsync(bidderId))
         {
+            var shadowMessage = _localizer["Bid_ShadowBan_Message"].Value;
+            await NotifyAuctionIssueAsync(bidderId, auctionId, _notifyLocalizer[NotificationKeys.BidFailedTitle], shadowMessage);
             return StatusCode(
                 StatusCodes.Status403Forbidden,
                 new
                 {
                     success = false,
-                    message = _localizer["Bid_ShadowBan_Message"].Value
+                    message = shadowMessage
                 });
         }
 
@@ -355,9 +385,11 @@ public async Task<IActionResult> DepositPayPalCancel(string token)
                 bidderId,
                 ipAddress);
 
+            var rateLimitMessage = _localizer["Bid_RateLimit_Message"].Value;
+            await NotifyAuctionIssueAsync(bidderId, auctionId, _notifyLocalizer[NotificationKeys.BidFailedTitle], rateLimitMessage);
             return StatusCode(
                 StatusCodes.Status429TooManyRequests,
-                new { success = false, message = _localizer["Bid_RateLimit_Message"].Value });
+                new { success = false, message = rateLimitMessage });
         }
 
         var challengeRequirement = await _bidChallengeService.GetRequirementAsync(
@@ -387,6 +419,8 @@ public async Task<IActionResult> DepositPayPalCancel(string token)
         var result = await _bidService.PlaceBidAsync(auctionId, bidderId, amount);
         if (!result.Success)
         {
+            await NotifyAuctionIssueAsync(bidderId, auctionId, _notifyLocalizer[NotificationKeys.BidFailedTitle], result.Message);
+
             return result.StatusCode switch
             {
                 404 => NotFound(new { success = false, message = result.Message }),
@@ -411,13 +445,33 @@ public async Task<IActionResult> DepositPayPalCancel(string token)
             endDate = result.EndDate is null ? null : DateTimeUtilities.AsUtc(result.EndDate.Value).ToString("o"),
             bidHistory = result.BidHistory?.Select(bid => new
             {
+                bidderId = bid.BidderId,
                 bidderName = bid.BidderName,
                 amount = bid.Amount,
                 bidTime = bid.BidTime,
                 isWinning = bid.IsWinning,
-                status = bid.Status
+                status = bid.Status,
+                isBidderProfilePublic = bid.IsBidderProfilePublic
             })
         });
+    }
+
+    private async Task NotifyAuctionIssueAsync(int userId, int auctionId, string title, string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        await _notificationService.CreateAndPushAsync(
+            userId,
+            title,
+            message,
+            NotificationType.Auction,
+            auctionId > 0 ? $"/Auction/Detail/{auctionId}" : null,
+            NotificationReferenceTypes.AuctionBidFailed,
+            auctionId > 0 ? auctionId : null,
+            debounceWindow: TimeSpan.FromMinutes(2));
     }
 
     private int? GetCurrentUserId()

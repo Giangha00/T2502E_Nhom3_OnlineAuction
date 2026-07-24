@@ -70,6 +70,10 @@ public class ComplaintDetailViewModel
 
     public int? AuctionId { get; set; }
 
+    public bool HasApprovedComplaintForOrder { get; set; }
+
+    public string? OrderRefundEligibilityWarning { get; set; }
+
     public bool CanMarkUnderReview { get; set; }
 
     public bool CanApprove { get; set; }

@@ -1,10 +1,70 @@
 @model AuctionDetailViewModel
+@using OnlineAuction.Configurations
+@using OnlineAuction.Helpers
 
 @{
     ViewData["Title"] = "Auction Details";
     ViewData["AdminPage"] = "auctions";
+    var canManage = AdminPermissionHelper.Can(User, PermissionCodes.AuctionsManage);
 
-    string FormatStatus(string status) => status.Replace('_', ' ');
+    string FormatStatus(string status) => status switch
+    {
+        "confirming" or "pending_review" => "Confirming",
+        "rejected" => "Rejected",
+        "scheduled" => "Scheduled",
+        "live" => "Live",
+        "ending_soon" => "Ending soon",
+        "ended" => "Ended",
+        "awaiting_payment" => "Awaiting payment",
+        "completed" => "Completed",
+        "cancelled" => "Cancelled",
+        _ => status.Replace('_', ' ')
+    };
+
+    string PhaseLabel(string phase)
+    {
+        var key = $"Auction_Phase_{phase}";
+        var label = Localizer[key];
+
+        if (!label.ResourceNotFound)
+        {
+            return label.Value;
+        }
+
+        return phase switch
+        {
+            AuctionListingPhases.RegistrationOpen => "Registration Open",
+            AuctionListingPhases.RegistrationClosed => "Awaiting Live",
+            AuctionListingPhases.LiveAuction => "Live Now",
+            AuctionListingPhases.LiveEndingSoon => "Ending Soon",
+            AuctionListingPhases.Upcoming => "Upcoming",
+            AuctionListingPhases.Ended => "Ended",
+            AuctionListingPhases.NotListed => "Not listed",
+            _ => phase.Replace('_', ' ')
+        };
+    }
+
+    string PhaseBadgeClass(string phase) => phase switch
+    {
+        AuctionListingPhases.RegistrationOpen => "bg-sky-600 text-white",
+        AuctionListingPhases.RegistrationClosed => "bg-amber-500 text-white",
+        AuctionListingPhases.LiveAuction => "bg-emerald-600 text-white",
+        AuctionListingPhases.LiveEndingSoon => "bg-red-600 text-white",
+        AuctionListingPhases.Ended => "bg-gray-600 text-white",
+        AuctionListingPhases.NotListed => "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+        _ => "bg-slate-600 text-white"
+    };
+
+    string StatusBadgeClass(string status) => status switch
+    {
+        "confirming" or "pending_review" => "bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",
+        "rejected" or "cancelled" => "bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-400",
+        "live" => "bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-400",
+        "ending_soon" => "bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-400",
+        "awaiting_payment" => "bg-warning-50 text-warning-700 dark:bg-warning-500/15 dark:text-warning-400",
+        "completed" => "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400",
+        _ => "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+    };
 }
 
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
@@ -14,16 +74,54 @@
             <p class="text-theme-sm text-gray-500 dark:text-gray-400">Viewing auction #@Model.Id.</p>
         </div>
 
-        <div class="flex gap-3">
-            <a asp-area="Admin"
-               asp-controller="Auction"
-               asp-action="Edit"
-               asp-route-id="@Model.Id"
-               class="admin-icon-action admin-icon-action--edit admin-icon-action--lg"
-               title="Edit"
-               aria-label="Edit">
-                <partial name="_AdminIcon" model='"pencil"' />
-            </a>
+        <div class="flex flex-wrap gap-3">
+            @if (Model.IsPubliclyListed)
+            {
+                <a asp-area=""
+                   asp-controller="Auction"
+                   asp-action="Detail"
+                   asp-route-id="@Model.Id"
+                   class="inline-flex items-center gap-2 rounded-lg border border-brand-200 bg-brand-50 px-3 py-2 text-theme-sm font-medium text-brand-700 hover:bg-brand-100"
+                   target="_blank"
+                   rel="noopener">
+                    Xem public
+                    <partial name="_AdminIcon" model='"external"' />
+                </a>
+            }
+
+            @if (canManage)
+            {
+                <a asp-area="Admin"
+                   asp-controller="Auction"
+                   asp-action="Edit"
+                   asp-route-id="@Model.Id"
+                   class="admin-icon-action admin-icon-action--edit admin-icon-action--lg"
+                   title="Edit"
+                   aria-label="Edit">
+                    <partial name="_AdminIcon" model='"pencil"' />
+                </a>
+
+                if (Model.CanDelete)
+                {
+                    <form asp-area="Admin" asp-controller="Auction" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="inline"
+                          onsubmit="return confirm('Bạn có chắc muốn xóa phiên #@Model.Id?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="admin-icon-action admin-icon-action--delete admin-icon-action--lg" title="Delete" aria-label="Delete">
+                            <partial name="_AdminIcon" model='"trash"' />
+                        </button>
+                    </form>
+                }
+                else if (Model.CanCancel)
+                {
+                    <form asp-area="Admin" asp-controller="Auction" asp-action="Cancel" asp-route-id="@Model.Id" method="post" class="inline"
+                          onsubmit="return confirm('Hủy phiên #@Model.Id thay vì xóa?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg" title="@Model.DeleteBlockReason" aria-label="Cancel">
+                            <partial name="_AdminIcon" model='"x-mark"' />
+                        </button>
+                    </form>
+                }
+            }
 
             <a asp-area="Admin"
                asp-controller="Auction"
@@ -36,6 +134,15 @@
         </div>
     </div>
 
+    <partial name="_AdminFlashMessages" />
+
+    @if (!string.IsNullOrWhiteSpace(Model.DeleteBlockReason) && canManage)
+    {
+        <div class="mb-4 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-theme-sm text-warning-800">
+            @Model.DeleteBlockReason
+        </div>
+    }
+
     <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
         <div class="flex flex-col gap-6 md:flex-row">
             @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
@@ -47,9 +154,18 @@
 
             <div class="flex-1">
                 <h3 class="text-xl font-semibold text-gray-800 dark:text-white/90">@Model.ProductName</h3>
-                <p class="mt-1 text-theme-sm capitalize text-gray-500 dark:text-gray-400">
-                    @FormatStatus(Model.Status) · @Model.ListingType · @Model.CategoryName
-                </p>
+                <p class="mt-1 text-theme-sm capitalize text-gray-500 dark:text-gray-400">@Model.ListingType · @Model.CategoryName</p>
+                <div class="mt-3 flex flex-wrap items-center gap-2">
+                    <span class="rounded-full px-2.5 py-0.5 text-theme-xs font-medium capitalize @StatusBadgeClass(Model.Status)">
+                        DB: @FormatStatus(Model.Status)
+                    </span>
+                    <span class="rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wide @PhaseBadgeClass(Model.ListingPhase)">
+                        @PhaseLabel(Model.ListingPhase)
+                    </span>
+                    <span class="rounded-full px-2.5 py-0.5 text-theme-xs font-medium @(Model.IsPubliclyListed ? "bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-400" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300")">
+                        Public: @(Model.IsPubliclyListed ? "Yes" : "No")
+                    </span>
+                </div>
             </div>
         </div>
 
@@ -79,18 +195,38 @@
             </div>
 
             <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Schedule</dt>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Registration Schedule</dt>
                 <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    @Model.StartDate.ToString("dd/MM/yyyy HH:mm") - @Model.EndDate.ToString("dd/MM/yyyy HH:mm")
+                    @Model.RegistrationStartDate.ToString("dd/MM/yyyy HH:mm") - @Model.RegistrationEndDate.ToString("dd/MM/yyyy HH:mm")
                 </dd>
+                <dd class="text-theme-xs text-gray-500">@Model.RegistrationCount registration(s)</dd>
             </div>
 
             <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Registration</dt>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Live Schedule</dt>
                 <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    @(Model.ListingType == ListingTypes.Auction ? "Registration required" : "Not applicable")
+                    @Model.StartDate.ToString("dd/MM/yyyy HH:mm") - @Model.EndDate.ToString("dd/MM/yyyy HH:mm")
                 </dd>
-                <dd class="text-theme-xs text-gray-500">@Model.RegistrationCount registration(s)</dd>
+                <dd class="text-theme-xs text-gray-500">@Model.TimeRemaining</dd>
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Visibility</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
+                    @(Model.IsPubliclyListed ? "Visible on /Auction" : "Not listed on /Auction")
+                </dd>
+                @if (Model.IsPubliclyListed)
+                {
+                    <dd>
+                        <a asp-area=""
+                           asp-controller="Auction"
+                           asp-action="Detail"
+                           asp-route-id="@Model.Id"
+                           class="text-theme-xs font-medium text-brand-600 hover:text-brand-700"
+                           target="_blank"
+                           rel="noopener">Open public detail</a>
+                    </dd>
+                }
             </div>
 
             <div>
@@ -101,11 +237,41 @@
             <div>
                 <dt class="text-theme-xs font-medium uppercase text-gray-400">Winner</dt>
                 <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.WinnerName ?? "Not assigned")</dd>
+                @if (Model.OrderId.HasValue)
+                {
+                    <dd class="text-theme-xs text-gray-500">
+                        Order: @(Model.OrderReference ?? $"#{Model.OrderId.Value}") · @(Model.OrderStatus ?? "unknown")
+                    </dd>
+                    @if (Model.PaymentDeadline.HasValue)
+                    {
+                        <dd class="text-theme-xs text-gray-500">Payment deadline: @Model.PaymentDeadline.Value.ToString("dd/MM/yyyy HH:mm")</dd>
+                    }
+                }
             </div>
 
             <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Product ID</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.ProductId</dd>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Verification</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
+                    @(Model.VerifiedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Not verified")
+                </dd>
+                <dd class="text-theme-xs text-gray-500">By: @(Model.VerifiedByName ?? "n/a")</dd>
+                @if (!string.IsNullOrWhiteSpace(Model.RejectReason))
+                {
+                    <dd class="text-theme-xs text-error-600">Reject reason: @Model.RejectReason</dd>
+                }
+            </div>
+
+            <div>
+                <dt class="text-theme-xs font-medium uppercase text-gray-400">Product</dt>
+                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
+                    <a asp-area="Admin"
+                       asp-controller="Product"
+                       asp-action="Details"
+                       asp-route-id="@Model.ProductId"
+                       class="font-medium text-brand-600 hover:text-brand-700">
+                        Product #@Model.ProductId
+                    </a>
+                </dd>
             </div>
 
             <div>

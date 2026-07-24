@@ -17,7 +17,8 @@ namespace OnlineAuction.Services;
 
 public class BidService : IBidService
 {
-    private const int BidHistoryLimit = 20;
+    private const int BidHistoryPreviewLimit = 10;
+    public const int BidHistoryPageSize = 25;
 
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IAuctionRegistrationService _registrationService;
@@ -235,6 +236,7 @@ public class BidService : IBidService
             AuctionId = auctionId,
             BidId = newBid.Id,
             BidderId = bidderId,
+            SellerId = auction.Product.SellerId,
             Amount = amount,
             PreviousPrice = previousPrice,
             OutbidUserIds = outbidUserIds,
@@ -256,7 +258,10 @@ public class BidService : IBidService
         }
 
         var bidCount = await _dbContext.Bids.CountAsync(b => b.AuctionId == auctionId);
-        var bidHistory = await LoadBidHistoryAsync(auctionId);
+        var bidHistory = await LoadBidHistoryAsync(
+            auctionId,
+            ProductDetailMapper.ShouldRevealBidderIdentity(auction),
+            BidHistoryPreviewLimit);
 
         return PlaceBidResult.Ok(
             "Bid placed successfully.",
@@ -278,7 +283,7 @@ public class BidService : IBidService
         {
             return auction.Status switch
             {
-                AuctionStatuses.PendingReview => "This auction is pending review and not yet open for bidding.",
+                AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview => "This auction is confirming and not yet open for bidding.",
                 AuctionStatuses.Rejected => "This auction listing was rejected.",
                 AuctionStatuses.Scheduled => "The live auction has not started yet.",
                 AuctionStatuses.Ended or AuctionStatuses.AwaitingPayment => "This auction has ended.",
@@ -344,8 +349,63 @@ public class BidService : IBidService
         }
 
         var bidCount = await _dbContext.Bids.CountAsync(b => b.AuctionId == auctionId, cancellationToken);
-        var bidHistory = await LoadBidHistoryAsync(auctionId);
+        var bidHistory = await LoadBidHistoryAsync(
+            auctionId,
+            ProductDetailMapper.ShouldRevealBidderIdentity(auction),
+            BidHistoryPreviewLimit);
         return BuildBidState(auctionId, auction, bidCount, bidHistory);
+    }
+
+    public async Task<AuctionBidHistoryPageViewModel?> GetAuctionBidHistoryPageAsync(
+        int auctionId,
+        int page = 1,
+        CancellationToken cancellationToken = default)
+    {
+        var auction = await _dbContext.Auctions
+            .AsNoTracking()
+            .Include(a => a.Product)
+            .FirstOrDefaultAsync(a => a.Id == auctionId, cancellationToken);
+
+        if (auction?.Product is null)
+        {
+            return null;
+        }
+
+        var revealIdentity = ProductDetailMapper.ShouldRevealBidderIdentity(auction);
+        var bidCount = await _dbContext.Bids.CountAsync(b => b.AuctionId == auctionId, cancellationToken);
+        var totalPages = bidCount == 0
+            ? 1
+            : (int)Math.Ceiling(bidCount / (double)BidHistoryPageSize);
+
+        if (page < 1)
+        {
+            page = 1;
+        }
+        else if (page > totalPages)
+        {
+            page = totalPages;
+        }
+
+        var skip = (page - 1) * BidHistoryPageSize;
+        var bids = await LoadBidHistoryAsync(
+            auctionId,
+            revealIdentity,
+            take: BidHistoryPageSize,
+            skip: skip);
+
+        return new AuctionBidHistoryPageViewModel
+        {
+            AuctionId = auction.Id,
+            ProductName = auction.Product.Name,
+            ProductImageUrl = auction.Product.PrimaryImage,
+            CurrentPrice = auction.CurrentPrice,
+            BidCount = bidCount,
+            IsEnded = revealIdentity,
+            Page = page,
+            PageSize = BidHistoryPageSize,
+            TotalPages = totalPages,
+            Bids = bids
+        };
     }
 
     private static AuctionBidStateViewModel BuildBidState(
@@ -354,11 +414,7 @@ public class BidService : IBidService
         int bidCount,
         IReadOnlyList<BidHistoryItemViewModel> bidHistory)
     {
-        var isEnded = !DateTimeUtilities.IsInFutureUtc(auction.EndDate)
-            || auction.Status is AuctionStatuses.Ended
-                or AuctionStatuses.AwaitingPayment
-                or AuctionStatuses.Completed
-                or AuctionStatuses.Cancelled;
+        var isEnded = ProductDetailMapper.ShouldRevealBidderIdentity(auction);
 
         return new AuctionBidStateViewModel
         {
@@ -372,17 +428,43 @@ public class BidService : IBidService
         };
     }
 
-    private async Task<IReadOnlyList<BidHistoryItemViewModel>> LoadBidHistoryAsync(int auctionId)
+    private async Task<IReadOnlyList<BidHistoryItemViewModel>> LoadBidHistoryAsync(
+        int auctionId,
+        bool revealBidderIdentity,
+        int? take,
+        int skip = 0)
     {
-        var bids = await _dbContext.Bids
+        Bid? winningBid = null;
+        if (skip > 0)
+        {
+            winningBid = await _dbContext.Bids
+                .AsNoTracking()
+                .Include(b => b.Bidder)
+                .Where(b => b.AuctionId == auctionId && b.IsWinning)
+                .FirstOrDefaultAsync();
+        }
+
+        var query = _dbContext.Bids
             .AsNoTracking()
             .Include(b => b.Bidder)
             .Where(b => b.AuctionId == auctionId)
-            .OrderByDescending(b => b.PlacedAt)
-            .Take(BidHistoryLimit)
-            .ToListAsync();
+            .OrderByDescending(b => b.PlacedAt);
 
-        return ProductDetailMapper.MapBidHistory(bids);
+        List<Bid> bids;
+        if (take.HasValue)
+        {
+            bids = await query.Skip(skip).Take(take.Value).ToListAsync();
+        }
+        else if (skip > 0)
+        {
+            bids = await query.Skip(skip).ToListAsync();
+        }
+        else
+        {
+            bids = await query.ToListAsync();
+        }
+
+        return ProductDetailMapper.MapBidHistory(bids, revealBidderIdentity, winningBid: winningBid);
     }
 
     private static PlaceBidResult Fail(string message, int statusCode = 400) =>

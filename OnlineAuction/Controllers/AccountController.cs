@@ -143,7 +143,9 @@ public class AccountController : Controller
             PageDescription = _localizer["Account_Submissions_Desc"],
             Listings = listings,
             ShowBidLink = false,
-            ShowTimeRemaining = false,
+            ShowWatchlistButton = false,
+            ShowWatchlistPlaceholder = true,
+            ShowTimeRemaining = true,
             EmptyDesc = _localizer["Account_Submissions_Empty"].Value
         });
     }

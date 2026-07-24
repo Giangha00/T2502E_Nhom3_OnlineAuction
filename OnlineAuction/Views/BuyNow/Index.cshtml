@@ -89,7 +89,7 @@
         @foreach (var item in Model.Auctions)
         {
           <partial name="Partials/_TradingCardAuctionCard"
-                   model="@(new AuctionCardViewModel { Item = item, EnableFiltering = true, Variant = "grid", CardMode = "buynow" })"/>
+                   model="@(new AuctionCardViewModel { Item = item, EnableFiltering = true, Variant = "grid", CardMode = "buynow", ShowWatchlistButton = true, ShowTimeRemaining = false })"/>
         }
       </div>
 

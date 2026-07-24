@@ -15,7 +15,6 @@ public static class UserSchemaPatcher
         }
 
         await EnsureSuperAdminColumnAsync(db, logger, cancellationToken);
-        await EnsureUserPermissionsTableAsync(db, logger, cancellationToken);
     }
 
     private static async Task EnsureSuperAdminColumnAsync(
@@ -49,43 +48,6 @@ public static class UserSchemaPatcher
         await EnsureMigrationHistoryAsync(db, "20260701083000_AddIsSuperAdminToUsers", cancellationToken);
     }
 
-    private static async Task EnsureUserPermissionsTableAsync(
-        AuctionHouseDbContext db,
-        ILogger logger,
-        CancellationToken cancellationToken)
-    {
-        if (await TableExistsAsync(db, "user_permissions", cancellationToken))
-        {
-            return;
-        }
-
-        logger.LogWarning(
-            "Table user_permissions is missing. Applying schema patch before seeders.");
-
-        await db.Database.ExecuteSqlRawAsync(
-            """
-            CREATE TABLE user_permissions (
-                user_id int NOT NULL,
-                permission_id int NOT NULL,
-                PRIMARY KEY (user_id, permission_id),
-                CONSTRAINT fk_user_permissions_user
-                    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-                CONSTRAINT fk_user_permissions_permission
-                    FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE
-            )
-            """,
-            cancellationToken);
-
-        await db.Database.ExecuteSqlRawAsync(
-            """
-            CREATE UNIQUE INDEX ux_user_permissions_user_permission
-            ON user_permissions (user_id, permission_id)
-            """,
-            cancellationToken);
-
-        await EnsureMigrationHistoryAsync(db, "20260701090000_AddUserPermissions", cancellationToken);
-    }
-
     private static async Task EnsureMigrationHistoryAsync(
         AuctionHouseDbContext db,
         string migrationId,
@@ -104,25 +66,6 @@ public static class UserSchemaPatcher
                 [migrationId, "9.0.17"],
                 cancellationToken);
         }
-    }
-
-    private static async Task<bool> TableExistsAsync(
-        AuctionHouseDbContext db,
-        string tableName,
-        CancellationToken cancellationToken)
-    {
-        var count = await db.Database
-            .SqlQueryRaw<long>(
-                """
-                SELECT COUNT(*) AS Value
-                FROM information_schema.TABLES
-                WHERE TABLE_SCHEMA = DATABASE()
-                  AND TABLE_NAME = {0}
-                """,
-                tableName)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return count > 0;
     }
 
     private static async Task<bool> ColumnExistsAsync(

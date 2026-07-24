@@ -732,8 +732,86 @@ footer .footer-link--active:visited {
 }
 
 .rarecard-category-tile {
-  display: block;
-  min-height: 10rem;
+  display: flex;
+  min-height: 14rem;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.rarecard-category-tile:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.rarecard-category-tile__visual {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  padding: 1.75rem 1.5rem 1.25rem;
+}
+
+.rarecard-category-tile__logo {
+  width: auto;
+  height: auto;
+  max-width: 88%;
+  max-height: 7.5rem;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.rarecard-category-tile:hover .rarecard-category-tile__logo {
+  transform: scale(1.04);
+}
+
+.rarecard-category-tile__footer {
+  border-top: 1px solid #f1f5f9;
+  background: #fff;
+  padding: 0.875rem 1.25rem 1rem;
+}
+
+.rarecard-category-tile__title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #0f172a;
+}
+
+.rarecard-category-tile__count {
+  margin-top: 0.125rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+@media (min-width: 640px) {
+  .rarecard-category-tile {
+    min-height: 15.5rem;
+  }
+
+  .rarecard-category-tile__visual {
+    padding: 2rem 1.5rem 1.5rem;
+  }
+
+  .rarecard-category-tile__logo {
+    max-height: 8.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .rarecard-category-tile {
+    min-height: 16.5rem;
+  }
+
+  .rarecard-category-tile__logo {
+    max-height: 9rem;
+  }
 }
 
 .rarecard-auction-grid {
@@ -2367,6 +2445,17 @@ body.home-auth-open {
   color: #94a3b8;
 }
 
+.user-detail-field__input--editable {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.user-detail-field__input--editable:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
 .user-detail-auction-card {
   display: flex;
   flex-direction: column;
@@ -2918,7 +3007,13 @@ body.home-auth-open {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(105deg, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.68) 42%, rgba(15, 23, 42, 0.35) 72%, rgba(15, 23, 42, 0.15) 100%),
+    linear-gradient(
+      105deg,
+      rgba(15, 23, 42, 0.92) 0%,
+      rgba(15, 23, 42, 0.68) 42%,
+      rgba(15, 23, 42, 0.35) 72%,
+      rgba(15, 23, 42, 0.15) 100%
+    ),
     linear-gradient(to top, rgba(15, 23, 42, 0.55), transparent 50%);
   pointer-events: none;
 }
@@ -3008,7 +3103,10 @@ body.home-auth-open {
   text-transform: uppercase;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .home-hero-banner__btn--primary {
@@ -3061,7 +3159,12 @@ body.home-auth-open {
 
 .about-section--muted {
   background:
-    radial-gradient(circle at 1px 1px, rgba(148, 163, 184, 0.22) 1px, transparent 0) 0 0 / 24px 24px,
+    radial-gradient(
+        circle at 1px 1px,
+        rgba(148, 163, 184, 0.22) 1px,
+        transparent 0
+      )
+      0 0 / 24px 24px,
     var(--about-surface);
 }
 
@@ -3135,7 +3238,11 @@ body.home-auth-open {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   text-decoration: none;
-  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .about-btn:hover {

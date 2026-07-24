@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Areas.Admin.ViewModels.Complaints;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
@@ -13,15 +14,18 @@ public class AdminComplaintService : IAdminComplaintService
 {
     private readonly AuctionHouseDbContext _dbContext;
     private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<AdminComplaintService> _logger;
 
     public AdminComplaintService(
         AuctionHouseDbContext dbContext,
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         ILogger<AdminComplaintService> logger)
     {
         _dbContext = dbContext;
         _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
     }
 
@@ -48,6 +52,7 @@ public class AdminComplaintService : IAdminComplaintService
                 complaint.RequestReference.Contains(keyword)
                 || (complaint.OrderReference != null && complaint.OrderReference.Contains(keyword))
                 || complaint.Buyer.FullName.Contains(keyword)
+                || complaint.ContactName.Contains(keyword)
                 || complaint.ContactEmail.Contains(keyword)
                 || (complaint.Buyer.Email != null && complaint.Buyer.Email.Contains(keyword))
                 || (complaint.Order != null && complaint.Order.OrderReference.Contains(keyword)));
@@ -165,12 +170,19 @@ public class AdminComplaintService : IAdminComplaintService
                      && c.Status == ComplaintStatuses.Approved,
                 cancellationToken);
 
-        var orderIsPaid = complaint.Order == null
-                          || complaint.Order.Status == OrderStatuses.Paid
-                          || complaint.Order.Status == OrderStatuses.Shipped
-                          || complaint.Order.Status == OrderStatuses.Delivered;
+        var orderIsRefundEligible = complaint.Order != null
+                                    && complaint.Order.Status is OrderStatuses.Paid
+                                        or OrderStatuses.Shipped
+                                        or OrderStatuses.Delivered;
 
         var isOpen = complaint.Status is ComplaintStatuses.Pending or ComplaintStatuses.UnderReview;
+        var orderRefundEligibilityWarning = complaint.Order switch
+        {
+            null => "This complaint is not linked to a valid order and cannot be approved.",
+            { Status: not (OrderStatuses.Paid or OrderStatuses.Shipped or OrderStatuses.Delivered) } =>
+                "The linked order is not paid, shipped, or delivered yet, so refund approval is blocked.",
+            _ => null
+        };
 
         return new ComplaintDetailViewModel
         {
@@ -208,8 +220,10 @@ public class AdminComplaintService : IAdminComplaintService
             SellerEmail = seller?.Email,
             ProductName = firstItem?.ItemName ?? "—",
             AuctionId = firstItem?.AuctionId,
+            HasApprovedComplaintForOrder = hasApprovedForOrder,
+            OrderRefundEligibilityWarning = orderRefundEligibilityWarning,
             CanMarkUnderReview = complaint.Status == ComplaintStatuses.Pending,
-            CanApprove = isOpen && orderIsPaid && !hasApprovedForOrder,
+            CanApprove = isOpen && orderIsRefundEligible && !hasApprovedForOrder,
             CanReject = isOpen,
             CanClose = complaint.Status is ComplaintStatuses.Approved or ComplaintStatuses.Rejected
         };
@@ -257,25 +271,26 @@ public class AdminComplaintService : IAdminComplaintService
                     return (false, "Resolution note is required when approving a complaint.");
                 }
 
-                if (complaint.OrderId.HasValue)
+                if (!complaint.OrderId.HasValue || complaint.Order is null)
                 {
-                    if (complaint.Order is null
-                        || complaint.Order.Status is not (OrderStatuses.Paid or OrderStatuses.Shipped or OrderStatuses.Delivered))
-                    {
-                        return (false, "The linked order must be paid before approval.");
-                    }
+                    return (false, "A valid linked order is required before approval.");
+                }
 
-                    var duplicateApproved = await _dbContext.Complaints.AnyAsync(
-                        c => c.DeletedAt == null
-                             && c.OrderId == complaint.OrderId
-                             && c.Id != complaint.Id
-                             && c.Status == ComplaintStatuses.Approved,
-                        cancellationToken);
+                if (complaint.Order.Status is not (OrderStatuses.Paid or OrderStatuses.Shipped or OrderStatuses.Delivered))
+                {
+                    return (false, "The linked order must be paid, shipped, or delivered before approval.");
+                }
 
-                    if (duplicateApproved)
-                    {
-                        return (false, "Another approved complaint already exists for this order.");
-                    }
+                var duplicateApproved = await _dbContext.Complaints.AnyAsync(
+                    c => c.DeletedAt == null
+                         && c.OrderId == complaint.OrderId
+                         && c.Id != complaint.Id
+                         && c.Status == ComplaintStatuses.Approved,
+                    cancellationToken);
+
+                if (duplicateApproved)
+                {
+                    return (false, "Another approved complaint already exists for this order.");
                 }
 
                 complaint.Status = ComplaintStatuses.Approved;
@@ -341,7 +356,10 @@ public class AdminComplaintService : IAdminComplaintService
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        if (normalizedAction is ComplaintStatusActions.Approve or ComplaintStatusActions.Reject)
+        if (normalizedAction is ComplaintStatusActions.Approve
+            or ComplaintStatusActions.Reject
+            or ComplaintStatusActions.UnderReview
+            or ComplaintStatusActions.Close)
         {
             await TryNotifyBuyerAsync(complaint, normalizedAction, cancellationToken);
         }
@@ -369,8 +387,8 @@ public class AdminComplaintService : IAdminComplaintService
             {
                 await _notificationService.CreateAndPushAsync(
                     complaint.BuyerId,
-                    "Refund request approved",
-                    complaint.ResolutionNote ?? "Your refund request has been approved.",
+                    _notifyLocalizer[NotificationKeys.RefundApprovedTitle],
+                    complaint.ResolutionNote ?? _notifyLocalizer[NotificationKeys.RefundApprovedMessage],
                     NotificationType.Refund,
                     "/Refund/Confirmation?requestId=" + Uri.EscapeDataString(complaint.RequestReference),
                     NotificationReferenceTypes.RefundApproved,
@@ -381,11 +399,35 @@ public class AdminComplaintService : IAdminComplaintService
             {
                 await _notificationService.CreateAndPushAsync(
                     complaint.BuyerId,
-                    "Refund request rejected",
-                    complaint.ResolutionNote ?? "Your refund request has been rejected.",
+                    _notifyLocalizer[NotificationKeys.RefundRejectedTitle],
+                    complaint.ResolutionNote ?? _notifyLocalizer[NotificationKeys.RefundRejectedMessage],
                     NotificationType.Refund,
                     "/Refund",
                     NotificationReferenceTypes.RefundRejected,
+                    complaint.Id,
+                    cancellationToken: cancellationToken);
+            }
+            else if (action == ComplaintStatusActions.UnderReview)
+            {
+                await _notificationService.CreateAndPushAsync(
+                    complaint.BuyerId,
+                    _notifyLocalizer[NotificationKeys.RefundUnderReviewTitle],
+                    _notifyLocalizer[NotificationKeys.RefundUnderReviewMessage],
+                    NotificationType.Refund,
+                    "/Refund",
+                    NotificationReferenceTypes.RefundUnderReview,
+                    complaint.Id,
+                    cancellationToken: cancellationToken);
+            }
+            else if (action == ComplaintStatusActions.Close)
+            {
+                await _notificationService.CreateAndPushAsync(
+                    complaint.BuyerId,
+                    _notifyLocalizer[NotificationKeys.RefundClosedTitle],
+                    complaint.ResolutionNote ?? _notifyLocalizer[NotificationKeys.RefundClosedMessage],
+                    NotificationType.Refund,
+                    "/Refund",
+                    NotificationReferenceTypes.RefundClosed,
                     complaint.Id,
                     cancellationToken: cancellationToken);
             }

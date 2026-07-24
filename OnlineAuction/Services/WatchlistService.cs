@@ -20,11 +20,12 @@ public class WatchlistService : IWatchlistService
         int auctionId,
         CancellationToken cancellationToken = default)
     {
-        var auctionExists = await _db.Auctions
+        var auction = await _db.Auctions
             .AsNoTracking()
-            .AnyAsync(a => a.Id == auctionId && a.DeletedAt == null, cancellationToken);
+            .Include(a => a.Product)
+            .FirstOrDefaultAsync(a => a.Id == auctionId && a.DeletedAt == null, cancellationToken);
 
-        if (!auctionExists)
+        if (auction is null)
         {
             throw new InvalidOperationException("Auction not found.");
         }
@@ -42,6 +43,14 @@ public class WatchlistService : IWatchlistService
                 IsWatched = false,
                 Count = await GetCountAsync(userId, cancellationToken)
             };
+        }
+
+        var isOwner = auction.Product.SellerId == userId;
+        if (!isOwner &&
+            (AuctionStatuses.IsConfirming(auction.Status) ||
+             auction.Status is AuctionStatuses.Rejected or AuctionStatuses.Cancelled))
+        {
+            throw new InvalidOperationException("This listing is not available to watch.");
         }
 
         _db.WatchlistItems.Add(new WatchlistItem
@@ -103,7 +112,10 @@ public class WatchlistService : IWatchlistService
             .Where(a =>
                 auctionIds.Contains(a.Id) &&
                 a.DeletedAt == null &&
-                a.Status != AuctionStatuses.Cancelled)
+                a.Status != AuctionStatuses.Cancelled &&
+                a.Status != AuctionStatuses.Confirming &&
+                a.Status != AuctionStatuses.LegacyPendingReview &&
+                a.Status != AuctionStatuses.Rejected)
             .Include(a => a.Product)
                 .ThenInclude(p => p.Category)
             .Include(a => a.Bids)

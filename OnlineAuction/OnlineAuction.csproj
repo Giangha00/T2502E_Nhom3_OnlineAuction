@@ -9,6 +9,12 @@
         <UserSecretsId>online-auction-dev-secrets</UserSecretsId>
     </PropertyGroup>
 
+    <!-- Keep machine-local secrets off App Service publish output -->
+    <ItemGroup>
+      <Content Update="appsettings.Local.json" CopyToPublishDirectory="Never" CopyToOutputDirectory="PreserveNewest" />
+      <Content Update="appsettings.Local.json.example" CopyToPublishDirectory="Never" />
+    </ItemGroup>
+
     <ItemGroup Condition="'$(Configuration)' == 'Debug'">
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.11" />
     </ItemGroup>
@@ -78,6 +84,13 @@
 
     <ItemGroup>
       <Content Include="Documents\.DS_Store" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="scripts\spec-test\**" />
+      <None Remove="scripts\spec-test\**" />
+      <Content Remove="scripts\spec-test\**" />
+      <EmbeddedResource Remove="scripts\spec-test\**" />
     </ItemGroup>
 
     <ItemGroup>

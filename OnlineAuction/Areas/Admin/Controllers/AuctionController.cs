@@ -26,16 +26,29 @@ public class AuctionController : BaseAdminController
 
     [HttpGet]
     [RequirePermission(PermissionCodes.AuctionsManage)]
-    public async Task<IActionResult> Create()
+    public IActionResult Create()
     {
-        return View(await _auctionService.BuildCreateFormAsync());
+        ViewData["Title"] = "Create Listing";
+        return View();
+    }
+
+    [HttpGet]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
+    public async Task<IActionResult> CreateAuction()
+    {
+        ViewData["Title"] = "Create Auction";
+        return View(await _auctionService.BuildCreateAuctionFormAsync());
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     [RequirePermission(PermissionCodes.AuctionsManage)]
-    public async Task<IActionResult> Create(AuctionFormViewModel model)
+    public async Task<IActionResult> CreateAuction(AuctionFormViewModel model)
     {
+        model.ListingType = ListingTypes.Auction;
+        BindUploadedFiles(model);
+        RevalidateModel(model);
+
         if (!ModelState.IsValid)
         {
             await _auctionService.PopulateFormOptionsAsync(model);
@@ -57,6 +70,55 @@ public class AuctionController : BaseAdminController
 
     [HttpGet]
     [RequirePermission(PermissionCodes.AuctionsManage)]
+    public async Task<IActionResult> CreateBuyNow()
+    {
+        ViewData["Title"] = "Create Buy Now";
+        return View(await _auctionService.BuildCreateBuyNowFormAsync());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
+    public async Task<IActionResult> CreateBuyNow(AuctionFormViewModel model)
+    {
+        model.ListingType = ListingTypes.BuyNow;
+        BindUploadedFiles(model);
+        RevalidateModel(model);
+
+        if (!ModelState.IsValid)
+        {
+            await _auctionService.PopulateFormOptionsAsync(model);
+            return View(model);
+        }
+
+        var result = await _auctionService.CreateAsync(model);
+
+        if (!result.Success)
+        {
+            ModelState.AddModelError(string.Empty, result.Message);
+            await _auctionService.PopulateFormOptionsAsync(model);
+            return View(model);
+        }
+
+        TempData["SuccessMessage"] = result.Message;
+        return RedirectToAction("Index", "BuyNow", new { area = "Admin" });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
+    public async Task<IActionResult> Create(AuctionFormViewModel model)
+    {
+        if (model.ListingType == ListingTypes.BuyNow)
+        {
+            return await CreateBuyNow(model);
+        }
+
+        return await CreateAuction(model);
+    }
+
+    [HttpGet]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
     public async Task<IActionResult> Edit(int id)
     {
         var model = await _auctionService.GetEditFormAsync(id);
@@ -74,6 +136,9 @@ public class AuctionController : BaseAdminController
     [RequirePermission(PermissionCodes.AuctionsManage)]
     public async Task<IActionResult> Edit(AuctionFormViewModel model)
     {
+        BindUploadedFiles(model);
+        RevalidateModel(model);
+
         if (!ModelState.IsValid)
         {
             await _auctionService.PopulateFormOptionsAsync(model);
@@ -86,11 +151,20 @@ public class AuctionController : BaseAdminController
         {
             ModelState.AddModelError(string.Empty, result.Message);
             await _auctionService.PopulateFormOptionsAsync(model);
+            var refreshed = await _auctionService.GetEditFormAsync(model.Id);
+            if (refreshed is not null)
+            {
+                model.IsScheduleLocked = refreshed.IsScheduleLocked;
+                model.IsStartingPriceLocked = refreshed.IsStartingPriceLocked;
+            }
+
             return View(model);
         }
 
         TempData["SuccessMessage"] = result.Message;
-        return RedirectToAction(nameof(Index));
+        return model.IsBuyNow
+            ? RedirectToAction("Index", "BuyNow", new { area = "Admin" })
+            : RedirectToAction(nameof(Index));
     }
 
     [HttpGet]
@@ -138,9 +212,19 @@ public class AuctionController : BaseAdminController
     [HttpPost]
     [ValidateAntiForgeryToken]
     [RequirePermission(PermissionCodes.AuctionsManage)]
+    public async Task<IActionResult> Cancel(int id)
+    {
+        var result = await _auctionService.CancelAsync(id, GetCurrentAdminId());
+        TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequirePermission(PermissionCodes.AuctionsManage)]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _auctionService.DeleteAsync(id);
+        var result = await _auctionService.DeleteAsync(id, GetCurrentAdminId());
 
         if (result.Success)
         {
@@ -160,12 +244,55 @@ public class AuctionController : BaseAdminController
         return int.TryParse(value, out var userId) ? userId : 0;
     }
 
+    private void BindUploadedFiles(AuctionFormViewModel model)
+    {
+        model.PrimaryImageFile ??= Request.Form.Files
+            .FirstOrDefault(file => file.Name == nameof(AuctionFormViewModel.PrimaryImageFile));
+
+        var galleryFiles = Request.Form.Files
+            .Where(file => file.Name == "GalleryImageFiles")
+            .ToList();
+        if (galleryFiles.Count > 0)
+        {
+            model.GalleryImageFiles = galleryFiles;
+        }
+
+        var documentFiles = Request.Form.Files
+            .Where(file => file.Name == "DocumentFiles")
+            .ToList();
+        if (documentFiles.Count > 0)
+        {
+            model.DocumentFiles = documentFiles;
+        }
+
+        var documentNames = Request.Form["DocumentNames"]
+            .Select(name => name!)
+            .ToList();
+        if (documentNames.Count > 0)
+        {
+            model.DocumentNames = documentNames;
+        }
+        else if (model.DocumentFiles.Count > 0)
+        {
+            model.DocumentNames = model.DocumentFiles
+                .Select(file => file.FileName)
+                .ToList();
+        }
+    }
+
+    private void RevalidateModel(AuctionFormViewModel model)
+    {
+        model.NormalizeGrading();
+        ModelState.Clear();
+        TryValidateModel(model, prefix: string.Empty);
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     [RequirePermission(PermissionCodes.AuctionsManage)]
     public async Task<IActionResult> BulkDelete(AuctionBulkDeleteViewModel model)
     {
-        var result = await _auctionService.BulkDeleteAsync(model.SelectedAuctionIds);
+        var result = await _auctionService.BulkDeleteAsync(model.SelectedAuctionIds, GetCurrentAdminId());
 
         if (result.Success)
         {

@@ -1,5 +1,7 @@
 namespace OnlineAuction.Areas.Admin.ViewModels.Products;
 
+using OnlineAuction.Entities;
+
 public class ProductDetailViewModel
 {
     public int Id { get; set; }
@@ -66,6 +68,8 @@ public class ProductDetailViewModel
 
     public bool CanDelete { get; set; } = true;
 
+    public string? DeleteBlockReason { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
@@ -76,6 +80,8 @@ public class ProductLinkedAuctionViewModel
     public int Id { get; set; }
 
     public string Status { get; set; } = string.Empty;
+
+    public string ListingType { get; set; } = ListingTypes.Auction;
 
     public decimal StartingPrice { get; set; }
 

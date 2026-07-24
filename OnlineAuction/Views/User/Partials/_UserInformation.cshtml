@@ -1,33 +1,212 @@
 @model OnlineAuction.Models.UserBasicInfoViewModel
 
-<section class="p-6 sm:p-8">
-  <div class="mb-6 flex items-center gap-3">
-    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
-      </svg>
+<section class="p-6 sm:p-8" id="profile-edit" data-profile-editor="@(Model.IsOwner ? "true" : "false")">
+  <div class="mb-6 flex flex-wrap items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+        </svg>
+      </div>
+      <div>
+        <h2 class="text-base font-bold text-slate-900">@Localizer["User_BasicInformation"]</h2>
+        <p class="text-xs text-slate-500" data-profile-desc-view>
+          @(Model.CanViewContactInfo || Model.IsOwner
+              ? Localizer["User_BasicInformation_Desc"]
+              : Localizer["User_BasicInformation_PublicDesc"])
+        </p>
+        @if (Model.IsOwner)
+        {
+          <p class="text-xs text-slate-500" data-profile-desc-edit hidden>
+            @Localizer["User_BasicInformation_EditDesc"]
+          </p>
+        }
+      </div>
     </div>
-    <div>
-      <h2 class="text-base font-bold text-slate-900">@Localizer["User_BasicInformation"]</h2>
-      <p class="text-xs text-slate-500">@Localizer["User_BasicInformation_Desc"]</p>
+
+    @if (Model.IsOwner)
+    {
+      <button type="button"
+              data-profile-edit-btn
+              class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/>
+        </svg>
+        @Localizer["User_EditProfile"]
+      </button>
+    }
+  </div>
+
+  <div data-profile-view>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label class="user-detail-field__label">@Localizer["User_FullName"]</label>
+        <input type="text" readonly value="@Model.FullName"
+               class="user-detail-field__input"/>
+      </div>
+      @if (Model.CanViewContactInfo || Model.IsOwner)
+      {
+        <div>
+          <label class="user-detail-field__label">@Localizer["User_Email"]</label>
+          <input type="text" readonly value="@(string.IsNullOrWhiteSpace(Model.Email) ? Localizer["User_NotUpdated"].Value : Model.Email)"
+                 class="user-detail-field__input @(string.IsNullOrWhiteSpace(Model.Email) ? "user-detail-field__input--placeholder" : "")"/>
+        </div>
+        <div>
+          <label class="user-detail-field__label">@Localizer["User_PhoneNumber"]</label>
+          <input type="text" readonly value="@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? Localizer["User_NotUpdated"].Value : Model.PhoneNumber)"
+                 class="user-detail-field__input @(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "user-detail-field__input--placeholder" : "")"/>
+        </div>
+      }
+      else
+      {
+        <div class="sm:col-span-1">
+          <label class="user-detail-field__label">@Localizer["User_ContactInfo"]</label>
+          <p class="user-detail-field__input user-detail-field__input--placeholder flex items-center">
+            @Localizer["User_ContactPrivate"]
+          </p>
+        </div>
+      }
     </div>
   </div>
 
-  <div class="grid gap-5 sm:grid-cols-2">
-    <div>
-      <label class="user-detail-field__label">@Localizer["User_FullName"]</label>
-      <input type="text" readonly value="@Model.FullName"
-             class="user-detail-field__input"/>
-    </div>
-    <div>
-      <label class="user-detail-field__label">@Localizer["User_Email"]</label>
-      <input type="text" readonly value="@Model.Email"
-             class="user-detail-field__input"/>
-    </div>
-    <div>
-      <label class="user-detail-field__label">@Localizer["User_PhoneNumber"]</label>
-      <input type="text" readonly value="@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? Localizer["User_NotUpdated"].Value : Model.PhoneNumber)"
-             class="user-detail-field__input @(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "user-detail-field__input--placeholder" : "")"/>
-    </div>
-  </div>
+  @if (Model.IsOwner)
+  {
+    <form asp-controller="User"
+          asp-action="UpdateProfile"
+          method="post"
+          enctype="multipart/form-data"
+          id="profile-edit-form"
+          data-profile-edit
+          hidden
+          class="space-y-5">
+      @Html.AntiForgeryToken()
+
+      <input id="profile-avatar-input"
+             type="file"
+             name="AvatarFile"
+             accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+             class="sr-only" />
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label class="user-detail-field__label" for="profile-full-name">@Localizer["User_FullName"]</label>
+          <input id="profile-full-name"
+                 type="text"
+                 name="FullName"
+                 value="@Model.FullName"
+                 data-original-value="@Model.FullName"
+                 required
+                 maxlength="120"
+                 class="user-detail-field__input user-detail-field__input--editable"/>
+        </div>
+        <div>
+          <label class="user-detail-field__label" for="profile-email">@Localizer["User_Email"]</label>
+          <input id="profile-email"
+                 type="email"
+                 name="Email"
+                 value="@Model.Email"
+                 data-original-value="@Model.Email"
+                 required
+                 maxlength="160"
+                 class="user-detail-field__input user-detail-field__input--editable"/>
+        </div>
+        <div>
+          <label class="user-detail-field__label" for="profile-phone">@Localizer["User_PhoneNumber"]</label>
+          <input id="profile-phone"
+                 type="text"
+                 name="PhoneNumber"
+                 value="@Model.PhoneNumber"
+                 data-original-value="@Model.PhoneNumber"
+                 required
+                 pattern="\d{9,12}"
+                 maxlength="12"
+                 inputmode="numeric"
+                 class="user-detail-field__input user-detail-field__input--editable"/>
+          <p class="mt-1 text-xs text-slate-400">@Localizer["User_PhoneHint"]</p>
+        </div>
+        <div class="flex items-end">
+          <p id="profile-avatar-filename" class="text-xs text-slate-400">@Localizer["User_AvatarHint"]</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap justify-end gap-3 border-t border-slate-100 pt-5">
+        <button type="button"
+                data-profile-cancel-btn
+                class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+          @Localizer["User_CancelEditProfile"]
+        </button>
+        <button type="submit"
+                class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+          </svg>
+          @Localizer["User_SaveProfile"]
+        </button>
+      </div>
+    </form>
+
+    <script>
+      (function () {
+        var root = document.getElementById('profile-edit');
+        if (!root || root.getAttribute('data-profile-editor') !== 'true') return;
+
+        var viewPanel = root.querySelector('[data-profile-view]');
+        var editForm = root.querySelector('[data-profile-edit]');
+        var editBtn = root.querySelector('[data-profile-edit-btn]');
+        var cancelBtn = root.querySelector('[data-profile-cancel-btn]');
+        var descView = root.querySelector('[data-profile-desc-view]');
+        var descEdit = root.querySelector('[data-profile-desc-edit]');
+        var avatarChange = document.getElementById('profile-avatar-change');
+        var avatarInput = document.getElementById('profile-avatar-input');
+        var preview = document.getElementById('profile-avatar-preview');
+        var filename = document.getElementById('profile-avatar-filename');
+        var avatarHint = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["User_AvatarHint"].Value));
+
+        function setEditing(isEditing) {
+          if (viewPanel) viewPanel.hidden = isEditing;
+          if (editForm) editForm.hidden = !isEditing;
+          if (editBtn) editBtn.hidden = isEditing;
+          if (descView) descView.hidden = isEditing;
+          if (descEdit) descEdit.hidden = !isEditing;
+          if (avatarChange) avatarChange.hidden = !isEditing;
+        }
+
+        function resetForm() {
+          if (!editForm) return;
+          editForm.querySelectorAll('[data-original-value]').forEach(function (input) {
+            input.value = input.getAttribute('data-original-value') || '';
+          });
+          if (avatarInput) avatarInput.value = '';
+          if (preview) {
+            preview.src = preview.getAttribute('data-original-src') || preview.src;
+          }
+          if (filename) filename.textContent = avatarHint;
+        }
+
+        if (editBtn) {
+          editBtn.addEventListener('click', function () {
+            setEditing(true);
+            var first = document.getElementById('profile-full-name');
+            if (first) first.focus();
+          });
+        }
+
+        if (cancelBtn) {
+          cancelBtn.addEventListener('click', function () {
+            resetForm();
+            setEditing(false);
+          });
+        }
+
+        if (avatarInput && preview) {
+          avatarInput.addEventListener('change', function () {
+            var file = avatarInput.files && avatarInput.files[0];
+            if (!file) return;
+            if (filename) filename.textContent = file.name;
+            preview.src = URL.createObjectURL(file);
+          });
+        }
+      })();
+    </script>
+  }
 </section>

@@ -17,7 +17,7 @@
       <p class="field-error mt-1 hidden text-xs text-red-600" data-for="productName"></p>
     </div>
 
-    @await Html.PartialAsync("Partials/_CategorySelect", Model)
+    @await Html.PartialAsync("~/Views/Sell/Partials/_CategorySelect.cshtml", Model)
 
     <div>
       <label for="shortDescription" class="mb-1.5 block text-sm font-medium text-slate-700">@Localizer["Sell_ShortDescription"]</label>

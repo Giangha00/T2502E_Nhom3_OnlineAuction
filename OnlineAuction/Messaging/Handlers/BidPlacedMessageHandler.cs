@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Data;
+using OnlineAuction.Entities;
+using OnlineAuction.Helpers;
 using OnlineAuction.Messaging.Messages;
+using OnlineAuction.Models;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Messaging.Handlers;
@@ -16,10 +19,14 @@ public interface IBidPlacedMessageHandler
 /// </summary>
 public sealed class BidPlacedMessageHandler : IBidPlacedMessageHandler
 {
+    private static readonly TimeSpan SellerNewBidDebounce = TimeSpan.FromMinutes(5);
+
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IBidService _bidService;
     private readonly IRealtimePublisher _realtimePublisher;
     private readonly INotificationDeliveryService _notificationDelivery;
+    private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<BidPlacedMessageHandler> _logger;
 
     public BidPlacedMessageHandler(
@@ -27,12 +34,16 @@ public sealed class BidPlacedMessageHandler : IBidPlacedMessageHandler
         IBidService bidService,
         IRealtimePublisher realtimePublisher,
         INotificationDeliveryService notificationDelivery,
+        INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         ILogger<BidPlacedMessageHandler> logger)
     {
         _dbContext = dbContext;
         _bidService = bidService;
         _realtimePublisher = realtimePublisher;
         _notificationDelivery = notificationDelivery;
+        _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
     }
 
@@ -83,6 +94,33 @@ public sealed class BidPlacedMessageHandler : IBidPlacedMessageHandler
         }
 
         await _realtimePublisher.SendBidUpdateAsync(message.AuctionId, bidState, cancellationToken);
+
+        var relatedUrl = $"/Auction/Detail/{message.AuctionId}";
+
+        await _notificationService.CreateAndPushAsync(
+            message.BidderId,
+            _notifyLocalizer[NotificationKeys.BidPlacedTitle],
+            _notifyLocalizer.Format(NotificationKeys.BidPlacedMessage, message.Amount, message.ProductName),
+            NotificationType.Auction,
+            relatedUrl,
+            NotificationReferenceTypes.AuctionBidPlaced,
+            message.AuctionId,
+            debounceWindow: SellerNewBidDebounce,
+            cancellationToken: cancellationToken);
+
+        if (message.SellerId > 0 && message.SellerId != message.BidderId)
+        {
+            await _notificationService.CreateAndPushAsync(
+                message.SellerId,
+                _notifyLocalizer[NotificationKeys.NewBidTitle],
+                _notifyLocalizer.Format(NotificationKeys.NewBidMessage, message.Amount, message.ProductName),
+                NotificationType.Auction,
+                relatedUrl,
+                NotificationReferenceTypes.AuctionNewBid,
+                message.AuctionId,
+                debounceWindow: SellerNewBidDebounce,
+                cancellationToken: cancellationToken);
+        }
 
         foreach (var outbidUserId in message.OutbidUserIds)
         {

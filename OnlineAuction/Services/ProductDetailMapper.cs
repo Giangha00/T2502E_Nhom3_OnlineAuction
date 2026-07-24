@@ -38,8 +38,7 @@ internal static class ProductDetailMapper
             userRegistrationStatus,
             isSeller,
             auctionAcceptsBids);
-        var isRegistered = userRegistrationStatus is not null &&
-                           userRegistrationStatus != AuctionRegistrationStatuses.Cancelled;
+        var isRegistered = userRegistrationStatus == AuctionRegistrationStatuses.Approved;
         var registrationDepositAmount = ResolveRegistrationDepositAmount(auction, feeSettings);
 
         return new ProductDetailViewModel
@@ -95,7 +94,10 @@ internal static class ProductDetailMapper
             RegistrationDepositAmount = registrationDepositAmount,
             Seller = seller,
             Grading = BuildGrading(product),
-            BidHistory = MapBidHistory(bids),
+            BidHistory = MapBidHistory(
+                bids,
+                ShouldRevealBidderIdentity(auction),
+                BidHistoryPreviewLimit),
             Documents = MapDocuments(product),
             RelatedProducts = relatedProducts.ToList(),
             MoreRelatedProducts = (moreRelatedProducts ?? []).ToList(),
@@ -149,17 +151,24 @@ internal static class ProductDetailMapper
             FullName = seller.FullName,
             AvatarUrl = seller.AvatarUrl ?? "/admin/images/user/user-01.jpg",
             AuctionCount = auctionCount,
-            SuccessfulSales = successfulSales,
-            Rating = 0
+            SuccessfulSales = successfulSales
         };
 
     public static AuctionItemViewModel MapToAuctionItem(Auction auction, bool forBuyNowCatalog = false)
     {
         var product = auction.Product;
         var bidCount = auction.Bids?.Count ?? 0;
-        var phaseInfo = AuctionScheduleHelper.ResolveListingPhase(auction);
-        var status = MapListingStatus(auction, phaseInfo);
+        var phaseInfo = ResolveDisplayPhase(auction);
+        var status = AuctionStatuses.IsConfirming(auction.Status)
+            ? "Confirming"
+            : auction.Status switch
+            {
+                AuctionStatuses.Rejected => "Rejected",
+                AuctionStatuses.Cancelled => "Cancelled",
+                _ => MapListingStatus(auction, phaseInfo)
+            };
         var hasBuyNow = auction.BuyNowPrice.HasValue && auction.BuyNowPrice.Value > 0;
+        var (isPubliclyListed, publicListingReason) = ResolvePublicListingInfo(auction);
         var countdownTarget = forBuyNowCatalog || auction.ListingType == ListingTypes.BuyNow
             ? auction.EndDate
             : phaseInfo.CountdownTarget;
@@ -173,18 +182,21 @@ internal static class ProductDetailMapper
             StartingPrice = auction.StartingPrice,
             CurrentPrice = forBuyNowCatalog && hasBuyNow
                 ? auction.BuyNowPrice!.Value
-                : auction.CurrentPrice,
+                : auction.ListingType == ListingTypes.BuyNow && auction.BuyNowPrice is > 0
+                    ? auction.BuyNowPrice.Value
+                    : auction.CurrentPrice,
             Status = status,
             ListingPhase = phaseInfo.Phase,
             PhaseCountdownKind = phaseInfo.CountdownKind,
-            TimeRemaining = forBuyNowCatalog && hasBuyNow
+            IsPubliclyListed = isPubliclyListed,
+            PublicListingStatus = isPubliclyListed ? "Yes" : "No",
+            PublicListingReason = publicListingReason,
+            TimeRemaining = forBuyNowCatalog || auction.ListingType == ListingTypes.BuyNow
                 ? "In stock"
-                : auction.ListingType == ListingTypes.BuyNow
-                    ? "In stock"
-                    : FormatTimeRemaining(countdownTarget),
+                : FormatTimeRemaining(countdownTarget),
             EndDate = countdownTarget,
             ListingType = auction.ListingType,
-            BuyNowPrice = auction.BuyNowPrice,
+            BuyNowPrice = auction.BuyNowPrice ?? (auction.ListingType == ListingTypes.BuyNow ? auction.CurrentPrice : null),
             Grade = product.GradeLabel ?? string.Empty,
             Authenticator = ResolveAuthenticator(product.GradeLabel),
             Subtitle = BuildSubtitle(product),
@@ -199,6 +211,75 @@ internal static class ProductDetailMapper
 
         ApplyDealInfo(item);
         return item;
+    }
+
+    /// <summary>
+    /// Pending listings should render like the sell-form preview (schedule phases),
+    /// not as a broken "upcoming" card while waiting for admin approval.
+    /// </summary>
+    private static AuctionListingPhaseInfo ResolveDisplayPhase(Auction auction)
+    {
+        if (auction.Status != AuctionStatuses.Confirming &&
+            auction.Status != AuctionStatuses.LegacyPendingReview)
+        {
+            return AuctionScheduleHelper.ResolveListingPhase(auction);
+        }
+
+        var originalStatus = auction.Status;
+        auction.Status = AuctionStatuses.Scheduled;
+        try
+        {
+            return AuctionScheduleHelper.ResolveListingPhase(auction);
+        }
+        finally
+        {
+            auction.Status = originalStatus;
+        }
+    }
+
+    private static (bool IsPubliclyListed, string Reason) ResolvePublicListingInfo(Auction auction)
+    {
+        if (auction.DeletedAt is not null || auction.Product.DeletedAt is not null)
+        {
+            return (false, "Listing is deleted.");
+        }
+
+        if (auction.Status is AuctionStatuses.PendingReview)
+        {
+            return (false, "Pending admin approval.");
+        }
+
+        if (auction.Status is AuctionStatuses.Rejected)
+        {
+            return (false, "Rejected by admin.");
+        }
+
+        if (auction.Status is AuctionStatuses.Cancelled)
+        {
+            return (false, "Listing is cancelled.");
+        }
+
+        if (auction.ListingType == ListingTypes.BuyNow)
+        {
+            var visible = auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon &&
+                          DateTimeUtilities.IsInFutureUtc(auction.EndDate);
+
+            return visible
+                ? (true, "Visible on Buy Now.")
+                : (false, "Buy Now listing is not active.");
+        }
+
+        if (AuctionScheduleHelper.IsPubliclyListed(auction))
+        {
+            var phase = AuctionScheduleHelper.ResolveListingPhase(auction);
+            var reason = phase.Phase == AuctionListingPhases.Upcoming
+                ? $"Visible on Auction as Upcoming. Registration opens at {DateTimeUtilities.AsUtc(auction.RegistrationStartDate):yyyy-MM-dd HH:mm} UTC."
+                : "Visible on Auction.";
+
+            return (true, reason);
+        }
+
+        return (false, "Auction is not in a public listing window.");
     }
 
     private static string MapListingStatus(Auction auction, AuctionListingPhaseInfo phaseInfo) =>
@@ -303,20 +384,54 @@ internal static class ProductDetailMapper
             })
             .ToList();
 
-    public static List<BidHistoryItemViewModel> MapBidHistory(IEnumerable<Bid> bids)
+    public const int BidHistoryPreviewLimit = 10;
+
+    public static List<BidHistoryItemViewModel> MapBidHistory(
+        IEnumerable<Bid> bids,
+        bool revealBidderIdentity = false,
+        int? take = null,
+        Bid? winningBid = null)
     {
-        var bidList = bids.ToList();
-        var winningBid = bidList.FirstOrDefault(bid => bid.IsWinning);
+        var allBids = bids.ToList();
+        winningBid ??= allBids.FirstOrDefault(bid => bid.IsWinning);
+
+        var bidList = allBids
+            .OrderByDescending(bid => bid.PlacedAt)
+            .ToList();
+
+        if (take is > 0)
+        {
+            bidList = bidList.Take(take.Value).ToList();
+        }
 
         return bidList
             .Select(bid => new BidHistoryItemViewModel
             {
-                BidderName = FormatBidderName(bid.Bidder),
+                BidderId = revealBidderIdentity ? bid.BidderId : 0,
+                BidderName = FormatBidderName(bid.Bidder, revealBidderIdentity),
                 Amount = bid.Amount,
                 BidTime = bid.PlacedAt,
-                Status = ResolveBidStatus(bid, winningBid)
+                Status = ResolveBidStatus(bid, winningBid),
+                IsBidderProfilePublic = revealBidderIdentity && bid.BidderId > 0
             })
             .ToList();
+    }
+
+    /// <summary>
+    /// Bidder names stay private while the live session can still accept bids.
+    /// After the live window ends, identities are revealed publicly.
+    /// </summary>
+    public static bool ShouldRevealBidderIdentity(Auction auction)
+    {
+        if (auction.Status is AuctionStatuses.Ended
+            or AuctionStatuses.AwaitingPayment
+            or AuctionStatuses.Completed
+            or AuctionStatuses.Cancelled)
+        {
+            return true;
+        }
+
+        return !DateTimeUtilities.IsInFutureUtc(auction.EndDate);
     }
 
     private static string ResolveBidStatus(Bid bid, Bid? winningBid)
@@ -334,18 +449,51 @@ internal static class ProductDetailMapper
         return "OUTBID";
     }
 
-    private static string FormatBidderName(ApplicationUser bidder)
+    private static string FormatBidderName(ApplicationUser bidder, bool revealFullName)
     {
         var display = string.IsNullOrWhiteSpace(bidder.FullName)
             ? bidder.UserName ?? "Bidder"
-            : bidder.FullName;
+            : bidder.FullName.Trim();
 
-        if (display.Length <= 2)
+        if (revealFullName)
         {
             return display;
         }
 
-        return $"{display[0]}***{display[^1]}";
+        return MaskBidderDisplayName(display);
+    }
+
+    internal static string MaskBidderDisplayName(string display)
+    {
+        if (string.IsNullOrWhiteSpace(display))
+        {
+            return "Bidder";
+        }
+
+        var parts = display
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        if (parts.Length == 0)
+        {
+            return "Bidder";
+        }
+
+        if (parts.Length == 1)
+        {
+            var single = parts[0];
+            if (single.Length <= 2)
+            {
+                return single;
+            }
+
+            return $"{single[0]}***{single[^1]}";
+        }
+
+        var first = parts[0];
+        var last = parts[^1];
+        var visiblePrefixLength = Math.Min(4, Math.Max(1, first.Length - 1));
+        var maskedFirst = first[..visiblePrefixLength] + "***";
+        return $"{maskedFirst} {last}";
     }
 
     private static GradingScoreViewModel BuildGrading(Product product)
@@ -395,14 +543,20 @@ internal static class ProductDetailMapper
 
         if (!string.IsNullOrWhiteSpace(product.PrimaryImage))
         {
-            images.Add(product.PrimaryImage);
+            images.Add(ResolveImageUrl(product.PrimaryImage));
         }
 
         foreach (var image in product.Images.OrderBy(item => item.SortOrder))
         {
-            if (!string.IsNullOrWhiteSpace(image.ImageUrl) && !images.Contains(image.ImageUrl))
+            if (string.IsNullOrWhiteSpace(image.ImageUrl))
             {
-                images.Add(image.ImageUrl);
+                continue;
+            }
+
+            var url = ResolveImageUrl(image.ImageUrl);
+            if (!images.Contains(url))
+            {
+                images.Add(url);
             }
         }
 
@@ -459,7 +613,7 @@ internal static class ProductDetailMapper
 
         return status switch
         {
-            AuctionStatuses.PendingReview => ("Pending Review", "bg-amber-500 text-white"),
+            _ when AuctionStatuses.IsConfirming(status) => ("Confirming", "bg-amber-500 text-white"),
             AuctionStatuses.Rejected => ("Rejected", "bg-red-600 text-white"),
             AuctionStatuses.Scheduled => ("Scheduled", "bg-sky-600 text-white"),
             AuctionStatuses.Live => ("Active Auction", "bg-emerald-600 text-white"),
@@ -493,9 +647,9 @@ internal static class ProductDetailMapper
             return "Cancelled";
         }
 
-        if (auction.Status == AuctionStatuses.PendingReview)
+        if (AuctionStatuses.IsConfirming(auction.Status))
         {
-            return "Pending Review";
+            return "Confirming";
         }
 
         if (auction.Status == AuctionStatuses.Rejected)
@@ -522,8 +676,19 @@ internal static class ProductDetailMapper
         return "Live";
     }
 
-    private static string ResolveImageUrl(string? primaryImage) =>
-        string.IsNullOrWhiteSpace(primaryImage) ? DefaultProductImageUrl : primaryImage;
+    private static string ResolveImageUrl(string? primaryImage)
+    {
+        if (string.IsNullOrWhiteSpace(primaryImage))
+        {
+            return DefaultProductImageUrl;
+        }
+
+        // Older uploads used Cloudinary c_fill (square crop). Rewrite to c_limit
+        // so card/list views show the full uploaded image like the sell preview.
+        return primaryImage
+            .Replace("c_fill,", "c_limit,", StringComparison.OrdinalIgnoreCase)
+            .Replace(",c_fill", ",c_limit", StringComparison.OrdinalIgnoreCase);
+    }
 
     private static string FormatTimeRemaining(DateTime endDate)
     {

@@ -12,6 +12,8 @@ public sealed class BidPlacedMessage
 
     public int BidderId { get; init; }
 
+    public int SellerId { get; init; }
+
     public decimal Amount { get; init; }
 
     public decimal PreviousPrice { get; init; }

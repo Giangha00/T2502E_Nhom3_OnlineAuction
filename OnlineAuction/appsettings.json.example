@@ -12,7 +12,7 @@
   },
   "SeedData": {
     "RefreshTestAuctionsOnStartup": false,
-    "RefreshTestAuctionsInDevelopment": true,
+    "RefreshTestAuctionsInDevelopment": false,
     "SyncCatalogOnStartup": false,
     "SyncCatalogInDevelopment": true
   },
@@ -27,7 +27,8 @@
     "Mode": "sandbox",
     "ReturnUrl": "http://localhost:5006/Payment/PayPalReturn",
     "CancelUrl": "http://localhost:5006/Payment/PayPalCancel",
-    "CurrencyCode": "USD"
+    "CurrencyCode": "USD",
+    "SandboxInitialWalletBalance": 1000
   },
   "FirebaseSettings": {
     "ProjectId": "YOUR_FIREBASE_PROJECT_ID",
@@ -73,7 +74,7 @@
     "ChallengeAfterBidsPerMinute": 8,
     "ChallengeAfterFraudAlert": true,
     "ChallengeRequiredMinutes": 15,
-    "StubChallengeAcceptedTokens": [ "stub-ok" ]
+    "StubChallengeAcceptedTokens": ["stub-ok"]
   },
   "Email": {
     "Gmail": {
@@ -91,6 +92,7 @@
     "UserName": "guest",
     "Password": "guest",
     "VirtualHost": "/",
+    "UseSsl": false,
     "ExchangeName": "online-auction.direct",
     "PrefetchCount": 10
   },

@@ -1,12 +1,73 @@
 @model AuctionListViewModel
+@using OnlineAuction.Configurations
+@using OnlineAuction.Helpers
 
 @{
+    var canManage = AdminPermissionHelper.Can(User, PermissionCodes.AuctionsManage);
     var currentPage = Model.Filter.Page <= 0 ? 1 : Model.Filter.Page;
     var totalPages = Model.TotalPages <= 0 ? 1 : Model.TotalPages;
     var startPage = Math.Max(1, currentPage - 2);
     var endPage = Math.Min(totalPages, currentPage + 2);
 
-    string FormatStatus(string status) => status.Replace('_', ' ');
+    string FormatStatus(string status) => status switch
+    {
+        "confirming" or "pending_review" => "Confirming",
+        "rejected" => "Rejected",
+        "scheduled" => "Scheduled",
+        "live" => "Live",
+        "ending_soon" => "Ending soon",
+        "ended" => "Ended",
+        "awaiting_payment" => "Awaiting payment",
+        "completed" => "Completed",
+        "cancelled" => "Cancelled",
+        _ => status.Replace('_', ' ')
+    };
+
+    string PhaseLabel(string phase)
+    {
+        var key = $"Auction_Phase_{phase}";
+        var label = Localizer[key];
+
+        if (!label.ResourceNotFound)
+        {
+            return label.Value;
+        }
+
+        return phase switch
+        {
+            AuctionListingPhases.RegistrationOpen => "Registration Open",
+            AuctionListingPhases.RegistrationClosed => "Awaiting Live",
+            AuctionListingPhases.LiveAuction => "Live Now",
+            AuctionListingPhases.LiveEndingSoon => "Ending Soon",
+            AuctionListingPhases.Upcoming => "Upcoming",
+            AuctionListingPhases.Ended => "Ended",
+            AuctionListingPhases.NotListed => "Not listed",
+            _ => phase.Replace('_', ' ')
+        };
+    }
+
+    string PhaseBadgeClass(string phase) => phase switch
+    {
+        AuctionListingPhases.RegistrationOpen => "admin-phase-chip admin-phase-chip--registration-open",
+        AuctionListingPhases.RegistrationClosed => "admin-phase-chip admin-phase-chip--registration-closed",
+        AuctionListingPhases.LiveAuction => "admin-phase-chip admin-phase-chip--live",
+        AuctionListingPhases.LiveEndingSoon => "admin-phase-chip admin-phase-chip--ending-soon",
+        AuctionListingPhases.Ended => "admin-phase-chip admin-phase-chip--ended",
+        AuctionListingPhases.NotListed => "admin-phase-chip admin-phase-chip--not-listed",
+        AuctionListingPhases.Upcoming => "admin-phase-chip admin-phase-chip--upcoming",
+        _ => "admin-phase-chip admin-phase-chip--default"
+    };
+
+    string StatusBadgeClass(string status) => status switch
+    {
+        "confirming" or "pending_review" => "bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",
+        "rejected" or "cancelled" => "bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-400",
+        "live" => "bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-400",
+        "ending_soon" => "bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-400",
+        "awaiting_payment" => "bg-warning-50 text-warning-700 dark:bg-warning-500/15 dark:text-warning-400",
+        "completed" => "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400",
+        _ => "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+    };
 }
 
 <form id="auctionBulkDeleteForm"
@@ -17,13 +78,16 @@
     @Html.AntiForgeryToken()
 
     <div class="mb-4 flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03] sm:flex-row sm:items-center sm:justify-between">
-        <button type="submit"
-                data-bulk-delete="true"
-                class="admin-icon-action admin-icon-action--delete admin-icon-action--lg"
-                title="Delete selected"
-                aria-label="Delete selected">
-            <partial name="_AdminIcon" model='"trash"' />
-        </button>
+        @if (canManage)
+        {
+            <button type="submit"
+                    data-bulk-delete="true"
+                    class="admin-icon-action admin-icon-action--delete admin-icon-action--lg"
+                    title="Delete selected"
+                    aria-label="Delete selected">
+                <partial name="_AdminIcon" model='"trash"' />
+            </button>
+        }
 
         <div class="text-theme-sm text-gray-500">
             Total: <span class="font-medium text-gray-800 dark:text-white/90">@Model.TotalItems</span>
@@ -32,20 +96,19 @@
 
     <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
         <div class="max-w-full overflow-x-auto">
-            <table class="w-full min-w-[1100px]">
+            <table class="admin-auction-table">
                 <thead>
                 <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
-                    <th class="w-12 px-5 py-3 text-left">
+                    <th class="w-10 text-left">
                         <input id="selectAllAuctions" type="checkbox" aria-label="Select all auctions" />
                     </th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Product</th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Category</th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Seller</th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Prices</th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Status</th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Schedule</th>
-                    <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Bids</th>
-                    <th class="px-5 py-3 text-right text-theme-xs font-medium uppercase text-gray-500">Actions</th>
+                    <th class="text-left font-medium uppercase text-gray-500">Product</th>
+                    <th class="text-left font-medium uppercase text-gray-500">Seller</th>
+                    <th class="text-left font-medium uppercase text-gray-500">Price</th>
+                    <th class="text-left font-medium uppercase text-gray-500">Status</th>
+                    <th class="text-left font-medium uppercase text-gray-500">Schedule</th>
+                    <th class="text-left font-medium uppercase text-gray-500">Activity</th>
+                    <th class="text-right font-medium uppercase text-gray-500">Actions</th>
                 </tr>
                 </thead>
 
@@ -53,7 +116,7 @@
                 @if (Model.Auctions.Count == 0)
                 {
                     <tr>
-                        <td colspan="9" class="px-5 py-10 text-center text-theme-sm text-gray-500">No auctions found.</td>
+                        <td colspan="8" class="px-4 py-8 text-center text-sm text-gray-500">No auctions found.</td>
                     </tr>
                 }
                 else
@@ -61,41 +124,75 @@
                     @foreach (var auction in Model.Auctions)
                     {
                         <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
-                            <td class="px-5 py-4">
-                                <input class="auction-checkbox" type="checkbox" name="SelectedAuctionIds" value="@auction.Id" />
+                            <td>
+                                <input class="auction-checkbox" type="checkbox" name="SelectedAuctionIds" value="@auction.Id" @(canManage ? null : "disabled") />
                             </td>
-                            <td class="px-5 py-4">
-                                <div class="flex items-center gap-3">
+                            <td class="admin-auction-product">
+                                <div class="flex items-center gap-2.5">
                                     @if (!string.IsNullOrWhiteSpace(auction.ImageUrl))
                                     {
                                         <img src="@auction.ImageUrl"
                                              alt="@auction.ProductName"
-                                             class="h-12 w-12 rounded-lg object-cover" />
+                                             class="admin-auction-product__thumb" />
                                     }
-                                    <div>
-                                        <p class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@auction.ProductName</p>
-                                        <p class="text-theme-xs text-gray-500">ID: @auction.Id · @auction.ListingType</p>
+                                    <div class="admin-auction-product__body">
+                                        <p class="admin-auction-product__name text-gray-800 dark:text-white/90" title="@auction.ProductName">@auction.ProductName</p>
+                                        <p class="admin-auction-muted">#@auction.Id · @auction.CategoryName</p>
+                                        <span class="admin-auction-chip mt-1 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">@auction.ListingType</span>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@auction.CategoryName</td>
-                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@auction.SellerName</td>
-                            <td class="px-5 py-4">
-                                <p class="text-theme-sm text-gray-800 dark:text-white/90">Current: @auction.CurrentPrice.ToString("N0")</p>
-                                <p class="text-theme-xs text-gray-500">Start: @auction.StartingPrice.ToString("N0")</p>
+                            <td>
+                                <p class="admin-auction-meta text-gray-700 dark:text-gray-300" title="@auction.SellerName">@auction.SellerName</p>
                             </td>
-                            <td class="px-5 py-4">
-                                <span class="rounded-full bg-brand-50 px-2.5 py-0.5 text-theme-xs font-medium capitalize text-brand-700 dark:bg-brand-500/15 dark:text-brand-400">
-                                    @FormatStatus(auction.Status)
-                                </span>
+                            <td>
+                                <p class="admin-auction-price text-gray-800 dark:text-white/90">$@auction.CurrentPrice.ToString("N0")</p>
+                                <p class="admin-auction-muted">Start $@auction.StartingPrice.ToString("N0") · Step $@auction.BidStep.ToString("N0")</p>
                             </td>
-                            <td class="px-5 py-4">
-                                <p class="text-theme-sm text-gray-700 dark:text-gray-300">@auction.StartDate.ToString("dd/MM/yyyy HH:mm")</p>
-                                <p class="text-theme-xs text-gray-500">to @auction.EndDate.ToString("dd/MM/yyyy HH:mm")</p>
+                            <td>
+                                <div class="admin-auction-badge-row">
+                                    <span class="admin-auction-status @StatusBadgeClass(auction.Status)">@FormatStatus(auction.Status)</span>
+                                    <span class="@PhaseBadgeClass(auction.ListingPhase)">@PhaseLabel(auction.ListingPhase)</span>
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(auction.TimeRemaining) && auction.ListingPhase != AuctionListingPhases.NotListed)
+                                {
+                                    <p class="admin-auction-muted">@auction.TimeRemaining</p>
+                                }
                             </td>
-                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@auction.BidCount</td>
-                            <td class="px-5 py-4">
+                            <td>
+                                <p class="admin-auction-meta text-gray-700 dark:text-gray-300">
+                                    Live @auction.StartDate.ToString("dd/MM/yyyy HH:mm")
+                                </p>
+                                <p class="admin-auction-meta text-gray-500">
+                                    → @auction.EndDate.ToString("dd/MM/yyyy HH:mm")
+                                </p>
+                                <p class="admin-auction-muted">
+                                    Reg @auction.RegistrationStartDate.ToString("dd/MM/yyyy") – @auction.RegistrationEndDate.ToString("dd/MM/yyyy")
+                                </p>
+                            </td>
+                            <td>
+                                <p class="admin-auction-meta text-gray-800 dark:text-white/90">@auction.BidCount bids · @auction.RegistrationCount reg</p>
+                                <p class="admin-auction-muted @(auction.IsPubliclyListed ? "text-success-600" : "")">
+                                    @(auction.IsPubliclyListed ? "Public" : "Hidden")
+                                </p>
+                            </td>
+                            <td class="admin-auction-actions">
                                 <div class="admin-icon-action-group">
+                                    @if (auction.IsPubliclyListed)
+                                    {
+                                        <a asp-area=""
+                                           asp-controller="Auction"
+                                           asp-action="Detail"
+                                           asp-route-id="@auction.Id"
+                                           class="admin-icon-action admin-icon-action--neutral"
+                                           title="View on site"
+                                           aria-label="View on site"
+                                           target="_blank"
+                                           rel="noopener">
+                                            <partial name="_AdminIcon" model='"external"' />
+                                        </a>
+                                    }
+
                                     <a asp-area="Admin"
                                        asp-controller="Auction"
                                        asp-action="Details"
@@ -106,24 +203,56 @@
                                         <partial name="_AdminIcon" model='"eye"' />
                                     </a>
 
-                                    <a asp-area="Admin"
-                                       asp-controller="Auction"
-                                       asp-action="Edit"
-                                       asp-route-id="@auction.Id"
-                                       class="admin-icon-action admin-icon-action--edit"
-                                       title="Edit"
-                                       aria-label="Edit">
-                                        <partial name="_AdminIcon" model='"pencil"' />
-                                    </a>
+                                    @if (canManage)
+                                    {
+                                        <a asp-area="Admin"
+                                           asp-controller="Auction"
+                                           asp-action="Edit"
+                                           asp-route-id="@auction.Id"
+                                           class="admin-icon-action admin-icon-action--edit"
+                                           title="Edit"
+                                           aria-label="Edit">
+                                            <partial name="_AdminIcon" model='"pencil"' />
+                                        </a>
 
-                                    <button type="submit"
-                                            formaction="@Url.Action("Delete", "Auction", new { area = "Admin", id = auction.Id })"
-                                            class="admin-icon-action admin-icon-action--delete"
-                                            title="Delete"
-                                            aria-label="Delete"
-                                            onclick="return confirm('Are you sure you want to delete this auction?');">
-                                        <partial name="_AdminIcon" model='"trash"' />
-                                    </button>
+                                        if (auction.CanDelete)
+                                        {
+                                            <button type="submit"
+                                                    formaction="@Url.Action("Delete", "Auction", new { area = "Admin", id = auction.Id })"
+                                                    class="admin-icon-action admin-icon-action--delete"
+                                                    title="Delete"
+                                                    aria-label="Delete"
+                                                    data-confirm
+                                                    data-confirm-variant="danger"
+                                                    data-confirm-title="Delete auction?"
+                                                    data-confirm-message="Delete auction #@auction.Id?"
+                                                    data-confirm-confirm="Delete">
+                                                <partial name="_AdminIcon" model='"trash"' />
+                                            </button>
+                                        }
+                                        else if (auction.CanCancel)
+                                        {
+                                            <button type="submit"
+                                                    formaction="@Url.Action("Cancel", "Auction", new { area = "Admin", id = auction.Id })"
+                                                    class="admin-icon-action admin-icon-action--neutral"
+                                                    title="@auction.DeleteBlockReason"
+                                                    aria-label="Cancel auction"
+                                                    data-confirm
+                                                    data-confirm-variant="danger"
+                                                    data-confirm-title="Cancel auction?"
+                                                    data-confirm-message="Cancel auction #@auction.Id instead of deleting?"
+                                                    data-confirm-confirm="Cancel listing">
+                                                <partial name="_AdminIcon" model='"x-mark"' />
+                                            </button>
+                                        }
+                                        else if (!string.IsNullOrWhiteSpace(auction.DeleteBlockReason))
+                                        {
+                                            <span class="inline-flex h-8 min-w-8 items-center justify-center rounded-lg border border-gray-200 px-2 text-xs font-semibold text-gray-500"
+                                                  title="@auction.DeleteBlockReason">
+                                                !
+                                            </span>
+                                        }
+                                    }
                                 </div>
                             </td>
                         </tr>
@@ -147,6 +276,8 @@
            asp-action="Index"
            asp-route-Search="@Model.Filter.Search"
            asp-route-Status="@Model.Filter.Status"
+           asp-route-ListingPhase="@Model.Filter.ListingPhase"
+           asp-route-ListingType="@Model.Filter.ListingType"
            asp-route-CategoryId="@Model.Filter.CategoryId"
            asp-route-SortOrder="@Model.Filter.SortOrder"
            asp-route-Page="@(currentPage - 1)"
@@ -163,6 +294,8 @@
                asp-action="Index"
                asp-route-Search="@Model.Filter.Search"
                asp-route-Status="@Model.Filter.Status"
+               asp-route-ListingPhase="@Model.Filter.ListingPhase"
+               asp-route-ListingType="@Model.Filter.ListingType"
                asp-route-CategoryId="@Model.Filter.CategoryId"
                asp-route-SortOrder="@Model.Filter.SortOrder"
                asp-route-Page="@pageNumber"
@@ -176,6 +309,8 @@
            asp-action="Index"
            asp-route-Search="@Model.Filter.Search"
            asp-route-Status="@Model.Filter.Status"
+           asp-route-ListingPhase="@Model.Filter.ListingPhase"
+           asp-route-ListingType="@Model.Filter.ListingType"
            asp-route-CategoryId="@Model.Filter.CategoryId"
            asp-route-SortOrder="@Model.Filter.SortOrder"
            asp-route-Page="@(currentPage + 1)"

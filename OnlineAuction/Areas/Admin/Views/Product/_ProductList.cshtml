@@ -137,7 +137,11 @@
                                                 class="admin-icon-action admin-icon-action--delete"
                                                 title="@Localizer["AdminProduct.Delete"]"
                                                 aria-label="@Localizer["AdminProduct.Delete"]"
-                                                onclick="return confirm('@Localizer["AdminProduct.ConfirmDeleteProduct"]');">
+                                                data-confirm
+                                                data-confirm-variant="danger"
+                                                data-confirm-title="@Localizer["AdminProduct.Delete"]"
+                                                data-confirm-message="@Localizer["AdminProduct.ConfirmDeleteProduct"]"
+                                                data-confirm-confirm="@Localizer["AdminProduct.Delete"]">
                                             <partial name="_AdminIcon" model='"trash"' />
                                         </button>
                                     }

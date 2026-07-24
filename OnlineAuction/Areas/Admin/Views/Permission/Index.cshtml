@@ -13,7 +13,7 @@
     <div class="mb-6">
         <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Permission Management</h2>
         <p class="text-theme-sm text-gray-500 dark:text-gray-400">
-            Dynamic RBAC with two application roles: <strong>Admin</strong> (full access) and <strong>User</strong> (delegated permissions assigned below).
+            Dynamic RBAC using ASP.NET Identity: <strong>Admin</strong> (full access via role) and <strong>User</strong> (delegated permissions stored as Identity claims).
         </p>
         <p class="mt-2 text-theme-xs text-amber-700">
             Permission claims are loaded into the admin cookie at login. After saving, affected users must sign out and sign in again at <code class="rounded bg-gray-100 px-1">/Admin/Account/Login</code>.
@@ -87,11 +87,11 @@
                                 <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                                     @foreach (var permission in moduleGroup)
                                     {
-                                        var isChecked = Model.SelectedUserPermissionIds.Contains(permission.Id);
+                                        var isChecked = Model.SelectedUserPermissionCodes.Contains(permission.Code);
                                         <label class="flex items-start gap-3 rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-700">
                                             <input type="checkbox"
-                                                   name="permissionIds"
-                                                   value="@permission.Id"
+                                                   name="permissionCodes"
+                                                   value="@permission.Code"
                                                    checked="@isChecked"
                                                    class="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500" />
                                             <span>
@@ -119,7 +119,7 @@
             {
                 <div class="p-5">
                     <div class="flex flex-wrap gap-2">
-                        @foreach (var permission in Model.Permissions.Where(p => Model.SelectedUserPermissionIds.Contains(p.Id)))
+                        @foreach (var permission in Model.Permissions.Where(p => Model.SelectedUserPermissionCodes.Contains(p.Code)))
                         {
                             <span class="rounded-full bg-brand-50 px-3 py-1 text-theme-xs font-medium text-brand-700">
                                 @permission.Code

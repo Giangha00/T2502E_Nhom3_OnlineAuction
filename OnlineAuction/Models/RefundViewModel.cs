@@ -57,4 +57,6 @@ public class RefundSubmitViewModel
     public string Description { get; set; } = string.Empty;
 
     public decimal? RequestedAmount { get; set; }
+
+    public string? EvidenceUrls { get; set; }
 }

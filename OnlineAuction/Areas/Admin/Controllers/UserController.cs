@@ -2,6 +2,7 @@
 using OnlineAuction.Areas.Admin.ViewModels.Users;
 using OnlineAuction.Authorization;
 using OnlineAuction.Configurations;
+using OnlineAuction.Helpers;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Areas.Admin.Controllers;
@@ -68,10 +69,15 @@ public class UserController : BaseAdminController
     [HttpPost]
     [ValidateAntiForgeryToken]
     [RequirePermission(PermissionCodes.UsersManage)]
-    public async Task<IActionResult> Edit(UserFormViewModel model)
+    public async Task<IActionResult> Edit(UserFormViewModel model, bool returnToDetails = false)
     {
         if (!ModelState.IsValid)
         {
+            if (returnToDetails && model.Id.HasValue)
+            {
+                return await DetailsPageResultAsync(model.Id.Value, model);
+            }
+
             var editModel = await _userService.GetEditFormAsync(model.Id ?? 0);
             return editModel is null ? NotFound() : View(editModel);
         }
@@ -82,11 +88,22 @@ public class UserController : BaseAdminController
         {
             ModelState.AddModelError(string.Empty, result.Message);
 
+            if (returnToDetails && model.Id.HasValue)
+            {
+                return await DetailsPageResultAsync(model.Id.Value, model);
+            }
+
             var editModel = await _userService.GetEditFormAsync(model.Id ?? 0);
             return editModel is null ? NotFound() : View(editModel);
         }
 
         TempData["SuccessMessage"] = result.Message;
+
+        if (returnToDetails && model.Id.HasValue)
+        {
+            return RedirectToAction(nameof(Details), new { id = model.Id.Value });
+        }
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -94,14 +111,48 @@ public class UserController : BaseAdminController
     [RequirePermission(PermissionCodes.UsersView)]
     public async Task<IActionResult> Details(int id)
     {
-        var model = await _userService.GetDetailsAsync(id);
+        return await DetailsPageResultAsync(id);
+    }
 
-        if (model is null)
+    private async Task<IActionResult> DetailsPageResultAsync(int id, UserFormViewModel? postedForm = null)
+    {
+        var profile = await _userService.GetDetailsAsync(id);
+        if (profile is null)
         {
             return NotFound();
         }
 
-        return View(model);
+        var canEdit = AdminPermissionHelper.Can(User, PermissionCodes.UsersManage);
+        UserFormViewModel? editForm = null;
+
+        if (canEdit)
+        {
+            editForm = postedForm ?? await _userService.GetEditFormAsync(id);
+            if (editForm is null)
+            {
+                return NotFound();
+            }
+
+            if (postedForm is not null)
+            {
+                // Keep dropdown / permission options populated after validation errors.
+                var fresh = await _userService.GetEditFormAsync(id);
+                if (fresh is not null)
+                {
+                    editForm.RoleOptions = fresh.RoleOptions;
+                    editForm.StatusOptions = fresh.StatusOptions;
+                    editForm.AvailablePermissions = fresh.AvailablePermissions;
+                    editForm.CurrentAvatarUrl ??= fresh.CurrentAvatarUrl;
+                }
+            }
+        }
+
+        return View("Details", new UserDetailsPageViewModel
+        {
+            Profile = profile,
+            EditForm = editForm,
+            CanEdit = canEdit && editForm is not null
+        });
     }
 
     [HttpPost]

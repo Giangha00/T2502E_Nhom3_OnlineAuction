@@ -16,6 +16,7 @@ public class RegistrationDepositService : IRegistrationDepositService
     private readonly IPayPalService _payPalService;
     private readonly IPayPalCaptureGuardService _payPalCaptureGuardService;
     private readonly INotificationService _notificationService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<RegistrationDepositService> _logger;
     private readonly PlatformFeeSettings _feeSettings;
 
@@ -24,6 +25,7 @@ public class RegistrationDepositService : IRegistrationDepositService
         IPayPalService payPalService,
         IPayPalCaptureGuardService payPalCaptureGuardService,
         INotificationService notificationService,
+        INotificationLocalizer notifyLocalizer,
         ILogger<RegistrationDepositService> logger,
         IOptions<PlatformFeeSettings> feeSettings)
     {
@@ -31,6 +33,7 @@ public class RegistrationDepositService : IRegistrationDepositService
         _payPalService = payPalService;
         _payPalCaptureGuardService = payPalCaptureGuardService;
         _notificationService = notificationService;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
         _feeSettings = feeSettings.Value;
     }
@@ -54,22 +57,50 @@ public class RegistrationDepositService : IRegistrationDepositService
 
         if (auction == null)
         {
-            return RegistrationDepositResult.Fail("Không tìm thấy phiên đấu giá.", 404);
+            return await FailAndNotifyAsync(
+                userId,
+                "Không tìm thấy phiên đấu giá.",
+                auctionId,
+                404,
+                cancellationToken);
         }
 
         // Seller không được đăng ký phiên đấu giá của chính mình
         if (auction.Product.SellerId == userId)
         {
-            return RegistrationDepositResult.Fail(
+            return await FailAndNotifyAsync(
+                userId,
                 "Seller không được đăng ký phiên đấu giá của chính mình.",
-                403);
+                auctionId,
+                403,
+                cancellationToken);
         }
 
         // Auction không yêu cầu registration thì không bắt cọc
         if (!auction.RequiresRegistration)
         {
-            return RegistrationDepositResult.Fail(
-                "Phiên đấu giá này không yêu cầu đặt cọc.");
+            return await FailAndNotifyAsync(
+                userId,
+                "Phiên đấu giá này không yêu cầu đặt cọc.",
+                auctionId,
+                cancellationToken: cancellationToken);
+        }
+
+        if (auction.Status is AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview
+            or AuctionStatuses.Rejected or AuctionStatuses.Cancelled)
+        {
+            var message = auction.Status switch
+            {
+                AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview => "This auction is confirming and not yet open for registration.",
+                AuctionStatuses.Rejected => "This auction listing was rejected.",
+                _ => "This auction has been cancelled."
+            };
+
+            return await FailAndNotifyAsync(
+                userId,
+                message,
+                auctionId,
+                cancellationToken: cancellationToken);
         }
 
         // Chỉ cho đăng ký trong khung thời gian đăng ký
@@ -78,18 +109,27 @@ public class RegistrationDepositService : IRegistrationDepositService
         {
             if (now < DateTimeUtilities.AsUtc(auction.RegistrationStartDate))
             {
-                return RegistrationDepositResult.Fail(
-                    "Thời gian đăng ký đấu giá chưa bắt đầu.");
+                return await FailAndNotifyAsync(
+                    userId,
+                    "Thời gian đăng ký đấu giá chưa bắt đầu.",
+                    auctionId,
+                    cancellationToken: cancellationToken);
             }
 
             if (now >= DateTimeUtilities.AsUtc(auction.RegistrationEndDate))
             {
-                return RegistrationDepositResult.Fail(
-                    "Thời gian đăng ký đấu giá đã kết thúc.");
+                return await FailAndNotifyAsync(
+                    userId,
+                    "Thời gian đăng ký đấu giá đã kết thúc.",
+                    auctionId,
+                    cancellationToken: cancellationToken);
             }
 
-            return RegistrationDepositResult.Fail(
-                "Không nằm trong thời gian đăng ký đấu giá.");
+            return await FailAndNotifyAsync(
+                userId,
+                "Không nằm trong thời gian đăng ký đấu giá.",
+                auctionId,
+                cancellationToken: cancellationToken);
         }
 
         decimal depositAmount;
@@ -103,7 +143,11 @@ public class RegistrationDepositService : IRegistrationDepositService
         }
         catch (InvalidOperationException ex)
         {
-            return RegistrationDepositResult.Fail(ex.Message);
+            return await FailAndNotifyAsync(
+                userId,
+                ex.Message,
+                auctionId,
+                cancellationToken: cancellationToken);
         }
 
         var registration = await _dbContext.AuctionRegistrations
@@ -116,8 +160,11 @@ public class RegistrationDepositService : IRegistrationDepositService
         if (registration != null &&
             registration.Status == AuctionRegistrationStatuses.Approved)
         {
-            return RegistrationDepositResult.Fail(
-                "Bạn đã đăng ký phiên đấu giá này rồi.");
+            return await FailAndNotifyAsync(
+                userId,
+                "Bạn đã đăng ký phiên đấu giá này rồi.",
+                auctionId,
+                cancellationToken: cancellationToken);
         }
 
         // Tạo reference gửi sang PayPal
@@ -136,8 +183,11 @@ public class RegistrationDepositService : IRegistrationDepositService
             string.IsNullOrWhiteSpace(payPalOrder.PayPalOrderId) ||
             string.IsNullOrWhiteSpace(payPalOrder.ApprovalUrl))
         {
-            return RegistrationDepositResult.Fail(
-                payPalOrder.ErrorMessage ?? "Không thể tạo PayPal order.");
+            return await FailAndNotifyAsync(
+                userId,
+                payPalOrder.ErrorMessage ?? "Không thể tạo PayPal order.",
+                auctionId,
+                cancellationToken: cancellationToken);
         }
 
         // Nếu có deposit pending cũ thì hủy đi để tránh nhiều order pending
@@ -201,6 +251,17 @@ public class RegistrationDepositService : IRegistrationDepositService
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
+        await _notificationService.CreateAndPushAsync(
+            userId,
+            _notifyLocalizer[NotificationKeys.DepositRequestCreatedTitle],
+            _notifyLocalizer[NotificationKeys.DepositRequestCreatedMessage],
+            NotificationType.Payment,
+            $"/Auction/Detail/{auctionId}",
+            NotificationReferenceTypes.AuctionDepositInitiated,
+            auctionId,
+            debounceWindow: TimeSpan.FromMinutes(2),
+            cancellationToken: cancellationToken);
+
         return RegistrationDepositResult.Ok(
             "Đã tạo yêu cầu đặt cọc. Vui lòng thanh toán qua PayPal.",
             payPalOrder.ApprovalUrl,
@@ -215,7 +276,10 @@ public class RegistrationDepositService : IRegistrationDepositService
     {
         if (string.IsNullOrWhiteSpace(payPalOrderId))
         {
-            return RegistrationDepositResult.Fail("Thiếu PayPal token.");
+            return await FailAndNotifyAsync(
+                userId,
+                "Thiếu PayPal token.",
+                cancellationToken: cancellationToken);
         }
 
         var deposit = await _dbContext.AuctionRegistrationDeposits
@@ -226,9 +290,11 @@ public class RegistrationDepositService : IRegistrationDepositService
 
         if (deposit == null)
         {
-            return RegistrationDepositResult.Fail(
+            return await FailAndNotifyAsync(
+                userId,
                 "Không tìm thấy giao dịch đặt cọc.",
-                404);
+                statusCode: 404,
+                cancellationToken: cancellationToken);
         }
 
         if (deposit.Status == AuctionRegistrationDepositStatuses.Paid)
@@ -255,8 +321,11 @@ public class RegistrationDepositService : IRegistrationDepositService
                 deposit.Status,
                 payPalOrderId);
 
-            return RegistrationDepositResult.Fail(
-                "Giao dịch đặt cọc không còn ở trạng thái chờ thanh toán.");
+            return await FailAndNotifyAsync(
+                userId,
+                "Giao dịch đặt cọc không còn ở trạng thái chờ thanh toán.",
+                deposit.AuctionId,
+                cancellationToken: cancellationToken);
         }
 
         var captureContext = new PayPalCaptureContext(
@@ -272,8 +341,11 @@ public class RegistrationDepositService : IRegistrationDepositService
 
         if (!captureResult.Success || string.IsNullOrWhiteSpace(captureResult.CaptureId))
         {
-            return RegistrationDepositResult.Fail(
-                captureResult.ErrorMessage ?? "Capture PayPal thất bại.");
+            return await FailAndNotifyAsync(
+                userId,
+                captureResult.ErrorMessage ?? "Capture PayPal thất bại.",
+                deposit.AuctionId,
+                cancellationToken: cancellationToken);
         }
 
         deposit = await _dbContext.AuctionRegistrationDeposits
@@ -284,9 +356,11 @@ public class RegistrationDepositService : IRegistrationDepositService
 
         if (deposit == null)
         {
-            return RegistrationDepositResult.Fail(
+            return await FailAndNotifyAsync(
+                userId,
                 "Không tìm thấy giao dịch đặt cọc.",
-                404);
+                statusCode: 404,
+                cancellationToken: cancellationToken);
         }
 
         if (deposit.Status == AuctionRegistrationDepositStatuses.Paid)
@@ -312,8 +386,11 @@ public class RegistrationDepositService : IRegistrationDepositService
                 recovery.Success,
                 recovery.ErrorMessage);
 
-            return RegistrationDepositResult.Fail(
-                "Giao dịch đặt cọc không còn ở trạng thái chờ thanh toán.");
+            return await FailAndNotifyAsync(
+                userId,
+                "Giao dịch đặt cọc không còn ở trạng thái chờ thanh toán.",
+                deposit.AuctionId,
+                cancellationToken: cancellationToken);
         }
 
         if (!PayPalAmountHelper.AmountsMatch(deposit.Amount, captureResult.CapturedAmount))
@@ -331,8 +408,11 @@ public class RegistrationDepositService : IRegistrationDepositService
                 captureResult.CapturedAmount,
                 recovery.Success);
 
-            return RegistrationDepositResult.Fail(
-                "Số tiền PayPal capture không khớp với tiền cọc. Đã khởi tạo hoàn tiền.");
+            return await FailAndNotifyAsync(
+                userId,
+                "Số tiền PayPal capture không khớp với tiền cọc. Đã khởi tạo hoàn tiền.",
+                deposit.AuctionId,
+                cancellationToken: cancellationToken);
         }
 
         var now = DateTime.UtcNow;
@@ -353,13 +433,15 @@ public class RegistrationDepositService : IRegistrationDepositService
             .Include(a => a.Product)
             .FirstOrDefaultAsync(a => a.Id == deposit.AuctionId, cancellationToken);
 
-        var productName = auction?.Product?.Name ?? "the auction";
+        var productName = auction?.Product?.Name ?? "phiên đấu giá";
         await _notificationService.CreateAndPushAsync(
             userId,
-            "Registration confirmed",
-            $"Your registration for {productName} is confirmed. Deposit of ${deposit.Amount:N0} was received.",
+            _notifyLocalizer[NotificationKeys.DepositPaidTitle],
+            _notifyLocalizer.Format(NotificationKeys.DepositPaidMessage, productName, deposit.Amount),
             NotificationType.Auction,
             $"/Auction/Detail/{deposit.AuctionId}",
+            NotificationReferenceTypes.AuctionRegistrationConfirmed,
+            deposit.AuctionId,
             cancellationToken: cancellationToken);
 
         return RegistrationDepositResult.Ok(
@@ -375,7 +457,10 @@ public class RegistrationDepositService : IRegistrationDepositService
     {
         if (string.IsNullOrWhiteSpace(payPalOrderId))
         {
-            return RegistrationDepositResult.Fail("Thiếu PayPal token.");
+            return await FailAndNotifyAsync(
+                userId,
+                "Thiếu PayPal token.",
+                cancellationToken: cancellationToken);
         }
 
         var deposit = await _dbContext.AuctionRegistrationDeposits
@@ -386,15 +471,20 @@ public class RegistrationDepositService : IRegistrationDepositService
 
         if (deposit == null)
         {
-            return RegistrationDepositResult.Fail(
+            return await FailAndNotifyAsync(
+                userId,
                 "Không tìm thấy giao dịch đặt cọc.",
-                404);
+                statusCode: 404,
+                cancellationToken: cancellationToken);
         }
 
         if (deposit.Status == AuctionRegistrationDepositStatuses.Paid)
         {
-            return RegistrationDepositResult.Fail(
-                "Giao dịch đã thanh toán, không thể hủy.");
+            return await FailAndNotifyAsync(
+                userId,
+                "Giao dịch đã thanh toán, không thể hủy.",
+                deposit.AuctionId,
+                cancellationToken: cancellationToken);
         }
 
         var cancelResult = await _payPalService.CancelOrderAsync(payPalOrderId, cancellationToken);
@@ -417,9 +507,54 @@ public class RegistrationDepositService : IRegistrationDepositService
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
+        await _notificationService.CreateAndPushAsync(
+            userId,
+            _notifyLocalizer[NotificationKeys.DepositCancelledTitle],
+            _notifyLocalizer[NotificationKeys.DepositCancelledMessage],
+            NotificationType.Payment,
+            $"/Auction/Detail/{deposit.AuctionId}",
+            NotificationReferenceTypes.AuctionDepositCancelled,
+            deposit.AuctionId,
+            debounceWindow: TimeSpan.FromMinutes(5),
+            cancellationToken: cancellationToken);
+
         return RegistrationDepositResult.Ok(
             "Bạn đã hủy thanh toán tiền cọc.",
             auctionId: deposit.AuctionId,
             depositAmount: deposit.Amount);
+    }
+
+    private async Task<RegistrationDepositResult> FailAndNotifyAsync(
+        int userId,
+        string message,
+        int? auctionId = null,
+        int statusCode = 400,
+        CancellationToken cancellationToken = default)
+    {
+        await NotifyDepositFailureAsync(userId, auctionId, message, cancellationToken);
+        return RegistrationDepositResult.Fail(message, statusCode, auctionId);
+    }
+
+    private async Task NotifyDepositFailureAsync(
+        int userId,
+        int? auctionId,
+        string message,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        await _notificationService.CreateAndPushAsync(
+            userId,
+            _notifyLocalizer[NotificationKeys.DepositFailedTitle],
+            message,
+            NotificationType.Payment,
+            auctionId is > 0 ? $"/Auction/Detail/{auctionId.Value}" : null,
+            auctionId is > 0 ? NotificationReferenceTypes.AuctionDepositFailed : null,
+            auctionId is > 0 ? auctionId : null,
+            debounceWindow: TimeSpan.FromMinutes(5),
+            cancellationToken: cancellationToken);
     }
 }

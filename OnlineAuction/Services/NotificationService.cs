@@ -17,17 +17,20 @@ public class NotificationService : INotificationService
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IRabbitMqPublisher _publisher;
     private readonly INotificationDeliveryService _deliveryService;
+    private readonly INotificationLocalizer _notifyLocalizer;
     private readonly ILogger<NotificationService> _logger;
 
     public NotificationService(
         AuctionHouseDbContext dbContext,
         IRabbitMqPublisher publisher,
         INotificationDeliveryService deliveryService,
+        INotificationLocalizer notifyLocalizer,
         ILogger<NotificationService> logger)
     {
         _dbContext = dbContext;
         _publisher = publisher;
         _deliveryService = deliveryService;
+        _notifyLocalizer = notifyLocalizer;
         _logger = logger;
     }
 
@@ -291,14 +294,21 @@ public class NotificationService : INotificationService
                 .Distinct()
                 .ToListAsync(cancellationToken);
 
-            var watcherIds = await _dbContext.AuctionRegistrations
+            var registrantIds = await _dbContext.AuctionRegistrations
                 .AsNoTracking()
                 .Where(r => r.AuctionId == auction.Id && r.Status == AuctionRegistrationStatuses.Approved)
                 .Select(r => r.UserId)
                 .ToListAsync(cancellationToken);
 
+            var watchlistIds = await _dbContext.WatchlistItems
+                .AsNoTracking()
+                .Where(w => w.AuctionId == auction.Id)
+                .Select(w => w.UserId)
+                .ToListAsync(cancellationToken);
+
             var recipientIds = bidderIds
-                .Concat(watcherIds)
+                .Concat(registrantIds)
+                .Concat(watchlistIds)
                 .Distinct()
                 .ToList();
 
@@ -309,8 +319,8 @@ public class NotificationService : INotificationService
             {
                 await CreateAndPushAsync(
                     userId,
-                    "Auction ending soon",
-                    $"{productName} ends within the next hour.",
+                    _notifyLocalizer[NotificationKeys.AuctionEndingSoonTitle],
+                    _notifyLocalizer.Format(NotificationKeys.AuctionEndingSoonMessage, productName),
                     NotificationType.Auction,
                     relatedUrl,
                     NotificationReferenceTypes.AuctionEndingSoon,
@@ -346,7 +356,18 @@ public class NotificationService : INotificationService
                 .Distinct()
                 .ToListAsync(cancellationToken);
 
-            if (registrantIds.Count == 0)
+            var watchlistIds = await _dbContext.WatchlistItems
+                .AsNoTracking()
+                .Where(w => w.AuctionId == auction.Id)
+                .Select(w => w.UserId)
+                .ToListAsync(cancellationToken);
+
+            var recipientIds = registrantIds
+                .Concat(watchlistIds)
+                .Distinct()
+                .ToList();
+
+            if (recipientIds.Count == 0)
             {
                 continue;
             }
@@ -355,12 +376,12 @@ public class NotificationService : INotificationService
             var relatedUrl = $"/Auction/Detail/{auction.Id}";
             var startLocal = DateTimeUtilities.AsUtc(auction.StartDate).ToLocalTime().ToString("dd/MM/yyyy HH:mm");
 
-            foreach (var userId in registrantIds)
+            foreach (var userId in recipientIds)
             {
                 await CreateAndPushAsync(
                     userId,
-                    "Auction starting soon",
-                    $"{productName} goes live at {startLocal}. Get ready to bid.",
+                    _notifyLocalizer[NotificationKeys.AuctionStartingSoonTitle],
+                    _notifyLocalizer.Format(NotificationKeys.AuctionStartingSoonMessage, productName, startLocal),
                     NotificationType.Auction,
                     relatedUrl,
                     NotificationReferenceTypes.AuctionStartingSoon,

@@ -1,0 +1,13 @@
+@if (TempData["SuccessMessage"] is not null)
+{
+    <div class="mb-4 rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-theme-sm text-success-700">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] is not null)
+{
+    <div class="mb-4 rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-theme-sm text-error-700">
+        @TempData["ErrorMessage"]
+    </div>
+}

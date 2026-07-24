@@ -20,13 +20,16 @@ public class SellerAuctionService : ISellerAuctionService
 
     private readonly AuctionHouseDbContext _db;
     private readonly IPhotoService _photoService;
+    private readonly ISellService _sellService;
 
     public SellerAuctionService(
         AuctionHouseDbContext db,
-        IPhotoService photoService)
+        IPhotoService photoService,
+        ISellService sellService)
     {
         _db = db;
         _photoService = photoService;
+        _sellService = sellService;
     }
 
     public async Task<List<AuctionItemViewModel>> GetSellerAuctionsAsync(
@@ -61,45 +64,23 @@ public class SellerAuctionService : ISellerAuctionService
             query = ApplySellerTabFilter(query, tab);
         }
 
-        var rows = await query
+        var auctions = await query
+            .Include(auction => auction.Product)
+                .ThenInclude(product => product.Category)
+            .Include(auction => auction.Bids)
             .OrderByDescending(auction => auction.CreatedAt)
-            .Select(auction => new
-            {
-                auction.Id,
-                auction.StartingPrice,
-                auction.CurrentPrice,
-                auction.Status,
-                auction.RejectReason,
-                auction.EndDate,
-                auction.ListingType,
-                ProductName = auction.Product.Name,
-                CategoryName = auction.Product.Category.Name,
-                ImageUrl = auction.Product.PrimaryImage,
-                Grade = auction.Product.GradeLabel,
-                Condition = auction.Product.Condition,
-                Year = auction.Product.Year
-            })
             .ToListAsync();
 
-        return rows.Select(auction => new AuctionItemViewModel
-        {
-            Id = auction.Id,
-            Name = auction.ProductName,
-            Category = auction.CategoryName,
-            ImageUrl = auction.ImageUrl,
-            StartingPrice = auction.StartingPrice,
-            CurrentPrice = auction.CurrentPrice,
-            Status = auction.Status,
-            RejectReason = auction.RejectReason,
-            Grade = auction.Grade ?? string.Empty,
-            Condition = auction.Condition,
-            Year = auction.Year ?? 0,
-            ListingType = auction.ListingType,
-            EndDate = auction.EndDate,
-            TimeRemaining = auction.ListingType == ListingTypes.BuyNow
-                ? string.Empty
-                : FormatAuctionTimeRemaining(auction.EndDate)
-        }).ToList();
+        return auctions
+            .Select(auction =>
+            {
+                var item = ProductDetailMapper.MapToAuctionItem(
+                    auction,
+                    forBuyNowCatalog: auction.ListingType == ListingTypes.BuyNow);
+                item.RejectReason = auction.RejectReason;
+                return item;
+            })
+            .ToList();
     }
 
     private static readonly string[] ProfilePublicVisibleStatuses =
@@ -112,26 +93,47 @@ public class SellerAuctionService : ISellerAuctionService
     [
         AuctionStatuses.Live,
         AuctionStatuses.EndingSoon,
-        AuctionStatuses.PendingReview,
+        AuctionStatuses.Confirming,
+        AuctionStatuses.LegacyPendingReview,
         AuctionStatuses.Rejected,
         AuctionStatuses.Scheduled
     ];
 
-    private static IQueryable<Auction> ApplySellerTabFilter(IQueryable<Auction> query, string tab) =>
-        tab.ToLowerInvariant() switch
+    private static IQueryable<Auction> ApplySellerTabFilter(IQueryable<Auction> query, string tab)
+    {
+        var now = DateTime.UtcNow;
+
+        return tab.ToLowerInvariant() switch
         {
-            "sold" => query.Where(a => a.Status == AuctionStatuses.Completed),
+            // Sold: completed sales, winner awaiting payment, or ended with a winner.
+            "sold" => query.Where(a =>
+                a.Status == AuctionStatuses.Completed ||
+                a.Status == AuctionStatuses.AwaitingPayment ||
+                (a.Status == AuctionStatuses.Ended &&
+                 (a.WinnerId != null || a.Bids.Any(b => b.IsWinning)))),
+
+            // Unsold: ended with nobody winning / no sale completed.
             "unsold" => query.Where(a =>
-                a.Status == AuctionStatuses.Ended ||
-                a.Status == AuctionStatuses.Rejected),
+                a.Status == AuctionStatuses.Ended &&
+                a.WinnerId == null &&
+                !a.Bids.Any(b => b.IsWinning)),
+
+            // Scheduled: approved but not yet at registration start (Upcoming).
             "scheduled" => query.Where(a =>
-                a.Status == AuctionStatuses.Scheduled ||
-                a.Status == AuctionStatuses.PendingReview),
+                a.Status == AuctionStatuses.Scheduled &&
+                a.RegistrationStartDate > now),
+
+            // Active: admin-approved listings in marketplace phases:
+            // registration open, registration closed (awaiting live), live, ending soon.
+            // Confirming stays on Account/Submissions (and owner profile).
             _ => query.Where(a =>
                 a.Status == AuctionStatuses.Live ||
                 a.Status == AuctionStatuses.EndingSoon ||
-                a.Status == AuctionStatuses.AwaitingPayment)
+                (a.Status == AuctionStatuses.Scheduled &&
+                 a.RegistrationStartDate <= now &&
+                 a.EndDate > now))
         };
+    }
 
     public async Task<(bool Success, string Message, int? AuctionId)> CreateAsync(
         CreateAuctionViewModel model,
@@ -303,7 +305,7 @@ public class SellerAuctionService : ISellerAuctionService
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
                 ListingType = ListingTypes.Auction,
-                Status = AuctionStatuses.PendingReview,
+                Status = AuctionStatuses.Confirming,
                 SubmittedAt = now,
                 CreatedAt = now
             };
@@ -312,7 +314,7 @@ public class SellerAuctionService : ISellerAuctionService
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return (true, "Listing submitted for review.", auction.Id);
+            return (true, "Your listing is confirming / awaiting admin confirmation.", auction.Id);
         }
         catch
         {
@@ -465,19 +467,23 @@ public class SellerAuctionService : ISellerAuctionService
 
             var buyNowScheduleStart = now;
             var buyNowLiveStart = buyNowScheduleStart.AddMinutes(1);
+            var buyNowPrice = model.Price;
+            var startingPrice = ResolveBuyNowStartingPrice(buyNowPrice);
 
             var auction = new Auction
             {
                 Product = product,
-                StartingPrice = model.Price,
+                StartingPrice = startingPrice,
                 BidStep = 0.01m,
-                CurrentPrice = model.Price,
+                CurrentPrice = buyNowPrice,
+                BuyNowPrice = buyNowPrice,
+                RequiresRegistration = false,
                 RegistrationStartDate = buyNowScheduleStart,
                 RegistrationEndDate = buyNowLiveStart,
                 StartDate = buyNowLiveStart,
                 EndDate = now.AddYears(1),
                 ListingType = ListingTypes.BuyNow,
-                Status = AuctionStatuses.PendingReview,
+                Status = AuctionStatuses.Confirming,
                 SubmittedAt = now,
                 CreatedAt = now
             };
@@ -486,7 +492,7 @@ public class SellerAuctionService : ISellerAuctionService
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return (true, "Listing submitted for review.", auction.Id);
+            return (true, "Your listing is confirming / awaiting admin confirmation.", auction.Id);
         }
         catch
         {
@@ -497,11 +503,14 @@ public class SellerAuctionService : ISellerAuctionService
 
     public async Task<SellerAuctionFormViewModel?> GetEditFormAsync(int auctionId, int sellerId)
     {
-        // Chi lay auction neu seller dang thao tac dung la chu so huu product.
         var auction = await _db.Auctions
             .AsNoTracking()
             .Include(a => a.Product)
             .ThenInclude(product => product.Category)
+            .Include(a => a.Product)
+            .ThenInclude(product => product.Images)
+            .Include(a => a.Product)
+            .ThenInclude(product => product.Documents)
             .FirstOrDefaultAsync(a => a.Id == auctionId && a.Product.SellerId == sellerId);
 
         if (auction is null)
@@ -509,26 +518,75 @@ public class SellerAuctionService : ISellerAuctionService
             return null;
         }
 
-        return new SellerAuctionFormViewModel
+        if (!IsEditableStatus(auction))
+        {
+            return null;
+        }
+
+        var hasBids = await _db.Bids.AnyAsync(b => b.AuctionId == auction.Id);
+        GradeLabelHelper.Parse(auction.Product.GradeLabel, out var authenticator, out var gradeValue);
+
+        var isBuyNow = string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
+        var model = new SellerAuctionFormViewModel
         {
             AuctionId = auction.Id,
+            Status = auction.Status,
+            ListingType = auction.ListingType,
+            HasBids = hasBids,
             ProductName = auction.Product.Name,
             Category = auction.Product.Category.Name,
             ShortDescription = auction.Product.ShortDescription,
-            DescriptionHtml = auction.Product.DescriptionHtml,
+            Subtitle = auction.Product.Subtitle,
+            ProductDescription = auction.Product.DescriptionHtml,
             Condition = auction.Product.Condition,
             Year = auction.Product.Year,
-            SetName = auction.Product.SetName,
-            GradeLabel = auction.Product.GradeLabel,
-            CertNumber = auction.Product.CertNumber,
-            PrimaryImage = auction.Product.PrimaryImage,
-            StartingPrice = auction.StartingPrice,
-            BidStep = auction.BidStep,
-            StartDate = auction.StartDate,
-            EndDate = auction.EndDate,
-            RegistrationStartDate = auction.RegistrationStartDate,
-            RegistrationEndDate = auction.RegistrationEndDate
+            SetName = auction.Product.SetName ?? string.Empty,
+            Language = auction.Product.Language ?? "English",
+            CardNumber = auction.Product.CardNumber,
+            Authenticator = authenticator,
+            GradeValue = gradeValue,
+            Grade = auction.Product.GradeLabel ?? GradeLabelHelper.Compose(authenticator, gradeValue),
+            CertificateNumber = auction.Product.CertNumber,
+            ExistingPrimaryImage = auction.Product.PrimaryImage,
+            StartingPrice = isBuyNow
+                ? ResolveBuyNowStartingPrice(auction.BuyNowPrice ?? auction.CurrentPrice)
+                : auction.StartingPrice,
+            BidStep = isBuyNow
+                ? 0.01m
+                : auction.BidStep,
+            BuyNowPrice = isBuyNow
+                ? auction.BuyNowPrice ?? auction.CurrentPrice
+                : auction.BuyNowPrice,
+            StartDate = DateTimeUtilities.AsUtc(auction.StartDate),
+            EndDate = DateTimeUtilities.AsUtc(auction.EndDate),
+            RegistrationStartDate = DateTimeUtilities.AsUtc(auction.RegistrationStartDate),
+            RegistrationEndDate = DateTimeUtilities.AsUtc(auction.RegistrationEndDate),
+            ExistingGalleryImages = auction.Product.Images
+                .Where(image => image.DeletedAt == null)
+                .OrderBy(image => image.SortOrder)
+                .Select(image => new SellerAuctionExistingImageViewModel
+                {
+                    Id = image.Id,
+                    Url = image.ImageUrl,
+                    SortOrder = image.SortOrder
+                })
+                .ToList(),
+            ExistingDocuments = auction.Product.Documents
+                .Where(document => document.DeletedAt == null)
+                .OrderBy(document => document.Id)
+                .Select(document => new SellerAuctionExistingDocumentViewModel
+                {
+                    Id = document.Id,
+                    Name = document.Name,
+                    FileUrl = document.FileUrl
+                })
+                .ToList()
         };
+
+        ApplyEditLocks(model, auction, hasBids);
+        _sellService.PopulateOptions(model);
+        SellService.NormalizeGradingFields(model);
+        return model;
     }
 
     public async Task<(bool Success, string Message)> UpdateAsync(
@@ -542,6 +600,9 @@ public class SellerAuctionService : ISellerAuctionService
 
         var auction = await _db.Auctions
             .Include(a => a.Product)
+            .ThenInclude(product => product.Images)
+            .Include(a => a.Product)
+            .ThenInclude(product => product.Documents)
             .FirstOrDefaultAsync(a => a.Id == model.AuctionId && a.Product.SellerId == sellerId);
 
         if (auction is null)
@@ -549,74 +610,429 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "Auction not found.");
         }
 
+        if (!IsEditableStatus(auction))
+        {
+            return (false, "Only pending, scheduled, or live listings can be edited.");
+        }
+
         var hasBids = await _db.Bids.AnyAsync(b => b.AuctionId == auction.Id);
-        if (hasBids)
+        ApplyEditLocks(model, auction, hasBids);
+        model.ListingType = auction.ListingType;
+
+        var isBuyNow = string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
+        if (isBuyNow)
         {
-            return (false, "Cannot edit auction that already has bids.");
+            // Buy Now has no editable schedule UI — keep the original window.
+            model.RegistrationStartDate = auction.RegistrationStartDate;
+            model.RegistrationEndDate = auction.RegistrationEndDate;
+            model.StartDate = auction.StartDate;
+            model.EndDate = auction.EndDate;
+            model.BidStep = 0.01m;
+
+            if (model.LockStartingPrice)
+            {
+                model.BuyNowPrice = auction.BuyNowPrice ?? auction.CurrentPrice;
+                model.StartingPrice = auction.StartingPrice;
+            }
+            else
+            {
+                var buyNowPrice = model.BuyNowPrice ?? 0m;
+                if (buyNowPrice <= 0.01m)
+                {
+                    return (false, "Price must be greater than 0.01.");
+                }
+
+                model.BuyNowPrice = buyNowPrice;
+                model.StartingPrice = ResolveBuyNowStartingPrice(buyNowPrice);
+            }
+
+            var buyNowValidationModel = new CreateBuyNowViewModel
+            {
+                ProductName = model.ProductName,
+                Category = model.Category,
+                ShortDescription = model.ShortDescription,
+                Subtitle = model.Subtitle,
+                ProductDescription = model.ProductDescription,
+                Condition = model.Condition,
+                Year = model.Year,
+                SetName = model.SetName,
+                Language = model.Language,
+                CardNumber = model.CardNumber,
+                Authenticator = model.Authenticator,
+                GradeValue = model.GradeValue,
+                Grade = model.Grade,
+                CertificateNumber = model.CertificateNumber,
+                Price = model.BuyNowPrice ?? 0m,
+                Categories = model.Categories,
+                Authenticators = model.Authenticators,
+                GradeValues = model.GradeValues,
+                Languages = model.Languages
+            };
+
+            SellService.NormalizeGradingFields(buyNowValidationModel);
+            model.Grade = buyNowValidationModel.Grade;
+            model.Condition = buyNowValidationModel.Condition;
+
+            foreach (var (_, message) in _sellService.ValidateCreateBuyNow(buyNowValidationModel))
+            {
+                return (false, message);
+            }
+        }
+        else
+        {
+            if (model.LockRegistrationDates)
+            {
+                model.RegistrationStartDate = auction.RegistrationStartDate;
+                model.RegistrationEndDate = auction.RegistrationEndDate;
+            }
+
+            if (model.LockLiveStartDate)
+            {
+                model.StartDate = auction.StartDate;
+            }
+
+            if (model.LockStartingPrice)
+            {
+                model.StartingPrice = auction.StartingPrice;
+            }
+
+            if (model.LockBidStep)
+            {
+                model.BidStep = auction.BidStep;
+            }
+
+            if (DateTimeUtilities.AsUtc(model.EndDate) < DateTimeUtilities.AsUtc(auction.EndDate))
+            {
+                return (false, "End date can only be extended, not shortened.");
+            }
+
+            SellService.NormalizeGradingFields(model);
+
+            foreach (var (key, message) in _sellService.ValidateCreateAuction(model))
+            {
+                // Past registration start is allowed on edit when dates are locked / already open.
+                if (model.LockRegistrationDates
+                    && key == nameof(model.RegistrationStartDate))
+                {
+                    continue;
+                }
+
+                if (key == nameof(model.RegistrationStartDate)
+                    && DateTimeUtilities.AsUtc(model.RegistrationStartDate)
+                        == DateTimeUtilities.AsUtc(auction.RegistrationStartDate))
+                {
+                    continue;
+                }
+
+                return (false, message);
+            }
+
+            if (model.EndDate <= model.StartDate)
+            {
+                return (false, "Live end must be greater than live start.");
+            }
+
+            if (!model.LockRegistrationDates)
+            {
+                var scheduleError = AuctionScheduleHelper.ValidateSchedule(
+                    model.RegistrationStartDate,
+                    model.RegistrationEndDate,
+                    model.StartDate,
+                    model.EndDate);
+
+                if (scheduleError is not null)
+                {
+                    return (false, scheduleError);
+                }
+            }
         }
 
-        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.PendingReview or AuctionStatuses.Rejected)
-            || (auction.Status == AuctionStatuses.Live && !DateTimeUtilities.IsInFutureUtc(auction.EndDate)))
+        var galleryFiles = model.GalleryImageFiles
+            .Where(file => file is { Length: > 0 })
+            .Take(4)
+            .ToList();
+
+        var remainingGalleryCount = auction.Product.Images.Count(image =>
+            image.DeletedAt == null && !model.RemovedGalleryImageIds.Contains(image.Id));
+        if (1 + remainingGalleryCount + galleryFiles.Count > 5)
         {
-            return (false, "Only pending or live listings can be edited.");
+            return (false, "You can upload up to 5 images.");
         }
 
-        if (model.EndDate < auction.EndDate)
+        var remainingDocCount = auction.Product.Documents.Count(document =>
+            document.DeletedAt == null && !model.RemovedDocumentIds.Contains(document.Id));
+        var newDocCount = model.DocumentFiles.Count(file => file is { Length: > 0 });
+        if (remainingDocCount + newDocCount > MaxDocumentsPerProduct)
         {
-            return (false, "End date can only be extended, not shortened.");
+            return (false, $"You can upload up to {MaxDocumentsPerProduct} documents per product.");
         }
 
-        string? newImageUrl;
+        var documentValidation = ValidateDocumentFiles(model.DocumentFiles);
+        if (documentValidation is not null)
+        {
+            return (false, documentValidation);
+        }
+
+        var strategy = _db.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(() => UpdateAuctionCoreAsync(model, auction, hasBids, galleryFiles));
+    }
+
+    private async Task<(bool Success, string Message)> UpdateAuctionCoreAsync(
+        SellerAuctionFormViewModel model,
+        Auction auction,
+        bool hasBids,
+        IReadOnlyList<IFormFile> galleryFiles)
+    {
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+
         try
         {
-            // Edit cung dung Cloudinary: neu co file moi thi thay cover, khong co thi giu anh cu.
-            newImageUrl = await _photoService.AddPhotoAsync(model.PrimaryImageFile, ProductImageFolder);
+            string? newImageUrl;
+            try
+            {
+                newImageUrl = await _photoService.AddPhotoAsync(model.PrimaryImageFile, ProductImageFolder);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return (false, ex.Message);
+            }
+
+            var category = await GetOrCreateCategoryAsync(model.Category);
+            var now = DateTime.UtcNow;
+
+            auction.Product.Name = model.ProductName.Trim();
+            auction.Product.CategoryId = category.Id;
+            auction.Product.Category = category;
+            auction.Product.ShortDescription = TrimOrNull(model.ShortDescription);
+            auction.Product.Subtitle = TrimOrNull(model.Subtitle);
+            auction.Product.DescriptionHtml = model.ProductDescription;
+            auction.Product.Condition = model.Condition;
+            auction.Product.Year = model.Year;
+            auction.Product.SetName = TrimOrNull(model.SetName);
+            auction.Product.Language = TrimOrNull(model.Language);
+            auction.Product.CardNumber = TrimOrNull(model.CardNumber);
+            auction.Product.GradeLabel = TrimOrNull(model.Grade);
+            auction.Product.CertNumber = TrimOrNull(model.CertificateNumber);
+            auction.Product.UpdatedAt = now;
+
+            if (!string.IsNullOrWhiteSpace(newImageUrl))
+            {
+                auction.Product.PrimaryImage = newImageUrl;
+            }
+            else if (!string.IsNullOrWhiteSpace(model.ExistingPrimaryImage))
+            {
+                auction.Product.PrimaryImage = model.ExistingPrimaryImage;
+            }
+
+            foreach (var image in auction.Product.Images.Where(image =>
+                         image.DeletedAt == null && model.RemovedGalleryImageIds.Contains(image.Id)))
+            {
+                image.DeletedAt = now;
+                image.UpdatedAt = now;
+            }
+
+            if (string.IsNullOrWhiteSpace(auction.Product.PrimaryImage))
+            {
+                var fallbackGallery = auction.Product.Images
+                    .Where(image => image.DeletedAt == null)
+                    .OrderBy(image => image.SortOrder)
+                    .FirstOrDefault();
+                if (fallbackGallery is not null)
+                {
+                    auction.Product.PrimaryImage = fallbackGallery.ImageUrl;
+                    fallbackGallery.DeletedAt = now;
+                    fallbackGallery.UpdatedAt = now;
+                }
+                else
+                {
+                    auction.Product.PrimaryImage = DefaultProductImageUrl;
+                }
+            }
+
+            foreach (var document in auction.Product.Documents.Where(document =>
+                         document.DeletedAt == null && model.RemovedDocumentIds.Contains(document.Id)))
+            {
+                document.DeletedAt = now;
+                document.UpdatedAt = now;
+            }
+
+            var sortOrder = auction.Product.Images
+                .Where(image => image.DeletedAt == null)
+                .Select(image => image.SortOrder)
+                .DefaultIfEmpty(0)
+                .Max() + 1;
+
+            foreach (var galleryFile in galleryFiles)
+            {
+                try
+                {
+                    var galleryUrl = await _photoService.AddPhotoAsync(galleryFile, ProductImageFolder);
+                    if (string.IsNullOrWhiteSpace(galleryUrl))
+                    {
+                        continue;
+                    }
+
+                    auction.Product.Images.Add(new ProductImage
+                    {
+                        ImageUrl = galleryUrl,
+                        SortOrder = sortOrder++,
+                        CreatedAt = now
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    await transaction.RollbackAsync();
+                    return (false, ex.Message);
+                }
+            }
+
+            for (var i = 0; i < model.DocumentFiles.Count; i++)
+            {
+                var documentFile = model.DocumentFiles[i];
+                if (documentFile is not { Length: > 0 })
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var documentUrl = await _photoService.AddPhotoAsync(documentFile, DocumentFolder);
+                    if (string.IsNullOrWhiteSpace(documentUrl))
+                    {
+                        continue;
+                    }
+
+                    var documentName = i < model.DocumentNames.Count && !string.IsNullOrWhiteSpace(model.DocumentNames[i])
+                        ? model.DocumentNames[i].Trim()
+                        : documentFile.FileName;
+
+                    auction.Product.Documents.Add(new ProductDocument
+                    {
+                        Name = documentName,
+                        FileUrl = documentUrl,
+                        FileType = ResolveDocumentType(documentFile),
+                        CreatedAt = now
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    await transaction.RollbackAsync();
+                    return (false, ex.Message);
+                }
+            }
+
+            if (!model.LockStartingPrice)
+            {
+                auction.StartingPrice = model.StartingPrice;
+                if (!hasBids)
+                {
+                    auction.CurrentPrice = model.StartingPrice;
+                }
+            }
+
+            if (!model.LockBidStep)
+            {
+                auction.BidStep = model.BidStep;
+            }
+
+            if (string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase))
+            {
+                // CHECK chk_auctions_prices requires buy_now_price > starting_price.
+                var buyNowPrice = model.BuyNowPrice ?? model.StartingPrice;
+                if (buyNowPrice <= 0)
+                {
+                    await transaction.RollbackAsync();
+                    return (false, "Buy now price must be greater than 0.");
+                }
+
+                auction.BuyNowPrice = buyNowPrice;
+                auction.StartingPrice = ResolveBuyNowStartingPrice(buyNowPrice);
+                auction.BidStep = 0.01m;
+                if (!hasBids)
+                {
+                    auction.CurrentPrice = buyNowPrice;
+                }
+            }
+            else if (model.BuyNowPrice is not null && model.BuyNowPrice <= auction.StartingPrice)
+            {
+                await transaction.RollbackAsync();
+                return (false, "Buy now price must be greater than the starting price.");
+            }
+            else
+            {
+                auction.BuyNowPrice = model.BuyNowPrice;
+            }
+
+            if (!model.LockRegistrationDates)
+            {
+                auction.RegistrationStartDate = model.RegistrationStartDate;
+                auction.RegistrationEndDate = model.RegistrationEndDate;
+            }
+
+            if (!model.LockLiveStartDate)
+            {
+                auction.StartDate = model.StartDate;
+            }
+
+            auction.EndDate = model.EndDate;
+            auction.UpdatedAt = now;
+
+            if (auction.Status == AuctionStatuses.Rejected)
+            {
+                auction.Status = AuctionStatuses.Confirming;
+                auction.SubmittedAt = now;
+                auction.RejectReason = null;
+                auction.VerifiedAt = null;
+                auction.VerifiedBy = null;
+            }
+
+            await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            var message = AuctionStatuses.IsConfirming(auction.Status)
+                ? "Listing updated and resubmitted for admin confirmation."
+                : "Auction updated successfully.";
+
+            return (true, message);
         }
-        catch (InvalidOperationException ex)
+        catch
         {
-            return (false, ex.Message);
+            await transaction.RollbackAsync();
+            throw;
         }
+    }
 
-        var category = await GetOrCreateCategoryAsync(model.Category);
-
-        auction.Product.Name = model.ProductName.Trim();
-        auction.Product.CategoryId = category.Id;
-        auction.Product.Category = category;
-        auction.Product.ShortDescription = model.ShortDescription;
-        auction.Product.DescriptionHtml = model.DescriptionHtml;
-        auction.Product.Condition = model.Condition;
-        auction.Product.Year = model.Year;
-        auction.Product.SetName = model.SetName;
-        auction.Product.GradeLabel = model.GradeLabel;
-        auction.Product.CertNumber = model.CertNumber;
-        auction.Product.PrimaryImage = string.IsNullOrWhiteSpace(newImageUrl)
-            ? model.PrimaryImage
-            : newImageUrl;
-
-        auction.StartingPrice = model.StartingPrice;
-        auction.CurrentPrice = model.StartingPrice;
-        auction.BidStep = model.BidStep;
-        auction.RegistrationStartDate = model.RegistrationStartDate;
-        auction.RegistrationEndDate = model.RegistrationEndDate;
-        auction.StartDate = model.StartDate;
-        auction.EndDate = model.EndDate;
-
-        if (auction.Status == AuctionStatuses.Rejected)
+    private static bool IsEditableStatus(Auction auction)
+    {
+        if (auction.Status is AuctionStatuses.Confirming
+            or AuctionStatuses.LegacyPendingReview
+            or AuctionStatuses.Rejected
+            or AuctionStatuses.Scheduled)
         {
-            auction.Status = AuctionStatuses.PendingReview;
-            auction.SubmittedAt = DateTime.UtcNow;
-            auction.RejectReason = null;
-            auction.VerifiedAt = null;
-            auction.VerifiedBy = null;
+            return true;
         }
 
-        await _db.SaveChangesAsync();
+        return auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon
+               && DateTimeUtilities.IsInFutureUtc(auction.EndDate);
+    }
 
-        var message = auction.Status == AuctionStatuses.PendingReview
-            ? "Listing updated and resubmitted for review."
-            : "Auction updated successfully.";
+    private static void ApplyEditLocks(SellerAuctionFormViewModel model, Auction auction, bool hasBids)
+    {
+        var now = DateTime.UtcNow;
+        var registrationOpened = now >= DateTimeUtilities.AsUtc(auction.RegistrationStartDate);
+        var liveStarted = now >= DateTimeUtilities.AsUtc(auction.StartDate);
 
-        return (true, message);
+        var canEditFull = AuctionStatuses.IsConfirming(auction.Status)
+            || auction.Status == AuctionStatuses.Rejected
+            || (auction.Status == AuctionStatuses.Scheduled && !registrationOpened);
+
+        model.CanEditFull = canEditFull;
+        model.LockRegistrationDates = !canEditFull;
+        model.LockLiveStartDate = !canEditFull || liveStarted;
+        model.LockStartingPrice = hasBids || (!canEditFull && (registrationOpened || liveStarted));
+        model.LockBidStep = hasBids;
+        model.HasBids = hasBids;
+        model.Status = auction.Status;
     }
 
     public async Task<(bool Success, string Message)> CancelAsync(int auctionId, int sellerId)
@@ -646,8 +1062,9 @@ public class SellerAuctionService : ISellerAuctionService
             return (false, "Cannot cancel auction that already has a pending or paid order.");
         }
 
-        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.PendingReview or AuctionStatuses.Rejected)
-            || (auction.Status == AuctionStatuses.Live && !DateTimeUtilities.IsInFutureUtc(auction.EndDate)))
+        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.EndingSoon or AuctionStatuses.Confirming or AuctionStatuses.LegacyPendingReview or AuctionStatuses.Rejected or AuctionStatuses.Scheduled)
+            || ((auction.Status == AuctionStatuses.Live || auction.Status == AuctionStatuses.EndingSoon)
+                && !DateTimeUtilities.IsInFutureUtc(auction.EndDate)))
         {
             return (false, "This listing cannot be cancelled.");
         }
@@ -657,27 +1074,6 @@ public class SellerAuctionService : ISellerAuctionService
         await _db.SaveChangesAsync();
 
         return (true, "Auction cancelled successfully.");
-    }
-
-    private static string FormatAuctionTimeRemaining(DateTime endDate)
-    {
-        var remaining = DateTimeUtilities.RemainingUtc(endDate);
-        if (remaining <= TimeSpan.Zero)
-        {
-            return "Ended";
-        }
-
-        if (remaining.TotalDays >= 1)
-        {
-            return $"{(int)remaining.TotalDays} days left";
-        }
-
-        if (remaining.TotalHours >= 1)
-        {
-            return $"{(int)remaining.TotalHours} hours left";
-        }
-
-        return $"{Math.Max(1, (int)remaining.TotalMinutes)} minutes left";
     }
 
     private async Task<Category> GetOrCreateCategoryAsync(string categoryName)
@@ -740,6 +1136,13 @@ public class SellerAuctionService : ISellerAuctionService
     }
 
     private const int MaxDocumentsPerProduct = 5;
+
+    /// <summary>
+    /// Buy Now listings store the visible price in buy_now_price/current_price.
+    /// starting_price must stay strictly lower to satisfy chk_auctions_prices.
+    /// </summary>
+    private static decimal ResolveBuyNowStartingPrice(decimal price) =>
+        price <= 0.01m ? 0.01m : price - 0.01m;
 
     private static string? ValidateDocumentFiles(IEnumerable<IFormFile> files)
     {

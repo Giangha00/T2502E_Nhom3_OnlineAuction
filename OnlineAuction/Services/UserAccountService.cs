@@ -106,7 +106,8 @@ public class UserAccountService : IUserAccountService
     {
         var submissionStatuses = new[]
         {
-            AuctionStatuses.PendingReview,
+            AuctionStatuses.Confirming,
+            AuctionStatuses.LegacyPendingReview,
             AuctionStatuses.Rejected,
             AuctionStatuses.Scheduled
         };
