@@ -55,7 +55,11 @@
                       asp-route-id="@Model.Id"
                       asp-route-returnTemplateId="@Model.ProductTemplateId"
                       method="post"
-                      onsubmit="return confirm('@Localizer["AdminProduct.ConfirmDeleteProduct"]');">
+                      data-confirm
+                      data-confirm-variant="danger"
+                      data-confirm-title="@Localizer["AdminProduct.Delete"]"
+                      data-confirm-message="@Localizer["AdminProduct.ConfirmDeleteProduct"]"
+                      data-confirm-confirm="@Localizer["AdminProduct.Delete"]">
                     @Html.AntiForgeryToken()
                     <button type="submit"
                             class="admin-icon-action admin-icon-action--delete admin-icon-action--lg"

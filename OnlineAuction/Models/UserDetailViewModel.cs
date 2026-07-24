@@ -66,6 +66,10 @@ public class SellerListingCardViewModel
     public AuctionItemViewModel Auction { get; set; } = new();
 
     public bool IsOwner { get; set; }
+
+    public bool CanEdit { get; set; }
+
+    public bool CanDelete { get; set; }
 }
 
 public class EmptyListingStateViewModel

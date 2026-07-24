@@ -879,12 +879,15 @@
   <data name="User_Ends" xml:space="preserve"><value>Kết thúc</value></data>
   <data name="User_ViewDetail" xml:space="preserve"><value>Xem chi tiết</value></data>
   <data name="User_CancelListing" xml:space="preserve"><value>Hủy</value></data>
+  <data name="User_CancelListingConfirm" xml:space="preserve"><value>Hủy tin đăng này? Tin sẽ bị gỡ khỏi sàn.</value></data>
+  <data name="User_EditListing" xml:space="preserve"><value>Sửa</value></data>
   <data name="User_CancelConfirm" xml:space="preserve"><value>Hủy tin đấu giá này?</value></data>
   <data name="User_Status_Active" xml:space="preserve"><value>Đấu giá đang diễn ra</value></data>
   <data name="User_Status_EndingSoon" xml:space="preserve"><value>Sắp kết thúc</value></data>
   <data name="User_Status_Completed" xml:space="preserve"><value>Đã hoàn tất</value></data>
   <data name="UserAuction_EditTitle" xml:space="preserve"><value>Sửa đấu giá</value></data>
-  <data name="UserAuction_EditDesc" xml:space="preserve"><value>Chỉ sửa được đấu giá đang diễn ra và chưa có lượt đấu giá.</value></data>
+  <data name="UserAuction_EditDesc" xml:space="preserve"><value>Cập nhật thông tin listing. Ngày đăng ký và giá khởi điểm có thể bị khóa sau khi mở đăng ký hoặc đã có bid.</value></data>
+  <data name="UserAuction_EditPhaseLockHint" xml:space="preserve"><value>Một số trường lịch/giá đã bị khóa theo giai đoạn. Bạn vẫn có thể gia hạn ngày kết thúc live.</value></data>
   <data name="UserAuction_ProductName" xml:space="preserve"><value>Tên sản phẩm</value></data>
   <data name="UserAuction_ShortDescription" xml:space="preserve"><value>Mô tả ngắn</value></data>
   <data name="UserAuction_SetName" xml:space="preserve"><value>Tên bộ</value></data>
@@ -895,6 +898,13 @@
   <data name="UserAuction_StartDate" xml:space="preserve"><value>Ngày bắt đầu</value></data>
   <data name="UserAuction_EndDate" xml:space="preserve"><value>Ngày kết thúc</value></data>
   <data name="UserAuction_SaveChanges" xml:space="preserve"><value>Lưu thay đổi</value></data>
+  <data name="UserAuction_SaveSuccess" xml:space="preserve"><value>Đã cập nhật listing thành công.</value></data>
+  <data name="UserAuction_SaveFailed" xml:space="preserve"><value>Không thể cập nhật listing. Vui lòng thử lại.</value></data>
+  <data name="UserAuction_ReadyToSave_Highlight" xml:space="preserve"><value>Sẵn sàng lưu?</value></data>
+  <data name="UserAuction_ReadyToSave" xml:space="preserve"><value>Xem lại preview rồi lưu thay đổi.</value></data>
+  <data name="ConfirmModal_EditAuction_Title" xml:space="preserve"><value>Lưu thay đổi listing?</value></data>
+  <data name="ConfirmModal_EditAuction_Message" xml:space="preserve"><value>Bạn sắp lưu cập nhật cho "{0}".</value></data>
+  <data name="ConfirmModal_EditAuction_Note" xml:space="preserve"><value>Listing bị từ chối sẽ được gửi lại để admin xác nhận.</value></data>
   <data name="Sell_AuctionHeader_Label" xml:space="preserve"><value>Bảng điều khiển người bán</value></data>
   <data name="Sell_AuctionHeader_Title" xml:space="preserve"><value>Tạo đấu giá mới</value></data>
   <data name="Sell_AuctionHeader_Desc" xml:space="preserve"><value>Bán sản phẩm qua đấu giá. Hoàn thành biểu mẫu và xem lại tin đăng trước khi xuất bản.</value></data>

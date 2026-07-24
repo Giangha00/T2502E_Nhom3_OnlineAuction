@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
@@ -188,6 +189,12 @@ public class RefundComplaintService : IRefundComplaintService
             return (false, "Requested amount cannot exceed the order total.", null);
         }
 
+        var evidenceResult = SerializeEvidenceUrls(model.EvidenceUrls);
+        if (!evidenceResult.Success)
+        {
+            return (false, evidenceResult.Message, null);
+        }
+
         var now = DateTime.UtcNow;
         var complaint = new Complaint
         {
@@ -202,6 +209,7 @@ public class RefundComplaintService : IRefundComplaintService
             ContactName = model.ContactName.Trim(),
             ContactEmail = model.ContactEmail.Trim(),
             Status = ComplaintStatuses.Pending,
+            EvidenceUrlsJson = evidenceResult.Json,
             CreatedAt = now,
             UpdatedAt = now
         };
@@ -295,4 +303,34 @@ public class RefundComplaintService : IRefundComplaintService
             .OrderByDescending(payment => payment.PaidAt)
             .Select(payment => payment.PaidAt)
             .FirstOrDefault();
+
+    private static (bool Success, string Message, string? Json) SerializeEvidenceUrls(string? rawEvidenceUrls)
+    {
+        if (string.IsNullOrWhiteSpace(rawEvidenceUrls))
+        {
+            return (true, string.Empty, null);
+        }
+
+        var urls = rawEvidenceUrls
+            .Split(['\r', '\n', ',', ';'], StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (urls.Count > 5)
+        {
+            return (false, "Please provide no more than 5 evidence links.", null);
+        }
+
+        foreach (var url in urls)
+        {
+            if (url.Length > 500
+                || !Uri.TryCreate(url, UriKind.Absolute, out var parsedUrl)
+                || parsedUrl.Scheme is not ("http" or "https"))
+            {
+                return (false, "Evidence links must be valid http or https URLs.", null);
+            }
+        }
+
+        return (true, string.Empty, JsonSerializer.Serialize(urls));
+    }
 }

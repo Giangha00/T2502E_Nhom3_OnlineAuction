@@ -121,6 +121,11 @@
 
             if (bulkActionForm) {
                 bulkActionForm.onsubmit = function (event) {
+                    if (bulkActionForm.dataset.confirmAccepted === '1') {
+                        delete bulkActionForm.dataset.confirmAccepted;
+                        return;
+                    }
+
                     if (event.submitter?.dataset.bulkSubmit !== 'true') {
                         return;
                     }
@@ -139,9 +144,35 @@
                         return;
                     }
 
-                    if (action === '@UserBulkActions.Delete' && !confirm('Are you sure you want to delete selected users?')) {
-                        event.preventDefault();
+                    if (action !== '@UserBulkActions.Delete') {
+                        return;
                     }
+
+                    event.preventDefault();
+                    const submitter = event.submitter;
+                    const confirmFn = typeof window.showConfirmModal === 'function'
+                        ? window.showConfirmModal
+                        : function (options) {
+                            return Promise.resolve(window.confirm(options.message || ''));
+                        };
+
+                    confirmFn({
+                        title: 'Delete selected users?',
+                        message: 'Are you sure you want to delete selected users?',
+                        confirmText: 'Delete',
+                        variant: 'danger'
+                    }).then(function (confirmed) {
+                        if (!confirmed) {
+                            return;
+                        }
+
+                        bulkActionForm.dataset.confirmAccepted = '1';
+                        if (typeof bulkActionForm.requestSubmit === 'function') {
+                            bulkActionForm.requestSubmit(submitter || undefined);
+                        } else {
+                            HTMLFormElement.prototype.submit.call(bulkActionForm);
+                        }
+                    });
                 };
             }
         }
