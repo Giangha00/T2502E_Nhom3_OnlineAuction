@@ -107,7 +107,7 @@ public class AdminComplaintService : IAdminComplaintService
                 BuyerEmail = complaint.ContactEmail,
                 ProductName = complaint.Order != null && complaint.Order.Items.Any()
                     ? complaint.Order.Items.OrderBy(item => item.Id).First().ItemName
-                    : "—",
+                    : "Not available",
                 ReasonCode = complaint.ReasonCode,
                 ReasonLabel = complaint.ReasonCode,
                 RequestedAmount = complaint.RequestedAmount,
@@ -142,6 +142,8 @@ public class AdminComplaintService : IAdminComplaintService
             .Include(c => c.Reviewer)
             .Include(c => c.Order!)
                 .ThenInclude(o => o.Items)
+            .Include(c => c.Order!)
+                .ThenInclude(o => o.Items)
                 .ThenInclude(i => i.Auction)
                 .ThenInclude(a => a.Product)
                 .ThenInclude(p => p.Seller)
@@ -155,7 +157,7 @@ public class AdminComplaintService : IAdminComplaintService
         }
 
         var firstItem = complaint.Order?.Items.OrderBy(item => item.Id).FirstOrDefault();
-        var seller = firstItem?.Auction.Product.Seller;
+        var seller = firstItem?.Auction?.Product?.Seller;
         var successfulPayment = complaint.Order?.Payments
             .Where(payment => payment.DeletedAt == null && payment.Status == PaymentStatuses.Success)
             .OrderByDescending(payment => payment.PaidAt)
@@ -218,7 +220,7 @@ public class AdminComplaintService : IAdminComplaintService
             SellerId = seller?.Id,
             SellerName = seller?.FullName,
             SellerEmail = seller?.Email,
-            ProductName = firstItem?.ItemName ?? "—",
+            ProductName = firstItem?.ItemName ?? "Not available",
             AuctionId = firstItem?.AuctionId,
             HasApprovedComplaintForOrder = hasApprovedForOrder,
             OrderRefundEligibilityWarning = orderRefundEligibilityWarning,
@@ -246,7 +248,7 @@ public class AdminComplaintService : IAdminComplaintService
             return (false, "Complaint not found.");
         }
 
-        var normalizedAction = action.Trim().ToLowerInvariant();
+        var normalizedAction = (action ?? string.Empty).Trim().ToLowerInvariant();
         var now = DateTime.UtcNow;
 
         switch (normalizedAction)

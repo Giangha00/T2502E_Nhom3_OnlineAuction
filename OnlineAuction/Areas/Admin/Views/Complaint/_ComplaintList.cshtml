@@ -7,61 +7,84 @@
     var endPage = Math.Min(totalPages, currentPage + 2);
 }
 
-<div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+<div class="complaint-list-panel">
+    <div class="complaint-list-panel__header">
+        <div>
+            <h3>Case queue</h3>
+            <p>Showing @Model.Items.Count of @Model.TotalItems complaints</p>
+        </div>
+        <span class="complaint-page-chip">Page @currentPage of @totalPages</span>
+    </div>
+
     @if (Model.Items.Count == 0)
     {
-        <div class="px-6 py-16 text-center">
-            <p class="text-theme-sm font-medium text-gray-700 dark:text-white/80">No complaints found</p>
-            <p class="mt-1 text-theme-xs text-gray-500 dark:text-gray-400">Buyer refund requests will appear here once submitted.</p>
+        <div class="complaint-empty-state">
+            <div class="complaint-empty-state__icon">
+                <partial name="_AdminIcon" model='"review"' />
+            </div>
+            <p>No complaints found</p>
+            <span>Try clearing filters or checking again after buyers submit new requests.</span>
         </div>
     }
     else
     {
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-                <thead class="bg-gray-50 dark:bg-white/[0.02]">
+        <div class="complaint-table-wrap">
+            <table class="complaint-table">
+                <thead>
                     <tr>
-                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Request ID</th>
-                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Order ref</th>
-                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Buyer</th>
-                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Product</th>
-                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Reason</th>
-                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Amount</th>
-                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Status</th>
-                        <th class="px-4 py-3 text-left text-theme-xs font-semibold uppercase text-gray-500">Submitted</th>
-                        <th class="px-4 py-3 text-right text-theme-xs font-semibold uppercase text-gray-500">Actions</th>
+                        <th>Request</th>
+                        <th>Buyer</th>
+                        <th>Order</th>
+                        <th>Reason</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th class="complaint-table__actions">Action</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+                <tbody>
                     @foreach (var item in Model.Items)
                     {
                         <tr>
-                            <td class="px-4 py-3 text-theme-sm font-medium text-gray-800 dark:text-white/90">@item.RequestReference</td>
-                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@(item.OrderReference ?? "—")</td>
-                            <td class="px-4 py-3">
-                                <p class="text-theme-sm text-gray-800 dark:text-white/90">@item.BuyerName</p>
-                                <p class="text-theme-xs text-gray-500">@item.BuyerEmail</p>
+                            <td data-label="Request">
+                                <div class="complaint-request-cell">
+                                    <span>@item.RequestReference</span>
+                                    <small>@(string.IsNullOrWhiteSpace(item.ProductName) ? "No product name" : item.ProductName)</small>
+                                </div>
                             </td>
-                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@item.ProductName</td>
-                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">@item.ReasonLabel</td>
-                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">
-                                @(item.RequestedAmount.HasValue ? $"${item.RequestedAmount.Value:N2}" : "Full refund")
+                            <td data-label="Buyer">
+                                <div class="complaint-person-cell">
+                                    <span>@item.BuyerName</span>
+                                    <small>@item.BuyerEmail</small>
+                                </div>
                             </td>
-                            <td class="px-4 py-3">
+                            <td data-label="Order">
+                                <span class="complaint-muted-text">@(item.OrderReference ?? "Not linked")</span>
+                            </td>
+                            <td data-label="Reason">
+                                <span class="complaint-reason-pill">@item.ReasonLabel</span>
+                            </td>
+                            <td data-label="Amount">
+                                <span class="complaint-amount">
+                                    @(item.RequestedAmount.HasValue ? $"${item.RequestedAmount.Value:N2}" : "Full refund")
+                                </span>
+                            </td>
+                            <td data-label="Status">
                                 <span class="inline-flex rounded-full border px-2.5 py-0.5 text-theme-xs font-medium @ComplaintDisplayHelper.GetStatusBadgeClass(item.Status)">
                                     @item.StatusLabel
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-theme-sm text-gray-700 dark:text-gray-300">
-                                @item.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                            <td data-label="Submitted">
+                                <span class="complaint-muted-text">@item.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
                             </td>
-                            <td class="px-4 py-3 text-right">
+                            <td data-label="Action" class="complaint-table__actions">
                                 <a asp-action="Details"
                                    asp-route-id="@item.Id"
-                                   class="admin-icon-action admin-icon-action--review"
-                                   title="Review"
-                                   aria-label="Review">
+                                   class="complaint-action-button complaint-action-button--review complaint-action-button--compact"
+                                   title="Review complaint"
+                                   aria-label="Review complaint @item.RequestReference">
                                     <partial name="_AdminIcon" model='"review"' />
+                                    <span>Review</span>
                                 </a>
                             </td>
                         </tr>
@@ -72,11 +95,9 @@
 
         @if (totalPages > 1)
         {
-            <div class="flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-800">
-                <p class="text-theme-xs text-gray-500">
-                    Showing @Model.Items.Count of @Model.TotalItems complaints
-                </p>
-                <div class="flex items-center gap-1">
+            <div class="complaint-pagination">
+                <p>Showing @Model.Items.Count of @Model.TotalItems complaints</p>
+                <div class="complaint-pagination__links">
                     @if (currentPage > 1)
                     {
                         <a asp-action="Index"
@@ -89,9 +110,9 @@
                                ["SortOrder"] = Model.Filter.SortOrder,
                                ["Page"] = (currentPage - 1).ToString()
                            })"
-                           class="js-admin-page admin-icon-action admin-icon-action--pagination"
-                           title="Prev"
-                           aria-label="Prev">
+                           class="js-admin-page complaint-page-button"
+                           title="Previous page"
+                           aria-label="Previous page">
                             <partial name="_AdminIcon" model='"chevron-left"' />
                         </a>
                     }
@@ -108,7 +129,7 @@
                                ["SortOrder"] = Model.Filter.SortOrder,
                                ["Page"] = pageNumber.ToString()
                            })"
-                           class="js-admin-page rounded-lg px-3 py-1.5 text-theme-xs @(pageNumber == currentPage ? "bg-brand-500 text-white" : "border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300")">
+                           class="js-admin-page complaint-page-number @(pageNumber == currentPage ? "is-active" : string.Empty)">
                             @pageNumber
                         </a>
                     }
@@ -125,9 +146,9 @@
                                ["SortOrder"] = Model.Filter.SortOrder,
                                ["Page"] = (currentPage + 1).ToString()
                            })"
-                           class="js-admin-page admin-icon-action admin-icon-action--pagination"
-                           title="Next"
-                           aria-label="Next">
+                           class="js-admin-page complaint-page-button"
+                           title="Next page"
+                           aria-label="Next page">
                             <partial name="_AdminIcon" model='"chevron-right"' />
                         </a>
                     }
