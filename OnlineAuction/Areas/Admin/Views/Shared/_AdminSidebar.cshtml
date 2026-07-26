@@ -16,11 +16,11 @@
          class="sidebar-header flex items-center gap-2 border-b border-gray-100 pb-6 pt-7 dark:border-gray-800">
         <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="flex items-center gap-2">
             <span class="logo" :class="sidebarToggle ? 'hidden' : ''">
-                <img class="dark:hidden" src="~/admin/images/logo/logo.svg" alt="Auction House" />
-                <img class="hidden dark:block" src="~/admin/images/logo/logo-dark.svg" alt="Auction House" />
+                <img class="dark:hidden" src="~/admin/images/logo/logo.svg" alt="CardMaket Admin" asp-append-version="true" />
+                <img class="hidden dark:block" src="~/admin/images/logo/logo-dark.svg" alt="CardMaket Admin" asp-append-version="true" />
             </span>
             <img class="logo-icon" :class="sidebarToggle ? 'lg:block' : 'hidden'"
-                 src="~/admin/images/logo/logo-icon.svg" alt="Auction House" />
+                 src="~/admin/images/logo/logo-icon.svg" alt="CardMaket Admin" asp-append-version="true" />
         </a>
     </div>
 
