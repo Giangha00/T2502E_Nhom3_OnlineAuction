@@ -1,0 +1,49 @@
+@startuml
+title Sequence — Verify Listing
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor Admin
+participant "AuctionVerification\nController" as Ctrl
+participant "VerificationService" as Svc
+participant "NotificationService" as Notify
+database "Database" as DB
+
+Admin -> Ctrl: GET /Admin/AuctionVerification
+activate Ctrl
+Ctrl -> Ctrl: Check permission\nauctions.verify
+alt No permission
+  Ctrl --> Admin: 403
+else OK
+  Ctrl -> DB: SELECT status=confirming
+  DB --> Ctrl: queue
+  Ctrl --> Admin: Hàng đợi xác minh
+
+  Admin -> Ctrl: GET Details/{id}
+  Ctrl -> Svc: Load detail
+  Svc -> DB: product + media + schedule
+  DB --> Svc: data
+  Svc --> Ctrl: detail
+  Ctrl --> Admin: Trang chi tiết
+
+  alt Approve
+    Admin -> Ctrl: POST Approve
+    Ctrl -> Svc: ValidateForApproval
+    Svc -> DB: UPDATE VerifiedAt/By\nStatus=live|scheduled
+    DB --> Svc: OK
+    Svc -> Notify: ListingApproved\n(in-app + push)
+    Notify --> Admin: (seller notified)
+    Ctrl --> Admin: Success → Index
+  else Reject
+    Admin -> Ctrl: POST Reject\n(reason >= 10 chars)
+    Ctrl -> Svc: Reject
+    Svc -> DB: Status=rejected\n+ RejectReason
+    Svc -> Notify: ListingRejected + lý do
+    Ctrl --> Admin: Success → Index
+  end
+end
+deactivate Ctrl
+@enduml

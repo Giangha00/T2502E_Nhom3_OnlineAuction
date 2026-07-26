@@ -1,0 +1,39 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+autonumber "<b>0</b> : "
+
+mainframe sd Auction Closing
+
+actor "Background Worker" as Worker
+participant Controller
+database Database
+participant "Notification" as Notify
+
+Worker -> Controller: Tick FinalizeExpiredAuctions
+Controller -> Database: Find expired live/ending_soon auctions
+Database --> Controller: Auction list
+alt No auction to finalize
+  Controller --> Worker: Idle
+else Has expired auctions
+  loop Each auction
+    Controller -> Database: Begin Serializable transaction
+    Controller -> Database: Get winning bid
+    alt No winning bid
+      Controller -> Database: Status = ended
+      Database --> Controller: OK
+    else Has winner
+      Controller -> Database: Create Order pending_payment (48h)
+      Controller -> Database: Status = awaiting_payment
+      Database --> Controller: OK
+      Controller -> Notify: Notify winner + seller
+    end
+    Controller -> Database: Commit
+  end
+  Controller --> Worker: Finalize done
+end
+
+@enduml

@@ -1,0 +1,27 @@
+@startuml
+title Notifications Flow — OnlineAuction
+skinparam monochrome true
+skinparam shadowing false
+skinparam ConditionEndStyle hline
+
+|Người dùng|
+start
+:Đăng nhập hệ thống;
+|Hệ thống|
+:Load header notifications\nGET /Notification/List\n+ unread count;
+|Người dùng|
+if (Thao tác?) then (Xem danh sách)
+  :Mở danh sách thông báo;
+elseif (Đánh dấu đã đọc) then
+  :POST MarkRead/{id}\nhoặc MarkAllRead;
+  |Hệ thống|
+  :Cập nhật trạng thái read;
+elseif (Đăng ký thiết bị) then
+  :Cho phép FCM / browser push;
+  :POST RegisterDevice\n(token);
+  |Hệ thống|
+  :Lưu device token;
+  :Push qua Firebase / SignalR\n(/hubs/app);
+endif
+stop
+@enduml

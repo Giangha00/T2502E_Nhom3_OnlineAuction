@@ -1,0 +1,302 @@
+===== 4.3.1 Browse Marketplace (Duyệt Marketplace) =====
+@startuml
+left to right direction
+
+actor User
+
+rectangle "Online Auction System" {
+  usecase "Browse Marketplace" as UC_Main
+  usecase "View Auction Listings" as UC_1
+  usecase "View Buy Now Listings" as UC_2
+  usecase "Search / Filter Listings" as UC_3
+  usecase "View Listing Detail" as UC_4
+}
+
+User --> UC_Main
+UC_Main ..> UC_1 : <<include>>
+UC_Main ..> UC_2 : <<include>>
+UC_Main ..> UC_3 : <<include>>
+UC_Main ..> UC_4 : <<include>>
+@enduml
+
+===== 4.3.2 Manage Account (Quản lý tài khoản) =====
+@startuml
+left to right direction
+
+actor User
+
+rectangle "Online Auction System" {
+  usecase "Manage Account" as UC_Main
+  usecase "Register Account" as UC_1
+  usecase "Confirm Email" as UC_2
+  usecase "Login / Logout" as UC_3
+  usecase "Reset Password with OTP" as UC_4
+  usecase "View Account Dashboard" as UC_5
+}
+
+User --> UC_Main
+UC_Main ..> UC_1 : <<include>>
+UC_Main ..> UC_2 : <<include>>
+UC_Main ..> UC_3 : <<include>>
+UC_Main ..> UC_4 : <<include>>
+UC_Main ..> UC_5 : <<include>>
+@enduml
+
+===== 4.3.3 Manage Personal Activity (Quản lý hoạt động cá nhân) =====
+@startuml
+left to right direction
+
+actor User
+
+rectangle "Online Auction System" {
+  usecase "Manage Personal Activity" as UC_Main
+  usecase "View My Bids" as UC_1
+  usecase "View My Orders / Offers" as UC_2
+  usecase "View Watchlist" as UC_3
+  usecase "View My Selling Listings" as UC_4
+  usecase "View Submitted Listings" as UC_5
+}
+
+User --> UC_Main
+UC_Main ..> UC_1 : <<include>>
+UC_Main ..> UC_2 : <<include>>
+UC_Main ..> UC_3 : <<include>>
+UC_Main ..> UC_4 : <<include>>
+UC_Main ..> UC_5 : <<include>>
+@enduml
+
+===== 4.3.4 Participate In Auction (Tham gia đấu giá) =====
+@startuml
+left to right direction
+
+actor User
+actor PayPal
+
+rectangle "Online Auction System" {
+  usecase "Participate In Auction" as UC_Main
+  usecase "Register for Auction" as UC_1
+  usecase "Pay Registration Deposit" as UC_2
+  usecase "Cancel Registration" as UC_3
+  usecase "Place Bid" as UC_4
+  usecase "View Bid History / State" as UC_5
+}
+
+User --> UC_Main
+UC_Main ..> UC_1 : <<include>>
+UC_Main ..> UC_2 : <<include>>
+UC_Main ..> UC_3 : <<include>>
+UC_Main ..> UC_4 : <<include>>
+UC_Main ..> UC_5 : <<include>>
+UC_2 --> PayPal
+@enduml
+
+===== 4.3.5 Purchase Product (Mua sản phẩm) =====
+@startuml
+left to right direction
+
+actor User
+actor PayPal
+
+rectangle "Online Auction System" {
+  usecase "Purchase Product" as UC_Main
+  usecase "Add Buy Now Item to Cart" as UC_1
+  usecase "Complete Buy Now Order" as UC_2
+  usecase "Complete Won-Auction Order" as UC_3
+  usecase "Checkout Payment" as UC_4
+  usecase "View Payment Confirmation" as UC_5
+}
+
+User --> UC_Main
+UC_Main ..> UC_1 : <<include>>
+UC_Main ..> UC_2 : <<include>>
+UC_Main ..> UC_3 : <<include>>
+UC_Main ..> UC_4 : <<include>>
+UC_Main ..> UC_5 : <<include>>
+UC_4 --> PayPal
+@enduml
+
+===== 4.3.6 Manage Own Listings (Quản lý tin đăng của mình) =====
+@startuml
+left to right direction
+
+actor User
+
+rectangle "Online Auction System" {
+  usecase "Manage Own Listings" as UC_Main
+  usecase "Create Auction Listing" as UC_1
+  usecase "Create Buy Now Listing" as UC_2
+  usecase "Edit Own Listing" as UC_3
+  usecase "Delete Own Listing" as UC_4
+  usecase "Track Listing Verification Status" as UC_5
+}
+
+User --> UC_Main
+UC_Main ..> UC_1 : <<include>>
+UC_Main ..> UC_2 : <<include>>
+UC_Main ..> UC_3 : <<include>>
+UC_Main ..> UC_4 : <<include>>
+UC_Main ..> UC_5 : <<include>>
+@enduml
+
+===== 4.3.7 Notifications (Thông báo) =====
+@startuml
+left to right direction
+
+actor User
+actor "Email / Firebase" as Notify
+
+rectangle "Online Auction System" {
+  usecase "Manage Notifications" as UC_Main
+  usecase "View Notifications" as UC_1
+  usecase "Register Device Token" as UC_2
+  usecase "Mark Notification as Read" as UC_3
+  usecase "Mark All Notifications as Read" as UC_4
+}
+
+User --> UC_Main
+UC_Main ..> UC_1 : <<include>>
+UC_Main ..> UC_2 : <<include>>
+UC_Main ..> UC_3 : <<include>>
+UC_Main ..> UC_4 : <<include>>
+Notify --> UC_Main
+@enduml
+
+===== 4.3.9 Admin Dashboard (Bảng điều khiển Admin) =====
+@startuml
+left to right direction
+
+actor Admin
+
+rectangle "Online Auction System" {
+  usecase "Admin Dashboard" as UC_Main
+  usecase "View Overview Metrics" as UC_1
+  usecase "View Auction Statistics" as UC_2
+  usecase "View Revenue Statistics" as UC_3
+  usecase "Export Report" as UC_4
+}
+
+Admin --> UC_Main
+UC_Main ..> UC_1 : <<include>>
+UC_Main ..> UC_2 : <<include>>
+UC_Main ..> UC_3 : <<include>>
+UC_Main ..> UC_4 : <<include>>
+
+@enduml
+
+===== 4.3.10 Manage Users & Permissions (Quản lý người dùng & phân quyền) =====
+@startuml
+left to right direction
+
+actor Admin
+
+rectangle "Online Auction System" {
+  usecase "Manage Users & Permissions" as UC_Main
+  usecase "View User List" as UC_1
+  usecase "Create / Edit User" as UC_2
+  usecase "Delete / Bulk Action User" as UC_3
+  usecase "Assign Permissions" as UC_4
+}
+
+Admin --> UC_Main
+UC_Main ..> UC_1 : <<include>>
+UC_Main ..> UC_2 : <<include>>
+UC_Main ..> UC_3 : <<include>>
+UC_Main ..> UC_4 : <<include>>
+@enduml
+
+===== 4.3.11 Manage Catalog (Quản lý danh mục) =====
+@startuml
+left to right direction
+
+actor Admin
+
+rectangle "Online Auction System" {
+  usecase "Manage Catalog" as UC_Main
+  usecase "Manage Categories" as UC_1
+  usecase "Manage Product Templates" as UC_2
+  usecase "Manage Products" as UC_3
+  usecase "Download Product Documents" as UC_4
+}
+
+Admin --> UC_Main
+UC_Main ..> UC_1 : <<include>>
+UC_Main ..> UC_2 : <<include>>
+UC_Main ..> UC_3 : <<include>>
+UC_Main ..> UC_4 : <<include>>
+@enduml
+
+===== 4.3.12 Manage Auctions (Quản lý phiên đấu giá) =====
+@startuml
+left to right direction
+
+actor Admin
+
+rectangle "Online Auction System" {
+  usecase "Manage Auctions" as UC_Main
+  usecase "View Auction List" as UC_1
+  usecase "View DB Status & Listing Phase" as UC_2
+  usecase "Create / Edit Auction" as UC_3
+  usecase "Delete / Bulk Delete Auction" as UC_4
+  usecase "Review Fraud Alerts" as UC_5
+}
+
+Admin --> UC_Main
+UC_Main ..> UC_1 : <<include>>
+UC_Main ..> UC_2 : <<include>>
+UC_Main ..> UC_3 : <<include>>
+UC_Main ..> UC_4 : <<include>>
+UC_Main ..> UC_5 : <<include>>
+
+@enduml
+
+===== 4.3.13 Verify Listings (Xác minh tin đăng) =====
+DECODE_FAIL: Error -5 while decompressing data: incomplete or truncated stream
+
+===== 4.3.14 Manage Buy Now (Quản lý Mua ngay) =====
+@startuml
+left to right direction
+
+actor Admin
+
+rectangle "Online Auction System" {
+  usecase "Manage Buy Now" as UC_Main
+  usecase "View Buy Now List" as UC_1
+  usecase "View Buy Now Detail" as UC_2
+  usecase "Create / Edit Buy Now Listing" as UC_3
+  usecase "Cancel Buy Now Listing" as UC_4
+}
+
+Admin --> UC_Main
+UC_Main ..> UC_1 : <<include>>
+UC_Main ..> UC_2 : <<include>>
+UC_Main ..> UC_3 : <<include>>
+UC_Main ..> UC_4 : <<include>>
+
+@enduml
+
+===== 4.3.15 Handle Complaints / Refunds (Xử lý khiếu nại / hoàn tiền) =====
+@startuml
+left to right direction
+
+actor Admin
+actor "Email / Firebase" as Notify
+
+rectangle "Online Auction System" {
+  usecase "Handle Complaints / Refunds" as UC_Main
+  usecase "View Complaint List" as UC_1
+  usecase "View Complaint Detail" as UC_2
+  usecase "Update Complaint Status" as UC_3
+  usecase "Process Refund Decision" as UC_4
+  usecase "Notify User" as UC_5
+}
+
+Admin --> UC_Main
+UC_Main ..> UC_1 : <<include>>
+UC_Main ..> UC_2 : <<include>>
+UC_Main ..> UC_3 : <<include>>
+UC_Main ..> UC_4 : <<include>>
+UC_3 ..> UC_5 : <<include>>
+UC_4 ..> UC_5 : <<include>>
+UC_5 --> Notify
+@enduml
+

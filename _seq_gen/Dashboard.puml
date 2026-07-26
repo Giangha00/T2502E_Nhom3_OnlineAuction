@@ -1,0 +1,37 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+autonumber "<b>0</b> : "
+
+mainframe sd Admin Dashboard
+
+actor Admin
+participant Client
+participant Controller
+database Database
+
+Admin -> Client: Open /Admin/Dashboard
+Client -> Controller: GET Dashboard
+Controller -> Controller: Check dashboard.view permission
+alt No permission
+  Controller --> Client: 403
+  Client --> Admin: Access denied
+else Allowed
+  Controller -> Database: Aggregate revenue / users / auctions
+  Database --> Controller: Metrics
+  Controller --> Client: Dashboard DTO
+  Client --> Admin: Show charts + metrics
+  opt Export Excel
+    Admin -> Client: Click Export
+    Client -> Controller: GET Export
+    Controller -> Database: Query report range
+    Database --> Controller: Rows
+    Controller --> Client: Excel file
+    Client --> Admin: Download report
+  end
+end
+
+@enduml

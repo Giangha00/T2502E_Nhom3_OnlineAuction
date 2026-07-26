@@ -1,0 +1,37 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+autonumber "<b>0</b> : "
+
+mainframe sd Request Refund Complaint
+
+actor Buyer
+participant Client
+participant Controller
+database Database
+participant "Notification" as Notify
+
+Buyer -> Client: Open /Refund
+Client -> Controller: GET eligible orders
+Controller -> Database: GetEligibleOrdersAsync
+Database --> Controller: Paid orders
+Controller --> Client: Form data
+Client --> Buyer: Show refund form
+Buyer -> Client: Choose order, reason, notes
+Buyer -> Client: Submit
+Client -> Controller: POST /Refund/Submit
+alt Invalid
+  Controller --> Client: Validation error
+  Client --> Buyer: Show error
+else Valid
+  Controller -> Database: Create Complaint (refund, pending)
+  Database --> Controller: requestId
+  Controller -> Notify: Notify buyer submitted
+  Controller --> Client: Redirect Confirmation
+  Client --> Buyer: View confirmation
+end
+
+@enduml

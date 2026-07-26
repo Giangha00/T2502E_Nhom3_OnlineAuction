@@ -1,0 +1,39 @@
+@startuml
+title Admin Manage Buy Now Flow — OnlineAuction
+skinparam monochrome true
+skinparam shadowing false
+skinparam ConditionEndStyle hline
+
+|Admin|
+start
+:Đăng nhập Admin;
+:Vào /Admin/BuyNow\n(auctions.view / manage);
+|Hệ thống|
+if (Có quyền?) then (Không)
+  :403;
+  stop
+else (Có)
+  :Hiển thị Buy Now list\n(AJAX _BuyNowList);
+endif
+|Admin|
+if (Thao tác?) then (Create)
+  :GET|POST /Admin/BuyNow/Create;
+  |Hệ thống|
+  :IAdminBuyNowService tạo listing;
+elseif (Edit) then
+  :GET|POST Edit/{id};
+  |Hệ thống|
+  :Cập nhật listing;
+elseif (Cancel) then
+  :POST Cancel;
+  |Hệ thống|
+  :Hủy Buy Now listing;
+elseif (Bulk Delete) then
+  :POST BulkDelete;
+  |Hệ thống|
+  :Xóa hàng loạt;
+else (Details)
+  :Xem Details/{id};
+endif
+stop
+@enduml

@@ -1,0 +1,44 @@
+@startuml
+title Sequence — Register Account
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor Guest
+participant "AuthController" as Auth
+participant "UserManager\n(Identity)" as UM
+participant "EmailService" as Mail
+database "Database" as DB
+
+Guest -> Auth: POST /Auth/SignUp\n(FullName, Email, Phone, Password)
+activate Auth
+Auth -> Auth: Validate ModelState\n(+ chuẩn hóa SĐT)
+alt Invalid
+  Auth --> Guest: Hiển thị lỗi validation
+else Valid
+  Auth -> UM: FindByEmailAsync(email)
+  activate UM
+  UM -> DB: SELECT user by email
+  DB --> UM: user / null
+  alt Email exists & confirmed
+    UM --> Auth: exists
+    Auth --> Guest: "Email already exists"
+  else Email exists & not confirmed
+    Auth -> Mail: SendEmailConfirmationAsync
+    Mail --> Guest: Email kích hoạt
+    Auth --> Guest: Redirect Login\n(đã gửi lại email)
+  else New email
+    Auth -> UM: CreateAsync(user, password)
+    UM -> DB: INSERT user (EmailConfirmed=false)
+    DB --> UM: OK
+    UM --> Auth: IdentityResult
+    Auth -> Mail: SendEmailConfirmationAsync
+    Mail --> Guest: Email kích hoạt
+    Auth --> Guest: Đăng ký thành công\n→ tab Login
+  end
+  deactivate UM
+end
+deactivate Auth
+@enduml

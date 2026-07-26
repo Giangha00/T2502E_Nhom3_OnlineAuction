@@ -1,0 +1,80 @@
+[
+  {
+    "title": "5.4.1 [Guest] Register Account",
+    "key": "Register_Account",
+    "png": "/Users/macbook/RiderProjects/Nhom3/_seq_gen/Register_Account.png",
+    "url": "https://www.plantuml.com/plantuml/png/VLHDRnen4BtxLumu9MeYUaOf2acJgce9KRVftTYph1NlUEiFAF--Oo_G9OGUCCRpvisyDpQt8KeVKsj5U3NKIIzRQ1qvrNZN8aIVS109ZTHkOsW5jRJXA1At5ddrHhrX2_Wx8IcSOmXoXJDhLWGMwpZ0U0oTex37tA5rcvdtRjCt85DqbDebUXZTBASVRyRBAKnW94Gh3TNCmAKr_C2L2P51CwLSeYY4LD5v-98mHC6Leb6canJXtXgaDqUEedVMeXTQHhcK0U7pRdC473rmKGiL-hLHE08POCu7GfGoS3tTiKzWqI51nN9VEkXObkW3SCsO0fv0rR36Gz-ry-qfpGFbs6Eozec5Na6fVmNFZIF-zIn3s3YlJ_FuMxqUo0_5_m5-IMjOAyBSQRHLvAsGDi9NMkU803ZJyBfFD8u0UKe-2EJRqFCDigO3KoVmlAX-mdYMOZFkFSd8GpoZztPFuD6GljiMeREm9NM1UNl96NjCwMb8_nAOX8TDx1FZiev-KFY7zGS-EYutD3XhsA6bzIZrzYZhVHEASWOKwRlaDQzoQV6asb3SFLTWqrDk-A8aCh8slaNzgJohov9-LkdYsplq-GfoOqXwo5XcL1miAHbqGbVbb_0VTwga53zB-C2lL1kFAi9tjp9qnfid5qsz1TKWNxuojkmHQP4_ufPN_dlu2m00"
+  },
+  {
+    "title": "5.4.2 [Guest] Login",
+    "key": "Login",
+    "png": "/Users/macbook/RiderProjects/Nhom3/_seq_gen/Login.png",
+    "url": "https://www.plantuml.com/plantuml/png/ZPDDRzim38Rl-XL43yEAeiZEHX4qtRgXG8SMIxUx8Z6949bA9Qf1_lqeoTdST0rsi2sGhyY77xvEh2FdtgkqSRJLKVVG1mfc7KEFm37Zo9FMseQTenKijK-lFBptAE_ep56qXCyPoU1tJ4clSERTYi3ZaaUQY6aRA1qqD-Z3RXPZs3K0dJbGxXSOuUngCVrqDLbCeOCpfNhjQ2aH9BM5-x1of9Gs729yovXOINXsncqrCNps3kd858XZy1wZifhrGYU4ByD1gHe2BgV3pQvypMP8qsnmAUwgws2-5jxgX6M8_TlhjyHImQqmU_W0ZpgbNOZs_zByzVxItWaiWZGlizAUuOvUYb41l4E5qii8aye5lWP6cL-BDRes7NMaWyU7-HDCPfdNamO38tSH7rhLmLT7zcPVIvkbFHcH7fmLPXpsPv9s0nJmSWGAB62Ph03wO3PO3evaZEu5HVWwwwWJFv1pf5PSqvsglc-x9S9QUYaBKZP6pF2nWaWAF7-JyAWdmzJciiLtL6k52p0XRDn9rlcGwK9stRg8XjyXRWiqWFs1jRqO2z_fVhJ8W_mmitzbUTWY3J8_o92iAe-wbhVymhy1"
+  },
+  {
+    "title": "5.4.3 [User] Browse Marketplace",
+    "key": "Browse_Marketplace",
+    "png": "/Users/macbook/RiderProjects/Nhom3/_seq_gen/Browse_Marketplace.png",
+    "url": "https://www.plantuml.com/plantuml/png/XPDDRjim48NtFCKWsy9Grq9Wn6xwiqXQj6uEC2B7DX6APCaX3A7etJkIB5SMadGZa9h7Dsy-IdUPCN5fdShFraTCs48RVD3755e2JeLcbNn44qxM7s2FBbzLk7CapsJrmYtJhq9UqoFbZ0VQE7lmu6ZFCqsY78FFasPBBfmsAONJ600B1r_QXXBSt3RhzxTLiuOQRfHgqVgzE4Xh0riva0aUCJqJHuUQb4BD8S5JfgIa5Ljj8tg63ywIv-jNmNCApedI86E3OdL_NYZLEy1gVJvOmxT87hxqY2hO5CqsU5bjI_SrdDGe6kGNqne-V_m9pcOMV5dzA_IogKyDtmkb3c9fdDM0et4MvwPqNfmd8QmMvW-ZyT3WodoM-GTnIVwI0Tx9BMhYVCahsdxE6dP7GT_EE2x7tn4cVPHSdwnZALMm2uddWv-5cnXT1thOhR8r1FlXn0jDdw9mfoaUQ4mclynzaXXYjEuDtDNvQghxGLdzjkRFg-WV0fe9kR29AHZPoAebO_5rzACtz1_DVyWlybxZNWobxiWR-PF-0W00"
+  },
+  {
+    "title": "5.4.4 [Seller] Create Auction",
+    "key": "Create_Auction",
+    "png": "/Users/macbook/RiderProjects/Nhom3/_seq_gen/Create_Auction.png",
+    "url": "https://www.plantuml.com/plantuml/png/TLDDRzim3BthLn0vTLYBx1mKGREi7OfrIB6qkzCodGZJXqV92VBlHrjnQjVTHR39nqVoFUak9kJKEAlY7-DhP7JWWWzwpy4H96vea8bxBCFH-1rKQECeaqwMv6IZtx55-jkGr_IJOiGThQpPUR1KfG66ATR1nnxpbMmuhfZ3CG-0JGg-SGKnp6wBvPVRUR641SoKScXy9GpIkeGr4oQ2LQEJ2Lufr2amRCbQOYMDaj6cHfzWRGtvD0u5dpXqo18J5XW9lfq_Hi3PseQcD1xvD0ECqFqgbRl0pV9Cle1DJHxcRNoU1rCvqs4ktHRm_VwbdxmAxDHR3cu6T0-IWy-W1RSBR2XUw0IKkozWknV9CjbPXSmvdUxU9mdK74h1NKFKUoeRIzSICbh8fnMljGrOWd5YK8Gvb44tJZ8VORTDuKo2wTxd_6-qfhniZ3R1ep-qCGNmlxKEkQRTYUHgS5GaLp1J3Sh6uZvljYzZ4m260e_H_LWZ1QSLhUCNFPvP5E7JOokB-BF35dRg1X9Ojd3G8kDUVpt52Mz_tMHVF90GTzu8Ps_bbGw-Ckpa_NsIwXu_wR7vyOvxv8mMU-F7EZ-PcDh77Jlx4fMjFt0WDfNHdVIAl5psEpdbaVy3"
+  },
+  {
+    "title": "5.4.5 [Admin] Verify Listing",
+    "key": "Verify_Listing",
+    "png": "/Users/macbook/RiderProjects/Nhom3/_seq_gen/Verify_Listing.png",
+    "url": "https://www.plantuml.com/plantuml/png/hLHDRzim3BthLn2v5aLsDhgWsT8DmxfbIuhU6ObEjCgI9yd9Wc7_VOmiDyxdgHVB81yV-Pu-xaD47vlAYF2YROqUAwYSTNBbNKKGVKEzJ5YXSXjjbr2Y2GUPk3N4Nw_b4LkWtmrPITye15pIsEYb1KDbx64yXThPq64-a76RiVTkqmw0JNIsgHRaON2t6Bsx6ov6KC10Y0grBPc1Moju9g_BBJpg47b48L16vs6iAcq5zubQwXfjX8z6aus78MUZTyQG5meZBZ0GJFBF0N3mtKLTQebHEpi03902Mo5I7xWTPVe2fZLP6ARmSDp8NK6QC1UB5fSgNhiNyFdX2QIpfVRLpcVsZWtO0tRmRh027XsgFXhRDa5q4BWzel-vumF35XsGziQUKMoypP0y8gUJZWBcAzuK5gPsxKphTBYWVK8HjGd3lrhzkw9stJC5LAgvBZYhxB0NjKvEkKvrTWtFAyrPD176TUtTcWJ0YLfUvKiFS5xhZ-dygGywaDW7FgFHV0hfa_Cj7Cq9Vc_9d69xyZKfkE4hYB49l3Lh6WQv8jKOKbn-qQNfrnFozaWNUUKRd1BvNcK5wgYgPyUyaP8lSi-8lQipKjgJZF35AleZY5yHZltYo3bZ7snaRf_oCyB0ctwpXr-nUO-vu5fhq_kMEXdd4_zREZNBv6_Zb5L2tFENNzV_"
+  },
+  {
+    "title": "5.4.6 [Buyer] Register for Auction / Deposit",
+    "key": "Register_Deposit",
+    "png": "/Users/macbook/RiderProjects/Nhom3/_seq_gen/Register_Deposit.png",
+    "url": "https://www.plantuml.com/plantuml/png/VPJ9Rjim48RlV8f1ha7W1EZ928muJWz5qTgmsmSOKMER24KgN6huxJjQGqMI3rf0_hDzC-IB3-X2BBJmxygKwB20mXehpyuM1C55IdRy6NDxKUO4HzH-i1EkclZjbFpYpTD792Ff5tcF9rfhTJAWwHWIZIDVMkCxpIjfUraxPozD0XY3DR78oC7TSxPwV5vaArZ2dH05AdDa3nmwXpsTb0yiEbe7woY3iWRUgBHU1I5G1bv-ZLToWgC69LM99i16Ap9Xk6HDS5PhLkOOC4DFyDR-38GxlEvG2r5xXOTLwsm9sv9Caa90fKMp1myig_LBE9ovmZxhB0OkS-oBl_Azb_LkLacQIzXj3tzWqKPSz6BK0NvRo1i8pFaZAaUvWCIuSjLLj-pZhFtLIC2oTFPVRT19wWBIqDkVNzmbkNVUcf0Z01iqK6gK19dA1UcAy-rK4z_VdXxX7fHHGM6Wrkwlqqca2KO_XleR93QEM0VSoRoQU5UNuh1kwNs7T6JVZ4HltP6tBkTsGBizOjXmHjscFmSpPoAo7xifehm5d5-lg0QWZUcZb7o-U15WD6Hx2j7rfwMnQDPg_JJG3PQie8J5B8rMMUArg4vRfPn1qKhp2M-VlUccf4ILSpC6lKbcTXRb8M4nXlYTxoYLyNqMR3sO0FLejWbBvDjCJsCSyDjy2kVuLO8R-99XRAHfeOivk_JkgCrq1sDKwJu59nCn3xse7l72RxxG_mC0"
+  },
+  {
+    "title": "5.4.7 [Buyer] Place Bid",
+    "key": "Place_Bid",
+    "png": "/Users/macbook/RiderProjects/Nhom3/_seq_gen/Place_Bid.png",
+    "url": "https://www.plantuml.com/plantuml/png/VPHDZzem48Rl_XKZJgog9RJbqcY55hhjfH-iIjlxn9c0XMEd_bX4Vtt72KG1jXpo8Vl9pFlEZFFe0xeGQotyJfa67TPGMsFbrjcQ8BX8Wns_nTBkbTb0XTgVxOI39hux9I-YUVeJoKZwHjxZXXPQRGnegiA0SUGRQ_o9MPAs-uLpTjy9m1YiYNL13aOFnNpwa1Lpo64aH8tAL1o1KvVmh54IB5Kf1CfW7IpZWPpW5459rQ09y54hCk5yoPhWhDPCbXYmG4_mT7mv0qVVRL2LaXYKDID03-t2GOWs3zpFZ-5pM3LaO15b8k690YeDOwrUw4vq2DmptNwMmthBFWjLGcLTVHthamcyaFQnjf75Nn7ybBk1-rEA-S1R3i-hzK_8ZgAobcxX7hdyO1735ZAMbtg-HCFlFp3GLrMh079BSkS5wf2g0AYvOrGAW66yWSRPz6qscxxFPky-9AXNs9KmJxe_SvMeXB5jaaBKTmFmebh4i-44yGZ2ujNCyxw5EPoiBlp1I1YloIdKwYyMcbAA4zZ97VZ_pHHF1C4RyFX2gGMC9yVzJiMIUUs6w-bHQmlTC0DZCYMxpu3j73izcKoImDPcdtBrvIhXqEolfgLaT2xbQlWy9WDyPaqwjfs76wPV3NzgKlS46qCQnwmTIX-bv5Dxgmhh3c4PXlRyZs21_wa7TmcQrAu-RXMrFgGYc5AaIppodNym_m00"
+  },
+  {
+    "title": "5.4.8 [System] Auction Closing",
+    "key": "Auction_Closing",
+    "png": "/Users/macbook/RiderProjects/Nhom3/_seq_gen/Auction_Closing.png",
+    "url": "https://www.plantuml.com/plantuml/png/ZLHDRzD04BtlhnZb149LEN10KQcQXF8X13qKgKSqzawIKTOxPdTC2B-UyLTn8gNqOgzctxptPlVPDranQLC5btSSQqnOGILHocsIYa1JGvETl4KlUuuRM6F8Hpjw26JFnEK9MwQV3SMIlbBEkA55u4s4G6kTO1BbMc8UCKiAib-a9FlU03OgiQaAIZ2xAgvVNrqMrp27cNCLSbmRWqbxM3IbiaHO1SdcqJaiLQnbYULkawI97XuaxIZD0FEmT6P0kUGQey9AeYO9mSeU5GlC1E-7nH5mzasKrrnYgzUnTOM3SpqhN5nFoERmdSiTVE28WV_GxU-Q4_d1RNR_W6tRg3TlyHwe1qFWNtH9qTjSFxBOa3YsZmrmSI8w7aVWh0w3ciUn2rHWFTXn05C7HjBFC8VFFf0ZksVuP1EEJXw50O983RTORiUYrOxPflCiQSCHxYbnguj5QEE5CUF_Mp-IWiKkjiahs7VOOQBJydcIUqLjChm3EqOQmMTFx-vBXtWSlzMnN3mjiKg4Id2NlEtKmtNLUAZ8GlFYpTljo-Twn3soJhgVQVUKkO_bV7WFGy0h-oYxb7SJHl_asQ-aghZLxu5diZA66xn42ur1tOqzxLVm5m00"
+  },
+  {
+    "title": "5.4.9 [Buyer] Payment",
+    "key": "Payment",
+    "png": "/Users/macbook/RiderProjects/Nhom3/_seq_gen/Payment.png",
+    "url": "https://www.plantuml.com/plantuml/png/TLJBRjim4BppAnQv5e5x5W8ZZf8KHHlOgDDUYpMrjWbJ94jICVptNKcKeuTreMJkS3Wxi_9ZYEXZLMeHJieuz5X2QOsLHszBWkWhwbN24GjxLkO0UzHXK8aNJRnw9KTiWVvLP2IzKGXue9LM1mEQzh67yHISDQ73F96svvNtzjmAm2fQKvKxyd3ti5j-VLZibf31dH0bAhDd1hwwW0rUIZ9H29JHUdYgBkG5Nn2LL0vDX5ohkZxOiYPwgpKZ2uoumq3md5u6G2RVe1QYOONxPIBBOEt8m6Bj2zvE2Y3dXHbRI0E-NfF1jvTtu3D5RQEjZmNnMQx1tVqP_BHOTDY_Bf6dCnqAxaVywobdJ-ulYfNd05I8LtrSRjhAO7japvNvi4fIcFRwKhV5Kw2SgzL_0NcqbYMqvYpozVFq33_bYGMMJbEa6Kysw-rxCd7n2HsuqeV_GQquBc857RevkmeN8mNg2D_DHuqH03C-fAXUKMbgOBUz89v2BuY77UhkXdJzgDxGdr8qu50LB0qh6PKr89F4-fhvr7xCQzrMakC8DrLs8nSIff6QXdMijjtEs1mL5TlN_iwF94-sYgrva50JWUYSjspgRpyc7anNeJp9s5DmIp6mArV4P6BQIZkeFOQXd1mTrmdILp7RQyBDzvK0ur6PP9j2xSBiqfttWhVtofVOeMQZatqWV-n2FFBA_wB_0G00"
+  },
+  {
+    "title": "5.4.10 [Buyer] Request Refund / Complaint",
+    "key": "Request_Refund",
+    "png": "/Users/macbook/RiderProjects/Nhom3/_seq_gen/Request_Refund.png",
+    "url": "https://www.plantuml.com/plantuml/png/VLFBRjim4BppAnO-jO03vom4HXmtAN9e7SH1xfIqiecIN7Mvgk6_x-hXH7xbGWgSuUxCS7MVnB8qmPlqnyNQiWqGA5AnPGe8mWsEaBIr9UrSt41bVJf2PEzHLtR5IRM4VnkC1Vx2bEm65zvj8dYiPCHXJ3N5TE0yeAVTWfbslG3R2CKcvCWmkSldjtUpV0uPJ8m9riLAAsZh4bxRJabqhvfOmf92xHKNOsmXnF3Gx96DTXHNkDf6WQLtgFZH4KLXybwPfHMRsuJmO_Wu8av-axZA5LOSnGdO1Dt1tfYk3zpCX_8Ph6gCCEjbcVwmWpzQPV3pyGrGet6vnaXS8YVpYRViWmZbeZmEr5N7NAHzBCo103SdjL-iAo_L72by8WxG-lsGfs3d8uFrLj-1-qmhvPtxMsw9qY1xgbIRA4uXac0w9w-RF3Yv4iFBQlrsI6esCAqNU8x_h7Ub0RXYuBs5kwS0rC7XbddPIG-ZZcz_wQJcEEYbMX7y72JuriSm1NtGKd-3xthvQkpSZ-FpUOT-KB9XXxoBA7Lk1Rym-OgbOoow8QqSXyxlHQVl3dTGZ5ags9XxNVNl_0y0"
+  },
+  {
+    "title": "5.4.11 [Admin] Manage User Status",
+    "key": "Manage_User",
+    "png": "/Users/macbook/RiderProjects/Nhom3/_seq_gen/Manage_User.png",
+    "url": "https://www.plantuml.com/plantuml/png/VLDDRzmW4BtpAqOvjOV8ELlHAcwILbKJRLidFm33U1SL1WU6hbPL_tinzZQxIPoBXNYFzm7ZgyWoS79Mn5-61Xca0-V9gstm3e53mYCaRgNsEqCRwAMD9mZlBUPlCEg5MiIdXAJm7cEK6soisH1OxFc84p0EdkA1ymcjtpKX-DqKG2Rsb5o70SukkzN5PTMje8Op8Pmqr6U5RAtXNb8-38ynyrgMdA8GKh4Fq6XdI6GlDieCaXYkhK7YqorF7Bor68IMB3iP4MxcXH150ivNyyaQrWCIL6Mx6Yt511JAVwKQljm-G1eJMHDPF2CZxw1Umu-4OLzu4JxqnZA6Z-80m_aBpT4kdcWTvVg9d0BDTdEa39UWDRJRVAd5Pw7HhJPS_J7wxpjzHl_FFhZ5EdTUwkBoVeUb2fFsszanvuD-9BpAVxsLbDz_Udfe59lVM7qbMHQlwMtgdE65cj_NxKEvYyMEZqEU4cpYdjHXsXRBhhyjLMsJKddevy5_e_Haeo5En3vPknVY2addt-mV"
+  },
+  {
+    "title": "5.4.12 [Admin] Handle Complaints / Refunds",
+    "key": "Handle_Complaints",
+    "png": "/Users/macbook/RiderProjects/Nhom3/_seq_gen/Handle_Complaints.png",
+    "url": "https://www.plantuml.com/plantuml/png/hLHDZzCm4BtxLunwHQjoZfPgonR1OM6XtJsZgJrj3OuTxF5M5UA_Cyr7IPksU-6IHFEUthmt7kSkCKREfLFff_KLHYoX33xeJGmb0STCFIHjq8IjzMjOeKj72EySoJDQVQAMw5Sch-apfOHhcZgxzk1enJrEf5G5dphEUt9XEuqnR1i3c3duN2ufmkXsENbxErvEe82HKYLQln85QMtW4teZ9kv3MJcfSu8vhR8tIIdK729CJMczafPijQtGCzmxIvwFIy5p3CvHL0OPbvW8Pkt74N7q9R1TMOriWny19gWBEwNgFd0pQUKBUAp8mxWkZm_sL8FMl4FF0Zv-U0BTSS3P9CG3l2TtPWhubYdk_f6JwY2uEH5zE9NfcPiJv-ZRJgqbWMkt1ImsSWgz5kUppOZHkZJ-RSsVAxbCJRkOvo6WwML_0o4QEOQBgMP3kM6khkVvP0qghMH3v1YJGiSmhQeONaW13DAsa6piVhE4SJxiryV54pnNia2qOEIS00-QbzAdclYk9Pe1izckedt3CkzaDiUadj55rbfkaoAvfpAA7wJvN9u6aVm-CANhUMAdyag2XlT_4pnxsGHny69f2sFXX7JsV9gPjqwknybxoUy7ITrANWetK7x5jMp7SEVcP6pS3xo-RUfEMFAt_0i0"
+  },
+  {
+    "title": "5.4.13 [Admin] Dashboard",
+    "key": "Dashboard",
+    "png": "/Users/macbook/RiderProjects/Nhom3/_seq_gen/Dashboard.png",
+    "url": "https://www.plantuml.com/plantuml/png/TLDDJzn03BtFhx2uLdIHsjCAhKXPr1CWMlw0C_4c8oQUr9uG-FVr9lkH1VQGSM8_Fp_RanlDABblezENm1qAjj0cJhwHr19awMaMqGQhD0IkOODHJoBvFPAT4lm7DgL_FR6dUrB5ceeOQeP8cpp326cNMFUONnJJK8YaOHA0VKxSjoK9N5oNgwlhHRc29LmursBWZJ5OwGgAgWqCQzIcJ2YLS-Xpaidjh50EFdJ86MvZ8CwdhiHPKemahiAC9IePq_JYtCHykTfbBk6n8uR5w5uS2qxH4NUWMyBlk-UPg6Fa8-ws8Vy2rHxv_JNG01r96rH3OeSnmqEQUm3cR3DvFwz-R8CxEHOObIwXyDuc31LneCgHhH2AQBEsZrEkrQ5vIwfheHepsPfUYNk21VHAecQnzzcKgANl4oOXixxkQNihzBpQmt1W_VpufUw_ZLq5tzY-5Bv1Uo1CNOQxjox9rdYAvWBuj2opDjW9DoBExsaEEZEEfvxatKOnLXNacaRusVR_f44_4SxKZS9X4oATQ3islqu3nuJLhgQXY6rvzhWRE-rl-my0"
+  }
+]

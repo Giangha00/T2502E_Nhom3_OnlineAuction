@@ -1,0 +1,38 @@
+@startuml
+title Sequence — Request Refund / Complaint
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor Buyer
+participant "RefundController" as Ctrl
+participant "RefundComplaint\nService" as Svc
+participant "NotificationService" as Notify
+database "Database" as DB
+
+Buyer -> Ctrl: GET /Refund
+activate Ctrl
+Ctrl -> Svc: GetEligibleOrdersAsync
+Svc -> DB: paid orders\nwithout open complaint
+DB --> Svc: eligible
+Svc --> Ctrl: form data
+Ctrl --> Buyer: Refund page
+
+Buyer -> Ctrl: POST /Refund/Submit\n(order, reason, notes)
+Ctrl -> Svc: Create complaint
+activate Svc
+alt Invalid
+  Svc --> Ctrl: validation error
+  Ctrl --> Buyer: Hiển thị lỗi
+else OK
+  Svc -> DB: INSERT Complaint\ntype=refund, status=pending\n+ RequestReference
+  DB --> Svc: OK
+  Svc -> Notify: Notify buyer submitted
+  Svc --> Ctrl: requestId
+  deactivate Svc
+  Ctrl --> Buyer: Confirmation?requestId=
+end
+deactivate Ctrl
+@enduml

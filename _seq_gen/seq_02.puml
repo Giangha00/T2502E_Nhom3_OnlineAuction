@@ -1,0 +1,42 @@
+@startuml
+title Sequence — Login
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor User
+participant "AuthController" as Auth
+participant "UserManager" as UM
+participant "SignInManager" as SM
+database "Database" as DB
+
+User -> Auth: POST /Auth/Login\n(Email, Password, RememberMe)
+activate Auth
+Auth -> Auth: Validate ModelState
+alt Invalid
+  Auth --> User: Lỗi form
+else Valid
+  Auth -> UM: FindByEmailAsync(email)
+  UM -> DB: SELECT user
+  DB --> UM: user
+  alt User not found / Inactive
+    Auth --> User: Lỗi đăng nhập
+  else Role = Admin
+    Auth --> User: Redirect\n/Admin/Account/Login
+  else User thường
+    Auth -> SM: PasswordSignInAsync\n(lockoutOnFailure=true)
+    SM -> DB: Check password / lockout
+    alt Succeeded
+      SM --> Auth: Success + cookie\n.AuctionHouse.User
+      Auth --> User: Redirect returnUrl / Home
+    else LockedOut
+      Auth --> User: Tài khoản bị khóa
+    else Failed
+      Auth --> User: Sai email/password
+    end
+  end
+end
+deactivate Auth
+@enduml

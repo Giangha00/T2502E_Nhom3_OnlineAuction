@@ -1,0 +1,39 @@
+@startuml
+title Sequence — Auction Closing (Finalization Worker)
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+participant "AuctionFinalization\nWorker" as Worker
+participant "RabbitMQ" as MQ
+participant "OrderCreation\nService" as Ord
+database "Database" as DB
+participant "NotificationService" as Notify
+
+loop mỗi ~15 giây
+  Worker -> Worker: PublishTick
+  Worker -> MQ: AuctionLifecycle\nFinalizeExpiredAuctions
+  MQ -> Ord: FinalizeExpiredAuctionsAsync
+  activate Ord
+  Ord -> DB: SELECT auctions\nEndDate <= now\nstatus live/ending_soon
+  alt Không có
+    Ord --> MQ: idle
+  else Có auction hết giờ
+    loop từng auction
+      Ord -> DB: BEGIN Serializable
+      Ord -> DB: Lấy Bid IsWinning
+      alt Không có winning bid
+        Ord -> DB: Status=ended\nWinnerId=null
+      else Có winner
+        Ord -> DB: INSERT Order\n+ OrderItem\n(pending_payment, 48h)
+        Ord -> DB: Auction\nstatus=awaiting_payment
+        Ord -> Notify: Notify winner / seller
+      end
+      Ord -> DB: COMMIT
+    end
+  end
+  deactivate Ord
+end
+@enduml

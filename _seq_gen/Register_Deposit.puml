@@ -1,0 +1,51 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+autonumber "<b>0</b> : "
+
+mainframe sd Register for Auction Deposit
+
+actor Buyer
+participant Client
+participant Controller
+database Database
+participant PayPal
+
+Buyer -> Client: Open Auction Detail
+Client --> Buyer: Show Register button
+Buyer -> Client: Click Register
+Client -> Controller: POST /Auction/Register
+alt No deposit required
+  Controller -> Database: RegisterAsync approved
+  Database --> Controller: OK
+  Controller --> Client: Registered
+  Client --> Buyer: Can place bid
+else Deposit required
+  Controller --> Client: 410 + initiateDepositUrl
+  Client -> Controller: POST InitiateDeposit
+  Controller -> Database: Create pending registration + deposit
+  Controller -> PayPal: Create deposit order
+  PayPal --> Controller: approvalUrl
+  Controller --> Client: Redirect PayPal
+  Client --> Buyer: Pay on PayPal
+  alt PayPal success
+    Buyer -> Client: Return DepositPayPalReturn
+    Client -> Controller: Capture deposit
+    Controller -> PayPal: Capture payment
+    PayPal --> Controller: Captured
+    Controller -> Database: Deposit paid + registration approved
+    Controller --> Client: Success
+    Client --> Buyer: Eligible to bid
+  else PayPal cancel
+    Buyer -> Client: DepositPayPalCancel
+    Client -> Controller: Cancel deposit
+    Controller -> Database: Cancel registration/deposit
+    Controller --> Client: Cancelled
+    Client --> Buyer: Registration cancelled
+  end
+end
+
+@enduml

@@ -1,0 +1,48 @@
+@startuml
+title Sequence — Payment (Order Complete)
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor Buyer
+participant "OrderController" as Ord
+participant "OrderService" as Svc
+participant "PayPal" as PP
+participant "NotificationService" as Notify
+database "Database" as DB
+
+Buyer -> Ord: GET /Order
+activate Ord
+Ord -> DB: pending_payment orders
+Ord --> Buyer: Payment Center
+
+Buyer -> Ord: POST /Order/Complete\n(shipping + method)
+Ord -> Svc: CompleteOrderAsync
+activate Svc
+Svc -> Svc: Validate shipping\n+ selected invoices
+alt Invalid
+  Svc --> Ord: fail
+  Ord -> Notify: PaymentFailed
+  Ord --> Buyer: Redirect /Order
+else COD
+  Svc -> DB: orders=paid\nauctions=completed
+  Svc -> Notify: Payment OK
+  Svc --> Ord: success
+  Ord --> Buyer: Redirect /Order
+else PayPal
+  Svc -> PP: InitiatePayPalCheckout
+  PP --> Svc: approvalUrl
+  Svc --> Ord: approvalUrl
+  Ord --> Buyer: Redirect PayPal
+  Buyer -> PP: Thanh toán
+  PP -> Ord: PayPalReturn
+  Ord -> Svc: Capture + mark paid
+  Svc -> DB: paid + completed
+  Svc -> Notify: Payment OK
+  Ord --> Buyer: Confirmation
+end
+deactivate Svc
+deactivate Ord
+@enduml

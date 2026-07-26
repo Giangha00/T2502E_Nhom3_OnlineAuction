@@ -1,0 +1,42 @@
+@startuml
+title Manage Personal Activity Flow — OnlineAuction
+skinparam monochrome true
+skinparam shadowing false
+skinparam ConditionEndStyle hline
+
+|Người dùng|
+start
+:Đăng nhập cookie User;
+:Vào khu vực Account;
+|Hệ thống|
+if (Đã đăng nhập?) then (Không)
+  :Redirect /Auth/Login;
+  stop
+else (Có)
+endif
+|Người dùng|
+if (Mục xem?) then (My Bids)
+  :GET /Account/Bids;
+  |Hệ thống|
+  :GetUserBidsAsync\n(active / past);
+elseif (Watchlist) then
+  :GET /Account/Watchlist;
+  |Hệ thống|
+  :Hiển thị watched listings;
+elseif (Orders / Offers) then
+  :GET /Account/Offers\nhoặc /Order;
+  |Hệ thống|
+  :GetUserOffersAsync /\ndanh sách đơn;
+elseif (Selling) then
+  :GET /Account/Selling;
+  |Hệ thống|
+  :GetSellerAuctionsAsync\n(auction | buynow);
+else (Submissions)
+  :GET /Account/Submissions;
+  |Hệ thống|
+  :Danh sách tin chờ duyệt;
+endif
+|Người dùng|
+:Xem chi tiết / thao tác tiếp;
+stop
+@enduml

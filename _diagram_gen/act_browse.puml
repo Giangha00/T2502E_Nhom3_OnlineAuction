@@ -1,0 +1,28 @@
+@startuml
+title Browse Marketplace Flow — OnlineAuction
+skinparam monochrome true
+skinparam shadowing false
+skinparam ConditionEndStyle hline
+
+|Người dùng|
+start
+:Mở trang chủ GET /\n(hoặc /Auction, /BuyNow);
+|Hệ thống|
+:Load listings công khai\n(GetHomePageAsync / Index);
+:Hiển thị Auction / Buy Now\n+ category facets;
+|Người dùng|
+:Search / Filter / Sort\n(category, grade, price, text);
+:Chọn một listing;
+|Hệ thống|
+:Mở Detail\n(/Auction/Detail/{id}\nhoặc /BuyNow/Detail/{id});
+:Hiển thị thông tin SP,\ngiá, lịch, media;
+|Người dùng|
+if (Theo dõi listing?) then (Có)
+  :POST /Watchlist/Toggle/{id};
+  |Hệ thống|
+  :Cập nhật watchlist;
+endif
+|Người dùng|
+:Xem Bid History / Bid State\n(tùy chọn);
+stop
+@enduml

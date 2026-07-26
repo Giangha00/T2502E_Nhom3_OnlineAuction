@@ -1,0 +1,40 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+autonumber "<b>0</b> : "
+
+mainframe sd Login
+
+actor Guest
+participant Client
+participant Controller
+database Database
+
+Guest -> Client: Click Login
+Client --> Guest: Show Login form
+Guest -> Client: Enter Email & Password
+Guest -> Client: Click Login
+Client -> Client: Validate input
+alt Invalid
+  Client --> Guest: Show error / form login
+else Valid
+  Client -> Controller: POST /Auth/Login
+  Controller -> Database: FindByEmailAsync
+  Database --> Controller: User
+  alt User not found / locked / inactive
+    Controller --> Client: Return error
+    Client --> Guest: Show error message
+  else Auth success (User role)
+    Controller -> Controller: PasswordSignInAsync + cookie
+    Controller --> Client: Success + redirect
+    Client --> Guest: Login success
+  else Admin role
+    Controller --> Client: Redirect Admin Login
+    Client --> Guest: Open Admin login
+  end
+end
+
+@enduml

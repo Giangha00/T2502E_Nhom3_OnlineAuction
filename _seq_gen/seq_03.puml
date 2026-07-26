@@ -1,0 +1,39 @@
+@startuml
+title Sequence — Browse Marketplace
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor User
+participant "HomeController\n/ AuctionController" as Ctrl
+participant "AuctionService" as Svc
+database "Database" as DB
+
+User -> Ctrl: GET / hoặc /Auction\nhoặc /BuyNow
+activate Ctrl
+Ctrl -> Svc: GetHomePageAsync /\nGet public listings
+activate Svc
+Svc -> DB: SELECT auctions/products\n(public status)
+DB --> Svc: listings + facets
+Svc --> Ctrl: ViewModel
+deactivate Svc
+Ctrl --> User: Trang list\n(Auction / Buy Now)
+
+User -> User: Search / Filter / Sort\n(client-side)
+User -> Ctrl: GET /Auction/Detail/{id}\nhoặc /BuyNow/Detail/{id}
+activate Ctrl
+Ctrl -> Svc: Get detail + media
+Svc -> DB: SELECT auction/product
+DB --> Svc: detail
+Svc --> Ctrl: DetailViewModel
+Ctrl --> User: Trang chi tiết
+deactivate Ctrl
+
+opt Toggle Watchlist
+  User -> Ctrl: POST /Watchlist/Toggle/{id}
+  Ctrl -> DB: INSERT/DELETE watchlist
+  Ctrl --> User: Updated
+end
+@enduml

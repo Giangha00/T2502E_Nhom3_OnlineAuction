@@ -1,0 +1,21 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+left to right direction
+
+actor User
+actor "Email / Firebase" as Notify
+rectangle "Online Auction System" {
+  usecase "Request Refund / Complaint" as UC_Main
+  usecase "Open Refund Page" as UC_1
+  usecase "Submit Refund Request" as UC_2
+  usecase "View Refund Confirmation" as UC_3
+  usecase "Receive Complaint Result" as UC_4
+}
+User --> UC_Main
+UC_Main ..> UC_1 : <<include>>
+UC_Main ..> UC_2 : <<include>>
+UC_Main ..> UC_3 : <<include>>
+UC_Main ..> UC_4 : <<include>>
+UC_4 --> Notify
+@enduml

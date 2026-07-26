@@ -1,0 +1,48 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+autonumber "<b>0</b> : "
+
+mainframe sd Verify Listing
+
+actor Admin
+participant Client
+participant Controller
+database Database
+participant "Notification" as Notify
+
+Admin -> Client: Open /Admin/AuctionVerification
+Client -> Controller: GET confirming queue
+Controller -> Database: Load confirming auctions
+Database --> Controller: Queue list
+Controller --> Client: Return list
+Client --> Admin: Show pending listings
+Admin -> Client: Open Details/{id}
+Client -> Controller: GET verification detail
+Controller -> Database: Load auction detail
+Database --> Controller: Detail
+Controller --> Client: Return detail
+Client --> Admin: Show detail
+alt Approve
+  Admin -> Client: Click Approve
+  Client -> Controller: POST Approve
+  Controller -> Controller: ValidateForApproval
+  Controller -> Database: Set Verified + status live/scheduled
+  Database --> Controller: OK
+  Controller -> Notify: Notify seller ListingApproved
+  Controller --> Client: Success
+  Client --> Admin: Redirect Index
+else Reject
+  Admin -> Client: Enter rejectReason + Reject
+  Client -> Controller: POST Reject
+  Controller -> Database: status=rejected + reason
+  Database --> Controller: OK
+  Controller -> Notify: Notify seller ListingRejected
+  Controller --> Client: Success
+  Client --> Admin: Redirect Index
+end
+
+@enduml

@@ -1,0 +1,43 @@
+@startuml
+title Admin Manage Auctions Flow — OnlineAuction
+skinparam monochrome true
+skinparam shadowing false
+skinparam ConditionEndStyle hline
+
+|Admin|
+start
+:Đăng nhập Admin;
+:Vào /Admin/Auction\n(auctions.view / manage);
+|Hệ thống|
+if (Có quyền view?) then (Không)
+  :403;
+  stop
+else (Có)
+  :Hiển thị list + filter\n(status, category, phase...);
+endif
+|Admin|
+if (Thao tác?) then (Create)
+  :GET|POST CreateAuction;
+  |Hệ thống|
+  if (Validate OK?) then (Không)
+    :Lỗi form;
+  else (Có)
+    :Lưu auction mới;
+  endif
+elseif (Edit) then
+  :GET|POST Edit/{id};
+  |Hệ thống|
+  :Cập nhật (khóa lịch/giá\nkhi cần);
+elseif (Cancel / Delete) then
+  :POST Cancel / Delete / BulkDelete;
+  |Hệ thống|
+  :Cập nhật / xóa listing;
+elseif (Fraud alert) then
+  :Review / DismissFraudAlert;
+  |Hệ thống|
+  :Cập nhật fraud alert;
+else (Details)
+  :Xem Details + bid history;
+endif
+stop
+@enduml

@@ -1,0 +1,49 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+autonumber "<b>0</b> : "
+
+mainframe sd Handle Complaints Refunds
+
+actor Admin
+participant Client
+participant Controller
+database Database
+participant "Notification" as Notify
+
+Admin -> Client: Open /Admin/Complaint
+Client -> Controller: GET complaint list
+Controller -> Database: Query complaints
+Database --> Controller: List
+Controller --> Client: Return list
+Client --> Admin: Show complaints
+Admin -> Client: Open Details/{id}
+Client -> Controller: GET detail
+Controller -> Database: Load complaint + order
+Database --> Controller: Detail
+Controller --> Client: Return detail
+Client --> Admin: Show detail + actions
+alt Approve
+  Admin -> Client: Approve refund
+  Client -> Controller: POST UpdateStatus approve
+  Controller -> Database: status=approved
+  Controller -> Notify: Notify buyer
+  Controller --> Client: Success
+else Reject
+  Admin -> Client: Reject + notes
+  Client -> Controller: POST reject
+  Controller -> Database: status=rejected
+  Controller -> Notify: Notify buyer
+  Controller --> Client: Success
+else Under review / Close
+  Admin -> Client: Update status
+  Client -> Controller: POST under_review / close
+  Controller -> Database: Update status
+  Controller --> Client: Success
+end
+Client --> Admin: Redirect list
+
+@enduml

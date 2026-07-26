@@ -1,0 +1,38 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+autonumber "<b>0</b> : "
+
+mainframe sd Create Auction
+
+actor Seller
+participant Client
+participant Controller
+database Database
+participant "Cloudinary" as Cloud
+
+Seller -> Client: Open /Sell/Create
+Client -> Controller: GET Create form
+Controller --> Client: Form + categories
+Client --> Seller: Show CreateAuction form
+Seller -> Client: Enter product, schedule, prices
+Seller -> Client: Upload images / documents
+Seller -> Client: Submit Create
+Client -> Client: Validate form
+alt Invalid
+  Client --> Seller: Show validation errors
+else Valid
+  Client -> Controller: POST /Sell/Create
+  Controller -> Controller: ValidateCreateAuction
+  Controller -> Cloud: Upload PrimaryImage + gallery
+  Cloud --> Controller: Image URLs
+  Controller -> Database: Save Product + Auction (confirming)
+  Database --> Controller: OK
+  Controller --> Client: Success
+  Client --> Seller: Listing submitted for verification
+end
+
+@enduml

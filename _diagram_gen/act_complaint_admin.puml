@@ -1,0 +1,43 @@
+@startuml
+title Admin Handle Complaints / Refunds Flow — OnlineAuction
+skinparam monochrome true
+skinparam shadowing false
+skinparam ConditionEndStyle hline
+
+|Admin|
+start
+:Đăng nhập Admin;
+:Vào /Admin/Complaint\n(permission complaints.review);
+|Hệ thống|
+if (Có quyền?) then (Không)
+  :403;
+  stop
+else (Có)
+  :Hiển thị complaint list\n(filter status, reason, type);
+endif
+|Admin|
+:Mở Details/{id};
+|Hệ thống|
+:Load detail + eligible actions;
+|Admin|
+if (Quyết định?) then (Under review)
+  :POST UpdateStatus under_review;
+elseif (Approve refund) then
+  :POST approve;
+  |Hệ thống|
+  :status=approved;\nNotify buyer;
+elseif (Reject) then
+  :POST reject (+ notes);
+  |Hệ thống|
+  :status=rejected;\nNotify buyer;
+elseif (Close) then
+  :POST close;
+  |Hệ thống|
+  :Đóng complaint;
+else (Add note)
+  :POST add_note;
+endif
+|Hệ thống|
+:Cập nhật + redirect list;
+stop
+@enduml

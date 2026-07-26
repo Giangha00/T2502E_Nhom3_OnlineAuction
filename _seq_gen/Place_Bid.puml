@@ -1,0 +1,42 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+autonumber "<b>0</b> : "
+
+mainframe sd Place Bid
+
+actor Buyer
+participant Client
+participant Controller
+database Database
+participant "Notification" as Notify
+
+Buyer -> Client: Open Auction Detail (live)
+Client --> Buyer: Show bid form
+Buyer -> Client: Enter bid amount
+Buyer -> Client: Click Place Bid
+Client -> Controller: POST /Auction/PlaceBid
+Controller -> Controller: Auth / ShadowBan / RateLimit checks
+alt Not allowed
+  Controller --> Client: 401/403/429
+  Client -> Notify: BidFailed (optional)
+  Client --> Buyer: Show error
+else Allowed
+  Controller -> Database: PlaceBidAsync (Serializable)
+  Database --> Controller: Validate + save bid
+  alt Validate fail
+    Controller --> Client: 400 error
+    Client --> Buyer: Show error (ended / low amount...)
+  else Validate OK
+    Controller -> Database: Update current price + winning bid
+    Database --> Controller: OK
+    Controller -> Notify: Notify outbid / bid success
+    Controller --> Client: Success + new state
+    Client --> Buyer: Bid placed successfully
+  end
+end
+
+@enduml

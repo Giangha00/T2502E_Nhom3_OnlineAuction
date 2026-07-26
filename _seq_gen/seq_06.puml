@@ -1,0 +1,42 @@
+@startuml
+title Sequence — Register for Auction / Deposit
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor Buyer
+participant "AuctionController" as Ctrl
+participant "RegistrationService" as Reg
+participant "DepositService" as Dep
+participant "PayPal" as PP
+database "Database" as DB
+
+Buyer -> Ctrl: POST /Auction/Register
+activate Ctrl
+alt Chưa login
+  Ctrl --> Buyer: 401
+else Không cần cọc
+  Ctrl -> Reg: RegisterAsync
+  Reg -> DB: INSERT registration\n(approved)
+  Ctrl --> Buyer: Registered OK
+else Cần đặt cọc
+  Ctrl --> Buyer: 410 + initiateDepositUrl
+  Buyer -> Ctrl: POST InitiateDeposit
+  Ctrl -> Dep: Create pending deposit\n+ PayPal order
+  Dep -> DB: INSERT registration pending\n+ deposit
+  Dep -> PP: Create order
+  PP --> Dep: approvalUrl
+  Dep --> Ctrl: approvalUrl
+  Ctrl --> Buyer: Redirect PayPal
+  Buyer -> PP: Thanh toán
+  PP -> Ctrl: GET DepositPayPalReturn
+  Ctrl -> Dep: Capture payment
+  Dep -> PP: Capture
+  PP --> Dep: Completed
+  Dep -> DB: deposit paid\nregistration approved
+  Ctrl --> Buyer: Đủ điều kiện đặt giá
+end
+deactivate Ctrl
+@enduml

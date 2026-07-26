@@ -1,0 +1,52 @@
+@startuml
+title Sequence — Admin Handle Complaints / Refunds
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor Admin
+participant "ComplaintController" as Ctrl
+participant "AdminComplaint\nService" as Svc
+participant "NotificationService" as Notify
+database "Database" as DB
+
+Admin -> Ctrl: GET /Admin/Complaint
+activate Ctrl
+Ctrl -> Ctrl: Check complaints.review
+alt No permission
+  Ctrl --> Admin: 403
+else OK
+  Ctrl -> DB: SELECT complaints + filters
+  Ctrl --> Admin: List
+
+  Admin -> Ctrl: GET Details/{id}
+  Ctrl -> Svc: Load detail + actions
+  Svc -> DB: complaint + order
+  Svc --> Ctrl: detail
+  Ctrl --> Admin: Detail page
+
+  alt Under review
+    Admin -> Ctrl: POST under_review
+    Ctrl -> Svc: UpdateStatus
+    Svc -> DB: status=under_review
+  else Approve
+    Admin -> Ctrl: POST approve
+    Ctrl -> Svc: Approve refund
+    Svc -> DB: status=approved
+    Svc -> Notify: Notify buyer
+  else Reject
+    Admin -> Ctrl: POST reject + notes
+    Ctrl -> Svc: Reject
+    Svc -> DB: status=rejected
+    Svc -> Notify: Notify buyer
+  else Close
+    Admin -> Ctrl: POST close
+    Ctrl -> Svc: Close
+    Svc -> DB: status=closed
+  end
+  Ctrl --> Admin: Redirect list
+end
+deactivate Ctrl
+@enduml

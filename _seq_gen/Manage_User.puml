@@ -1,0 +1,36 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+autonumber "<b>0</b> : "
+
+mainframe sd Manage User Status
+
+actor Admin
+participant Client
+participant Controller
+database Database
+
+Admin -> Client: Open /Admin/User
+Client -> Controller: GET user list
+Controller -> Database: Query users (filter)
+Database --> Controller: Users
+Controller --> Client: Return list
+Client --> Admin: Show users
+Admin -> Client: Open Edit/{id}
+Client -> Controller: GET UserForm
+Controller -> Database: Load user
+Database --> Controller: User
+Controller --> Client: Form
+Client --> Admin: Show edit form
+Admin -> Client: Change Status Active/Inactive
+Admin -> Client: Submit
+Client -> Controller: POST Edit
+Controller -> Database: UpdateAsync Status
+Database --> Controller: OK
+Controller --> Client: SuccessMessage
+Client --> Admin: Updated successfully
+
+@enduml

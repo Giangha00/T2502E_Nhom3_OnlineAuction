@@ -1,0 +1,341 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam classFontSize 11
+skinparam classAttributeFontSize 10
+skinparam nodesep 40
+skinparam ranksep 45
+hide circle
+skinparam class {
+  BackgroundColor white
+  BorderColor black
+  ArrowColor black
+  FontColor black
+  AttributeFontColor black
+  HeaderBackgroundColor white
+}
+
+class User {
+  +Id: int
+  +Email: string
+  +Password: string
+  +FullName: string
+  +PhoneNumber: string
+  +Role: enum
+  +Status: enum
+  +IsSuperAdmin: boolean
+  +AvatarUrl: string
+  +EmailConfirmed: boolean
+  +CreatedAt: datetime
+  +UpdatedAt: datetime
+  --
+  +Create(): User
+  +List(): List<User>
+  +Update(): User
+  +Delete(): boolean
+  +Profile(): User
+  +Login(): void
+  +Logout(): void
+  +Register(): User
+}
+
+class Category {
+  +Id: int
+  +Name: string
+  +Slug: string
+  +SortOrder: int
+  +IsActive: boolean
+  +CreatedAt: datetime
+  +UpdatedAt: datetime
+  --
+  +Create(): Category
+  +List(): List<Category>
+  +Update(): Category
+  +Detail(): Category
+  +Delete(): boolean
+}
+
+class ProductTemplate {
+  +Id: int
+  +Name: string
+  +CategoryId: int
+  +SetName: string
+  +CardNumber: string
+  +GradeLabel: string
+  +Year: int
+  +Language: string
+  +PrimaryImage: string
+  +IsActive: boolean
+  --
+  +Create(): ProductTemplate
+  +List(): List<ProductTemplate>
+  +Update(): ProductTemplate
+  +Delete(): boolean
+}
+
+class Product {
+  +Id: int
+  +SellerId: int
+  +CategoryId: int
+  +ProductTemplateId: int
+  +Name: string
+  +ShortDescription: string
+  +DescriptionHtml: text
+  +Condition: string
+  +Year: int
+  +SetName: string
+  +GradeLabel: string
+  +CertNumber: string
+  +PrimaryImage: string
+  +EstimatedValue: decimal
+  --
+  +Create(): Product
+  +List(): List<Product>
+  +Update(): Product
+  +Detail(): Product
+  +Delete(): boolean
+}
+
+class ProductImage {
+  +Id: int
+  +ProductId: int
+  +ImageUrl: string
+  +SortOrder: int
+  --
+  +Create(): ProductImage
+  +List(): List<ProductImage>
+  +Delete(): boolean
+}
+
+class ProductDocument {
+  +Id: int
+  +ProductId: int
+  +Name: string
+  +FileUrl: string
+  +FileType: string
+  --
+  +Create(): ProductDocument
+  +List(): List<ProductDocument>
+  +Download(): void
+  +Delete(): boolean
+}
+
+class Auction {
+  +Id: int
+  +ProductId: int
+  +StartingPrice: decimal
+  +BidStep: decimal
+  +CurrentPrice: decimal
+  +BuyNowPrice: decimal
+  +ListingType: enum
+  +Status: enum
+  +RequiresRegistration: boolean
+  +RegistrationStartDate: datetime
+  +RegistrationEndDate: datetime
+  +StartDate: datetime
+  +EndDate: datetime
+  +WinnerId: int
+  +VerifiedAt: datetime
+  +VerifiedBy: int
+  +RejectReason: string
+  --
+  +Create(): Auction
+  +List(): List<Auction>
+  +Detail(): Auction
+  +Update(): Auction
+  +Delete(): boolean
+  +Approve(): Auction
+  +Reject(): Auction
+  +Finalize(): void
+}
+
+class Bid {
+  +Id: long
+  +AuctionId: int
+  +BidderId: int
+  +Amount: decimal
+  +BidType: enum
+  +IsWinning: boolean
+  +PlacedAt: datetime
+  +IsFlagged: boolean
+  +FlagReason: string
+  --
+  +PlaceBid(): Bid
+  +List(): List<Bid>
+  +BidHistory(): List<Bid>
+}
+
+class AuctionRegistration {
+  +Id: long
+  +AuctionId: int
+  +UserId: int
+  +Status: enum
+  +RegisteredAt: datetime
+  +ReviewedAt: datetime
+  +ReviewedBy: int
+  +RejectReason: string
+  --
+  +Register(): AuctionRegistration
+  +Cancel(): boolean
+  +List(): List<AuctionRegistration>
+}
+
+class AuctionRegistrationDeposit {
+  +Id: long
+  +AuctionId: int
+  +UserId: int
+  +AuctionRegistrationId: long
+  +Amount: decimal
+  +Status: enum
+  +PayPalOrderId: string
+  +PayPalCaptureId: string
+  +PaidAt: datetime
+  +RefundedAt: datetime
+  --
+  +InitiateDeposit(): AuctionRegistrationDeposit
+  +Capture(): AuctionRegistrationDeposit
+  +Refund(): boolean
+}
+
+class Order {
+  +Id: int
+  +OrderReference: string
+  +BuyerId: int
+  +Subtotal: decimal
+  +ShippingFee: decimal
+  +VaultInsurance: decimal
+  +TotalAmount: decimal
+  +PlatformFee: decimal
+  +SellerFee: decimal
+  +SellerProceeds: decimal
+  +Status: enum
+  +OrderSource: enum
+  +PaymentDeadline: datetime
+  +PaymentMethod: string
+  +ShippingFullName: string
+  +ShippingAddress: string
+  +ShippingPhone: string
+  --
+  +Create(): Order
+  +List(): List<Order>
+  +Detail(): Order
+  +Complete(): Order
+  +Cancel(): boolean
+}
+
+class OrderItem {
+  +Id: int
+  +OrderId: int
+  +AuctionId: int
+  +ItemName: string
+  +ItemGrade: string
+  +ItemImageUrl: string
+  +WinningBid: decimal
+  --
+  +Create(): OrderItem
+  +List(): List<OrderItem>
+}
+
+class Payment {
+  +Id: int
+  +OrderId: int
+  +Amount: decimal
+  +Status: enum
+  +TransactionId: string
+  +PayPalOrderId: string
+  +PaidAt: datetime
+  --
+  +Create(): Payment
+  +Capture(): Payment
+  +List(): List<Payment>
+}
+
+class Complaint {
+  +Id: int
+  +RequestReference: string
+  +OrderId: int
+  +BuyerId: int
+  +ComplaintType: enum
+  +ReasonCode: string
+  +Description: text
+  +RequestedAmount: decimal
+  +Status: enum
+  +AdminNotes: string
+  +ReviewedBy: int
+  +ReviewedAt: datetime
+  --
+  +Submit(): Complaint
+  +List(): List<Complaint>
+  +Detail(): Complaint
+  +Approve(): Complaint
+  +Reject(): Complaint
+  +UpdateStatus(): Complaint
+}
+
+class Notification {
+  +Id: int
+  +UserId: int
+  +Title: string
+  +Message: string
+  +Type: string
+  +RelatedUrl: string
+  +IsRead: boolean
+  +ReadAt: datetime
+  +ReferenceType: string
+  +ReferenceId: int
+  --
+  +List(): List<Notification>
+  +MarkRead(): void
+  +MarkAllRead(): void
+}
+
+class WatchlistItem {
+  +Id: long
+  +UserId: int
+  +AuctionId: int
+  +AddedAt: datetime
+  --
+  +Toggle(): WatchlistItem
+  +List(): List<WatchlistItem>
+  +Delete(): boolean
+}
+
+' Layout helpers (hidden) for cleaner ortho routing like Example
+User -[hidden]right- Category
+Category -[hidden]right- ProductTemplate
+Product -[hidden]right- Auction
+Auction -[hidden]right- Order
+Bid -[hidden]right- AuctionRegistration
+OrderItem -[hidden]right- Payment
+Complaint -[hidden]right- Notification
+
+' Associations with multiplicities (Example style)
+User "1" -- "*" Product
+User "1" -- "*" Bid
+User "1" -- "*" Order
+User "1" -- "*" AuctionRegistration
+User "1" -- "*" WatchlistItem
+User "1" -- "*" Notification
+User "1" -- "*" Complaint
+User "1" -- "0..*" Auction
+
+Category "1" -- "*" Product
+Category "1" -- "*" ProductTemplate
+ProductTemplate "0..1" -- "*" Product
+Product "1" -- "*" ProductImage
+Product "1" -- "*" ProductDocument
+Product "1" -- "*" Auction
+
+Auction "1" -- "*" Bid
+Auction "1" -- "*" AuctionRegistration
+Auction "1" -- "*" OrderItem
+Auction "1" -- "*" WatchlistItem
+AuctionRegistration "1" -- "*" AuctionRegistrationDeposit
+
+Order "1" -- "*" OrderItem
+Order "1" -- "*" Payment
+Order "0..1" -- "*" Complaint
+
+@enduml

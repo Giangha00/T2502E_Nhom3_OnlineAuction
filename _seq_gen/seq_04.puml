@@ -1,0 +1,38 @@
+@startuml
+title Sequence — Create Auction
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor Seller
+participant "SellController" as Sell
+participant "SellerAuctionService" as Svc
+participant "Cloudinary" as Cloud
+database "Database" as DB
+
+Seller -> Sell: GET /Sell/Create
+activate Sell
+alt Chưa đăng nhập
+  Sell --> Seller: Redirect /Auth/Login
+else Đã đăng nhập
+  Sell --> Seller: Form CreateAuction
+  Seller -> Sell: POST /Sell/Create\n(+ images, documents)
+  Sell -> Sell: ValidateCreateAuction\n(lịch, giá, năm...)
+  alt Invalid
+    Sell --> Seller: Lỗi validation
+  else Valid
+    Sell -> Svc: Create listing
+    activate Svc
+    Svc -> Cloud: Upload PrimaryImage\n+ Gallery / Documents
+    Cloud --> Svc: URLs
+    Svc -> DB: INSERT product + auction\n(status=confirming)
+    DB --> Svc: OK
+    Svc --> Sell: Success
+    deactivate Svc
+    Sell --> Seller: Redirect\nSubmissions / Selling
+  end
+end
+deactivate Sell
+@enduml

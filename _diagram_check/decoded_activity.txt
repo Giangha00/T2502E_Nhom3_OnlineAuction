@@ -1,0 +1,650 @@
+===== 4.2.1 Register Account Flow (Luồng Đăng ký) =====
+@startuml
+title 1. Register Account Flow — OnlineAuction
+
+skinparam ConditionEndStyle hline
+
+|Người dùng|
+start
+:Mở form Đăng ký\n(POST /Auth/SignUp);
+:Nhập FullName, Email,\nPhoneNumber (11 số),\nPassword, ConfirmPassword;
+:Nhấn nút "Đăng ký"\n(+ Anti-Forgery Token);
+
+|Hệ thống|
+:Tiếp nhận SignUpViewModel;
+:Chuẩn hóa SĐT (chỉ giữ chữ số);
+:Kiểm tra ModelState\n(Required, Email format,\nPassword ≥ 6, Confirm khớp,\nSĐT đúng 11 số);
+
+if (Dữ liệu hợp lệ?) then (Có)
+  :Truy vấn FindByEmailAsync(email);
+
+  if (Email đã tồn tại?) then (Có)
+    if (EmailConfirmed = false?) then (Chưa kích hoạt)
+      :Gửi lại email kích hoạt\n(SendEmailConfirmationAsync);
+      if (Gửi mail thành công?) then (Có)
+        :Thông báo: đã gửi lại\nemail kích hoạt;
+        :Redirect tab Login;
+      else (Không)
+        :Hiển thị lỗi:\nKhông gửi được email;
+      endif
+    else (Đã kích hoạt)
+      :Hiển thị lỗi:\n"Email already exists.";
+    endif
+  else (Không tồn tại)
+    :GenerateUniqueUsername\ntừ phần local-part của email;
+    :Tạo ApplicationUser\nRole=User, Status=Active,\nEmailConfirmed=false;
+    :UserManager.CreateAsync\n(hash mật khẩu Identity);
+
+    if (Tạo tài khoản thành công?) then (Có)
+      :GenerateEmailConfirmationToken;
+      :Queue email chứa link\n/Auth/ConfirmEmail?userId&code;
+
+      if (Gửi/queue email OK?) then (Có)
+        :TempData: Đăng ký thành công.\nVui lòng xác thực email trước khi đăng nhập;
+        :Redirect tab Login;
+
+        |Người dùng|
+        :Mở email và bấm link kích hoạt;
+
+        |Hệ thống|
+        :GET /Auth/ConfirmEmail;
+        :ConfirmEmailAsync(token);
+
+        if (Kích hoạt thành công?) then (Có)
+          :EmailConfirmed = true;
+          :Thông báo kích hoạt thành công.\nCó thể đăng nhập;
+        else (Không)
+          :Thông báo link hết hạn / không hợp lệ;
+        endif
+      else (Không)
+        :Xóa user vừa tạo\n(DeleteAsync);
+        :Hiển thị lỗi:\nKhông gửi được email kích hoạt;
+      endif
+    else (Không)
+      :Hiển thị lỗi Identity\n(password policy...);
+    endif
+  endif
+else (Không)
+  :Hiển thị lỗi validation\n(giữ form signup);
+endif
+
+stop
+@enduml
+
+===== 4.2.2 Login Flow (Luồng Đăng nhập) =====
+@startuml
+title 2. Login Flow — OnlineAuction (Public /Auth/Login)
+
+skinparam ConditionEndStyle hline
+
+|Người dùng|
+start
+:Mở form Đăng nhập\n(POST /Auth/Login);
+:Nhập Email, Password,\nRememberMe (tùy chọn);
+:Nhấn nút "Đăng nhập"\n(+ Anti-Forgery Token);
+
+|Hệ thống|
+:Tiếp nhận LoginViewModel;
+:Kiểm tra ModelState\n(Email, Password bắt buộc);
+
+if (Dữ liệu hợp lệ?) then (Có)
+  :FindByEmailAsync(email);
+
+  if (Tìm thấy user?) then (Có)
+    if (Status = Active?) then (Có)
+      if (Role = Admin?) then (Có)
+        :Redirect sang\n/Admin/Account/Login\n(dual session — không\nđăng nhập bằng cookie User);
+      else (User thường)
+        :PasswordSignInAsync\n(username, password,\nRememberMe, lockoutOnFailure=true)\n→ cookie Identity\n.AuctionHouse.User;
+
+        if (SignIn Succeeded?) then (Có)
+          :ClearLegacySession;
+          :Redirect returnUrl\n(hoặc trang chủ);
+        else (Không)
+          if (IsLockedOut?) then (Có)
+            :Hiển thị lỗi:\nTài khoản bị khóa do\nnhiều lần đăng nhập sai;
+          else (Không)
+            if (IsNotAllowed?) then (Có)
+              if (EmailConfirmed?) then (Chưa)
+                :Hiển thị lỗi:\nTài khoản chưa kích hoạt.\nVui lòng kiểm tra email;
+              else (Đã confirm)
+                :Hiển thị lỗi:\nSign-in is not allowed;
+              endif
+            else (Không)
+              if (RequiresTwoFactor?) then (Có)
+                :Hiển thị lỗi:\nYêu cầu xác thực 2FA;
+              else (Sai mật khẩu)
+                :Hiển thị lỗi:\nInvalid email or password;
+              endif
+            endif
+          endif
+        endif
+      endif
+    else (Không Active)
+      :Hiển thị lỗi:\nYour account has been deactivated;
+    endif
+  else (Không)
+    :Hiển thị lỗi:\nInvalid email or password;
+  endif
+else (Không)
+  :Hiển thị lỗi validation\n(giữ form login);
+endif
+
+stop
+@enduml
+
+===== 4.2.3 Create Auction Flow (Luồng Tạo phòng Đấu giá) =====
+@startuml
+title 3. Create Auction Flow — OnlineAuction (/Sell/Create)
+
+skinparam ConditionEndStyle hline
+
+|Người bán|
+start
+:Truy cập /Sell/Create;
+
+|Hệ thống|
+if (Đã đăng nhập cookie User?) then (Không)
+  :Redirect /Auth/Login;
+else (Có)
+  :Hiển thị form CreateAuction\n(BuildCreateForm);
+
+  |Người bán|
+  :Nhập thông tin sản phẩm\n(Name, Category, mô tả, Year,\nSet, Grade, Cert...);
+  :Nhập lịch đấu giá\n(RegistrationStart/End,\nStartDate, EndDate);
+  :Nhập StartingPrice, BidStep,\nBuyNowPrice (tùy chọn);
+  :Upload PrimaryImage +\nGallery (tối đa 5 ảnh)\n+ Documents (tùy chọn);
+  :Nhấn "Xác nhận tạo"\n(POST /Sell/Create +\nAnti-Forgery Token);
+
+  |Hệ thống|
+  :Gắn file từ Request.Form;
+  :ValidateCreateAuction\n+ kiểm tra lịch\n(End > Start, giá > 0,\nnăm 1800–2100...);
+
+  if (Dữ liệu hợp lệ?) then (Không)
+    :Hiển thị lỗi validation\n(giữ form Create);
+  else (Có)
+    :Lấy sellerId từ UserManager;
+
+    if (Có seller account?) then (Không)
+      :Lỗi: No seller account found;
+    else (Có)
+      :BeginTransaction;
+      :Upload ảnh/document\nlên Cloudinary\n(PhotoService.AddPhotoAsync);
+
+      if (Upload thành công?) then (Không)
+        :Rollback;
+        :Hiển thị lỗi upload;
+      else (Có)
+        :Lưu Product\n(+ ProductImages, ProductDocuments);
+        :Lưu Auction\nListingType=auction\nStatus=confirming\nSubmittedAt=UtcNow\n(CurrentPrice=StartingPrice);
+        :CommitTransaction;
+        :Tạo notification\nListingSubmitted\n(in-app + push);
+        :Redirect Account/Selling\ntab=active, channel=auction\n(thông báo: awaiting\nadmin confirmation);
+
+        note right
+          Phiên **không** public
+          cho đến khi Admin duyệt
+          tại /Admin/AuctionVerification
+          → scheduled / live
+        end note
+      endif
+    endif
+  endif
+endif
+
+stop
+@enduml
+
+===== 4.2.4 Place Bid Flow (Luồng Đặt giá/Trả giá) =====
+@startuml
+title 4. Place Bid Flow — OnlineAuction (/Auction/PlaceBid)
+
+skinparam ConditionEndStyle hline
+
+|Người mua|
+start
+:Xem /Auction/Detail/{id}\n(phiên live / ending_soon);
+:Nhập số tiền muốn đặt;
+:Nhấn "Place Bid"\n(POST /Auction/PlaceBid);
+
+|Hệ thống|
+if (Đã đăng nhập cookie User?) then (Không)
+  :401 — Please sign in\nto place a bid;
+else (Có)
+  if (User bị ShadowBan?) then (Có)
+    :403 + notification BidFailed;
+  else (Không)
+    :Check Rate Limit\n(user / auction / IP);
+
+    if (Vượt rate limit?) then (Có)
+      :429 + notification BidFailed;
+    else (Không)
+      if (Yêu cầu Challenge\nvà token không hợp lệ?) then (Có)
+        :403 — requiresChallenge;
+      else (Không / token OK)
+        :PlaceBidAsync\n(transaction Serializable);
+        :ValidateBid:\n- Không phải seller\n- Status = live/ending_soon\n- Trong Start–End\n- amount ≥ Current + BidStep\n- tăng đúng bội BidStep;
+
+        if (Validate OK?) then (Không)
+          :400 — lỗi (ended /\nconfirming / giá thấp...);
+        else (Có)
+          if (Cần đăng ký/đặt cọc\nmà chưa đủ điều kiện?) then (Có)
+            :Chặn bid\n(GetBidBlockMessage);
+          else (Không)
+            :Fraud pre-bid gate;
+
+            if (Fraud cho phép?) then (Không)
+              :403 — fraud protection;
+            else (Có)
+              :Lưu Bid mới (IsWinning);
+              :Bỏ IsWinning bid cũ;
+              :Cập nhật CurrentPrice;
+              if (Anti-snipe\nđược áp dụng?) then (Có)
+                :Gia hạn EndDate;
+              else (Không)
+              endif
+              :Commit DB;
+              :RabbitMQ BidsPlaced\n→ outbid notification;
+              :SignalR BidUpdated\n(giá, history, minNextBid);
+              :JSON success\n"Bid placed successfully.";
+            endif
+          endif
+        endif
+      endif
+    endif
+  endif
+endif
+
+stop
+@enduml
+
+===== 4.2.5 Auction Closing Flow (Luồng Kết thúc Đấu giá) =====
+@startuml
+title 5. Auction Closing Flow — OnlineAuction
+
+skinparam ConditionEndStyle hline
+
+|Background Worker|
+start
+:AuctionFinalizationWorker\npoll mỗi ~15 giây;
+:PublishTick → RabbitMQ\nAuctionLifecycle\n(FinalizeExpiredAuctions);
+
+|Hệ thống|
+:OrderCreationService\n.FinalizeExpiredAuctionsAsync;
+:Tìm auction hết giờ:\nListingType=auction\nStatus ∈ {live, ending_soon}\nEndDate ≤ UtcNow;
+
+if (Có auction cần finalize?) then (Không)
+  :Kết thúc tick này;
+else (Có)
+  repeat
+    :CreatePendingPaymentOrder\nForAuctionAsync\n(transaction Serializable);
+    :Re-check status + EndDate;
+
+    if (Vẫn cần finalize?) then (Không)
+      :Skip (đã xử lý /\nchưa hết giờ);
+    else (Có)
+      :Lấy Bid IsWinning\n(cao nhất);
+
+      if (Có winning bid?) then (Không)
+        :Status = ended\n(WinnerId = null);
+        :Commit;
+      else (Có)
+        :Tạo Order + OrderItem\norder_source = auction_win\nstatus = pending_payment\ndeadline = 48 giờ;
+        :Status = awaiting_payment;
+        :WinnerId = bidder thắng;
+        :Commit;
+        if (Cọc winner > giá thắng?) then (Có)
+          :Refund phần cọc dư\n(PayPal);
+        else (Không)
+        endif
+        :NotifyAuctionWin\n(winner — in-app + FCM)\n+ link /Order;
+      endif
+    endif
+
+    :RefundLoserDeposits\nForAuctionAsync\n(hoàn cọc người thua,\nbỏ qua winner);
+  repeat while (Còn auction\ntrong batch?) is (Có)
+  ->Không;
+endif
+
+stop
+@enduml
+
+===== 4.2.6 Payment Flow (Luồng Thanh toán) =====
+@startuml
+title 6. Payment Flow — OnlineAuction (/Order + PayPal/COD)
+
+skinparam ConditionEndStyle hline
+
+|Người mua|
+start
+:Đăng nhập (cookie User);
+:Mở Payment Center /Order\n(danh sách pending_payment);
+:Chọn hóa đơn thanh toán\n(auction_win bắt buộc,\nbuy_now tùy chọn);
+:Nhập shipping\n(FullName, Address, City, Phone);
+:Chọn PayPal hoặc COD;
+:Nhấn Complete\n(POST /Order/Complete +\nAnti-Forgery);
+
+|Hệ thống|
+:Validate ModelState +\nCompleteOrderAsync\n(lưu shipping, resolve\nselected order IDs);
+
+if (Hợp lệ?) then (Không)
+  :Notification PaymentFailed;
+  :Redirect /Order;
+else (Có)
+  if (Phương thức?) then (COD)
+    :Đánh dấu orders = paid\n(ngay trên server);
+    :Auction liên quan → completed;
+    :Notification thanh toán OK;
+    :Redirect /Order;
+  else (PayPal)
+    :InitiatePayPalCheckoutAsync\n(tổng selected invoices);
+
+    if (Tạo checkout OK?) then (Không)
+      :Notification lỗi start checkout;
+      :Redirect /Order;
+    else (Có)
+      :Redirect ApprovalUrl;
+
+      |PayPal Sandbox|
+      :Hiển thị trang PayPal;
+      if (Người mua?) then (Approve)
+        :Return token →\nGET /Payment/PayPalReturn;
+
+        |Hệ thống|
+        :CapturePayPalCheckoutAsync;
+        if (Capture thành công?) then (Có)
+          :Orders = paid;
+          :Auction → completed;
+          :Notification Payment;
+          :Redirect /Payment/Confirmation;
+        else (Không)
+          :Notification lỗi capture;
+          :Redirect /Order\n(vẫn pending_payment);
+        endif
+      else (Cancel)
+        :GET /Payment/PayPalCancel;
+        |Hệ thống|
+        :CancelPayPalCheckoutAsync;
+        :Notification cancelled;
+        :Redirect /Order\n(vẫn pending_payment);
+      endif
+    endif
+  endif
+endif
+
+stop
+@enduml
+
+===== 4.2.7 Quản lý User (Luồng quản lý người dùng) =====
+@startuml
+title 7. Admin Change User Status Flow — OnlineAuction
+
+skinparam ConditionEndStyle hline
+
+|Admin|
+start
+:Đăng nhập /Admin/Account/Login\n(cookie .AuctionHouse.Admin);
+:Vào /Admin/User\n(UsersView permission);
+
+|Hệ thống|
+if (Có quyền UsersView?) then (Không)
+  :403 / Access denied;
+else (Có)
+  :Hiển thị danh sách User\n(filter: keyword, Role, Status);
+
+  |Admin|
+  if (Cách đổi status?) then (Edit 1 user)
+    :Mở /Admin/User/Edit/{id};
+    |Hệ thống|
+    if (Có UsersManage?) then (Không)
+      :403;
+    else (Có)
+      :Load UserForm\n(Status = Active|Inactive);
+
+      |Admin|
+      :Đổi Status\nActive ↔ Inactive;
+      :Submit POST Edit\n(+ Anti-Forgery);
+
+      |Hệ thống|
+      :UserService.UpdateAsync\n→ user.Status = model.Status;
+      :TempData SuccessMessage;
+      :Redirect /Admin/User;
+    endif
+  else (Bulk ChangeStatus)
+    :Tick nhiều user trên list;
+    :Chọn Bulk action\n= ChangeStatus\n+ Status đích;
+    :Submit BulkAction;
+
+    |Hệ thống|
+    if (Có UsersManage?) then (Không)
+      :403;
+    else (Có)
+      :ExecuteBulkActionAsync\nđổi Status hàng loạt;
+      :TempData Success/Error;
+      :Redirect /Admin/User;
+    endif
+  endif
+endif
+
+stop
+@enduml
+
+===== 4.2.8 Quản lý các phiên đấu giá =====
+@startuml
+title 8. Admin Auction Verification Flow — OnlineAuction
+
+skinparam ConditionEndStyle hline
+
+|Admin|
+start
+:Đăng nhập /Admin/Account/Login\n(cookie .AuctionHouse.Admin);
+:Vào /Admin/AuctionVerification\n(permission auctions.verify);
+
+|Hệ thống|
+if (Có quyền auctions.verify?) then (Không)
+  :403 Access denied;
+else (Có)
+  :Hiển thị hàng đợi confirming\n(+ badge pending count);
+
+  |Admin|
+  :Mở Details/{id}\n(xem product, media, lịch, giá);
+
+  |Hệ thống|
+  :Load verification detail\n(chỉ status confirming);
+
+  |Admin|
+  if (Quyết định?) then (Approve)
+    :Nhấn Approve\n(POST Approve);
+
+    |Hệ thống|
+    :ValidateForApproval\n(End>Start, giá>0,\nảnh, mô tả...);
+    if (Hợp lệ?) then (Không)
+      :TempData ErrorMessage;
+      :Redirect Details/Index;
+    else (Có)
+      :Set VerifiedAt, VerifiedBy;\nClear RejectReason;
+      if (StartDate ≤ now\n< EndDate?) then (Có)
+        :Status = live;
+      else (Không)
+        :Status = scheduled;
+      endif
+      :Notify seller\nListingApproved\n(in-app + push);
+      :TempData SuccessMessage;
+      :Redirect Index;
+    endif
+  else (Reject)
+    :Nhập rejectReason\n(≥ 10 ký tự);
+    :Nhấn Reject\n(POST Reject);
+
+    |Hệ thống|
+    if (Lý do đủ dài?) then (Không)
+      :Lỗi: reason ≥ 10 chars;
+    else (Có)
+      :Status = rejected;\nLưu RejectReason;\nVerifiedBy/At;
+      :Notify seller\nListingRejected + lý do;
+      :TempData SuccessMessage;
+      :Redirect Index;
+    endif
+  endif
+endif
+
+stop
+@enduml
+
+===== 4.2.9 Luồng quản lý category (Quản lý danh mục) =====
+@startuml
+title 9. Admin Category Management Flow — OnlineAuction
+
+skinparam ConditionEndStyle hline
+
+|Admin|
+start
+:Đăng nhập /Admin/Account/Login;
+:Vào /Admin/Category\n(permission categories.manage);
+
+|Hệ thống|
+if (Có CategoriesManage?) then (Không)
+  :403 Access denied;
+else (Có)
+  :Hiển thị danh sách Category\n(filter Search, IsActive,\nsort, phân trang)\nDeletedAt IS NULL;
+
+  |Admin|
+  if (Thao tác = Create?) then (Có)
+    :Mở Create\nnhập Name, Slug?,\nSortOrder, IsActive;
+    :POST Create +\nAnti-Forgery;
+
+    |Hệ thống|
+    if (ModelState OK\nvà Name/Slug unique?) then (Không)
+      :Hiển thị lỗi\n(trùng name/slug...);
+    else (Có)
+      :Lưu Category mới;
+      :TempData Success;
+      :Redirect Index;
+    endif
+  else (Không)
+    if (Thao tác = Edit?) then (Có)
+      :Mở Edit/{id}\nchỉnh Name, Slug,\nSortOrder, IsActive;
+      :POST Edit;
+
+      |Hệ thống|
+      if (ModelState OK\nvà unique?) then (Không)
+        :Hiển thị lỗi;
+      else (Có)
+        :UpdateAsync;
+        :TempData Success;
+        :Redirect Index;
+      endif
+    else (Delete / BulkDelete)
+      :Chọn 1 hoặc nhiều\ncategory → Delete;
+
+      |Hệ thống|
+      if (Còn product\nDeletedAt=null?) then (Có)
+        :Lỗi: Cannot delete\n— dùng Deactivate\n(IsActive=false);
+        :TempData Error;
+        :Redirect Index;
+      else (Không)
+        :Soft delete\nDeletedAt = UtcNow;
+        :TempData Success;
+        :Redirect Index;
+      endif
+    endif
+  endif
+endif
+
+stop
+@enduml
+
+===== 4.2.10 Quản lý product bên admin (Quản lý sản phẩm) =====
+@startuml
+title Admin Product Management Flow — OnlineAuction
+
+skinparam ConditionEndStyle hline
+
+|Admin|
+start
+:Đăng nhập /Admin/Account/Login\n(cookie .AuctionHouse.Admin);
+:Vào /Admin/Product\n(Authorize Admin scheme);
+
+|Hệ thống|
+:Hiển thị danh sách\n**Product Templates**\n(filter, phân trang);
+
+|Admin|
+if (Tầng quản lý?) then (Template)
+  if (Thao tác template?) then (CreateTemplate)
+    :Nhập Name, Category,\nSet, Card#, Grade,\nLanguage, ảnh mẫu...;
+    :POST CreateTemplate;
+
+    |Hệ thống|
+    if (Validate OK\n& không trùng key?) then (Không)
+      :Hiển thị lỗi form;
+    else (Có)
+      :Lưu ProductTemplate\n(+ upload ảnh Cloudinary);
+      :TempData Success;
+      :Redirect Index;
+    endif
+  else (Không)
+    if (Thao tác = EditTemplate?) then (Có)
+      :POST EditTemplate;
+      |Hệ thống|
+      if (Validate OK?) then (Không)
+        :Hiển thị lỗi;
+      else (Có)
+        :UpdateTemplateAsync;
+        :Redirect Index;
+      endif
+    else (DeleteTemplate)
+      :POST DeleteTemplate;
+      |Hệ thống|
+      if (Còn product\ninstance?) then (Có)
+        :Lỗi: không xóa mẫu\nđang có sản phẩm seller;
+      else (Không)
+        :Soft delete template\n(DeletedAt, DeletedBy);
+      endif
+      :Redirect Index;
+    endif
+  endif
+else (Product instance)
+  :Mở /Admin/Product/Template/{id}\n(danh sách product theo mẫu);
+
+  if (Thao tác product?) then (Create)
+    :Chọn/khóa Template +\nSeller, Condition,\nảnh gallery, documents;
+    :POST Create;
+
+    |Hệ thống|
+    if (ModelState &\nValidateReferences OK?) then (Không)
+      :Hiển thị lỗi;
+    else (Có)
+      :ApplyTemplateSnapshot;
+      :Upload Cloudinary\n(primary/gallery/docs);
+      :Lưu Product +\nImages + Documents;
+      :Redirect Template list;
+    endif
+  else (Không)
+    if (Thao tác = Edit?) then (Có)
+      :POST Edit;
+      |Hệ thống|
+      if (Update OK?) then (Không)
+        :Hiển thị lỗi\n(seller/template lock...);
+      else (Có)
+        :UpdateAsync +\nmedia;
+        :Redirect Template list;
+      endif
+    else (Delete / BulkDelete)
+      :Chọn 1 hoặc nhiều product;
+      :POST Delete / BulkDelete;
+
+      |Hệ thống|
+      if (Bị chặn bởi\nauction đang active?) then (Có)
+        :TempData Error\n(không xóa được);
+      else (Không)
+        :SoftDeleteProduct\n(DeletedAt, DeletedBy);
+        :TempData Success;
+      endif
+      :Redirect Template list;
+    endif
+  endif
+endif
+
+stop
+@enduml
+

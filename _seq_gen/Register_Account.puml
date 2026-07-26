@@ -1,0 +1,41 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+autonumber "<b>0</b> : "
+
+mainframe sd Register Account
+
+actor Guest
+participant Client
+participant Controller
+database Database
+participant "Email Service" as Mail
+
+Guest -> Client: Open SignUp page
+Client --> Guest: Show Register form
+Guest -> Client: Enter FullName, Email, Phone, Password
+Guest -> Client: Click Register
+Client -> Client: Validate ModelState
+alt Invalid
+  Client --> Guest: Show validation errors
+else Valid
+  Client -> Controller: POST /Auth/SignUp
+  Controller -> Database: FindByEmailAsync(email)
+  Database --> Controller: User or null
+  alt Email exists
+    Controller --> Client: Error Email already exists
+    Client --> Guest: Show error
+  else Email available
+    Controller -> Database: Create user (EmailConfirmed=false)
+    Database --> Controller: OK
+    Controller -> Mail: SendEmailConfirmationAsync
+    Mail --> Controller: Sent
+    Controller --> Client: Success + redirect Login
+    Client --> Guest: Notify check email
+  end
+end
+
+@enduml

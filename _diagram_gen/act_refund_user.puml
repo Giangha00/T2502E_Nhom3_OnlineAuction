@@ -1,0 +1,29 @@
+@startuml
+title Request Refund / Complaint Flow — OnlineAuction
+skinparam monochrome true
+skinparam shadowing false
+skinparam ConditionEndStyle hline
+
+|Người mua|
+start
+:Đăng nhập cookie User;
+:Mở GET /Refund;
+|Hệ thống|
+:GetEligibleOrdersAsync\n(đơn paid, chưa có complaint mở);
+:Hiển thị form + policy\n+ reason codes;
+|Người mua|
+:Chọn order, reason,\nnotes / evidence;
+:POST /Refund/Submit\n(+ Anti-Forgery);
+|Hệ thống|
+if (Hợp lệ?) then (Không)
+  :Hiển thị lỗi validation;
+  stop
+else (Có)
+  :Tạo Complaint type=refund\nstatus=pending\n+ RequestReference;
+  :Notify buyer (in-app + push);
+  :Redirect Confirmation?requestId=;
+endif
+|Người mua|
+:Xem xác nhận yêu cầu;
+stop
+@enduml

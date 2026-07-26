@@ -1,0 +1,39 @@
+@startuml
+title Register for Auction / Deposit Flow — OnlineAuction
+skinparam monochrome true
+skinparam shadowing false
+skinparam ConditionEndStyle hline
+
+|Người mua|
+start
+:Xem /Auction/Detail/{id};
+:Nhấn Register\n(POST /Auction/Register);
+|Hệ thống|
+if (Đã đăng nhập?) then (Không)
+  :401 — yêu cầu đăng nhập;
+  stop
+else (Có)
+endif
+if (Yêu cầu đặt cọc?) then (Không)
+  :RegisterAsync → approved;
+  :Thông báo đăng ký OK;
+  stop
+else (Có)
+  :Trả 410 + initiateDepositUrl;
+endif
+|Người mua|
+:POST /Auction/InitiateDeposit;
+|Hệ thống|
+:Tạo registration pending\n+ PayPal deposit order;
+:Trả approvalUrl;
+|Người mua|
+:Thanh toán trên PayPal;
+|Hệ thống|
+if (PayPal return OK?) then (Có)
+  :DepositPayPalReturn\n→ capture → approved;
+  :Thông báo đủ điều kiện bid;
+else (Cancel)
+  :DepositPayPalCancel\n→ huỷ deposit/registration;
+endif
+stop
+@enduml

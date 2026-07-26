@@ -1,0 +1,37 @@
+@startuml
+title Sequence — Place Bid
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor Buyer
+participant "AuctionController" as Ctrl
+participant "BidService" as Bid
+participant "NotificationService" as Notify
+database "Database" as DB
+
+Buyer -> Ctrl: POST /Auction/PlaceBid\n(auctionId, amount)
+activate Ctrl
+alt Chưa login / ShadowBan / Rate limit
+  Ctrl --> Buyer: 401 / 403 / 429
+else OK
+  Ctrl -> Bid: PlaceBidAsync\n(Serializable)
+  activate Bid
+  Bid -> DB: Validate:\nnot seller, live/ending_soon,\namount >= current+step
+  alt Validate fail
+    Bid --> Ctrl: 400 error
+    Ctrl -> Notify: BidFailed
+    Ctrl --> Buyer: Lỗi đặt giá
+  else OK
+    Bid -> DB: INSERT bid\nUPDATE current price\nUPDATE IsWinning
+    DB --> Bid: OK
+    Bid --> Ctrl: Success
+    deactivate Bid
+    Ctrl -> Notify: BidPlaced / Outbid
+    Ctrl --> Buyer: Đặt giá thành công
+  end
+end
+deactivate Ctrl
+@enduml

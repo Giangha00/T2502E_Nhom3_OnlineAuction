@@ -1,0 +1,32 @@
+@startuml
+title Admin Dashboard Flow — OnlineAuction
+skinparam monochrome true
+skinparam shadowing false
+skinparam ConditionEndStyle hline
+
+|Admin|
+start
+:Đăng nhập /Admin/Account/Login;
+:Vào /Admin/Dashboard\n(permission dashboard.view);
+|Hệ thống|
+if (Có quyền?) then (Không)
+  :403 Access denied;
+  stop
+else (Có)
+  :GetDashboardAsync\n(revenue, users, auctions);
+  :Hiển thị metrics + charts;
+endif
+|Admin|
+if (Thao tác?) then (Đổi khoảng ngày)
+  :Chọn date range / granularity;
+  |Hệ thống|
+  :Reload dashboard data;
+elseif (Export) then
+  :GET /Admin/Dashboard/Export;
+  |Hệ thống|
+  :ExportExcelAsync;
+  :Tải file Excel;
+else (Chỉ xem)
+endif
+stop
+@enduml

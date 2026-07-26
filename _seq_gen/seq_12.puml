@@ -1,0 +1,40 @@
+@startuml
+title Sequence — Admin Manage Users
+skinparam monochrome true
+skinparam shadowing false
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor Admin
+participant "Admin UserController" as Ctrl
+participant "UserService" as Svc
+database "Database" as DB
+
+Admin -> Ctrl: GET /Admin/User
+activate Ctrl
+Ctrl -> Ctrl: Check UsersView
+alt No permission
+  Ctrl --> Admin: 403
+else OK
+  Ctrl -> Svc: List users\n(filter keyword/role/status)
+  Svc -> DB: SELECT users
+  DB --> Svc: list
+  Svc --> Ctrl: UsersViewModel
+  Ctrl --> Admin: User list
+
+  Admin -> Ctrl: GET Edit/{id}
+  Ctrl -> Ctrl: Check UsersManage
+  Ctrl -> Svc: Load UserForm
+  Svc -> DB: SELECT user
+  Ctrl --> Admin: Edit form
+
+  Admin -> Ctrl: POST Edit\n(Status Active/Inactive...)
+  Ctrl -> Svc: UpdateAsync
+  Svc -> DB: UPDATE user
+  DB --> Svc: OK
+  Svc --> Ctrl: Success
+  Ctrl --> Admin: TempData + redirect
+end
+deactivate Ctrl
+@enduml
