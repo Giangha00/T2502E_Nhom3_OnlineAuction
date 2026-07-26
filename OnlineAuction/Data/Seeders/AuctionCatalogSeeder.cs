@@ -1104,6 +1104,10 @@ public static class AuctionCatalogSeeder
 
         if (orderIds.Count > 0)
         {
+            await dbContext.Complaints
+                .Where(complaint => complaint.OrderId != null && orderIds.Contains(complaint.OrderId.Value))
+                .ExecuteDeleteAsync();
+
             await dbContext.Payments
                 .Where(payment => orderIds.Contains(payment.OrderId))
                 .ExecuteDeleteAsync();

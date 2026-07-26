@@ -56,7 +56,7 @@ public interface IAdminDashboardService
     /// <summary>Snapshot: auctions awaiting admin verification (pending_review).</summary>
     Task<int> GetPendingVerificationCountAsync(CancellationToken cancellationToken = default);
 
-    Task<decimal?> GetAuctionSuccessRateAsync(CancellationToken cancellationToken = default);
+    Task<decimal> GetAuctionSuccessRateAsync(CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<DashboardCategoryBreakdownViewModel>> GetCategoryBidBreakdownAsync(
         DashboardFilterViewModel filter,

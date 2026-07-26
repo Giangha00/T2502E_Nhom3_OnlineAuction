@@ -8,7 +8,7 @@ public class DashboardKpiCardViewModel
 
     public decimal? ChangePercent { get; set; }
 
-    public string ChangeDisplay { get; set; } = "N/A";
+    public string ChangeDisplay { get; set; } = string.Empty;
 
     public bool IsPositiveChange { get; set; }
 

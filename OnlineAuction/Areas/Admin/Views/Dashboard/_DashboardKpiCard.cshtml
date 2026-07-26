@@ -14,7 +14,11 @@
     };
 
     string changeClass;
-    if (string.IsNullOrEmpty(Model.ChangeDisplay) || Model.ChangeDisplay == "N/A")
+    if (string.IsNullOrEmpty(Model.ChangeDisplay))
+    {
+        changeClass = "admin-dashboard-kpi__change--neutral";
+    }
+    else if (Model.ChangeDisplay is "0%" or "+0%")
     {
         changeClass = "admin-dashboard-kpi__change--neutral";
     }
@@ -64,10 +68,7 @@
         {
             <span class="admin-dashboard-kpi__change @changeClass">
                 @Model.ChangeDisplay
-                @if (Model.ChangeDisplay != "N/A")
-                {
-                    <span class="font-normal opacity-80">@Localizer["Admin_Dashboard_ChangeVsPrevious"]</span>
-                }
+                <span class="font-normal opacity-80">@Localizer["Admin_Dashboard_ChangeVsPrevious"]</span>
             </span>
         }
 

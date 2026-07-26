@@ -216,8 +216,8 @@ public class AdminDashboardService : IAdminDashboardService
                     pendingVerification),
                 SuccessRateKpi = BuildSnapshotKpi(
                     "Success Rate",
-                    successRate.HasValue ? $"{successRate.Value:0.0}%" : "N/A",
-                    successRate ?? 0),
+                    $"{successRate:0.0}%",
+                    successRate),
                 CategoryBreakdown = await GetCategoryBidBreakdownAsync(filter, cancellationToken)
             }
         };
@@ -399,7 +399,7 @@ public class AdminDashboardService : IAdminDashboardService
                 cancellationToken);
     }
 
-    public async Task<decimal?> GetAuctionSuccessRateAsync(CancellationToken cancellationToken = default)
+    public async Task<decimal> GetAuctionSuccessRateAsync(CancellationToken cancellationToken = default)
     {
         var denominator = await _dbContext.Auctions.AsNoTracking()
             .CountAsync(
@@ -410,7 +410,7 @@ public class AdminDashboardService : IAdminDashboardService
 
         if (denominator == 0)
         {
-            return null;
+            return 0m;
         }
 
         var numerator = await _dbContext.Auctions.AsNoTracking()
@@ -990,24 +990,17 @@ public class AdminDashboardService : IAdminDashboardService
 
         var changePercent = CalculateChangePercent(currentValue, previousValue);
         card.ChangePercent = changePercent;
-
-        if (!changePercent.HasValue)
-        {
-            card.ChangeDisplay = "N/A";
-            card.IsPositiveChange = true;
-            return card;
-        }
-
-        card.IsPositiveChange = changePercent.Value >= 0;
-        card.ChangeDisplay = $"{(changePercent.Value >= 0 ? "+" : string.Empty)}{changePercent.Value:0.#}%";
+        card.IsPositiveChange = changePercent >= 0;
+        card.ChangeDisplay = $"{(changePercent >= 0 ? "+" : string.Empty)}{changePercent:0.#}%";
         return card;
     }
 
-    private static decimal? CalculateChangePercent(decimal current, decimal previous)
+    private static decimal CalculateChangePercent(decimal current, decimal previous)
     {
         if (previous == 0)
         {
-            return null;
+            // No prior baseline: flat zero stays 0%, otherwise treat growth from zero as +100%.
+            return current == 0 ? 0m : 100m;
         }
 
         return Math.Round((current - previous) / previous * 100m, 1);

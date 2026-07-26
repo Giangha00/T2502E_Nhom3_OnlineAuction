@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Areas.Admin.ViewModels.Complaints;
 using OnlineAuction.Data;
@@ -32,7 +33,8 @@ public class AdminComplaintService : IAdminComplaintService
     public async Task<int> GetPendingCountAsync(CancellationToken cancellationToken = default) =>
         await _dbContext.Complaints.AsNoTracking()
             .CountAsync(
-                complaint => complaint.DeletedAt == null && complaint.Status == ComplaintStatuses.Pending,
+                complaint => complaint.DeletedAt == null
+                             && ComplaintStatuses.OpenStatuses.Contains(complaint.Status),
                 cancellationToken);
 
     public async Task<ComplaintListViewModel> GetComplaintsAsync(
@@ -106,7 +108,10 @@ public class AdminComplaintService : IAdminComplaintService
                 BuyerName = complaint.Buyer.FullName,
                 BuyerEmail = complaint.ContactEmail,
                 ProductName = complaint.Order != null && complaint.Order.Items.Any()
-                    ? complaint.Order.Items.OrderBy(item => item.Id).First().ItemName
+                    ? complaint.Order.Items
+                        .OrderBy(item => item.Id)
+                        .Select(item => item.ItemName != "" ? item.ItemName : item.Auction.Product.Name)
+                        .FirstOrDefault() ?? "—"
                     : "—",
                 ReasonCode = complaint.ReasonCode,
                 ReasonLabel = complaint.ReasonCode,
@@ -123,6 +128,8 @@ public class AdminComplaintService : IAdminComplaintService
             item.StatusLabel = ComplaintDisplayHelper.GetStatusLabel(item.Status);
         }
 
+        await BackfillMissingProductNamesAsync(items, cancellationToken);
+
         return new ComplaintListViewModel
         {
             Items = items,
@@ -130,6 +137,53 @@ public class AdminComplaintService : IAdminComplaintService
             TotalItems = totalItems,
             TotalPages = totalPages
         };
+    }
+
+    private async Task BackfillMissingProductNamesAsync(
+        IReadOnlyList<ComplaintListItemViewModel> items,
+        CancellationToken cancellationToken)
+    {
+        var missing = items
+            .Where(item => string.IsNullOrWhiteSpace(item.ProductName) || item.ProductName == "—")
+            .Where(item => !string.IsNullOrWhiteSpace(item.OrderReference))
+            .ToList();
+
+        if (missing.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var item in missing)
+        {
+            var resolved = await ResolveComplaintProductAsync(
+                order: null,
+                firstItem: null,
+                orderReference: item.OrderReference,
+                cancellationToken);
+
+            if (string.IsNullOrWhiteSpace(resolved.ProductName) && item.Id > 0)
+            {
+                // List items don't include OrderId; recover via complaint → order notifications.
+                var orderId = await _dbContext.Complaints
+                    .AsNoTracking()
+                    .Where(c => c.Id == item.Id)
+                    .Select(c => c.OrderId)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (orderId.HasValue)
+                {
+                    resolved = await TryResolveProductFromOrderNotificationsAsync(
+                        orderId.Value,
+                        item.OrderReference,
+                        cancellationToken) ?? resolved;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(resolved.ProductName))
+            {
+                item.ProductName = resolved.ProductName;
+            }
+        }
     }
 
     public async Task<ComplaintDetailViewModel?> GetComplaintDetailAsync(
@@ -154,12 +208,37 @@ public class AdminComplaintService : IAdminComplaintService
             return null;
         }
 
-        var firstItem = complaint.Order?.Items.OrderBy(item => item.Id).FirstOrDefault();
-        var seller = firstItem?.Auction.Product.Seller;
+        var firstItem = complaint.Order?.Items
+            .Where(item => item.DeletedAt == null)
+            .OrderBy(item => item.Id)
+            .FirstOrDefault();
+
+        var resolvedProduct = await ResolveComplaintProductAsync(
+            complaint.Order,
+            firstItem,
+            complaint.OrderReference ?? complaint.Order?.OrderReference,
+            cancellationToken);
+
+        var seller = resolvedProduct.Seller
+                     ?? firstItem?.Auction?.Product?.Seller;
         var successfulPayment = complaint.Order?.Payments
             .Where(payment => payment.DeletedAt == null && payment.Status == PaymentStatuses.Success)
-            .OrderByDescending(payment => payment.PaidAt)
+            .OrderByDescending(payment => payment.PaidAt ?? payment.UpdatedAt ?? payment.CreatedAt)
             .FirstOrDefault();
+
+        var productName = string.IsNullOrWhiteSpace(resolvedProduct.ProductName)
+            ? "—"
+            : resolvedProduct.ProductName;
+
+        // Prefer payment.PaidAt; if payment rows were removed but order is still marked paid, fall back.
+        DateTime? paidAt = successfulPayment?.PaidAt
+                           ?? successfulPayment?.UpdatedAt
+                           ?? successfulPayment?.CreatedAt;
+        if (!paidAt.HasValue
+            && complaint.Order is { Status: OrderStatuses.Paid or OrderStatuses.Shipped or OrderStatuses.Delivered })
+        {
+            paidAt = complaint.Order.UpdatedAt ?? complaint.Order.CreatedAt;
+        }
 
         var hasApprovedForOrder = complaint.OrderId.HasValue && await _dbContext.Complaints
             .AsNoTracking()
@@ -211,15 +290,15 @@ public class AdminComplaintService : IAdminComplaintService
             OrderTotal = complaint.Order?.TotalAmount,
             OrderStatus = complaint.Order?.Status,
             PaymentMethod = complaint.Order?.PaymentMethod,
-            PaidAt = successfulPayment?.PaidAt,
+            PaidAt = paidAt,
             BuyerId = complaint.BuyerId,
             BuyerName = complaint.Buyer.FullName,
             BuyerEmail = complaint.ContactEmail,
             SellerId = seller?.Id,
             SellerName = seller?.FullName,
             SellerEmail = seller?.Email,
-            ProductName = firstItem?.ItemName ?? "—",
-            AuctionId = firstItem?.AuctionId,
+            ProductName = productName,
+            AuctionId = resolvedProduct.AuctionId ?? firstItem?.AuctionId,
             HasApprovedComplaintForOrder = hasApprovedForOrder,
             OrderRefundEligibilityWarning = orderRefundEligibilityWarning,
             CanMarkUnderReview = complaint.Status == ComplaintStatuses.Pending,
@@ -436,6 +515,213 @@ public class AdminComplaintService : IAdminComplaintService
         {
             _logger.LogWarning(ex, "Failed to notify buyer about complaint {ComplaintId}", complaint.Id);
         }
+    }
+
+    private async Task<ResolvedComplaintProduct> ResolveComplaintProductAsync(
+        AuctionOrder? order,
+        OrderItem? firstItem,
+        string? orderReference,
+        CancellationToken cancellationToken)
+    {
+        if (!string.IsNullOrWhiteSpace(firstItem?.ItemName))
+        {
+            return new ResolvedComplaintProduct(
+                firstItem.ItemName.Trim(),
+                firstItem.AuctionId,
+                firstItem.Auction?.Product?.Seller);
+        }
+
+        if (!string.IsNullOrWhiteSpace(firstItem?.Auction?.Product?.Name))
+        {
+            return new ResolvedComplaintProduct(
+                firstItem.Auction.Product.Name.Trim(),
+                firstItem.AuctionId,
+                firstItem.Auction.Product.Seller);
+        }
+
+        var auctionId = TryParseAuctionIdFromOrderReference(orderReference);
+        if (auctionId.HasValue)
+        {
+            var auction = await _dbContext.Auctions
+                .AsNoTracking()
+                .IgnoreQueryFilters()
+                .Include(a => a.Product)
+                    .ThenInclude(p => p.Seller)
+                .FirstOrDefaultAsync(a => a.Id == auctionId.Value, cancellationToken);
+
+            if (auction?.Product is not null && !string.IsNullOrWhiteSpace(auction.Product.Name))
+            {
+                return new ResolvedComplaintProduct(
+                    auction.Product.Name.Trim(),
+                    auction.Id,
+                    auction.Product.Seller);
+            }
+
+            // Auction row may have been hard-deleted; try matching a live product by reconstructed name from notifications next.
+        }
+
+        if (order?.Id > 0)
+        {
+            var fromNotifications = await TryResolveProductFromOrderNotificationsAsync(
+                order.Id,
+                orderReference,
+                cancellationToken);
+            if (fromNotifications is not null)
+            {
+                return fromNotifications;
+            }
+        }
+
+        return ResolvedComplaintProduct.Empty;
+    }
+
+    private async Task<ResolvedComplaintProduct?> TryResolveProductFromOrderNotificationsAsync(
+        int orderId,
+        string? orderReference,
+        CancellationToken cancellationToken)
+    {
+        var messages = await _dbContext.Notifications
+            .AsNoTracking()
+            .Where(n =>
+                n.ReferenceId == orderId
+                && (n.ReferenceType == NotificationReferenceTypes.SellerAwaitingPayment
+                    || n.ReferenceType == NotificationReferenceTypes.SellerPaymentReceived
+                    || n.ReferenceType == NotificationReferenceTypes.BuyNowOrderCreated
+                    || n.ReferenceType == NotificationReferenceTypes.PaymentSuccess))
+            .OrderByDescending(n => n.CreatedAt)
+            .Select(n => n.Message)
+            .Take(10)
+            .ToListAsync(cancellationToken);
+
+        foreach (var message in messages)
+        {
+            var productName = TryExtractProductNameFromNotification(message, orderReference);
+            if (string.IsNullOrWhiteSpace(productName))
+            {
+                continue;
+            }
+
+            var product = await _dbContext.Products
+                .AsNoTracking()
+                .Include(p => p.Seller)
+                .Where(p => p.DeletedAt == null && p.Name == productName)
+                .OrderByDescending(p => p.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            var auctionId = await _dbContext.Auctions
+                .AsNoTracking()
+                .Where(a => a.DeletedAt == null && a.Product.Name == productName)
+                .OrderByDescending(a => a.Id)
+                .Select(a => (int?)a.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            return new ResolvedComplaintProduct(productName, auctionId, product?.Seller);
+        }
+
+        return null;
+    }
+
+    private static string? TryExtractProductNameFromNotification(string? message, string? orderReference)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return null;
+        }
+
+        var text = message.Trim();
+
+        // EN: Payment for {product} on order {ref} was confirmed via {method}.
+        var paymentMatch = Regex.Match(
+            text,
+            @"^Payment for (.+) on order\s+\S+",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (paymentMatch.Success)
+        {
+            return CleanExtractedProductName(paymentMatch.Groups[1].Value);
+        }
+
+        // EN: {product} has a winning buyer. Order {ref} is awaiting payment.
+        var awaitingMatch = Regex.Match(
+            text,
+            @"^(.+) has a winning buyer\.\s*Order\s+\S+",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (awaitingMatch.Success)
+        {
+            return CleanExtractedProductName(awaitingMatch.Groups[1].Value);
+        }
+
+        // VI: Thanh toán cho {product} ở đơn {ref} đã được xác nhận qua {method}.
+        var viPaymentMatch = Regex.Match(
+            text,
+            @"^Thanh toán cho (.+) ở đơn\s+\S+",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (viPaymentMatch.Success)
+        {
+            return CleanExtractedProductName(viPaymentMatch.Groups[1].Value);
+        }
+
+        // VI: {product} đã có người mua thắng. Đơn {ref} đang chờ thanh toán.
+        var viAwaitingMatch = Regex.Match(
+            text,
+            @"^(.+) đã có người mua thắng\.\s*Đơn\s+\S+",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (viAwaitingMatch.Success)
+        {
+            return CleanExtractedProductName(viAwaitingMatch.Groups[1].Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(orderReference))
+        {
+            var idx = text.IndexOf(orderReference, StringComparison.OrdinalIgnoreCase);
+            if (idx > 0)
+            {
+                // Fallback: take text before the order reference, then trim common glue words.
+                var before = text[..idx]
+                    .Replace("Payment for ", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("Thanh toán cho ", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace(" on order ", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace(" ở đơn ", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("has a winning buyer.", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace("đã có người mua thắng.", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Trim(' ', '-', '·', ',', '.', ':');
+
+                if (!string.IsNullOrWhiteSpace(before) && before.Length is >= 3 and <= 200)
+                {
+                    return before;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static string CleanExtractedProductName(string value) =>
+        value.Trim().Trim('"', '\'', '“', '”');
+
+    private static int? TryParseAuctionIdFromOrderReference(string? orderReference)
+    {
+        if (string.IsNullOrWhiteSpace(orderReference))
+        {
+            return null;
+        }
+
+        // BN-yyyyMMdd-{auctionId} or AH-yyyyMMdd-{auctionId}[+suffix]
+        var match = Regex.Match(
+            orderReference.Trim(),
+            @"^(?:BN|AH)-\d{8}-(\d+)",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+        return match.Success && int.TryParse(match.Groups[1].Value, out var auctionId)
+            ? auctionId
+            : null;
+    }
+
+    private sealed record ResolvedComplaintProduct(
+        string? ProductName,
+        int? AuctionId,
+        ApplicationUser? Seller)
+    {
+        public static ResolvedComplaintProduct Empty { get; } = new(null, null, null);
     }
 
     private static IReadOnlyList<string> ParseEvidenceUrls(string? json)

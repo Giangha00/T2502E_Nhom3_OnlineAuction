@@ -22,20 +22,4 @@
       <p class="mt-2 text-3xl font-bold text-slate-900">@Model.TotalListings</p>
     </div>
   </div>
-
-  <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">@Localizer["User_Stat_GrossSales"]</p>
-      <p class="mt-2 text-2xl font-bold text-slate-900">@Model.GrossSales.ToString("C2")</p>
-    </div>
-    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">@Localizer["User_Stat_SellerFee"]</p>
-      <p class="mt-2 text-2xl font-bold text-slate-900">@Model.SellerFees.ToString("C2")</p>
-    </div>
-    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">@Localizer["User_Stat_NetProceeds"]</p>
-      <p class="mt-2 text-2xl font-bold text-slate-900">@Model.NetProceeds.ToString("C2")</p>
-      <p class="mt-1 text-xs text-slate-400">@Localizer["User_Stat_NetProceedsNote"]</p>
-    </div>
-  </div>
 </section>
