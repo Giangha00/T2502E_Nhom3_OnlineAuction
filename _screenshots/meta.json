@@ -1,0 +1,92 @@
+[
+  {
+    "key": "01_home",
+    "caption": "Homepage - CardMarket",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/01_home.png",
+    "url": "http://localhost:5006/"
+  },
+  {
+    "key": "02_login_modal",
+    "caption": "Login - Auth modal",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/02_login_modal.png",
+    "url": "http://localhost:5006/"
+  },
+  {
+    "key": "03_signup_modal",
+    "caption": "Register Account - Sign up modal",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/03_signup_modal.png",
+    "url": "http://localhost:5006/"
+  },
+  {
+    "key": "04_auction_marketplace",
+    "caption": "Browse Marketplace - Auction listings",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/04_auction_marketplace.png",
+    "url": "http://localhost:5006/Auction"
+  },
+  {
+    "key": "05_auction_detail",
+    "caption": "Auction Detail - View listing & bid",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/05_auction_detail.png",
+    "url": "http://localhost:5006/Auction/Detail/4993"
+  },
+  {
+    "key": "06_buynow_marketplace",
+    "caption": "Browse Marketplace - Buy Now listings",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/06_buynow_marketplace.png",
+    "url": "http://localhost:5006/BuyNow"
+  },
+  {
+    "key": "07_buynow_detail",
+    "caption": "Buy Now Detail - Purchase product",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/07_buynow_detail.png",
+    "url": "http://localhost:5006/BuyNow/Detail/6235"
+  },
+  {
+    "key": "08_payment_info",
+    "caption": "Payment Information",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/08_payment_info.png",
+    "url": "http://localhost:5006/Payment"
+  },
+  {
+    "key": "09_refund",
+    "caption": "Request Refund / Complaint",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/09_refund.png",
+    "url": "http://localhost:5006/Refund"
+  },
+  {
+    "key": "10_contact",
+    "caption": "Contact Us",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/10_contact.png",
+    "url": "http://localhost:5006/Contact"
+  },
+  {
+    "key": "11_faq",
+    "caption": "FAQ",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/11_faq.png",
+    "url": "http://localhost:5006/Faq"
+  },
+  {
+    "key": "12_sell_create",
+    "caption": "Create Auction / Sell (requires login)",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/12_sell_create.png",
+    "url": "http://localhost:5006/?returnUrl=%2FSell%2FCreate"
+  },
+  {
+    "key": "13_order_center",
+    "caption": "Payment Center / Orders (requires login)",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/13_order_center.png",
+    "url": "http://localhost:5006/?returnUrl=%2FOrder"
+  },
+  {
+    "key": "14_account_bids",
+    "caption": "My Bids - Personal activity (requires login)",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/14_account_bids.png",
+    "url": "http://localhost:5006/?returnUrl=%2FAccount%2FBids"
+  },
+  {
+    "key": "15_auction_detail_bid_area",
+    "caption": "Auction Detail - Bid area",
+    "path": "/Users/macbook/RiderProjects/Nhom3/_screenshots/15_auction_detail_bid_area.png",
+    "url": "http://localhost:5006/Auction/Detail/4993"
+  }
+]

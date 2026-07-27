@@ -1,0 +1,74 @@
+[
+  {
+    "slide": 1,
+    "title": "Giới thiệu đề tài",
+    "folder": "_screenshots/canva_slides/01_gioi_thieu_de_tai",
+    "primary": "01_home_hero.png"
+  },
+  {
+    "slide": 2,
+    "title": "Giới thiệu thành viên",
+    "folder": "_screenshots/canva_slides/02_thanh_vien",
+    "primary": "02_team_collage.png"
+  },
+  {
+    "slide": 3,
+    "title": "Mục lục",
+    "folder": "_screenshots/canva_slides/03_muc_luc",
+    "primary": "03_toc_banner.png"
+  },
+  {
+    "slide": 4,
+    "title": "Giới thiệu bài toán",
+    "folder": "_screenshots/canva_slides/04_gioi_thieu_bai_toan",
+    "primary": "04_split_marketplace_detail.png"
+  },
+  {
+    "slide": 5,
+    "title": "Chức năng người dùng",
+    "folder": "_screenshots/canva_slides/05_chuc_nang_nguoi_dung",
+    "primary": "05_collage_auth_bid_order.png"
+  },
+  {
+    "slide": 6,
+    "title": "Chức năng Admin",
+    "folder": "_screenshots/canva_slides/06_chuc_nang_admin",
+    "primary": "06_collage_dashboard_verify_complaints.png"
+  },
+  {
+    "slide": 7,
+    "title": "Activity Diagram",
+    "folder": "_screenshots/canva_slides/07_activity_diagram",
+    "primary": "07_collage_register_bid_payment.png"
+  },
+  {
+    "slide": 8,
+    "title": "Kiến trúc hệ thống",
+    "folder": "_screenshots/canva_slides/08_kien_truc_he_thong",
+    "primary": "08_architecture_diagram.png"
+  },
+  {
+    "slide": 9,
+    "title": "Database",
+    "folder": "_screenshots/canva_slides/09_database",
+    "primary": "09_class_erd_diagram.png"
+  },
+  {
+    "slide": 10,
+    "title": "Công nghệ sử dụng",
+    "folder": "_screenshots/canva_slides/10_cong_nghe",
+    "primary": "10_tech_stack_banner.png"
+  },
+  {
+    "slide": 11,
+    "title": "Kết luận",
+    "folder": "_screenshots/canva_slides/11_ket_luan",
+    "primary": "11_conclusion_roadmap.png"
+  },
+  {
+    "slide": 12,
+    "title": "Cảm ơn",
+    "folder": "_screenshots/canva_slides/12_cam_on",
+    "primary": "12_home_hero_thanks.png"
+  }
+]
