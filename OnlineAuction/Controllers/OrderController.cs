@@ -1,10 +1,13 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OnlineAuction.Configurations;
+using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Helpers;
 using OnlineAuction.Models;
+using OnlineAuction.Services;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Controllers;
@@ -17,19 +20,22 @@ public class OrderController : Controller
     private readonly IOrderPaymentService _orderPaymentService;
     private readonly INotificationService _notificationService;
     private readonly INotificationLocalizer _notifyLocalizer;
+    private readonly AuctionHouseDbContext _dbContext;
 
     public OrderController(
         IOrderService orderService,
         IOrderCreationService orderCreationService,
         IOrderPaymentService orderPaymentService,
         INotificationService notificationService,
-        INotificationLocalizer notifyLocalizer)
+        INotificationLocalizer notifyLocalizer,
+        AuctionHouseDbContext dbContext)
     {
         _orderService = orderService;
         _orderCreationService = orderCreationService;
         _orderPaymentService = orderPaymentService;
         _notificationService = notificationService;
         _notifyLocalizer = notifyLocalizer;
+        _dbContext = dbContext;
     }
 
     public async Task<IActionResult> Index()
@@ -48,6 +54,41 @@ public class OrderController : Controller
         }
 
         return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ClearBuyNow()
+    {
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        var now = DateTime.UtcNow;
+        var buyNowOrders = await _dbContext.Orders
+            .Include(order => order.Items)
+            .Where(order =>
+                order.BuyerId == userId.Value &&
+                order.Status == OrderStatuses.PendingPayment &&
+                order.DeletedAt == null &&
+                order.OrderSource == OrderSources.BuyNow)
+            .ToListAsync();
+
+        foreach (var order in buyNowOrders)
+        {
+            order.Status = OrderStatuses.Cancelled;
+            order.UpdatedAt = now;
+            await OrderCancellationHelper.ApplyCancellationSideEffectsAsync(_dbContext, order, now);
+        }
+
+        if (buyNowOrders.Count > 0)
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]

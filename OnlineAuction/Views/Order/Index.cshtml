@@ -4,6 +4,7 @@
 @model OnlineAuction.Models.OrderPageViewModel
 @{
     ViewData["Title"] = Localizer["Order_PageTitle"];
+    var hasBuyNowItems = Model.Items.Any(item => item.OrderSource == OrderSources.BuyNow);
     var orderI18n = new Dictionary<string, string>
     {
         ["remainingHours"] = Localizer["Js_Order_RemainingHours"].Value,
@@ -65,6 +66,17 @@
 
         <div class="order-checkout__layout">
           <div class="order-checkout__main">
+            @if (hasBuyNowItems)
+            {
+              <div class="mb-4 flex justify-end">
+                <button type="submit"
+                        class="inline-flex items-center rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100"
+                        formaction="@Url.Action("ClearBuyNow", "Order")"
+                        formmethod="post">
+                  Clear all Buy Now items
+                </button>
+              </div>
+            }
             <div class="order-invoice-list">
           @foreach (var item in Model.Items)
           {
