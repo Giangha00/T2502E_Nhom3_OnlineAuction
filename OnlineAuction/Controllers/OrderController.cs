@@ -67,14 +67,16 @@ public class OrderController : Controller
         }
 
         var now = DateTime.UtcNow;
-        var buyNowOrders = await _dbContext.Orders
+        var pendingOrders = await _dbContext.Orders
             .Include(order => order.Items)
             .Where(order =>
                 order.BuyerId == userId.Value &&
                 order.Status == OrderStatuses.PendingPayment &&
-                order.DeletedAt == null &&
-                order.OrderSource == OrderSources.BuyNow)
+                order.DeletedAt == null)
             .ToListAsync();
+        var buyNowOrders = pendingOrders
+            .Where(order => OrderCheckoutSelection.ResolveOrderSource(order) == OrderSources.BuyNow)
+            .ToList();
 
         foreach (var order in buyNowOrders)
         {
