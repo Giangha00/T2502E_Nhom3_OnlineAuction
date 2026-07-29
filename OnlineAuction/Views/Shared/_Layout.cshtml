@@ -322,7 +322,7 @@
                                         class="@FooterLinkClass(isFaqPage)">@Localizer["Layout_Footer_HowToBid"]</a></li>
                                 <li><a asp-controller="Faq" asp-action="Index" asp-fragment="faq-selling"
                                         class="@FooterLinkClass(isFaqPage)">@Localizer["Layout_Footer_SellerGuide"]</a></li>
-                                <li><a href="/Admin/Account/Login?force=true" class="@FooterLinkClass(false)">Admin Login</a></li>
+                                <li><a href="/Admin/Account/Login?force=true" class="@FooterLinkClass(false)">@Localizer["Layout_Footer_AdminLogin"]</a></li>
                             </ul>
                         </div>
                         <div>
@@ -346,6 +346,12 @@
     }
 
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        window.homeCarouselI18n = {
+            showingZero: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Home_Carousel_ShowingZero"].Value)),
+            showingRange: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Home_Carousel_ShowingRange"].Value))
+        };
+    </script>
     @if (!isStandalonePage)
     {
         <script>

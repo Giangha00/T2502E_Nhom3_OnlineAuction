@@ -36,6 +36,10 @@ public class BuyNowDetailViewModel
 
     public string? ImageUrl { get; set; }
 
+    public IReadOnlyList<string> GalleryImages { get; set; } = [];
+
+    public IReadOnlyList<BuyNowDocumentViewModel> Documents { get; set; } = [];
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime? VerifiedAt { get; set; }

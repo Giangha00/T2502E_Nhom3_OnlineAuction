@@ -6,20 +6,20 @@
            data-home-carousel
            data-home-carousel-header-nav>
     <div class="mb-6 flex flex-col gap-4 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
-      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Recommended</h2>
+      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">@Localizer["Home_Recommended_Title"]</h2>
       <div class="flex flex-wrap items-center gap-3 sm:gap-4">
-        <span class="text-sm text-slate-500" data-home-carousel-range>Showing 1–@Math.Min(4, Model.Recommended.Count) of @Model.Recommended.Count</span>
+        <span class="text-sm text-slate-500" data-home-carousel-range>@Localizer["Home_Carousel_ShowingRange", 1, Math.Min(4, Model.Recommended.Count), Model.Recommended.Count]</span>
         <div class="flex items-center gap-1">
           <button type="button"
                   class="home-carousel-header-btn"
                   data-home-carousel-prev
-                  aria-label="Scroll recommended left">
+                  aria-label="@Localizer["Home_Carousel_ScrollLeft"]">
             ‹
           </button>
           <button type="button"
                   class="home-carousel-header-btn"
                   data-home-carousel-next
-                  aria-label="Scroll recommended right">
+                  aria-label="@Localizer["Home_Carousel_ScrollRight"]">
             ›
           </button>
         </div>

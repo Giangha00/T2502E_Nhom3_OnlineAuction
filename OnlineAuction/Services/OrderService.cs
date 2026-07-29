@@ -107,6 +107,7 @@ public class OrderService : IOrderService
         }
 
         await CancelExpiredPendingOrdersAsync(buyerId);
+        await CancelInvalidPendingOrdersAsync(buyerId);
 
         var now = DateTime.UtcNow;
         var orders = await _dbContext.Orders
@@ -114,18 +115,19 @@ public class OrderService : IOrderService
             .Include(order => order.Items)
                 .ThenInclude(item => item.Auction)
                     .ThenInclude(auction => auction.Product)
-            .Where(order =>
-                order.BuyerId == buyerId &&
-                order.Status == OrderStatuses.PendingPayment &&
-                order.DeletedAt == null &&
-                order.PaymentDeadline > now)
+            .Where(BuildPayableOrdersFilter(buyerId, now))
             .OrderBy(order => order.PaymentDeadline)
             .ToListAsync();
 
         var items = orders
             .Select(order =>
             {
-                var item = order.Items.First();
+                var item = order.Items.FirstOrDefault();
+                if (item is null)
+                {
+                    return null;
+                }
+
                 var orderSource = OrderCheckoutSelection.ResolveOrderSource(order);
                 var isMandatory = orderSource == OrderSources.AuctionWin;
 
@@ -150,6 +152,8 @@ public class OrderService : IOrderService
                     IsSelectedByDefault = isMandatory
                 };
             })
+            .Where(item => item is not null)
+            .Cast<WonOrderItem>()
             .ToList();
 
         var selectedItems = items.Where(item => item.IsSelectedByDefault).ToList();
@@ -186,12 +190,14 @@ public class OrderService : IOrderService
         return model;
     }
 
-    public Task<int> CountPendingPaymentOrdersAsync(int buyerId) =>
-        _dbContext.Orders.CountAsync(order =>
-            order.BuyerId == buyerId &&
-            order.Status == OrderStatuses.PendingPayment &&
-            order.DeletedAt == null &&
-            order.PaymentDeadline > DateTime.UtcNow);
+    public async Task<int> CountPendingPaymentOrdersAsync(int buyerId)
+    {
+        await CancelExpiredPendingOrdersAsync(buyerId);
+        await CancelInvalidPendingOrdersAsync(buyerId);
+
+        var now = DateTime.UtcNow;
+        return await _dbContext.Orders.CountAsync(BuildPayableOrdersFilter(buyerId, now));
+    }
 
     public async Task<int> CancelExpiredPendingOrdersAsync(int buyerId)
     {
@@ -207,6 +213,32 @@ public class OrderService : IOrderService
             .ToListAsync();
 
         return await CancelOrdersAsync(expiredOrders, now);
+    }
+
+    private async Task CancelInvalidPendingOrdersAsync(int buyerId)
+    {
+        var now = DateTime.UtcNow;
+        var invalidOrders = await _dbContext.Orders
+            .Include(order => order.Items)
+            .Where(order =>
+                order.BuyerId == buyerId &&
+                order.Status == OrderStatuses.PendingPayment &&
+                order.DeletedAt == null &&
+                !order.Items.Any())
+            .ToListAsync();
+
+        if (invalidOrders.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var order in invalidOrders)
+        {
+            order.Status = OrderStatuses.Cancelled;
+            order.UpdatedAt = now;
+        }
+
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task<int> CancelAllExpiredPendingOrdersAsync()
@@ -399,4 +431,12 @@ public class OrderService : IOrderService
 
         return parts.Count > 0 ? string.Join(" · ", parts) : product.ShortDescription ?? string.Empty;
     }
+
+    private static System.Linq.Expressions.Expression<Func<AuctionOrder, bool>> BuildPayableOrdersFilter(int buyerId, DateTime now) =>
+        order =>
+            order.BuyerId == buyerId &&
+            order.Status == OrderStatuses.PendingPayment &&
+            order.DeletedAt == null &&
+            order.PaymentDeadline > now &&
+            order.Items.Any();
 }

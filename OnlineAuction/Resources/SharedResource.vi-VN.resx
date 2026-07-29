@@ -177,8 +177,10 @@
   <data name="Common_Cancel" xml:space="preserve">
     <value>Hủy</value>
   </data>
-  <data name="ConfirmModal_Confirm" xml:space="preserve"><value>Xác nhận</value></data>
-  <data name="ConfirmModal_RegisterAuction_Title" xml:space="preserve"><value>Đăng ký tham gia đấu giá?</value></data>
+  <data name="ConfirmModal_Confirm" xml:space="preserve">
+    <value>Xác nhận</value>
+  </data>
+<data name="ConfirmModal_RegisterAuction_Title" xml:space="preserve"><value>Đăng ký tham gia đấu giá?</value></data>
   <data name="ConfirmModal_RegisterAuction_Message" xml:space="preserve"><value>Bạn sẽ thanh toán tiền cọc {0} qua PayPal để đăng ký phiên đấu giá này.</value></data>
   <data name="ConfirmModal_RegisterAuction_Note" xml:space="preserve"><value>Sau khi thanh toán thành công, bạn mới có thể đặt giá khi phiên live bắt đầu.</value></data>
   <data name="ConfirmModal_CancelRegistration_Title" xml:space="preserve"><value>Hủy đăng ký đấu giá?</value></data>
@@ -1291,4 +1293,358 @@
   <data name="Notification_PayPalAnomalyAutoRefund_Title" xml:space="preserve"><value>Bất thường PayPal đã tự hoàn tiền</value></data>
   <data name="Notification_PayPalAnomalyManual_Title" xml:space="preserve"><value>Bất thường PayPal cần xử lý thủ công</value></data>
   <data name="Notification_PayPalAnomaly_Message" xml:space="preserve"><value>Flow={0}; PayPalOrderId={1}; CaptureId={2}; Expected={3}; Captured={4}; Reason={5}; RefundSucceeded={6}; RefundError={7}</value></data>
+  <data name="Layout_Footer_Address" xml:space="preserve">
+    <value>Tòa nhà FPT Polytechnic, Trịnh Văn Bô, Xuân Phương, Hà Nội 100000, Việt Nam</value>
+  </data>
+  <data name="Product_MoreRelatedTitle" xml:space="preserve">
+    <value>Thêm tin liên quan</value>
+  </data>
+  <data name="Product_SimilarListingsTitle" xml:space="preserve">
+    <value>Tin đăng tương tự</value>
+  </data>
+  <data name="User_SellerStats_Title" xml:space="preserve">
+    <value>Thống kê người bán</value>
+  </data>
+  <data name="User_SellerStats_Description" xml:space="preserve">
+    <value>Tổng quan hiệu suất của người bán này.</value>
+  </data>
+  <data name="Admin_Dashboard_Col_NetProceeds" xml:space="preserve">
+    <value>Doanh thu ròng</value>
+  </data>
+  <data name="AdminProduct.ClearSelection" xml:space="preserve">
+    <value>Bỏ chọn</value>
+  </data>
+  <data name="AdminProduct.CurrentPrimary" xml:space="preserve">
+    <value>Ảnh chính hiện tại</value>
+  </data>
+  <data name="AdminProduct.MarkedForRemoval" xml:space="preserve">
+    <value>Đã đánh dấu xóa</value>
+  </data>
+  <data name="AdminProduct.UndoRemove" xml:space="preserve">
+    <value>Hoàn tác xóa</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.CloseLightbox" xml:space="preserve">
+    <value>Đóng</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.GalleryLimit" xml:space="preserve">
+    <value>Bạn có thể tải tối đa {0} ảnh gallery.</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.GalleryPartial" xml:space="preserve">
+    <value>Chỉ thêm được {0}/{1} ảnh đã chọn (giới hạn gallery).</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.InvalidFormat" xml:space="preserve">
+    <value>Định dạng ảnh không hợp lệ. Dùng JPG, PNG, WEBP hoặc GIF.</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.SizeLimit" xml:space="preserve">
+    <value>Mỗi ảnh tối đa {0} MB.</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.TemplateInvalidFormat" xml:space="preserve">
+    <value>Định dạng ảnh template không hợp lệ. Dùng JPG, PNG, WEBP hoặc GIF.</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.TemplateSizeLimit" xml:space="preserve">
+    <value>Mỗi ảnh template tối đa {0} MB.</value>
+  </data>
+  <data name="Home_Recommended_Title" xml:space="preserve">
+    <value>Đề xuất</value>
+  </data>
+  <data name="Home_TrendingAuction_Title" xml:space="preserve">
+    <value>Đang thịnh hành trên đấu giá</value>
+  </data>
+  <data name="Home_TrendingBuyNow_Title" xml:space="preserve">
+    <value>Đang thịnh hành trên mua ngay</value>
+  </data>
+  <data name="Home_RecentlyAdded_Title" xml:space="preserve">
+    <value>Mới thêm gần đây</value>
+  </data>
+  <data name="Home_BestSeller_Title" xml:space="preserve">
+    <value>Người bán hàng đầu</value>
+  </data>
+  <data name="Home_LatestFromVault_Title" xml:space="preserve">
+    <value>Mới từ Vault</value>
+  </data>
+  <data name="Home_Carousel_ShowingZero" xml:space="preserve">
+    <value>Hiển thị 0 mục</value>
+  </data>
+  <data name="Home_Carousel_ShowingRange" xml:space="preserve">
+    <value>Hiển thị {0} – {1} / {2}</value>
+  </data>
+  <data name="Home_Carousel_ScrollLeft" xml:space="preserve">
+    <value>Cuộn sang trái</value>
+  </data>
+  <data name="Home_Carousel_ScrollRight" xml:space="preserve">
+    <value>Cuộn sang phải</value>
+  </data>
+  <data name="Catalog_NoCardsFound" xml:space="preserve">
+    <value>Không tìm thấy thẻ nào</value>
+  </data>
+  <data name="Catalog_TryAdjustFilters" xml:space="preserve">
+    <value>Hãy thử điều chỉnh bộ lọc hoặc tìm kiếm.</value>
+  </data>
+  <data name="Catalog_Previous" xml:space="preserve">
+    <value>← Trước</value>
+  </data>
+  <data name="Catalog_Next" xml:space="preserve">
+    <value>Sau →</value>
+  </data>
+  <data name="Common_Min" xml:space="preserve">
+    <value>Tối thiểu</value>
+  </data>
+  <data name="Common_Max" xml:space="preserve">
+    <value>Tối đa</value>
+  </data>
+  <data name="Common_AddToWatchlist" xml:space="preserve">
+    <value>Thêm vào danh sách theo dõi</value>
+  </data>
+  <data name="Common_RemoveFromWatchlist" xml:space="preserve">
+    <value>Xóa khỏi danh sách theo dõi</value>
+  </data>
+  <data name="Layout_Footer_AdminLogin" xml:space="preserve">
+    <value>Đăng nhập Admin</value>
+  </data>
+  <data name="Faq_StillNeedHelp" xml:space="preserve">
+    <value>Vẫn cần hỗ trợ?</value>
+  </data>
+  <data name="Refund_EvidenceLinks" xml:space="preserve">
+    <value>Liên kết bằng chứng</value>
+  </data>
+  <data name="Refund_EvidenceLinks_Hint" xml:space="preserve">
+    <value>Tùy chọn. Thêm tối đa 5 liên kết HTTPS (ảnh hoặc tài liệu).</value>
+  </data>
+  <data name="Contact_Map_Address" xml:space="preserve">
+    <value>Tòa nhà FPT Polytechnic, Trịnh Văn Bô, Xuân Phương, Nam Từ Liêm, Hà Nội</value>
+  </data>
+  <data name="Contact_Map_ShortAddress" xml:space="preserve">
+    <value>FPT Polytechnic, Hà Nội</value>
+  </data>
+  <data name="Auth_Error_InvalidCredentials" xml:space="preserve">
+    <value>Email hoặc mật khẩu không đúng.</value>
+  </data>
+  <data name="Auth_Error_AccountDeactivated" xml:space="preserve">
+    <value>Tài khoản của bạn đã bị vô hiệu hóa.</value>
+  </data>
+  <data name="Auth_Error_AccountLocked" xml:space="preserve">
+    <value>Tài khoản bị khóa do nhiều lần đăng nhập sai. Vui lòng thử lại sau.</value>
+  </data>
+  <data name="Auth_Error_SignInNotAllowed" xml:space="preserve">
+    <value>Tài khoản này không được phép đăng nhập.</value>
+  </data>
+  <data name="Auth_Error_AccountNotActivated" xml:space="preserve">
+    <value>Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để hoàn tất đăng ký.</value>
+  </data>
+  <data name="Auth_Error_TwoFactorRequired" xml:space="preserve">
+    <value>Yêu cầu xác thực hai yếu tố.</value>
+  </data>
+  <data name="Auth_Error_EmailExists" xml:space="preserve">
+    <value>Email đã tồn tại.</value>
+  </data>
+  <data name="Auth_Error_ActivationEmailFailed" xml:space="preserve">
+    <value>Không gửi được email kích hoạt. Vui lòng thử lại sau.</value>
+  </data>
+  <data name="Auth_Success_SignupCheckEmail" xml:space="preserve">
+    <value>Đăng ký thành công. Vui lòng kiểm tra email và xác thực tài khoản trước khi đăng nhập.</value>
+  </data>
+  <data name="Auth_Success_ResentActivation" xml:space="preserve">
+    <value>Email này đã đăng ký nhưng chưa kích hoạt. Chúng tôi đã gửi lại email kích hoạt. Vui lòng xác thực trước khi đăng nhập.</value>
+  </data>
+  <data name="Auth_Success_SmokeSignup" xml:space="preserve">
+    <value>Đăng ký thành công (smoke). Xác thực qua /Smoke/ConfirmEmail trước khi đăng nhập.</value>
+  </data>
+  <data name="Auth_Activate_InvalidLink" xml:space="preserve">
+    <value>Link kích hoạt không hợp lệ.</value>
+  </data>
+  <data name="Auth_Activate_Success" xml:space="preserve">
+    <value>Kích hoạt tài khoản thành công. Bạn có thể đăng nhập ngay.</value>
+  </data>
+  <data name="Admin_Auction_ConfirmDelete" xml:space="preserve">
+    <value>Bạn có chắc muốn xóa phiên #{0}?</value>
+  </data>
+  <data name="Admin_Auction_ConfirmCancel" xml:space="preserve">
+    <value>Hủy phiên #{0}?</value>
+  </data>
+  <data name="Admin_Auction_LiveLockBanner" xml:space="preserve">
+    <value>Phiên đang live — trạng thái và lịch đăng ký/bắt đầu bị khóa. Chỉ có thể gia hạn thời gian kết thúc và cập nhật mô tả.</value>
+  </data>
+<data name="Admin_Product_CannotDeleteHasAuctions" xml:space="preserve">
+    <value>Không thể xóa sản phẩm này vì đang gắn với phiên đấu giá.</value>
+  </data>
+  <data name="ConfirmModal_Cancel" xml:space="preserve">
+    <value>Hủy</value>
+  </data>
+  <data name="Auth_Activate_UserNotFound" xml:space="preserve">
+    <value>Không tìm thấy tài khoản cần kích hoạt.</value>
+  </data>
+  <data name="Auth_Activate_AlreadyActivated" xml:space="preserve">
+    <value>Tài khoản đã được kích hoạt trước đó. Bạn có thể đăng nhập.</value>
+  </data>
+  <data name="Auth_Activate_InvalidOrChanged" xml:space="preserve">
+    <value>Link kích hoạt không hợp lệ hoặc đã bị thay đổi.</value>
+  </data>
+  <data name="Auth_Activate_FailedExpired" xml:space="preserve">
+    <value>Không thể kích hoạt tài khoản. Link có thể đã hết hạn.</value>
+  </data>
+  <data name="Admin_Auction_ConfirmCancelInstead" xml:space="preserve">
+    <value>Hủy phiên #{0} thay vì xóa?</value>
+  </data>
+  <data name="Admin_Product_CannotDeleteBecause" xml:space="preserve">
+    <value>Không thể xóa sản phẩm này vì {0}</value>
+  </data>
+  <data name="Faq_StillNeedHelp_Desc" xml:space="preserve">
+    <value>Không tìm thấy thông tin bạn cần? Liên hệ đội ngũ của chúng tôi hoặc gửi yêu cầu hoàn tiền.</value>
+  </data>
+  <data name="AdminMsg_Template_NeedPrimaryImage" xml:space="preserve">
+    <value>Vui lòng tải ảnh chính cho mẫu sản phẩm.</value>
+  </data>
+  <data name="AdminMsg_Template_Created" xml:space="preserve">
+    <value>Đã tạo mẫu sản phẩm thành công.</value>
+  </data>
+  <data name="AdminMsg_Template_MissingId" xml:space="preserve">
+    <value>Thiếu mã mẫu sản phẩm.</value>
+  </data>
+  <data name="AdminMsg_Template_NotFound" xml:space="preserve">
+    <value>Không tìm thấy mẫu sản phẩm.</value>
+  </data>
+  <data name="AdminMsg_Template_Updated" xml:space="preserve">
+    <value>Đã cập nhật mẫu sản phẩm thành công.</value>
+  </data>
+  <data name="AdminMsg_Template_CannotDeleteInUse" xml:space="preserve">
+    <value>Không thể xóa mẫu sản phẩm đang có sản phẩm của người bán.</value>
+  </data>
+  <data name="AdminMsg_Template_Deleted" xml:space="preserve">
+    <value>Đã xóa mẫu sản phẩm thành công.</value>
+  </data>
+  <data name="AdminMsg_Product_GalleryLimit" xml:space="preserve">
+    <value>Chỉ được tải tối đa {0} ảnh thư viện cho mỗi sản phẩm.</value>
+  </data>
+  <data name="AdminMsg_Product_Created" xml:space="preserve">
+    <value>Đã tạo sản phẩm thành công.</value>
+  </data>
+  <data name="AdminMsg_Product_MissingId" xml:space="preserve">
+    <value>Thiếu mã sản phẩm.</value>
+  </data>
+  <data name="AdminMsg_Product_NotFound" xml:space="preserve">
+    <value>Không tìm thấy sản phẩm.</value>
+  </data>
+  <data name="AdminMsg_Product_CannotChangeSellerLive" xml:space="preserve">
+    <value>Không thể đổi người bán khi sản phẩm đang có phiên đấu giá đang diễn ra hoặc sắp kết thúc.</value>
+  </data>
+  <data name="AdminMsg_Product_CannotChangeTemplateLive" xml:space="preserve">
+    <value>Không thể đổi mẫu sản phẩm khi sản phẩm đang có phiên đấu giá đang diễn ra hoặc sắp kết thúc.</value>
+  </data>
+  <data name="AdminMsg_Product_GalleryMax" xml:space="preserve">
+    <value>Thư viện chỉ được có tối đa {0} ảnh.</value>
+  </data>
+  <data name="AdminMsg_Product_DocumentsMax" xml:space="preserve">
+    <value>Mỗi sản phẩm chỉ được có tối đa {0} tài liệu.</value>
+  </data>
+  <data name="AdminMsg_Product_Updated" xml:space="preserve">
+    <value>Đã cập nhật sản phẩm thành công.</value>
+  </data>
+  <data name="AdminMsg_Product_CannotDeleteBecause" xml:space="preserve">
+    <value>Không thể xóa sản phẩm này vì {0}</value>
+  </data>
+  <data name="AdminMsg_Product_Deleted" xml:space="preserve">
+    <value>Đã xóa sản phẩm thành công.</value>
+  </data>
+  <data name="AdminMsg_Product_SelectAtLeastOne" xml:space="preserve">
+    <value>Vui lòng chọn ít nhất một sản phẩm.</value>
+  </data>
+  <data name="AdminMsg_Product_NoneFound" xml:space="preserve">
+    <value>Không tìm thấy sản phẩm nào.</value>
+  </data>
+  <data name="AdminMsg_Product_BulkDeleted" xml:space="preserve">
+    <value>Đã xóa {0} sản phẩm thành công.</value>
+  </data>
+  <data name="AdminMsg_Product_BulkDeletedWithSkip" xml:space="preserve">
+    <value>Đã xóa {0} sản phẩm. Bỏ qua {1}: {2}</value>
+  </data>
+  <data name="AdminMsg_Product_BlockingAuction" xml:space="preserve">
+    <value>phiên đấu giá #{0} đang ở trạng thái {1}.</value>
+  </data>
+  <data name="AdminMsg_Template_Unavailable" xml:space="preserve">
+    <value>Mẫu sản phẩm đã chọn không khả dụng.</value>
+  </data>
+  <data name="AdminMsg_Seller_Unavailable" xml:space="preserve">
+    <value>Người bán đã chọn không khả dụng.</value>
+  </data>
+  <data name="AdminMsg_Documents_UploadMax" xml:space="preserve">
+    <value>Chỉ được tải tối đa {0} tài liệu cho mỗi sản phẩm.</value>
+  </data>
+  <data name="AdminMsg_Documents_SizeLimit" xml:space="preserve">
+    <value>Dung lượng tài liệu không được vượt quá 5MB.</value>
+  </data>
+  <data name="AdminMsg_Documents_PdfOnly" xml:space="preserve">
+    <value>Tài liệu phải là file PDF.</value>
+  </data>
+  <data name="AdminMsg_Condition_Graded" xml:space="preserve">
+    <value>Đã chấm điểm</value>
+  </data>
+  <data name="AdminMsg_Condition_Ungraded" xml:space="preserve">
+    <value>Chưa chấm điểm</value>
+  </data>
+  <data name="AdminMsg_Category_Unavailable" xml:space="preserve">
+    <value>Danh mục đã chọn không khả dụng.</value>
+  </data>
+  <data name="AdminMsg_Template_PrimarySize" xml:space="preserve">
+    <value>Ảnh chính của mẫu sản phẩm không được vượt quá 2MB.</value>
+  </data>
+  <data name="AdminMsg_Template_PrimaryFormat" xml:space="preserve">
+    <value>Ảnh chính của mẫu sản phẩm phải là JPEG hoặc PNG.</value>
+  </data>
+  <data name="AdminMsg_Template_Duplicate" xml:space="preserve">
+    <value>Đã tồn tại mẫu sản phẩm đang hoạt động với thông tin trùng khớp.</value>
+  </data>
+  <data name="AdminMsg_Status_Live" xml:space="preserve">
+    <value>đang diễn ra</value>
+  </data>
+  <data name="AdminMsg_Status_EndingSoon" xml:space="preserve">
+    <value>sắp kết thúc</value>
+  </data>
+  <data name="AdminMsg_Status_AwaitingPayment" xml:space="preserve">
+    <value>đang chờ thanh toán</value>
+  </data>
+  <data name="AdminMsg_Auction_StartingPriceExceeds" xml:space="preserve">
+    <value>Giá khởi điểm không được vượt giá hiện tại khi đã có bid.</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotShortenEndLive" xml:space="preserve">
+    <value>Không thể rút ngắn thời gian kết thúc khi phiên đang live.</value>
+  </data>
+  <data name="AdminMsg_Auction_Updated" xml:space="preserve">
+    <value>Cập nhật phiên đấu giá thành công.</value>
+  </data>
+  <data name="AdminMsg_BuyNow_Updated" xml:space="preserve">
+    <value>Đã cập nhật tin Mua ngay thành công.</value>
+  </data>
+  <data name="AdminMsg_Auction_NotFound" xml:space="preserve">
+    <value>Không tìm thấy phiên đấu giá.</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotCancelLinkedOrder" xml:space="preserve">
+    <value>Không thể hủy phiên đã liên kết order.</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotCancelStatus" xml:space="preserve">
+    <value>Phiên này không thể hủy ở trạng thái hiện tại.</value>
+  </data>
+  <data name="AdminMsg_Auction_Cancelled" xml:space="preserve">
+    <value>Đã hủy phiên đấu giá thành công.</value>
+  </data>
+  <data name="AdminMsg_Auction_Deleted" xml:space="preserve">
+    <value>Đã xóa phiên đấu giá thành công.</value>
+  </data>
+  <data name="AdminMsg_Auction_EndedOrCancelled" xml:space="preserve">
+    <value>Phiên đã kết thúc hoặc đã hủy.</value>
+  </data>
+  <data name="AdminMsg_Auction_DeleteBlockedOrder" xml:space="preserve">
+    <value>Không xóa được — phiên đã liên kết order.</value>
+  </data>
+  <data name="AdminMsg_Auction_DeleteBlockedBids" xml:space="preserve">
+    <value>Không xóa được — đã có {0} bid. Hãy Cancel thay vì Delete.</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotDelete" xml:space="preserve">
+    <value>Không thể xóa phiên đấu giá này.</value>
+  </data>
+  <data name="AdminMsg_Auction_BulkDeleted" xml:space="preserve">
+    <value>Đã xóa {0}/{1} phiên đấu giá.</value>
+  </data>
+  <data name="AdminMsg_Auction_BulkDeletedWithSkip" xml:space="preserve">
+    <value>Đã xóa {0}/{1}; bỏ qua: {2}</value>
+  </data>
 </root>

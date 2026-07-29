@@ -9,20 +9,6 @@
         ["Hint"] = Localizer["Admin_Dashboard_Gmv_Hint"].Value
     })
 
-    @await Html.PartialAsync("_DashboardKpiCard", Model.UserSection.NewRegistrationsKpi, new ViewDataDictionary(ViewData)
-    {
-        ["Label"] = Localizer["Admin_Dashboard_Kpi_NewRegistrations"].Value,
-        ["Tone"] = "purple",
-        ["Hint"] = Localizer["Admin_Dashboard_FilteredPeriod_Note"].Value
-    })
-
-    @await Html.PartialAsync("_DashboardKpiCard", Model.UserSection.ActiveUsersKpi, new ViewDataDictionary(ViewData)
-    {
-        ["Label"] = Localizer["Admin_Dashboard_Kpi_ActiveUsers"].Value,
-        ["Tone"] = "brand",
-        ["Hint"] = Localizer["Admin_Dashboard_FilteredPeriod_Note"].Value
-    })
-
     @await Html.PartialAsync("_DashboardKpiCard", Model.AuctionSection.SuccessRateKpi, new ViewDataDictionary(ViewData)
     {
         ["Label"] = Localizer["Admin_Dashboard_Kpi_SuccessRate"].Value,

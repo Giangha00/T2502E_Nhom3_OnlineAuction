@@ -1029,4 +1029,358 @@
   <data name="Notification_OrderCancelled_Title" xml:space="preserve"><value>주문이 취소되었습니다</value></data>
   <data name="Notification_OrderCancelledBuyer_Message" xml:space="preserve"><value>{0}에 대한 주문 {1}이(가) 결제 기한 만료로 취소되었습니다.</value></data>
   <data name="Notification_OrderCancelledSeller_Message" xml:space="preserve"><value>{0}에 대한 주문 {1}이(가) 낙찰자가 기한 내 결제하지 않아 취소되었습니다.</value></data>
+  <data name="Product_MoreRelatedTitle" xml:space="preserve">
+    <value>관련 상품 더보기</value>
+  </data>
+  <data name="Product_SimilarListingsTitle" xml:space="preserve">
+    <value>유사 상품</value>
+  </data>
+  <data name="User_SellerStats_Title" xml:space="preserve">
+    <value>판매자 통계</value>
+  </data>
+  <data name="User_SellerStats_Description" xml:space="preserve">
+    <value>이 판매자의 실적 개요입니다.</value>
+  </data>
+  <data name="Admin_Dashboard_Col_NetProceeds" xml:space="preserve">
+    <value>순수익</value>
+  </data>
+  <data name="AdminProduct.ClearSelection" xml:space="preserve">
+    <value>선택 해제</value>
+  </data>
+  <data name="AdminProduct.CurrentPrimary" xml:space="preserve">
+    <value>현재 대표 이미지</value>
+  </data>
+  <data name="AdminProduct.MarkedForRemoval" xml:space="preserve">
+    <value>삭제 예정</value>
+  </data>
+  <data name="AdminProduct.UndoRemove" xml:space="preserve">
+    <value>삭제 취소</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.CloseLightbox" xml:space="preserve">
+    <value>닫기</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.GalleryLimit" xml:space="preserve">
+    <value>갤러리 이미지는 최대 {0}장까지 업로드할 수 있습니다.</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.GalleryPartial" xml:space="preserve">
+    <value>선택한 {1}장 중 {0}장만 추가되었습니다(갤러리 한도).</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.InvalidFormat" xml:space="preserve">
+    <value>잘못된 이미지 형식입니다. JPG, PNG, WEBP 또는 GIF를 사용하세요.</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.SizeLimit" xml:space="preserve">
+    <value>각 이미지는 {0}MB 이하여야 합니다.</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.TemplateInvalidFormat" xml:space="preserve">
+    <value>잘못된 템플릿 이미지 형식입니다. JPG, PNG, WEBP 또는 GIF를 사용하세요.</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.TemplateSizeLimit" xml:space="preserve">
+    <value>각 템플릿 이미지는 {0}MB 이하여야 합니다.</value>
+  </data>
+  <data name="Home_Recommended_Title" xml:space="preserve">
+    <value>추천</value>
+  </data>
+  <data name="Home_TrendingAuction_Title" xml:space="preserve">
+    <value>경매 인기</value>
+  </data>
+  <data name="Home_TrendingBuyNow_Title" xml:space="preserve">
+    <value>즉시구매 인기</value>
+  </data>
+  <data name="Home_RecentlyAdded_Title" xml:space="preserve">
+    <value>최근 추가</value>
+  </data>
+  <data name="Home_BestSeller_Title" xml:space="preserve">
+    <value>베스트 셀러</value>
+  </data>
+  <data name="Home_LatestFromVault_Title" xml:space="preserve">
+    <value>Vault 최신 소식</value>
+  </data>
+  <data name="Home_Carousel_ShowingZero" xml:space="preserve">
+    <value>0개 표시</value>
+  </data>
+  <data name="Home_Carousel_ShowingRange" xml:space="preserve">
+    <value>{2}개 중 {0} – {1} 표시</value>
+  </data>
+  <data name="Home_Carousel_ScrollLeft" xml:space="preserve">
+    <value>왼쪽으로 스크롤</value>
+  </data>
+  <data name="Home_Carousel_ScrollRight" xml:space="preserve">
+    <value>오른쪽으로 스크롤</value>
+  </data>
+  <data name="Catalog_NoCardsFound" xml:space="preserve">
+    <value>카드를 찾을 수 없습니다</value>
+  </data>
+  <data name="Catalog_TryAdjustFilters" xml:space="preserve">
+    <value>필터나 검색어를 조정해 보세요.</value>
+  </data>
+  <data name="Catalog_Previous" xml:space="preserve">
+    <value>← 이전</value>
+  </data>
+  <data name="Catalog_Next" xml:space="preserve">
+    <value>다음 →</value>
+  </data>
+  <data name="Common_Min" xml:space="preserve">
+    <value>최소</value>
+  </data>
+  <data name="Common_Max" xml:space="preserve">
+    <value>최대</value>
+  </data>
+  <data name="Common_AddToWatchlist" xml:space="preserve">
+    <value>관심 목록에 추가</value>
+  </data>
+  <data name="Common_RemoveFromWatchlist" xml:space="preserve">
+    <value>관심 목록에서 제거</value>
+  </data>
+  <data name="Layout_Footer_AdminLogin" xml:space="preserve">
+    <value>관리자 로그인</value>
+  </data>
+  <data name="Faq_StillNeedHelp" xml:space="preserve">
+    <value>도움이 더 필요하신가요?</value>
+  </data>
+  <data name="Refund_EvidenceLinks" xml:space="preserve">
+    <value>증빙 링크</value>
+  </data>
+  <data name="Refund_EvidenceLinks_Hint" xml:space="preserve">
+    <value>선택 사항. HTTPS 링크를 최대 5개 추가할 수 있습니다(이미지 또는 문서).</value>
+  </data>
+  <data name="Contact_Map_Address" xml:space="preserve">
+    <value>FPT Polytechnic 건물, Trinh Van Bo, Xuan Phuong, Nam Tu Liem, 하노이</value>
+  </data>
+  <data name="Contact_Map_ShortAddress" xml:space="preserve">
+    <value>FPT Polytechnic, 하노이</value>
+  </data>
+  <data name="Auth_Error_InvalidCredentials" xml:space="preserve">
+    <value>이메일 또는 비밀번호가 올바르지 않습니다.</value>
+  </data>
+  <data name="Auth_Error_AccountDeactivated" xml:space="preserve">
+    <value>계정이 비활성화되었습니다.</value>
+  </data>
+  <data name="Auth_Error_AccountLocked" xml:space="preserve">
+    <value>여러 번 실패하여 계정이 잠겼습니다. 나중에 다시 시도하세요.</value>
+  </data>
+  <data name="Auth_Error_SignInNotAllowed" xml:space="preserve">
+    <value>이 계정으로는 로그인할 수 없습니다.</value>
+  </data>
+  <data name="Auth_Error_AccountNotActivated" xml:space="preserve">
+    <value>계정이 아직 활성화되지 않았습니다. 이메일을 확인해 등록을 완료하세요.</value>
+  </data>
+  <data name="Auth_Error_TwoFactorRequired" xml:space="preserve">
+    <value>2단계 인증이 필요합니다.</value>
+  </data>
+  <data name="Auth_Error_EmailExists" xml:space="preserve">
+    <value>이미 등록된 이메일입니다.</value>
+  </data>
+  <data name="Auth_Error_ActivationEmailFailed" xml:space="preserve">
+    <value>활성화 이메일을 보낼 수 없습니다. 나중에 다시 시도하세요.</value>
+  </data>
+  <data name="Auth_Success_SignupCheckEmail" xml:space="preserve">
+    <value>등록이 완료되었습니다. 로그인하기 전에 이메일을 확인해 계정을 인증하세요.</value>
+  </data>
+  <data name="Auth_Success_ResentActivation" xml:space="preserve">
+    <value>이 이메일은 등록되었지만 아직 활성화되지 않았습니다. 활성화 이메일을 다시 보냈습니다. 로그인 전에 인증하세요.</value>
+  </data>
+  <data name="Auth_Success_SmokeSignup" xml:space="preserve">
+    <value>등록 성공(smoke). 로그인 전에 /Smoke/ConfirmEmail로 확인하세요.</value>
+  </data>
+  <data name="Auth_Activate_InvalidLink" xml:space="preserve">
+    <value>활성화 링크가 올바르지 않습니다.</value>
+  </data>
+  <data name="Auth_Activate_Success" xml:space="preserve">
+    <value>계정이 활성화되었습니다. 지금 로그인할 수 있습니다.</value>
+  </data>
+  <data name="Admin_Auction_ConfirmDelete" xml:space="preserve">
+    <value>경매 #{0}을(를) 삭제하시겠습니까?</value>
+  </data>
+  <data name="Admin_Auction_ConfirmCancel" xml:space="preserve">
+    <value>경매 #{0}을(를) 취소하시겠습니까?</value>
+  </data>
+  <data name="Admin_Auction_LiveLockBanner" xml:space="preserve">
+    <value>이 경매는 진행 중입니다 — 상태와 등록/시작 일정이 잠겨 있습니다. 종료 시간 연장과 설명 업데이트만 가능합니다.</value>
+  </data>
+<data name="Admin_Product_CannotDeleteHasAuctions" xml:space="preserve">
+    <value>경매에 연결되어 있어 이 상품을 삭제할 수 없습니다.</value>
+  </data>
+  <data name="ConfirmModal_Confirm" xml:space="preserve">
+    <value>확인</value>
+  </data>
+  <data name="ConfirmModal_Cancel" xml:space="preserve">
+    <value>취소</value>
+  </data>
+  <data name="Auth_Activate_UserNotFound" xml:space="preserve">
+    <value>활성화할 계정을 찾을 수 없습니다.</value>
+  </data>
+  <data name="Auth_Activate_AlreadyActivated" xml:space="preserve">
+    <value>이 계정은 이미 활성화되었습니다. 로그인할 수 있습니다.</value>
+  </data>
+  <data name="Auth_Activate_InvalidOrChanged" xml:space="preserve">
+    <value>활성화 링크가 잘못되었거나 변경되었습니다.</value>
+  </data>
+  <data name="Auth_Activate_FailedExpired" xml:space="preserve">
+    <value>계정을 활성화할 수 없습니다. 링크가 만료되었을 수 있습니다.</value>
+  </data>
+  <data name="Admin_Auction_ConfirmCancelInstead" xml:space="preserve">
+    <value>삭제 대신 경매 #{0}을(를) 취소하시겠습니까?</value>
+  </data>
+  <data name="Admin_Product_CannotDeleteBecause" xml:space="preserve">
+    <value>다음 이유로 이 상품을 삭제할 수 없습니다: {0}</value>
+  </data>
+  <data name="Faq_StillNeedHelp_Desc" xml:space="preserve">
+    <value>찾으시는 정보가 없나요? 팀에 문의하거나 환불 요청을 제출하세요.</value>
+  </data>
+  <data name="AdminMsg_Template_NeedPrimaryImage" xml:space="preserve">
+    <value>상품 템플릿의 대표 이미지를 업로드하세요.</value>
+  </data>
+  <data name="AdminMsg_Template_Created" xml:space="preserve">
+    <value>상품 템플릿이 생성되었습니다.</value>
+  </data>
+  <data name="AdminMsg_Template_MissingId" xml:space="preserve">
+    <value>상품 템플릿 ID가 필요합니다.</value>
+  </data>
+  <data name="AdminMsg_Template_NotFound" xml:space="preserve">
+    <value>상품 템플릿을 찾을 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Template_Updated" xml:space="preserve">
+    <value>상품 템플릿이 업데이트되었습니다.</value>
+  </data>
+  <data name="AdminMsg_Template_CannotDeleteInUse" xml:space="preserve">
+    <value>판매자 상품이 있는 템플릿은 삭제할 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Template_Deleted" xml:space="preserve">
+    <value>상품 템플릿이 삭제되었습니다.</value>
+  </data>
+  <data name="AdminMsg_Product_GalleryLimit" xml:space="preserve">
+    <value>상품당 갤러리 이미지는 최대 {0}장입니다.</value>
+  </data>
+  <data name="AdminMsg_Product_Created" xml:space="preserve">
+    <value>상품이 생성되었습니다.</value>
+  </data>
+  <data name="AdminMsg_Product_MissingId" xml:space="preserve">
+    <value>상품 ID가 필요합니다.</value>
+  </data>
+  <data name="AdminMsg_Product_NotFound" xml:space="preserve">
+    <value>상품을 찾을 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Product_CannotChangeSellerLive" xml:space="preserve">
+    <value>진행 중이거나 곧 종료되는 경매가 있으면 판매자를 변경할 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Product_CannotChangeTemplateLive" xml:space="preserve">
+    <value>진행 중이거나 곧 종료되는 경매가 있으면 템플릿을 변경할 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Product_GalleryMax" xml:space="preserve">
+    <value>갤러리는 최대 {0}장입니다.</value>
+  </data>
+  <data name="AdminMsg_Product_DocumentsMax" xml:space="preserve">
+    <value>상품당 문서는 최대 {0}개입니다.</value>
+  </data>
+  <data name="AdminMsg_Product_Updated" xml:space="preserve">
+    <value>상품이 업데이트되었습니다.</value>
+  </data>
+  <data name="AdminMsg_Product_CannotDeleteBecause" xml:space="preserve">
+    <value>다음 이유로 이 상품을 삭제할 수 없습니다: {0}</value>
+  </data>
+  <data name="AdminMsg_Product_Deleted" xml:space="preserve">
+    <value>상품이 삭제되었습니다.</value>
+  </data>
+  <data name="AdminMsg_Product_SelectAtLeastOne" xml:space="preserve">
+    <value>상품을 하나 이상 선택하세요.</value>
+  </data>
+  <data name="AdminMsg_Product_NoneFound" xml:space="preserve">
+    <value>상품을 찾을 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Product_BulkDeleted" xml:space="preserve">
+    <value>{0}개 상품을 삭제했습니다.</value>
+  </data>
+  <data name="AdminMsg_Product_BulkDeletedWithSkip" xml:space="preserve">
+    <value>{0}개 삭제. 건너뜀 {1}: {2}</value>
+  </data>
+  <data name="AdminMsg_Product_BlockingAuction" xml:space="preserve">
+    <value>경매 #{0}이(가) {1} 상태입니다.</value>
+  </data>
+  <data name="AdminMsg_Template_Unavailable" xml:space="preserve">
+    <value>선택한 상품 템플릿을 사용할 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Seller_Unavailable" xml:space="preserve">
+    <value>선택한 판매자를 사용할 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Documents_UploadMax" xml:space="preserve">
+    <value>상품당 문서는 최대 {0}개까지 업로드할 수 있습니다.</value>
+  </data>
+  <data name="AdminMsg_Documents_SizeLimit" xml:space="preserve">
+    <value>문서 크기는 5MB를 초과할 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Documents_PdfOnly" xml:space="preserve">
+    <value>문서는 PDF 파일이어야 합니다.</value>
+  </data>
+  <data name="AdminMsg_Condition_Graded" xml:space="preserve">
+    <value>등급 완료</value>
+  </data>
+  <data name="AdminMsg_Condition_Ungraded" xml:space="preserve">
+    <value>미등급</value>
+  </data>
+  <data name="AdminMsg_Category_Unavailable" xml:space="preserve">
+    <value>선택한 카테고리를 사용할 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Template_PrimarySize" xml:space="preserve">
+    <value>템플릿 대표 이미지는 2MB를 초과할 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Template_PrimaryFormat" xml:space="preserve">
+    <value>템플릿 대표 이미지는 JPEG 또는 PNG여야 합니다.</value>
+  </data>
+  <data name="AdminMsg_Template_Duplicate" xml:space="preserve">
+    <value>일치하는 활성 상품 템플릿이 이미 있습니다.</value>
+  </data>
+  <data name="AdminMsg_Status_Live" xml:space="preserve">
+    <value>진행 중</value>
+  </data>
+  <data name="AdminMsg_Status_EndingSoon" xml:space="preserve">
+    <value>곧 종료</value>
+  </data>
+  <data name="AdminMsg_Status_AwaitingPayment" xml:space="preserve">
+    <value>결제 대기</value>
+  </data>
+  <data name="AdminMsg_Auction_StartingPriceExceeds" xml:space="preserve">
+    <value>입찰이 있으면 시작가는 현재가를 초과할 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotShortenEndLive" xml:space="preserve">
+    <value>진행 중에는 종료 시간을 앞당길 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Auction_Updated" xml:space="preserve">
+    <value>경매가 업데이트되었습니다.</value>
+  </data>
+  <data name="AdminMsg_BuyNow_Updated" xml:space="preserve">
+    <value>즉시구매 상품이 업데이트되었습니다.</value>
+  </data>
+  <data name="AdminMsg_Auction_NotFound" xml:space="preserve">
+    <value>경매를 찾을 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotCancelLinkedOrder" xml:space="preserve">
+    <value>주문에 연결된 경매는 취소할 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotCancelStatus" xml:space="preserve">
+    <value>현재 상태에서는 이 경매를 취소할 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Auction_Cancelled" xml:space="preserve">
+    <value>경매가 취소되었습니다.</value>
+  </data>
+  <data name="AdminMsg_Auction_Deleted" xml:space="preserve">
+    <value>경매가 삭제되었습니다.</value>
+  </data>
+  <data name="AdminMsg_Auction_EndedOrCancelled" xml:space="preserve">
+    <value>경매가 종료되었거나 취소되었습니다.</value>
+  </data>
+  <data name="AdminMsg_Auction_DeleteBlockedOrder" xml:space="preserve">
+    <value>삭제할 수 없음 — 경매가 주문에 연결됨.</value>
+  </data>
+  <data name="AdminMsg_Auction_DeleteBlockedBids" xml:space="preserve">
+    <value>삭제할 수 없음 — 입찰 {0}건. Delete 대신 Cancel하세요.</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotDelete" xml:space="preserve">
+    <value>이 경매를 삭제할 수 없습니다.</value>
+  </data>
+  <data name="AdminMsg_Auction_BulkDeleted" xml:space="preserve">
+    <value>{0}/{1}개 경매를 삭제했습니다.</value>
+  </data>
+  <data name="AdminMsg_Auction_BulkDeletedWithSkip" xml:space="preserve">
+    <value>{0}/{1}개 삭제; 건너뜀: {2}</value>
+  </data>
 </root>

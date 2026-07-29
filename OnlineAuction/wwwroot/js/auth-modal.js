@@ -418,7 +418,7 @@
       (window.authModalConfig &&
         window.authModalConfig.i18n &&
         window.authModalConfig.i18n.phoneInvalidLength) ||
-      "Số điện thoại phải gồm đúng 11 chữ số.";
+      "Phone number must be exactly 11 digits.";
 
     function normalizePhoneValue() {
       var digits = (phoneInput.value || "").replace(/\D/g, "").slice(0, 11);

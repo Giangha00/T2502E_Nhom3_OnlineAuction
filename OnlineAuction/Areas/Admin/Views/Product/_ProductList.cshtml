@@ -6,6 +6,21 @@
     var startPage = Math.Max(1, currentPage - 2);
     var endPage = Math.Min(totalPages, currentPage + 2);
     var templateId = Model.ContextTemplateId ?? 0;
+
+    string DisplayOrDash(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return "—";
+        }
+
+        var normalized = value.Trim();
+        return normalized.Equals("N/A", StringComparison.OrdinalIgnoreCase)
+               || normalized.Equals("NA", StringComparison.OrdinalIgnoreCase)
+               || normalized.Equals("N a", StringComparison.OrdinalIgnoreCase)
+            ? "—"
+            : normalized;
+    }
 }
 
 <form id="productBulkDeleteForm"
@@ -32,7 +47,7 @@
 
     <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
         <div class="max-w-full overflow-x-auto">
-            <table class="w-full min-w-[1200px]">
+            <table class="admin-product-template-table w-full min-w-[1280px]">
                 <thead>
                 <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
                     <th class="w-12 px-5 py-3 text-left">
@@ -71,28 +86,40 @@
                             <td class="px-5 py-4">
                                 <input class="product-checkbox" type="checkbox" name="SelectedProductIds" value="@product.Id" />
                             </td>
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-4 product-template-col-product">
                                 <div class="flex items-center gap-3">
                                     <img src="@product.ThumbnailUrl"
                                          alt="@product.Name"
                                          class="h-12 w-12 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />
-                                    <div>
-                                        <p class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@product.Name</p>
-                                        <p class="text-theme-xs text-gray-500">@Localizer["AdminProduct.ProductCode"]: @product.ProductCode</p>
-                                        <p class="text-theme-xs text-gray-500">ID: @product.Id</p>
+                                    <div class="min-w-0">
+                                        <p class="text-theme-sm font-medium text-gray-800 dark:text-white/90 product-template-line-clamp-2" title="@product.Name">@product.Name</p>
+                                        @if (!string.IsNullOrWhiteSpace(product.Subtitle))
+                                        {
+                                            <p class="text-theme-xs text-gray-500 product-template-line-clamp-1" title="@product.Subtitle">@product.Subtitle</p>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(product.ShortDescription))
+                                        {
+                                            <p class="text-theme-xs text-gray-500 product-template-line-clamp-2" title="@product.ShortDescription">@product.ShortDescription</p>
+                                        }
+                                        <p class="text-theme-xs text-gray-500">@Localizer["AdminProduct.ProductCode"]: @product.ProductCode · ID: @product.Id</p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-5 py-4">
-                                <p class="text-theme-sm text-gray-800 dark:text-white/90">@product.SellerName</p>
-                                <p class="text-theme-xs text-gray-500">@product.SellerEmail</p>
+                            <td class="px-5 py-4 product-template-col-seller">
+                                <p class="text-theme-sm text-gray-800 dark:text-white/90 product-template-line-clamp-1" title="@product.SellerName">@product.SellerName</p>
+                                <p class="text-theme-xs text-gray-500 product-template-line-clamp-1" title="@product.SellerEmail">@product.SellerEmail</p>
                             </td>
                             <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">
-                                @product.Condition
+                                <p>@product.Condition</p>
                                 @if (!string.IsNullOrWhiteSpace(product.GradeLabel))
                                 {
-                                    <span class="text-theme-xs text-gray-500"> / @product.GradeLabel</span>
+                                    <p class="text-theme-xs text-gray-500">@product.GradeLabel</p>
                                 }
+                                <p class="text-theme-xs text-gray-500">
+                                    @DisplayOrDash(product.SetName)
+                                    · @DisplayOrDash(product.Language)
+                                    · @(product.Year?.ToString() ?? "—")
+                                </p>
                             </td>
                             <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">
                                 <p>@Localizer["AdminProduct.EstimatedShort"]: @(product.EstimatedValue?.ToString("N2") ?? "—")</p>
@@ -100,10 +127,10 @@
                             </td>
                             <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">1</td>
                             <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">
-                                @(string.IsNullOrWhiteSpace(product.CardNumber) ? "—" : product.CardNumber)
+                                <p>@DisplayOrDash(product.CardNumber)</p>
                                 @if (!string.IsNullOrWhiteSpace(product.CertNumber))
                                 {
-                                    <span class="text-theme-xs text-gray-500"> · @product.CertNumber</span>
+                                    <p class="text-theme-xs text-gray-500">@DisplayOrDash(product.CertNumber)</p>
                                 }
                             </td>
                             <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@product.AuctionCount</td>

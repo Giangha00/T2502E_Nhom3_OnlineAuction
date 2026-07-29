@@ -614,7 +614,9 @@ public class OrderCreationService : IOrderCreationService
             .CountAsync(pendingOrder =>
                 pendingOrder.BuyerId == buyerId &&
                 pendingOrder.Status == OrderStatuses.PendingPayment &&
-                pendingOrder.DeletedAt == null,
+                pendingOrder.DeletedAt == null &&
+                pendingOrder.PaymentDeadline > now &&
+                pendingOrder.Items.Any(),
                 cancellationToken);
         await _realtimePublisher.SendOrderCountToUserAsync(buyerId, orderCount, cancellationToken);
 

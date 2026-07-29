@@ -75,13 +75,13 @@
     </p>
 
     <nav class="flex flex-wrap items-center gap-2">
-        <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-Search="@Model.Filter.Search" asp-route-SortOrder="@Model.Filter.SortOrder" asp-route-Page="@(currentPage - 1)" class="admin-icon-action admin-icon-action--pagination @(currentPage <= 1 ? "is-disabled" : "js-admin-page")" title="@Localizer["AdminProduct.Previous"]" aria-label="@Localizer["AdminProduct.Previous"]"><partial name="_AdminIcon" model='"chevron-left"' /></a>
+        <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-Search="@Model.Filter.Search" asp-route-DateRange="@Model.Filter.DateRange" asp-route-SortOrder="@Model.Filter.SortOrder" asp-route-Page="@(currentPage - 1)" class="admin-icon-action admin-icon-action--pagination @(currentPage <= 1 ? "is-disabled" : "js-admin-page")" title="@Localizer["AdminProduct.Previous"]" aria-label="@Localizer["AdminProduct.Previous"]"><partial name="_AdminIcon" model='"chevron-left"' /></a>
 
         @for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++)
         {
-            <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-Search="@Model.Filter.Search" asp-route-SortOrder="@Model.Filter.SortOrder" asp-route-Page="@pageNumber" class="js-admin-page rounded-lg border px-3 py-2 text-theme-sm font-medium @(pageNumber == currentPage ? "border-brand-500 bg-brand-500 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50")">@pageNumber</a>
+            <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-Search="@Model.Filter.Search" asp-route-DateRange="@Model.Filter.DateRange" asp-route-SortOrder="@Model.Filter.SortOrder" asp-route-Page="@pageNumber" class="js-admin-page rounded-lg border px-3 py-2 text-theme-sm font-medium @(pageNumber == currentPage ? "border-brand-500 bg-brand-500 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50")">@pageNumber</a>
         }
 
-        <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-Search="@Model.Filter.Search" asp-route-SortOrder="@Model.Filter.SortOrder" asp-route-Page="@(currentPage + 1)" class="admin-icon-action admin-icon-action--pagination @(currentPage >= totalPages ? "is-disabled" : "js-admin-page")" title="@Localizer["AdminProduct.Next"]" aria-label="@Localizer["AdminProduct.Next"]"><partial name="_AdminIcon" model='"chevron-right"' /></a>
+        <a asp-area="Admin" asp-controller="Product" asp-action="Index" asp-route-Search="@Model.Filter.Search" asp-route-DateRange="@Model.Filter.DateRange" asp-route-SortOrder="@Model.Filter.SortOrder" asp-route-Page="@(currentPage + 1)" class="admin-icon-action admin-icon-action--pagination @(currentPage >= totalPages ? "is-disabled" : "js-admin-page")" title="@Localizer["AdminProduct.Next"]" aria-label="@Localizer["AdminProduct.Next"]"><partial name="_AdminIcon" model='"chevron-right"' /></a>
     </nav>
 </div>

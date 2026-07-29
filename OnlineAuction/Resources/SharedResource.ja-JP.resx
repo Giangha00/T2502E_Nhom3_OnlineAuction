@@ -1029,4 +1029,358 @@
   <data name="Notification_OrderCancelled_Title" xml:space="preserve"><value>注文がキャンセルされました</value></data>
   <data name="Notification_OrderCancelledBuyer_Message" xml:space="preserve"><value>{0} の注文 {1} は支払い期限切れのためキャンセルされました。</value></data>
   <data name="Notification_OrderCancelledSeller_Message" xml:space="preserve"><value>{0} の注文 {1} は落札者が期限内に支払わなかったためキャンセルされました。</value></data>
+  <data name="Product_MoreRelatedTitle" xml:space="preserve">
+    <value>関連出品をもっと見る</value>
+  </data>
+  <data name="Product_SimilarListingsTitle" xml:space="preserve">
+    <value>類似の出品</value>
+  </data>
+  <data name="User_SellerStats_Title" xml:space="preserve">
+    <value>出品者の統計</value>
+  </data>
+  <data name="User_SellerStats_Description" xml:space="preserve">
+    <value>この出品者の実績概要です。</value>
+  </data>
+  <data name="Admin_Dashboard_Col_NetProceeds" xml:space="preserve">
+    <value>純収益</value>
+  </data>
+  <data name="AdminProduct.ClearSelection" xml:space="preserve">
+    <value>選択をクリア</value>
+  </data>
+  <data name="AdminProduct.CurrentPrimary" xml:space="preserve">
+    <value>現在のメイン画像</value>
+  </data>
+  <data name="AdminProduct.MarkedForRemoval" xml:space="preserve">
+    <value>削除予定</value>
+  </data>
+  <data name="AdminProduct.UndoRemove" xml:space="preserve">
+    <value>削除を取り消す</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.CloseLightbox" xml:space="preserve">
+    <value>閉じる</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.GalleryLimit" xml:space="preserve">
+    <value>ギャラリー画像は最大{0}枚までアップロードできます。</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.GalleryPartial" xml:space="preserve">
+    <value>選択した{1}枚のうち{0}枚のみ追加されました（ギャラリー上限）。</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.InvalidFormat" xml:space="preserve">
+    <value>画像形式が無効です。JPG、PNG、WEBP、GIFを使用してください。</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.SizeLimit" xml:space="preserve">
+    <value>各画像は{0}MB以下にしてください。</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.TemplateInvalidFormat" xml:space="preserve">
+    <value>テンプレート画像の形式が無効です。JPG、PNG、WEBP、GIFを使用してください。</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.TemplateSizeLimit" xml:space="preserve">
+    <value>各テンプレート画像は{0}MB以下にしてください。</value>
+  </data>
+  <data name="Home_Recommended_Title" xml:space="preserve">
+    <value>おすすめ</value>
+  </data>
+  <data name="Home_TrendingAuction_Title" xml:space="preserve">
+    <value>オークションの注目</value>
+  </data>
+  <data name="Home_TrendingBuyNow_Title" xml:space="preserve">
+    <value>今すぐ購入の注目</value>
+  </data>
+  <data name="Home_RecentlyAdded_Title" xml:space="preserve">
+    <value>新着</value>
+  </data>
+  <data name="Home_BestSeller_Title" xml:space="preserve">
+    <value>ベストセラー</value>
+  </data>
+  <data name="Home_LatestFromVault_Title" xml:space="preserve">
+    <value>Vaultの最新情報</value>
+  </data>
+  <data name="Home_Carousel_ShowingZero" xml:space="preserve">
+    <value>0件を表示</value>
+  </data>
+  <data name="Home_Carousel_ShowingRange" xml:space="preserve">
+    <value>{2}件中 {0} – {1} を表示</value>
+  </data>
+  <data name="Home_Carousel_ScrollLeft" xml:space="preserve">
+    <value>左へスクロール</value>
+  </data>
+  <data name="Home_Carousel_ScrollRight" xml:space="preserve">
+    <value>右へスクロール</value>
+  </data>
+  <data name="Catalog_NoCardsFound" xml:space="preserve">
+    <value>カードが見つかりません</value>
+  </data>
+  <data name="Catalog_TryAdjustFilters" xml:space="preserve">
+    <value>フィルターや検索条件を調整してみてください。</value>
+  </data>
+  <data name="Catalog_Previous" xml:space="preserve">
+    <value>← 前へ</value>
+  </data>
+  <data name="Catalog_Next" xml:space="preserve">
+    <value>次へ →</value>
+  </data>
+  <data name="Common_Min" xml:space="preserve">
+    <value>最小</value>
+  </data>
+  <data name="Common_Max" xml:space="preserve">
+    <value>最大</value>
+  </data>
+  <data name="Common_AddToWatchlist" xml:space="preserve">
+    <value>ウォッチリストに追加</value>
+  </data>
+  <data name="Common_RemoveFromWatchlist" xml:space="preserve">
+    <value>ウォッチリストから削除</value>
+  </data>
+  <data name="Layout_Footer_AdminLogin" xml:space="preserve">
+    <value>管理者ログイン</value>
+  </data>
+  <data name="Faq_StillNeedHelp" xml:space="preserve">
+    <value>まだサポートが必要ですか？</value>
+  </data>
+  <data name="Refund_EvidenceLinks" xml:space="preserve">
+    <value>証拠リンク</value>
+  </data>
+  <data name="Refund_EvidenceLinks_Hint" xml:space="preserve">
+    <value>任意。HTTPSリンクを最大5件追加できます（画像または書類）。</value>
+  </data>
+  <data name="Contact_Map_Address" xml:space="preserve">
+    <value>FPT Polytechnicビル、Trinh Van Bo、Xuan Phuong、Nam Tu Liem、ハノイ</value>
+  </data>
+  <data name="Contact_Map_ShortAddress" xml:space="preserve">
+    <value>FPT Polytechnic、ハノイ</value>
+  </data>
+  <data name="Auth_Error_InvalidCredentials" xml:space="preserve">
+    <value>メールアドレスまたはパスワードが正しくありません。</value>
+  </data>
+  <data name="Auth_Error_AccountDeactivated" xml:space="preserve">
+    <value>アカウントが無効化されています。</value>
+  </data>
+  <data name="Auth_Error_AccountLocked" xml:space="preserve">
+    <value>複数回の失敗によりアカウントがロックされました。後でもう一度お試しください。</value>
+  </data>
+  <data name="Auth_Error_SignInNotAllowed" xml:space="preserve">
+    <value>このアカウントではサインインできません。</value>
+  </data>
+  <data name="Auth_Error_AccountNotActivated" xml:space="preserve">
+    <value>アカウントがまだ有効化されていません。メールを確認して登録を完了してください。</value>
+  </data>
+  <data name="Auth_Error_TwoFactorRequired" xml:space="preserve">
+    <value>二要素認証が必要です。</value>
+  </data>
+  <data name="Auth_Error_EmailExists" xml:space="preserve">
+    <value>このメールアドレスは既に登録されています。</value>
+  </data>
+  <data name="Auth_Error_ActivationEmailFailed" xml:space="preserve">
+    <value>有効化メールを送信できませんでした。後でもう一度お試しください。</value>
+  </data>
+  <data name="Auth_Success_SignupCheckEmail" xml:space="preserve">
+    <value>登録が完了しました。ログイン前にメールを確認してアカウントを認証してください。</value>
+  </data>
+  <data name="Auth_Success_ResentActivation" xml:space="preserve">
+    <value>このメールは登録済みですが未有効化です。有効化メールを再送しました。ログイン前に認証してください。</value>
+  </data>
+  <data name="Auth_Success_SmokeSignup" xml:space="preserve">
+    <value>登録成功（smoke）。ログイン前に /Smoke/ConfirmEmail で確認してください。</value>
+  </data>
+  <data name="Auth_Activate_InvalidLink" xml:space="preserve">
+    <value>有効化リンクが無効です。</value>
+  </data>
+  <data name="Auth_Activate_Success" xml:space="preserve">
+    <value>アカウントが有効化されました。今すぐログインできます。</value>
+  </data>
+  <data name="Admin_Auction_ConfirmDelete" xml:space="preserve">
+    <value>オークション #{0} を削除してもよろしいですか？</value>
+  </data>
+  <data name="Admin_Auction_ConfirmCancel" xml:space="preserve">
+    <value>オークション #{0} をキャンセルしますか？</value>
+  </data>
+  <data name="Admin_Auction_LiveLockBanner" xml:space="preserve">
+    <value>このオークションは進行中です — ステータスと登録/開始スケジュールはロックされています。終了時刻の延長と説明の更新のみ可能です。</value>
+  </data>
+<data name="Admin_Product_CannotDeleteHasAuctions" xml:space="preserve">
+    <value>オークションに紐づいているため、この商品は削除できません。</value>
+  </data>
+  <data name="ConfirmModal_Confirm" xml:space="preserve">
+    <value>確認</value>
+  </data>
+  <data name="ConfirmModal_Cancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="Auth_Activate_UserNotFound" xml:space="preserve">
+    <value>有効化するアカウントが見つかりませんでした。</value>
+  </data>
+  <data name="Auth_Activate_AlreadyActivated" xml:space="preserve">
+    <value>このアカウントは既に有効化されています。ログインできます。</value>
+  </data>
+  <data name="Auth_Activate_InvalidOrChanged" xml:space="preserve">
+    <value>有効化リンクが無効か、変更されています。</value>
+  </data>
+  <data name="Auth_Activate_FailedExpired" xml:space="preserve">
+    <value>アカウントを有効化できませんでした。リンクの有効期限が切れている可能性があります。</value>
+  </data>
+  <data name="Admin_Auction_ConfirmCancelInstead" xml:space="preserve">
+    <value>削除ではなくオークション #{0} をキャンセルしますか？</value>
+  </data>
+  <data name="Admin_Product_CannotDeleteBecause" xml:space="preserve">
+    <value>次の理由によりこの商品は削除できません: {0}</value>
+  </data>
+  <data name="Faq_StillNeedHelp_Desc" xml:space="preserve">
+    <value>お探しの情報が見つかりませんか？サポートへ連絡するか、返金リクエストを送信してください。</value>
+  </data>
+  <data name="AdminMsg_Template_NeedPrimaryImage" xml:space="preserve">
+    <value>商品テンプレートのメイン画像をアップロードしてください。</value>
+  </data>
+  <data name="AdminMsg_Template_Created" xml:space="preserve">
+    <value>商品テンプレートを作成しました。</value>
+  </data>
+  <data name="AdminMsg_Template_MissingId" xml:space="preserve">
+    <value>商品テンプレートIDが必要です。</value>
+  </data>
+  <data name="AdminMsg_Template_NotFound" xml:space="preserve">
+    <value>商品テンプレートが見つかりません。</value>
+  </data>
+  <data name="AdminMsg_Template_Updated" xml:space="preserve">
+    <value>商品テンプレートを更新しました。</value>
+  </data>
+  <data name="AdminMsg_Template_CannotDeleteInUse" xml:space="preserve">
+    <value>出品者商品が残っているテンプレートは削除できません。</value>
+  </data>
+  <data name="AdminMsg_Template_Deleted" xml:space="preserve">
+    <value>商品テンプレートを削除しました。</value>
+  </data>
+  <data name="AdminMsg_Product_GalleryLimit" xml:space="preserve">
+    <value>商品あたりギャラリー画像は最大{0}枚までです。</value>
+  </data>
+  <data name="AdminMsg_Product_Created" xml:space="preserve">
+    <value>商品を作成しました。</value>
+  </data>
+  <data name="AdminMsg_Product_MissingId" xml:space="preserve">
+    <value>商品IDが必要です。</value>
+  </data>
+  <data name="AdminMsg_Product_NotFound" xml:space="preserve">
+    <value>商品が見つかりません。</value>
+  </data>
+  <data name="AdminMsg_Product_CannotChangeSellerLive" xml:space="preserve">
+    <value>ライブまたは終了間近のオークションがある間は出品者を変更できません。</value>
+  </data>
+  <data name="AdminMsg_Product_CannotChangeTemplateLive" xml:space="preserve">
+    <value>ライブまたは終了間近のオークションがある間はテンプレートを変更できません。</value>
+  </data>
+  <data name="AdminMsg_Product_GalleryMax" xml:space="preserve">
+    <value>ギャラリーは最大{0}枚までです。</value>
+  </data>
+  <data name="AdminMsg_Product_DocumentsMax" xml:space="preserve">
+    <value>商品あたり書類は最大{0}件までです。</value>
+  </data>
+  <data name="AdminMsg_Product_Updated" xml:space="preserve">
+    <value>商品を更新しました。</value>
+  </data>
+  <data name="AdminMsg_Product_CannotDeleteBecause" xml:space="preserve">
+    <value>次の理由によりこの商品は削除できません: {0}</value>
+  </data>
+  <data name="AdminMsg_Product_Deleted" xml:space="preserve">
+    <value>商品を削除しました。</value>
+  </data>
+  <data name="AdminMsg_Product_SelectAtLeastOne" xml:space="preserve">
+    <value>商品を1つ以上選択してください。</value>
+  </data>
+  <data name="AdminMsg_Product_NoneFound" xml:space="preserve">
+    <value>商品が見つかりません。</value>
+  </data>
+  <data name="AdminMsg_Product_BulkDeleted" xml:space="preserve">
+    <value>{0}件の商品を削除しました。</value>
+  </data>
+  <data name="AdminMsg_Product_BulkDeletedWithSkip" xml:space="preserve">
+    <value>{0}件削除。スキップ{1}: {2}</value>
+  </data>
+  <data name="AdminMsg_Product_BlockingAuction" xml:space="preserve">
+    <value>オークション#{0}は{1}です。</value>
+  </data>
+  <data name="AdminMsg_Template_Unavailable" xml:space="preserve">
+    <value>選択した商品テンプレートは利用できません。</value>
+  </data>
+  <data name="AdminMsg_Seller_Unavailable" xml:space="preserve">
+    <value>選択した出品者は利用できません。</value>
+  </data>
+  <data name="AdminMsg_Documents_UploadMax" xml:space="preserve">
+    <value>商品あたり書類は最大{0}件までアップロードできます。</value>
+  </data>
+  <data name="AdminMsg_Documents_SizeLimit" xml:space="preserve">
+    <value>書類サイズは5MB以下にしてください。</value>
+  </data>
+  <data name="AdminMsg_Documents_PdfOnly" xml:space="preserve">
+    <value>書類はPDFファイルである必要があります。</value>
+  </data>
+  <data name="AdminMsg_Condition_Graded" xml:space="preserve">
+    <value>鑑定済み</value>
+  </data>
+  <data name="AdminMsg_Condition_Ungraded" xml:space="preserve">
+    <value>未鑑定</value>
+  </data>
+  <data name="AdminMsg_Category_Unavailable" xml:space="preserve">
+    <value>選択したカテゴリは利用できません。</value>
+  </data>
+  <data name="AdminMsg_Template_PrimarySize" xml:space="preserve">
+    <value>テンプレートのメイン画像は2MB以下にしてください。</value>
+  </data>
+  <data name="AdminMsg_Template_PrimaryFormat" xml:space="preserve">
+    <value>テンプレートのメイン画像はJPEGまたはPNGである必要があります。</value>
+  </data>
+  <data name="AdminMsg_Template_Duplicate" xml:space="preserve">
+    <value>一致する内容の有効な商品テンプレートが既に存在します。</value>
+  </data>
+  <data name="AdminMsg_Status_Live" xml:space="preserve">
+    <value>開催中</value>
+  </data>
+  <data name="AdminMsg_Status_EndingSoon" xml:space="preserve">
+    <value>終了間近</value>
+  </data>
+  <data name="AdminMsg_Status_AwaitingPayment" xml:space="preserve">
+    <value>支払い待ち</value>
+  </data>
+  <data name="AdminMsg_Auction_StartingPriceExceeds" xml:space="preserve">
+    <value>入札がある場合、開始価格は現在価格を超えてはいけません。</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotShortenEndLive" xml:space="preserve">
+    <value>ライブ中は終了時刻を早めることはできません。</value>
+  </data>
+  <data name="AdminMsg_Auction_Updated" xml:space="preserve">
+    <value>オークションを更新しました。</value>
+  </data>
+  <data name="AdminMsg_BuyNow_Updated" xml:space="preserve">
+    <value>今すぐ購入の出品を更新しました。</value>
+  </data>
+  <data name="AdminMsg_Auction_NotFound" xml:space="preserve">
+    <value>オークションが見つかりません。</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotCancelLinkedOrder" xml:space="preserve">
+    <value>注文に紐づくオークションはキャンセルできません。</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotCancelStatus" xml:space="preserve">
+    <value>現在のステータスではこのオークションをキャンセルできません。</value>
+  </data>
+  <data name="AdminMsg_Auction_Cancelled" xml:space="preserve">
+    <value>オークションをキャンセルしました。</value>
+  </data>
+  <data name="AdminMsg_Auction_Deleted" xml:space="preserve">
+    <value>オークションを削除しました。</value>
+  </data>
+  <data name="AdminMsg_Auction_EndedOrCancelled" xml:space="preserve">
+    <value>オークションは終了またはキャンセル済みです。</value>
+  </data>
+  <data name="AdminMsg_Auction_DeleteBlockedOrder" xml:space="preserve">
+    <value>削除できません — オークションが注文に紐づいています。</value>
+  </data>
+  <data name="AdminMsg_Auction_DeleteBlockedBids" xml:space="preserve">
+    <value>削除できません — 入札が{0}件あります。DeleteではなくCancelしてください。</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotDelete" xml:space="preserve">
+    <value>このオークションは削除できません。</value>
+  </data>
+  <data name="AdminMsg_Auction_BulkDeleted" xml:space="preserve">
+    <value>{0}/{1}件のオークションを削除しました。</value>
+  </data>
+  <data name="AdminMsg_Auction_BulkDeletedWithSkip" xml:space="preserve">
+    <value>{0}/{1}件削除; スキップ: {2}</value>
+  </data>
 </root>
