@@ -14,8 +14,9 @@
     "RefreshTestAuctionsOnStartup": false,
     "RefreshTestAuctionsInDevelopment": false,
     "SyncCatalogOnStartup": false,
-    "SyncCatalogInDevelopment": false,
-    "RunAuctionCatalogSeederOnStartup": false
+    "SyncCatalogInDevelopment": true,
+    "RunAuctionCatalogSeederOnStartup": false,
+    "RunAuctionCatalogSeederInDevelopment": true
   },
   "CloudinarySettings": {
     "CloudName": "YOUR_CLOUDINARY_CLOUD_NAME",

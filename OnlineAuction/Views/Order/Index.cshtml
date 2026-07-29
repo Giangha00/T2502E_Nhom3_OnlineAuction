@@ -69,6 +69,7 @@
     };
     var showAddedModal = Context.Request.Query["added"] == "1";
     var showClearedModal = Context.Request.Query["cleared"] == "1";
+    var paymentError = TempData["PaymentError"] as string;
 }
 
 <div class="order-page min-h-screen bg-slate-50">
@@ -358,7 +359,8 @@
     window.orderConfig = {
       i18n: @Html.Raw(JsonSerializer.Serialize(orderI18n)),
       showAddedModal: @Html.Raw(JsonSerializer.Serialize(showAddedModal)),
-      showClearedModal: @Html.Raw(JsonSerializer.Serialize(showClearedModal))
+      showClearedModal: @Html.Raw(JsonSerializer.Serialize(showClearedModal)),
+      paymentError: @Html.Raw(JsonSerializer.Serialize(paymentError))
     };
   </script>
   <script src="~/js/order.js" asp-append-version="true"></script>

@@ -102,18 +102,25 @@ public class PayPalService : IPayPalService
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogWarning("PayPal create order failed with status {StatusCode}.", response.StatusCode);
+            _logger.LogWarning(
+                "PayPal create order failed with status {StatusCode}. Body={Body}",
+                response.StatusCode,
+                TruncateForLog(body));
             return PayPalCreateOrderResult.Fail("PayPal could not start checkout. Please try again.");
         }
 
         var order = JsonSerializer.Deserialize<PayPalOrderResponse>(body, JsonOptions);
         var approvalUrl = order?.Links?
-            .FirstOrDefault(link => link.Rel.Equals("approve", StringComparison.OrdinalIgnoreCase))
+            .FirstOrDefault(link =>
+                link.Rel.Equals("approve", StringComparison.OrdinalIgnoreCase)
+                || link.Rel.Equals("payer-action", StringComparison.OrdinalIgnoreCase))
             ?.Href;
 
         if (string.IsNullOrWhiteSpace(order?.Id) || string.IsNullOrWhiteSpace(approvalUrl))
         {
-            _logger.LogWarning("PayPal create order response missing approval link.");
+            _logger.LogWarning(
+                "PayPal create order response missing approval link. Body={Body}",
+                TruncateForLog(body));
             return PayPalCreateOrderResult.Fail("PayPal returned an invalid checkout response.");
         }
 

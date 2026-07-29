@@ -69,6 +69,7 @@ public class OrderController : Controller
                 ?? _notifyLocalizer[NotificationKeys.PaymentCompleteFieldsMessage];
 
             await NotifyPaymentIssueAsync(userId.Value, error);
+            TempData["PaymentError"] = error;
             return RedirectToAction(nameof(Index));
         }
 
@@ -76,6 +77,7 @@ public class OrderController : Controller
         if (!result.Success)
         {
             await NotifyPaymentIssueAsync(userId.Value, result.Message);
+            TempData["PaymentError"] = result.Message;
             return RedirectToAction(nameof(Index));
         }
 
@@ -91,9 +93,10 @@ public class OrderController : Controller
 
             if (!paypalResult.Success || string.IsNullOrWhiteSpace(paypalResult.ApprovalUrl))
             {
-                await NotifyPaymentIssueAsync(
-                    userId.Value,
-                    paypalResult.ErrorMessage ?? _notifyLocalizer[NotificationKeys.PaymentUnableStartCheckoutMessage]);
+                var message = paypalResult.ErrorMessage
+                    ?? _notifyLocalizer[NotificationKeys.PaymentUnableStartCheckoutMessage];
+                await NotifyPaymentIssueAsync(userId.Value, message);
+                TempData["PaymentError"] = message;
                 return RedirectToAction(nameof(Index));
             }
 

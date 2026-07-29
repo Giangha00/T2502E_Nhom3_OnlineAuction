@@ -77,13 +77,30 @@ dotnet run --launch-profile http
 
 In **Development**, sample auction listings (`RareCard Vault Test Auctions`) are seeded once and **updated in place** on later starts (stable product/auction IDs). Expired seeded listings are reactivated without recreating rows.
 
-To wipe and reseed test auctions (IDs will jump), add to `appsettings.Local.json`:
+Controlled by `SeedData` flags in `Program.cs`:
+
+| Flag | Local (Development) | Azure (Production) |
+|------|---------------------|--------------------|
+| `RunAuctionCatalogSeederInDevelopment` | `true` (default) — runs catalog seeder | ignored |
+| `RunAuctionCatalogSeederOnStartup` | usually `false` (dev flag is enough) | **`true`** via `appsettings.Production.json` |
+| `SyncCatalogInDevelopment` / `SyncCatalogOnStartup` | sync in place (`true`) | sync in place (`true`) |
+| `RefreshTestAuctions*` | wipe+reseed — **Development only**; never on Azure | always forced off |
+
+On Azure App Service (`ASPNETCORE_ENVIRONMENT=Production`), committed `appsettings.Production.json` enables catalog seed + sync so deploy gets the same `SpreadsheetAuctionCatalog` sample data as local. **No wipe** — existing rows are updated; orphans cleaned. Optionally override in Azure Portal → Configuration → Application settings:
+
+```
+SeedData__RunAuctionCatalogSeederOnStartup = true
+SeedData__SyncCatalogOnStartup = true
+SeedData__RefreshTestAuctionsOnStartup = false
+```
+
+To wipe and reseed test auctions locally only (IDs will jump), add to `appsettings.Local.json`:
 
 ```json
 { "SeedData": { "RefreshTestAuctionsInDevelopment": true } }
 ```
 
-`SyncCatalogInDevelopment` (default `true`) keeps catalog fields in sync and removes orphaned seed products; it does **not** recreate products that already exist.
+`SyncCatalog*` keeps catalog fields in sync and removes orphaned seed products; it does **not** recreate products that already exist unless missing.
 ### Release smoke (pre-merge / demo)
 
 Short pack (≤ 20 min): `AUTH-REG-01` → `AUTH-LOGIN-01` → `AUCTION_REG-03` → `BID-01`.  

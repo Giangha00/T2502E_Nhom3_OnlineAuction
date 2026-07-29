@@ -80,18 +80,14 @@ public class OrderPaymentService : IOrderPaymentService
         }
 
         var totalAmount = orders.Sum(order => order.TotalAmount);
-        var referenceId = string.Join(',', orders.Select(order => order.OrderReference));
+        // PayPal purchase_unit.reference_id rejects commas/spaces; keep a safe single token.
+        // Multi-invoice checkouts use a compact checkout id (order mapping is stored on Payment rows).
+        var referenceId = orders.Count == 1
+            ? SanitizePayPalReferenceId(orders[0].OrderReference)
+            : SanitizePayPalReferenceId($"CHK-{buyerId}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}");
 
-        var walletCheck = await _sandboxPayPalWalletService.EnsureSufficientBalanceAsync(
-            buyerId,
-            totalAmount,
-            cancellationToken);
-        if (!walletCheck.Success)
-        {
-            return PayPalCheckoutResult.Fail(
-                walletCheck.ErrorMessage ?? "Insufficient PayPal sandbox wallet balance.");
-        }
-
+        // Do not block redirect to PayPal on the simulated sandbox wallet.
+        // Wallet balance is enforced at capture (same pattern as registration deposits).
         var createResult = await _payPalService.CreateCheckoutOrderAsync(
             totalAmount,
             referenceId,
@@ -987,5 +983,26 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
         }
 
         return $"Chưa xử lý status: {paymentStatus}";
+    }
+
+    private static string SanitizePayPalReferenceId(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return $"CHK-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+        }
+
+        var chars = value
+            .Trim()
+            .Select(ch => char.IsAsciiLetterOrDigit(ch) || ch is '-' or '_' ? ch : '-')
+            .ToArray();
+
+        var sanitized = new string(chars).Trim('-');
+        if (string.IsNullOrWhiteSpace(sanitized))
+        {
+            sanitized = $"CHK-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+        }
+
+        return sanitized.Length <= 127 ? sanitized : sanitized[..127];
     }
 }

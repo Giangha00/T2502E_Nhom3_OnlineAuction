@@ -372,4 +372,14 @@
             i18n.clearedMessage || 'Buy Now items cleared from your orders.');
         cleanOrderQueryParam('cleared');
     }
+
+    if (window.orderConfig && window.orderConfig.paymentError) {
+        if (typeof window.showAlertModal === 'function') {
+            window.showAlertModal({
+                title: (window.confirmModalConfig && window.confirmModalConfig.i18n && window.confirmModalConfig.i18n.errorTitle) || 'Error',
+                message: window.orderConfig.paymentError,
+                variant: 'danger'
+            });
+        }
+    }
 })();
