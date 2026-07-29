@@ -22,6 +22,7 @@ public class OrderService : IOrderService
     private readonly IWinnerNonPaymentRecoveryService _winnerNonPaymentRecoveryService;
     private readonly INotificationService _notificationService;
     private readonly INotificationLocalizer _notifyLocalizer;
+    private readonly IRealtimePublisher? _realtimePublisher;
 
     private sealed class NullWinnerNonPaymentRecoveryService : IWinnerNonPaymentRecoveryService
     {
@@ -86,13 +87,15 @@ public class OrderService : IOrderService
         IOptions<PlatformFeeSettings> feeSettings,
         IWinnerNonPaymentRecoveryService? winnerNonPaymentRecoveryService = null,
         INotificationService? notificationService = null,
-        INotificationLocalizer? notifyLocalizer = null)
+        INotificationLocalizer? notifyLocalizer = null,
+        IRealtimePublisher? realtimePublisher = null)
     {
         _dbContext = dbContext;
         _feeSettings = feeSettings.Value;
         _winnerNonPaymentRecoveryService = winnerNonPaymentRecoveryService ?? new NullWinnerNonPaymentRecoveryService();
         _notificationService = notificationService ?? new NullNotificationService();
         _notifyLocalizer = notifyLocalizer ?? new NullNotificationLocalizer();
+        _realtimePublisher = realtimePublisher;
     }
 
     public async Task<OrderPageViewModel?> BuildOrderPageAsync(int buyerId)
@@ -361,6 +364,55 @@ public class OrderService : IOrderService
         }
 
         return (true, "Đã lưu thông tin giao hàng. Bạn sẽ được chuyển đến PayPal để hoàn tất thanh toán.");
+    }
+
+    public async Task<(bool Success, string Message, int ClearedCount)> ClearAllBuyNowOrdersAsync(
+        int buyerId,
+        CancellationToken cancellationToken = default)
+    {
+        await CancelExpiredPendingOrdersAsync(buyerId);
+        await CancelInvalidPendingOrdersAsync(buyerId);
+
+        var now = DateTime.UtcNow;
+        var pendingOrders = await _dbContext.Orders
+            .Include(order => order.Items)
+            .Where(order =>
+                order.BuyerId == buyerId &&
+                order.Status == OrderStatuses.PendingPayment &&
+                order.DeletedAt == null &&
+                order.PaymentDeadline > now &&
+                order.Items.Any() &&
+                (order.OrderSource == OrderSources.BuyNow
+                 || order.OrderReference.StartsWith("BN-")))
+            .ToListAsync(cancellationToken);
+
+        if (pendingOrders.Count == 0)
+        {
+            return (true, "No Buy Now items to clear.", 0);
+        }
+
+        foreach (var order in pendingOrders)
+        {
+            order.Status = OrderStatuses.Cancelled;
+            order.UpdatedAt = now;
+            await OrderCancellationHelper.ApplyCancellationSideEffectsAsync(
+                _dbContext,
+                order,
+                now,
+                cancellationToken);
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        if (_realtimePublisher is not null)
+        {
+            var remainingCount = await _dbContext.Orders.CountAsync(
+                BuildPayableOrdersFilter(buyerId, DateTime.UtcNow),
+                cancellationToken);
+            await _realtimePublisher.SendOrderCountToUserAsync(buyerId, remainingCount, cancellationToken);
+        }
+
+        return (true, $"Cleared {pendingOrders.Count} Buy Now item(s).", pendingOrders.Count);
     }
 
     private async Task<int> CancelOrdersAsync(List<AuctionOrder> expiredOrders, DateTime now)

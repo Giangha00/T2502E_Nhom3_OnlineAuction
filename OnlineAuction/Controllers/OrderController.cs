@@ -104,6 +104,39 @@ public class OrderController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ClearBuyNow(CancellationToken cancellationToken)
+    {
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return Unauthorized(new { success = false, message = "Please sign in to continue." });
+        }
+
+        try
+        {
+            var result = await _orderService.ClearAllBuyNowOrdersAsync(userId.Value, cancellationToken);
+            var orderCount = await _orderService.CountPendingPaymentOrdersAsync(userId.Value);
+
+            return Json(new
+            {
+                success = result.Success || result.ClearedCount > 0,
+                message = result.Message,
+                clearedCount = result.ClearedCount,
+                orderCount
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new
+            {
+                success = false,
+                message = ex.Message
+            });
+        }
+    }
+
     private async Task NotifyPaymentIssueAsync(int userId, string message)
     {
         if (string.IsNullOrWhiteSpace(message))

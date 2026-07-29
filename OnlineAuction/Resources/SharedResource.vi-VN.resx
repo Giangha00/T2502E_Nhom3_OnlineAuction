@@ -939,6 +939,11 @@
   <data name="Order_DepositApplied" xml:space="preserve"><value>Tiền cọc đã trừ</value></data>
   <data name="Order_SelectInvoices" xml:space="preserve"><value>Chọn hóa đơn cần thanh toán</value></data>
   <data name="Order_ItemAdded" xml:space="preserve"><value>Đã thêm vào Trung tâm thanh toán. Chọn hóa đơn bên dưới để thanh toán.</value></data>
+  <data name="Order_ClearBuyNow" xml:space="preserve"><value>Xóa tất cả</value></data>
+  <data name="Order_ClearBuyNow_Title" xml:space="preserve"><value>Xóa tất cả sản phẩm Mua ngay?</value></data>
+  <data name="Order_ClearBuyNow_Message" xml:space="preserve"><value>Thao tác này sẽ xóa mọi sản phẩm Mua ngay khỏi Trung tâm thanh toán, dù đã tích chọn hay chưa.</value></data>
+  <data name="Order_ClearBuyNow_Note" xml:space="preserve"><value>Hóa đơn thắng đấu giá sẽ được giữ lại. Sản phẩm Mua ngay đã xóa sẽ mở bán lại.</value></data>
+  <data name="Order_ClearBuyNow_Success" xml:space="preserve"><value>Đã xóa tất cả sản phẩm Mua ngay khỏi đơn hàng của bạn.</value></data>
   <data name="Js_Order_NoSelection" xml:space="preserve"><value>Vui lòng chọn ít nhất một sản phẩm để thanh toán.</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Đang đặt giá…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Không thể đặt giá. Vui lòng thử lại.</value></data>
@@ -956,7 +961,10 @@
   <data name="Js_ProductDetail_CountdownLiveEnd" xml:space="preserve"><value>Còn {0} ngày {1} giờ {2} phút {3} giây</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>Đang thêm…</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>Đã thêm vào giỏ.</value></data>
+  <data name="Js_BuyNow_AlreadyInCart" xml:space="preserve"><value>Sản phẩm này đã có trong đơn hàng của bạn.</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>Không thể thêm vào giỏ. Vui lòng thử lại.</value></data>
+  <data name="AlertModal_Ok" xml:space="preserve"><value>Đã hiểu</value></data>
+  <data name="AlertModal_Title" xml:space="preserve"><value>Thông báo</value></data>
   <data name="Js_Order_RemainingHours" xml:space="preserve"><value>CÒN {0} GIỜ {1} PHÚT</value></data>
   <data name="Js_Order_RemainingMinutes" xml:space="preserve"><value>CÒN {0} PHÚT</value></data>
   <data name="Js_PaymentInfo_SaveFailed" xml:space="preserve"><value>Không thể lưu thông tin thanh toán</value></data>
@@ -1647,4 +1655,23 @@
   <data name="AdminMsg_Auction_BulkDeletedWithSkip" xml:space="preserve">
     <value>Đã xóa {0}/{1}; bỏ qua: {2}</value>
   </data>
+  <data name="Faq_Page_Subtitle" xml:space="preserve"><value>Tìm câu trả lời về đấu giá, bán hàng, kiểm định và bảo mật trên RareCard Auctions.</value></data>
+  <data name="Faq_Section_Buying_Title" xml:space="preserve"><value>Mua hàng</value></data>
+  <data name="Faq_Section_Selling_Title" xml:space="preserve"><value>Bán hàng</value></data>
+  <data name="Faq_Section_Security_Title" xml:space="preserve"><value>Bảo mật</value></data>
+  <data name="Faq_QuestionCount" xml:space="preserve"><value>{0} câu hỏi</value></data>
+  <data name="Faq_Buying_Q1" xml:space="preserve"><value>Làm sao để đặt giá?</value></data>
+  <data name="Faq_Buying_A1" xml:space="preserve"><value>Tạo tài khoản RareCard, duyệt các phiên đang mở và nhập mức giá cao hơn giá hiện tại. Bạn sẽ nhận xác nhận ngay và thông báo nếu bị vượt giá.</value></data>
+  <data name="Faq_Buying_Q2" xml:space="preserve"><value>Phí vận chuyển được tính như thế nào?</value></data>
+  <data name="Faq_Buying_A2" xml:space="preserve"><value>Phí vận chuyển được tính khi checkout dựa trên giá trị món hàng, điểm đến và mức bảo hiểm. Đơn nội địa thường dao động từ $15–$45 với gói giao chuẩn có bảo hiểm.</value></data>
+  <data name="Faq_Buying_Q3" xml:space="preserve"><value>Có thể đấu giá quốc tế không?</value></data>
+  <data name="Faq_Buying_A3" xml:space="preserve"><value>Có — đấu giá quốc tế hỗ trợ tại một số khu vực. Thuế nhập khẩu và phí hải quan (nếu có) do người mua chịu trách nhiệm. Liên hệ hỗ trợ để biết chi tiết theo từng quốc gia.</value></data>
+  <data name="Faq_Selling_Q1" xml:space="preserve"><value>Nền tảng thu những khoản phí nào?</value></data>
+  <data name="Faq_Selling_A1" xml:space="preserve"><value>Có 3 khoản phí: (1) tiền cọc đăng ký đấu giá của bidder — hoàn cho người thua và trừ vào checkout cho người thắng; (2) phí checkout của người mua tính trên subtotal; (3) phí thành công của người bán trừ trên subtotal khi đơn đã thanh toán. Doanh thu ròng người bán = Subtotal − phí thành công. Phí vận chuyển và bảo hiểm vault tách riêng, không cộng vào sổ doanh thu người bán. Không có phí đăng tin. Tỷ lệ phí cấu hình trong PlatformFee. Giai đoạn 1 ghi nhận doanh thu trên order để báo cáo; tự động payout PayPal cho người bán là giai đoạn 2 (hiện trả thủ công).</value></data>
+  <data name="Faq_Selling_Q2" xml:space="preserve"><value>Gửi thẻ đến RareCard như thế nào?</value></data>
+  <data name="Faq_Selling_A2" xml:space="preserve"><value>Sau khi tin đăng được duyệt, bạn tạo nhãn gửi hàng trả trước có bảo hiểm từ trang người bán. Thẻ cần được đóng gói trong mailer cứng hoặc hộp slab, có mã theo dõi.</value></data>
+  <data name="Faq_Security_Q1" xml:space="preserve"><value>Thẻ của tôi có được bảo hiểm không?</value></data>
+  <data name="Faq_Security_A1" xml:space="preserve"><value>Mọi thẻ trong kho vault và trong quá trình vận chuyển đều được bảo hiểm đầy đủ tới giá trị niêm yết. Bảo hiểm bắt đầu ngay khi chúng tôi nhận hàng và kéo dài tới khi giao cho người mua.</value></data>
+  <data name="Faq_Security_Q2" xml:space="preserve"><value>Làm sao xác minh tính xác thực?</value></data>
+  <data name="Faq_Security_A2" xml:space="preserve"><value>Chúng tôi tích hợp API PSA và BGS để xác minh slab theo thời gian thực, đồng thời có bước kiểm tra vật lý 10 điểm bởi đội ngũ curator trước khi phiên lên live.</value></data>
 </root>

@@ -9,12 +9,14 @@
   var iconWrap = document.getElementById('confirmModalIconWrap');
   var iconInfo = document.getElementById('confirmModalIconInfo');
   var iconDanger = document.getElementById('confirmModalIconDanger');
+  var iconSuccess = document.getElementById('confirmModalIconSuccess');
   var cancelBtn = document.getElementById('confirmModalCancelBtn');
   var confirmBtn = document.getElementById('confirmModalConfirmBtn');
 
   var defaults = (window.confirmModalConfig && window.confirmModalConfig.i18n) || {};
   var pendingResolve = null;
   var lastFocusedElement = null;
+  var alertMode = false;
 
   function applyTemplate(text, values) {
     if (!text) {
@@ -45,17 +47,50 @@
 
   function setVariant(variant) {
     var isDanger = variant === 'danger';
+    var isSuccess = variant === 'success';
+    var classKey = isDanger
+      ? 'data-class-danger'
+      : isSuccess
+        ? 'data-class-success'
+        : 'data-class-default';
 
-    applyClassFromData(iconWrap, isDanger ? 'data-class-danger' : 'data-class-default');
-    applyClassFromData(confirmBtn, isDanger ? 'data-class-danger' : 'data-class-default');
+    applyClassFromData(iconWrap, classKey);
+    applyClassFromData(confirmBtn, classKey);
 
     if (iconInfo) {
-      iconInfo.classList.toggle('hidden', isDanger);
+      iconInfo.classList.toggle('hidden', isDanger || isSuccess);
     }
 
     if (iconDanger) {
       iconDanger.classList.toggle('hidden', !isDanger);
     }
+
+    if (iconSuccess) {
+      iconSuccess.classList.toggle('hidden', !isSuccess);
+    }
+  }
+
+  function setAlertMode(enabled) {
+    alertMode = Boolean(enabled);
+    if (!cancelBtn) {
+      return;
+    }
+
+    // Use the HTML hidden attribute — Tailwind `hidden` loses to `inline-flex`.
+    cancelBtn.hidden = alertMode;
+    cancelBtn.setAttribute('aria-hidden', alertMode ? 'true' : 'false');
+    cancelBtn.style.display = alertMode ? 'none' : '';
+    cancelBtn.disabled = alertMode;
+  }
+
+  function resolveLabel(value, fallback) {
+    if (!value || value.indexOf('_') >= 0 && value === value.replace(/[^A-Za-z0-9_]/g, '')) {
+      // Missing i18n often returns the raw key (e.g. AlertModal_Ok).
+      if (value && /^[A-Za-z][A-Za-z0-9]*(_[A-Za-z0-9]+)+$/.test(value)) {
+        return fallback;
+      }
+    }
+    return value || fallback;
   }
 
   function closeModal(confirmed) {
@@ -69,6 +104,7 @@
     overlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('confirm-modal-open');
     document.removeEventListener('keydown', onKeyDown);
+    setAlertMode(false);
 
     if (pendingResolve) {
       var resolve = pendingResolve;
@@ -84,29 +120,47 @@
   function onKeyDown(event) {
     if (event.key === 'Escape' && isModalOpen()) {
       event.preventDefault();
-      closeModal(false);
+      closeModal(true);
     }
   }
 
-  function showConfirmModal(options) {
+  function openModal(options) {
     options = options || {};
 
     if (!overlay || !titleEl || !messageEl || !confirmBtn || !cancelBtn) {
-      return Promise.resolve(window.confirm(options.message || options.title || ''));
+      var fallbackMessage = options.message || options.title || '';
+      if (options.alertOnly) {
+        window.alert(fallbackMessage);
+        return Promise.resolve(true);
+      }
+
+      return Promise.resolve(window.confirm(fallbackMessage));
     }
 
     if (pendingResolve) {
       closeModal(false);
     }
 
+    setAlertMode(Boolean(options.alertOnly));
     setVariant(options.variant || 'default');
 
-    titleEl.textContent = options.title || defaults.title || 'Confirm';
+    var defaultTitle = options.alertOnly
+      ? (options.variant === 'danger'
+        ? resolveLabel(defaults.errorTitle, 'Error')
+        : options.variant === 'success'
+          ? resolveLabel(defaults.successTitle, 'Success')
+          : resolveLabel(defaults.title, 'Notice'))
+      : resolveLabel(defaults.title, 'Confirm');
+
+    titleEl.textContent = options.title || defaultTitle;
     messageEl.textContent = applyTemplate(
       options.message || defaults.message || '',
       options.messageArgs || []);
-    confirmBtn.textContent = options.confirmText || defaults.confirm || 'Confirm';
-    cancelBtn.textContent = options.cancelText || defaults.cancel || 'Cancel';
+    confirmBtn.textContent = options.confirmText
+      || (options.alertOnly
+        ? resolveLabel(defaults.ok, resolveLabel(defaults.confirm, 'OK'))
+        : resolveLabel(defaults.confirm, 'Confirm'));
+    cancelBtn.textContent = options.cancelText || resolveLabel(defaults.cancel, 'Cancel');
 
     if (noteEl) {
       var note = applyTemplate(options.note || '', options.noteArgs || []);
@@ -131,6 +185,21 @@
     return new Promise(function (resolve) {
       pendingResolve = resolve;
     });
+  }
+
+  function showConfirmModal(options) {
+    options = options || {};
+    options.alertOnly = false;
+    return openModal(options);
+  }
+
+  function showAlertModal(options) {
+    options = options || {};
+    options.alertOnly = true;
+    if (!options.variant) {
+      options.variant = 'default';
+    }
+    return openModal(options);
   }
 
   function readConfirmOptions(element) {
@@ -208,7 +277,7 @@
   if (overlay) {
     overlay.addEventListener('click', function (event) {
       if (event.target === overlay) {
-        closeModal(false);
+        closeModal(true);
       }
     });
   }
@@ -220,4 +289,5 @@
   }
 
   window.showConfirmModal = showConfirmModal;
+  window.showAlertModal = showAlertModal;
 })();

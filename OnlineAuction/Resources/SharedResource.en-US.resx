@@ -899,8 +899,16 @@
   <data name="Js_ProductDetail_RegistrationCancelled" xml:space="preserve"><value>Registration cancelled.</value></data>
   <data name="Js_ProductDetail_CancelRegistrationFailed" xml:space="preserve"><value>Unable to cancel registration.</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>Adding…</value></data>
+  <data name="Order_ClearBuyNow" xml:space="preserve"><value>Clear all</value></data>
+  <data name="Order_ClearBuyNow_Title" xml:space="preserve"><value>Clear all Buy Now items?</value></data>
+  <data name="Order_ClearBuyNow_Message" xml:space="preserve"><value>This will remove every Buy Now item from your Payment Center, whether checked or not.</value></data>
+  <data name="Order_ClearBuyNow_Note" xml:space="preserve"><value>Auction-win invoices are kept. Cleared Buy Now listings become available again.</value></data>
+  <data name="Order_ClearBuyNow_Success" xml:space="preserve"><value>All Buy Now items have been cleared from your orders.</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>Added to cart.</value></data>
+  <data name="Js_BuyNow_AlreadyInCart" xml:space="preserve"><value>This item is already in your orders.</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>Unable to add to cart. Please try again.</value></data>
+  <data name="AlertModal_Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="AlertModal_Title" xml:space="preserve"><value>Notice</value></data>
   <data name="Js_Order_RemainingHours" xml:space="preserve"><value>{0}H {1}M REMAINING</value></data>
   <data name="Js_Order_RemainingMinutes" xml:space="preserve"><value>{0}M REMAINING</value></data>
   <data name="Js_PaymentInfo_SaveFailed" xml:space="preserve"><value>Unable to save payment information</value></data>
@@ -1591,4 +1599,23 @@
   <data name="AdminMsg_Auction_BulkDeletedWithSkip" xml:space="preserve">
     <value>Deleted {0}/{1}; skipped: {2}</value>
   </data>
+  <data name="Faq_Page_Subtitle" xml:space="preserve"><value>Find answers about bidding, selling, grading, and security at RareCard Auctions.</value></data>
+  <data name="Faq_Section_Buying_Title" xml:space="preserve"><value>Buying</value></data>
+  <data name="Faq_Section_Selling_Title" xml:space="preserve"><value>Selling</value></data>
+  <data name="Faq_Section_Security_Title" xml:space="preserve"><value>Security</value></data>
+  <data name="Faq_QuestionCount" xml:space="preserve"><value>{0} question(s)</value></data>
+  <data name="Faq_Buying_Q1" xml:space="preserve"><value>How to bid?</value></data>
+  <data name="Faq_Buying_A1" xml:space="preserve"><value>Create your RareCard account, browse active auctions, and enter a bid amount higher than the current price. You'll receive instant confirmation and notifications if you're outbid.</value></data>
+  <data name="Faq_Buying_Q2" xml:space="preserve"><value>What are the shipping fees?</value></data>
+  <data name="Faq_Buying_A2" xml:space="preserve"><value>Shipping fees are calculated at checkout based on item value, destination, and insurance level. Domestic orders typically range from $15–$45 for standard insured delivery.</value></data>
+  <data name="Faq_Buying_Q3" xml:space="preserve"><value>International bidding?</value></data>
+  <data name="Faq_Buying_A3" xml:space="preserve"><value>Yes — international bidding is available in select regions. Import duties and customs fees may apply and are the buyer's responsibility. Contact support for country-specific details.</value></data>
+  <data name="Faq_Selling_Q1" xml:space="preserve"><value>What fees does the platform charge?</value></data>
+  <data name="Faq_Selling_A1" xml:space="preserve"><value>Three marketplace charges: (1) auction registration deposit for bidders — refunded to losers, applied at checkout for the winner; (2) buyer checkout fee on the order subtotal; (3) seller success fee deducted from the item subtotal when the order is paid. Seller net proceeds = Subtotal − seller success fee. Shipping and vault insurance are separate and do not go to the seller ledger. There is no listing fee. Rates are configured under PlatformFee. Phase 1 records proceeds on the order for reporting; automatic seller PayPal payout is Phase 2 (manual payout for now).</value></data>
+  <data name="Faq_Selling_Q2" xml:space="preserve"><value>How do I ship my cards to RareCard?</value></data>
+  <data name="Faq_Selling_A2" xml:space="preserve"><value>After your listing is approved, generate a prepaid insured shipping label from your seller dashboard. Cards must be sent in a rigid mailer or slab case with tracking enabled.</value></data>
+  <data name="Faq_Security_Q1" xml:space="preserve"><value>Is my card insured?</value></data>
+  <data name="Faq_Security_A1" xml:space="preserve"><value>Every card held in our vault and in transit is fully insured up to its listed value. Coverage begins the moment we receive your item and continues through delivery to the buyer.</value></data>
+  <data name="Faq_Security_Q2" xml:space="preserve"><value>How do you verify authenticity?</value></data>
+  <data name="Faq_Security_A2" xml:space="preserve"><value>We use direct PSA and BGS API integration for real-time slab verification, plus a secondary 10-point physical inspection by our specialist curators before any listing goes live.</value></data>
 </root>

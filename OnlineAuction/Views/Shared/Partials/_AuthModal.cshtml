@@ -51,16 +51,11 @@
         <h2 id="authModalTitle" class="home-auth-heading">@Localizer["Auth_Modal_Title"]</h2>
         <p id="authModalSubtitle" class="home-auth-subheading">@Localizer["Auth_Modal_Subtitle"]</p>
 
-        <div id="authModalAlerts" class="home-auth-alerts" aria-live="polite">
-          @if (!string.IsNullOrWhiteSpace(authError))
-          {
-            <p id="authModalError" class="home-auth-alert home-auth-alert--error" data-auth-auto-dismiss="5000" role="alert">@authError</p>
-          }
-          @if (!string.IsNullOrWhiteSpace(authSuccess))
-          {
-            <p id="authModalSuccess" class="home-auth-alert home-auth-alert--success" data-auth-auto-dismiss="5000" role="status">@authSuccess</p>
-          }
-        </div>
+        <div id="authModalAlerts"
+             class="home-auth-alerts"
+             aria-live="polite"
+             data-auth-error="@authError"
+             data-auth-success="@authSuccess"></div>
 
         <div id="authTabs" class="home-auth-tabs" role="tablist" aria-label="@Localizer["Auth_Modal_Title"]">
           <button type="button" id="authTabLogin" class="home-auth-tab home-auth-tab--active" data-tab="login" role="tab" aria-selected="true" aria-controls="authPanelLogin">@Localizer["Auth_LogIn"]</button>

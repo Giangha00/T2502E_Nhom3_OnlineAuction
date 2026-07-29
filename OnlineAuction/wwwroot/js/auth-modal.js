@@ -348,16 +348,54 @@
 
   function initAuthAlerts() {
     clearAlertDismissTimers();
-    overlay
-      .querySelectorAll("[data-auth-auto-dismiss]")
-      .forEach(function (alert) {
-        var delay =
-          Number(alert.getAttribute("data-auth-auto-dismiss")) || 5000;
-        var timerId = window.setTimeout(function () {
-          dismissAuthAlert(alert);
-        }, delay);
-        alertDismissTimers.push(timerId);
-      });
+    var alertsHost = document.getElementById("authModalAlerts");
+    if (!alertsHost) return;
+
+    var error = alertsHost.getAttribute("data-auth-error");
+    var success = alertsHost.getAttribute("data-auth-success");
+
+    function pushToast(title, message, isSuccess) {
+      if (!message) return;
+
+      if (typeof window.showAlertModal === "function") {
+        window.showAlertModal({
+          title: title || (isSuccess ? "Success" : "Error"),
+          message: message,
+          variant: isSuccess ? "success" : "danger"
+        });
+        return;
+      }
+
+      if (window.fcmNotifications && typeof window.fcmNotifications.showToast === "function") {
+        window.fcmNotifications.showToast(title, message, isSuccess);
+        return;
+      }
+
+      var toast = document.createElement("div");
+      toast.className =
+        "fixed bottom-4 right-4 z-[100] max-w-sm rounded-lg border px-4 py-3 shadow-lg " +
+        (isSuccess
+          ? "border-emerald-200 bg-emerald-50"
+          : "border-red-200 bg-red-50");
+      toast.innerHTML =
+        '<p class="text-sm font-semibold text-slate-900"></p><p class="mt-1 text-xs text-slate-600"></p>';
+      toast.querySelector("p").textContent = title || "";
+      toast.querySelectorAll("p")[1].textContent = message;
+      document.body.appendChild(toast);
+      window.setTimeout(function () {
+        toast.remove();
+      }, 5000);
+    }
+
+    if (error) {
+      pushToast(i18n.defaultTitle || "Error", error, false);
+      alertsHost.setAttribute("data-auth-error", "");
+    }
+
+    if (success) {
+      pushToast(i18n.defaultTitle || "Success", success, true);
+      alertsHost.setAttribute("data-auth-success", "");
+    }
   }
 
   function openModal(tabName, returnUrl) {

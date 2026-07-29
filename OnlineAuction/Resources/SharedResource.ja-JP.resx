@@ -849,8 +849,16 @@
   <data name="Js_ProductDetail_RegistrationCancelled" xml:space="preserve"><value>登録をキャンセルしました。</value></data>
   <data name="Js_ProductDetail_CancelRegistrationFailed" xml:space="preserve"><value>登録をキャンセルできませんでした。</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>追加中…</value></data>
+  <data name="Order_ClearBuyNow" xml:space="preserve"><value>すべて削除</value></data>
+  <data name="Order_ClearBuyNow_Title" xml:space="preserve"><value>Buy Now商品をすべて削除しますか？</value></data>
+  <data name="Order_ClearBuyNow_Message" xml:space="preserve"><value>チェックの有無に関係なく、支払いセンター内のBuy Now商品をすべて削除します。</value></data>
+  <data name="Order_ClearBuyNow_Note" xml:space="preserve"><value>オークション落札の請求は残ります。削除したBuy Now商品は再び購入可能になります。</value></data>
+  <data name="Order_ClearBuyNow_Success" xml:space="preserve"><value>Buy Now商品をすべて注文から削除しました。</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>カートに追加しました。</value></data>
+  <data name="Js_BuyNow_AlreadyInCart" xml:space="preserve"><value>この商品はすでに注文に追加されています。</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>カートに追加できませんでした。もう一度お試しください。</value></data>
+  <data name="AlertModal_Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="AlertModal_Title" xml:space="preserve"><value>お知らせ</value></data>
   <data name="Js_Order_RemainingHours" xml:space="preserve"><value>残り{0}時間{1}分</value></data>
   <data name="Js_Order_RemainingMinutes" xml:space="preserve"><value>残り{0}分</value></data>
   <data name="Js_PaymentInfo_SaveFailed" xml:space="preserve"><value>支払い情報を保存できません</value></data>
@@ -1383,4 +1391,23 @@
   <data name="AdminMsg_Auction_BulkDeletedWithSkip" xml:space="preserve">
     <value>{0}/{1}件削除; スキップ: {2}</value>
   </data>
+  <data name="Faq_Page_Subtitle" xml:space="preserve"><value>RareCard Auctionsの入札、出品、鑑定、安全性に関する回答をご確認ください。</value></data>
+  <data name="Faq_Section_Buying_Title" xml:space="preserve"><value>購入</value></data>
+  <data name="Faq_Section_Selling_Title" xml:space="preserve"><value>出品</value></data>
+  <data name="Faq_Section_Security_Title" xml:space="preserve"><value>セキュリティ</value></data>
+  <data name="Faq_QuestionCount" xml:space="preserve"><value>{0} 件の質問</value></data>
+  <data name="Faq_Buying_Q1" xml:space="preserve"><value>入札方法は？</value></data>
+  <data name="Faq_Buying_A1" xml:space="preserve"><value>RareCardアカウントを作成し、開催中オークションを選択して現在価格より高い金額で入札してください。上書き入札された場合も即時通知されます。</value></data>
+  <data name="Faq_Buying_Q2" xml:space="preserve"><value>配送料はどのように計算されますか？</value></data>
+  <data name="Faq_Buying_A2" xml:space="preserve"><value>配送料はチェックアウト時に商品価格、配送先、保険レベルに応じて計算されます。国内配送は通常$15〜$45です。</value></data>
+  <data name="Faq_Buying_Q3" xml:space="preserve"><value>国際入札は可能ですか？</value></data>
+  <data name="Faq_Buying_A3" xml:space="preserve"><value>はい。一部地域で国際入札に対応しています。輸入関税・通関手数料は購入者負担です。国別条件はサポートへお問い合わせください。</value></data>
+  <data name="Faq_Selling_Q1" xml:space="preserve"><value>プラットフォーム手数料は？</value></data>
+  <data name="Faq_Selling_A1" xml:space="preserve"><value>主な費用は3つです。(1) 入札登録デポジット（落札者以外へ返金、落札者は決済時に充当）(2) 購入者チェックアウト手数料 (3) 売り手成功手数料（決済完了時に商品小計から控除）。売上純額 = 小計 − 成功手数料。送料・Vault保険は別計上です。出品手数料はありません。</value></data>
+  <data name="Faq_Selling_Q2" xml:space="preserve"><value>カードはどう発送しますか？</value></data>
+  <data name="Faq_Selling_A2" xml:space="preserve"><value>出品承認後、セラーダッシュボードで前払い保険付き配送ラベルを発行します。カードは硬質メーラーまたはスラブケースで、追跡付きで発送してください。</value></data>
+  <data name="Faq_Security_Q1" xml:space="preserve"><value>カードは保険対象ですか？</value></data>
+  <data name="Faq_Security_A1" xml:space="preserve"><value>Vault保管中および輸送中のカードは、掲載価格まで全額保険対象です。受領時から購入者への配達完了まで補償されます。</value></data>
+  <data name="Faq_Security_Q2" xml:space="preserve"><value>真贋確認はどう行いますか？</value></data>
+  <data name="Faq_Security_A2" xml:space="preserve"><value>PSA/BGS API連携によるリアルタイム照合に加え、掲載前に専門キュレーターによる10項目の実物検査を行います。</value></data>
 </root>

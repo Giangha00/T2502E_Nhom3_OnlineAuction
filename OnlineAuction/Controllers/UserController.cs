@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using OnlineAuction;
 using OnlineAuction.Configurations;
 using OnlineAuction.Entities;
 using OnlineAuction.Models;
@@ -12,13 +14,19 @@ public class UserController : Controller
 {
     private readonly IUserService _userService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly INotificationService _notificationService;
+    private readonly IStringLocalizer<SharedResource> _localizer;
 
     public UserController(
         IUserService userService,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        INotificationService notificationService,
+        IStringLocalizer<SharedResource> localizer)
     {
         _userService = userService;
         _userManager = userManager;
+        _notificationService = notificationService;
+        _localizer = localizer;
     }
 
     public async Task<IActionResult> Detail(int id)
@@ -48,14 +56,34 @@ public class UserController : Controller
 
         if (!ModelState.IsValid)
         {
-            TempData["ErrorMessage"] = string.Join(
+            var message = string.Join(
                 " ",
                 ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).Where(m => !string.IsNullOrWhiteSpace(m)));
+            await PushProfileNotificationAsync(currentUserId, false, message);
             return RedirectToAction(nameof(Detail), new { id = currentUserId });
         }
 
         var result = await _userService.UpdateOwnProfileAsync(currentUserId, model);
-        TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+        await PushProfileNotificationAsync(currentUserId, result.Success, result.Message);
         return RedirectToAction(nameof(Detail), new { id = currentUserId });
+    }
+
+    private Task PushProfileNotificationAsync(int userId, bool isSuccess, string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return Task.CompletedTask;
+        }
+
+        return _notificationService.CreateAndPushAsync(
+            userId,
+            isSuccess ? _localizer["Common_Success"] : _localizer["Common_Error"],
+            message,
+            NotificationType.System,
+            $"/User/Detail/{userId}",
+            referenceType: isSuccess
+                ? NotificationReferenceTypes.ProfileUpdated
+                : NotificationReferenceTypes.ProfileUpdateFailed,
+            referenceId: userId);
     }
 }

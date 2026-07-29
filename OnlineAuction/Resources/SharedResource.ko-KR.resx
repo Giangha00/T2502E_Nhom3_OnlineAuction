@@ -849,8 +849,16 @@
   <data name="Js_ProductDetail_RegistrationCancelled" xml:space="preserve"><value>등록이 취소되었습니다.</value></data>
   <data name="Js_ProductDetail_CancelRegistrationFailed" xml:space="preserve"><value>등록을 취소할 수 없습니다.</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>추가 중…</value></data>
+  <data name="Order_ClearBuyNow" xml:space="preserve"><value>모두 삭제</value></data>
+  <data name="Order_ClearBuyNow_Title" xml:space="preserve"><value>Buy Now 상품을 모두 삭제할까요?</value></data>
+  <data name="Order_ClearBuyNow_Message" xml:space="preserve"><value>체크 여부와 관계없이 결제 센터의 모든 Buy Now 상품을 삭제합니다.</value></data>
+  <data name="Order_ClearBuyNow_Note" xml:space="preserve"><value>경매 낙찰 청구서는 유지됩니다. 삭제한 Buy Now 상품은 다시 구매할 수 있습니다.</value></data>
+  <data name="Order_ClearBuyNow_Success" xml:space="preserve"><value>모든 Buy Now 상품이 주문에서 삭제되었습니다.</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>장바구니에 추가됨.</value></data>
+  <data name="Js_BuyNow_AlreadyInCart" xml:space="preserve"><value>이 상품은 이미 주문에 있습니다.</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>장바구니에 추가할 수 없습니다. 다시 시도하세요.</value></data>
+  <data name="AlertModal_Ok" xml:space="preserve"><value>확인</value></data>
+  <data name="AlertModal_Title" xml:space="preserve"><value>알림</value></data>
   <data name="Js_Order_RemainingHours" xml:space="preserve"><value>{0}시간 {1}분 남음</value></data>
   <data name="Js_Order_RemainingMinutes" xml:space="preserve"><value>{0}분 남음</value></data>
   <data name="Js_PaymentInfo_SaveFailed" xml:space="preserve"><value>결제 정보를 저장할 수 없습니다</value></data>
@@ -1383,4 +1391,23 @@
   <data name="AdminMsg_Auction_BulkDeletedWithSkip" xml:space="preserve">
     <value>{0}/{1}개 삭제; 건너뜀: {2}</value>
   </data>
+  <data name="Faq_Page_Subtitle" xml:space="preserve"><value>RareCard Auctions의 입찰, 판매, 감정, 보안 관련 답변을 확인하세요.</value></data>
+  <data name="Faq_Section_Buying_Title" xml:space="preserve"><value>구매</value></data>
+  <data name="Faq_Section_Selling_Title" xml:space="preserve"><value>판매</value></data>
+  <data name="Faq_Section_Security_Title" xml:space="preserve"><value>보안</value></data>
+  <data name="Faq_QuestionCount" xml:space="preserve"><value>{0}개 질문</value></data>
+  <data name="Faq_Buying_Q1" xml:space="preserve"><value>입찰은 어떻게 하나요?</value></data>
+  <data name="Faq_Buying_A1" xml:space="preserve"><value>RareCard 계정을 만들고 진행 중인 경매를 선택한 뒤 현재가보다 높은 금액으로 입찰하세요. 상회 입찰 시 즉시 알림을 받습니다.</value></data>
+  <data name="Faq_Buying_Q2" xml:space="preserve"><value>배송비는 어떻게 계산되나요?</value></data>
+  <data name="Faq_Buying_A2" xml:space="preserve"><value>배송비는 결제 시 상품 가치, 배송지, 보험 수준에 따라 계산됩니다. 국내 배송은 일반적으로 $15~$45 범위입니다.</value></data>
+  <data name="Faq_Buying_Q3" xml:space="preserve"><value>해외 입찰이 가능한가요?</value></data>
+  <data name="Faq_Buying_A3" xml:space="preserve"><value>네, 일부 지역에서 해외 입찰을 지원합니다. 관세/통관 수수료는 구매자 부담이며 국가별 정책은 고객지원에 문의하세요.</value></data>
+  <data name="Faq_Selling_Q1" xml:space="preserve"><value>플랫폼 수수료는 무엇인가요?</value></data>
+  <data name="Faq_Selling_A1" xml:space="preserve"><value>주요 수수료는 3가지입니다. (1) 입찰 등록 보증금(낙찰자 외 환불, 낙찰자는 결제 시 차감) (2) 구매자 체크아웃 수수료 (3) 판매 성공 수수료(결제 완료 시 상품 소계에서 차감). 판매자 순수익 = 소계 − 성공 수수료. 배송비와 Vault 보험료는 별도입니다. 등록 수수료는 없습니다.</value></data>
+  <data name="Faq_Selling_Q2" xml:space="preserve"><value>카드는 어떻게 보내나요?</value></data>
+  <data name="Faq_Selling_A2" xml:space="preserve"><value>리스팅 승인 후 판매자 대시보드에서 선결제 보험 배송 라벨을 발급하세요. 카드는 단단한 메일러 또는 슬랩 케이스에 넣고 추적 가능하게 발송해야 합니다.</value></data>
+  <data name="Faq_Security_Q1" xml:space="preserve"><value>카드가 보험 적용되나요?</value></data>
+  <data name="Faq_Security_A1" xml:space="preserve"><value>Vault 보관 및 운송 중인 모든 카드는 등록 가치 한도 내에서 전액 보험 적용됩니다. 당사 수령 시점부터 구매자 배송 완료까지 보장됩니다.</value></data>
+  <data name="Faq_Security_Q2" xml:space="preserve"><value>진품 검증은 어떻게 하나요?</value></data>
+  <data name="Faq_Security_A2" xml:space="preserve"><value>PSA/BGS API 연동 실시간 슬랩 검증과 함께, 라이브 전 전문 큐레이터의 10포인트 실물 검수를 진행합니다.</value></data>
 </root>
