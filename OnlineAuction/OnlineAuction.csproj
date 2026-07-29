@@ -9,10 +9,21 @@
         <UserSecretsId>online-auction-dev-secrets</UserSecretsId>
     </PropertyGroup>
 
+    <ItemGroup>
+      <InternalsVisibleTo Include="OnlineAuction.Tests" />
+    </ItemGroup>
+
     <!-- Keep machine-local secrets off App Service publish output -->
     <ItemGroup>
       <Content Update="appsettings.Local.json" CopyToPublishDirectory="Never" CopyToOutputDirectory="PreserveNewest" />
       <Content Update="appsettings.Local.json.example" CopyToPublishDirectory="Never" />
+    </ItemGroup>
+
+    <!-- Standalone Excel generator; not part of the web app -->
+    <ItemGroup>
+      <Compile Remove="scripts\spec-test\**" />
+      <Content Remove="scripts\spec-test\**" />
+      <None Include="scripts\spec-test\**" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)' == 'Debug'">
