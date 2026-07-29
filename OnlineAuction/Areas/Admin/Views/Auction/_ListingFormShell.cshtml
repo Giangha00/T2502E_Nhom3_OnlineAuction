@@ -38,7 +38,7 @@
             @if (Model.IsScheduleLocked)
             {
                 <div class="rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-theme-sm text-warning-800">
-                    Phiên đang live — trạng thái và lịch đăng ký/bắt đầu bị khóa. Chỉ có thể gia hạn thời gian kết thúc và cập nhật mô tả.
+                    @Localizer["Admin_Auction_LiveLockBanner"]
                 </div>
             }
 
@@ -71,12 +71,7 @@
         </div>
 
         <aside class="space-y-4 xl:sticky xl:top-24 xl:self-start">
-            <div class="hidden xl:block">
-                @await Html.PartialAsync(previewPartial)
-            </div>
-            <div class="xl:hidden">
-                @await Html.PartialAsync(previewPartial)
-            </div>
+            @await Html.PartialAsync(previewPartial)
         </aside>
     </form>
 </div>

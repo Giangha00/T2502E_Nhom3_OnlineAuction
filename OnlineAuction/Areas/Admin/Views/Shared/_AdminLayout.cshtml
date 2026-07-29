@@ -42,9 +42,9 @@
     <script>
         window.confirmModalConfig = {
             i18n: {
-                confirm: 'Confirm',
-                cancel: 'Cancel',
-                title: 'Confirm'
+                confirm: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["ConfirmModal_Confirm"].Value)),
+                cancel: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["ConfirmModal_Cancel"].Value)),
+                title: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["ConfirmModal_Confirm"].Value))
             }
         };
     </script>

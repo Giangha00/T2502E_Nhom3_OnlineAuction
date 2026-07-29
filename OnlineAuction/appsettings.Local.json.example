@@ -79,6 +79,7 @@
     "RefreshTestAuctionsOnStartup": false,
     "RefreshTestAuctionsInDevelopment": false,
     "SyncCatalogOnStartup": false,
-    "SyncCatalogInDevelopment": true
+    "SyncCatalogInDevelopment": false,
+    "RunAuctionCatalogSeederOnStartup": false
   }
 }

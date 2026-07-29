@@ -9,14 +9,8 @@
 
 .admin-dashboard__hero {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
-}
-
-@media (max-width: 1279px) {
-    .admin-dashboard__hero {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
 }
 
 @media (max-width: 639px) {
@@ -33,6 +27,29 @@
     background: #fff;
     padding: 1.25rem;
     min-height: 8.5rem;
+}
+
+a.admin-dashboard-kpi--link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+a.admin-dashboard-kpi--link:hover {
+    border-color: color-mix(in srgb, var(--dash-accent, var(--dash-brand)) 45%, #e4e7ec);
+    box-shadow: 0 8px 20px rgba(16, 24, 40, 0.08);
+    transform: translateY(-1px);
+}
+
+a.admin-dashboard-kpi--link:focus-visible {
+    outline: 2px solid var(--dash-accent, var(--dash-brand));
+    outline-offset: 2px;
+}
+
+.dark a.admin-dashboard-kpi--link:hover {
+    border-color: color-mix(in srgb, var(--dash-accent, var(--dash-brand)) 55%, #1d2939);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 .dark .admin-dashboard-kpi {

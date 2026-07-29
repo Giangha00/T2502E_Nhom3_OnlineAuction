@@ -322,7 +322,7 @@
                                         class="@FooterLinkClass(isFaqPage)">@Localizer["Layout_Footer_HowToBid"]</a></li>
                                 <li><a asp-controller="Faq" asp-action="Index" asp-fragment="faq-selling"
                                         class="@FooterLinkClass(isFaqPage)">@Localizer["Layout_Footer_SellerGuide"]</a></li>
-                                <li><a href="/Admin/Account/Login?force=true" class="@FooterLinkClass(false)">Admin Login</a></li>
+                                <li><a href="/Admin/Account/Login?force=true" class="@FooterLinkClass(false)">@Localizer["Layout_Footer_AdminLogin"]</a></li>
                             </ul>
                         </div>
                         <div>
@@ -346,6 +346,12 @@
     }
 
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        window.homeCarouselI18n = {
+            showingZero: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Home_Carousel_ShowingZero"].Value)),
+            showingRange: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Home_Carousel_ShowingRange"].Value))
+        };
+    </script>
     @if (!isStandalonePage)
     {
         <script>
@@ -374,10 +380,18 @@
         </script>
         <script src="~/js/auth-modal.js" asp-append-version="true"></script>
         <script>
+            @{
+                var alertOk = Localizer["AlertModal_Ok"];
+                var alertTitle = Localizer["AlertModal_Title"];
+            }
             window.confirmModalConfig = {
                 i18n: {
                     confirm: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["ConfirmModal_Confirm"].Value)),
-                    cancel: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Common_Cancel"].Value))
+                    cancel: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Common_Cancel"].Value)),
+                    ok: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(alertOk.ResourceNotFound ? Localizer["ConfirmModal_Confirm"].Value : alertOk.Value)),
+                    successTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Common_Success"].Value)),
+                    errorTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Common_Error"].Value)),
+                    title: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(alertTitle.ResourceNotFound ? Localizer["Common_Success"].Value : alertTitle.Value))
                 }
             };
         </script>

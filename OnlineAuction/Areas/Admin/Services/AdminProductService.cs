@@ -1,6 +1,7 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using OnlineAuction.Areas.Admin.ViewModels.Products;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
@@ -19,6 +20,7 @@ public class AdminProductService : IAdminProductService
         "https://res.cloudinary.com/demo/image/upload/c_fill,w_900,h_900,q_auto,f_auto/sample.jpg";
 
     private const int MaxGalleryImages = 4;
+    private const int MaxDocumentsPerProduct = 5;
 
     private static readonly string[] BlockDeleteAuctionStatuses =
     [
@@ -35,11 +37,16 @@ public class AdminProductService : IAdminProductService
 
     private readonly AuctionHouseDbContext _dbContext;
     private readonly IPhotoService _photoService;
+    private readonly IStringLocalizer<SharedResource> _localizer;
 
-    public AdminProductService(AuctionHouseDbContext dbContext, IPhotoService photoService)
+    public AdminProductService(
+        AuctionHouseDbContext dbContext,
+        IPhotoService photoService,
+        IStringLocalizer<SharedResource> localizer)
     {
         _dbContext = dbContext;
         _photoService = photoService;
+        _localizer = localizer;
     }
 
     public async Task<ProductTemplateListViewModel> GetProductTemplatesAsync(ProductTemplateFilterViewModel filter)
@@ -58,6 +65,27 @@ public class AdminProductService : IAdminProductService
                 template.Category.Name.Contains(keyword) ||
                 (template.SetName != null && template.SetName.Contains(keyword)) ||
                 (template.CardNumber != null && template.CardNumber.Contains(keyword)));
+        }
+
+        var dateRange = ParseDateRange(filter.DateRange);
+        if (dateRange.StartDate.HasValue && dateRange.EndDate.HasValue)
+        {
+            query = query.Where(template =>
+                template.CreatedAt >= dateRange.StartDate.Value &&
+                template.CreatedAt < dateRange.EndDate.Value);
+        }
+        else
+        {
+            if (filter.FromDate.HasValue)
+            {
+                query = query.Where(template => template.CreatedAt >= filter.FromDate.Value);
+            }
+
+            if (filter.ToDate.HasValue)
+            {
+                var toDateExclusive = filter.ToDate.Value.Date.AddDays(1);
+                query = query.Where(template => template.CreatedAt < toDateExclusive);
+            }
         }
 
         query = filter.SortOrder switch
@@ -113,6 +141,8 @@ public class AdminProductService : IAdminProductService
         {
             return null;
         }
+
+        await BackfillMissingProductPricesAsync(templateId);
 
         filter.ProductTemplateId = templateId;
         filter.SortOrder = string.IsNullOrWhiteSpace(filter.SortOrder) ? "price_asc" : filter.SortOrder;
@@ -182,7 +212,7 @@ public class AdminProductService : IAdminProductService
 
         if (string.IsNullOrWhiteSpace(imageUrl))
         {
-            return (false, "Vui lòng tải ảnh chính cho mẫu sản phẩm.");
+            return (false, _localizer["AdminMsg_Template_NeedPrimaryImage"].Value);
         }
 
         var template = new ProductTemplate
@@ -204,14 +234,14 @@ public class AdminProductService : IAdminProductService
         _dbContext.ProductTemplates.Add(template);
         await _dbContext.SaveChangesAsync();
 
-        return (true, "Đã tạo mẫu sản phẩm thành công.");
+        return (true, _localizer["AdminMsg_Template_Created"].Value);
     }
 
     public async Task<(bool Success, string Message)> UpdateTemplateAsync(ProductTemplateFormViewModel model)
     {
         if (!model.Id.HasValue)
         {
-            return (false, "Thiếu mã mẫu sản phẩm.");
+            return (false, _localizer["AdminMsg_Template_MissingId"].Value);
         }
 
         var template = await _dbContext.ProductTemplates
@@ -219,7 +249,7 @@ public class AdminProductService : IAdminProductService
 
         if (template is null)
         {
-            return (false, "Không tìm thấy mẫu sản phẩm.");
+            return (false, _localizer["AdminMsg_Template_NotFound"].Value);
         }
 
         var validationError = await ValidateTemplateAsync(model);
@@ -257,7 +287,7 @@ public class AdminProductService : IAdminProductService
 
         await _dbContext.SaveChangesAsync();
 
-        return (true, "Đã cập nhật mẫu sản phẩm thành công.");
+        return (true, _localizer["AdminMsg_Template_Updated"].Value);
     }
 
     public async Task<(bool Success, string Message)> DeleteTemplateAsync(int id, int adminUserId)
@@ -268,12 +298,12 @@ public class AdminProductService : IAdminProductService
 
         if (template is null)
         {
-            return (false, "Không tìm thấy mẫu sản phẩm.");
+            return (false, _localizer["AdminMsg_Template_NotFound"].Value);
         }
 
         if (template.Products.Any(product => product.DeletedAt == null))
         {
-            return (false, "Không thể xóa mẫu sản phẩm đang có sản phẩm của người bán.");
+            return (false, _localizer["AdminMsg_Template_CannotDeleteInUse"].Value);
         }
 
         var now = DateTime.UtcNow;
@@ -283,7 +313,7 @@ public class AdminProductService : IAdminProductService
 
         await _dbContext.SaveChangesAsync();
 
-        return (true, "Đã xóa mẫu sản phẩm thành công.");
+        return (true, _localizer["AdminMsg_Template_Deleted"].Value);
     }
 
     public async Task<ProductListViewModel> GetProductsAsync(ProductFilterViewModel filter)
@@ -403,6 +433,7 @@ public class AdminProductService : IAdminProductService
             {
                 Id = product.Id,
                 Name = product.Name,
+                ShortDescription = product.ShortDescription,
                 ThumbnailUrl = product.PrimaryImage,
                 CategoryName = product.Category.Name,
                 SellerId = product.SellerId,
@@ -410,6 +441,10 @@ public class AdminProductService : IAdminProductService
                 SellerEmail = product.Seller.Email ?? string.Empty,
                 Condition = product.Condition,
                 GradeLabel = product.GradeLabel,
+                SetName = product.SetName,
+                Language = product.Language,
+                Year = product.Year,
+                Subtitle = product.Subtitle,
                 CardNumber = product.CardNumber,
                 CertNumber = product.CertNumber,
                 EstimatedValue = product.EstimatedValue,
@@ -440,6 +475,8 @@ public class AdminProductService : IAdminProductService
 
     public async Task<ProductDetailViewModel?> GetDetailsAsync(int id)
     {
+        await BackfillMissingProductPricesAsync(productId: id);
+
         var product = await _dbContext.Products
             .AsNoTracking()
             .Where(item => item.Id == id && item.DeletedAt == null)
@@ -537,7 +574,7 @@ public class AdminProductService : IAdminProductService
             if (blockingAuction is not null)
             {
                 deleteBlockReason =
-                    $"phiên đấu giá #{blockingAuction.Id} đang ở trạng thái {FormatStatusLabel(blockingAuction.Status)}.";
+                    _localizer.GetString("AdminMsg_Product_BlockingAuction", blockingAuction.Id, FormatStatusLabel(blockingAuction.Status)).Value;
             }
         }
 
@@ -557,17 +594,12 @@ public class AdminProductService : IAdminProductService
             SellerName = product.SellerName,
             SellerEmail = product.SellerEmail,
             Condition = product.Condition,
-            ProductOrigin = product.ProductOrigin,
             Year = product.Year,
             SetName = product.SetName,
             Language = product.Language,
             CardNumber = product.CardNumber,
             GradeLabel = product.GradeLabel,
             CertNumber = product.CertNumber,
-            GradingCentering = product.GradingCentering,
-            GradingCorners = product.GradingCorners,
-            GradingEdges = product.GradingEdges,
-            GradingSurface = product.GradingSurface,
             EstimatedValue = product.EstimatedValue,
             ImportPrice = product.ImportPrice,
             PrimaryImage = product.PrimaryImage,
@@ -631,17 +663,12 @@ public class AdminProductService : IAdminProductService
             CategoryId = product.CategoryId,
             SellerId = product.SellerId,
             Condition = product.Condition,
-            ProductOrigin = product.ProductOrigin,
             Year = product.Year,
             SetName = product.SetName,
             Language = product.Language,
             CardNumber = product.CardNumber,
             GradeLabel = product.GradeLabel,
             CertNumber = product.CertNumber,
-            GradingCentering = product.GradingCentering,
-            GradingCorners = product.GradingCorners,
-            GradingEdges = product.GradingEdges,
-            GradingSurface = product.GradingSurface,
             EstimatedValue = product.EstimatedValue,
             ImportPrice = product.ImportPrice,
             PrimaryImageUrl = product.PrimaryImage,
@@ -699,7 +726,7 @@ public class AdminProductService : IAdminProductService
 
         if (galleryFiles.Count > MaxGalleryImages)
         {
-            return (false, $"Chỉ được tải tối đa {MaxGalleryImages} ảnh thư viện cho mỗi sản phẩm.");
+            return (false, _localizer.GetString("AdminMsg_Product_GalleryLimit", MaxGalleryImages).Value);
         }
 
         var documentValidation = ValidateDocumentFiles(model.DocumentFiles);
@@ -802,7 +829,7 @@ public class AdminProductService : IAdminProductService
             await _dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return (true, "Đã tạo sản phẩm thành công.");
+            return (true, _localizer["AdminMsg_Product_Created"].Value);
         }
         catch
         {
@@ -815,7 +842,7 @@ public class AdminProductService : IAdminProductService
     {
         if (!model.Id.HasValue)
         {
-            return (false, "Thiếu mã sản phẩm.");
+            return (false, _localizer["AdminMsg_Product_MissingId"].Value);
         }
 
         var product = await _dbContext.Products
@@ -826,7 +853,7 @@ public class AdminProductService : IAdminProductService
 
         if (product is null)
         {
-            return (false, "Không tìm thấy sản phẩm.");
+            return (false, _localizer["AdminMsg_Product_NotFound"].Value);
         }
 
         var isSellerLocked = product.Auctions.Any(auction =>
@@ -834,12 +861,12 @@ public class AdminProductService : IAdminProductService
 
         if (isSellerLocked && model.SellerId != product.SellerId)
         {
-            return (false, "Không thể đổi người bán khi sản phẩm đang có phiên đấu giá đang diễn ra hoặc sắp kết thúc.");
+            return (false, _localizer["AdminMsg_Product_CannotChangeSellerLive"].Value);
         }
 
         if (isSellerLocked && model.ProductTemplateId != product.ProductTemplateId)
         {
-            return (false, "Không thể đổi mẫu sản phẩm khi sản phẩm đang có phiên đấu giá đang diễn ra hoặc sắp kết thúc.");
+            return (false, _localizer["AdminMsg_Product_CannotChangeTemplateLive"].Value);
         }
 
         var validationError = await ValidateReferencesAsync(model);
@@ -862,7 +889,7 @@ public class AdminProductService : IAdminProductService
 
         if (remainingGalleryCount + newGalleryFiles.Count > MaxGalleryImages)
         {
-            return (false, $"Thư viện chỉ được có tối đa {MaxGalleryImages} ảnh.");
+            return (false, _localizer.GetString("AdminMsg_Product_GalleryMax", MaxGalleryImages).Value);
         }
 
         var documentValidation = ValidateDocumentFiles(model.DocumentFiles);
@@ -876,7 +903,7 @@ public class AdminProductService : IAdminProductService
         var newDocumentCount = model.DocumentFiles.Count(file => file is { Length: > 0 });
         if (remainingDocumentCount + newDocumentCount > MaxDocumentsPerProduct)
         {
-            return (false, $"Mỗi sản phẩm chỉ được có tối đa {MaxDocumentsPerProduct} tài liệu.");
+            return (false, _localizer.GetString("AdminMsg_Product_DocumentsMax", MaxDocumentsPerProduct).Value);
         }
 
         string? newImageUrl = null;
@@ -978,7 +1005,7 @@ public class AdminProductService : IAdminProductService
         product.UpdatedAt = now;
         await _dbContext.SaveChangesAsync();
 
-        return (true, "Đã cập nhật sản phẩm thành công.");
+        return (true, _localizer["AdminMsg_Product_Updated"].Value);
     }
 
     public async Task<(bool Success, string Message)> DeleteAsync(int id, int adminUserId)
@@ -991,26 +1018,26 @@ public class AdminProductService : IAdminProductService
 
         if (product is null)
         {
-            return (false, "Không tìm thấy sản phẩm.");
+            return (false, _localizer["AdminMsg_Product_NotFound"].Value);
         }
 
         var blockingReason = GetDeleteBlockingReason(product);
         if (blockingReason is not null)
         {
-            return (false, $"Không thể xóa sản phẩm này vì {blockingReason}");
+            return (false, _localizer.GetString("AdminMsg_Product_CannotDeleteBecause", blockingReason).Value);
         }
 
         SoftDeleteProduct(product, adminUserId);
         await _dbContext.SaveChangesAsync();
 
-        return (true, "Đã xóa sản phẩm thành công.");
+        return (true, _localizer["AdminMsg_Product_Deleted"].Value);
     }
 
     public async Task<(bool Success, string Message)> BulkDeleteAsync(IReadOnlyList<int> productIds, int adminUserId)
     {
         if (productIds.Count == 0)
         {
-            return (false, "Vui lòng chọn ít nhất một sản phẩm.");
+            return (false, _localizer["AdminMsg_Product_SelectAtLeastOne"].Value);
         }
 
         var products = await _dbContext.Products
@@ -1022,7 +1049,7 @@ public class AdminProductService : IAdminProductService
 
         if (products.Count == 0)
         {
-            return (false, "Không tìm thấy sản phẩm nào.");
+            return (false, _localizer["AdminMsg_Product_NoneFound"].Value);
         }
 
         var deletedCount = 0;
@@ -1050,13 +1077,14 @@ public class AdminProductService : IAdminProductService
 
         if (skippedMessages.Count == 0)
         {
-            return (true, $"Đã xóa {deletedCount} sản phẩm thành công.");
+            return (true, _localizer.GetString("AdminMsg_Product_BulkDeleted", deletedCount).Value);
         }
 
-        return (true, $"Đã xóa {deletedCount} sản phẩm. Bỏ qua {skippedMessages.Count}: {string.Join(" ", skippedMessages)}");
+        var skippedSummary = string.Join(" ", skippedMessages);
+        return (true, _localizer.GetString("AdminMsg_Product_BulkDeletedWithSkip", deletedCount, skippedMessages.Count, skippedSummary).Value);
     }
 
-    private static string? GetDeleteBlockingReason(Product product)
+    private string? GetDeleteBlockingReason(Product product)
     {
         var blockingAuction = product.Auctions
             .Where(auction => auction.DeletedAt == null)
@@ -1067,7 +1095,8 @@ public class AdminProductService : IAdminProductService
             return null;
         }
 
-        return $"phiên đấu giá #{blockingAuction.Id} đang ở trạng thái {FormatStatusLabel(blockingAuction.Status)}.";
+        var statusLabel = FormatStatusLabel(blockingAuction.Status);
+        return _localizer.GetString("AdminMsg_Product_BlockingAuction", blockingAuction.Id, statusLabel).Value;
     }
 
     private static void SoftDeleteProduct(Product product, int adminUserId)
@@ -1104,17 +1133,17 @@ public class AdminProductService : IAdminProductService
             Subtitle = TrimOrNull(model.Subtitle),
             DescriptionHtml = model.DescriptionHtml,
             Condition = model.Condition,
-            ProductOrigin = TrimOrNull(model.ProductOrigin),
             Year = model.Year,
             SetName = TrimOrNull(model.SetName),
             Language = TrimOrNull(model.Language),
             CardNumber = TrimOrNull(model.CardNumber),
             GradeLabel = TrimOrNull(model.GradeLabel),
             CertNumber = TrimOrNull(model.CertNumber),
-            GradingCentering = TrimOrNull(model.GradingCentering),
-            GradingCorners = TrimOrNull(model.GradingCorners),
-            GradingEdges = TrimOrNull(model.GradingEdges),
-            GradingSurface = TrimOrNull(model.GradingSurface),
+            ProductOrigin = null,
+            GradingCentering = null,
+            GradingCorners = null,
+            GradingEdges = null,
+            GradingSurface = null,
             EstimatedValue = model.EstimatedValue,
             ImportPrice = model.ImportPrice,
             CreatedAt = now
@@ -1131,17 +1160,17 @@ public class AdminProductService : IAdminProductService
         product.Subtitle = TrimOrNull(model.Subtitle);
         product.DescriptionHtml = model.DescriptionHtml;
         product.Condition = model.Condition;
-        product.ProductOrigin = TrimOrNull(model.ProductOrigin);
         product.Year = model.Year;
         product.SetName = TrimOrNull(model.SetName);
         product.Language = TrimOrNull(model.Language);
         product.CardNumber = TrimOrNull(model.CardNumber);
         product.GradeLabel = TrimOrNull(model.GradeLabel);
         product.CertNumber = TrimOrNull(model.CertNumber);
-        product.GradingCentering = TrimOrNull(model.GradingCentering);
-        product.GradingCorners = TrimOrNull(model.GradingCorners);
-        product.GradingEdges = TrimOrNull(model.GradingEdges);
-        product.GradingSurface = TrimOrNull(model.GradingSurface);
+        product.ProductOrigin = null;
+        product.GradingCentering = null;
+        product.GradingCorners = null;
+        product.GradingEdges = null;
+        product.GradingSurface = null;
         product.EstimatedValue = model.EstimatedValue;
         product.ImportPrice = model.ImportPrice;
     }
@@ -1150,7 +1179,7 @@ public class AdminProductService : IAdminProductService
     {
         if (!model.ProductTemplateId.HasValue)
         {
-            return "Mẫu sản phẩm đã chọn không khả dụng.";
+            return _localizer["AdminMsg_Template_Unavailable"].Value;
         }
 
         var templateExists = await _dbContext.ProductTemplates
@@ -1163,7 +1192,7 @@ public class AdminProductService : IAdminProductService
 
         if (!templateExists)
         {
-            return "Mẫu sản phẩm đã chọn không khả dụng.";
+            return _localizer["AdminMsg_Template_Unavailable"].Value;
         }
 
         var sellerExists = await _dbContext.Users
@@ -1175,34 +1204,33 @@ public class AdminProductService : IAdminProductService
 
         if (!sellerExists)
         {
-            return "Người bán đã chọn không khả dụng.";
+            return _localizer["AdminMsg_Seller_Unavailable"].Value;
         }
 
         return null;
     }
 
-    private const int MaxDocumentsPerProduct = 5;
-
-    private static string? ValidateDocumentFiles(IEnumerable<IFormFile> files)
+    private string? ValidateDocumentFiles(IEnumerable<IFormFile> files)
     {
         const long maxFileSize = 5 * 1024 * 1024;
-        var uploadCount = files.Count(file => file is { Length: > 0 });
+        var fileList = files as IList<IFormFile> ?? files.ToList();
+        var uploadCount = fileList.Count(file => file is { Length: > 0 });
         if (uploadCount > MaxDocumentsPerProduct)
         {
-            return $"Chỉ được tải tối đa {MaxDocumentsPerProduct} tài liệu cho mỗi sản phẩm.";
+            return _localizer.GetString("AdminMsg_Documents_UploadMax", MaxDocumentsPerProduct).Value;
         }
 
-        foreach (var file in files.Where(file => file is { Length: > 0 }))
+        foreach (var file in fileList.Where(file => file is { Length: > 0 }))
         {
             if (file.Length > maxFileSize)
             {
-                return "Dung lượng tài liệu không được vượt quá 5MB.";
+                return _localizer["AdminMsg_Documents_SizeLimit"].Value;
             }
 
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
             if (extension != ".pdf")
             {
-                return "Tài liệu phải là file PDF.";
+                return _localizer["AdminMsg_Documents_PdfOnly"].Value;
             }
         }
 
@@ -1317,7 +1345,7 @@ public class AdminProductService : IAdminProductService
             .ToList();
     }
 
-    private static List<SelectListItem> BuildConditionOptions(string? selected = null)
+    private List<SelectListItem> BuildConditionOptions(string? selected = null)
     {
         return new[] { "Graded", "Ungraded" }
             .Select(condition => new SelectListItem
@@ -1329,11 +1357,11 @@ public class AdminProductService : IAdminProductService
             .ToList();
     }
 
-    private static string FormatConditionLabel(string condition) =>
+    private string FormatConditionLabel(string condition) =>
         condition switch
         {
-            "Graded" => "Đã chấm điểm",
-            "Ungraded" => "Chưa chấm điểm",
+            "Graded" => _localizer["AdminMsg_Condition_Graded"].Value,
+            "Ungraded" => _localizer["AdminMsg_Condition_Ungraded"].Value,
             _ => condition
         };
 
@@ -1376,6 +1404,8 @@ public class AdminProductService : IAdminProductService
                 GradeLabel = item.GradeLabel,
                 Language = item.Language,
                 Year = item.Year,
+                ShortDescription = item.ShortDescription,
+                DescriptionHtml = item.DescriptionHtml,
                 PrimaryImage = item.PrimaryImage
             })
             .FirstOrDefaultAsync();
@@ -1409,7 +1439,7 @@ public class AdminProductService : IAdminProductService
 
         if (!categoryExists)
         {
-            return "Danh mục đã chọn không khả dụng.";
+            return _localizer["AdminMsg_Category_Unavailable"].Value;
         }
 
         if (model.PrimaryImageFile is { Length: > 0 })
@@ -1419,18 +1449,18 @@ public class AdminProductService : IAdminProductService
 
             if (model.PrimaryImageFile.Length > maxImageSize)
             {
-                return "Ảnh chính của mẫu sản phẩm không được vượt quá 2MB.";
+                return _localizer["AdminMsg_Template_PrimarySize"].Value;
             }
 
             if (extension is not ".jpg" and not ".jpeg" and not ".png")
             {
-                return "Ảnh chính của mẫu sản phẩm phải là JPEG hoặc PNG.";
+                return _localizer["AdminMsg_Template_PrimaryFormat"].Value;
             }
         }
 
         if (!model.Id.HasValue && model.PrimaryImageFile is not { Length: > 0 })
         {
-            return "Vui lòng tải ảnh chính cho mẫu sản phẩm.";
+            return _localizer["AdminMsg_Template_NeedPrimaryImage"].Value;
         }
 
         var normalizedName = NormalizeTemplateKey(model.Name);
@@ -1461,7 +1491,7 @@ public class AdminProductService : IAdminProductService
             NormalizeTemplateKey(template.GradeLabel) == normalizedGrade);
 
         return isDuplicate
-            ? "Đã tồn tại mẫu sản phẩm đang hoạt động với thông tin trùng khớp."
+            ? _localizer["AdminMsg_Template_Duplicate"].Value
             : null;
     }
 
@@ -1561,14 +1591,96 @@ public class AdminProductService : IAdminProductService
         };
     }
 
-    private static string FormatStatusLabel(string status) =>
+    private string FormatStatusLabel(string status) =>
         status switch
         {
-            AuctionStatuses.Live => "đang diễn ra",
-            AuctionStatuses.EndingSoon => "sắp kết thúc",
-            AuctionStatuses.AwaitingPayment => "đang chờ thanh toán",
+            AuctionStatuses.Live => _localizer["AdminMsg_Status_Live"].Value,
+            AuctionStatuses.EndingSoon => _localizer["AdminMsg_Status_EndingSoon"].Value,
+            AuctionStatuses.AwaitingPayment => _localizer["AdminMsg_Status_AwaitingPayment"].Value,
             _ => status.Replace('_', ' ')
         };
+
+    private async Task BackfillMissingProductPricesAsync(int? templateId = null, int? productId = null)
+    {
+        var query = _dbContext.Products
+            .Include(product => product.Auctions)
+            .Where(product =>
+                product.DeletedAt == null &&
+                (product.EstimatedValue == null || product.ImportPrice == null));
+
+        if (productId.HasValue)
+        {
+            query = query.Where(product => product.Id == productId.Value);
+        }
+        else if (templateId.HasValue)
+        {
+            query = query.Where(product => product.ProductTemplateId == templateId.Value);
+        }
+
+        var products = await query.ToListAsync();
+        if (products.Count == 0)
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        var anyChanged = false;
+
+        foreach (var product in products)
+        {
+            var referencePrice = ResolveReferencePrice(product.Auctions);
+            if (!referencePrice.HasValue || referencePrice.Value <= 0)
+            {
+                continue;
+            }
+
+            var productChanged = false;
+
+            if (!product.EstimatedValue.HasValue)
+            {
+                product.EstimatedValue = referencePrice.Value;
+                productChanged = true;
+            }
+
+            if (!product.ImportPrice.HasValue)
+            {
+                product.ImportPrice = Math.Round(referencePrice.Value * 0.8m, 2, MidpointRounding.AwayFromZero);
+                productChanged = true;
+            }
+
+            if (productChanged)
+            {
+                product.UpdatedAt = now;
+                anyChanged = true;
+            }
+        }
+
+        if (anyChanged)
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+    }
+
+    private static decimal? ResolveReferencePrice(IEnumerable<Auction> auctions)
+    {
+        var auction = auctions
+            .Where(item => item.DeletedAt == null)
+            .OrderByDescending(item => item.CreatedAt)
+            .ThenByDescending(item => item.Id)
+            .FirstOrDefault();
+
+        if (auction is null)
+        {
+            return null;
+        }
+
+        if (auction.BuyNowPrice is > 0)
+        {
+            return auction.BuyNowPrice.Value;
+        }
+
+        return auction.StartingPrice > 0 ? auction.StartingPrice : null;
+    }
 
     private static (DateTime? StartDate, DateTime? EndDate) ParseDateRange(string? dateRange)
     {

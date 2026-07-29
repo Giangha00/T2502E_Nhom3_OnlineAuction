@@ -379,12 +379,16 @@ using (var scope = app.Services.CreateScope())
     var syncCatalog = !refreshTestAuctions && (
         configuration.GetValue("SeedData:SyncCatalogOnStartup", false)
         || (app.Environment.IsDevelopment()
-            && configuration.GetValue("SeedData:SyncCatalogInDevelopment", true)));
+            && configuration.GetValue("SeedData:SyncCatalogInDevelopment", false)));
+    var runAuctionCatalogSeeder = configuration.GetValue("SeedData:RunAuctionCatalogSeederOnStartup", false);
 
     await UserSeeder.SeedAsync(db, userManager);
     await AdminSeeder.SeedAsync(db, userManager, roleManager);
     await PermissionSeeder.SeedAsync(db, roleManager, userManager);
-    await AuctionCatalogSeeder.SeedAsync(db, userManager, refreshTestAuctions, syncCatalog);
+    if (runAuctionCatalogSeeder)
+    {
+        await AuctionCatalogSeeder.SeedAsync(db, userManager, refreshTestAuctions, syncCatalog);
+    }
 }
 
 using (var scope = app.Services.CreateScope())

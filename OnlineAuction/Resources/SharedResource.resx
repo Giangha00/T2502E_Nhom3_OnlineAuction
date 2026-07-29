@@ -927,6 +927,11 @@
   <data name="Order_DepositApplied" xml:space="preserve"><value>Deposit applied</value></data>
   <data name="Order_SelectInvoices" xml:space="preserve"><value>Select invoices to pay</value></data>
   <data name="Order_ItemAdded" xml:space="preserve"><value>Item added to Payment Center. Select invoices below to checkout.</value></data>
+  <data name="Order_ClearBuyNow" xml:space="preserve"><value>Clear all</value></data>
+  <data name="Order_ClearBuyNow_Title" xml:space="preserve"><value>Clear all Buy Now items?</value></data>
+  <data name="Order_ClearBuyNow_Message" xml:space="preserve"><value>This will remove every Buy Now item from your Payment Center, whether checked or not.</value></data>
+  <data name="Order_ClearBuyNow_Note" xml:space="preserve"><value>Auction-win invoices are kept. Cleared Buy Now listings become available again.</value></data>
+  <data name="Order_ClearBuyNow_Success" xml:space="preserve"><value>All Buy Now items have been cleared from your orders.</value></data>
   <data name="Js_Order_NoSelection" xml:space="preserve"><value>Please select at least one product to pay.</value></data>
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Placing bid…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Unable to place bid. Please try again.</value></data>
@@ -944,7 +949,10 @@
   <data name="Js_ProductDetail_CountdownLiveEnd" xml:space="preserve"><value>{0}d {1}h {2}m {3}s remaining</value></data>
   <data name="Js_BuyNow_Adding" xml:space="preserve"><value>Adding…</value></data>
   <data name="Js_BuyNow_AddedToCart" xml:space="preserve"><value>Added to cart.</value></data>
+  <data name="Js_BuyNow_AlreadyInCart" xml:space="preserve"><value>This item is already in your orders.</value></data>
   <data name="Js_BuyNow_AddFailed" xml:space="preserve"><value>Unable to add to cart. Please try again.</value></data>
+  <data name="AlertModal_Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="AlertModal_Title" xml:space="preserve"><value>Notice</value></data>
   <data name="Js_Order_RemainingHours" xml:space="preserve"><value>{0}H {1}M REMAINING</value></data>
   <data name="Js_Order_RemainingMinutes" xml:space="preserve"><value>{0}M REMAINING</value></data>
   <data name="Js_PaymentInfo_SaveFailed" xml:space="preserve"><value>Unable to save payment information</value></data>
@@ -1422,4 +1430,380 @@
   <data name="Notification_PayPalAnomalyAutoRefund_Title" xml:space="preserve"><value>PayPal capture anomaly auto-refunded</value></data>
   <data name="Notification_PayPalAnomalyManual_Title" xml:space="preserve"><value>PayPal capture anomaly requires manual recovery</value></data>
   <data name="Notification_PayPalAnomaly_Message" xml:space="preserve"><value>Flow={0}; PayPalOrderId={1}; CaptureId={2}; Expected={3}; Captured={4}; Reason={5}; RefundSucceeded={6}; RefundError={7}</value></data>
+  <data name="Layout_Footer_Address" xml:space="preserve">
+    <value>FPT Polytechnic Building, Trinh Van Bo, Xuan Phuong, Hanoi 100000, Vietnam</value>
+  </data>
+  <data name="Product_MoreRelatedTitle" xml:space="preserve">
+    <value>More related listings</value>
+  </data>
+  <data name="Product_SimilarListingsTitle" xml:space="preserve">
+    <value>Similar listings</value>
+  </data>
+  <data name="User_SellerStats_Title" xml:space="preserve">
+    <value>Seller statistics</value>
+  </data>
+  <data name="User_SellerStats_Description" xml:space="preserve">
+    <value>Performance overview for this seller.</value>
+  </data>
+  <data name="Admin_Dashboard_Col_NetProceeds" xml:space="preserve">
+    <value>Net proceeds</value>
+  </data>
+  <data name="AdminProduct.ClearSelection" xml:space="preserve">
+    <value>Clear selection</value>
+  </data>
+  <data name="AdminProduct.CurrentPrimary" xml:space="preserve">
+    <value>Current primary image</value>
+  </data>
+  <data name="AdminProduct.MarkedForRemoval" xml:space="preserve">
+    <value>Marked for removal</value>
+  </data>
+  <data name="AdminProduct.UndoRemove" xml:space="preserve">
+    <value>Undo remove</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.CloseLightbox" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.GalleryLimit" xml:space="preserve">
+    <value>You can upload up to {0} gallery images.</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.GalleryPartial" xml:space="preserve">
+    <value>Only {0} of {1} selected images were added (gallery limit).</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.InvalidFormat" xml:space="preserve">
+    <value>Invalid image format. Use JPG, PNG, WEBP, or GIF.</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.SizeLimit" xml:space="preserve">
+    <value>Each image must be {0} MB or smaller.</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.TemplateInvalidFormat" xml:space="preserve">
+    <value>Invalid template image format. Use JPG, PNG, WEBP, or GIF.</value>
+  </data>
+  <data name="AdminProduct.ImageUploader.TemplateSizeLimit" xml:space="preserve">
+    <value>Each template image must be {0} MB or smaller.</value>
+  </data>
+  <data name="Home_Recommended_Title" xml:space="preserve">
+    <value>Recommended</value>
+  </data>
+  <data name="Home_TrendingAuction_Title" xml:space="preserve">
+    <value>Trending on auction</value>
+  </data>
+  <data name="Home_TrendingBuyNow_Title" xml:space="preserve">
+    <value>Trending on buy now</value>
+  </data>
+  <data name="Home_RecentlyAdded_Title" xml:space="preserve">
+    <value>Recently added</value>
+  </data>
+  <data name="Home_BestSeller_Title" xml:space="preserve">
+    <value>Best seller</value>
+  </data>
+  <data name="Home_LatestFromVault_Title" xml:space="preserve">
+    <value>Latest from vault</value>
+  </data>
+  <data name="Home_Carousel_ShowingZero" xml:space="preserve">
+    <value>Showing 0 items</value>
+  </data>
+  <data name="Home_Carousel_ShowingRange" xml:space="preserve">
+    <value>Showing {0} – {1} of {2}</value>
+  </data>
+  <data name="Home_Carousel_ScrollLeft" xml:space="preserve">
+    <value>Scroll left</value>
+  </data>
+  <data name="Home_Carousel_ScrollRight" xml:space="preserve">
+    <value>Scroll right</value>
+  </data>
+  <data name="Catalog_NoCardsFound" xml:space="preserve">
+    <value>No cards found</value>
+  </data>
+  <data name="Catalog_TryAdjustFilters" xml:space="preserve">
+    <value>Try adjusting your filters or search.</value>
+  </data>
+  <data name="Catalog_Previous" xml:space="preserve">
+    <value>← Previous</value>
+  </data>
+  <data name="Catalog_Next" xml:space="preserve">
+    <value>Next →</value>
+  </data>
+  <data name="Common_Min" xml:space="preserve">
+    <value>Min</value>
+  </data>
+  <data name="Common_Max" xml:space="preserve">
+    <value>Max</value>
+  </data>
+  <data name="Common_AddToWatchlist" xml:space="preserve">
+    <value>Add to watchlist</value>
+  </data>
+  <data name="Common_RemoveFromWatchlist" xml:space="preserve">
+    <value>Remove from watchlist</value>
+  </data>
+  <data name="Layout_Footer_AdminLogin" xml:space="preserve">
+    <value>Admin Login</value>
+  </data>
+  <data name="Faq_StillNeedHelp" xml:space="preserve">
+    <value>Still need help?</value>
+  </data>
+  <data name="Refund_EvidenceLinks" xml:space="preserve">
+    <value>Evidence links</value>
+  </data>
+  <data name="Refund_EvidenceLinks_Hint" xml:space="preserve">
+    <value>Optional. Add up to 5 HTTPS links (images or documents).</value>
+  </data>
+  <data name="Contact_Map_Address" xml:space="preserve">
+    <value>FPT Polytechnic Building, Trinh Van Bo, Xuan Phuong, Nam Tu Liem, Hanoi</value>
+  </data>
+  <data name="Contact_Map_ShortAddress" xml:space="preserve">
+    <value>FPT Polytechnic, Hanoi</value>
+  </data>
+  <data name="Auth_Error_InvalidCredentials" xml:space="preserve">
+    <value>Invalid email or password.</value>
+  </data>
+  <data name="Auth_Error_AccountDeactivated" xml:space="preserve">
+    <value>Your account has been deactivated.</value>
+  </data>
+  <data name="Auth_Error_AccountLocked" xml:space="preserve">
+    <value>Account locked due to multiple failed attempts. Try again later.</value>
+  </data>
+  <data name="Auth_Error_SignInNotAllowed" xml:space="preserve">
+    <value>Sign-in is not allowed for this account.</value>
+  </data>
+  <data name="Auth_Error_AccountNotActivated" xml:space="preserve">
+    <value>Your account is not activated yet. Please check your email to finish registration.</value>
+  </data>
+  <data name="Auth_Error_TwoFactorRequired" xml:space="preserve">
+    <value>Two-factor authentication is required.</value>
+  </data>
+  <data name="Auth_Error_EmailExists" xml:space="preserve">
+    <value>Email already exists.</value>
+  </data>
+  <data name="Auth_Error_ActivationEmailFailed" xml:space="preserve">
+    <value>Could not send the activation email. Please try again later.</value>
+  </data>
+  <data name="Auth_Success_SignupCheckEmail" xml:space="preserve">
+    <value>Registration successful. Please check your email and verify your account before signing in.</value>
+  </data>
+  <data name="Auth_Success_ResentActivation" xml:space="preserve">
+    <value>This email is registered but not activated yet. We resent the activation email. Please verify before signing in.</value>
+  </data>
+  <data name="Auth_Success_SmokeSignup" xml:space="preserve">
+    <value>Registration successful (smoke). Confirm via /Smoke/ConfirmEmail before signing in.</value>
+  </data>
+  <data name="Auth_Activate_InvalidLink" xml:space="preserve">
+    <value>Activation link is invalid.</value>
+  </data>
+  <data name="Auth_Activate_Success" xml:space="preserve">
+    <value>Account activated successfully. You can sign in now.</value>
+  </data>
+  <data name="Admin_Auction_ConfirmDelete" xml:space="preserve">
+    <value>Are you sure you want to delete auction #{0}?</value>
+  </data>
+  <data name="Admin_Auction_ConfirmCancel" xml:space="preserve">
+    <value>Cancel auction #{0}?</value>
+  </data>
+  <data name="Admin_Auction_LiveLockBanner" xml:space="preserve">
+    <value>This auction is live — status and registration/start schedule are locked. You can only extend the end time and update the description.</value>
+  </data>
+<data name="Admin_Product_CannotDeleteHasAuctions" xml:space="preserve">
+    <value>This product cannot be deleted because it is linked to auctions.</value>
+  </data>
+  <data name="ConfirmModal_Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="ConfirmModal_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Auth_Activate_UserNotFound" xml:space="preserve">
+    <value>The account to activate was not found.</value>
+  </data>
+  <data name="Auth_Activate_AlreadyActivated" xml:space="preserve">
+    <value>This account was already activated. You can sign in.</value>
+  </data>
+  <data name="Auth_Activate_InvalidOrChanged" xml:space="preserve">
+    <value>Activation link is invalid or has been altered.</value>
+  </data>
+  <data name="Auth_Activate_FailedExpired" xml:space="preserve">
+    <value>Could not activate the account. The link may have expired.</value>
+  </data>
+  <data name="Admin_Auction_ConfirmCancelInstead" xml:space="preserve">
+    <value>Cancel auction #{0} instead of deleting?</value>
+  </data>
+  <data name="Admin_Product_CannotDeleteBecause" xml:space="preserve">
+    <value>This product cannot be deleted because {0}</value>
+  </data>
+  <data name="Faq_StillNeedHelp_Desc" xml:space="preserve">
+    <value>Can't find what you're looking for? Contact our team or submit a refund request.</value>
+  </data>
+  <data name="AdminMsg_Template_NeedPrimaryImage" xml:space="preserve">
+    <value>Please upload a primary image for the product template.</value>
+  </data>
+  <data name="AdminMsg_Template_Created" xml:space="preserve">
+    <value>Product template created successfully.</value>
+  </data>
+  <data name="AdminMsg_Template_MissingId" xml:space="preserve">
+    <value>Product template id is required.</value>
+  </data>
+  <data name="AdminMsg_Template_NotFound" xml:space="preserve">
+    <value>Product template not found.</value>
+  </data>
+  <data name="AdminMsg_Template_Updated" xml:space="preserve">
+    <value>Product template updated successfully.</value>
+  </data>
+  <data name="AdminMsg_Template_CannotDeleteInUse" xml:space="preserve">
+    <value>Cannot delete a template that still has seller products.</value>
+  </data>
+  <data name="AdminMsg_Template_Deleted" xml:space="preserve">
+    <value>Product template deleted successfully.</value>
+  </data>
+  <data name="AdminMsg_Product_GalleryLimit" xml:space="preserve">
+    <value>You can upload at most {0} gallery images per product.</value>
+  </data>
+  <data name="AdminMsg_Product_Created" xml:space="preserve">
+    <value>Product created successfully.</value>
+  </data>
+  <data name="AdminMsg_Product_MissingId" xml:space="preserve">
+    <value>Product id is required.</value>
+  </data>
+  <data name="AdminMsg_Product_NotFound" xml:space="preserve">
+    <value>Product not found.</value>
+  </data>
+  <data name="AdminMsg_Product_CannotChangeSellerLive" xml:space="preserve">
+    <value>Cannot change seller while the product has a live or ending-soon auction.</value>
+  </data>
+  <data name="AdminMsg_Product_CannotChangeTemplateLive" xml:space="preserve">
+    <value>Cannot change template while the product has a live or ending-soon auction.</value>
+  </data>
+  <data name="AdminMsg_Product_GalleryMax" xml:space="preserve">
+    <value>Gallery can have at most {0} images.</value>
+  </data>
+  <data name="AdminMsg_Product_DocumentsMax" xml:space="preserve">
+    <value>Each product can have at most {0} documents.</value>
+  </data>
+  <data name="AdminMsg_Product_Updated" xml:space="preserve">
+    <value>Product updated successfully.</value>
+  </data>
+  <data name="AdminMsg_Product_CannotDeleteBecause" xml:space="preserve">
+    <value>This product cannot be deleted because {0}</value>
+  </data>
+  <data name="AdminMsg_Product_Deleted" xml:space="preserve">
+    <value>Product deleted successfully.</value>
+  </data>
+  <data name="AdminMsg_Product_SelectAtLeastOne" xml:space="preserve">
+    <value>Please select at least one product.</value>
+  </data>
+  <data name="AdminMsg_Product_NoneFound" xml:space="preserve">
+    <value>No products found.</value>
+  </data>
+  <data name="AdminMsg_Product_BulkDeleted" xml:space="preserve">
+    <value>Deleted {0} products successfully.</value>
+  </data>
+  <data name="AdminMsg_Product_BulkDeletedWithSkip" xml:space="preserve">
+    <value>Deleted {0} products. Skipped {1}: {2}</value>
+  </data>
+  <data name="AdminMsg_Product_BlockingAuction" xml:space="preserve">
+    <value>auction #{0} is {1}.</value>
+  </data>
+  <data name="AdminMsg_Template_Unavailable" xml:space="preserve">
+    <value>The selected product template is unavailable.</value>
+  </data>
+  <data name="AdminMsg_Seller_Unavailable" xml:space="preserve">
+    <value>The selected seller is unavailable.</value>
+  </data>
+  <data name="AdminMsg_Documents_UploadMax" xml:space="preserve">
+    <value>You can upload at most {0} documents per product.</value>
+  </data>
+  <data name="AdminMsg_Documents_SizeLimit" xml:space="preserve">
+    <value>Document size must not exceed 5MB.</value>
+  </data>
+  <data name="AdminMsg_Documents_PdfOnly" xml:space="preserve">
+    <value>Documents must be PDF files.</value>
+  </data>
+  <data name="AdminMsg_Condition_Graded" xml:space="preserve">
+    <value>Graded</value>
+  </data>
+  <data name="AdminMsg_Condition_Ungraded" xml:space="preserve">
+    <value>Ungraded</value>
+  </data>
+  <data name="AdminMsg_Category_Unavailable" xml:space="preserve">
+    <value>The selected category is unavailable.</value>
+  </data>
+  <data name="AdminMsg_Template_PrimarySize" xml:space="preserve">
+    <value>Template primary image must not exceed 2MB.</value>
+  </data>
+  <data name="AdminMsg_Template_PrimaryFormat" xml:space="preserve">
+    <value>Template primary image must be JPEG or PNG.</value>
+  </data>
+  <data name="AdminMsg_Template_Duplicate" xml:space="preserve">
+    <value>An active product template with matching details already exists.</value>
+  </data>
+  <data name="AdminMsg_Status_Live" xml:space="preserve">
+    <value>live</value>
+  </data>
+  <data name="AdminMsg_Status_EndingSoon" xml:space="preserve">
+    <value>ending soon</value>
+  </data>
+  <data name="AdminMsg_Status_AwaitingPayment" xml:space="preserve">
+    <value>awaiting payment</value>
+  </data>
+  <data name="AdminMsg_Auction_StartingPriceExceeds" xml:space="preserve">
+    <value>Starting price cannot exceed the current price when bids exist.</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotShortenEndLive" xml:space="preserve">
+    <value>Cannot shorten the end time while the auction is live.</value>
+  </data>
+  <data name="AdminMsg_Auction_Updated" xml:space="preserve">
+    <value>Auction updated successfully.</value>
+  </data>
+  <data name="AdminMsg_BuyNow_Updated" xml:space="preserve">
+    <value>Buy Now listing updated successfully.</value>
+  </data>
+  <data name="AdminMsg_Auction_NotFound" xml:space="preserve">
+    <value>Auction not found.</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotCancelLinkedOrder" xml:space="preserve">
+    <value>Cannot cancel an auction linked to an order.</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotCancelStatus" xml:space="preserve">
+    <value>This auction cannot be cancelled in its current status.</value>
+  </data>
+  <data name="AdminMsg_Auction_Cancelled" xml:space="preserve">
+    <value>Auction cancelled successfully.</value>
+  </data>
+  <data name="AdminMsg_Auction_Deleted" xml:space="preserve">
+    <value>Auction deleted successfully.</value>
+  </data>
+  <data name="AdminMsg_Auction_EndedOrCancelled" xml:space="preserve">
+    <value>Auction has ended or been cancelled.</value>
+  </data>
+  <data name="AdminMsg_Auction_DeleteBlockedOrder" xml:space="preserve">
+    <value>Cannot delete — auction is linked to an order.</value>
+  </data>
+  <data name="AdminMsg_Auction_DeleteBlockedBids" xml:space="preserve">
+    <value>Cannot delete — {0} bid(s) exist. Cancel instead of Delete.</value>
+  </data>
+  <data name="AdminMsg_Auction_CannotDelete" xml:space="preserve">
+    <value>This auction cannot be deleted.</value>
+  </data>
+  <data name="AdminMsg_Auction_BulkDeleted" xml:space="preserve">
+    <value>Deleted {0}/{1} auctions.</value>
+  </data>
+  <data name="AdminMsg_Auction_BulkDeletedWithSkip" xml:space="preserve">
+    <value>Deleted {0}/{1}; skipped: {2}</value>
+  </data>
+  <data name="Faq_Page_Subtitle" xml:space="preserve"><value>Find answers about bidding, selling, grading, and security at RareCard Auctions.</value></data>
+  <data name="Faq_Section_Buying_Title" xml:space="preserve"><value>Buying</value></data>
+  <data name="Faq_Section_Selling_Title" xml:space="preserve"><value>Selling</value></data>
+  <data name="Faq_Section_Security_Title" xml:space="preserve"><value>Security</value></data>
+  <data name="Faq_QuestionCount" xml:space="preserve"><value>{0} question(s)</value></data>
+  <data name="Faq_Buying_Q1" xml:space="preserve"><value>How to bid?</value></data>
+  <data name="Faq_Buying_A1" xml:space="preserve"><value>Create your RareCard account, browse active auctions, and enter a bid amount higher than the current price. You'll receive instant confirmation and notifications if you're outbid.</value></data>
+  <data name="Faq_Buying_Q2" xml:space="preserve"><value>What are the shipping fees?</value></data>
+  <data name="Faq_Buying_A2" xml:space="preserve"><value>Shipping fees are calculated at checkout based on item value, destination, and insurance level. Domestic orders typically range from $15–$45 for standard insured delivery.</value></data>
+  <data name="Faq_Buying_Q3" xml:space="preserve"><value>International bidding?</value></data>
+  <data name="Faq_Buying_A3" xml:space="preserve"><value>Yes — international bidding is available in select regions. Import duties and customs fees may apply and are the buyer's responsibility. Contact support for country-specific details.</value></data>
+  <data name="Faq_Selling_Q1" xml:space="preserve"><value>What fees does the platform charge?</value></data>
+  <data name="Faq_Selling_A1" xml:space="preserve"><value>Three marketplace charges: (1) auction registration deposit for bidders — refunded to losers, applied at checkout for the winner; (2) buyer checkout fee on the order subtotal; (3) seller success fee deducted from the item subtotal when the order is paid. Seller net proceeds = Subtotal − seller success fee. Shipping and vault insurance are separate and do not go to the seller ledger. There is no listing fee. Rates are configured under PlatformFee. Phase 1 records proceeds on the order for reporting; automatic seller PayPal payout is Phase 2 (manual payout for now).</value></data>
+  <data name="Faq_Selling_Q2" xml:space="preserve"><value>How do I ship my cards to RareCard?</value></data>
+  <data name="Faq_Selling_A2" xml:space="preserve"><value>After your listing is approved, generate a prepaid insured shipping label from your seller dashboard. Cards must be sent in a rigid mailer or slab case with tracking enabled.</value></data>
+  <data name="Faq_Security_Q1" xml:space="preserve"><value>Is my card insured?</value></data>
+  <data name="Faq_Security_A1" xml:space="preserve"><value>Every card held in our vault and in transit is fully insured up to its listed value. Coverage begins the moment we receive your item and continues through delivery to the buyer.</value></data>
+  <data name="Faq_Security_Q2" xml:space="preserve"><value>How do you verify authenticity?</value></data>
+  <data name="Faq_Security_A2" xml:space="preserve"><value>We use direct PSA and BGS API integration for real-time slab verification, plus a secondary 10-point physical inspection by our specialist curators before any listing goes live.</value></data>
 </root>

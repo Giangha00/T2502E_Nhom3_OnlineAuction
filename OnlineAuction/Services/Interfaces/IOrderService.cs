@@ -15,4 +15,8 @@ public interface IOrderService
     Task<(bool Success, string Message)> CompleteOrderAsync(
         int buyerId,
         CompleteOrderRequest request);
+
+    Task<(bool Success, string Message, int ClearedCount)> ClearAllBuyNowOrdersAsync(
+        int buyerId,
+        CancellationToken cancellationToken = default);
 }

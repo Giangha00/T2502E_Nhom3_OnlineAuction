@@ -45,12 +45,17 @@
     }
 
     var range = getVisibleRange(track, getItemSelector(section));
+    var i18n = window.homeCarouselI18n || {};
     if (range.total === 0) {
-      counter.textContent = 'Showing 0 items';
+      counter.textContent = i18n.showingZero || 'Showing 0 items';
       return;
     }
 
-    counter.textContent = 'Showing ' + range.start + ' \u2013 ' + range.end + ' of ' + range.total;
+    var template = i18n.showingRange || 'Showing {0} – {1} of {2}';
+    counter.textContent = template
+      .replace('{0}', String(range.start))
+      .replace('{1}', String(range.end))
+      .replace('{2}', String(range.total));
   }
 
   function updateCarouselButtons(section) {

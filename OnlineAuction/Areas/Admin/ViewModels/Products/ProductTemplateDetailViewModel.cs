@@ -18,6 +18,10 @@ public class ProductTemplateDetailViewModel
 
     public int? Year { get; set; }
 
+    public string? ShortDescription { get; set; }
+
+    public string? DescriptionHtml { get; set; }
+
     public string PrimaryImage { get; set; } = string.Empty;
 
     public int InstanceCount { get; set; }

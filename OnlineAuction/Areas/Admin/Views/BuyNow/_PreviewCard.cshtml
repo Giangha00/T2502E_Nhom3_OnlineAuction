@@ -1,0 +1,20 @@
+@model BuyNowFormViewModel
+
+<div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
+    <h3 class="text-theme-sm font-semibold text-gray-800 dark:text-white/90">Buy Now Preview</h3>
+    <p class="mt-1 text-theme-xs text-gray-500">Live card preview while editing</p>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900/30">
+        <div class="aspect-square bg-gray-100 dark:bg-gray-800">
+            <img id="buyNowPreviewImage"
+                 src="@(string.IsNullOrWhiteSpace(Model.ImageUrl) ? "https://placehold.co/600x600?text=Preview" : Model.ImageUrl)"
+                 alt="Preview"
+                 class="h-full w-full object-cover" />
+        </div>
+        <div class="space-y-2 p-4">
+            <p id="buyNowPreviewName" class="line-clamp-2 text-sm font-semibold text-gray-800 dark:text-white/90">@(string.IsNullOrWhiteSpace(Model.ProductName) ? "Product name" : Model.ProductName)</p>
+            <p id="buyNowPreviewPrice" class="text-base font-bold text-brand-600">$@Model.BuyNowPrice.ToString("N2")</p>
+            <p id="buyNowPreviewMeta" class="text-xs text-gray-500">Status: @Model.Status</p>
+        </div>
+    </div>
+</div>

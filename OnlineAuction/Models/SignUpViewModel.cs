@@ -15,7 +15,7 @@ public class SignUpViewModel
     public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Phone number is required.")]
-    [RegularExpression(@"^\d{11}$", ErrorMessage = "Số điện thoại phải gồm đúng 11 chữ số.")]
+    [RegularExpression(@"^\d{11}$", ErrorMessage = "Auth_Phone_InvalidLength")]
     [Display(Name = "Phone number")]
     public string PhoneNumber { get; set; } = string.Empty;
 

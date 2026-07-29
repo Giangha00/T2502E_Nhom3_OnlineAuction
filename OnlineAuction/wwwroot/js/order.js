@@ -168,10 +168,18 @@
                 if (getSelectedCards().length === 0) {
                     event.preventDefault();
                     var selectionError = document.getElementById('orderSelectionError');
-                if (selectionError) {
-                    selectionError.classList.add('is-visible');
-                    selectionError.textContent = i18n.noSelection || 'Please select at least one product to pay.';
-                }
+                    var message = i18n.noSelection || 'Please select at least one product to pay.';
+                    if (selectionError) {
+                        selectionError.classList.add('is-visible');
+                        selectionError.textContent = message;
+                    }
+                    if (typeof window.showAlertModal === 'function') {
+                        window.showAlertModal({
+                            title: (window.confirmModalConfig && window.confirmModalConfig.i18n && window.confirmModalConfig.i18n.errorTitle) || 'Error',
+                            message: message,
+                            variant: 'danger'
+                        });
+                    }
                 }
             });
         }
@@ -179,8 +187,189 @@
         updateSummary();
     }
 
+    function cleanOrderQueryParam(name) {
+        if (!window.history || !window.history.replaceState) {
+            return;
+        }
+
+        var pattern = new RegExp('([?&])' + name + '=1(&|$)');
+        var cleanUrl = window.location.pathname + window.location.search
+            .replace(pattern, function (_, prefix, suffix) {
+                return suffix === '&' ? prefix : '';
+            })
+            .replace(/\?$/, '')
+            .replace(/[?&]$/, '');
+        window.history.replaceState({}, document.title, cleanUrl || window.location.pathname);
+    }
+
+    function showOrderAlert(title, message) {
+        if (!message || typeof window.showAlertModal !== 'function') {
+            return;
+        }
+
+        window.showAlertModal({
+            title: title || 'Success',
+            message: message,
+            variant: 'success'
+        });
+    }
+
+    function getCsrfToken() {
+        var meta = document.querySelector('meta[name="request-verification-token"]');
+        if (meta && meta.getAttribute('content')) {
+            return meta.getAttribute('content');
+        }
+
+        var input = document.querySelector('#orderCheckoutForm input[name="__RequestVerificationToken"]');
+        return input ? input.value : '';
+    }
+
+    function updateOrderBadge(count) {
+        if (window.realtimeHub && typeof window.realtimeHub.updateOrderBadge === 'function') {
+            window.realtimeHub.updateOrderBadge(count);
+            return;
+        }
+
+        var badge = document.getElementById('orderCountBadge');
+        var link = document.getElementById('orderNavLink');
+        if (!badge || typeof count !== 'number') {
+            return;
+        }
+
+        if (count > 0) {
+            badge.textContent = count > 9 ? '9+' : String(count);
+            badge.classList.remove('hidden');
+            if (link) link.setAttribute('data-order-count', String(count));
+        } else {
+            badge.classList.add('hidden');
+            if (link) link.setAttribute('data-order-count', '0');
+        }
+    }
+
+    function initClearBuyNow() {
+        var button = document.getElementById('clearBuyNowBtn');
+        var configEl = document.getElementById('clearBuyNowConfig');
+        if (!button || !configEl) {
+            return;
+        }
+
+        button.addEventListener('click', function () {
+            var url = configEl.getAttribute('data-url') || '/Order/ClearBuyNow';
+            var confirmOptions = {
+                title: configEl.getAttribute('data-title') || 'Clear all Buy Now items?',
+                message: configEl.getAttribute('data-message') || '',
+                note: configEl.getAttribute('data-note') || '',
+                confirmText: configEl.getAttribute('data-confirm') || 'Clear all',
+                variant: 'danger'
+            };
+
+            var confirmPromise = typeof window.showConfirmModal === 'function'
+                ? window.showConfirmModal(confirmOptions)
+                : Promise.resolve(window.confirm(confirmOptions.message || confirmOptions.title));
+
+            confirmPromise.then(function (confirmed) {
+                if (!confirmed) {
+                    return;
+                }
+
+                button.disabled = true;
+
+                var token = getCsrfToken();
+                var body = new URLSearchParams();
+                if (token) {
+                    body.append('__RequestVerificationToken', token);
+                }
+
+                var headers = {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                };
+                if (token) {
+                    headers.RequestVerificationToken = token;
+                }
+
+                fetch(url, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: headers,
+                    body: body.toString()
+                })
+                    .then(function (response) {
+                        return response.text().then(function (text) {
+                            var data = null;
+                            if (text) {
+                                try {
+                                    data = JSON.parse(text);
+                                } catch (e) {
+                                    data = null;
+                                }
+                            }
+
+                            return {
+                                ok: response.ok,
+                                status: response.status,
+                                data: data,
+                                raw: text
+                            };
+                        });
+                    })
+                    .then(function (result) {
+                        if (!result.ok || !result.data || result.data.success === false) {
+                            button.disabled = false;
+                            var errorMessage = (result.data && result.data.message)
+                                || (result.status === 400
+                                    ? 'Security token expired. Please refresh the page and try again.'
+                                    : result.status === 404
+                                        ? 'Clear action is unavailable. Please restart the app and try again.'
+                                        : 'Unable to clear Buy Now items.');
+                            if (typeof window.showAlertModal === 'function') {
+                                window.showAlertModal({
+                                    title: (window.confirmModalConfig && window.confirmModalConfig.i18n && window.confirmModalConfig.i18n.errorTitle) || 'Error',
+                                    message: errorMessage,
+                                    variant: 'danger'
+                                });
+                            }
+                            return;
+                        }
+
+                        if (typeof result.data.orderCount === 'number') {
+                            updateOrderBadge(result.data.orderCount);
+                        }
+
+                        window.location.assign(
+                            result.data.clearedCount > 0 ? '/Order?cleared=1' : '/Order');
+                    })
+                    .catch(function () {
+                        button.disabled = false;
+                        if (typeof window.showAlertModal === 'function') {
+                            window.showAlertModal({
+                                title: (window.confirmModalConfig && window.confirmModalConfig.i18n && window.confirmModalConfig.i18n.errorTitle) || 'Error',
+                                message: 'Unable to clear Buy Now items.',
+                                variant: 'danger'
+                            });
+                        }
+                    });
+            });
+        });
+    }
+
     updateDeadlines();
     window.setInterval(updateDeadlines, 60000);
     initPaymentOptions();
     initInvoiceSelection();
+    initClearBuyNow();
+
+    if (window.orderConfig && window.orderConfig.showAddedModal) {
+        showOrderAlert(
+            i18n.itemAddedTitle || 'Success',
+            i18n.itemAddedMessage || 'Item added to Payment Center.');
+        cleanOrderQueryParam('added');
+    }
+
+    if (window.orderConfig && window.orderConfig.showClearedModal) {
+        showOrderAlert(
+            i18n.clearedTitle || 'Success',
+            i18n.clearedMessage || 'Buy Now items cleared from your orders.');
+        cleanOrderQueryParam('cleared');
+    }
 })();
