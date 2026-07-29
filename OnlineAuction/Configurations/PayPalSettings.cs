@@ -20,10 +20,17 @@ public class PayPalSettings
     public string CurrencyCode { get; set; } = "USD";
 
     /// <summary>
-    /// Starting balance for each user's simulated PayPal sandbox wallet.
-    /// Only used when <see cref="IsSandbox"/> is true. PayPal does not expose real buyer balances.
+    /// Starting balance for each user's simulated PayPal sandbox wallet ledger.
+    /// Only used when <see cref="EnforceSandboxWallet"/> is true.
     /// </summary>
     public decimal SandboxInitialWalletBalance { get; set; } = 1000m;
+
+    /// <summary>
+    /// When true (sandbox only), a local simulated wallet can block checkout/capture.
+    /// Default false: real PayPal sandbox/live buyer accounts fund payments; the local
+    /// ledger must never reject a payment the buyer already approved on PayPal.
+    /// </summary>
+    public bool EnforceSandboxWallet { get; set; }
 
     public bool IsConfigured =>
         HasValidCredential(ClientId) && HasValidCredential(ClientSecret);

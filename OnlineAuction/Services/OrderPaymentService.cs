@@ -278,9 +278,13 @@ public class OrderPaymentService : IOrderPaymentService
                 cancellationToken);
             if (!deductResult.Success)
             {
-                persistenceFailureMessage = deductResult.ErrorMessage
-                    ?? "Insufficient PayPal sandbox wallet balance.";
-                return;
+                // PayPal already captured funds — never roll back the order for the local
+                // simulated wallet. Log and continue marking the order paid.
+                _logger.LogWarning(
+                    "Sandbox wallet deduct skipped after successful PayPal capture. BuyerId={BuyerId} Amount={Amount} Error={Error}",
+                    buyerId,
+                    reloadedExpectedAmount,
+                    deductResult.ErrorMessage);
             }
 
             var now = DateTime.UtcNow;
@@ -664,23 +668,8 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
         }
 
         var webhookBuyerId = orders[0].BuyerId;
-        var webhookWalletCheck = await _sandboxPayPalWalletService.EnsureSufficientBalanceAsync(
-            webhookBuyerId,
-            expectedAmount,
-            cancellationToken);
-        if (!webhookWalletCheck.Success)
-        {
-            _logger.LogWarning(
-                "PayPal webhook rejected due to insufficient sandbox wallet. PayPalOrderId={PayPalOrderId} BuyerId={BuyerId}",
-                payPalOrderId,
-                webhookBuyerId);
-            return PayPalWebhookProcessingResult.Fail(
-                webhookWalletCheck.ErrorMessage ?? "Insufficient PayPal sandbox wallet balance.");
-        }
 
         var strategy = _dbContext.Database.CreateExecutionStrategy();
-        var walletDeductFailed = false;
-        string? walletDeductError = null;
         await strategy.ExecuteAsync(async () =>
         {
             await using var transaction = await _dbContext.Database.BeginTransactionAsync(
@@ -697,9 +686,12 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
                     cancellationToken);
                 if (!deductResult.Success)
                 {
-                    walletDeductFailed = true;
-                    walletDeductError = deductResult.ErrorMessage;
-                    return;
+                    // Capture already succeeded on PayPal — do not reject webhook persistence.
+                    _logger.LogWarning(
+                        "Sandbox wallet deduct skipped after PayPal webhook capture. BuyerId={BuyerId} Amount={Amount} Error={Error}",
+                        webhookBuyerId,
+                        amountToDeduct,
+                        deductResult.ErrorMessage);
                 }
             }
 
@@ -743,12 +735,6 @@ public async Task<PayPalWebhookProcessingResult> ProcessPayPalWebhookAsync(
             await _dbContext.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
         });
-
-        if (walletDeductFailed)
-        {
-            return PayPalWebhookProcessingResult.Fail(
-                walletDeductError ?? "Insufficient PayPal sandbox wallet balance.");
-        }
 
         foreach (var order in orders.Where(order => order.Status == OrderStatuses.Paid))
         {

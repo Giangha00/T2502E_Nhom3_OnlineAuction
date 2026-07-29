@@ -7,7 +7,8 @@
     "ClientId": "YOUR_SANDBOX_CLIENT_ID",
     "ClientSecret": "YOUR_SANDBOX_CLIENT_SECRET",
     "WebhookId": "YOUR_PAYPAL_WEBHOOK_ID",
-    "SandboxInitialWalletBalance": 1000
+    "SandboxInitialWalletBalance": 1000,
+    "EnforceSandboxWallet": false
   },
   "PasswordResetOtp": {
     "UseMockOtpSender": true

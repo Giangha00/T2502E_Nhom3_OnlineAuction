@@ -20,11 +20,15 @@ public class SandboxPayPalWalletService : ISandboxPayPalWalletService
         _payPalSettings = payPalSettings.Value;
     }
 
-    public bool IsEnforced => _payPalSettings.IsSandbox;
+    /// <summary>
+    /// Opt-in demo mode only. Real PayPal checkout must not depend on this ledger.
+    /// </summary>
+    public bool IsEnforced =>
+        _payPalSettings.IsSandbox && _payPalSettings.EnforceSandboxWallet;
 
     public async Task<decimal> GetBalanceAsync(int userId, CancellationToken cancellationToken = default)
     {
-        if (!IsEnforced)
+        if (!_payPalSettings.IsSandbox)
         {
             return decimal.MaxValue;
         }
@@ -59,22 +63,40 @@ public class SandboxPayPalWalletService : ISandboxPayPalWalletService
         decimal amount,
         CancellationToken cancellationToken = default)
     {
-        if (!IsEnforced || amount <= 0m)
+        if (amount <= 0m)
         {
             return SandboxWalletDeductResult.Ok(0m);
         }
 
-        var wallet = await GetOrCreateWalletAsync(userId, cancellationToken);
-        if (wallet.Balance < amount)
+        // When enforcement is off, keep an optional ledger without blocking payment.
+        if (!IsEnforced)
         {
-            return SandboxWalletDeductResult.Fail(
-                BuildInsufficientMessage(wallet.Balance, amount),
-                wallet.Balance);
+            if (!_payPalSettings.IsSandbox)
+            {
+                return SandboxWalletDeductResult.Ok(0m);
+            }
+
+            var wallet = await GetOrCreateWalletAsync(userId, cancellationToken);
+            if (wallet.Balance >= amount)
+            {
+                wallet.Balance -= amount;
+                wallet.UpdatedAt = DateTime.UtcNow;
+            }
+
+            return SandboxWalletDeductResult.Ok(wallet.Balance);
         }
 
-        wallet.Balance -= amount;
-        wallet.UpdatedAt = DateTime.UtcNow;
-        return SandboxWalletDeductResult.Ok(wallet.Balance);
+        var enforcedWallet = await GetOrCreateWalletAsync(userId, cancellationToken);
+        if (enforcedWallet.Balance < amount)
+        {
+            return SandboxWalletDeductResult.Fail(
+                BuildInsufficientMessage(enforcedWallet.Balance, amount),
+                enforcedWallet.Balance);
+        }
+
+        enforcedWallet.Balance -= amount;
+        enforcedWallet.UpdatedAt = DateTime.UtcNow;
+        return SandboxWalletDeductResult.Ok(enforcedWallet.Balance);
     }
 
     private async Task<UserSandboxWallet> GetOrCreateWalletAsync(

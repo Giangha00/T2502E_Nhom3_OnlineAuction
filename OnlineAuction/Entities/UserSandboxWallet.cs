@@ -1,8 +1,8 @@
 namespace OnlineAuction.Entities;
 
 /// <summary>
-/// Simulated PayPal buyer wallet used only when PayPal.Mode = sandbox.
-/// PayPal does not expose real buyer balances to merchants.
+/// Optional simulated PayPal buyer wallet ledger (sandbox only).
+/// Does not gate real PayPal payments unless PayPal:EnforceSandboxWallet=true.
 /// </summary>
 public class UserSandboxWallet : AuditableEntity
 {
