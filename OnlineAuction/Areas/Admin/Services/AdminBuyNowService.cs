@@ -4,6 +4,7 @@ using OnlineAuction.Areas.Admin.ViewModels.BuyNow;
 using OnlineAuction.Data;
 using OnlineAuction.Entities;
 using OnlineAuction.Enums;
+using OnlineAuction.Helpers;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Areas.Admin.Services;
@@ -68,7 +69,11 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
             .Where(auction =>
                 auction.DeletedAt == null &&
                 auction.Product.DeletedAt == null &&
-                auction.ListingType == ListingTypes.BuyNow);
+                auction.ListingType == ListingTypes.BuyNow &&
+                auction.BuyNowPrice.HasValue &&
+                auction.BuyNowPrice.Value > 0 &&
+                (auction.Status == AuctionStatuses.Live || auction.Status == AuctionStatuses.EndingSoon) &&
+                auction.EndDate > now);
 
         if (!string.IsNullOrWhiteSpace(filter.Search))
         {
@@ -79,9 +84,25 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
                 auction.Product.Seller.FullName.Contains(keyword));
         }
 
-        if (!string.IsNullOrWhiteSpace(filter.Status))
+        var dateRange = AdminDateRangeHelper.Parse(filter.DateRange);
+        if (dateRange.StartDate.HasValue && dateRange.EndDateExclusive.HasValue)
         {
-            query = query.Where(auction => auction.Status == filter.Status);
+            query = query.Where(auction =>
+                auction.CreatedAt >= dateRange.StartDate.Value &&
+                auction.CreatedAt < dateRange.EndDateExclusive.Value);
+        }
+        else
+        {
+            if (filter.FromDate.HasValue)
+            {
+                query = query.Where(auction => auction.CreatedAt >= filter.FromDate.Value);
+            }
+
+            if (filter.ToDate.HasValue)
+            {
+                var toDateExclusive = filter.ToDate.Value.Date.AddDays(1);
+                query = query.Where(auction => auction.CreatedAt < toDateExclusive);
+            }
         }
 
         if (filter.CategoryId.HasValue)
@@ -186,6 +207,20 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
                 StartDate = item.StartDate,
                 EndDate = item.EndDate,
                 ImageUrl = item.Product.PrimaryImage,
+                GalleryImages = item.Product.Images
+                    .Where(image => image.DeletedAt == null)
+                    .OrderBy(image => image.SortOrder)
+                    .Select(image => image.ImageUrl)
+                    .ToList(),
+                Documents = item.Product.Documents
+                    .Where(document => document.DeletedAt == null)
+                    .OrderBy(document => document.Name)
+                    .Select(document => new BuyNowDocumentViewModel
+                    {
+                        Name = document.Name,
+                        Url = document.FileUrl
+                    })
+                    .ToList(),
                 CreatedAt = item.CreatedAt,
                 VerifiedAt = item.VerifiedAt,
                 VerifierName = item.Verifier != null ? item.Verifier.FullName : null,

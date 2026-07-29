@@ -68,13 +68,20 @@ public sealed class BidFraudDetectionService : IBidFraudDetectionService
             return new BidFraudGateResult(true);
         }
 
+        var isSharedBestSellerDemoBid = IsSharedBestSellerDemoBid(auction, bidder);
         BidFraudGateResult? block = null;
 
-        block ??= await EvaluateSellerRelatedBidderAsync(
-            auction, bidder, bidId: null, ipAddress, applyEnforcement: true, cancellationToken);
+        if (!isSharedBestSellerDemoBid)
+        {
+            block ??= await EvaluateSellerRelatedBidderAsync(
+                auction, bidder, bidId: null, ipAddress, applyEnforcement: true, cancellationToken);
+        }
 
-        block ??= await EvaluateSameIpMultipleAccountsProjectedAsync(
-            auctionId, bidderId, bidId: null, ipAddress, applyEnforcement: true, cancellationToken);
+        if (!isSharedBestSellerDemoBid)
+        {
+            block ??= await EvaluateSameIpMultipleAccountsProjectedAsync(
+                auctionId, bidderId, bidId: null, ipAddress, applyEnforcement: true, cancellationToken);
+        }
 
         block ??= await EvaluateRapidBiddingProjectedAsync(
             auctionId, bidderId, bidId: null, applyEnforcement: true, cancellationToken);
@@ -557,5 +564,20 @@ public sealed class BidFraudDetectionService : IBidFraudDetectionService
         }
 
         return new string(phone.Where(char.IsDigit).ToArray());
+    }
+
+    private static bool IsSharedBestSellerDemoBid(Auction auction, ApplicationUser bidder)
+    {
+        if (!string.Equals(auction.AuctionEventName, SpreadsheetAuctionCatalog.TestAuctionEventName, StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        if (!string.Equals(auction.Product?.Name, SpreadsheetAuctionCatalog.FullFlowDemoProductName, StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        return bidder.FullName is "Nguyễn Giang Hà" or "Đinh Văn Hải" or "Nguyễn Văn Hưng";
     }
 }

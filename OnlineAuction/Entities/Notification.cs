@@ -62,4 +62,6 @@ public static class NotificationReferenceTypes
     public const string BuyNowOrderCreated = "buy_now_order_created";
     public const string RefundUnderReview = "refund_under_review";
     public const string RefundClosed = "refund_closed";
+    public const string ProfileUpdated = "profile_updated";
+    public const string ProfileUpdateFailed = "profile_update_failed";
 }

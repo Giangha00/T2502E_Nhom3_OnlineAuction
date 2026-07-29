@@ -8,6 +8,8 @@ public class ProductListItemViewModel
 
     public string Name { get; set; } = string.Empty;
 
+    public string? ShortDescription { get; set; }
+
     public string ThumbnailUrl { get; set; } = string.Empty;
 
     public string CategoryName { get; set; } = string.Empty;
@@ -21,6 +23,14 @@ public class ProductListItemViewModel
     public string Condition { get; set; } = string.Empty;
 
     public string? GradeLabel { get; set; }
+
+    public string? SetName { get; set; }
+
+    public string? Language { get; set; }
+
+    public int? Year { get; set; }
+
+    public string? Subtitle { get; set; }
 
     public string? CardNumber { get; set; }
 

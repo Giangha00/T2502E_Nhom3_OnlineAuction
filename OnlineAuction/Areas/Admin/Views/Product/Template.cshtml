@@ -9,6 +9,7 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <link rel="stylesheet" href="~/admin/css/daterangepicker-admin.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/admin/css/admin-product-template.css" asp-append-version="true" />
 
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
     <div class="mb-4">
@@ -46,6 +47,40 @@
             <partial name="_AdminIcon" model='"plus"' />
         </a>
     </div>
+
+
+
+    @if (template is not null)
+    {
+        <div class="mb-6 grid gap-4 lg:grid-cols-3">
+            <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+                <p class="text-theme-xs uppercase text-gray-500">Language / Year</p>
+                <p class="mt-1 text-theme-sm font-medium text-gray-800 dark:text-white/90">@(!string.IsNullOrWhiteSpace(template.Language) ? template.Language : "—") · @(template.Year?.ToString() ?? "—")</p>
+            </div>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+                <p class="text-theme-xs uppercase text-gray-500">Set / Card Number</p>
+                <p class="mt-1 text-theme-sm font-medium text-gray-800 dark:text-white/90">@(!string.IsNullOrWhiteSpace(template.SetName) ? template.SetName : "—") · @(!string.IsNullOrWhiteSpace(template.CardNumber) ? template.CardNumber : "—")</p>
+            </div>
+            <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+                <p class="text-theme-xs uppercase text-gray-500">Grade</p>
+                <p class="mt-1 text-theme-sm font-medium text-gray-800 dark:text-white/90">@(!string.IsNullOrWhiteSpace(template.GradeLabel) ? template.GradeLabel : "—")</p>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(template.ShortDescription) || !string.IsNullOrWhiteSpace(template.DescriptionHtml))
+        {
+            <div class="mb-6 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
+                @if (!string.IsNullOrWhiteSpace(template.ShortDescription))
+                {
+                    <p class="mb-3 text-theme-sm text-gray-700 dark:text-gray-300">@template.ShortDescription</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(template.DescriptionHtml))
+                {
+                    <div class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">@Html.Raw(template.DescriptionHtml)</div>
+                }
+            </div>
+        }
+    }
 
     @if (TempData["SuccessMessage"] is not null)
     {

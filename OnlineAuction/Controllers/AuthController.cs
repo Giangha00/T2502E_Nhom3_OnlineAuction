@@ -86,13 +86,13 @@ public class AuthController : Controller
         var user = await _userManager.FindByEmailAsync(model.Email.Trim());
         if (user is null)
         {
-            ModelState.AddModelError(string.Empty, "Invalid email or password.");
+            ModelState.AddModelError(string.Empty, _localizer["Auth_Error_InvalidCredentials"].Value);
             return AuthFailureView(model, "login", fromModal);
         }
 
         if (user.Status != UserStatus.Active)
         {
-            ModelState.AddModelError(string.Empty, "Your account has been deactivated.");
+            ModelState.AddModelError(string.Empty, _localizer["Auth_Error_AccountDeactivated"].Value);
             return AuthFailureView(model, "login", fromModal);
         }
 
@@ -117,22 +117,22 @@ public class AuthController : Controller
 
         if (result.IsLockedOut)
         {
-            ModelState.AddModelError(string.Empty, "Account locked due to multiple failed attempts. Try again later.");
+            ModelState.AddModelError(string.Empty, _localizer["Auth_Error_AccountLocked"].Value);
         }
         else if (result.IsNotAllowed)
         {
             var message = await _userManager.IsEmailConfirmedAsync(user)
-                ? "Sign-in is not allowed for this account."
-                : "Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để hoàn tất đăng ký.";
+                ? _localizer["Auth_Error_SignInNotAllowed"].Value
+                : _localizer["Auth_Error_AccountNotActivated"].Value;
             ModelState.AddModelError(string.Empty, message);
         }
         else if (result.RequiresTwoFactor)
         {
-            ModelState.AddModelError(string.Empty, "Two-factor authentication is required.");
+            ModelState.AddModelError(string.Empty, _localizer["Auth_Error_TwoFactorRequired"].Value);
         }
         else
         {
-            ModelState.AddModelError(string.Empty, "Invalid email or password.");
+            ModelState.AddModelError(string.Empty, _localizer["Auth_Error_InvalidCredentials"].Value);
         }
 
         return AuthFailureView(model, "login", fromModal);
@@ -471,7 +471,7 @@ public class AuthController : Controller
         {
             ModelState.AddModelError(
                 nameof(model.PhoneNumber),
-                "Số điện thoại phải gồm đúng 11 chữ số.");
+                _localizer["Auth_Phone_InvalidLength"].Value);
         }
 
         if (!ModelState.IsValid)
@@ -488,18 +488,17 @@ public class AuthController : Controller
                 var resent = await SendEmailConfirmationAsync(existingUser, cancellationToken);
                 if (resent)
                 {
-                    TempData["AuthSuccess"] =
-                        "Email này đã đăng ký nhưng chưa kích hoạt. Chúng tôi đã gửi lại email kích hoạt. Vui lòng xác thực trước khi đăng nhập.";
+                    TempData["AuthSuccess"] = _localizer["Auth_Success_ResentActivation"].Value;
                     return RedirectAfterAuthSuccess(model.ReturnUrl, "login");
                 }
 
                 ModelState.AddModelError(
                     string.Empty,
-                    "Không gửi được email kích hoạt. Vui lòng thử lại sau.");
+                    _localizer["Auth_Error_ActivationEmailFailed"].Value);
                 return AuthFailureView(model, "signup", fromModal);
             }
 
-            ModelState.AddModelError(string.Empty, "Email already exists.");
+            ModelState.AddModelError(string.Empty, _localizer["Auth_Error_EmailExists"].Value);
             return AuthFailureView(model, "signup", fromModal);
         }
 
@@ -537,20 +536,18 @@ public class AuthController : Controller
                 _logger.LogWarning(
                     "Signup email send failed for {Email}; keeping user for smoke confirm.",
                     user.Email);
-                TempData["AuthSuccess"] =
-                    "Đăng ký thành công (smoke). Xác thực qua /Smoke/ConfirmEmail trước khi đăng nhập.";
+                TempData["AuthSuccess"] = _localizer["Auth_Success_SmokeSignup"].Value;
                 return RedirectAfterAuthSuccess(model.ReturnUrl, "login");
             }
 
             await _userManager.DeleteAsync(user);
             ModelState.AddModelError(
                 string.Empty,
-                "Không gửi được email kích hoạt. Vui lòng thử lại sau.");
+                _localizer["Auth_Error_ActivationEmailFailed"].Value);
             return AuthFailureView(model, "signup", fromModal);
         }
 
-        TempData["AuthSuccess"] =
-            "Đăng ký thành công. Vui lòng kiểm tra email và xác thực tài khoản trước khi đăng nhập.";
+        TempData["AuthSuccess"] = _localizer["Auth_Success_SignupCheckEmail"].Value;
         return RedirectAfterAuthSuccess(model.ReturnUrl, "login");
     }
 
@@ -559,20 +556,20 @@ public class AuthController : Controller
     {
         if (userId <= 0 || string.IsNullOrWhiteSpace(code))
         {
-            TempData["AuthError"] = "Link kích hoạt không hợp lệ.";
+            TempData["AuthError"] = _localizer["Auth_Activate_InvalidLink"].Value;
             return RedirectAfterAuthSuccess(null, "login");
         }
 
         var user = await _userManager.FindByIdAsync(userId.ToString(CultureInfo.InvariantCulture));
         if (user is null)
         {
-            TempData["AuthError"] = "Không tìm thấy tài khoản cần kích hoạt.";
+            TempData["AuthError"] = _localizer["Auth_Activate_UserNotFound"].Value;
             return RedirectAfterAuthSuccess(null, "login");
         }
 
         if (await _userManager.IsEmailConfirmedAsync(user))
         {
-            TempData["AuthSuccess"] = "Tài khoản đã được kích hoạt trước đó. Bạn có thể đăng nhập.";
+            TempData["AuthSuccess"] = _localizer["Auth_Activate_AlreadyActivated"].Value;
             return RedirectAfterAuthSuccess(null, "login");
         }
 
@@ -583,18 +580,18 @@ public class AuthController : Controller
         }
         catch (FormatException)
         {
-            TempData["AuthError"] = "Link kích hoạt không hợp lệ hoặc đã bị thay đổi.";
+            TempData["AuthError"] = _localizer["Auth_Activate_InvalidOrChanged"].Value;
             return RedirectAfterAuthSuccess(null, "login");
         }
 
         var result = await _userManager.ConfirmEmailAsync(user, token);
         if (!result.Succeeded)
         {
-            TempData["AuthError"] = "Không thể kích hoạt tài khoản. Link có thể đã hết hạn.";
+            TempData["AuthError"] = _localizer["Auth_Activate_FailedExpired"].Value;
             return RedirectAfterAuthSuccess(null, "login");
         }
 
-        TempData["AuthSuccess"] = "Kích hoạt tài khoản thành công. Bạn có thể đăng nhập.";
+        TempData["AuthSuccess"] = _localizer["Auth_Activate_Success"].Value;
         return RedirectAfterAuthSuccess(null, "login");
     }
 

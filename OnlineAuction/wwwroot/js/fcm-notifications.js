@@ -48,9 +48,12 @@
         return postJson('/Notification/UnregisterDevice', { fcmToken: token });
     }
 
-    function showToast(title, body) {
+    function showToast(title, body, isSuccess) {
         var toast = document.createElement('div');
-        toast.className = 'fixed bottom-4 right-4 z-[100] max-w-sm rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-lg';
+        var toneClass = isSuccess === false
+            ? 'border-red-200 bg-red-50'
+            : 'border-slate-200 bg-white';
+        toast.className = 'fixed bottom-4 right-4 z-[100] max-w-sm rounded-lg border px-4 py-3 shadow-lg ' + toneClass;
         toast.innerHTML = '<p class="text-sm font-semibold text-slate-900"></p><p class="mt-1 text-xs text-slate-600"></p>';
         toast.querySelector('p').textContent = title || '';
         toast.querySelectorAll('p')[1].textContent = body || '';
@@ -79,7 +82,7 @@
             }
         }
 
-        showToast(title, body);
+        showToast(title, body, true);
     }
 
     function loadFirebaseScripts() {
@@ -182,6 +185,7 @@
     });
 
     window.fcmNotifications = {
-        unregister: unregisterToken
+        unregister: unregisterToken,
+        showToast: showToast
     };
 })();

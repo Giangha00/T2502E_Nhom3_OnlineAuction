@@ -104,7 +104,7 @@
                 if (Model.CanDelete)
                 {
                     <form asp-area="Admin" asp-controller="Auction" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="inline"
-                          onsubmit="return confirm('Bạn có chắc muốn xóa phiên #@Model.Id?');">
+                          onsubmit="return confirm(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Admin_Auction_ConfirmDelete", Model.Id].Value)));">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="admin-icon-action admin-icon-action--delete admin-icon-action--lg" title="Delete" aria-label="Delete">
                             <partial name="_AdminIcon" model='"trash"' />
@@ -114,7 +114,7 @@
                 else if (Model.CanCancel)
                 {
                     <form asp-area="Admin" asp-controller="Auction" asp-action="Cancel" asp-route-id="@Model.Id" method="post" class="inline"
-                          onsubmit="return confirm('Hủy phiên #@Model.Id thay vì xóa?');">
+                          onsubmit="return confirm(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Admin_Auction_ConfirmCancelInstead", Model.Id].Value)));">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg" title="@Model.DeleteBlockReason" aria-label="Cancel">
                             <partial name="_AdminIcon" model='"x-mark"' />

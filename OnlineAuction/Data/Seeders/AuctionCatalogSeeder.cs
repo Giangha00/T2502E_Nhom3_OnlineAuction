@@ -18,11 +18,13 @@ public static class AuctionCatalogSeeder
 
     /// <summary>6 public Buy Now pages × 12 cards per page.</summary>
     private const int TargetLiveBuyNowCount = 72;
+    private const int TargetProductsPerTemplate = 4;
 
     private sealed record BestSellerProfile(
         string Email,
         string UserName,
         string FullName,
+        string PhoneNumber,
         string AvatarUrl,
         string Password,
         string[] LegacyEmails);
@@ -33,6 +35,7 @@ public static class AuctionCatalogSeeder
             "vietanh@yopmail.com",
             "vietanh",
             "Phạm Việt Anh",
+            "0901000001",
             "/images/team/pham-viet-anh.png",
             "Vietanh00",
             ["viet.anh@auctionhouse.local"]),
@@ -40,6 +43,7 @@ public static class AuctionCatalogSeeder
             "giangha@yopmail.com",
             "giangha",
             "Nguyễn Giang Hà",
+            "0901000002",
             "/images/team/nguyen-giang-ha.png",
             "Giangha00",
             ["giangha@auctionhouse.local"]),
@@ -47,6 +51,7 @@ public static class AuctionCatalogSeeder
             "dinhhai@yopmail.com",
             "dinhhai",
             "Đinh Văn Hải",
+            "0901000003",
             "/images/team/dinh-van-hai.png",
             "Dinhhai00",
             ["nguyen.hai@auctionhouse.local"]),
@@ -54,6 +59,7 @@ public static class AuctionCatalogSeeder
             "nguyenhung@yopmail.com",
             "nguyenhung",
             "Nguyễn Văn Hưng",
+            "0901000004",
             "/images/team/nguyen-van-hung.png",
             "Nguyenhung00",
             ["van.hung@auctionhouse.local"]),
@@ -61,6 +67,7 @@ public static class AuctionCatalogSeeder
             "huuquan@yopmail.com",
             "huuquan",
             "Nguyễn Hữu Quân",
+            "0901000005",
             "/images/team/nguyen-huu-quan.png",
             "Huuquan00",
             ["huu.quan@auctionhouse.local"]),
@@ -68,6 +75,7 @@ public static class AuctionCatalogSeeder
             "danil@yopmail.com",
             "danil",
             "Danil Fomin Long",
+            "0901000006",
             "/images/team/danil-fomin-long.png",
             "Danil00",
             ["dan.long@auctionhouse.local"])
@@ -147,7 +155,9 @@ public static class AuctionCatalogSeeder
             categoryCache,
             templateCache,
             now);
+        await EnsureTemplateSampleInstancesAsync(dbContext, now, sellerIds);
         await EnsureFullFlowDemoScheduleAsync(dbContext, DateTime.UtcNow);
+        await EnsureSharedBestSellerBiddingScenarioAsync(dbContext, DateTime.UtcNow);
         await SyncSeedCategoriesAsync(dbContext);
 
         if (!refreshInDevelopment)
@@ -258,7 +268,7 @@ public static class AuctionCatalogSeeder
                 UserName = profile.UserName,
                 Email = profile.Email,
                 FullName = profile.FullName,
-                PhoneNumber = "0900000000",
+                PhoneNumber = profile.PhoneNumber,
                 Role = UserRole.User,
                 Status = UserStatus.Active,
                 EmailConfirmed = true,
@@ -307,6 +317,12 @@ public static class AuctionCatalogSeeder
         if (!string.Equals(user.FullName, profile.FullName, StringComparison.Ordinal))
         {
             user.FullName = profile.FullName;
+            needsUpdate = true;
+        }
+
+        if (!string.Equals(user.PhoneNumber, profile.PhoneNumber, StringComparison.Ordinal))
+        {
+            user.PhoneNumber = profile.PhoneNumber;
             needsUpdate = true;
         }
 
@@ -439,16 +455,21 @@ public static class AuctionCatalogSeeder
         product.Name = entry.Name;
         product.ShortDescription = SpreadsheetAuctionCatalog.BuildShortDescription(entry.Description);
         product.DescriptionHtml = SpreadsheetAuctionCatalog.BuildDescriptionHtml(entry.Description);
-        product.Condition = entry.Condition;
+        product.Condition = NormalizeCondition(entry.Condition);
         product.Year = entry.Year;
-        product.SetName = entry.SetName;
-        product.Language = entry.Language;
-        product.CardNumber = entry.CardNumber;
+        product.SetName = NormalizeTextOrNull(entry.SetName);
+        product.Language = NormalizeTextOrNull(entry.Language);
+        product.CardNumber = NormalizeCardNumberOrNull(entry.CardNumber);
         product.GradeLabel = entry.GradeLabel;
-        product.CertNumber = entry.Condition == "graded"
-            ? $"{entry.GradeLabel.Replace(" ", "-")}-{entry.CardNumber.Replace("/", "-")}"
+        product.CertNumber = product.Condition == "graded" && !string.IsNullOrWhiteSpace(product.CardNumber)
+            ? $"{entry.GradeLabel.Replace(" ", "-")}-{product.CardNumber.Replace("/", "-")}"
             : null;
         product.PrimaryImage = entry.PrimaryImage;
+
+        var startingPrice = ResolveValidStartingPrice(entry);
+        product.EstimatedValue = startingPrice;
+        product.ImportPrice = Math.Round(startingPrice * 0.8m, 2, MidpointRounding.AwayFromZero);
+        product.ProductOrigin = NormalizeTextOrNull(entry.Language);
     }
 
     private static void ApplyTemplateFieldsFromEntry(
@@ -458,11 +479,11 @@ public static class AuctionCatalogSeeder
     {
         template.Name = entry.Name;
         template.CategoryId = categoryId;
-        template.SetName = entry.SetName;
-        template.CardNumber = entry.CardNumber;
+        template.SetName = NormalizeTextOrNull(entry.SetName);
+        template.CardNumber = NormalizeCardNumberOrNull(entry.CardNumber);
         template.GradeLabel = entry.GradeLabel;
         template.Year = entry.Year;
-        template.Language = entry.Language;
+        template.Language = NormalizeTextOrNull(entry.Language);
         template.ShortDescription = SpreadsheetAuctionCatalog.BuildShortDescription(entry.Description);
         template.DescriptionHtml = SpreadsheetAuctionCatalog.BuildDescriptionHtml(entry.Description);
         template.PrimaryImage = entry.PrimaryImage;
@@ -778,6 +799,42 @@ public static class AuctionCatalogSeeder
     private static string BuildTemplateCacheKey(int categoryId, string name) =>
         $"{categoryId}:{name.Trim()}";
 
+    private static string NormalizeCondition(string? condition)
+    {
+        if (string.IsNullOrWhiteSpace(condition))
+        {
+            return "graded";
+        }
+
+        var value = condition.Trim();
+        if (value.Contains('|') || value.Length > 40)
+        {
+            return "graded";
+        }
+
+        return value;
+    }
+
+    private static string? NormalizeTextOrNull(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var normalized = value.Trim();
+        if (normalized.Equals("N/A", StringComparison.OrdinalIgnoreCase)
+            || normalized.Equals("NA", StringComparison.OrdinalIgnoreCase)
+            || normalized.Equals("N a", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        return normalized;
+    }
+
+    private static string? NormalizeCardNumberOrNull(string? value) => NormalizeTextOrNull(value);
+
     private static async Task SyncBuyNowPricesAsync(AuctionHouseDbContext dbContext)
     {
         var priceMap = SpreadsheetAuctionCatalog.GetBuyNowPriceMap();
@@ -982,6 +1039,275 @@ public static class AuctionCatalogSeeder
 
         var plain = value.Trim();
         return plain.Length <= maxLength ? plain : plain[..maxLength];
+    }
+
+    private static async Task EnsureTemplateSampleInstancesAsync(
+        AuctionHouseDbContext dbContext,
+        DateTime now,
+        IReadOnlyList<int> sellerIds)
+    {
+        var templates = await dbContext.ProductTemplates
+            .AsNoTracking()
+            .Where(template => template.DeletedAt == null && template.IsActive)
+            .Where(template => dbContext.Products.Any(product =>
+                product.ProductTemplateId == template.Id &&
+                product.DeletedAt == null &&
+                product.Auctions.Any(auction =>
+                    auction.DeletedAt == null &&
+                    auction.AuctionEventName != null &&
+                    LegacySeedEventNames.Contains(auction.AuctionEventName))))
+            .Select(template => new { template.Id })
+            .ToListAsync();
+
+        if (templates.Count == 0)
+        {
+            return;
+        }
+
+        var seedIndex = 0;
+        foreach (var template in templates)
+        {
+            var products = await dbContext.Products
+                .Include(product => product.Images)
+                .Include(product => product.Auctions)
+                .Where(product => product.ProductTemplateId == template.Id && product.DeletedAt == null)
+                .Where(product => product.Auctions.Any(auction =>
+                    auction.DeletedAt == null &&
+                    auction.AuctionEventName != null &&
+                    LegacySeedEventNames.Contains(auction.AuctionEventName)))
+                .OrderBy(product => product.Id)
+                .ToListAsync();
+
+            if (products.Count == 0)
+            {
+                continue;
+            }
+
+            var missing = TargetProductsPerTemplate - products.Count;
+            if (missing <= 0)
+            {
+                continue;
+            }
+
+            var baseProduct = products[0];
+            var baseAuction = baseProduct.Auctions
+                .Where(auction => auction.DeletedAt == null && auction.AuctionEventName == SpreadsheetAuctionCatalog.TestAuctionEventName)
+                .OrderBy(auction => auction.Id)
+                .FirstOrDefault();
+
+            if (baseAuction is null)
+            {
+                continue;
+            }
+
+            for (var i = 0; i < missing; i++)
+            {
+                var sellerId = sellerIds.Count == 0
+                    ? baseProduct.SellerId
+                    : ResolveSellerId(sellerIds, seedIndex++);
+
+                var clone = new Product
+                {
+                    SellerId = sellerId,
+                    CategoryId = baseProduct.CategoryId,
+                    ProductTemplateId = baseProduct.ProductTemplateId,
+                    Name = baseProduct.Name,
+                    ShortDescription = baseProduct.ShortDescription,
+                    Subtitle = baseProduct.Subtitle,
+                    DescriptionHtml = baseProduct.DescriptionHtml,
+                    Condition = baseProduct.Condition,
+                    ProductOrigin = baseProduct.ProductOrigin,
+                    Year = baseProduct.Year,
+                    SetName = baseProduct.SetName,
+                    Language = baseProduct.Language,
+                    CardNumber = baseProduct.CardNumber,
+                    GradeLabel = baseProduct.GradeLabel,
+                    CertNumber = baseProduct.CertNumber,
+                    GradingCentering = baseProduct.GradingCentering,
+                    GradingCorners = baseProduct.GradingCorners,
+                    GradingEdges = baseProduct.GradingEdges,
+                    GradingSurface = baseProduct.GradingSurface,
+                    PrimaryImage = baseProduct.PrimaryImage,
+                    EstimatedValue = baseProduct.EstimatedValue,
+                    ImportPrice = baseProduct.ImportPrice,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                };
+
+                dbContext.Products.Add(clone);
+                await dbContext.SaveChangesAsync();
+
+                var sortOrder = 0;
+                foreach (var image in baseProduct.Images
+                    .Where(image => image.DeletedAt == null)
+                    .OrderBy(image => image.SortOrder))
+                {
+                    dbContext.ProductImages.Add(new ProductImage
+                    {
+                        ProductId = clone.Id,
+                        ImageUrl = image.ImageUrl,
+                        SortOrder = sortOrder++,
+                        CreatedAt = now
+                    });
+                }
+
+                var cloneAuction = new Auction
+                {
+                    ProductId = clone.Id,
+                    StartingPrice = baseAuction.StartingPrice,
+                    BidStep = baseAuction.BidStep,
+                    CurrentPrice = baseAuction.StartingPrice,
+                    BuyNowPrice = null,
+                    ListingType = ListingTypes.Auction,
+                    RequiresRegistration = true,
+                    AuctionEventName = SpreadsheetAuctionCatalog.TestAuctionEventName,
+                    Status = AuctionStatuses.Live,
+                    CreatedAt = now
+                };
+
+                AuctionScheduleHelper.ApplyTestAuctionSchedule(cloneAuction, clone.Id, now);
+                dbContext.Auctions.Add(cloneAuction);
+                await dbContext.SaveChangesAsync();
+            }
+        }
+    }
+
+    private static async Task EnsureSharedBestSellerBiddingScenarioAsync(
+        AuctionHouseDbContext dbContext,
+        DateTime now)
+    {
+        var bidderNames = new[]
+        {
+            "Nguyễn Giang Hà",
+            "Đinh Văn Hải",
+            "Nguyễn Văn Hưng"
+        };
+
+        var bidders = await dbContext.Users
+            .Where(user => bidderNames.Contains(user.FullName) && user.Status == UserStatus.Active)
+            .OrderBy(user => user.Id)
+            .ToListAsync();
+
+        if (bidders.Count < 3)
+        {
+            return;
+        }
+
+        var auction = await dbContext.Auctions
+            .Include(item => item.Product)
+            .Include(item => item.Bids)
+            .Include(item => item.Registrations)
+            .FirstOrDefaultAsync(item =>
+                item.DeletedAt == null &&
+                item.Product.DeletedAt == null &&
+                item.ListingType == ListingTypes.Auction &&
+                item.AuctionEventName == SpreadsheetAuctionCatalog.TestAuctionEventName &&
+                item.Product.Name == SpreadsheetAuctionCatalog.FullFlowDemoProductName);
+
+        if (auction is null)
+        {
+            return;
+        }
+
+        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.EndingSoon))
+        {
+            auction.Status = AuctionStatuses.Live;
+        }
+
+        if (auction.StartDate >= now)
+        {
+            auction.StartDate = now.AddMinutes(-30);
+        }
+
+        if (auction.EndDate <= now)
+        {
+            auction.EndDate = now.AddHours(2);
+        }
+
+        auction.RegistrationStartDate = auction.StartDate.AddDays(-1);
+        auction.RegistrationEndDate = auction.StartDate.AddMinutes(-5);
+        auction.RequiresRegistration = true;
+        auction.UpdatedAt = now;
+
+        foreach (var bidder in bidders)
+        {
+            var registration = auction.Registrations
+                .FirstOrDefault(item => item.UserId == bidder.Id && item.DeletedAt == null);
+
+            if (registration is null)
+            {
+                registration = new AuctionRegistration
+                {
+                    AuctionId = auction.Id,
+                    UserId = bidder.Id,
+                    Status = AuctionRegistrationStatuses.Approved,
+                    RegisteredAt = now.AddMinutes(-25),
+                    ReviewedAt = now.AddMinutes(-24),
+                    CreatedAt = now.AddMinutes(-25),
+                    UpdatedAt = now
+                };
+                dbContext.AuctionRegistrations.Add(registration);
+            }
+            else if (registration.Status != AuctionRegistrationStatuses.Approved)
+            {
+                registration.Status = AuctionRegistrationStatuses.Approved;
+                registration.ReviewedAt = now.AddMinutes(-24);
+                registration.UpdatedAt = now;
+            }
+        }
+
+        var activeBids = auction.Bids
+            .Where(item => item.DeletedAt == null)
+            .OrderBy(item => item.PlacedAt)
+            .ThenBy(item => item.Id)
+            .ToList();
+
+        foreach (var bidder in bidders)
+        {
+            if (activeBids.Any(item => item.BidderId == bidder.Id))
+            {
+                continue;
+            }
+
+            var nextAmount = (activeBids.LastOrDefault()?.Amount ?? auction.CurrentPrice) + auction.BidStep;
+            if (nextAmount <= auction.CurrentPrice)
+            {
+                nextAmount = auction.CurrentPrice + Math.Max(auction.BidStep, 1m);
+            }
+
+            var bid = new Bid
+            {
+                AuctionId = auction.Id,
+                BidderId = bidder.Id,
+                Amount = nextAmount,
+                BidType = BidTypes.Manual,
+                IsWinning = false,
+                PlacedAt = now.AddMinutes(-10 + activeBids.Count),
+                CreatedAt = now,
+                UpdatedAt = now
+            };
+            dbContext.Bids.Add(bid);
+            activeBids.Add(bid);
+        }
+
+        if (activeBids.Count > 0)
+        {
+            foreach (var bid in activeBids)
+            {
+                bid.IsWinning = false;
+            }
+
+            var winningBid = activeBids
+                .OrderByDescending(item => item.Amount)
+                .ThenByDescending(item => item.PlacedAt)
+                .First();
+            winningBid.IsWinning = true;
+
+            auction.CurrentPrice = winningBid.Amount;
+            auction.WinnerId = winningBid.BidderId;
+        }
+
+        await dbContext.SaveChangesAsync();
     }
 
     private static async Task EnsureFullFlowDemoScheduleAsync(AuctionHouseDbContext dbContext, DateTime now)

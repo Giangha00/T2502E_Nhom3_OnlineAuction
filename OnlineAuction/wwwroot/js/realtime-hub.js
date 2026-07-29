@@ -126,7 +126,8 @@
     window.realtimeHub = {
         joinAuction: joinAuction,
         leaveAuction: leaveAuction,
-        isConnected: function () { return isConnected; }
+        isConnected: function () { return isConnected; },
+        updateOrderBadge: updateOrderBadge
     };
 
     document.addEventListener('DOMContentLoaded', function () {

@@ -5,6 +5,9 @@
     ViewData["AdminPage"] = "buy-now";
 }
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<link rel="stylesheet" href="~/admin/css/daterangepicker-admin.css" asp-append-version="true" />
+
 <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -53,22 +56,6 @@
                        class="h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
             </div>
 
-            <div class="w-[170px]">
-                <label class="mb-1 block text-theme-xs font-medium text-gray-500">Status</label>
-                <select name="Status" class="admin-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                    <option value="">All</option>
-                    <option value="pending_review" selected="@(Model.Filter.Status == "pending_review")">Pending review</option>
-                    <option value="rejected" selected="@(Model.Filter.Status == "rejected")">Rejected</option>
-                    <option value="scheduled" selected="@(Model.Filter.Status == "scheduled")">Scheduled</option>
-                    <option value="live" selected="@(Model.Filter.Status == "live")">Live</option>
-                    <option value="ending_soon" selected="@(Model.Filter.Status == "ending_soon")">Ending soon</option>
-                    <option value="ended" selected="@(Model.Filter.Status == "ended")">Ended</option>
-                    <option value="awaiting_payment" selected="@(Model.Filter.Status == "awaiting_payment")">Awaiting payment</option>
-                    <option value="completed" selected="@(Model.Filter.Status == "completed")">Completed</option>
-                    <option value="cancelled" selected="@(Model.Filter.Status == "cancelled")">Cancelled</option>
-                </select>
-            </div>
-
             <div class="w-[180px]">
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Category</label>
                 <select name="CategoryId" class="admin-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
@@ -91,6 +78,18 @@
                 </select>
             </div>
 
+            <div class="w-[300px]">
+                <label class="mb-1 block text-theme-xs font-medium text-gray-500">Date range</label>
+                @{
+                    ViewData["DateRangeId"] = "buyNowDateRangePicker";
+                    ViewData["DateRangeHiddenId"] = "buyNowDateRangeValue";
+                    ViewData["DateRangeName"] = "DateRange";
+                    ViewData["DateRangeValue"] = Model.Filter.DateRange;
+                    ViewData["DateRangePlaceholder"] = "Select date range";
+                }
+                @await Html.PartialAsync("_DateRangeTrigger")
+            </div>
+
             <div class="w-[170px]">
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Sort</label>
                 <select name="SortOrder" class="admin-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
@@ -111,6 +110,9 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script src="~/admin/js/admin-list-filter.js" asp-append-version="true"></script>
     <script>
         function bindBuyNowBulkActions(container) {
@@ -128,6 +130,9 @@
             resultsId: 'buyNowListResults',
             searchInputId: 'buyNowSearchInput',
             listUrl: '@Url.Action("Index", "BuyNow", new { area = "Admin" })',
+            setupDateRange: function (submitCallback) {
+                AdminListFilter.setupDateRangePicker('#buyNowDateRangePicker', submitCallback);
+            },
             onUpdated: bindBuyNowBulkActions
         });
     </script>

@@ -1,23 +1,37 @@
 @{
     ViewData["Title"] = Localizer["Faq_PageTitle"];
 
+    string T(string key, string fallback)
+    {
+        var localized = Localizer[key].Value;
+        return string.Equals(localized, key, StringComparison.Ordinal) ? fallback : localized;
+    }
+
+    string TF(string key, string fallbackTemplate, params object[] args)
+    {
+        var localized = Localizer[key, args].Value;
+        return string.Equals(localized, key, StringComparison.Ordinal)
+            ? string.Format(fallbackTemplate, args)
+            : localized;
+    }
+
     var faqSections = new Dictionary<string, (string Title, string Icon, (string Question, string Answer)[] Items)>
     {
-        ["buying"] = ("Buying", "cart", new[]
+        ["buying"] = (T("Faq_Section_Buying_Title", "Buying"), "cart", new[]
         {
-            ("How to bid?", "Create your RareCard account, browse active auctions, and enter a bid amount higher than the current price. You'll receive instant confirmation and notifications if you're outbid."),
-            ("What are the shipping fees?", "Shipping fees are calculated at checkout based on item value, destination, and insurance level. Domestic orders typically range from $15–$45 for standard insured delivery."),
-            ("International bidding?", "Yes — international bidding is available in select regions. Import duties and customs fees may apply and are the buyer's responsibility. Contact support for country-specific details.")
+            (T("Faq_Buying_Q1", "How to bid?"), T("Faq_Buying_A1", "Create your RareCard account, browse active auctions, and enter a bid amount higher than the current price. You'll receive instant confirmation and notifications if you're outbid.")),
+            (T("Faq_Buying_Q2", "What are the shipping fees?"), T("Faq_Buying_A2", "Shipping fees are calculated at checkout based on item value, destination, and insurance level. Domestic orders typically range from $15–$45 for standard insured delivery.")),
+            (T("Faq_Buying_Q3", "International bidding?"), T("Faq_Buying_A3", "Yes — international bidding is available in select regions. Import duties and customs fees may apply and are the buyer's responsibility. Contact support for country-specific details."))
         }),
-        ["selling"] = ("Selling", "tag", new[]
+        ["selling"] = (T("Faq_Section_Selling_Title", "Selling"), "tag", new[]
         {
-            ("What fees does the platform charge?", "Three marketplace charges: (1) auction registration deposit for bidders — refunded to losers, applied at checkout for the winner; (2) buyer checkout fee on the order subtotal; (3) seller success fee deducted from the item subtotal when the order is paid. Seller net proceeds = Subtotal − seller success fee. Shipping and vault insurance are separate and do not go to the seller ledger. There is no listing fee. Rates are configured under PlatformFee. Phase 1 records proceeds on the order for reporting; automatic seller PayPal payout is Phase 2 (manual payout for now)."),
-            ("How do I ship my cards to RareCard?", "After your listing is approved, generate a prepaid insured shipping label from your seller dashboard. Cards must be sent in a rigid mailer or slab case with tracking enabled.")
+            (T("Faq_Selling_Q1", "What fees does the platform charge?"), T("Faq_Selling_A1", "Three marketplace charges: (1) auction registration deposit for bidders — refunded to losers, applied at checkout for the winner; (2) buyer checkout fee on the order subtotal; (3) seller success fee deducted from the item subtotal when the order is paid. Seller net proceeds = Subtotal − seller success fee. Shipping and vault insurance are separate and do not go to the seller ledger. There is no listing fee. Rates are configured under PlatformFee. Phase 1 records proceeds on the order for reporting; automatic seller PayPal payout is Phase 2 (manual payout for now).")),
+            (T("Faq_Selling_Q2", "How do I ship my cards to RareCard?"), T("Faq_Selling_A2", "After your listing is approved, generate a prepaid insured shipping label from your seller dashboard. Cards must be sent in a rigid mailer or slab case with tracking enabled."))
         }),
-        ["security"] = ("Security", "shield", new[]
+        ["security"] = (T("Faq_Section_Security_Title", "Security"), "shield", new[]
         {
-            ("Is my card insured?", "Every card held in our vault and in transit is fully insured up to its listed value. Coverage begins the moment we receive your item and continues through delivery to the buyer."),
-            ("How do you verify authenticity?", "We use direct PSA and BGS API integration for real-time slab verification, plus a secondary 10-point physical inspection by our specialist curators before any listing goes live.")
+            (T("Faq_Security_Q1", "Is my card insured?"), T("Faq_Security_A1", "Every card held in our vault and in transit is fully insured up to its listed value. Coverage begins the moment we receive your item and continues through delivery to the buyer.")),
+            (T("Faq_Security_Q2", "How do you verify authenticity?"), T("Faq_Security_A2", "We use direct PSA and BGS API integration for real-time slab verification, plus a secondary 10-point physical inspection by our specialist curators before any listing goes live."))
         })
     };
 }
@@ -29,10 +43,10 @@
 
     <div class="site-shell relative px-4 py-10 text-center sm:px-6 sm:py-12">
       <h1 class="mx-auto max-w-3xl text-3xl font-bold leading-tight tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-        @Localizer["Faq_PageTitle"]
+        @T("Faq_PageTitle", "FAQ")
       </h1>
       <p class="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
-        Find answers about bidding, selling, grading, and security at RareCard Auctions.
+        @T("Faq_Page_Subtitle", "Find answers about bidding, selling, grading, and security at RareCard Auctions.")
       </p>
     </div>
   </section>
@@ -71,7 +85,7 @@
               </div>
               <div>
                 <h2 class="text-lg font-bold text-slate-900 sm:text-xl">@meta.Title</h2>
-                <p class="mt-0.5 text-xs text-slate-500 sm:text-sm">@meta.Items.Length question@(meta.Items.Length == 1 ? "" : "s")</p>
+                <p class="mt-0.5 text-xs text-slate-500 sm:text-sm">@TF("Faq_QuestionCount", "{0} question(s)", meta.Items.Length)</p>
               </div>
             </header>
 
@@ -83,14 +97,14 @@
                   <button type="button" class="faq-question flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-slate-50/80 sm:px-6 sm:py-5">
                     <span class="flex min-w-0 items-start gap-3 text-sm font-medium text-slate-900 sm:text-base">
                       <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-semibold text-blue-700">@questionNumber</span>
-                      <span>@item.Question</span>
+                      <span class="min-w-0 break-words">@item.Question</span>
                     </span>
                     <svg class="faq-chevron h-4 w-4 shrink-0 text-slate-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
                     </svg>
                   </button>
                   <div class="faq-answer hidden px-5 pb-5 sm:px-6 sm:pb-6">
-                    <p class="pl-9 text-sm leading-relaxed text-slate-600 sm:text-[0.9375rem]">@item.Answer</p>
+                    <p class="pl-9 text-sm leading-relaxed text-slate-600 break-words sm:text-[0.9375rem]">@item.Answer</p>
                   </div>
                 </div>
               }
@@ -100,9 +114,9 @@
       }
 
       <div class="rounded-2xl bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 px-6 py-8 text-center shadow-lg sm:px-10 sm:py-10">
-        <h3 class="text-lg font-bold text-white sm:text-xl">Still need help?</h3>
+        <h3 class="text-lg font-bold text-white sm:text-xl">@Localizer["Faq_StillNeedHelp"]</h3>
         <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-blue-100">
-          Can't find what you're looking for? Contact our team or submit a refund request.
+          @Localizer["Faq_StillNeedHelp_Desc"]
         </p>
         <div class="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a asp-controller="Contact" asp-action="Index"

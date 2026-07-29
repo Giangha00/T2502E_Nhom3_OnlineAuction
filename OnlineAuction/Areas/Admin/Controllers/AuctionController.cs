@@ -28,8 +28,7 @@ public class AuctionController : BaseAdminController
     [RequirePermission(PermissionCodes.AuctionsManage)]
     public IActionResult Create()
     {
-        ViewData["Title"] = "Create Listing";
-        return View();
+        return RedirectToAction(nameof(CreateAuction));
     }
 
     [HttpGet]
