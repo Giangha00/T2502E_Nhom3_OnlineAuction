@@ -44,6 +44,19 @@
         ["errorDocSizeLimit"] = Localizer["Sell_Error_DocSizeLimit"].Value,
         ["errorDocMaxCount"] = "You can upload up to 5 documents per product."
     };
+
+    var existingImagePayload = new List<object>();
+    if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+    {
+        existingImagePayload.Add(new { id = 0, url = Model.ImageUrl, isPrimary = true });
+    }
+
+    foreach (var image in Model.ExistingGalleryImages)
+    {
+        existingImagePayload.Add(new { id = image.Id, url = image.ImageUrl, isPrimary = false });
+    }
+
+    var existingImagesJson = JsonSerializer.Serialize(existingImagePayload);
 }
 
 <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
@@ -55,6 +68,243 @@
     };
 </script>
 <script src="~/js/sell-numeric-input.js" asp-append-version="true"></script>
-<script src="~/admin/js/product-image-uploader.js" asp-append-version="true"></script>
 <script src="~/admin/js/admin-listing-form.js" asp-append-version="true"></script>
+<script>
+    (function () {
+        var MAX_IMAGES = 5;
+        var MAX_IMAGE_SIZE = 1.5 * 1024 * 1024;
+        var IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+        var form = document.getElementById('adminListingForm');
+        if (!form) return;
+
+        var dropZone = document.getElementById('imageDropZone');
+        var imageInput = document.getElementById('imageInput');
+        var primaryInput = form.querySelector('[data-primary-input]');
+        var galleryInput = form.querySelector('[data-gallery-input]');
+        var removeContainer = document.getElementById('removeGalleryImageIdsContainer');
+        var previewGrid = document.getElementById('imagePreviewGrid');
+        var previewList = document.getElementById('imagePreviewList');
+        var imageCount = document.getElementById('imageCount');
+        var clearAllBtn = document.getElementById('clearAllImages');
+        var imageError = document.getElementById('imageError');
+        var savedPrimaryWrap = form.querySelector('[data-saved-primary-image]');
+        var savedPrimaryImg = form.querySelector('[data-saved-primary-thumb]');
+        var primaryPreviewWrap = form.querySelector('[data-primary-preview-wrap]');
+        var primaryPreviewImg = form.querySelector('[data-primary-preview-img]');
+
+        var images = [];
+        var removedExistingImageIds = [];
+        var existingImages = @Html.Raw(existingImagesJson);
+
+        function showImageError(message) {
+            if (!imageError) return;
+            if (!message) {
+                imageError.textContent = '';
+                imageError.classList.add('hidden');
+                return;
+            }
+            imageError.textContent = message;
+            imageError.classList.remove('hidden');
+        }
+
+        function syncPreviewHooks() {
+            var first = images.length > 0 ? images[0] : null;
+
+            if (first && first.file) {
+                if (primaryPreviewWrap) primaryPreviewWrap.classList.remove('hidden');
+                if (primaryPreviewImg) primaryPreviewImg.src = first.url;
+                if (savedPrimaryWrap) savedPrimaryWrap.classList.add('hidden');
+            } else if (first && first.url) {
+                if (savedPrimaryWrap) savedPrimaryWrap.classList.remove('hidden');
+                if (savedPrimaryImg) savedPrimaryImg.src = first.url;
+                if (primaryPreviewWrap) primaryPreviewWrap.classList.add('hidden');
+            } else {
+                if (savedPrimaryWrap) savedPrimaryWrap.classList.add('hidden');
+                if (primaryPreviewWrap) primaryPreviewWrap.classList.add('hidden');
+                if (primaryPreviewImg) primaryPreviewImg.removeAttribute('src');
+            }
+
+            document.dispatchEvent(new CustomEvent('product-image-uploader:changed'));
+        }
+
+        function renderImagePreviews() {
+            if (!previewList) return;
+            previewList.innerHTML = '';
+
+            if (images.length === 0) {
+                if (previewGrid) previewGrid.classList.add('hidden');
+                syncPreviewHooks();
+                return;
+            }
+
+            if (previewGrid) previewGrid.classList.remove('hidden');
+            if (imageCount) imageCount.textContent = '(' + images.length + ')';
+
+            images.forEach(function (img, index) {
+                var card = document.createElement('div');
+                card.className = 'auction-detail__image-card group';
+                var coverBadge = index === 0
+                    ? '<span class="auction-detail__cover-badge">Cover</span>'
+                    : '';
+                card.innerHTML =
+                    '<img src="' + img.url + '" alt="Uploaded image"/>' +
+                    coverBadge +
+                    '<button type="button" class="auction-detail__image-remove" data-remove-image="' + img.id + '">Remove</button>';
+                previewList.appendChild(card);
+            });
+
+            previewList.querySelectorAll('[data-remove-image]').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    removeImage(btn.getAttribute('data-remove-image'));
+                });
+            });
+
+            syncPreviewHooks();
+        }
+
+        function addImages(files) {
+            var errors = [];
+            Array.from(files || []).forEach(function (file) {
+                if (images.length >= MAX_IMAGES) {
+                    errors.push('You can upload up to ' + MAX_IMAGES + ' images.');
+                    return;
+                }
+                if (IMAGE_TYPES.indexOf(file.type) === -1) {
+                    errors.push(file.name + ': invalid format (JPG, PNG, WEBP only)');
+                    return;
+                }
+                if (file.size > MAX_IMAGE_SIZE) {
+                    errors.push(file.name + ': exceeds 1.5MB limit');
+                    return;
+                }
+
+                images.push({
+                    id: 'img_' + Date.now() + '_' + Math.random().toString(36).slice(2),
+                    file: file,
+                    url: URL.createObjectURL(file),
+                    existing: false,
+                    existingId: 0,
+                    isPrimary: false
+                });
+            });
+
+            showImageError(errors.length ? errors[0] : '');
+            syncFilesToFormInputs();
+            renderImagePreviews();
+        }
+
+        function removeImage(id) {
+            var idx = images.findIndex(function (item) { return item.id === id; });
+            if (idx < 0) return;
+
+            var removed = images[idx];
+            if (removed.existingId && removed.existingId > 0) {
+                if (removedExistingImageIds.indexOf(removed.existingId) === -1) {
+                    removedExistingImageIds.push(removed.existingId);
+                }
+            } else if (removed.url && String(removed.url).indexOf('blob:') === 0) {
+                URL.revokeObjectURL(removed.url);
+            }
+
+            images.splice(idx, 1);
+            if (imageInput && images.length === 0) imageInput.value = '';
+            showImageError('');
+            syncFilesToFormInputs();
+            renderImagePreviews();
+        }
+
+        function clearAllImages() {
+            images.forEach(function (img) {
+                if (img.existingId && img.existingId > 0) {
+                    if (removedExistingImageIds.indexOf(img.existingId) === -1) {
+                        removedExistingImageIds.push(img.existingId);
+                    }
+                } else if (img.url && String(img.url).indexOf('blob:') === 0) {
+                    URL.revokeObjectURL(img.url);
+                }
+            });
+            images = [];
+            if (imageInput) imageInput.value = '';
+            showImageError('');
+            syncFilesToFormInputs();
+            renderImagePreviews();
+        }
+
+        function syncFilesToFormInputs() {
+            if (!window.DataTransfer) return;
+
+            var primaryDt = new DataTransfer();
+            var galleryDt = new DataTransfer();
+            var primaryStillExists = images.some(function (img) { return img.isPrimary && img.existing; });
+            var newFiles = images.filter(function (img) { return !!img.file; });
+
+            if (!primaryStillExists && newFiles.length > 0) {
+                primaryDt.items.add(newFiles[0].file);
+                newFiles.slice(1).forEach(function (img) { galleryDt.items.add(img.file); });
+            } else {
+                newFiles.forEach(function (img) { galleryDt.items.add(img.file); });
+            }
+
+            if (primaryInput) primaryInput.files = primaryDt.files;
+            if (galleryInput) galleryInput.files = galleryDt.files;
+
+            if (removeContainer) {
+                removeContainer.innerHTML = '';
+                removedExistingImageIds.forEach(function (id) {
+                    if (!id || id <= 0) return;
+                    var hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = 'RemoveGalleryImageIds';
+                    hidden.value = String(id);
+                    removeContainer.appendChild(hidden);
+                });
+            }
+        }
+
+        function setupDropZone() {
+            if (!dropZone || !imageInput) return;
+
+            dropZone.addEventListener('click', function () { imageInput.click(); });
+            dropZone.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                dropZone.classList.add('is-dragover', 'border-blue-500', 'bg-blue-50/60');
+            });
+            dropZone.addEventListener('dragleave', function () {
+                dropZone.classList.remove('is-dragover', 'border-blue-500', 'bg-blue-50/60');
+            });
+            dropZone.addEventListener('drop', function (e) {
+                e.preventDefault();
+                dropZone.classList.remove('is-dragover', 'border-blue-500', 'bg-blue-50/60');
+                if (e.dataTransfer && e.dataTransfer.files.length) addImages(e.dataTransfer.files);
+            });
+            imageInput.addEventListener('change', function () {
+                if (imageInput.files && imageInput.files.length) addImages(imageInput.files);
+                imageInput.value = '';
+            });
+        }
+
+        function seedExistingImages() {
+            (existingImages || []).forEach(function (item, index) {
+                images.push({
+                    id: 'existing_img_' + (item.id || 0) + '_' + index,
+                    existingId: item.isPrimary ? 0 : (item.id || 0),
+                    file: null,
+                    url: item.url,
+                    existing: true,
+                    isPrimary: !!item.isPrimary
+                });
+            });
+            renderImagePreviews();
+        }
+
+        if (clearAllBtn) clearAllBtn.addEventListener('click', clearAllImages);
+        form.addEventListener('submit', function () { syncFilesToFormInputs(); });
+
+        setupDropZone();
+        seedExistingImages();
+    })();
+</script>
 <partial name="_ValidationScriptsPartial" />

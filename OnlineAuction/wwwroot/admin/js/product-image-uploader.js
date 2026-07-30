@@ -164,7 +164,7 @@
     var mode = root.getAttribute('data-mode') || 'product';
     var labels = parseLabels(root.getAttribute('data-labels'));
     var maxGallery = parseInt(root.getAttribute('data-max-gallery') || '4', 10);
-    var maxImageSize = parseInt(root.getAttribute('data-max-image-size') || String(5 * 1024 * 1024), 10);
+    var maxImageSize = parseInt(root.getAttribute('data-max-image-size') || String(1.5 * 1024 * 1024), 10);
 
     var primaryInput = root.querySelector('[data-primary-input]');
     var primaryPreviewWrap = root.querySelector('[data-primary-preview-wrap]');
@@ -255,7 +255,7 @@
       }
 
       if (file.size > maxImageSize) {
-        var sizeMb = Math.round(maxImageSize / (1024 * 1024));
+        var sizeMb = Math.round((maxImageSize / (1024 * 1024)) * 10) / 10;
         showToast(
           root,
           label(labels, 'sizeLimit', 'Image must not exceed ' + sizeMb + 'MB.'),

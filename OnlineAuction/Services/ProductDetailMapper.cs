@@ -323,7 +323,9 @@ internal static class ProductDetailMapper
             }
         }
 
-        if (item.BuyNowPrice.HasValue && item.BuyNowPrice.Value > item.CurrentPrice)
+        if (item.ListingType == ListingTypes.BuyNow
+            && item.BuyNowPrice.HasValue
+            && item.BuyNowPrice.Value > item.CurrentPrice)
         {
             item.DealLabel = "Buy Now";
             item.DealNote = $"Instant purchase at ${item.BuyNowPrice.Value:N0}";

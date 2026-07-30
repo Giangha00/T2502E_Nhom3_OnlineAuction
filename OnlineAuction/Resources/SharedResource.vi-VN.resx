@@ -272,7 +272,7 @@
   <data name="Sell_Error_AuthenticatorRequired" xml:space="preserve"><value>Vui lòng chọn đơn vị xác thực.</value></data>
   <data name="Sell_Error_GradeRequired" xml:space="preserve"><value>Vui lòng chọn điểm grade.</value></data>
   <data name="Sell_Section2_Title" xml:space="preserve"><value>Hình ảnh sản phẩm</value></data>
-  <data name="Sell_Section2_Desc" xml:space="preserve"><value>Tải lên nhiều hình — JPG, PNG, WEBP (tối đa 5MB mỗi ảnh)</value></data>
+  <data name="Sell_Section2_Desc" xml:space="preserve"><value>Tải lên nhiều hình — JPG, PNG, WEBP (tối đa 1.5MB mỗi ảnh)</value></data>
   <data name="Sell_UploadImages_Title" xml:space="preserve"><value>Tải lên hình ảnh sản phẩm</value></data>
   <data name="Sell_UploadImages_DragDrop" xml:space="preserve"><value>Kéo thả file vào đây hoặc bấm để chọn</value></data>
   <data name="Sell_UploadImages_CloudinaryNote" xml:space="preserve"><value>Hình ảnh sẽ được tải lên Cloudinary và lưu làm ảnh bìa tin đăng.</value></data>
@@ -346,7 +346,7 @@
   <data name="Sell_Error_LiveEndRequired" xml:space="preserve"><value>Vui lòng chọn thời gian kết thúc live</value></data>
   <data name="Sell_Error_LiveEndAfterStart" xml:space="preserve"><value>Thời gian kết thúc live phải sau thời gian bắt đầu live</value></data>
   <data name="Sell_Error_ImageInvalidFormat" xml:space="preserve"><value>{0}: định dạng không hợp lệ (chỉ JPG, PNG, WEBP)</value></data>
-  <data name="Sell_Error_ImageSizeLimit" xml:space="preserve"><value>{0}: vượt quá giới hạn 5MB</value></data>
+  <data name="Sell_Error_ImageSizeLimit" xml:space="preserve"><value>{0}: vượt quá giới hạn 1.5MB</value></data>
   <data name="Sell_Error_DocInvalidFormat" xml:space="preserve"><value>{0}: định dạng không hợp lệ (chỉ PDF, JPG, PNG)</value></data>
   <data name="Sell_Error_DocSizeLimit" xml:space="preserve"><value>{0}: vượt quá giới hạn 10MB</value></data>
   <data name="UserMenu_Orders" xml:space="preserve"><value>Đơn hàng</value></data>
@@ -1593,7 +1593,7 @@
     <value>Danh mục đã chọn không khả dụng.</value>
   </data>
   <data name="AdminMsg_Template_PrimarySize" xml:space="preserve">
-    <value>Ảnh chính của mẫu sản phẩm không được vượt quá 2MB.</value>
+    <value>Ảnh chính của mẫu sản phẩm không được vượt quá 1.5MB.</value>
   </data>
   <data name="AdminMsg_Template_PrimaryFormat" xml:space="preserve">
     <value>Ảnh chính của mẫu sản phẩm phải là JPEG hoặc PNG.</value>

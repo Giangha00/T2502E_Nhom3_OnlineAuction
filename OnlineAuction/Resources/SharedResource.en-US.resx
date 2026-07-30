@@ -268,7 +268,7 @@
   <data name="Sell_AuctionEventName_Placeholder" xml:space="preserve"><value>e.g. RareCard Vault: Premium Trading Card Auction</value></data>
   <data name="Sell_Error_YearInvalid" xml:space="preserve"><value>Please enter a valid year between 1800 and 2100.</value></data>
   <data name="Sell_Section2_Title" xml:space="preserve"><value>Product Images</value></data>
-  <data name="Sell_Section2_Desc" xml:space="preserve"><value>Upload multiple images — JPG, PNG, WEBP (max 5MB each)</value></data>
+  <data name="Sell_Section2_Desc" xml:space="preserve"><value>Upload multiple images — JPG, PNG, WEBP (max 1.5MB each)</value></data>
   <data name="Sell_UploadImages_Title" xml:space="preserve"><value>Upload Product Images</value></data>
   <data name="Sell_UploadImages_DragDrop" xml:space="preserve"><value>Drag &amp; Drop files here or click to browse</value></data>
   <data name="Sell_UploadImages_CloudinaryNote" xml:space="preserve"><value>This image will be uploaded to Cloudinary and saved as the listing cover.</value></data>
@@ -327,7 +327,7 @@
   <data name="Sell_Error_EndDateRequired" xml:space="preserve"><value>End date is required</value></data>
   <data name="Sell_Error_EndDateAfterStart" xml:space="preserve"><value>End date must be greater than start date</value></data>
   <data name="Sell_Error_ImageInvalidFormat" xml:space="preserve"><value>{0}: invalid format (JPG, PNG, WEBP only)</value></data>
-  <data name="Sell_Error_ImageSizeLimit" xml:space="preserve"><value>{0}: exceeds 5MB limit</value></data>
+  <data name="Sell_Error_ImageSizeLimit" xml:space="preserve"><value>{0}: exceeds 1.5MB limit</value></data>
   <data name="Sell_Error_DocInvalidFormat" xml:space="preserve"><value>{0}: invalid format (PDF, JPG, PNG only)</value></data>
   <data name="Sell_Error_DocSizeLimit" xml:space="preserve"><value>{0}: exceeds 10MB limit</value></data>
   <data name="UserMenu_Orders" xml:space="preserve"><value>Orders</value></data>
@@ -1537,7 +1537,7 @@
     <value>The selected category is unavailable.</value>
   </data>
   <data name="AdminMsg_Template_PrimarySize" xml:space="preserve">
-    <value>Template primary image must not exceed 2MB.</value>
+    <value>Template primary image must not exceed 1.5MB.</value>
   </data>
   <data name="AdminMsg_Template_PrimaryFormat" xml:space="preserve">
     <value>Template primary image must be JPEG or PNG.</value>

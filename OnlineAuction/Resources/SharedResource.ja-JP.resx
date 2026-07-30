@@ -253,7 +253,7 @@
   <data name="Sell_AuctionEventName_Placeholder" xml:space="preserve"><value>例: RareCard Vault: Premium Trading Card Auction</value></data>
   <data name="Sell_Error_YearInvalid" xml:space="preserve"><value>1800年から2100年の有効な年を入力してください。</value></data>
   <data name="Sell_Section2_Title" xml:space="preserve"><value>商品画像</value></data>
-  <data name="Sell_Section2_Desc" xml:space="preserve"><value>複数画像をアップロード — JPG, PNG, WEBP（各最大5MB）</value></data>
+  <data name="Sell_Section2_Desc" xml:space="preserve"><value>複数画像をアップロード — JPG, PNG, WEBP（各最大1.5MB）</value></data>
   <data name="Sell_UploadImages_Title" xml:space="preserve"><value>商品画像をアップロード</value></data>
   <data name="Sell_UploadImages_DragDrop" xml:space="preserve"><value>ファイルをドラッグ＆ドロップ、またはクリックして選択</value></data>
   <data name="Sell_UploadImages_CloudinaryNote" xml:space="preserve"><value>この画像はCloudinaryにアップロードされ、出品のカバー画像として保存されます。</value></data>
@@ -312,7 +312,7 @@
   <data name="Sell_Error_EndDateRequired" xml:space="preserve"><value>終了日は必須です</value></data>
   <data name="Sell_Error_EndDateAfterStart" xml:space="preserve"><value>終了日は開始日より後である必要があります</value></data>
   <data name="Sell_Error_ImageInvalidFormat" xml:space="preserve"><value>{0}: 無効な形式（JPG, PNG, WEBPのみ）</value></data>
-  <data name="Sell_Error_ImageSizeLimit" xml:space="preserve"><value>{0}: 5MB制限を超えています</value></data>
+  <data name="Sell_Error_ImageSizeLimit" xml:space="preserve"><value>{0}: 1.5MB制限を超えています</value></data>
   <data name="Sell_Error_DocInvalidFormat" xml:space="preserve"><value>{0}: 無効な形式（PDF, JPG, PNGのみ）</value></data>
   <data name="Sell_Error_DocSizeLimit" xml:space="preserve"><value>{0}: 10MB制限を超えています</value></data>
   <data name="UserMenu_Orders" xml:space="preserve"><value>注文</value></data>
@@ -798,7 +798,7 @@
   <data name="UserAuction_GallerySlotsLeft" xml:space="preserve"><value>ギャラリー残り {0} 枠</value></data>
   <data name="UserAuction_GalleryLimit" xml:space="preserve"><value>ギャラリー画像は最大 {0} 枚までです。</value></data>
   <data name="UserAuction_ImageInvalidFormat" xml:space="preserve"><value>{0}: 無効な形式（JPG、PNG、WEBPのみ）</value></data>
-  <data name="UserAuction_ImageSizeLimit" xml:space="preserve"><value>{0}: 5MB制限を超えています</value></data>
+  <data name="UserAuction_ImageSizeLimit" xml:space="preserve"><value>{0}: 1.5MB制限を超えています</value></data>
   <data name="UserAuction_CurrentCover" xml:space="preserve"><value>現在のカバー</value></data>
   <data name="UserAuction_ReplaceCover" xml:space="preserve"><value>カバー画像を変更</value></data>
   <data name="UserAuction_CurrentGallery" xml:space="preserve"><value>現在のギャラリー</value></data>
@@ -1329,7 +1329,7 @@
     <value>選択したカテゴリは利用できません。</value>
   </data>
   <data name="AdminMsg_Template_PrimarySize" xml:space="preserve">
-    <value>テンプレートのメイン画像は2MB以下にしてください。</value>
+    <value>テンプレートのメイン画像は1.5MB以下にしてください。</value>
   </data>
   <data name="AdminMsg_Template_PrimaryFormat" xml:space="preserve">
     <value>テンプレートのメイン画像はJPEGまたはPNGである必要があります。</value>

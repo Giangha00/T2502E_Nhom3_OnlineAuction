@@ -1,4 +1,5 @@
 @model AuctionDetailViewModel
+@using System.Text.RegularExpressions
 @using OnlineAuction.Configurations
 @using OnlineAuction.Helpers
 
@@ -51,246 +52,585 @@
         AuctionListingPhases.LiveAuction => "bg-emerald-600 text-white",
         AuctionListingPhases.LiveEndingSoon => "bg-red-600 text-white",
         AuctionListingPhases.Ended => "bg-gray-600 text-white",
-        AuctionListingPhases.NotListed => "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+        AuctionListingPhases.NotListed => "bg-slate-500 text-white",
         _ => "bg-slate-600 text-white"
     };
 
-    string StatusBadgeClass(string status) => status switch
+    string CountdownLabel(string kind) => kind switch
     {
-        "confirming" or "pending_review" => "bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",
-        "rejected" or "cancelled" => "bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-400",
-        "live" => "bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-400",
-        "ending_soon" => "bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-400",
-        "awaiting_payment" => "bg-warning-50 text-warning-700 dark:bg-warning-500/15 dark:text-warning-400",
-        "completed" => "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400",
-        _ => "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+        "registration_end" => Localizer["Auction_Countdown_RegistrationEnd"].Value,
+        "live_start" => Localizer["Auction_Countdown_LiveStart"].Value,
+        "live_end" => Localizer["Auction_Countdown_LiveEnd"].Value,
+        "registration_start" => Localizer["Auction_Countdown_RegistrationStart"].Value,
+        _ => Localizer["Card_TimeLeft"].Value
     };
+
+    var plainDescription = string.IsNullOrWhiteSpace(Model.Description)
+        ? string.Empty
+        : Regex.Replace(Model.Description, "<.*?>", string.Empty).Trim();
+
+    var phaseText = string.IsNullOrWhiteSpace(Model.ListingPhaseLabel)
+        ? PhaseLabel(Model.ListingPhase)
+        : Model.ListingPhaseLabel;
 }
 
-<div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
-    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Auction Details</h2>
-            <p class="text-theme-sm text-gray-500 dark:text-gray-400">Viewing auction #@Model.Id.</p>
-        </div>
-
-        <div class="flex flex-wrap gap-3">
-            @if (Model.IsPubliclyListed)
-            {
-                <a asp-area=""
-                   asp-controller="Auction"
-                   asp-action="Detail"
-                   asp-route-id="@Model.Id"
-                   class="inline-flex items-center gap-2 rounded-lg border border-brand-200 bg-brand-50 px-3 py-2 text-theme-sm font-medium text-brand-700 hover:bg-brand-100"
-                   target="_blank"
-                   rel="noopener">
-                    Xem public
-                    <partial name="_AdminIcon" model='"external"' />
-                </a>
-            }
-
-            @if (canManage)
-            {
-                <a asp-area="Admin"
-                   asp-controller="Auction"
-                   asp-action="Edit"
-                   asp-route-id="@Model.Id"
-                   class="admin-icon-action admin-icon-action--edit admin-icon-action--lg"
-                   title="Edit"
-                   aria-label="Edit">
-                    <partial name="_AdminIcon" model='"pencil"' />
-                </a>
-
-                if (Model.CanDelete)
-                {
-                    <form asp-area="Admin" asp-controller="Auction" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="inline"
-                          onsubmit="return confirm(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Admin_Auction_ConfirmDelete", Model.Id].Value)));">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="admin-icon-action admin-icon-action--delete admin-icon-action--lg" title="Delete" aria-label="Delete">
-                            <partial name="_AdminIcon" model='"trash"' />
-                        </button>
-                    </form>
-                }
-                else if (Model.CanCancel)
-                {
-                    <form asp-area="Admin" asp-controller="Auction" asp-action="Cancel" asp-route-id="@Model.Id" method="post" class="inline"
-                          onsubmit="return confirm(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Admin_Auction_ConfirmCancelInstead", Model.Id].Value)));">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg" title="@Model.DeleteBlockReason" aria-label="Cancel">
-                            <partial name="_AdminIcon" model='"x-mark"' />
-                        </button>
-                    </form>
-                }
-            }
-
-            <a asp-area="Admin"
-               asp-controller="Auction"
-               asp-action="Index"
-               class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg"
-               title="Back"
-               aria-label="Back">
-                <partial name="_AdminIcon" model='"arrow-left"' />
-            </a>
-        </div>
-    </div>
-
-    <partial name="_AdminFlashMessages" />
-
-    @if (!string.IsNullOrWhiteSpace(Model.DeleteBlockReason) && canManage)
-    {
-        <div class="mb-4 rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-theme-sm text-warning-800">
-            @Model.DeleteBlockReason
-        </div>
+<style>
+    .auction-detail {
+        background: #f8fafc;
+        padding: 18px;
     }
+    .auction-detail .site-shell {
+        margin: 0 auto;
+        width: 100%;
+        max-width: 1280px;
+    }
+    .auction-detail .auction-detail__layout {
+        display: grid;
+        gap: 2rem;
+    }
+    .auction-detail .auction-detail__hero h1 {
+        margin: 0;
+        font-size: 30px;
+        line-height: 1.2;
+        font-weight: 700;
+        color: #0f172a;
+    }
+    .auction-detail .auction-detail__hero p {
+        margin-top: 8px;
+        color: #64748b;
+        font-size: 14px;
+    }
+    .auction-detail .sell-section {
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+    }
+    .auction-detail .sell-footer-bar {
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+    }
+    .auction-detail .rarecard-card {
+        position: relative;
+    }
+    .auction-detail .rarecard-card__shell {
+        overflow: hidden;
+        border-radius: 1rem;
+        border: 1px solid #e7e5e4;
+        background: #fff;
+    }
+    .auction-detail .rarecard-card__image-wrap {
+        position: relative;
+        aspect-ratio: 1 / 1;
+        background: #f5f5f4;
+    }
+    .auction-detail .rarecard-card__image {
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+    }
+    .auction-detail .rarecard-card__body {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+    }
+    .auction-detail .rarecard-card__price-row {
+        margin-top: auto;
+    }
+    .auction-detail .auction-detail__actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .auction-detail .auction-detail__btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 10px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .auction-detail .auction-detail__btn--cancel {
+        border: 1px solid #e2e8f0;
+        color: #334155;
+        background: #fff;
+    }
+    .auction-detail .auction-detail__btn--save {
+        border: 1px solid #1d4ed8;
+        color: #fff;
+        background: #1d4ed8;
+    }
+    .auction-detail .auction-detail__btn--danger {
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+        background: #fef2f2;
+    }
+    .auction-detail .auction-detail__readonly {
+        width: 100%;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 14px;
+        background: #f8fafc;
+        color: #0f172a;
+        min-height: 42px;
+    }
+    .auction-detail .auction-detail__image-card {
+        position: relative;
+        width: 7.5rem;
+        height: 7.5rem;
+        overflow: hidden;
+        border-radius: 0.5rem;
+        border: 1px solid #e2e8f0;
+        background: #f1f5f9;
+    }
+    .auction-detail .auction-detail__image-card img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+    .auction-detail .auction-detail__image-card .auction-detail__cover-badge {
+        position: absolute;
+        left: 0.375rem;
+        top: 0.375rem;
+        border-radius: 0.375rem;
+        background: rgba(29, 78, 216, 0.92);
+        padding: 0.2rem 0.45rem;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #fff;
+    }
+    @@media (min-width: 1024px) {
+        .auction-detail .auction-detail__layout {
+            grid-template-columns: minmax(0, 1fr) 340px;
+        }
+        .auction-detail .auction-detail__aside {
+            position: sticky;
+            top: 96px;
+            align-self: start;
+        }
+    }
+</style>
 
-    <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-        <div class="flex flex-col gap-6 md:flex-row">
-            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
-            {
-                <img src="@Model.ImageUrl"
-                     alt="@Model.ProductName"
-                     class="h-40 w-40 rounded-xl object-cover" />
-            }
-
-            <div class="flex-1">
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-white/90">@Model.ProductName</h3>
-                <p class="mt-1 text-theme-sm capitalize text-gray-500 dark:text-gray-400">@Model.ListingType · @Model.CategoryName</p>
-                <div class="mt-3 flex flex-wrap items-center gap-2">
-                    <span class="rounded-full px-2.5 py-0.5 text-theme-xs font-medium capitalize @StatusBadgeClass(Model.Status)">
-                        DB: @FormatStatus(Model.Status)
-                    </span>
-                    <span class="rounded-md px-2 py-1 text-[11px] font-bold uppercase tracking-wide @PhaseBadgeClass(Model.ListingPhase)">
-                        @PhaseLabel(Model.ListingPhase)
-                    </span>
-                    <span class="rounded-full px-2.5 py-0.5 text-theme-xs font-medium @(Model.IsPubliclyListed ? "bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-400" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300")">
-                        Public: @(Model.IsPubliclyListed ? "Yes" : "No")
-                    </span>
-                </div>
-            </div>
+<div class="sell-page auction-detail min-h-screen bg-slate-50">
+    <section class="site-shell px-4 py-8 sm:px-6 lg:py-10">
+        <div class="mb-8 auction-detail__hero">
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Auction Details</h1>
+            <p class="mt-2 text-sm text-slate-500 sm:text-base">
+                Auction #@Model.Id · @FormatStatus(Model.Status) · @phaseText
+            </p>
         </div>
 
-        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        <partial name="_AdminFlashMessages" />
+
+        @if (!string.IsNullOrWhiteSpace(Model.DeleteBlockReason) && canManage)
         {
-            <div class="prose prose-sm mt-6 max-w-none rounded-xl border border-gray-100 bg-gray-50 p-4 text-theme-sm text-gray-700 dark:border-gray-800 dark:bg-white/[0.02] dark:text-gray-300">
-                @Html.Raw(Model.Description)
+            <div class="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm text-amber-800">
+                @Model.DeleteBlockReason
             </div>
         }
 
-        <dl class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Seller</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.SellerName</dd>
-                <dd class="text-theme-xs text-gray-500">@Model.SellerEmail</dd>
-            </div>
+        <div class="grid gap-8 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] auction-detail__layout">
+            <div class="space-y-6 auction-detail__main">
+                <div class="rounded-xl border border-blue-200 bg-blue-50 px-5 py-3 text-sm text-blue-800">
+                    Review auction information below. Use Edit to update product details, pricing, and schedule.
+                </div>
 
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Pricing</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    Current: @Model.CurrentPrice.ToString("N0") · Start: @Model.StartingPrice.ToString("N0") · Step: @Model.BidStep.ToString("N0")
-                </dd>
-                @if (Model.BuyNowPrice.HasValue)
+                <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-100 px-6 py-5">
+                        <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">1</span>
+                            Product Details
+                        </h2>
+                        <p class="mt-1 pl-10 text-sm text-slate-500">Basic information customers see on the auction page.</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
+                        <div class="md:col-span-2">
+                            <label class="mb-1.5 block text-sm font-medium text-slate-700">Product Name</label>
+                            <div class="auction-detail__readonly">@Model.ProductName</div>
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-slate-700">Category</label>
+                            <div class="auction-detail__readonly">@Model.CategoryName</div>
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-slate-700">Seller</label>
+                            <div class="auction-detail__readonly">
+                                <div>@Model.SellerName</div>
+                                <div class="mt-0.5 break-all text-xs text-slate-500">@Model.SellerEmail</div>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="mb-1.5 block text-sm font-medium text-slate-700">Description</label>
+                            <div class="auction-detail__readonly min-h-28 prose prose-sm max-w-none text-slate-800 [&_img]:max-w-full">
+                                @if (string.IsNullOrWhiteSpace(Model.Description))
+                                {
+                                    <span class="text-slate-400">No description</span>
+                                }
+                                else
+                                {
+                                    @Html.Raw(Model.Description)
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-100 px-6 py-5">
+                        <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">2</span>
+                            Product Images
+                        </h2>
+                        <p class="mt-1 pl-10 text-sm text-slate-500">Cover image for this auction listing.</p>
+                    </div>
+                    <div class="p-6">
+                        @if (string.IsNullOrWhiteSpace(Model.ImageUrl))
+                        {
+                            <p class="text-sm text-slate-500">No image uploaded.</p>
+                        }
+                        else
+                        {
+                            <div class="flex flex-row flex-nowrap gap-3 overflow-x-auto pb-1">
+                                <a href="@Model.ImageUrl"
+                                   target="_blank"
+                                   rel="noopener"
+                                   class="auction-detail__image-card"
+                                   title="Cover image">
+                                    <img src="@Model.ImageUrl" alt="@Model.ProductName" />
+                                    <span class="auction-detail__cover-badge">Cover</span>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-100 px-6 py-5">
+                        <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">3</span>
+                            Auction Settings
+                        </h2>
+                        <p class="mt-1 pl-10 text-sm text-slate-500">Starting price and bid step for this auction.</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4 p-6 sm:grid-cols-3">
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-slate-700">Current Bid</label>
+                            <div class="auction-detail__readonly font-semibold text-blue-700">$@Model.CurrentPrice.ToString("N0")</div>
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-slate-700">Starting Price</label>
+                            <div class="auction-detail__readonly">$@Model.StartingPrice.ToString("N0")</div>
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-slate-700">Bid Step</label>
+                            <div class="auction-detail__readonly">$@Model.BidStep.ToString("N0")</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-100 px-6 py-5">
+                        <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">4</span>
+                            Auction Duration
+                        </h2>
+                        <p class="mt-1 pl-10 text-sm text-slate-500">Registration window and live auction schedule.</p>
+                    </div>
+                    <div class="space-y-6 p-6">
+                        <div>
+                            <h3 class="mb-3 text-sm font-semibold text-slate-800">Registration Period</h3>
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-slate-700">Registration Start</label>
+                                    <div class="auction-detail__readonly">@Model.RegistrationStartDate.ToString("dd/MM/yyyy HH:mm")</div>
+                                </div>
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-slate-700">Registration End</label>
+                                    <div class="auction-detail__readonly">@Model.RegistrationEndDate.ToString("dd/MM/yyyy HH:mm")</div>
+                                </div>
+                            </div>
+                            <p class="mt-2 text-xs text-slate-500">@Model.RegistrationCount registration(s)</p>
+                        </div>
+                        <div>
+                            <h3 class="mb-3 text-sm font-semibold text-slate-800">Live Period</h3>
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-slate-700">Live Start</label>
+                                    <div class="auction-detail__readonly">@Model.StartDate.ToString("dd/MM/yyyy HH:mm")</div>
+                                </div>
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-slate-700">Live End</label>
+                                    <div class="auction-detail__readonly">@Model.EndDate.ToString("dd/MM/yyyy HH:mm")</div>
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(Model.TimeRemaining))
+                            {
+                                <p class="mt-2 text-xs text-slate-500">@Model.TimeRemaining</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-100 px-6 py-5">
+                        <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">5</span>
+                            Winner &amp; Order
+                        </h2>
+                        <p class="mt-1 pl-10 text-sm text-slate-500">Auction outcome and related order information.</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-slate-700">Winner</label>
+                            <div class="auction-detail__readonly">@(Model.WinnerName ?? "Not assigned")</div>
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-slate-700">Bids</label>
+                            <div class="auction-detail__readonly">@Model.BidCount</div>
+                        </div>
+                        @if (Model.OrderId.HasValue)
+                        {
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-slate-700">Order</label>
+                                <div class="auction-detail__readonly">
+                                    @(Model.OrderReference ?? $"#{Model.OrderId.Value}")
+                                    <span class="ml-1 text-xs font-normal capitalize text-slate-500">· @(Model.OrderStatus ?? "unknown")</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-slate-700">Payment Deadline</label>
+                                <div class="auction-detail__readonly">
+                                    @(Model.PaymentDeadline?.ToString("dd/MM/yyyy HH:mm") ?? "—")
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="sell-footer-bar rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm sm:px-6">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <p class="text-sm text-slate-500">
+                            <span class="font-medium text-slate-700">Need changes?</span> Open Edit to update this auction.
+                        </p>
+                        <div class="auction-detail__actions">
+                            <a asp-area="Admin"
+                               asp-controller="Auction"
+                               asp-action="Index"
+                               class="auction-detail__btn auction-detail__btn--cancel">
+                                Back to list
+                            </a>
+
+                            @if (Model.IsPubliclyListed)
+                            {
+                                <a asp-area=""
+                                   asp-controller="Auction"
+                                   asp-action="Detail"
+                                   asp-route-id="@Model.Id"
+                                   target="_blank"
+                                   rel="noopener"
+                                   class="auction-detail__btn auction-detail__btn--cancel">
+                                    View public
+                                </a>
+                            }
+
+                            @if (canManage)
+                            {
+                                <a asp-area="Admin"
+                                   asp-controller="Auction"
+                                   asp-action="Edit"
+                                   asp-route-id="@Model.Id"
+                                   class="auction-detail__btn auction-detail__btn--save">
+                                    Edit auction
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @if (canManage && (Model.CanDelete || Model.CanCancel))
                 {
-                    <dd class="text-theme-xs text-gray-500">Buy now: @Model.BuyNowPrice.Value.ToString("N0")</dd>
+                    <div class="rounded-xl border border-red-200 bg-red-50 px-5 py-4">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <p class="text-sm text-red-700">
+                                @(Model.CanDelete
+                                    ? "Danger zone: permanently delete this auction."
+                                    : "Danger zone: cancel this auction and remove it from the public catalog.")
+                            </p>
+                            @if (Model.CanDelete)
+                            {
+                                <form asp-area="Admin"
+                                      asp-controller="Auction"
+                                      asp-action="Delete"
+                                      asp-route-id="@Model.Id"
+                                      method="post"
+                                      onsubmit="return confirm(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Admin_Auction_ConfirmDelete", Model.Id].Value)));">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="auction-detail__btn auction-detail__btn--danger">
+                                        Delete auction
+                                    </button>
+                                </form>
+                            }
+                            else if (Model.CanCancel)
+                            {
+                                <form asp-area="Admin"
+                                      asp-controller="Auction"
+                                      asp-action="Cancel"
+                                      asp-route-id="@Model.Id"
+                                      method="post"
+                                      onsubmit="return confirm(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Localizer["Admin_Auction_ConfirmCancelInstead", Model.Id].Value)));">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="auction-detail__btn auction-detail__btn--danger"
+                                            title="@Model.DeleteBlockReason">
+                                        Cancel auction
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
                 }
             </div>
 
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Registration Schedule</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    @Model.RegistrationStartDate.ToString("dd/MM/yyyy HH:mm") - @Model.RegistrationEndDate.ToString("dd/MM/yyyy HH:mm")
-                </dd>
-                <dd class="text-theme-xs text-gray-500">@Model.RegistrationCount registration(s)</dd>
-            </div>
+            <aside class="space-y-4 auction-detail__aside">
+                <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-100 px-6 py-5">
+                        <h2 class="text-base font-semibold text-slate-900">Listing Info</h2>
+                    </div>
+                    <dl class="space-y-2 p-6 text-sm">
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Auction ID</dt>
+                            <dd class="font-medium text-slate-800">#@Model.Id</dd>
+                        </div>
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Product</dt>
+                            <dd class="font-medium text-slate-800">
+                                <a asp-area="Admin"
+                                   asp-controller="Product"
+                                   asp-action="Details"
+                                   asp-route-id="@Model.ProductId"
+                                   class="text-blue-700 hover:underline">
+                                    #@Model.ProductId
+                                </a>
+                            </dd>
+                        </div>
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Type</dt>
+                            <dd class="font-medium text-slate-800">@Model.ListingType</dd>
+                        </div>
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Status</dt>
+                            <dd class="font-medium capitalize text-slate-800">@FormatStatus(Model.Status)</dd>
+                        </div>
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Phase</dt>
+                            <dd class="font-medium text-slate-800">@phaseText</dd>
+                        </div>
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Public</dt>
+                            <dd class="font-medium text-slate-800">@(Model.IsPubliclyListed ? "Visible" : "Hidden")</dd>
+                        </div>
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Verified</dt>
+                            <dd class="font-medium text-slate-800">
+                                @(Model.VerifiedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Not verified")
+                                @if (!string.IsNullOrWhiteSpace(Model.VerifiedByName))
+                                {
+                                    <span class="block text-xs font-normal text-slate-500">by @Model.VerifiedByName</span>
+                                }
+                            </dd>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(Model.RejectReason))
+                        {
+                            <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                                <dt class="text-slate-500">Reject</dt>
+                                <dd class="font-medium text-red-600">@Model.RejectReason</dd>
+                            </div>
+                        }
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Created</dt>
+                            <dd class="font-medium text-slate-800">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+                        </div>
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Updated</dt>
+                            <dd class="font-medium text-slate-800">
+                                @(Model.UpdatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Not updated")
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
 
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Live Schedule</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    @Model.StartDate.ToString("dd/MM/yyyy HH:mm") - @Model.EndDate.ToString("dd/MM/yyyy HH:mm")
-                </dd>
-                <dd class="text-theme-xs text-gray-500">@Model.TimeRemaining</dd>
-            </div>
+                <div>
+                    <div class="mb-3 px-1">
+                        <h2 class="text-sm font-semibold text-slate-900">Customer Preview</h2>
+                        <p class="mt-0.5 text-xs text-slate-500">Same style as auction item card</p>
+                    </div>
 
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Visibility</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    @(Model.IsPubliclyListed ? "Visible on /Auction" : "Not listed on /Auction")
-                </dd>
-                @if (Model.IsPubliclyListed)
-                {
-                    <dd>
-                        <a asp-area=""
-                           asp-controller="Auction"
-                           asp-action="Detail"
-                           asp-route-id="@Model.Id"
-                           class="text-theme-xs font-medium text-brand-600 hover:text-brand-700"
-                           target="_blank"
-                           rel="noopener">Open public detail</a>
-                    </dd>
-                }
-            </div>
+                    <article class="rarecard-card rarecard-card--grid sell-preview-card group h-full">
+                        <div class="rarecard-card__shell pointer-events-none overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+                            <div class="flex flex-1 flex-col">
+                                <div class="rarecard-card__image-wrap relative bg-stone-50">
+                                    @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                                    {
+                                        <img src="@Model.ImageUrl"
+                                             alt="@Model.ProductName"
+                                             class="rarecard-card__image object-contain" />
+                                    }
+                                    else
+                                    {
+                                        <div class="flex h-full flex-col items-center justify-center text-stone-400">
+                                            <span class="text-xs">No image</span>
+                                        </div>
+                                    }
+                                    <span class="absolute left-3 top-3 max-w-[calc(100%-3.5rem)] rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide shadow @PhaseBadgeClass(Model.ListingPhase)">
+                                        @phaseText
+                                    </span>
+                                    <span class="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 bg-white/95 text-stone-400 shadow-sm"
+                                          aria-hidden="true">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                        </svg>
+                                    </span>
+                                </div>
 
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Bids</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.BidCount</dd>
-            </div>
+                                <div class="rarecard-card__body flex flex-1 flex-col p-3 sm:p-4">
+                                    <p class="text-[10px] font-bold uppercase tracking-wide text-blue-700">@Model.CategoryName</p>
+                                    <h3 class="mt-1 line-clamp-2 min-h-10 text-sm font-semibold leading-snug text-stone-900">@Model.ProductName</h3>
+                                    <p class="mt-1 line-clamp-1 min-h-4.5 text-xs text-stone-500">
+                                        @(string.IsNullOrWhiteSpace(plainDescription) ? "\u00a0" : plainDescription)
+                                    </p>
 
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Winner</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@(Model.WinnerName ?? "Not assigned")</dd>
-                @if (Model.OrderId.HasValue)
-                {
-                    <dd class="text-theme-xs text-gray-500">
-                        Order: @(Model.OrderReference ?? $"#{Model.OrderId.Value}") · @(Model.OrderStatus ?? "unknown")
-                    </dd>
-                    @if (Model.PaymentDeadline.HasValue)
-                    {
-                        <dd class="text-theme-xs text-gray-500">Payment deadline: @Model.PaymentDeadline.Value.ToString("dd/MM/yyyy HH:mm")</dd>
-                    }
-                }
-            </div>
+                                    <div class="rarecard-card__price-row mt-auto flex items-end justify-between gap-2 border-t border-stone-100 pt-3">
+                                        <div>
+                                            <p class="text-[10px] font-semibold uppercase tracking-wider text-stone-400">Current bid</p>
+                                            <p class="text-xl font-bold tabular-nums text-blue-700">$@Model.CurrentPrice.ToString("N0")</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-[10px] font-semibold uppercase tracking-wider text-stone-400">@CountdownLabel(Model.PhaseCountdownKind)</p>
+                                            <p class="text-xs font-semibold tabular-nums text-stone-700">
+                                                @(string.IsNullOrWhiteSpace(Model.TimeRemaining) ? "—" : Model.TimeRemaining)
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </aside>
+        </div>
 
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Verification</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    @(Model.VerifiedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Not verified")
-                </dd>
-                <dd class="text-theme-xs text-gray-500">By: @(Model.VerifiedByName ?? "n/a")</dd>
-                @if (!string.IsNullOrWhiteSpace(Model.RejectReason))
-                {
-                    <dd class="text-theme-xs text-error-600">Reject reason: @Model.RejectReason</dd>
-                }
-            </div>
-
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Product</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    <a asp-area="Admin"
-                       asp-controller="Product"
-                       asp-action="Details"
-                       asp-route-id="@Model.ProductId"
-                       class="font-medium text-brand-600 hover:text-brand-700">
-                        Product #@Model.ProductId
-                    </a>
-                </dd>
-            </div>
-
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Created Date</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
-            </div>
-
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Updated Date</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    @(Model.UpdatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Not updated")
-                </dd>
-            </div>
-        </dl>
-    </div>
-
-    @await Html.PartialAsync("_FraudAlertsSection", Model)
-
-    @await Html.PartialAsync("_WinnerNonPaymentSection", Model)
-
-    @await Html.PartialAsync("_BidHistorySection", Model)
+        <div class="mt-8 space-y-6">
+            @await Html.PartialAsync("_FraudAlertsSection", Model)
+            @await Html.PartialAsync("_WinnerNonPaymentSection", Model)
+            @await Html.PartialAsync("_BidHistorySection", Model)
+        </div>
+    </section>
 </div>

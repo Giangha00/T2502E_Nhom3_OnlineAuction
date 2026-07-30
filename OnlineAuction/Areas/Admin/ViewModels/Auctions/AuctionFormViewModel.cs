@@ -86,21 +86,26 @@ public class AuctionFormViewModel : IValidatableObject
 
     [Range(0.01, double.MaxValue, ErrorMessage = "Starting price must be greater than 0")]
     [Display(Name = "Starting Price")]
+    [DisplayFormat(DataFormatString = "{0:0.##}", ApplyFormatInEditMode = true)]
     public decimal StartingPrice { get; set; }
 
     [Range(0.01, double.MaxValue, ErrorMessage = "Bid step must be greater than 0")]
     [Display(Name = "Bid Step")]
+    [DisplayFormat(DataFormatString = "{0:0.##}", ApplyFormatInEditMode = true)]
     public decimal BidStep { get; set; }
 
     [Range(0.01, double.MaxValue, ErrorMessage = "Buy now price must be greater than 0")]
     [Display(Name = "Buy Now Price")]
+    [DisplayFormat(DataFormatString = "{0:0.##}", ApplyFormatInEditMode = true)]
     public decimal? BuyNowPrice { get; set; }
 
     [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
     [Display(Name = "Price")]
+    [DisplayFormat(DataFormatString = "{0:0.##}", ApplyFormatInEditMode = true)]
     public decimal Price { get; set; }
 
     [Display(Name = "Current Price")]
+    [DisplayFormat(DataFormatString = "{0:0.##}", ApplyFormatInEditMode = true)]
     public decimal CurrentPrice { get; set; }
 
     [DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]

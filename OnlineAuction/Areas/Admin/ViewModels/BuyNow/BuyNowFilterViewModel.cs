@@ -14,6 +14,10 @@ public class BuyNowFilterViewModel
 
     public int? SellerId { get; set; }
 
+    public string? Status { get; set; }
+
+    public bool OnCatalogOnly { get; set; }
+
     public string? SortOrder { get; set; }
 
     public int Page { get; set; } = 1;

@@ -2,7 +2,7 @@
   'use strict';
 
   var DRAFT_KEY = 'auctionHouse_createBuyNow_draft';
-  var MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+  var MAX_IMAGE_SIZE = 1.5 * 1024 * 1024;
   var MAX_DOC_SIZE = 5 * 1024 * 1024;
   var MAX_IMAGES = 5;
   var MAX_DOCUMENTS = 5;
@@ -229,7 +229,7 @@
       }
 
       if (file.size > MAX_IMAGE_SIZE) {
-        errors.push(tf(t('errorImageSizeLimit', '{0}: exceeds 5MB limit'), file.name));
+        errors.push(tf(t('errorImageSizeLimit', '{0}: exceeds 1.5MB limit'), file.name));
         return;
       }
 

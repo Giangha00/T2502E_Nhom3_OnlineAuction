@@ -19,7 +19,7 @@ public class AdminProductService : IAdminProductService
     private const string DefaultProductImageUrl =
         "https://res.cloudinary.com/demo/image/upload/c_fill,w_900,h_900,q_auto,f_auto/sample.jpg";
 
-    private const int MaxGalleryImages = 4;
+    private const int MaxGalleryImages = UploadLimits.MaxGalleryImages;
     private const int MaxDocumentsPerProduct = 5;
 
     private static readonly string[] BlockDeleteAuctionStatuses =
@@ -1444,7 +1444,7 @@ public class AdminProductService : IAdminProductService
 
         if (model.PrimaryImageFile is { Length: > 0 })
         {
-            const long maxImageSize = 2 * 1024 * 1024;
+            const long maxImageSize = UploadLimits.MaxImageBytes;
             var extension = Path.GetExtension(model.PrimaryImageFile.FileName).ToLowerInvariant();
 
             if (model.PrimaryImageFile.Length > maxImageSize)

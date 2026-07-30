@@ -2,6 +2,7 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.Extensions.Options;
 using OnlineAuction.Configurations;
+using OnlineAuction.Helpers;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Services;
@@ -21,7 +22,8 @@ public class PhotoService : IPhotoService
         ".pdf"
     ];
 
-    private const long MaxFileSize = 5 * 1024 * 1024;
+    private const long MaxImageBytes = UploadLimits.MaxImageBytes;
+    private const long MaxDocumentBytes = UploadLimits.MaxDocumentBytes;
 
     private readonly Cloudinary _cloudinary;
 
@@ -46,13 +48,16 @@ public class PhotoService : IPhotoService
             return null;
         }
 
-        if (file.Length > MaxFileSize)
+        var isDocumentFolder = folder.Contains("documents", StringComparison.OrdinalIgnoreCase);
+        var maxBytes = isDocumentFolder ? MaxDocumentBytes : MaxImageBytes;
+        if (file.Length > maxBytes)
         {
-            throw new InvalidOperationException("Image file size must not exceed 5MB.");
+            throw new InvalidOperationException(isDocumentFolder
+                ? "Document file size must not exceed 5MB."
+                : $"Image file size must not exceed {UploadLimits.MaxImageSizeLabel}.");
         }
 
         var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-        var isDocumentFolder = folder.Contains("documents", StringComparison.OrdinalIgnoreCase);
 
         if (isDocumentFolder)
         {

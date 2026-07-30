@@ -260,7 +260,7 @@
   <data name="Sell_Error_AuthenticatorRequired" xml:space="preserve"><value>Please select an authenticator.</value></data>
   <data name="Sell_Error_GradeRequired" xml:space="preserve"><value>Please select a grade.</value></data>
   <data name="Sell_Section2_Title" xml:space="preserve"><value>Product Images</value></data>
-  <data name="Sell_Section2_Desc" xml:space="preserve"><value>Upload multiple images — JPG, PNG, WEBP (max 5MB each)</value></data>
+  <data name="Sell_Section2_Desc" xml:space="preserve"><value>Upload multiple images — JPG, PNG, WEBP (max 1.5MB each)</value></data>
   <data name="Sell_UploadImages_Title" xml:space="preserve"><value>Upload Product Images</value></data>
   <data name="Sell_UploadImages_DragDrop" xml:space="preserve"><value>Drag &amp; Drop files here or click to browse</value></data>
   <data name="Sell_UploadImages_CloudinaryNote" xml:space="preserve"><value>Upload up to 5 images. The first image becomes the listing cover.</value></data>
@@ -334,7 +334,7 @@
   <data name="Sell_Error_LiveEndRequired" xml:space="preserve"><value>Live end is required</value></data>
   <data name="Sell_Error_LiveEndAfterStart" xml:space="preserve"><value>Live end must be after live start</value></data>
   <data name="Sell_Error_ImageInvalidFormat" xml:space="preserve"><value>{0}: invalid format (JPG, PNG, WEBP only)</value></data>
-  <data name="Sell_Error_ImageSizeLimit" xml:space="preserve"><value>{0}: exceeds 5MB limit</value></data>
+  <data name="Sell_Error_ImageSizeLimit" xml:space="preserve"><value>{0}: exceeds 1.5MB limit</value></data>
   <data name="Sell_Error_DocInvalidFormat" xml:space="preserve"><value>{0}: invalid format (PDF, JPG, PNG only)</value></data>
   <data name="Sell_Error_DocSizeLimit" xml:space="preserve"><value>{0}: exceeds 10MB limit</value></data>
   <data name="UserMenu_Orders" xml:space="preserve"><value>Orders</value></data>
@@ -1254,12 +1254,12 @@
   <data name="AdminProduct.Value" xml:space="preserve"><value>Value</value></data>
   <data name="AdminProduct.Media" xml:space="preserve"><value>Images and documents</value></data>
   <data name="AdminProduct.PrimaryImage" xml:space="preserve"><value>Primary image</value></data>
-  <data name="AdminProduct.PrimaryImageHelp" xml:space="preserve"><value>JPG, PNG, or WEBP. Max 5MB.</value></data>
+  <data name="AdminProduct.PrimaryImageHelp" xml:space="preserve"><value>JPG, PNG, or WEBP. Max 1.5MB.</value></data>
   <data name="AdminProduct.CurrentGallery" xml:space="preserve"><value>Current gallery</value></data>
   <data name="AdminProduct.Gallery" xml:space="preserve"><value>Gallery</value></data>
   <data name="AdminProduct.GalleryImage" xml:space="preserve"><value>Gallery image</value></data>
   <data name="AdminProduct.GalleryImages" xml:space="preserve"><value>Gallery images</value></data>
-  <data name="AdminProduct.GalleryImagesHelp" xml:space="preserve"><value>Up to 4 gallery images in addition to the primary image. JPG, PNG, or WEBP. Max 5MB each.</value></data>
+  <data name="AdminProduct.GalleryImagesHelp" xml:space="preserve"><value>Up to 4 gallery images in addition to the primary image. JPG, PNG, or WEBP. Max 1.5MB each.</value></data>
   <data name="AdminProduct.CurrentDocuments" xml:space="preserve"><value>Current certificates/documents</value></data>
   <data name="AdminProduct.CertificateDocuments" xml:space="preserve"><value>Certificate / verification documents (PDF)</value></data>
   <data name="AdminProduct.CertificateDocumentsHelp" xml:space="preserve"><value>Upload PSA certificates, grading reports, or verification PDFs. Max 5MB each, up to 5 documents per product.</value></data>
@@ -1725,7 +1725,7 @@
     <value>The selected category is unavailable.</value>
   </data>
   <data name="AdminMsg_Template_PrimarySize" xml:space="preserve">
-    <value>Template primary image must not exceed 2MB.</value>
+    <value>Template primary image must not exceed 1.5MB.</value>
   </data>
   <data name="AdminMsg_Template_PrimaryFormat" xml:space="preserve">
     <value>Template primary image must be JPEG or PNG.</value>

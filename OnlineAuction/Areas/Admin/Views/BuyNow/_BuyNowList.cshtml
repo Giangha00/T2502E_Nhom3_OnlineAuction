@@ -5,30 +5,21 @@
     var totalPages = Model.TotalPages <= 0 ? 1 : Model.TotalPages;
     var startPage = Math.Max(1, currentPage - 2);
     var endPage = Math.Min(totalPages, currentPage + 2);
+    var filterStatus = Model.Filter.Status;
+    var filterOnCatalogOnly = Model.Filter.OnCatalogOnly;
+    var filterSearch = Model.Filter.Search;
+    var filterDateRange = Model.Filter.DateRange;
+    var filterCategoryId = Model.Filter.CategoryId;
+    var filterSellerId = Model.Filter.SellerId;
+    var filterSortOrder = Model.Filter.SortOrder;
 
     string FormatStatus(string status) => status switch
     {
         "confirming" or "pending_review" => "Confirming",
-        "rejected" => "Rejected",
-        "scheduled" => "Scheduled",
-        "live" => "Live",
-        "ending_soon" => "Ending soon",
-        "ended" => "Ended",
+        "live" or "ending_soon" => "In stock",
         "awaiting_payment" => "Awaiting payment",
-        "completed" => "Completed",
-        "cancelled" => "Cancelled",
+        "completed" => "Sold",
         _ => status.Replace('_', ' ')
-    };
-
-    string StatusBadgeClass(string status) => status switch
-    {
-        "confirming" or "pending_review" => "bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",
-        "rejected" or "cancelled" => "bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-400",
-        "live" => "bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-400",
-        "ending_soon" => "bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-400",
-        "awaiting_payment" => "bg-warning-50 text-warning-700 dark:bg-warning-500/15 dark:text-warning-400",
-        "completed" => "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-400",
-        _ => "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
     };
 }
 
@@ -121,9 +112,7 @@
                                 <p class="admin-auction-price text-gray-800 dark:text-white/90">$@listing.BuyNowPrice.ToString("N0")</p>
                             </td>
                             <td>
-                                <span class="admin-auction-status @StatusBadgeClass(listing.Status)">
-                                    @FormatStatus(listing.Status)
-                                </span>
+                                <p class="admin-auction-meta capitalize text-gray-700 dark:text-gray-300">@FormatStatus(listing.Status)</p>
                             </td>
                             <td>
                                 <p class="admin-auction-meta text-gray-700 dark:text-gray-300">@listing.AvailabilityLabel</p>
@@ -191,11 +180,13 @@
         <a asp-area="Admin"
            asp-controller="BuyNow"
            asp-action="Index"
-           asp-route-Search="@Model.Filter.Search"
-           asp-route-DateRange="@Model.Filter.DateRange"
-           asp-route-CategoryId="@Model.Filter.CategoryId"
-           asp-route-SellerId="@Model.Filter.SellerId"
-           asp-route-SortOrder="@Model.Filter.SortOrder"
+           asp-route-Search="@filterSearch"
+           asp-route-DateRange="@filterDateRange"
+           asp-route-CategoryId="@filterCategoryId"
+           asp-route-SellerId="@filterSellerId"
+           asp-route-Status="@filterStatus"
+           asp-route-OnCatalogOnly="@filterOnCatalogOnly"
+           asp-route-SortOrder="@filterSortOrder"
            asp-route-Page="@(currentPage - 1)"
            class="admin-icon-action admin-icon-action--pagination @(currentPage <= 1 ? "is-disabled" : "js-admin-page")"
            title="Previous"
@@ -208,11 +199,13 @@
             <a asp-area="Admin"
                asp-controller="BuyNow"
                asp-action="Index"
-               asp-route-Search="@Model.Filter.Search"
-               asp-route-DateRange="@Model.Filter.DateRange"
-               asp-route-CategoryId="@Model.Filter.CategoryId"
-               asp-route-SellerId="@Model.Filter.SellerId"
-               asp-route-SortOrder="@Model.Filter.SortOrder"
+               asp-route-Search="@filterSearch"
+               asp-route-DateRange="@filterDateRange"
+               asp-route-CategoryId="@filterCategoryId"
+               asp-route-SellerId="@filterSellerId"
+               asp-route-Status="@filterStatus"
+               asp-route-OnCatalogOnly="@filterOnCatalogOnly"
+               asp-route-SortOrder="@filterSortOrder"
                asp-route-Page="@pageNumber"
                class="js-admin-page rounded-lg border px-3 py-2 text-theme-sm font-medium @(pageNumber == currentPage ? "border-brand-500 bg-brand-500 text-white" : "border-gray-300 text-gray-700 hover:bg-gray-50")">
                 @pageNumber
@@ -222,11 +215,13 @@
         <a asp-area="Admin"
            asp-controller="BuyNow"
            asp-action="Index"
-           asp-route-Search="@Model.Filter.Search"
-           asp-route-DateRange="@Model.Filter.DateRange"
-           asp-route-CategoryId="@Model.Filter.CategoryId"
-           asp-route-SellerId="@Model.Filter.SellerId"
-           asp-route-SortOrder="@Model.Filter.SortOrder"
+           asp-route-Search="@filterSearch"
+           asp-route-DateRange="@filterDateRange"
+           asp-route-CategoryId="@filterCategoryId"
+           asp-route-SellerId="@filterSellerId"
+           asp-route-Status="@filterStatus"
+           asp-route-OnCatalogOnly="@filterOnCatalogOnly"
+           asp-route-SortOrder="@filterSortOrder"
            asp-route-Page="@(currentPage + 1)"
            class="admin-icon-action admin-icon-action--pagination @(currentPage >= totalPages ? "is-disabled" : "js-admin-page")"
            title="Next"

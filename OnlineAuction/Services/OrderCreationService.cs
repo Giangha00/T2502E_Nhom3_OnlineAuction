@@ -493,7 +493,9 @@ public class OrderCreationService : IOrderCreationService
             return (false, "This item is no longer available.");
         }
 
-        if (auction.BuyNowPrice is null || auction.BuyNowPrice <= 0)
+        if (!string.Equals(auction.ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase)
+            || auction.BuyNowPrice is null
+            || auction.BuyNowPrice <= 0)
         {
             await transaction.RollbackAsync(cancellationToken);
             return (false, "This listing does not offer buy now.");

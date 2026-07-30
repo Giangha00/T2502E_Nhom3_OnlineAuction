@@ -12,13 +12,14 @@ namespace OnlineAuction.Areas.Admin.Services;
 public sealed class AdminBuyNowService : IAdminBuyNowService
 {
     private const string ProductImageFolder = "auction-house/products";
+    private const int MaxGalleryImages = UploadLimits.MaxGalleryImages;
 
     private const string DefaultProductImageUrl =
         "https://res.cloudinary.com/demo/image/upload/c_fill,w_900,h_900,q_auto,f_auto/sample.jpg";
 
     private static readonly string[] AllowedStatuses =
     [
-        AuctionStatuses.PendingReview,
+        AuctionStatuses.Confirming,
         AuctionStatuses.Rejected,
         AuctionStatuses.Scheduled,
         AuctionStatuses.Live,
@@ -29,9 +30,38 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
         AuctionStatuses.Cancelled
     ];
 
+    /// <summary>Status filter choices shown in Buy Now Manager.</summary>
+    private static readonly (string Value, string Label)[] FilterStatusChoices =
+    [
+        (AuctionStatuses.Confirming, "Confirming"),
+        (AuctionStatuses.Rejected, "Rejected"),
+        (AuctionStatuses.Live, "In stock")
+    ];
+
+    /// <summary>Status choices for Create/Edit forms (Buy Now wording).</summary>
+    private static readonly (string Value, string Label)[] FormStatusChoices =
+    [
+        (AuctionStatuses.Confirming, "Confirming"),
+        (AuctionStatuses.Rejected, "Rejected"),
+        (AuctionStatuses.Scheduled, "Scheduled"),
+        (AuctionStatuses.Live, "In stock"),
+        (AuctionStatuses.AwaitingPayment, "Awaiting payment"),
+        (AuctionStatuses.Completed, "Sold"),
+        (AuctionStatuses.Cancelled, "Cancelled")
+    ];
+
+    private static readonly HashSet<string> AllowedStatusSet =
+        new(AllowedStatuses, StringComparer.OrdinalIgnoreCase);
+
+    private static readonly HashSet<string> InStockStatuses =
+    [
+        AuctionStatuses.Live,
+        AuctionStatuses.EndingSoon
+    ];
+
     private static readonly HashSet<string> EditableStatuses =
     [
-        AuctionStatuses.PendingReview,
+        AuctionStatuses.Confirming,
         AuctionStatuses.Rejected,
         AuctionStatuses.Scheduled,
         AuctionStatuses.Live,
@@ -71,9 +101,29 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
                 auction.Product.DeletedAt == null &&
                 auction.ListingType == ListingTypes.BuyNow &&
                 auction.BuyNowPrice.HasValue &&
-                auction.BuyNowPrice.Value > 0 &&
-                (auction.Status == AuctionStatuses.Live || auction.Status == AuctionStatuses.EndingSoon) &&
+                auction.BuyNowPrice.Value > 0);
+
+        if (!string.IsNullOrWhiteSpace(filter.Status))
+        {
+            var status = filter.Status.Trim();
+            if (string.Equals(status, AuctionStatuses.Live, StringComparison.OrdinalIgnoreCase))
+            {
+                // "In stock" covers both live and ending_soon Buy Now rows.
+                query = query.Where(auction => InStockStatuses.Contains(auction.Status));
+            }
+            else if (AllowedStatusSet.Contains(status))
+            {
+                query = query.Where(auction => auction.Status == status);
+            }
+        }
+
+        if (filter.OnCatalogOnly)
+        {
+            // Only listings currently visible on the public /BuyNow catalog.
+            query = query.Where(auction =>
+                InStockStatuses.Contains(auction.Status) &&
                 auction.EndDate > now);
+        }
 
         if (!string.IsNullOrWhiteSpace(filter.Search))
         {
@@ -177,6 +227,7 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
             Filter = filter,
             CategoryOptions = await BuildCategoryOptionsAsync(filter.CategoryId),
             SellerOptions = await BuildSellerOptionsAsync(filter.SellerId),
+            StatusFilterOptions = BuildFilterStatusOptions(filter.Status),
             TotalItems = totalItems,
             TotalPages = totalPages
         };
@@ -263,6 +314,7 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
         var auction = await _dbContext.Auctions
             .AsNoTracking()
             .Include(item => item.Product)
+            .ThenInclude(product => product.Images)
             .FirstOrDefaultAsync(item =>
                 item.Id == id &&
                 item.DeletedAt == null &&
@@ -295,6 +347,16 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
             CategoryId = auction.Product.CategoryId,
             SellerId = auction.Product.SellerId,
             ImageUrl = auction.Product.PrimaryImage,
+            ExistingGalleryImages = auction.Product.Images
+                .Where(image => image.DeletedAt == null)
+                .OrderBy(image => image.SortOrder)
+                .Select(image => new BuyNowImageItemViewModel
+                {
+                    Id = image.Id,
+                    ImageUrl = image.ImageUrl,
+                    SortOrder = image.SortOrder
+                })
+                .ToList(),
             HasOrders = hasOrders,
             CategoryOptions = await BuildCategoryOptionsAsync(auction.Product.CategoryId),
             SellerOptions = await BuildSellerOptionsAsync(auction.Product.SellerId),
@@ -307,6 +369,32 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
         model.CategoryOptions = await BuildCategoryOptionsAsync(model.CategoryId);
         model.SellerOptions = await BuildSellerOptionsAsync(model.SellerId);
         model.StatusOptions = BuildStatusOptions(model.Status);
+
+        if (model.Id <= 0)
+        {
+            return;
+        }
+
+        if (!model.ProductId.HasValue)
+        {
+            return;
+        }
+
+        var existingGallery = await _dbContext.ProductImages
+            .AsNoTracking()
+            .Where(image =>
+                image.ProductId == model.ProductId.Value &&
+                image.DeletedAt == null)
+            .OrderBy(image => image.SortOrder)
+            .Select(image => new BuyNowImageItemViewModel
+            {
+                Id = image.Id,
+                ImageUrl = image.ImageUrl,
+                SortOrder = image.SortOrder
+            })
+            .ToListAsync();
+
+        model.ExistingGalleryImages = existingGallery;
     }
 
     public async Task<(bool Success, string Message)> CreateAsync(BuyNowFormViewModel model)
@@ -387,6 +475,7 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
 
         var auction = await _dbContext.Auctions
             .Include(item => item.Product)
+            .ThenInclude(product => product.Images)
             .FirstOrDefaultAsync(item =>
                 item.Id == model.Id &&
                 item.DeletedAt == null &&
@@ -412,6 +501,24 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
             return (false, validationError);
         }
 
+        var newGalleryFiles = model.GalleryImageFiles
+            .Where(file => file is { Length: > 0 })
+            .ToList();
+
+        var remainingGalleryCount = auction.Product.Images.Count(image =>
+            image.DeletedAt == null && !model.RemoveGalleryImageIds.Contains(image.Id));
+
+        if (model.PromoteGalleryImageId is > 0 &&
+            !model.RemoveGalleryImageIds.Contains(model.PromoteGalleryImageId.Value))
+        {
+            remainingGalleryCount = Math.Max(0, remainingGalleryCount - 1);
+        }
+
+        if (remainingGalleryCount + newGalleryFiles.Count > MaxGalleryImages)
+        {
+            return (false, $"Gallery can contain at most {MaxGalleryImages} images.");
+        }
+
         string? imageUrl = auction.Product.PrimaryImage;
         if (model.ImageFile is not null && model.ImageFile.Length > 0)
         {
@@ -429,6 +536,30 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
                 return (false, "Image upload failed.");
             }
         }
+        else if (model.PromoteGalleryImageId is > 0)
+        {
+            var promoteImage = auction.Product.Images.FirstOrDefault(image =>
+                image.Id == model.PromoteGalleryImageId.Value &&
+                image.DeletedAt == null);
+
+            if (promoteImage is null)
+            {
+                return (false, "Selected cover image was not found.");
+            }
+
+            imageUrl = promoteImage.ImageUrl;
+            promoteImage.DeletedAt = DateTime.UtcNow;
+            promoteImage.UpdatedAt = DateTime.UtcNow;
+
+            if (!model.RemoveGalleryImageIds.Contains(promoteImage.Id))
+            {
+                model.RemoveGalleryImageIds.Add(promoteImage.Id);
+            }
+        }
+        else if (model.ClearPrimaryImage)
+        {
+            imageUrl = DefaultProductImageUrl;
+        }
 
         auction.Product.Name = model.ProductName.Trim();
         auction.Product.ShortDescription = TruncatePlainText(model.Description, 300);
@@ -437,6 +568,46 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
         auction.Product.SellerId = model.SellerId;
         auction.Product.PrimaryImage = imageUrl ?? DefaultProductImageUrl;
         auction.Product.UpdatedAt = DateTime.UtcNow;
+
+        foreach (var image in auction.Product.Images.Where(image => model.RemoveGalleryImageIds.Contains(image.Id)))
+        {
+            image.DeletedAt = DateTime.UtcNow;
+            image.UpdatedAt = DateTime.UtcNow;
+        }
+
+        if (newGalleryFiles.Count > 0)
+        {
+            var maxSortOrder = auction.Product.Images
+                .Where(image => image.DeletedAt == null)
+                .Select(image => (int?)image.SortOrder)
+                .Max() ?? -1;
+
+            foreach (var file in newGalleryFiles)
+            {
+                string? galleryUrl;
+                try
+                {
+                    galleryUrl = await _photoService.AddPhotoAsync(file, ProductImageFolder);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return (false, ex.Message);
+                }
+
+                if (string.IsNullOrWhiteSpace(galleryUrl))
+                {
+                    return (false, "One of gallery image uploads failed.");
+                }
+
+                maxSortOrder++;
+                auction.Product.Images.Add(new ProductImage
+                {
+                    ImageUrl = galleryUrl,
+                    SortOrder = maxSortOrder,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+        }
 
         if (!model.HasOrders)
         {
@@ -582,15 +753,61 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
             .ToList();
     }
 
+    private static List<SelectListItem> BuildFilterStatusOptions(string? selected = null)
+    {
+        var options = new List<SelectListItem>
+        {
+            new() { Value = "", Text = "All statuses", Selected = string.IsNullOrWhiteSpace(selected) }
+        };
+
+        options.AddRange(FilterStatusChoices
+            .Select(choice => new SelectListItem
+            {
+                Value = choice.Value,
+                Text = choice.Label,
+                Selected = string.Equals(choice.Value, selected, StringComparison.OrdinalIgnoreCase)
+            }));
+
+        return options;
+    }
+
+    private static string FormatStatusLabel(string status) => status switch
+    {
+        AuctionStatuses.Confirming => "Confirming",
+        AuctionStatuses.Rejected => "Rejected",
+        AuctionStatuses.Scheduled => "Scheduled",
+        AuctionStatuses.Live or AuctionStatuses.EndingSoon => "In stock",
+        AuctionStatuses.Ended => "Ended",
+        AuctionStatuses.AwaitingPayment => "Awaiting payment",
+        AuctionStatuses.Completed => "Sold",
+        AuctionStatuses.Cancelled => "Cancelled",
+        _ => status.Replace('_', ' ')
+    };
+
     private static List<SelectListItem> BuildStatusOptions(string? selected = null)
     {
-        return AllowedStatuses
-            .Select(status => new SelectListItem
+        var formChoices = FormStatusChoices.ToList();
+
+        // Ensure current DB value remains selectable when editing legacy ending_soon rows.
+        if (!string.IsNullOrWhiteSpace(selected)
+            && formChoices.TrueForAll(choice =>
+                !string.Equals(choice.Value, selected, StringComparison.OrdinalIgnoreCase))
+            && AllowedStatusSet.Contains(selected))
+        {
+            formChoices.Add((selected, FormatStatusLabel(selected)));
+        }
+
+        return formChoices
+            .Select(choice => new SelectListItem
             {
-                Value = status,
-                Text = status.Replace('_', ' '),
-                Selected = string.Equals(status, selected, StringComparison.OrdinalIgnoreCase)
+                Value = choice.Value == AuctionStatuses.EndingSoon ? AuctionStatuses.Live : choice.Value,
+                Text = choice.Label,
+                Selected = choice.Value == AuctionStatuses.Live
+                    ? selected is AuctionStatuses.Live or AuctionStatuses.EndingSoon
+                    : string.Equals(choice.Value, selected, StringComparison.OrdinalIgnoreCase)
             })
+            .GroupBy(item => item.Value, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
             .ToList();
     }
 
@@ -607,6 +824,16 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
         }
 
         filter.PageSize = Math.Min(filter.PageSize, 50);
+
+        var allowedFilterStatuses = new HashSet<string>(
+            FilterStatusChoices.Select(c => c.Value),
+            StringComparer.OrdinalIgnoreCase);
+
+        if (!string.IsNullOrWhiteSpace(filter.Status)
+            && !allowedFilterStatuses.Contains(filter.Status))
+        {
+            filter.Status = null;
+        }
     }
 
     private static decimal ResolveStartingPrice(decimal buyNowPrice) =>
@@ -614,7 +841,7 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
 
     private static bool IsPublicLive(string status, decimal buyNowPrice, DateTime endDate, DateTime now) =>
         buyNowPrice > 0 &&
-        (status == AuctionStatuses.Live || status == AuctionStatuses.EndingSoon) &&
+        InStockStatuses.Contains(status) &&
         endDate > now;
 
     private static string BuildAvailabilityLabel(string status, bool isPublicLive) =>
@@ -622,13 +849,13 @@ public sealed class AdminBuyNowService : IAdminBuyNowService
         {
             AuctionStatuses.Cancelled => "Cancelled",
             AuctionStatuses.Completed => "Sold",
-            AuctionStatuses.PendingReview => "Pending review",
+            AuctionStatuses.Confirming => "Confirming",
             AuctionStatuses.Rejected => "Rejected",
             AuctionStatuses.AwaitingPayment => "Awaiting payment",
             AuctionStatuses.Ended => "Ended",
             AuctionStatuses.Scheduled => "Scheduled",
             AuctionStatuses.Live or AuctionStatuses.EndingSoon =>
-                isPublicLive ? "Available" : "Not on public catalog",
+                isPublicLive ? "In stock" : "Not on public catalog",
             _ => status.Replace('_', ' ')
         };
 

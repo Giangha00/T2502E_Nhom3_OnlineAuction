@@ -52,6 +52,23 @@ public class BuyNowFormViewModel : IValidatableObject
     [Display(Name = "Product Image")]
     public IFormFile? ImageFile { get; set; }
 
+    [Display(Name = "Gallery Images")]
+    public List<IFormFile> GalleryImageFiles { get; set; } = [];
+
+    public List<BuyNowImageItemViewModel> ExistingGalleryImages { get; set; } = [];
+
+    public List<int> RemoveGalleryImageIds { get; set; } = [];
+
+    /// <summary>
+    /// When true and no new primary ImageFile is uploaded, clear/replace primary image.
+    /// </summary>
+    public bool ClearPrimaryImage { get; set; }
+
+    /// <summary>
+    /// Existing gallery image id to promote as the new primary cover image.
+    /// </summary>
+    public int? PromoteGalleryImageId { get; set; }
+
     public bool HasOrders { get; set; }
 
     public List<SelectListItem> CategoryOptions { get; set; } = [];
@@ -69,4 +86,13 @@ public class BuyNowFormViewModel : IValidatableObject
                 [nameof(StartDate), nameof(EndDate)]);
         }
     }
+}
+
+public class BuyNowImageItemViewModel
+{
+    public int Id { get; set; }
+
+    public string ImageUrl { get; set; } = string.Empty;
+
+    public int SortOrder { get; set; }
 }

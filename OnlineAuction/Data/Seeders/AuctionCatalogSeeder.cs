@@ -838,9 +838,12 @@ public static class AuctionCatalogSeeder
     private static async Task SyncBuyNowPricesAsync(AuctionHouseDbContext dbContext)
     {
         var priceMap = SpreadsheetAuctionCatalog.GetBuyNowPriceMap();
+        // Only auction listings get optional catalog Buy Now prices.
+        // Dedicated Buy Now rows use ListingType=buynow and must keep BuyNowPrice set.
         var auctions = await dbContext.Auctions
             .Include(auction => auction.Product)
             .Where(auction =>
+                auction.ListingType == ListingTypes.Auction &&
                 auction.AuctionEventName != null &&
                 LegacySeedEventNames.Contains(auction.AuctionEventName) &&
                 auction.Product.Name != null)
@@ -884,6 +887,25 @@ public static class AuctionCatalogSeeder
             ? $"{catalogName} [Buy Now]"
             : $"{catalogName} [Buy Now] #{sequence}";
 
+    private static bool TryGetCatalogNameFromDedicatedBuyNowProduct(string? productName, out string catalogName)
+    {
+        catalogName = string.Empty;
+        if (string.IsNullOrWhiteSpace(productName))
+        {
+            return false;
+        }
+
+        const string marker = " [Buy Now]";
+        var markerIndex = productName.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
+        if (markerIndex <= 0)
+        {
+            return false;
+        }
+
+        catalogName = productName[..markerIndex].Trim();
+        return catalogName.Length > 0;
+    }
+
     private static decimal ResolveDedicatedBuyNowStartingPrice(decimal buyNowPrice) =>
         buyNowPrice <= 0.01m ? 0.01m : buyNowPrice - 0.01m;
 
@@ -898,6 +920,67 @@ public static class AuctionCatalogSeeder
         return Math.Max(entry.StartingPrice + 25m, 50m);
     }
 
+    private static decimal ResolveBuyNowPriceForDedicatedListing(
+        Auction auction,
+        IReadOnlyDictionary<string, SpreadsheetAuctionCatalog.Entry> entriesByName)
+    {
+        if (TryGetCatalogNameFromDedicatedBuyNowProduct(auction.Product?.Name, out var catalogName))
+        {
+            if (SpreadsheetAuctionCatalog.TryGetBuyNowPrice(catalogName) is { } mapped)
+            {
+                return mapped;
+            }
+
+            if (entriesByName.TryGetValue(catalogName, out var entry))
+            {
+                return ResolveBuyNowPrice(entry);
+            }
+        }
+
+        if (auction.CurrentPrice > auction.StartingPrice)
+        {
+            return auction.CurrentPrice;
+        }
+
+        return Math.Max(auction.StartingPrice + 25m, 50m);
+    }
+
+    private static void ApplyDedicatedBuyNowPricing(
+        Auction auction,
+        IReadOnlyDictionary<string, SpreadsheetAuctionCatalog.Entry> entriesByName)
+    {
+        var buyNowPrice = ResolveBuyNowPriceForDedicatedListing(auction, entriesByName);
+        var startingPrice = ResolveDedicatedBuyNowStartingPrice(buyNowPrice);
+
+        if (auction.BuyNowPrice == buyNowPrice
+            && auction.StartingPrice == startingPrice
+            && auction.CurrentPrice == buyNowPrice
+            && auction.ListingType == ListingTypes.BuyNow)
+        {
+            return;
+        }
+
+        auction.ListingType = ListingTypes.BuyNow;
+        auction.BuyNowPrice = buyNowPrice;
+        auction.StartingPrice = startingPrice;
+        auction.CurrentPrice = buyNowPrice;
+        auction.BidStep = 0.01m;
+        auction.RequiresRegistration = false;
+        auction.UpdatedAt = DateTime.UtcNow;
+    }
+
+    private static void ApplyDedicatedBuyNowSchedule(Auction auction, DateTime now)
+    {
+        auction.Status = AuctionStatuses.Live;
+        auction.EndDate = now.AddYears(1);
+        auction.StartDate = now.AddMinutes(-5);
+        auction.RegistrationStartDate = auction.StartDate.AddMinutes(-1);
+        auction.RegistrationEndDate = auction.StartDate;
+        auction.VerifiedAt ??= now;
+        auction.WinnerId = null;
+        auction.UpdatedAt = now;
+    }
+
     private static async Task EnsureDedicatedBuyNowListingsAsync(
         AuctionHouseDbContext dbContext,
         IReadOnlyList<int> sellerIds,
@@ -909,6 +992,10 @@ public static class AuctionCatalogSeeder
         {
             return;
         }
+
+        var entriesByName = SpreadsheetAuctionCatalog.GetEntries()
+            .GroupBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(group => group.Key, group => group.First(), StringComparer.OrdinalIgnoreCase);
 
         var dedicated = await dbContext.Auctions
             .Include(auction => auction.Product)
@@ -926,16 +1013,12 @@ public static class AuctionCatalogSeeder
             auction.Product.SellerId = ResolveSellerId(sellerIds, i);
             auction.Product.UpdatedAt = now;
 
+            ApplyDedicatedBuyNowPricing(auction, entriesByName);
+
             if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.EndingSoon)
                 || auction.EndDate <= now)
             {
-                auction.Status = AuctionStatuses.Live;
-                auction.EndDate = now.AddYears(1);
-                auction.StartDate = now.AddMinutes(-5);
-                auction.RegistrationStartDate = auction.StartDate.AddMinutes(-1);
-                auction.RegistrationEndDate = auction.StartDate;
-                auction.VerifiedAt ??= now;
-                auction.UpdatedAt = now;
+                ApplyDedicatedBuyNowSchedule(auction, now);
             }
         }
 
@@ -951,7 +1034,9 @@ public static class AuctionCatalogSeeder
 
         var liveCount = dedicated.Count(auction =>
             auction.Status is AuctionStatuses.Live or AuctionStatuses.EndingSoon
-            && auction.EndDate > now);
+            && auction.EndDate > now
+            && auction.BuyNowPrice != null
+            && auction.BuyNowPrice > auction.StartingPrice);
 
         if (liveCount >= TargetLiveBuyNowCount)
         {
@@ -1347,13 +1432,38 @@ public static class AuctionCatalogSeeder
             return;
         }
 
+        var entriesByName = SpreadsheetAuctionCatalog.GetEntries()
+            .GroupBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(group => group.Key, group => group.First(), StringComparer.OrdinalIgnoreCase);
+
         var changed = false;
 
         foreach (var auction in seededListings)
         {
-            var shouldReactivate = IsExpiredSeededListing(auction, now);
+            var isDedicatedBuyNow =
+                auction.ListingType == ListingTypes.BuyNow
+                || string.Equals(auction.AuctionEventName, DedicatedBuyNowEventName, StringComparison.Ordinal);
 
-            if (!shouldReactivate)
+            // Dedicated Buy Now catalog must stay purchasable with a fixed price.
+            if (isDedicatedBuyNow)
+            {
+                var needsRepair = IsExpiredSeededListing(auction, now)
+                    || auction.BuyNowPrice is null
+                    || auction.BuyNowPrice <= auction.StartingPrice
+                    || auction.Status is not (AuctionStatuses.Live or AuctionStatuses.EndingSoon);
+
+                if (!needsRepair)
+                {
+                    continue;
+                }
+
+                ApplyDedicatedBuyNowPricing(auction, entriesByName);
+                ApplyDedicatedBuyNowSchedule(auction, now);
+                changed = true;
+                continue;
+            }
+
+            if (!IsExpiredSeededListing(auction, now))
             {
                 continue;
             }

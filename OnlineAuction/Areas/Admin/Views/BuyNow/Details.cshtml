@@ -1,238 +1,546 @@
 @model BuyNowDetailViewModel
+@using System.Text.RegularExpressions
 
 @{
     ViewData["Title"] = "Buy Now Details";
     ViewData["AdminPage"] = "buy-now";
 
-    string FormatStatus(string status) => status.Replace('_', ' ');
+    string FormatStatus(string status) => status switch
+    {
+        "confirming" or "pending_review" => "Confirming",
+        "live" or "ending_soon" => "In stock",
+        "completed" => "Sold",
+        "cancelled" => "Cancelled",
+        "draft" => "Draft",
+        "scheduled" => "Scheduled",
+        _ => status.Replace('_', ' ')
+    };
+
+    var plainDescription = string.IsNullOrWhiteSpace(Model.Description)
+        ? string.Empty
+        : Regex.Replace(Model.Description, "<.*?>", string.Empty).Trim();
+
+    var allImages = new List<string>();
+    if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+    {
+        allImages.Add(Model.ImageUrl!);
+    }
+
+    foreach (var image in Model.GalleryImages)
+    {
+        if (!string.IsNullOrWhiteSpace(image) &&
+            !allImages.Contains(image, StringComparer.OrdinalIgnoreCase))
+        {
+            allImages.Add(image);
+        }
+    }
 }
 
-<div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
-    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Buy Now Details</h2>
-            <p class="text-theme-sm text-gray-500 dark:text-gray-400">Listing #@Model.Id · @FormatStatus(Model.Status)</p>
-        </div>
-
-        <div class="flex flex-wrap gap-3">
-            @if (Model.CanManage && Model.CanEdit)
-            {
-                <a asp-area="Admin"
-                   asp-controller="BuyNow"
-                   asp-action="Edit"
-                   asp-route-id="@Model.Id"
-                   class="admin-icon-action admin-icon-action--edit admin-icon-action--lg"
-                   title="Edit"
-                   aria-label="Edit">
-                    <partial name="_AdminIcon" model='"pencil"' />
-                </a>
-            }
-
-            @if (Model.IsPublicLive)
-            {
-                <a href="@Url.Action("Detail", "BuyNow", new { area = "", id = Model.Id })"
-                   target="_blank"
-                   rel="noopener"
-                   class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg"
-                   title="View public listing"
-                   aria-label="View public listing">
-                    <partial name="_AdminIcon" model='"external"' />
-                </a>
-            }
-
-            @if (Model.Status == AuctionStatuses.PendingReview)
-            {
-                <a asp-area="Admin"
-                   asp-controller="AuctionVerification"
-                   asp-action="Details"
-                   asp-route-id="@Model.Id"
-                   class="rounded-lg border border-brand-200 px-3 py-2 text-theme-sm font-medium text-brand-700 hover:bg-brand-50">
-                    Open verification
-                </a>
-            }
-
-            <a asp-area="Admin"
-               asp-controller="BuyNow"
-               asp-action="Index"
-               class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg"
-               title="Back"
-               aria-label="Back">
-                <partial name="_AdminIcon" model='"arrow-left"' />
-            </a>
-        </div>
-    </div>
-
-    @if (TempData["SuccessMessage"] is not null)
-    {
-        <div class="mb-4 rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-theme-sm text-success-700">
-            @TempData["SuccessMessage"]
-        </div>
+<style>
+    .buynow-edit {
+        background: #f8fafc;
+        padding: 18px;
     }
-
-    @if (TempData["ErrorMessage"] is not null)
-    {
-        <div class="mb-4 rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-theme-sm text-error-700">
-            @TempData["ErrorMessage"]
-        </div>
+    .buynow-edit .site-shell {
+        margin: 0 auto;
+        width: 100%;
+        max-width: 1280px;
     }
+    .buynow-edit .buynow-edit__layout {
+        display: grid;
+        gap: 2rem;
+    }
+    .buynow-edit .buynow-edit__hero h1 {
+        margin: 0;
+        font-size: 30px;
+        line-height: 1.2;
+        font-weight: 700;
+        color: #0f172a;
+    }
+    .buynow-edit .buynow-edit__hero p {
+        margin-top: 8px;
+        color: #64748b;
+        font-size: 14px;
+    }
+    .buynow-edit .sell-section {
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+    }
+    .buynow-edit .sell-footer-bar {
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+    }
+    .buynow-edit .rarecard-card {
+        position: relative;
+    }
+    .buynow-edit .rarecard-card__shell {
+        overflow: hidden;
+        border-radius: 1rem;
+        border: 1px solid #e7e5e4;
+        background: #fff;
+    }
+    .buynow-edit .rarecard-card__image-wrap {
+        position: relative;
+        aspect-ratio: 1 / 1;
+        background: #f5f5f4;
+    }
+    .buynow-edit .rarecard-card__image {
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+    }
+    .buynow-edit .rarecard-card__body {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+    }
+    .buynow-edit .rarecard-card__price-row {
+        margin-top: auto;
+    }
+    .buynow-edit .buynow-edit__actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .buynow-edit .buynow-edit__btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 10px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .buynow-edit .buynow-edit__btn--cancel {
+        border: 1px solid #e2e8f0;
+        color: #334155;
+        background: #fff;
+    }
+    .buynow-edit .buynow-edit__btn--save {
+        border: 1px solid #1d4ed8;
+        color: #fff;
+        background: #1d4ed8;
+    }
+    .buynow-edit .buynow-edit__btn--danger {
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+        background: #fef2f2;
+    }
+    .buynow-edit .buynow-edit__readonly {
+        width: 100%;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 14px;
+        background: #f8fafc;
+        color: #0f172a;
+        min-height: 42px;
+    }
+    .buynow-edit .buynow-edit__image-row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 0.75rem;
+        overflow-x: auto;
+        padding-bottom: 0.25rem;
+    }
+    .buynow-edit .buynow-edit__image-card {
+        position: relative;
+        flex: 0 0 auto;
+        width: 7.5rem;
+        height: 7.5rem;
+        overflow: hidden;
+        border-radius: 0.5rem;
+        border: 1px solid #e2e8f0;
+        background: #f1f5f9;
+    }
+    .buynow-edit .buynow-edit__image-card img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+    .buynow-edit .buynow-edit__image-card .buynow-edit__cover-badge {
+        position: absolute;
+        left: 0.375rem;
+        top: 0.375rem;
+        border-radius: 0.375rem;
+        background: rgba(29, 78, 216, 0.92);
+        padding: 0.2rem 0.45rem;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #fff;
+    }
+    @@media (min-width: 1024px) {
+        .buynow-edit .buynow-edit__layout {
+            grid-template-columns: minmax(0, 1fr) 340px;
+        }
+        .buynow-edit .buynow-edit__aside {
+            position: sticky;
+            top: 96px;
+            align-self: start;
+        }
+    }
+</style>
 
-    <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-        <div class="flex flex-col gap-6 md:flex-row">
-            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
-            {
-                <img src="@Model.ImageUrl"
-                     alt="@Model.ProductName"
-                     class="h-40 w-40 rounded-xl object-cover" />
-            }
-
-            <div class="flex-1">
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-white/90">@Model.ProductName</h3>
-                <p class="mt-1 text-theme-sm capitalize text-gray-500 dark:text-gray-400">
-                    @Model.AvailabilityLabel · @Model.CategoryName
-                </p>
-            </div>
+<div class="sell-page buynow-edit min-h-screen bg-slate-50">
+    <section class="site-shell px-4 py-8 sm:px-6 lg:py-10">
+        <div class="mb-8 buynow-edit__hero">
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Buy Now Details</h1>
+            <p class="mt-2 text-sm text-slate-500 sm:text-base">
+                Listing #@Model.Id · @FormatStatus(Model.Status) · @Model.AvailabilityLabel
+            </p>
         </div>
 
-        @if (Model.GalleryImages.Count > 0)
+        @if (TempData["SuccessMessage"] is not null)
         {
-            <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                @foreach (var image in Model.GalleryImages)
+            <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-sm text-emerald-800">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] is not null)
+        {
+            <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm text-red-700">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="grid gap-8 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] buynow-edit__layout">
+            <div class="space-y-6 buynow-edit__main">
+                <div class="rounded-xl border border-blue-200 bg-blue-50 px-5 py-3 text-sm text-blue-800">
+                    Review listing information below. Use Edit to update product details, price, and images.
+                </div>
+
+                <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-100 px-6 py-5">
+                        <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">1</span>
+                            Product Details
+                        </h2>
+                        <p class="mt-1 pl-10 text-sm text-slate-500">Basic information customers see on the buy now page.</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
+                        <div class="md:col-span-2">
+                            <label class="mb-1.5 block text-sm font-medium text-slate-700">Product Name</label>
+                            <div class="buynow-edit__readonly">@Model.ProductName</div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="mb-1.5 block text-sm font-medium text-slate-700">Description</label>
+                            <div class="buynow-edit__readonly min-h-28 prose prose-sm max-w-none text-slate-800 [&_img]:max-w-full">
+                                @if (string.IsNullOrWhiteSpace(Model.Description))
+                                {
+                                    <span class="text-slate-400">No description</span>
+                                }
+                                else
+                                {
+                                    @Html.Raw(Model.Description)
+                                }
+                            </div>
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-slate-700">Category</label>
+                            <div class="buynow-edit__readonly">@Model.CategoryName</div>
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-slate-700">Seller</label>
+                            <div class="buynow-edit__readonly">
+                                <div>@Model.SellerName</div>
+                                <div class="mt-0.5 break-all text-xs text-slate-500">@Model.SellerEmail</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-100 px-6 py-5">
+                        <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">2</span>
+                            Pricing
+                        </h2>
+                        <p class="mt-1 pl-10 text-sm text-slate-500">Fixed Buy Now price for this listing.</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
+                        <div class="md:col-span-2 max-w-sm">
+                            <label class="mb-1.5 block text-sm font-medium text-slate-700">Buy Now Price</label>
+                            <div class="buynow-edit__readonly font-semibold text-blue-700">$@Model.BuyNowPrice.ToString("N0")</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-100 px-6 py-5">
+                        <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">3</span>
+                            Product Images
+                        </h2>
+                        <p class="mt-1 pl-10 text-sm text-slate-500">Cover and gallery images for this Buy Now listing.</p>
+                    </div>
+                    <div class="p-6">
+                        @if (allImages.Count == 0)
+                        {
+                            <p class="text-sm text-slate-500">No images uploaded.</p>
+                        }
+                        else
+                        {
+                            <div class="mb-3 flex items-center justify-between">
+                                <p class="text-sm font-medium text-slate-700">
+                                    Uploaded Images <span class="text-slate-400">(@allImages.Count)</span>
+                                </p>
+                            </div>
+                            <div class="buynow-edit__image-row">
+                                @for (var i = 0; i < allImages.Count; i++)
+                                {
+                                    <a href="@allImages[i]"
+                                       target="_blank"
+                                       rel="noopener"
+                                       class="buynow-edit__image-card"
+                                       title="@(i == 0 ? "Cover image" : $"Gallery image {i}")">
+                                        <img src="@allImages[i]" alt="Product image @(i + 1)" />
+                                        @if (i == 0)
+                                        {
+                                            <span class="buynow-edit__cover-badge">Cover</span>
+                                        }
+                                    </a>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @if (Model.Documents.Count > 0)
                 {
-                    <a href="@image" target="_blank" rel="noopener" class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-                        <img src="@image" alt="Gallery image" class="h-24 w-full object-cover" />
-                    </a>
+                    <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                        <div class="border-b border-slate-100 px-6 py-5">
+                            <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+                                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">4</span>
+                                Documents
+                            </h2>
+                            <p class="mt-1 pl-10 text-sm text-slate-500">Supporting files attached to this listing.</p>
+                        </div>
+                        <div class="p-6">
+                            <ul class="space-y-2">
+                                @foreach (var document in Model.Documents)
+                                {
+                                    <li>
+                                        <a href="@document.Url"
+                                           target="_blank"
+                                           rel="noopener"
+                                           class="text-sm font-medium text-blue-700 hover:underline">
+                                            @document.Name
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                }
+
+                @if (Model.RelatedOrders.Count > 0)
+                {
+                    <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                        <div class="border-b border-slate-100 px-6 py-5">
+                            <h2 class="text-base font-semibold text-slate-900">Related Buy Now Orders</h2>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[640px]">
+                                <thead>
+                                <tr class="border-b border-slate-100 bg-slate-50">
+                                    <th class="px-5 py-3 text-left text-xs font-medium uppercase text-slate-500">Order</th>
+                                    <th class="px-5 py-3 text-left text-xs font-medium uppercase text-slate-500">Buyer</th>
+                                    <th class="px-5 py-3 text-left text-xs font-medium uppercase text-slate-500">Status</th>
+                                    <th class="px-5 py-3 text-left text-xs font-medium uppercase text-slate-500">Total</th>
+                                    <th class="px-5 py-3 text-left text-xs font-medium uppercase text-slate-500">Created</th>
+                                </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                @foreach (var order in Model.RelatedOrders)
+                                {
+                                    <tr>
+                                        <td class="px-5 py-4 text-sm text-slate-800">@order.OrderReference</td>
+                                        <td class="px-5 py-4 text-sm text-slate-700">@order.BuyerName</td>
+                                        <td class="px-5 py-4 text-sm capitalize text-slate-700">@FormatStatus(order.Status)</td>
+                                        <td class="px-5 py-4 text-sm text-slate-800">$@order.TotalAmount.ToString("N0")</td>
+                                        <td class="px-5 py-4 text-sm text-slate-700">@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+
+                <div class="sell-footer-bar rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm sm:px-6">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <p class="text-sm text-slate-500">
+                            <span class="font-medium text-slate-700">Need changes?</span> Open Edit to update this listing.
+                        </p>
+                        <div class="buynow-edit__actions">
+                            <a asp-area="Admin"
+                               asp-controller="BuyNow"
+                               asp-action="Index"
+                               class="buynow-edit__btn buynow-edit__btn--cancel">
+                                Back to list
+                            </a>
+
+                            @if (Model.IsPublicLive)
+                            {
+                                <a href="@Url.Action("Detail", "BuyNow", new { area = "", id = Model.Id })"
+                                   target="_blank"
+                                   rel="noopener"
+                                   class="buynow-edit__btn buynow-edit__btn--cancel">
+                                    View public
+                                </a>
+                            }
+
+                            @if (Model.Status == AuctionStatuses.PendingReview)
+                            {
+                                <a asp-area="Admin"
+                                   asp-controller="AuctionVerification"
+                                   asp-action="Details"
+                                   asp-route-id="@Model.Id"
+                                   class="buynow-edit__btn buynow-edit__btn--cancel">
+                                    Open verification
+                                </a>
+                            }
+
+                            @if (Model.CanManage && Model.CanEdit)
+                            {
+                                <a asp-area="Admin"
+                                   asp-controller="BuyNow"
+                                   asp-action="Edit"
+                                   asp-route-id="@Model.Id"
+                                   class="buynow-edit__btn buynow-edit__btn--save">
+                                    Edit listing
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @if (Model.CanManage && Model.CanCancel)
+                {
+                    <form asp-area="Admin"
+                          asp-controller="BuyNow"
+                          asp-action="Cancel"
+                          asp-route-id="@Model.Id"
+                          method="post"
+                          class="rounded-xl border border-red-200 bg-red-50 px-5 py-4"
+                          data-confirm
+                          data-confirm-variant="danger"
+                          data-confirm-title="Cancel listing?"
+                          data-confirm-message="Cancel this Buy Now listing? It will be removed from the public catalog."
+                          data-confirm-confirm="Cancel listing">
+                        @Html.AntiForgeryToken()
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <p class="text-sm text-red-700">Danger zone: this will remove listing from public catalog.</p>
+                            <button type="submit" class="buynow-edit__btn buynow-edit__btn--danger">
+                                Cancel listing
+                            </button>
+                        </div>
+                    </form>
                 }
             </div>
-        }
 
-        @if (!string.IsNullOrWhiteSpace(Model.Description))
-        {
-            <div class="prose prose-sm mt-6 max-w-none rounded-xl border border-gray-100 bg-gray-50 p-4 text-theme-sm text-gray-700 dark:border-gray-800 dark:bg-white/[0.02] dark:text-gray-300">
-                @Html.Raw(Model.Description)
-            </div>
-        }
+            <aside class="space-y-4 buynow-edit__aside">
+                <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-100 px-6 py-5">
+                        <h2 class="text-base font-semibold text-slate-900">Listing Info</h2>
+                    </div>
+                    <dl class="space-y-2 p-6 text-sm">
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Listing ID</dt>
+                            <dd class="font-medium text-slate-800">#@Model.Id</dd>
+                        </div>
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Product ID</dt>
+                            <dd class="font-medium text-slate-800">@Model.ProductId</dd>
+                        </div>
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Status</dt>
+                            <dd class="font-medium capitalize text-slate-800">@FormatStatus(Model.Status)</dd>
+                        </div>
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Public</dt>
+                            <dd class="font-medium text-slate-800">@(Model.IsPublicLive ? "Visible" : "Hidden")</dd>
+                        </div>
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Created</dt>
+                            <dd class="font-medium text-slate-800">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+                        </div>
+                        <div class="grid grid-cols-[110px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Verified</dt>
+                            <dd class="font-medium text-slate-800">
+                                @(Model.VerifiedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Not verified")
+                                @if (!string.IsNullOrWhiteSpace(Model.VerifierName))
+                                {
+                                    <span class="block text-xs font-normal text-slate-500">by @Model.VerifierName</span>
+                                }
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
 
-        @if (Model.Documents.Count > 0)
-        {
-            <div class="mt-5 rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-gray-800 dark:bg-white/[0.02]">
-                <h4 class="text-theme-sm font-semibold text-gray-800 dark:text-white/90">Documents</h4>
-                <ul class="mt-3 space-y-2">
-                    @foreach (var document in Model.Documents)
-                    {
-                        <li>
-                            <a href="@document.Url" target="_blank" rel="noopener" class="text-theme-sm text-brand-600 hover:underline">@document.Name</a>
-                        </li>
-                    }
-                </ul>
-            </div>
-        }
+                <div class="space-y-4">
+                    <div>
+                        <div class="mb-3 px-1">
+                            <h2 class="text-sm font-semibold text-slate-900">Customer Preview</h2>
+                            <p class="mt-0.5 text-xs text-slate-500">Same style as Buy Now item card</p>
+                        </div>
 
-        <dl class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Seller</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.SellerName</dd>
-                <dd class="text-theme-xs text-gray-500">@Model.SellerEmail</dd>
-            </div>
+                        <article class="rarecard-card rarecard-card--grid sell-preview-card group h-full">
+                            <div class="rarecard-card__shell pointer-events-none overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+                                <div class="flex flex-1 flex-col">
+                                    <div class="rarecard-card__image-wrap relative bg-stone-50">
+                                        @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                                        {
+                                            <img src="@Model.ImageUrl"
+                                                 alt="@Model.ProductName"
+                                                 class="rarecard-card__image object-contain" />
+                                        }
+                                        else
+                                        {
+                                            <div class="flex h-full flex-col items-center justify-center text-stone-400">
+                                                <span class="text-xs">No image</span>
+                                            </div>
+                                        }
+                                        <span class="absolute left-3 top-3 rounded-md bg-emerald-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                                            @Model.AvailabilityLabel
+                                        </span>
+                                        <span class="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 bg-white/95 text-stone-400 shadow-sm"
+                                              aria-hidden="true">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                            </svg>
+                                        </span>
+                                    </div>
 
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Buy Now Price</dt>
-                <dd class="mt-1 text-theme-sm font-semibold text-gray-800 dark:text-white/90">$@Model.BuyNowPrice.ToString("N0")</dd>
-            </div>
+                                    <div class="rarecard-card__body flex flex-1 flex-col p-3 sm:p-4">
+                                        <p class="text-[10px] font-bold uppercase tracking-wide text-blue-700">@Model.CategoryName</p>
+                                        <h3 class="mt-1 line-clamp-2 min-h-10 text-sm font-semibold leading-snug text-stone-900">@Model.ProductName</h3>
+                                        <p class="mt-1 line-clamp-1 min-h-4.5 text-xs text-stone-500">
+                                            @(string.IsNullOrWhiteSpace(plainDescription) ? "\u00a0" : plainDescription)
+                                        </p>
 
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Status</dt>
-                <dd class="mt-1 text-theme-sm capitalize text-gray-800 dark:text-white/90">@FormatStatus(Model.Status)</dd>
-            </div>
-
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Schedule</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    @Model.StartDate.ToString("dd/MM/yyyy HH:mm") - @Model.EndDate.ToString("dd/MM/yyyy HH:mm")
-                </dd>
-            </div>
-
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Created</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
-            </div>
-
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Verified</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    @(Model.VerifiedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Not verified")
-                </dd>
-                @if (!string.IsNullOrWhiteSpace(Model.VerifierName))
-                {
-                    <dd class="text-theme-xs text-gray-500">by @Model.VerifierName</dd>
-                }
-            </div>
-
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Product ID</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">@Model.ProductId</dd>
-            </div>
-
-            <div>
-                <dt class="text-theme-xs font-medium uppercase text-gray-400">Public catalog</dt>
-                <dd class="mt-1 text-theme-sm text-gray-800 dark:text-white/90">
-                    @(Model.IsPublicLive ? "Visible on /BuyNow" : "Hidden from public Buy Now catalog")
-                </dd>
-            </div>
-        </dl>
-
-        @if (Model.CanManage && Model.CanCancel)
-        {
-            <form asp-area="Admin"
-                  asp-controller="BuyNow"
-                  asp-action="Cancel"
-                  asp-route-id="@Model.Id"
-                  method="post"
-                  class="mt-6 border-t border-gray-100 pt-6 dark:border-gray-800"
-                  data-confirm
-                  data-confirm-variant="danger"
-                  data-confirm-title="Cancel listing?"
-                  data-confirm-message="Cancel this Buy Now listing? It will be removed from the public catalog."
-                  data-confirm-confirm="Cancel listing">
-                @Html.AntiForgeryToken()
-                <button type="submit"
-                        class="rounded-lg border border-error-200 bg-error-50 px-4 py-2 text-theme-sm font-medium text-error-700 hover:bg-error-100">
-                    Cancel listing
-                </button>
-            </form>
-        }
-    </div>
-
-    @if (Model.RelatedOrders.Count > 0)
-    {
-        <div class="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-            <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-800">
-                <h3 class="text-theme-sm font-semibold text-gray-800 dark:text-white/90">Related Buy Now orders</h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full min-w-[720px]">
-                    <thead>
-                    <tr class="border-b border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-white/[0.02]">
-                        <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Order</th>
-                        <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Buyer</th>
-                        <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Status</th>
-                        <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Total</th>
-                        <th class="px-5 py-3 text-left text-theme-xs font-medium uppercase text-gray-500">Created</th>
-                    </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                    @foreach (var order in Model.RelatedOrders)
-                    {
-                        <tr>
-                            <td class="px-5 py-4 text-theme-sm text-gray-800 dark:text-white/90">@order.OrderReference</td>
-                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@order.BuyerName</td>
-                            <td class="px-5 py-4 text-theme-sm capitalize text-gray-700 dark:text-gray-300">@FormatStatus(order.Status)</td>
-                            <td class="px-5 py-4 text-theme-sm text-gray-800 dark:text-white/90">$@order.TotalAmount.ToString("N0")</td>
-                            <td class="px-5 py-4 text-theme-sm text-gray-700 dark:text-gray-300">@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            </div>
+                                        <div class="rarecard-card__price-row mt-auto flex items-end justify-between gap-2 border-t border-stone-100 pt-3">
+                                            <div>
+                                                <p class="text-[10px] font-semibold uppercase tracking-wider text-stone-400">Buy now price</p>
+                                                <p class="text-xl font-bold tabular-nums text-blue-700">$@Model.BuyNowPrice.ToString("N0")</p>
+                                            </div>
+                                            <p class="text-right text-xs font-semibold text-emerald-700">@Model.AvailabilityLabel</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </aside>
         </div>
-    }
+    </section>
 </div>

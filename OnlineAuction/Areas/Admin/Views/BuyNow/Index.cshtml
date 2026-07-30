@@ -3,6 +3,9 @@
 @{
     ViewData["Title"] = "Buy Now Management";
     ViewData["AdminPage"] = "buy-now";
+    var statusOptions = Model.StatusFilterOptions;
+    var categoryOptions = Model.CategoryOptions;
+    var sellerOptions = Model.SellerOptions;
 }
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
@@ -12,7 +15,7 @@
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Buy Now Management</h2>
-            <p class="text-theme-sm text-gray-500 dark:text-gray-400">Manage Buy Now listings currently on sale, pending review, or sold.</p>
+            <p class="text-theme-sm text-gray-500 dark:text-gray-400">Manage all Buy Now listings — confirming, on catalog, sold, or cancelled.</p>
         </div>
 
         @if (Model.CanManage)
@@ -57,12 +60,36 @@
             </div>
 
             <div class="w-[180px]">
+                <label class="mb-1 block text-theme-xs font-medium text-gray-500">Status</label>
+                <select name="Status" class="admin-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                    @foreach (var status in statusOptions)
+                    {
+                        if (status.Selected)
+                        {
+                            <option value="@status.Value" selected="selected">@status.Text</option>
+                        }
+                        else
+                        {
+                            <option value="@status.Value">@status.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="w-[180px]">
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Category</label>
                 <select name="CategoryId" class="admin-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                     <option value="">All</option>
-                    @foreach (var category in Model.CategoryOptions)
+                    @foreach (var category in categoryOptions)
                     {
-                        <option value="@category.Value" selected="@category.Selected">@category.Text</option>
+                        if (category.Selected)
+                        {
+                            <option value="@category.Value" selected="selected">@category.Text</option>
+                        }
+                        else
+                        {
+                            <option value="@category.Value">@category.Text</option>
+                        }
                     }
                 </select>
             </div>
@@ -71,9 +98,16 @@
                 <label class="mb-1 block text-theme-xs font-medium text-gray-500">Seller</label>
                 <select name="SellerId" class="admin-filter-control h-10 w-full rounded-lg border border-gray-300 px-3 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                     <option value="">All</option>
-                    @foreach (var seller in Model.SellerOptions)
+                    @foreach (var seller in sellerOptions)
                     {
-                        <option value="@seller.Value" selected="@seller.Selected">@seller.Text</option>
+                        if (seller.Selected)
+                        {
+                            <option value="@seller.Value" selected="selected">@seller.Text</option>
+                        }
+                        else
+                        {
+                            <option value="@seller.Value">@seller.Text</option>
+                        }
                     }
                 </select>
             </div>
@@ -101,6 +135,16 @@
                     <option value="name_desc" selected="@(Model.Filter.SortOrder == "name_desc")">Name Z-A</option>
                 </select>
             </div>
+
+            <label class="mb-1 flex h-10 items-center gap-2 text-theme-sm text-gray-700 dark:text-gray-300"
+                   title="Only show listings currently visible on the public /BuyNow page">
+                <input type="checkbox"
+                       name="OnCatalogOnly"
+                       value="true"
+                       class="rounded border-gray-300"
+                       @(Model.Filter.OnCatalogOnly ? "checked=\"checked\"" : null) />
+                On /BuyNow catalog
+            </label>
         </form>
     </div>
 

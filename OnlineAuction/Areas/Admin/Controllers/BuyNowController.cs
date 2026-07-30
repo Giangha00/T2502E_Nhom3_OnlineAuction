@@ -97,6 +97,18 @@ public class BuyNowController : BaseAdminController
     [RequirePermission(PermissionCodes.AuctionsManage)]
     public async Task<IActionResult> Edit(BuyNowFormViewModel model)
     {
+        model.ImageFile ??= Request.Form.Files
+            .FirstOrDefault(file => file.Name == nameof(BuyNowFormViewModel.ImageFile));
+
+        var galleryFiles = Request.Form.Files
+            .Where(file => file.Name == nameof(BuyNowFormViewModel.GalleryImageFiles))
+            .Where(file => file.Length > 0)
+            .ToList();
+        if (galleryFiles.Count > 0)
+        {
+            model.GalleryImageFiles = galleryFiles;
+        }
+
         if (!ModelState.IsValid)
         {
             await _buyNowService.PopulateFormOptionsAsync(model);

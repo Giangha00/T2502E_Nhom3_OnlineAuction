@@ -73,8 +73,7 @@ public class AuctionItemViewModel
     public decimal? BuyNowPrice { get; set; }
     public bool RequiresRegistration { get; set; } = true;
     public bool HasBuyNow =>
-        string.Equals(ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase)
-        || (BuyNowPrice.HasValue && BuyNowPrice.Value > 0);
+        string.Equals(ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
 }
 
 public class SellerViewModel

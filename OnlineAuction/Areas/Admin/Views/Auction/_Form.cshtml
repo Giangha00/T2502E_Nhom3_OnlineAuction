@@ -1,157 +1,164 @@
 @model AuctionFormViewModel
-@using System.Text.Json
 @using OnlineAuction.Helpers
 
 @{
-    var imageUploaderLabels = JsonSerializer.Serialize(new
-    {
-        remove = Localizer["AdminProduct.Remove"].Value,
-        clear = Localizer["AdminProduct.ClearSelection"].Value,
-        undo = Localizer["AdminProduct.UndoRemove"].Value,
-        markedForRemoval = Localizer["AdminProduct.MarkedForRemoval"].Value,
-        invalidFormat = Localizer["AdminProduct.ImageUploader.InvalidFormat"].Value,
-        sizeLimit = Localizer["AdminProduct.ImageUploader.SizeLimit"].Value,
-        galleryLimit = Localizer["AdminProduct.ImageUploader.GalleryLimit"].Value,
-        galleryPartial = Localizer["AdminProduct.ImageUploader.GalleryPartial"].Value
-    });
+    var documentSectionNumber = Model.IsBuyNow ? 5 : 6;
+    var adminSectionNumber = Model.IsBuyNow ? 6 : 7;
+    var fieldClass = "field-input w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100";
+    var readonlyClass = "w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-600";
 }
 
-<div asp-validation-summary="ModelOnly" class="mb-4 text-theme-sm text-error-600"></div>
+<div asp-validation-summary="ModelOnly" class="mb-4 rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm text-red-700"></div>
 
-<section class="space-y-5">
-    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Product information</h3>
-    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+@if (!Model.IsBuyNow)
+{
+    <input asp-for="BuyNowPrice" type="hidden" id="buyNowPrice" />
+}
+
+<div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-100 px-6 py-5">
+        <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">1</span>
+            Product Details
+        </h2>
+        <p class="mt-1 pl-10 text-sm text-slate-500">Basic information customers see on the listing page.</p>
+    </div>
+    <div class="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
         <div class="md:col-span-2">
-            <label asp-for="ProductName" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <input asp-for="ProductName" id="productName" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
-            <span asp-validation-for="ProductName" class="text-theme-xs text-error-600"></span>
-            <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="productName"></p>
+            <label asp-for="ProductName"></label>
+            <input asp-for="ProductName" id="productName" class="@fieldClass" />
+            <span asp-validation-for="ProductName" class="mt-1 block text-xs text-red-600"></span>
+            <p class="field-error mt-1 hidden text-xs text-red-600" data-for="productName"></p>
         </div>
 
         <div>
-            <label asp-for="CategoryId" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <select asp-for="CategoryId" asp-items="Model.CategoryOptions" id="categoryId" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+            <label asp-for="CategoryId"></label>
+            <select asp-for="CategoryId" asp-items="Model.CategoryOptions" id="categoryId" class="@fieldClass">
                 <option value="">Select category</option>
             </select>
-            <span asp-validation-for="CategoryId" class="text-theme-xs text-error-600"></span>
-            <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="categoryId"></p>
+            <span asp-validation-for="CategoryId" class="mt-1 block text-xs text-red-600"></span>
+            <p class="field-error mt-1 hidden text-xs text-red-600" data-for="categoryId"></p>
         </div>
 
         <div>
-            <label asp-for="Condition" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <input asp-for="Condition" id="condition" readonly class="h-11 w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white/90" />
+            <label asp-for="Condition"></label>
+            <input asp-for="Condition" id="condition" readonly class="@readonlyClass" />
         </div>
 
         <div class="md:col-span-2">
-            <label asp-for="ShortDescription" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <textarea asp-for="ShortDescription" id="shortDescription" rows="2" maxlength="300" class="field-input w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></textarea>
-            <span asp-validation-for="ShortDescription" class="text-theme-xs text-error-600"></span>
+            <label asp-for="ShortDescription"></label>
+            <textarea asp-for="ShortDescription" id="shortDescription" rows="2" maxlength="300" class="@fieldClass"></textarea>
+            <span asp-validation-for="ShortDescription" class="mt-1 block text-xs text-red-600"></span>
         </div>
 
         <div class="md:col-span-2">
-            <label asp-for="ProductDescription" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+            <label asp-for="ProductDescription"></label>
             <textarea asp-for="ProductDescription" id="productDescription" class="hidden"></textarea>
-            <div id="descriptionEditor" class="ckeditor-wrapper overflow-hidden rounded-lg border border-gray-300 bg-white dark:border-gray-700"></div>
-            <span asp-validation-for="ProductDescription" class="text-theme-xs text-error-600"></span>
+            <div id="descriptionEditor" class="ckeditor-wrapper overflow-hidden rounded-lg border border-slate-200 bg-white"></div>
+            <span asp-validation-for="ProductDescription" class="mt-1 block text-xs text-red-600"></span>
         </div>
     </div>
-</section>
+</div>
 
-<section class="space-y-5 border-t border-gray-100 pt-6 dark:border-gray-800">
-    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Images</h3>
-    <div class="grid grid-cols-1 gap-5"
-         data-product-image-uploader
-         data-mode="product"
-         data-max-gallery="4"
-         data-max-image-size="5242880"
-         data-labels='@Html.Raw(imageUploaderLabels)'>
-        <div>
-            <label asp-for="PrimaryImageFile" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <div class="mb-3 flex flex-wrap items-start gap-4">
-                <div data-saved-primary-image class="@(string.IsNullOrWhiteSpace(Model.ImageUrl) ? "hidden" : string.Empty)">
-                    <img data-saved-primary-thumb src="@Model.ImageUrl" alt="Current primary" class="h-40 w-40 rounded-lg object-cover" />
-                    <p class="mt-1 text-theme-xs text-gray-500">Current primary image</p>
-                </div>
-                <div data-primary-preview-wrap class="relative hidden">
-                    <img data-primary-preview-img alt="Preview" class="h-40 w-40 rounded-lg object-cover" />
-                </div>
-            </div>
-            <input asp-for="PrimaryImageFile" type="file" accept=".jpg,.jpeg,.png,.webp" data-primary-input class="block w-full text-theme-sm" />
-            <span asp-validation-for="PrimaryImageFile" class="text-theme-xs text-error-600"></span>
-            <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="primaryImage"></p>
+<div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-100 px-6 py-5">
+        <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">2</span>
+            Product Images
+        </h2>
+        <p class="mt-1 pl-10 text-sm text-slate-500">Cover and gallery thumbnails for this listing.</p>
+    </div>
+    <div class="p-6">
+        <div class="mb-4 flex flex-wrap items-center gap-3">
+            <button type="button"
+                    id="imageDropZone"
+                    class="auction-detail__dropzone inline-flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700">
+                <svg class="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z"/>
+                </svg>
+                Upload images
+            </button>
+            <p class="text-xs text-slate-500">JPG, PNG, WEBP · max 1.5MB each · up to 5 images</p>
+            <input type="file" id="imageInput" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple class="sr-only" />
+        </div>
+        <p id="imageError" class="field-error mt-2 hidden text-xs text-red-600" data-for="primaryImage"></p>
+        <span asp-validation-for="PrimaryImageFile" class="mt-1 block text-xs text-red-600"></span>
+
+        @* Synced by JS on submit / change; also used by admin-listing-form preview *@
+        <input asp-for="PrimaryImageFile" type="file" accept="image/*" class="sr-only" tabindex="-1" aria-hidden="true" data-primary-input />
+        <input name="GalleryImageFiles" type="file" multiple accept="image/*" class="sr-only" tabindex="-1" aria-hidden="true" data-gallery-input />
+        <div id="removeGalleryImageIdsContainer"></div>
+
+        <div data-saved-primary-image class="hidden">
+            <img data-saved-primary-thumb src="@(Model.ImageUrl ?? "")" alt="Current primary" />
+        </div>
+        <div data-primary-preview-wrap class="hidden">
+            <img data-primary-preview-img alt="Preview" />
         </div>
 
-        @if (Model.ExistingGalleryImages.Count > 0)
-        {
-            <div data-existing-gallery>
-                <p class="mb-2 text-theme-sm font-medium text-gray-700 dark:text-gray-400">Current gallery</p>
-                <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    @foreach (var image in Model.ExistingGalleryImages)
-                    {
-                        <div class="relative rounded-lg border border-gray-200 p-2 dark:border-gray-700" data-existing-gallery-item data-image-id="@image.Id">
-                            <img data-existing-gallery-thumb src="@image.ImageUrl" alt="Gallery" class="h-24 w-full rounded object-cover" />
-                            <input type="checkbox" name="RemoveGalleryImageIds" value="@image.Id" class="sr-only" data-remove-checkbox />
-                            <div class="mt-2 flex gap-2">
-                                <button type="button" data-mark-remove class="admin-icon-action admin-icon-action--delete admin-icon-action--sm"><partial name="_AdminIcon" model='"trash"' /></button>
-                                <button type="button" data-undo-remove class="hidden admin-icon-action admin-icon-action--neutral admin-icon-action--sm"><partial name="_AdminIcon" model='"undo"' /></button>
-                            </div>
-                        </div>
-                    }
-                </div>
+        <div id="imagePreviewGrid" class="hidden">
+            <div class="mb-3 flex items-center justify-between">
+                <p class="text-sm font-medium text-slate-700">
+                    Uploaded Images <span id="imageCount" class="text-slate-400">(0)</span>
+                </p>
+                <button type="button" id="clearAllImages" class="cursor-pointer text-xs font-semibold text-red-600 hover:text-red-700">
+                    Remove all
+                </button>
             </div>
-        }
-
-        <div>
-            <label class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400">Gallery images</label>
-            <input name="GalleryImageFiles" type="file" accept=".jpg,.jpeg,.png,.webp" multiple data-gallery-input class="block w-full text-theme-sm" />
-            <div data-gallery-preview-grid class="mt-3 hidden grid grid-cols-2 gap-4 sm:grid-cols-4"></div>
+            <div id="imagePreviewList" class="auction-detail__image-row"></div>
         </div>
     </div>
-</section>
+</div>
 
-<section class="space-y-5 border-t border-gray-100 pt-6 dark:border-gray-800">
-    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Card specifications</h3>
-    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+<div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-100 px-6 py-5">
+        <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">3</span>
+            Card Specifications
+        </h2>
+        <p class="mt-1 pl-10 text-sm text-slate-500">Grading and card metadata for collectors.</p>
+    </div>
+    <div class="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
         <div class="md:col-span-2">
-            <label asp-for="Subtitle" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <input asp-for="Subtitle" id="subtitle" maxlength="160" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            <label asp-for="Subtitle"></label>
+            <input asp-for="Subtitle" id="subtitle" maxlength="160" class="@fieldClass" />
         </div>
         <div>
-            <label asp-for="Year" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <input asp-for="Year" id="year" type="number" min="1800" max="2100" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
-            <span asp-validation-for="Year" class="text-theme-xs text-error-600"></span>
-            <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="year"></p>
+            <label asp-for="Year"></label>
+            <input asp-for="Year" id="year" type="number" min="1800" max="2100" class="@fieldClass" />
+            <span asp-validation-for="Year" class="mt-1 block text-xs text-red-600"></span>
+            <p class="field-error mt-1 hidden text-xs text-red-600" data-for="year"></p>
         </div>
         <div>
-            <label asp-for="SetName" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <input asp-for="SetName" id="setName" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            <label asp-for="SetName"></label>
+            <input asp-for="SetName" id="setName" class="@fieldClass" />
         </div>
         <div>
-            <label asp-for="Authenticator" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <select asp-for="Authenticator" id="authenticator" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+            <label asp-for="Authenticator"></label>
+            <select asp-for="Authenticator" id="authenticator" class="@fieldClass">
                 @foreach (var item in Model.Authenticators)
                 {
                     <option value="@item" selected="@(Model.Authenticator == item)">@item</option>
                 }
             </select>
-            <span asp-validation-for="Authenticator" class="text-theme-xs text-error-600"></span>
-            <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="authenticator"></p>
+            <span asp-validation-for="Authenticator" class="mt-1 block text-xs text-red-600"></span>
+            <p class="field-error mt-1 hidden text-xs text-red-600" data-for="authenticator"></p>
         </div>
         <div>
-            <label asp-for="GradeValue" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <select asp-for="GradeValue" id="gradeValue" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+            <label asp-for="GradeValue"></label>
+            <select asp-for="GradeValue" id="gradeValue" class="@fieldClass">
                 @foreach (var item in Model.GradeValues)
                 {
                     <option value="@item" selected="@(Model.GradeValue == item)">@item</option>
                 }
             </select>
-            <span asp-validation-for="GradeValue" class="text-theme-xs text-error-600"></span>
-            <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="gradeValue"></p>
+            <span asp-validation-for="GradeValue" class="mt-1 block text-xs text-red-600"></span>
+            <p class="field-error mt-1 hidden text-xs text-red-600" data-for="gradeValue"></p>
         </div>
         <input type="hidden" asp-for="Grade" id="grade" />
         <div>
-            <label asp-for="Language" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <select asp-for="Language" id="language" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+            <label asp-for="Language"></label>
+            <select asp-for="Language" id="language" class="@fieldClass">
                 @foreach (var item in Model.Languages)
                 {
                     <option value="@item" selected="@(Model.Language == item)">@item</option>
@@ -159,159 +166,224 @@
             </select>
         </div>
         <div>
-            <label asp-for="CardNumber" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <input asp-for="CardNumber" id="cardNumber" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            <label asp-for="CardNumber"></label>
+            <input asp-for="CardNumber" id="cardNumber" class="@fieldClass" />
         </div>
         <div class="md:col-span-2">
-            <label asp-for="CertificateNumber" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <input asp-for="CertificateNumber" id="certificateNumber" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+            <label asp-for="CertificateNumber"></label>
+            <input asp-for="CertificateNumber" id="certificateNumber" class="@fieldClass" />
         </div>
     </div>
-</section>
+</div>
 
 @if (!Model.IsBuyNow)
 {
-    <section class="space-y-5 border-t border-gray-100 pt-6 dark:border-gray-800" data-auction-only>
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Auction pricing & schedule</h3>
-        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <div>
-                <label asp-for="StartingPrice" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <input asp-for="StartingPrice" id="startingPrice" type="number" step="0.01" min="0.01"
-                       readonly="@(Model.IsStartingPriceLocked ? "readonly" : null)"
-                       class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 @(Model.IsStartingPriceLocked ? "bg-gray-50 dark:bg-gray-800" : string.Empty)" />
-                <span asp-validation-for="StartingPrice" class="text-theme-xs text-error-600"></span>
-                <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="startingPrice"></p>
-            </div>
-            <div>
-                <label asp-for="BidStep" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <input asp-for="BidStep" id="bidStep" type="number" step="0.01" min="0.01" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
-                <span asp-validation-for="BidStep" class="text-theme-xs text-error-600"></span>
-                <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="bidStep"></p>
-            </div>
-            <div>
-                <label asp-for="BuyNowPrice" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <input asp-for="BuyNowPrice" id="buyNowPrice" type="number" step="0.01" min="0.01" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
-                <span asp-validation-for="BuyNowPrice" class="text-theme-xs text-error-600"></span>
-                <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="buyNowPrice"></p>
-            </div>
+    <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" data-auction-only>
+        <div class="border-b border-slate-100 px-6 py-5">
+            <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">4</span>
+                Auction Settings
+            </h2>
+            <p class="mt-1 pl-10 text-sm text-slate-500">Starting price and bid step for this auction.</p>
+        </div>
+        <div class="grid grid-cols-1 gap-4 p-6 sm:grid-cols-3">
             @if (Model.Id > 0)
             {
                 <div>
-                    <label asp-for="CurrentPrice" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                    <input asp-for="CurrentPrice" readonly class="h-11 w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white/90" />
+                    <label asp-for="CurrentPrice"></label>
+                    <input name="CurrentPrice"
+                           id="CurrentPrice"
+                           value="@Model.CurrentPrice.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
+                           readonly
+                           class="@readonlyClass font-semibold text-blue-700" />
                 </div>
             }
             <div>
-                <label asp-for="RegistrationStartDate" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <input asp-for="RegistrationStartDate" id="registrationStartDate" type="datetime-local"
-                       readonly="@(Model.IsScheduleLocked ? "readonly" : null)"
-                       class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 @(Model.IsScheduleLocked ? "bg-gray-50 dark:bg-gray-800" : string.Empty)" />
-                <span asp-validation-for="RegistrationStartDate" class="text-theme-xs text-error-600"></span>
-                <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="registrationStartDate"></p>
+                <label asp-for="StartingPrice"></label>
+                <input name="StartingPrice"
+                       id="startingPrice"
+                       type="number"
+                       step="1"
+                       min="1"
+                       value="@Model.StartingPrice.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
+                       readonly="@(Model.IsStartingPriceLocked ? "readonly" : null)"
+                       class="field-input @(Model.IsStartingPriceLocked ? readonlyClass : fieldClass)" />
+                <span asp-validation-for="StartingPrice" class="mt-1 block text-xs text-red-600"></span>
+                <p class="field-error mt-1 hidden text-xs text-red-600" data-for="startingPrice"></p>
             </div>
             <div>
-                <label asp-for="RegistrationEndDate" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <input asp-for="RegistrationEndDate" id="registrationEndDate" type="datetime-local"
-                       readonly="@(Model.IsScheduleLocked ? "readonly" : null)"
-                       class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 @(Model.IsScheduleLocked ? "bg-gray-50 dark:bg-gray-800" : string.Empty)" />
-                <span asp-validation-for="RegistrationEndDate" class="text-theme-xs text-error-600"></span>
-                <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="registrationEndDate"></p>
-            </div>
-            <div>
-                <label asp-for="StartDate" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <input asp-for="StartDate" id="liveStartDate" type="datetime-local"
-                       readonly="@(Model.IsScheduleLocked ? "readonly" : null)"
-                       class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 @(Model.IsScheduleLocked ? "bg-gray-50 dark:bg-gray-800" : string.Empty)" />
-                <span asp-validation-for="StartDate" class="text-theme-xs text-error-600"></span>
-                <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="liveStartDate"></p>
-            </div>
-            <div>
-                <label asp-for="EndDate" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <input asp-for="EndDate" id="liveEndDate" type="datetime-local" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
-                <span asp-validation-for="EndDate" class="text-theme-xs text-error-600"></span>
-                <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="liveEndDate"></p>
+                <label asp-for="BidStep"></label>
+                <input name="BidStep"
+                       id="bidStep"
+                       type="number"
+                       step="1"
+                       min="1"
+                       value="@Model.BidStep.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
+                       class="@fieldClass" />
+                <span asp-validation-for="BidStep" class="mt-1 block text-xs text-red-600"></span>
+                <p class="field-error mt-1 hidden text-xs text-red-600" data-for="bidStep"></p>
             </div>
         </div>
-    </section>
+    </div>
+
+    <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" data-auction-only>
+        <div class="border-b border-slate-100 px-6 py-5">
+            <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">5</span>
+                Auction Duration
+            </h2>
+            <p class="mt-1 pl-10 text-sm text-slate-500">Registration window and live auction schedule.</p>
+        </div>
+        <div class="space-y-6 p-6">
+            <div>
+                <h3 class="mb-3 text-sm font-semibold text-slate-800">Registration Period</h3>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label asp-for="RegistrationStartDate"></label>
+                        <input asp-for="RegistrationStartDate" id="registrationStartDate" type="datetime-local"
+                               readonly="@(Model.IsScheduleLocked ? "readonly" : null)"
+                               class="@(Model.IsScheduleLocked ? readonlyClass : fieldClass)" />
+                        <span asp-validation-for="RegistrationStartDate" class="mt-1 block text-xs text-red-600"></span>
+                        <p class="field-error mt-1 hidden text-xs text-red-600" data-for="registrationStartDate"></p>
+                    </div>
+                    <div>
+                        <label asp-for="RegistrationEndDate"></label>
+                        <input asp-for="RegistrationEndDate" id="registrationEndDate" type="datetime-local"
+                               readonly="@(Model.IsScheduleLocked ? "readonly" : null)"
+                               class="@(Model.IsScheduleLocked ? readonlyClass : fieldClass)" />
+                        <span asp-validation-for="RegistrationEndDate" class="mt-1 block text-xs text-red-600"></span>
+                        <p class="field-error mt-1 hidden text-xs text-red-600" data-for="registrationEndDate"></p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h3 class="mb-3 text-sm font-semibold text-slate-800">Live Period</h3>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label asp-for="StartDate"></label>
+                        <input asp-for="StartDate" id="liveStartDate" type="datetime-local"
+                               readonly="@(Model.IsScheduleLocked ? "readonly" : null)"
+                               class="@(Model.IsScheduleLocked ? readonlyClass : fieldClass)" />
+                        <span asp-validation-for="StartDate" class="mt-1 block text-xs text-red-600"></span>
+                        <p class="field-error mt-1 hidden text-xs text-red-600" data-for="liveStartDate"></p>
+                    </div>
+                    <div>
+                        <label asp-for="EndDate"></label>
+                        <input asp-for="EndDate" id="liveEndDate" type="datetime-local" class="@fieldClass" />
+                        <span asp-validation-for="EndDate" class="mt-1 block text-xs text-red-600"></span>
+                        <p class="field-error mt-1 hidden text-xs text-red-600" data-for="liveEndDate"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 else
 {
-    <section class="space-y-5 border-t border-gray-100 pt-6 dark:border-gray-800" data-buynow-only>
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Buy Now pricing</h3>
-        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <div>
-                <label asp-for="Price" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-                <input asp-for="Price" id="price" type="number" step="0.01" min="0.01" class="field-input h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
-                <span asp-validation-for="Price" class="text-theme-xs text-error-600"></span>
-                <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="price"></p>
+    <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" data-buynow-only>
+        <div class="border-b border-slate-100 px-6 py-5">
+            <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">4</span>
+                Pricing
+            </h2>
+            <p class="mt-1 pl-10 text-sm text-slate-500">Fixed Buy Now price for this listing.</p>
+        </div>
+        <div class="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
+            <div class="max-w-sm">
+                <label asp-for="Price"></label>
+                <input name="Price"
+                       id="price"
+                       type="number"
+                       step="1"
+                       min="1"
+                       value="@(Model.Price > 0 ? Model.Price.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) : "")"
+                       class="@fieldClass" />
+                <span asp-validation-for="Price" class="mt-1 block text-xs text-red-600"></span>
+                <p class="field-error mt-1 hidden text-xs text-red-600" data-for="price"></p>
             </div>
         </div>
-    </section>
+    </div>
 }
 
-<section class="space-y-5 border-t border-gray-100 pt-6 dark:border-gray-800"
-         data-document-uploader
-         data-max-documents="5"
-         data-existing-count="@Model.ExistingDocuments.Count">
-    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Documents</h3>
-    @if (Model.ExistingDocuments.Count > 0)
-    {
-        <div class="space-y-2" data-existing-documents>
-            @foreach (var document in Model.ExistingDocuments)
+<div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+     data-document-uploader
+     data-max-documents="5"
+     data-existing-count="@Model.ExistingDocuments.Count">
+    <div class="border-b border-slate-100 px-6 py-5">
+        <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">@documentSectionNumber</span>
+            Documents
+        </h2>
+        <p class="mt-1 pl-10 text-sm text-slate-500">Supporting PDF files attached to this listing.</p>
+    </div>
+    <div class="space-y-5 p-6">
+        @if (Model.ExistingDocuments.Count > 0)
+        {
+            <div class="space-y-2" data-existing-documents>
+                @foreach (var document in Model.ExistingDocuments)
+                {
+                    <label class="flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-4 py-3">
+                        <div>
+                            <p class="text-sm font-medium text-slate-800">@document.Name</p>
+                            <p class="text-xs text-slate-500">@document.FileType</p>
+                        </div>
+                        <span class="inline-flex items-center gap-2 text-xs text-slate-500">
+                            <input type="checkbox" name="RemoveDocumentIds" value="@document.Id" class="rounded border-slate-300" data-remove-document />
+                            Remove
+                        </span>
+                    </label>
+                }
+            </div>
+        }
+
+        <div class="mb-1 flex flex-wrap gap-2">
+            @foreach (var docType in OnlineAuction.Data.CreateAuctionMockData.DocumentTypes)
             {
-                <label class="flex items-center justify-between gap-3 rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-700">
-                    <div>
-                        <p class="text-theme-sm font-medium text-gray-800 dark:text-white/90">@document.Name</p>
-                        <p class="text-theme-xs text-gray-500">@document.FileType</p>
-                    </div>
-                    <input type="checkbox" name="RemoveDocumentIds" value="@document.Id" class="rounded border-gray-300" data-remove-document />
-                    <span class="text-theme-xs text-gray-500">Remove</span>
-                </label>
+                <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">@docType</span>
             }
         </div>
-    }
 
-    <div class="mb-4 flex flex-wrap gap-2">
-        @foreach (var docType in OnlineAuction.Data.CreateAuctionMockData.DocumentTypes)
-        {
-            <span class="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">@docType</span>
-        }
+        <div id="documentDropZone"
+             class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/60 px-6 py-8 transition hover:border-blue-500 hover:bg-blue-50/40">
+            <svg class="mb-2 h-8 w-8 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
+            </svg>
+            <p class="text-sm font-semibold text-slate-700">@Localizer["Sell_UploadDocuments"]</p>
+            <p class="mt-1 text-xs text-slate-500">@Localizer["Sell_UploadDocuments_Hint"]</p>
+            <input type="file" id="documentInput" accept=".pdf,application/pdf" multiple class="sr-only" />
+        </div>
+        <p class="field-error mt-2 hidden text-xs text-red-600" data-for="documents"></p>
+        <ul id="documentList" class="mt-2 space-y-2"></ul>
     </div>
+</div>
 
-    <div id="documentDropZone"
-         class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/60 px-6 py-8 transition hover:border-brand-500 hover:bg-brand-50/40 dark:border-gray-700 dark:bg-gray-900/40">
-        <svg class="mb-2 h-8 w-8 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
-        </svg>
-        <p class="text-sm font-semibold text-gray-700 dark:text-white/90">@Localizer["Sell_UploadDocuments"]</p>
-        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">@Localizer["Sell_UploadDocuments_Hint"]</p>
-        <input type="file" id="documentInput" accept=".pdf,application/pdf" multiple class="sr-only" />
+<div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-100 px-6 py-5">
+        <h2 class="flex items-center gap-3 text-base font-semibold text-slate-900">
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">@adminSectionNumber</span>
+            Admin Settings
+        </h2>
+        <p class="mt-1 pl-10 text-sm text-slate-500">Seller assignment and listing status.</p>
     </div>
-    <p class="field-error mt-2 hidden text-theme-xs text-error-600" data-for="documents"></p>
-    <ul id="documentList" class="mt-4 space-y-2"></ul>
-</section>
-
-<section class="space-y-5 border-t border-gray-100 pt-6 dark:border-gray-800">
-    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Admin settings</h3>
-    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+    <div class="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
         <div>
-            <label asp-for="SellerId" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
-            <select asp-for="SellerId" asp-items="Model.SellerOptions" id="sellerId" class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+            <label asp-for="SellerId"></label>
+            <select asp-for="SellerId" asp-items="Model.SellerOptions" id="sellerId" class="@fieldClass">
                 <option value="">Select seller</option>
             </select>
-            <span asp-validation-for="SellerId" class="text-theme-xs text-error-600"></span>
-            <p class="field-error mt-1 hidden text-theme-xs text-error-600" data-for="sellerId"></p>
+            <span asp-validation-for="SellerId" class="mt-1 block text-xs text-red-600"></span>
+            <p class="field-error mt-1 hidden text-xs text-red-600" data-for="sellerId"></p>
         </div>
         <div>
-            <label asp-for="Status" class="mb-1.5 block text-theme-sm font-medium text-gray-700 dark:text-gray-400"></label>
+            <label asp-for="Status"></label>
             <select asp-for="Status" asp-items="Model.StatusOptions"
                     disabled="@(Model.IsScheduleLocked ? "disabled" : null)"
-                    class="h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-theme-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 @(Model.IsScheduleLocked ? "bg-gray-50 dark:bg-gray-800" : string.Empty)"></select>
+                    class="@(Model.IsScheduleLocked ? readonlyClass : fieldClass)"></select>
             @if (Model.IsScheduleLocked)
             {
                 <input type="hidden" asp-for="Status" />
             }
-            <span asp-validation-for="Status" class="text-theme-xs text-error-600"></span>
+            <span asp-validation-for="Status" class="mt-1 block text-xs text-red-600"></span>
         </div>
     </div>
-</section>
+</div>

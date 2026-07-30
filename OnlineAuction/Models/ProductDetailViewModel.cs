@@ -61,8 +61,7 @@ public class ProductDetailViewModel
     public string ListingType { get; set; } = ListingTypes.Auction;
     public string? ListingRejectReason { get; set; }
     public bool HasBuyNow =>
-        string.Equals(ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase)
-        || (BuyNowPrice.HasValue && BuyNowPrice.Value > 0);
+        string.Equals(ListingType, ListingTypes.BuyNow, StringComparison.OrdinalIgnoreCase);
     public bool CanPurchaseBuyNow =>
         !IsSeller && AuctionStatus is "Active Auction" or "Ending Soon";
 }

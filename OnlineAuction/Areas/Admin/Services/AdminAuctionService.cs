@@ -18,7 +18,7 @@ public class AdminAuctionService
 
     private const string ProductImageFolder = "auction-house/products";
     private const string DocumentFolder = "auction-house/documents";
-    private const int MaxGalleryImages = 4;
+    private const int MaxGalleryImages = UploadLimits.MaxGalleryImages;
     private const int MaxDocumentsPerProduct = 5;
 
     private const string DefaultProductImageUrl =
@@ -1404,7 +1404,18 @@ public class AdminAuctionService
 
         var phaseInfo = AuctionScheduleHelper.ResolveListingPhase(auction, now);
         setPhase(phaseInfo.Phase);
-        setIsPublic(AuctionScheduleHelper.IsPubliclyListed(auction, now));
+
+        if (auction.ListingType == ListingTypes.BuyNow)
+        {
+            var buyNowVisible = status is AuctionStatuses.Live or AuctionStatuses.EndingSoon
+                                && auction.EndDate > now;
+            setIsPublic(buyNowVisible);
+        }
+        else
+        {
+            setIsPublic(AuctionScheduleHelper.IsPubliclyListed(auction, now));
+        }
+
         setCountdownTarget(phaseInfo.CountdownTarget);
         setCountdownKind(phaseInfo.CountdownKind);
         setTimeRemaining(FormatTimeRemaining(phaseInfo.CountdownTarget, now));

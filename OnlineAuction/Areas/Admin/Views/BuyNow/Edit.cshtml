@@ -1,76 +1,574 @@
 @model BuyNowFormViewModel
+@using System.Text.Json
 
 @{
     ViewData["Title"] = "Edit Buy Now Listing";
     ViewData["AdminPage"] = "buy-now";
+
+    var existingImagePayload = new List<object>();
+    if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+    {
+        existingImagePayload.Add(new { id = 0, url = Model.ImageUrl, isPrimary = true });
+    }
+
+    foreach (var image in Model.ExistingGalleryImages)
+    {
+        existingImagePayload.Add(new { id = image.Id, url = image.ImageUrl, isPrimary = false });
+    }
+
+    var existingImagesJson = JsonSerializer.Serialize(existingImagePayload);
 }
 
-<div class="mx-auto max-w-(--breakpoint-7xl) p-4 md:p-6">
-    <div class="mb-6">
-        <h2 class="text-title-md font-bold text-gray-800 dark:text-white/90">Edit Buy Now Listing</h2>
-        <p class="text-theme-sm text-gray-500 dark:text-gray-400">Update Buy Now listing #@Model.Id.</p>
-    </div>
+<style>
+    .buynow-edit {
+        background: #f8fafc;
+        padding: 18px;
+    }
+    .buynow-edit .site-shell {
+        margin: 0 auto;
+        width: 100%;
+        max-width: 1280px;
+    }
+    .buynow-edit .buynow-edit__layout {
+        display: grid;
+        gap: 2rem;
+    }
+    .buynow-edit .buynow-edit__hero h1 {
+        margin: 0;
+        font-size: 30px;
+        line-height: 1.2;
+        font-weight: 700;
+        color: #0f172a;
+    }
+    .buynow-edit .buynow-edit__hero p {
+        margin-top: 8px;
+        color: #64748b;
+        font-size: 14px;
+    }
+    .buynow-edit .sell-section {
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+    }
+    .buynow-edit .sell-footer-bar {
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+    }
+    .buynow-edit .sell-section input[type="text"],
+    .buynow-edit .sell-section input[type="number"],
+    .buynow-edit .sell-section input[type="datetime-local"],
+    .buynow-edit .sell-section input[type="file"],
+    .buynow-edit .sell-section select,
+    .buynow-edit .sell-section textarea {
+        width: 100%;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 14px;
+        background: #fff;
+    }
+    .buynow-edit .sell-section label {
+        display: block;
+        margin-bottom: 6px;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    .buynow-edit .rarecard-card {
+        position: relative;
+    }
+    .buynow-edit .rarecard-card__shell {
+        overflow: hidden;
+        border-radius: 1rem;
+        border: 1px solid #e7e5e4;
+        background: #fff;
+    }
+    .buynow-edit .rarecard-card__image-wrap {
+        position: relative;
+        aspect-ratio: 1 / 1;
+        background: #f5f5f4;
+    }
+    .buynow-edit .rarecard-card__image {
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+    }
+    .buynow-edit .rarecard-card__body {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+    }
+    .buynow-edit .rarecard-card__price-row {
+        margin-top: auto;
+    }
+    .buynow-edit .buynow-edit__actions {
+        display: flex;
+        gap: 10px;
+    }
+    .buynow-edit .buynow-edit__btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 10px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .buynow-edit .buynow-edit__btn--cancel {
+        border: 1px solid #e2e8f0;
+        color: #334155;
+        background: #fff;
+    }
+    .buynow-edit .buynow-edit__btn--save {
+        border: 1px solid #1d4ed8;
+        color: #fff;
+        background: #1d4ed8;
+    }
+    .buynow-edit .buynow-edit__dropzone.is-dragover {
+        border-color: #3b82f6;
+        background: rgba(239, 246, 255, 0.7);
+    }
+    .buynow-edit .buynow-edit__image-row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 0.75rem;
+        overflow-x: auto;
+        padding-bottom: 0.25rem;
+    }
+    .buynow-edit .buynow-edit__image-card {
+        position: relative;
+        flex: 0 0 auto;
+        width: 7.5rem;
+        height: 7.5rem;
+        overflow: hidden;
+        border-radius: 0.5rem;
+        border: 1px solid #e2e8f0;
+        background: #f1f5f9;
+    }
+    .buynow-edit .buynow-edit__image-card img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+    .buynow-edit .buynow-edit__image-card .buynow-edit__image-remove {
+        position: absolute;
+        right: 0.375rem;
+        top: 0.375rem;
+        border-radius: 0.5rem;
+        background: rgba(220, 38, 38, 0.9);
+        padding: 0.25rem 0.5rem;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #fff;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        cursor: pointer;
+        border: 0;
+    }
+    .buynow-edit .buynow-edit__image-card:hover .buynow-edit__image-remove {
+        opacity: 1;
+    }
+    .buynow-edit .buynow-edit__image-card .buynow-edit__cover-badge {
+        position: absolute;
+        left: 0.375rem;
+        top: 0.375rem;
+        border-radius: 0.375rem;
+        background: rgba(29, 78, 216, 0.92);
+        padding: 0.2rem 0.45rem;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #fff;
+    }
+    .buynow-edit .sell-section input[type="file"].sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+    @@media (min-width: 1024px) {
+        .buynow-edit .buynow-edit__layout {
+            grid-template-columns: minmax(0, 1fr) 340px;
+        }
+        .buynow-edit .buynow-edit__aside {
+            position: sticky;
+            top: 96px;
+            align-self: start;
+        }
+    }
+</style>
 
-    <form asp-area="Admin"
-          asp-controller="BuyNow"
-          asp-action="Edit"
-          method="post"
-          enctype="multipart/form-data"
-          class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+<div class="sell-page buynow-edit min-h-screen bg-slate-50">
+    <section class="site-shell px-4 py-8 sm:px-6 lg:py-10">
+        <div class="mb-8 buynow-edit__hero">
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Edit Buy Now Listing</h1>
+            <p class="mt-2 text-sm text-slate-500 sm:text-base">Update listing #@Model.Id with the same publishing layout as Sell Buy Now.</p>
+        </div>
+
+        <form asp-area="Admin"
+              asp-controller="BuyNow"
+              asp-action="Edit"
+              method="post"
+              enctype="multipart/form-data"
+              class="grid gap-8 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] buynow-edit__layout">
         @Html.AntiForgeryToken()
         <input asp-for="Id" type="hidden" />
         <input asp-for="ProductId" type="hidden" />
+        <input asp-for="Status" type="hidden" />
+        <input asp-for="StartDate" type="hidden" />
+        <input asp-for="EndDate" type="hidden" />
+        <input type="hidden" name="ClearPrimaryImage" id="ClearPrimaryImage" value="false" />
+        <input type="hidden" name="PromoteGalleryImageId" id="PromoteGalleryImageId" value="" />
 
-        <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-            <partial name="_Form" model="Model" />
-
-            <div class="mt-6 flex justify-end gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
-                <a asp-area="Admin" asp-controller="BuyNow" asp-action="Details" asp-route-id="@Model.Id" class="admin-icon-action admin-icon-action--neutral admin-icon-action--lg" title="Cancel" aria-label="Cancel">
-                    <partial name="_AdminIcon" model='"x-mark"' />
-                </a>
-                <button type="submit" class="admin-icon-action admin-icon-action--primary admin-icon-action--lg" title="Save Changes" aria-label="Save Changes">
-                    <partial name="_AdminIcon" model='"save"' />
-                </button>
+            <div class="space-y-6 buynow-edit__main">
+                <div class="rounded-xl border border-blue-200 bg-blue-50 px-5 py-3 text-sm text-blue-800">
+                    Fill in required fields and review the live preview before saving.
+                </div>
+                <partial name="_Form" model="Model" />
+                <div class="sell-footer-bar rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm sm:px-6">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <p class="text-sm text-slate-500">
+                            <span class="font-medium text-slate-700">Ready to save?</span> Review the preview card and submit updates.
+                        </p>
+                        <div class="flex flex-col gap-3 sm:flex-row sm:shrink-0 buynow-edit__actions">
+                            <a asp-area="Admin"
+                               asp-controller="BuyNow"
+                               asp-action="Details"
+                               asp-route-id="@Model.Id"
+                               class="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 buynow-edit__btn buynow-edit__btn--cancel">
+                                Cancel
+                            </a>
+                            <button type="submit"
+                                    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-blue-700 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 buynow-edit__btn buynow-edit__btn--save">
+                                <partial name="_AdminIcon" model='"save"' />
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <aside class="space-y-4 xl:sticky xl:top-24 xl:self-start">
-            <partial name="_PreviewCard" model="Model" />
-        </aside>
-    </form>
+            <aside class="space-y-4 buynow-edit__aside">
+                <div class="sell-section overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-100 px-6 py-5">
+                        <h2 class="text-base font-semibold text-slate-900">Listing Info</h2>
+                    </div>
+                    <dl class="space-y-2 p-6 text-sm">
+                        <div class="grid grid-cols-[96px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Listing ID</dt>
+                            <dd class="font-medium text-slate-800">#@Model.Id</dd>
+                        </div>
+                        <div class="grid grid-cols-[96px_1fr] items-start gap-2">
+                            <dt class="text-slate-500">Product ID</dt>
+                            <dd class="font-medium text-slate-800">@Model.ProductId</dd>
+                        </div>
+                    </dl>
+                </div>
+                <div class="hidden lg:sticky lg:top-28 lg:block lg:self-start">
+                    <partial name="_PreviewCard" model="Model" />
+                </div>
+                <div class="lg:hidden">
+                    <partial name="_PreviewCard" model="Model" />
+                </div>
+            </aside>
+        </form>
+    </section>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
         (function () {
-            var nameInput = document.getElementById('ProductName');
-            var priceInput = document.getElementById('BuyNowPrice');
-            var statusInput = document.getElementById('Status');
-            var imageInput = document.getElementById('ImageFile');
-            var previewName = document.getElementById('buyNowPreviewName');
-            var previewPrice = document.getElementById('buyNowPreviewPrice');
-            var previewMeta = document.getElementById('buyNowPreviewMeta');
-            var previewImage = document.getElementById('buyNowPreviewImage');
+            var MAX_IMAGES = 5;
+            var MAX_IMAGE_SIZE = 1.5 * 1024 * 1024;
+            var IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
-            function refresh() {
+            var form = document.querySelector('form[asp-action="Edit"], form[action*="Edit"]') || document.querySelector('.buynow-edit form');
+            if (!form) form = document.querySelector('form');
+            if (!form) return;
+
+            var nameInput = document.getElementById('ProductName');
+            var descriptionInput = document.getElementById('Description');
+            var categoryInput = document.getElementById('CategoryId');
+            var priceInput = document.getElementById('BuyNowPrice');
+            var previewName = document.getElementById('previewName');
+            var previewPrice = document.getElementById('previewPrice');
+            var previewMeta = document.getElementById('buyNowPreviewMeta');
+            var previewImage = document.getElementById('previewImage');
+            var previewCategory = document.getElementById('previewCategory');
+            var previewSubtitle = document.getElementById('previewSubtitle');
+            var previewAvailability = document.getElementById('previewAvailability');
+            var previewBadge = document.getElementById('previewBadge');
+            var previewImagePlaceholder = document.getElementById('previewImagePlaceholder');
+
+            var dropZone = document.getElementById('imageDropZone');
+            var imageInput = document.getElementById('imageInput');
+            var primaryInput = document.getElementById('ImageFile');
+            var galleryInput = document.getElementById('GalleryImageFiles');
+            var removeContainer = document.getElementById('removeGalleryImageIdsContainer');
+            var previewGrid = document.getElementById('imagePreviewGrid');
+            var previewList = document.getElementById('imagePreviewList');
+            var imageCount = document.getElementById('imageCount');
+            var clearAllBtn = document.getElementById('clearAllImages');
+            var imageError = document.getElementById('imageError');
+
+            var images = [];
+            var removedExistingImageIds = [];
+            var clearPrimaryImage = false;
+            var existingImages = @Html.Raw(existingImagesJson);
+
+            function showImageError(message) {
+                if (!imageError) return;
+                if (!message) {
+                    imageError.textContent = '';
+                    imageError.classList.add('hidden');
+                    return;
+                }
+                imageError.textContent = message;
+                imageError.classList.remove('hidden');
+            }
+
+            function refreshTextPreview() {
                 if (previewName) previewName.textContent = nameInput && nameInput.value ? nameInput.value : 'Product name';
                 var value = priceInput && priceInput.value ? Number(priceInput.value) : 0;
-                if (previewPrice) previewPrice.textContent = '$' + value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                if (previewMeta) previewMeta.textContent = 'Status: ' + (statusInput && statusInput.value ? statusInput.value : 'n/a');
+                if (previewPrice) previewPrice.textContent = '$' + value.toLocaleString(undefined, { maximumFractionDigits: 0 });
+                if (previewMeta) previewMeta.textContent = 'Preview how your listing will appear on Buy Now';
+
+                if (previewCategory && categoryInput) {
+                    var selectedCategory = categoryInput.options[categoryInput.selectedIndex];
+                    previewCategory.textContent = selectedCategory && selectedCategory.value ? selectedCategory.text : 'Category';
+                }
+
+                if (previewSubtitle && descriptionInput) {
+                    var cleanedText = descriptionInput.value ? descriptionInput.value.trim() : '';
+                    previewSubtitle.textContent = cleanedText ? cleanedText : '\u00A0';
+                }
+                if (previewAvailability) previewAvailability.textContent = 'In stock';
+                if (previewBadge) previewBadge.textContent = 'In stock';
             }
 
-            if (nameInput) nameInput.addEventListener('input', refresh);
-            if (priceInput) priceInput.addEventListener('input', refresh);
-            if (statusInput) statusInput.addEventListener('change', refresh);
-            if (imageInput) {
+            function updateCardPreviewImage() {
+                if (!previewImage) return;
+                if (images.length === 0) {
+                    previewImage.src = '';
+                    previewImage.classList.add('hidden');
+                    if (previewImagePlaceholder) previewImagePlaceholder.classList.remove('hidden');
+                    return;
+                }
+
+                previewImage.src = images[0].url;
+                previewImage.classList.remove('hidden');
+                if (previewImagePlaceholder) previewImagePlaceholder.classList.add('hidden');
+            }
+
+            function renderImagePreviews() {
+                if (!previewList) return;
+                previewList.innerHTML = '';
+
+                if (images.length === 0) {
+                    if (previewGrid) previewGrid.classList.add('hidden');
+                    updateCardPreviewImage();
+                    return;
+                }
+
+                if (previewGrid) previewGrid.classList.remove('hidden');
+                if (imageCount) imageCount.textContent = '(' + images.length + ')';
+
+                images.forEach(function (img, index) {
+                    var card = document.createElement('div');
+                    card.className = 'buynow-edit__image-card group';
+                    var coverBadge = index === 0
+                        ? '<span class="buynow-edit__cover-badge">Cover</span>'
+                        : '';
+                    card.innerHTML =
+                        '<img src="' + img.url + '" alt="Uploaded image"/>' +
+                        coverBadge +
+                        '<button type="button" class="buynow-edit__image-remove" data-remove-image="' + img.id + '">Remove</button>';
+                    previewList.appendChild(card);
+                });
+
+                previewList.querySelectorAll('[data-remove-image]').forEach(function (btn) {
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        removeImage(btn.getAttribute('data-remove-image'));
+                    });
+                });
+
+                updateCardPreviewImage();
+            }
+
+            function addImages(files) {
+                var errors = [];
+                Array.from(files || []).forEach(function (file) {
+                    if (images.length >= MAX_IMAGES) {
+                        errors.push('You can upload up to ' + MAX_IMAGES + ' images.');
+                        return;
+                    }
+                    if (IMAGE_TYPES.indexOf(file.type) === -1) {
+                        errors.push(file.name + ': invalid format (JPG, PNG, WEBP only)');
+                        return;
+                    }
+                    if (file.size > MAX_IMAGE_SIZE) {
+                        errors.push(file.name + ': exceeds 1.5MB limit');
+                        return;
+                    }
+
+                    images.push({
+                        id: 'img_' + Date.now() + '_' + Math.random().toString(36).slice(2),
+                        file: file,
+                        url: URL.createObjectURL(file),
+                        existing: false,
+                        existingId: 0
+                    });
+                });
+
+                showImageError(errors.length ? errors[0] : '');
+                renderImagePreviews();
+            }
+
+            function removeImage(id) {
+                var idx = images.findIndex(function (item) { return item.id === id; });
+                if (idx < 0) return;
+
+                var removed = images[idx];
+                if (removed.isPrimary || (removed.existing && !removed.existingId)) {
+                    clearPrimaryImage = true;
+                }
+                if (removed.existingId && removed.existingId > 0) {
+                    if (removedExistingImageIds.indexOf(removed.existingId) === -1) {
+                        removedExistingImageIds.push(removed.existingId);
+                    }
+                } else if (removed.url && String(removed.url).indexOf('blob:') === 0) {
+                    URL.revokeObjectURL(removed.url);
+                }
+
+                images.splice(idx, 1);
+                if (imageInput && images.length === 0) imageInput.value = '';
+                showImageError('');
+                renderImagePreviews();
+            }
+
+            function clearAllImages() {
+                images.forEach(function (img) {
+                    if (img.isPrimary || (img.existing && !img.existingId)) {
+                        clearPrimaryImage = true;
+                    }
+                    if (img.existingId && img.existingId > 0) {
+                        if (removedExistingImageIds.indexOf(img.existingId) === -1) {
+                            removedExistingImageIds.push(img.existingId);
+                        }
+                    } else if (img.url && String(img.url).indexOf('blob:') === 0) {
+                        URL.revokeObjectURL(img.url);
+                    }
+                });
+                images = [];
+                if (imageInput) imageInput.value = '';
+                showImageError('');
+                renderImagePreviews();
+            }
+
+            function syncFilesToFormInputs() {
+                if (window.DataTransfer) {
+                    var primaryDt = new DataTransfer();
+                    var galleryDt = new DataTransfer();
+
+                    images.forEach(function (img, index) {
+                        if (!img.file) return;
+                        if (index === 0) primaryDt.items.add(img.file);
+                        else galleryDt.items.add(img.file);
+                    });
+
+                    if (primaryInput) primaryInput.files = primaryDt.files;
+                    if (galleryInput) galleryInput.files = galleryDt.files;
+                }
+
+                if (removeContainer) {
+                    removeContainer.innerHTML = '';
+                    removedExistingImageIds.forEach(function (id) {
+                        if (!id || id <= 0) return;
+                        var hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = 'RemoveGalleryImageIds';
+                        hidden.value = String(id);
+                        removeContainer.appendChild(hidden);
+                    });
+                }
+
+                var clearPrimaryInput = document.getElementById('ClearPrimaryImage');
+                var promoteInput = document.getElementById('PromoteGalleryImageId');
+                var first = images.length > 0 ? images[0] : null;
+                var hasNewPrimaryFile = !!(first && first.file);
+                var promoteId = first && first.existingId > 0 ? first.existingId : '';
+
+                if (clearPrimaryInput) {
+                    clearPrimaryInput.value = (!hasNewPrimaryFile && !promoteId && clearPrimaryImage) ? 'true' : 'false';
+                }
+                if (promoteInput) {
+                    promoteInput.value = (!hasNewPrimaryFile && promoteId) ? String(promoteId) : '';
+                }
+            }
+
+            function setupDropZone() {
+                if (!dropZone || !imageInput) return;
+
+                dropZone.addEventListener('click', function () { imageInput.click(); });
+                dropZone.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                    dropZone.classList.add('is-dragover', 'border-blue-500', 'bg-blue-50/60');
+                });
+                dropZone.addEventListener('dragleave', function () {
+                    dropZone.classList.remove('is-dragover', 'border-blue-500', 'bg-blue-50/60');
+                });
+                dropZone.addEventListener('drop', function (e) {
+                    e.preventDefault();
+                    dropZone.classList.remove('is-dragover', 'border-blue-500', 'bg-blue-50/60');
+                    if (e.dataTransfer && e.dataTransfer.files.length) addImages(e.dataTransfer.files);
+                });
                 imageInput.addEventListener('change', function () {
-                    var file = imageInput.files && imageInput.files[0];
-                    if (!file || !previewImage) return;
-                    previewImage.src = URL.createObjectURL(file);
+                    if (imageInput.files && imageInput.files.length) addImages(imageInput.files);
+                    imageInput.value = '';
                 });
             }
-            refresh();
+
+            function seedExistingImages() {
+                (existingImages || []).forEach(function (item, index) {
+                    images.push({
+                        id: 'existing_img_' + (item.id || 0) + '_' + index,
+                        existingId: item.isPrimary ? 0 : (item.id || 0),
+                        file: null,
+                        url: item.url,
+                        existing: true,
+                        isPrimary: !!item.isPrimary
+                    });
+                });
+                renderImagePreviews();
+            }
+
+            if (nameInput) nameInput.addEventListener('input', refreshTextPreview);
+            if (descriptionInput) descriptionInput.addEventListener('input', refreshTextPreview);
+            if (categoryInput) categoryInput.addEventListener('change', refreshTextPreview);
+            if (priceInput) priceInput.addEventListener('input', refreshTextPreview);
+            if (clearAllBtn) clearAllBtn.addEventListener('click', clearAllImages);
+
+            form.addEventListener('submit', function () {
+                syncFilesToFormInputs();
+            });
+
+            setupDropZone();
+            seedExistingImages();
+            refreshTextPreview();
         })();
     </script>
 }
