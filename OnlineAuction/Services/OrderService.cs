@@ -449,7 +449,12 @@ public class OrderService : IOrderService
     private sealed class NullNotificationLocalizer : INotificationLocalizer
     {
         public string this[string name] => name;
-        public string Format(string name, params object[] args) => string.Format(name, args);
+
+        public string Format(string name, params object[] args) =>
+            NotificationLocalization.Encode(name, args);
+
+        public string Resolve(string? stored, string? argsJson = null) =>
+            stored ?? string.Empty;
     }
 
     private static void ApplySummary(OrderPageViewModel model, IReadOnlyList<WonOrderItem> selectedItems)

@@ -69,7 +69,7 @@ public class OrderController : Controller
                 ?? _notifyLocalizer[NotificationKeys.PaymentCompleteFieldsMessage];
 
             await NotifyPaymentIssueAsync(userId.Value, error);
-            TempData["PaymentError"] = error;
+            TempData["PaymentError"] = _notifyLocalizer.Resolve(error);
             return RedirectToAction(nameof(Index));
         }
 
@@ -77,7 +77,7 @@ public class OrderController : Controller
         if (!result.Success)
         {
             await NotifyPaymentIssueAsync(userId.Value, result.Message);
-            TempData["PaymentError"] = result.Message;
+            TempData["PaymentError"] = _notifyLocalizer.Resolve(result.Message);
             return RedirectToAction(nameof(Index));
         }
 
@@ -96,7 +96,7 @@ public class OrderController : Controller
                 var message = paypalResult.ErrorMessage
                     ?? _notifyLocalizer[NotificationKeys.PaymentUnableStartCheckoutMessage];
                 await NotifyPaymentIssueAsync(userId.Value, message);
-                TempData["PaymentError"] = message;
+                TempData["PaymentError"] = _notifyLocalizer.Resolve(message);
                 return RedirectToAction(nameof(Index));
             }
 

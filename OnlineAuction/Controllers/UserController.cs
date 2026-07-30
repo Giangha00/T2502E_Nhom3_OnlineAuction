@@ -77,7 +77,7 @@ public class UserController : Controller
 
         return _notificationService.CreateAndPushAsync(
             userId,
-            isSuccess ? _localizer["Common_Success"] : _localizer["Common_Error"],
+            isSuccess ? "Common_Success" : "Common_Error",
             message,
             NotificationType.System,
             $"/User/Detail/{userId}",

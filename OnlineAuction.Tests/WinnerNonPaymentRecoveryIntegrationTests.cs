@@ -636,9 +636,10 @@ public class WinnerNonPaymentRecoveryIntegrationTests
         public string this[string name] => name;
 
         public string Format(string name, params object[] args) =>
-            args.Length == 0
-                ? name
-                : string.Format(System.Globalization.CultureInfo.InvariantCulture, name, args);
+            OnlineAuction.Helpers.NotificationLocalization.Encode(name, args);
+
+        public string Resolve(string? stored, string? argsJson = null) =>
+            stored ?? string.Empty;
     }
 
     private sealed class NoOpRealtimePublisher : IRealtimePublisher

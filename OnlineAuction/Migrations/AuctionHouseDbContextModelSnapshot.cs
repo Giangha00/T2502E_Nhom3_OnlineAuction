@@ -1282,6 +1282,10 @@ namespace OnlineAuction.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_read");
 
+                    b.Property<string>("LocalizationArgsJson")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("localization_args_json");
+
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasMaxLength(500)

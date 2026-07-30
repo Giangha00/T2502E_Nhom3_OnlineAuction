@@ -12,6 +12,11 @@ public class Notification : AuditableEntity
 
     public string Message { get; set; } = string.Empty;
 
+    /// <summary>
+    /// JSON string[] of format args for <see cref="Message"/> when it is a resource key.
+    /// </summary>
+    public string? LocalizationArgsJson { get; set; }
+
     public string Type { get; set; } = NotificationType.System.ToString().ToLowerInvariant();
 
     public string? RelatedUrl { get; set; }
