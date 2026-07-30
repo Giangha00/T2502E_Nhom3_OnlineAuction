@@ -115,13 +115,34 @@ public class PayPalCaptureFlowTests
             CaptureResult = PayPalCaptureResult.Ok(CaptureId, 100m)
         };
 
-        var service = CreateOrderPaymentService(db, payPal, sandboxInitialBalance: 50m);
+        var service = CreateOrderPaymentService(db, payPal, sandboxInitialBalance: 50m, enforceSandboxWallet: true);
         var result = await service.CapturePayPalCheckoutAsync(1, PayPalOrderId);
 
         Assert.False(result.Success);
         Assert.Contains("nhỏ hơn", result.ErrorMessage, StringComparison.OrdinalIgnoreCase);
         Assert.Equal(0, payPal.CaptureCallCount);
         Assert.Equal(OrderStatuses.PendingPayment, (await db.Orders.SingleAsync()).Status);
+    }
+
+    [Fact]
+    public async Task CapturePayPalCheckoutAsync_AllowsPaymentWhenSandboxWalletEnforcementDisabled()
+    {
+        await using var db = CreateDbContext();
+        await SeedOrderPaymentAsync(db, OrderStatuses.PendingPayment);
+
+        var payPal = new FakePayPalService
+        {
+            OrderDetails = PayPalOrderDetailsResult.Ok(PayPalOrderId, "APPROVED", 100m),
+            CaptureResult = PayPalCaptureResult.Ok(CaptureId, 100m)
+        };
+
+        // Default: EnforceSandboxWallet=false — low local ledger must not block PayPal capture.
+        var service = CreateOrderPaymentService(db, payPal, sandboxInitialBalance: 1m);
+        var result = await service.CapturePayPalCheckoutAsync(1, PayPalOrderId);
+
+        Assert.True(result.Success);
+        Assert.Equal(1, payPal.CaptureCallCount);
+        Assert.Equal(OrderStatuses.Paid, (await db.Orders.SingleAsync()).Status);
     }
 
     [Fact]
@@ -136,7 +157,7 @@ public class PayPalCaptureFlowTests
             CaptureResult = PayPalCaptureResult.Ok(CaptureId, 100m)
         };
 
-        var service = CreateOrderPaymentService(db, payPal, sandboxInitialBalance: 250m);
+        var service = CreateOrderPaymentService(db, payPal, sandboxInitialBalance: 250m, enforceSandboxWallet: true);
         var result = await service.CapturePayPalCheckoutAsync(1, PayPalOrderId);
 
         Assert.True(result.Success);
@@ -222,7 +243,8 @@ public class PayPalCaptureFlowTests
     private static OrderPaymentService CreateOrderPaymentService(
         AuctionHouseDbContext db,
         FakePayPalService payPal,
-        decimal sandboxInitialBalance = 10_000m)
+        decimal sandboxInitialBalance = 10_000m,
+        bool enforceSandboxWallet = false)
     {
         var guard = CreateGuard(db, payPal);
         var wallet = new SandboxPayPalWalletService(
@@ -231,6 +253,7 @@ public class PayPalCaptureFlowTests
             {
                 Mode = "sandbox",
                 SandboxInitialWalletBalance = sandboxInitialBalance,
+                EnforceSandboxWallet = enforceSandboxWallet,
                 CurrencyCode = "USD"
             }));
 
@@ -503,7 +526,10 @@ public class PayPalCaptureFlowTests
         public string this[string name] => name;
 
         public string Format(string name, params object[] args) =>
-            string.Format(System.Globalization.CultureInfo.InvariantCulture, name, args);
+            OnlineAuction.Helpers.NotificationLocalization.Encode(name, args);
+
+        public string Resolve(string? stored, string? argsJson = null) =>
+            stored ?? string.Empty;
     }
 
     private sealed class NoOpOrderService : IOrderService
@@ -524,6 +550,11 @@ public class PayPalCaptureFlowTests
             int buyerId,
             CompleteOrderRequest request) =>
             Task.FromResult((false, "not implemented"));
+
+        public Task<(bool Success, string Message, int ClearedCount)> ClearAllBuyNowOrdersAsync(
+            int buyerId,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult((false, "not implemented", 0));
     }
 
     private sealed class NoOpRealtimePublisher : IRealtimePublisher

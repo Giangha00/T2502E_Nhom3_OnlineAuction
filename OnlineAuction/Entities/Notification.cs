@@ -12,6 +12,11 @@ public class Notification : AuditableEntity
 
     public string Message { get; set; } = string.Empty;
 
+    /// <summary>
+    /// JSON string[] of format args for <see cref="Message"/> when it is a resource key.
+    /// </summary>
+    public string? LocalizationArgsJson { get; set; }
+
     public string Type { get; set; } = NotificationType.System.ToString().ToLowerInvariant();
 
     public string? RelatedUrl { get; set; }
@@ -62,4 +67,6 @@ public static class NotificationReferenceTypes
     public const string BuyNowOrderCreated = "buy_now_order_created";
     public const string RefundUnderReview = "refund_under_review";
     public const string RefundClosed = "refund_closed";
+    public const string ProfileUpdated = "profile_updated";
+    public const string ProfileUpdateFailed = "profile_update_failed";
 }

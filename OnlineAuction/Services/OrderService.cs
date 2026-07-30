@@ -22,6 +22,7 @@ public class OrderService : IOrderService
     private readonly IWinnerNonPaymentRecoveryService _winnerNonPaymentRecoveryService;
     private readonly INotificationService _notificationService;
     private readonly INotificationLocalizer _notifyLocalizer;
+    private readonly IRealtimePublisher? _realtimePublisher;
 
     private sealed class NullWinnerNonPaymentRecoveryService : IWinnerNonPaymentRecoveryService
     {
@@ -86,13 +87,15 @@ public class OrderService : IOrderService
         IOptions<PlatformFeeSettings> feeSettings,
         IWinnerNonPaymentRecoveryService? winnerNonPaymentRecoveryService = null,
         INotificationService? notificationService = null,
-        INotificationLocalizer? notifyLocalizer = null)
+        INotificationLocalizer? notifyLocalizer = null,
+        IRealtimePublisher? realtimePublisher = null)
     {
         _dbContext = dbContext;
         _feeSettings = feeSettings.Value;
         _winnerNonPaymentRecoveryService = winnerNonPaymentRecoveryService ?? new NullWinnerNonPaymentRecoveryService();
         _notificationService = notificationService ?? new NullNotificationService();
         _notifyLocalizer = notifyLocalizer ?? new NullNotificationLocalizer();
+        _realtimePublisher = realtimePublisher;
     }
 
     public async Task<OrderPageViewModel?> BuildOrderPageAsync(int buyerId)
@@ -107,6 +110,7 @@ public class OrderService : IOrderService
         }
 
         await CancelExpiredPendingOrdersAsync(buyerId);
+        await CancelInvalidPendingOrdersAsync(buyerId);
 
         var now = DateTime.UtcNow;
         var orders = await _dbContext.Orders
@@ -114,18 +118,19 @@ public class OrderService : IOrderService
             .Include(order => order.Items)
                 .ThenInclude(item => item.Auction)
                     .ThenInclude(auction => auction.Product)
-            .Where(order =>
-                order.BuyerId == buyerId &&
-                order.Status == OrderStatuses.PendingPayment &&
-                order.DeletedAt == null &&
-                order.PaymentDeadline > now)
+            .Where(BuildPayableOrdersFilter(buyerId, now))
             .OrderBy(order => order.PaymentDeadline)
             .ToListAsync();
 
         var items = orders
             .Select(order =>
             {
-                var item = order.Items.First();
+                var item = order.Items.FirstOrDefault();
+                if (item is null)
+                {
+                    return null;
+                }
+
                 var orderSource = OrderCheckoutSelection.ResolveOrderSource(order);
                 var isMandatory = orderSource == OrderSources.AuctionWin;
 
@@ -150,6 +155,8 @@ public class OrderService : IOrderService
                     IsSelectedByDefault = isMandatory
                 };
             })
+            .Where(item => item is not null)
+            .Cast<WonOrderItem>()
             .ToList();
 
         var selectedItems = items.Where(item => item.IsSelectedByDefault).ToList();
@@ -186,12 +193,14 @@ public class OrderService : IOrderService
         return model;
     }
 
-    public Task<int> CountPendingPaymentOrdersAsync(int buyerId) =>
-        _dbContext.Orders.CountAsync(order =>
-            order.BuyerId == buyerId &&
-            order.Status == OrderStatuses.PendingPayment &&
-            order.DeletedAt == null &&
-            order.PaymentDeadline > DateTime.UtcNow);
+    public async Task<int> CountPendingPaymentOrdersAsync(int buyerId)
+    {
+        await CancelExpiredPendingOrdersAsync(buyerId);
+        await CancelInvalidPendingOrdersAsync(buyerId);
+
+        var now = DateTime.UtcNow;
+        return await _dbContext.Orders.CountAsync(BuildPayableOrdersFilter(buyerId, now));
+    }
 
     public async Task<int> CancelExpiredPendingOrdersAsync(int buyerId)
     {
@@ -207,6 +216,32 @@ public class OrderService : IOrderService
             .ToListAsync();
 
         return await CancelOrdersAsync(expiredOrders, now);
+    }
+
+    private async Task CancelInvalidPendingOrdersAsync(int buyerId)
+    {
+        var now = DateTime.UtcNow;
+        var invalidOrders = await _dbContext.Orders
+            .Include(order => order.Items)
+            .Where(order =>
+                order.BuyerId == buyerId &&
+                order.Status == OrderStatuses.PendingPayment &&
+                order.DeletedAt == null &&
+                !order.Items.Any())
+            .ToListAsync();
+
+        if (invalidOrders.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var order in invalidOrders)
+        {
+            order.Status = OrderStatuses.Cancelled;
+            order.UpdatedAt = now;
+        }
+
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task<int> CancelAllExpiredPendingOrdersAsync()
@@ -331,6 +366,55 @@ public class OrderService : IOrderService
         return (true, "Đã lưu thông tin giao hàng. Bạn sẽ được chuyển đến PayPal để hoàn tất thanh toán.");
     }
 
+    public async Task<(bool Success, string Message, int ClearedCount)> ClearAllBuyNowOrdersAsync(
+        int buyerId,
+        CancellationToken cancellationToken = default)
+    {
+        await CancelExpiredPendingOrdersAsync(buyerId);
+        await CancelInvalidPendingOrdersAsync(buyerId);
+
+        var now = DateTime.UtcNow;
+        var pendingOrders = await _dbContext.Orders
+            .Include(order => order.Items)
+            .Where(order =>
+                order.BuyerId == buyerId &&
+                order.Status == OrderStatuses.PendingPayment &&
+                order.DeletedAt == null &&
+                order.PaymentDeadline > now &&
+                order.Items.Any() &&
+                (order.OrderSource == OrderSources.BuyNow
+                 || order.OrderReference.StartsWith("BN-")))
+            .ToListAsync(cancellationToken);
+
+        if (pendingOrders.Count == 0)
+        {
+            return (true, "No Buy Now items to clear.", 0);
+        }
+
+        foreach (var order in pendingOrders)
+        {
+            order.Status = OrderStatuses.Cancelled;
+            order.UpdatedAt = now;
+            await OrderCancellationHelper.ApplyCancellationSideEffectsAsync(
+                _dbContext,
+                order,
+                now,
+                cancellationToken);
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        if (_realtimePublisher is not null)
+        {
+            var remainingCount = await _dbContext.Orders.CountAsync(
+                BuildPayableOrdersFilter(buyerId, DateTime.UtcNow),
+                cancellationToken);
+            await _realtimePublisher.SendOrderCountToUserAsync(buyerId, remainingCount, cancellationToken);
+        }
+
+        return (true, $"Cleared {pendingOrders.Count} Buy Now item(s).", pendingOrders.Count);
+    }
+
     private async Task<int> CancelOrdersAsync(List<AuctionOrder> expiredOrders, DateTime now)
     {
         if (expiredOrders.Count == 0)
@@ -365,7 +449,12 @@ public class OrderService : IOrderService
     private sealed class NullNotificationLocalizer : INotificationLocalizer
     {
         public string this[string name] => name;
-        public string Format(string name, params object[] args) => string.Format(name, args);
+
+        public string Format(string name, params object[] args) =>
+            NotificationLocalization.Encode(name, args);
+
+        public string Resolve(string? stored, string? argsJson = null) =>
+            stored ?? string.Empty;
     }
 
     private static void ApplySummary(OrderPageViewModel model, IReadOnlyList<WonOrderItem> selectedItems)
@@ -399,4 +488,12 @@ public class OrderService : IOrderService
 
         return parts.Count > 0 ? string.Join(" · ", parts) : product.ShortDescription ?? string.Empty;
     }
+
+    private static System.Linq.Expressions.Expression<Func<AuctionOrder, bool>> BuildPayableOrdersFilter(int buyerId, DateTime now) =>
+        order =>
+            order.BuyerId == buyerId &&
+            order.Status == OrderStatuses.PendingPayment &&
+            order.DeletedAt == null &&
+            order.PaymentDeadline > now &&
+            order.Items.Any();
 }

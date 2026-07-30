@@ -3,7 +3,8 @@ namespace OnlineAuction.Services.Interfaces;
 public interface ISandboxPayPalWalletService
 {
     /// <summary>
-    /// Returns true when sandbox wallet enforcement is active (PayPal Mode = sandbox).
+    /// Returns true when opt-in sandbox wallet enforcement is active
+    /// (<c>PayPal:Mode=sandbox</c> and <c>PayPal:EnforceSandboxWallet=true</c>).
     /// </summary>
     bool IsEnforced { get; }
 
@@ -16,7 +17,7 @@ public interface ISandboxPayPalWalletService
 
     /// <summary>
     /// Deducts from the sandbox wallet inside the caller's DbContext/transaction.
-    /// No-op success when enforcement is off.
+    /// When enforcement is off: best-effort ledger only (never fails the payment).
     /// </summary>
     Task<SandboxWalletDeductResult> TryDeductAsync(
         int userId,

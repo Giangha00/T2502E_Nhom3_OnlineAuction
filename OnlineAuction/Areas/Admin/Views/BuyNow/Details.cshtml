@@ -93,10 +93,37 @@
             </div>
         </div>
 
+        @if (Model.GalleryImages.Count > 0)
+        {
+            <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                @foreach (var image in Model.GalleryImages)
+                {
+                    <a href="@image" target="_blank" rel="noopener" class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+                        <img src="@image" alt="Gallery image" class="h-24 w-full object-cover" />
+                    </a>
+                }
+            </div>
+        }
+
         @if (!string.IsNullOrWhiteSpace(Model.Description))
         {
             <div class="prose prose-sm mt-6 max-w-none rounded-xl border border-gray-100 bg-gray-50 p-4 text-theme-sm text-gray-700 dark:border-gray-800 dark:bg-white/[0.02] dark:text-gray-300">
                 @Html.Raw(Model.Description)
+            </div>
+        }
+
+        @if (Model.Documents.Count > 0)
+        {
+            <div class="mt-5 rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-gray-800 dark:bg-white/[0.02]">
+                <h4 class="text-theme-sm font-semibold text-gray-800 dark:text-white/90">Documents</h4>
+                <ul class="mt-3 space-y-2">
+                    @foreach (var document in Model.Documents)
+                    {
+                        <li>
+                            <a href="@document.Url" target="_blank" rel="noopener" class="text-theme-sm text-brand-600 hover:underline">@document.Name</a>
+                        </li>
+                    }
+                </ul>
             </div>
         }
 

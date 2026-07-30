@@ -76,13 +76,13 @@
   <partial name="Partials/_HomeRecommendedSection" model="Model"/>
 
   <partial name="Partials/_HomeProductSection"
-           model="@(new HomeProductSectionViewModel { Title = "Trending on auction", SectionKey = "trending-auction", Items = Model.TrendingOnAuction })"/>
+           model="@(new HomeProductSectionViewModel { Title = Localizer["Home_TrendingAuction_Title"].Value, SectionKey = "trending-auction", Items = Model.TrendingOnAuction })"/>
 
   <partial name="Partials/_HomeProductSection"
-           model="@(new HomeProductSectionViewModel { Title = "Trending on buy now", SectionKey = "trending-buynow", Items = Model.TrendingOnBuyNow, CardMode = "buynow", ViewAllController = "BuyNow" })"/>
+           model="@(new HomeProductSectionViewModel { Title = Localizer["Home_TrendingBuyNow_Title"].Value, SectionKey = "trending-buynow", Items = Model.TrendingOnBuyNow, CardMode = "buynow", ViewAllController = "BuyNow" })"/>
 
   <partial name="Partials/_HomeProductSection"
-           model="@(new HomeProductSectionViewModel { Title = "Recently added", SectionKey = "recently-added", Items = Model.RecentlyAdded })"/>
+           model="@(new HomeProductSectionViewModel { Title = Localizer["Home_RecentlyAdded_Title"].Value, SectionKey = "recently-added", Items = Model.RecentlyAdded })"/>
 
   <section class="border-b border-stone-200 bg-slate-50 py-10 sm:py-12">
     <div class="mb-8 px-4 sm:px-8 lg:px-12">
@@ -111,7 +111,7 @@
 
   <section class="border-b border-stone-200 py-10 sm:py-12">
     <div class="mb-8 px-4 sm:px-8 lg:px-12">
-      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Best seller</h2>
+      <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">@Localizer["Home_BestSeller_Title"]</h2>
     </div>
     <div class="flex flex-wrap justify-center gap-8 px-4 sm:px-8 lg:px-12">
       @foreach (var seller in Model.BestSellers)
@@ -142,7 +142,7 @@
   {
     <section class="py-10 sm:py-14">
       <div class="mb-8 flex w-full items-end justify-between gap-4 px-4 sm:px-8 lg:px-12">
-        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">Latest from vault</h2>
+        <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">@Localizer["Home_LatestFromVault_Title"]</h2>
         <a href="#" class="text-sm font-semibold text-blue-700 hover:text-blue-900">@Localizer["Common_ViewAllPosts"] <span aria-hidden="true">→</span></a>
       </div>
       <div class="grid w-full grid-cols-1 gap-6 px-4 sm:grid-cols-2 sm:px-8 lg:grid-cols-3 lg:px-12">

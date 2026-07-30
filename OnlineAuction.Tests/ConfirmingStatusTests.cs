@@ -344,7 +344,11 @@ public class ConfirmingStatusTests
     {
         public string this[string name] => name;
 
-        public string Format(string name, params object[] args) => name;
+        public string Format(string name, params object[] args) =>
+            OnlineAuction.Helpers.NotificationLocalization.Encode(name, args);
+
+        public string Resolve(string? stored, string? argsJson = null) =>
+            stored ?? string.Empty;
     }
 
     private sealed class NoOpDepositRefundService : IRegistrationDepositRefundService

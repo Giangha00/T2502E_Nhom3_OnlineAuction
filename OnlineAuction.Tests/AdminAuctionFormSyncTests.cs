@@ -319,7 +319,19 @@ public class AdminAuctionFormSyncTests
     }
 
     private static AdminAuctionService CreateService(AuctionHouseDbContext db) =>
-        new(db, new FakePhotoService(), NullLogger<AdminAuctionService>.Instance);
+        new(db, new FakePhotoService(), NullLogger<AdminAuctionService>.Instance, new PassthroughStringLocalizer());
+
+    private sealed class PassthroughStringLocalizer : Microsoft.Extensions.Localization.IStringLocalizer<OnlineAuction.SharedResource>
+    {
+        public Microsoft.Extensions.Localization.LocalizedString this[string name] =>
+            new(name, name, resourceNotFound: false);
+
+        public Microsoft.Extensions.Localization.LocalizedString this[string name, params object[] arguments] =>
+            new(name, string.Format(System.Globalization.CultureInfo.InvariantCulture, name, arguments), resourceNotFound: false);
+
+        public System.Collections.Generic.IEnumerable<Microsoft.Extensions.Localization.LocalizedString> GetAllStrings(bool includeParentCultures) =>
+            System.Array.Empty<Microsoft.Extensions.Localization.LocalizedString>();
+    }
 
     private static async Task<AuctionHouseDbContext> CreateContextAsync()
     {

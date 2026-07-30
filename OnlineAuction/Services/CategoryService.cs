@@ -36,6 +36,27 @@ public class CategoryService : ICategoryService
             query = query.Where(category => category.IsActive == filter.IsActive.Value);
         }
 
+        var dateRange = OnlineAuction.Helpers.AdminDateRangeHelper.Parse(filter.DateRange);
+        if (dateRange.StartDate.HasValue && dateRange.EndDateExclusive.HasValue)
+        {
+            query = query.Where(category =>
+                category.CreatedAt >= dateRange.StartDate.Value &&
+                category.CreatedAt < dateRange.EndDateExclusive.Value);
+        }
+        else
+        {
+            if (filter.FromDate.HasValue)
+            {
+                query = query.Where(category => category.CreatedAt >= filter.FromDate.Value);
+            }
+
+            if (filter.ToDate.HasValue)
+            {
+                var toDateExclusive = filter.ToDate.Value.Date.AddDays(1);
+                query = query.Where(category => category.CreatedAt < toDateExclusive);
+            }
+        }
+
         query = filter.SortOrder switch
         {
             "name_desc" => query.OrderByDescending(category => category.Name),

@@ -86,11 +86,15 @@ public class NotificationService : INotificationService
         }
 
         var now = DateTime.UtcNow;
+        var (titleStorage, _) = NotificationLocalization.ToStorage(title);
+        var (messageStorage, messageArgsJson) = NotificationLocalization.ToStorage(message);
+
         var notification = new Notification
         {
             UserId = userId,
-            Title = title.Trim(),
-            Message = message.Trim(),
+            Title = titleStorage,
+            Message = messageStorage,
+            LocalizationArgsJson = messageArgsJson,
             Type = type.ToString().ToLowerInvariant(),
             RelatedUrl = relatedUrl,
             IsRead = false,
@@ -391,12 +395,12 @@ public class NotificationService : INotificationService
         }
     }
 
-    private static NotificationItemViewModel MapToViewModel(Notification notification) =>
+    private NotificationItemViewModel MapToViewModel(Notification notification) =>
         new()
         {
             Id = notification.Id,
-            Title = notification.Title,
-            Message = notification.Message,
+            Title = _notifyLocalizer.Resolve(notification.Title),
+            Message = _notifyLocalizer.Resolve(notification.Message, notification.LocalizationArgsJson),
             TimeAgo = RelativeTimeHelper.Format(notification.CreatedAt),
             Type = Enum.TryParse<NotificationType>(notification.Type, true, out var parsedType)
                 ? parsedType

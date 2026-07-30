@@ -69,6 +69,7 @@ public class OrderController : Controller
                 ?? _notifyLocalizer[NotificationKeys.PaymentCompleteFieldsMessage];
 
             await NotifyPaymentIssueAsync(userId.Value, error);
+            TempData["PaymentError"] = _notifyLocalizer.Resolve(error);
             return RedirectToAction(nameof(Index));
         }
 
@@ -76,6 +77,7 @@ public class OrderController : Controller
         if (!result.Success)
         {
             await NotifyPaymentIssueAsync(userId.Value, result.Message);
+            TempData["PaymentError"] = _notifyLocalizer.Resolve(result.Message);
             return RedirectToAction(nameof(Index));
         }
 
@@ -91,9 +93,10 @@ public class OrderController : Controller
 
             if (!paypalResult.Success || string.IsNullOrWhiteSpace(paypalResult.ApprovalUrl))
             {
-                await NotifyPaymentIssueAsync(
-                    userId.Value,
-                    paypalResult.ErrorMessage ?? _notifyLocalizer[NotificationKeys.PaymentUnableStartCheckoutMessage]);
+                var message = paypalResult.ErrorMessage
+                    ?? _notifyLocalizer[NotificationKeys.PaymentUnableStartCheckoutMessage];
+                await NotifyPaymentIssueAsync(userId.Value, message);
+                TempData["PaymentError"] = _notifyLocalizer.Resolve(message);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -102,6 +105,39 @@ public class OrderController : Controller
 
         // COD success is already pushed inside OrderService.CompleteOrderAsync.
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ClearBuyNow(CancellationToken cancellationToken)
+    {
+        var userId = GetCurrentUserId();
+        if (!userId.HasValue)
+        {
+            return Unauthorized(new { success = false, message = "Please sign in to continue." });
+        }
+
+        try
+        {
+            var result = await _orderService.ClearAllBuyNowOrdersAsync(userId.Value, cancellationToken);
+            var orderCount = await _orderService.CountPendingPaymentOrdersAsync(userId.Value);
+
+            return Json(new
+            {
+                success = result.Success || result.ClearedCount > 0,
+                message = result.Message,
+                clearedCount = result.ClearedCount,
+                orderCount
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new
+            {
+                success = false,
+                message = ex.Message
+            });
+        }
     }
 
     private async Task NotifyPaymentIssueAsync(int userId, string message)

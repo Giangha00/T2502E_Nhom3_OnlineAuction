@@ -371,20 +371,47 @@ using (var scope = app.Services.CreateScope())
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var seedLogger = scope.ServiceProvider
+        .GetRequiredService<ILoggerFactory>()
+        .CreateLogger("SeedData");
+
     // Default: keep seeded product/auction IDs stable across restarts.
-    // Opt into wipe+reseed with SeedData:RefreshTestAuctions* = true.
-    var refreshTestAuctions = configuration.GetValue("SeedData:RefreshTestAuctionsOnStartup", false)
+    // Opt into wipe+reseed only in Development via SeedData:RefreshTestAuctions*.
+    // Never wipe catalog data in Production/Azure.
+    var refreshTestAuctions = app.Environment.IsDevelopment()
+        && (configuration.GetValue("SeedData:RefreshTestAuctionsOnStartup", false)
+            || configuration.GetValue("SeedData:RefreshTestAuctionsInDevelopment", false));
+
+    // Local/dev: RunAuctionCatalogSeederInDevelopment (default true) keeps sample catalog aligned.
+    // Azure/Production: set SeedData:RunAuctionCatalogSeederOnStartup=true (see appsettings.Production.json).
+    var runAuctionCatalogSeeder = configuration.GetValue("SeedData:RunAuctionCatalogSeederOnStartup", false)
         || (app.Environment.IsDevelopment()
-            && configuration.GetValue("SeedData:RefreshTestAuctionsInDevelopment", false));
+            && configuration.GetValue("SeedData:RunAuctionCatalogSeederInDevelopment", true));
+
+    var syncCatalogOnStartup = configuration.GetValue<bool?>("SeedData:SyncCatalogOnStartup");
     var syncCatalog = !refreshTestAuctions && (
-        configuration.GetValue("SeedData:SyncCatalogOnStartup", false)
-        || (app.Environment.IsDevelopment()
-            && configuration.GetValue("SeedData:SyncCatalogInDevelopment", true)));
+        syncCatalogOnStartup
+        ?? (app.Environment.IsDevelopment()
+            ? configuration.GetValue("SeedData:SyncCatalogInDevelopment", true)
+            // Production: when catalog seeder runs, sync in place by default (no wipe).
+            : runAuctionCatalogSeeder));
 
     await UserSeeder.SeedAsync(db, userManager);
     await AdminSeeder.SeedAsync(db, userManager, roleManager);
     await PermissionSeeder.SeedAsync(db, roleManager, userManager);
-    await AuctionCatalogSeeder.SeedAsync(db, userManager, refreshTestAuctions, syncCatalog);
+    if (runAuctionCatalogSeeder)
+    {
+        seedLogger.LogInformation(
+            "Running AuctionCatalogSeeder (refresh={Refresh}, sync={Sync}, env={Env}).",
+            refreshTestAuctions,
+            syncCatalog,
+            app.Environment.EnvironmentName);
+        await AuctionCatalogSeeder.SeedAsync(db, userManager, refreshTestAuctions, syncCatalog);
+    }
+    else
+    {
+        seedLogger.LogInformation("AuctionCatalogSeeder skipped (disabled by SeedData flags).");
+    }
 }
 
 using (var scope = app.Services.CreateScope())

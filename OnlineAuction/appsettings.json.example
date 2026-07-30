@@ -14,7 +14,9 @@
     "RefreshTestAuctionsOnStartup": false,
     "RefreshTestAuctionsInDevelopment": false,
     "SyncCatalogOnStartup": false,
-    "SyncCatalogInDevelopment": true
+    "SyncCatalogInDevelopment": true,
+    "RunAuctionCatalogSeederOnStartup": false,
+    "RunAuctionCatalogSeederInDevelopment": true
   },
   "CloudinarySettings": {
     "CloudName": "YOUR_CLOUDINARY_CLOUD_NAME",
@@ -28,7 +30,8 @@
     "ReturnUrl": "http://localhost:5006/Payment/PayPalReturn",
     "CancelUrl": "http://localhost:5006/Payment/PayPalCancel",
     "CurrencyCode": "USD",
-    "SandboxInitialWalletBalance": 1000
+    "SandboxInitialWalletBalance": 1000,
+    "EnforceSandboxWallet": false
   },
   "FirebaseSettings": {
     "ProjectId": "YOUR_FIREBASE_PROJECT_ID",

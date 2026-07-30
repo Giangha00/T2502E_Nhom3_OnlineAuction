@@ -490,7 +490,7 @@ public class OrderCreationService : IOrderCreationService
         if (auction?.Product is null)
         {
             await transaction.RollbackAsync(cancellationToken);
-            return (false, "Product not found.");
+            return (false, "This item is no longer available.");
         }
 
         if (auction.BuyNowPrice is null || auction.BuyNowPrice <= 0)
@@ -515,30 +515,34 @@ public class OrderCreationService : IOrderCreationService
             return (false, "This item is no longer available.");
         }
 
-        var existingOrder = await _dbContext.OrderItems
+        var existingActiveOrder = await _dbContext.OrderItems
             .AsNoTracking()
             .Include(item => item.Order)
-            .Where(item => item.AuctionId == auctionId)
+            .Where(item =>
+                item.AuctionId == auctionId &&
+                item.DeletedAt == null &&
+                item.Order.DeletedAt == null &&
+                item.Order.Status != OrderStatuses.Cancelled)
             .Select(item => new { item.OrderId, item.Order.BuyerId, item.Order.Status })
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (existingOrder is not null)
+        if (existingActiveOrder is not null)
         {
-            if (existingOrder.BuyerId == buyerId
-                && existingOrder.Status == OrderStatuses.PendingPayment)
+            if (existingActiveOrder.BuyerId == buyerId
+                && existingActiveOrder.Status == OrderStatuses.PendingPayment)
             {
                 await transaction.CommitAsync(cancellationToken);
                 return (true, "Item is already in your orders.");
             }
 
             await transaction.RollbackAsync(cancellationToken);
-            return (false, "This item is reserved by another buyer.");
+            return (false, "This item is no longer available.");
         }
 
         if (auction.Status == AuctionStatuses.AwaitingPayment && auction.WinnerId != buyerId)
         {
             await transaction.RollbackAsync(cancellationToken);
-            return (false, "This item is reserved by another buyer.");
+            return (false, "This item is no longer available.");
         }
 
         var subtotal = auction.BuyNowPrice.Value;
@@ -547,9 +551,18 @@ public class OrderCreationService : IOrderCreationService
         var buyerCheckoutFee = MarketplaceFeeCalculator.CalculateBuyerCheckoutFee(subtotal, _feeSettings);
         var total = subtotal + ShippingFee + insurance + buyerCheckoutFee;
 
+        var priorCancelledCount = await _dbContext.OrderItems
+            .AsNoTracking()
+            .Include(item => item.Order)
+            .CountAsync(item =>
+                    item.AuctionId == auction.Id &&
+                    item.Order.Status == OrderStatuses.Cancelled,
+                cancellationToken);
+        var recoverySuffix = priorCancelledCount > 0 ? $"-R{priorCancelledCount + 1}" : string.Empty;
+
         var order = new AuctionOrder
         {
-            OrderReference = $"BN-{now:yyyyMMdd}-{auction.Id}",
+            OrderReference = $"BN-{now:yyyyMMdd}-{auction.Id}{recoverySuffix}",
             BuyerId = buyerId,
             Subtotal = subtotal,
             ShippingFee = ShippingFee,
@@ -589,7 +602,26 @@ public class OrderCreationService : IOrderCreationService
         {
             _logger.LogWarning(ex, "Buy now order creation raced for auction {AuctionId}.", auctionId);
             await transaction.RollbackAsync(cancellationToken);
-            return (true, "Item is already in your orders.");
+
+            var racedOrder = await _dbContext.OrderItems
+                .AsNoTracking()
+                .Include(item => item.Order)
+                .Where(item =>
+                    item.AuctionId == auctionId &&
+                    item.DeletedAt == null &&
+                    item.Order.DeletedAt == null &&
+                    item.Order.Status != OrderStatuses.Cancelled)
+                .Select(item => new { item.Order.BuyerId, item.Order.Status })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (racedOrder is not null
+                && racedOrder.BuyerId == buyerId
+                && racedOrder.Status == OrderStatuses.PendingPayment)
+            {
+                return (true, "Item is already in your orders.");
+            }
+
+            return (false, "This item is no longer available.");
         }
 
         await _notificationService.CreateAndPushAsync(
@@ -614,7 +646,9 @@ public class OrderCreationService : IOrderCreationService
             .CountAsync(pendingOrder =>
                 pendingOrder.BuyerId == buyerId &&
                 pendingOrder.Status == OrderStatuses.PendingPayment &&
-                pendingOrder.DeletedAt == null,
+                pendingOrder.DeletedAt == null &&
+                pendingOrder.PaymentDeadline > now &&
+                pendingOrder.Items.Any(),
                 cancellationToken);
         await _realtimePublisher.SendOrderCountToUserAsync(buyerId, orderCount, cancellationToken);
 

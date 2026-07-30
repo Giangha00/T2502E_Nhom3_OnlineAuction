@@ -4,7 +4,11 @@ public class BuyNowFilterViewModel
 {
     public string? Search { get; set; }
 
-    public string? Status { get; set; }
+    public string? DateRange { get; set; }
+
+    public DateTime? FromDate { get; set; }
+
+    public DateTime? ToDate { get; set; }
 
     public int? CategoryId { get; set; }
 

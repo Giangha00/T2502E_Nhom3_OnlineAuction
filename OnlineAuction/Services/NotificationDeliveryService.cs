@@ -48,12 +48,15 @@ public sealed class NotificationDeliveryService : INotificationDeliveryService
             ["relatedUrl"] = relatedUrl
         };
 
+        var title = _notifyLocalizer.Resolve(notification.Title);
+        var message = _notifyLocalizer.Resolve(notification.Message, notification.LocalizationArgsJson);
+
         try
         {
             await _fcmService.SendToUserAsync(
                 notification.UserId,
-                notification.Title,
-                notification.Message,
+                title,
+                message,
                 dataPayload,
                 cancellationToken);
         }
@@ -66,7 +69,7 @@ public sealed class NotificationDeliveryService : INotificationDeliveryService
                 notification.Id);
         }
 
-        var viewModel = MapToViewModel(notification);
+        var viewModel = MapToViewModel(notification, title, message);
         var unreadCount = await _dbContext.Notifications
             .AsNoTracking()
             .CountAsync(
@@ -102,11 +105,16 @@ public sealed class NotificationDeliveryService : INotificationDeliveryService
 
         var now = DateTime.UtcNow;
         var relatedUrl = $"/Auction/Detail/{auctionId}";
+        var (titleStorage, _) = NotificationLocalization.ToStorage(_notifyLocalizer[NotificationKeys.OutbidTitle]);
+        var (messageStorage, messageArgsJson) = NotificationLocalization.ToStorage(
+            _notifyLocalizer.Format(NotificationKeys.OutbidMessage, productName));
+
         var notification = new Notification
         {
             UserId = userId,
-            Title = _notifyLocalizer[NotificationKeys.OutbidTitle],
-            Message = _notifyLocalizer.Format(NotificationKeys.OutbidMessage, productName),
+            Title = titleStorage,
+            Message = messageStorage,
+            LocalizationArgsJson = messageArgsJson,
             Type = NotificationType.Auction.ToString().ToLowerInvariant(),
             RelatedUrl = relatedUrl,
             IsRead = false,
@@ -121,12 +129,15 @@ public sealed class NotificationDeliveryService : INotificationDeliveryService
         await DeliverAsync(notification.Id, cancellationToken);
     }
 
-    private static NotificationItemViewModel MapToViewModel(Notification notification) =>
+    private static NotificationItemViewModel MapToViewModel(
+        Notification notification,
+        string title,
+        string message) =>
         new()
         {
             Id = notification.Id,
-            Title = notification.Title,
-            Message = notification.Message,
+            Title = title,
+            Message = message,
             TimeAgo = RelativeTimeHelper.Format(notification.CreatedAt),
             Type = Enum.TryParse<NotificationType>(notification.Type, true, out var parsedType)
                 ? parsedType

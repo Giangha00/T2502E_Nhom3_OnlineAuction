@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Localization;
 using OnlineAuction.Entities;
 
 namespace OnlineAuction.Areas.Admin.Services;
@@ -24,19 +25,23 @@ internal static class AdminAuctionLifecycleHelper
 
     public static bool IsScheduleLockedStatus(string? status) => IsLiveLikeStatus(status);
 
+    public static bool CanCancelStatus(string? status) =>
+        !string.IsNullOrWhiteSpace(status) && CancellableStatuses.Contains(status);
+
     public static void ApplyMutationFlags(
         int bidCount,
         int orderCount,
         string status,
         Action<bool> setCanDelete,
         Action<bool> setCanCancel,
-        Action<string?> setBlockReason)
+        Action<string?> setBlockReason,
+        IStringLocalizer<SharedResource> localizer)
     {
         if (status == AuctionStatuses.Cancelled || status == AuctionStatuses.Completed)
         {
             setCanDelete(false);
             setCanCancel(false);
-            setBlockReason("Phiên đã kết thúc hoặc đã hủy.");
+            setBlockReason(localizer["AdminMsg_Auction_EndedOrCancelled"].Value);
             return;
         }
 
@@ -44,7 +49,7 @@ internal static class AdminAuctionLifecycleHelper
         {
             setCanDelete(false);
             setCanCancel(false);
-            setBlockReason("Không xóa được — phiên đã liên kết order.");
+            setBlockReason(localizer["AdminMsg_Auction_DeleteBlockedOrder"].Value);
             return;
         }
 
@@ -52,7 +57,7 @@ internal static class AdminAuctionLifecycleHelper
         {
             setCanDelete(false);
             setCanCancel(CanCancelStatus(status));
-            setBlockReason($"Không xóa được — đã có {bidCount} bid. Hãy Cancel thay vì Delete.");
+            setBlockReason(localizer.GetString("AdminMsg_Auction_DeleteBlockedBids", bidCount).Value);
             return;
         }
 
@@ -61,19 +66,22 @@ internal static class AdminAuctionLifecycleHelper
         setBlockReason(null);
     }
 
-    public static string BuildDeleteBlockedMessage(int bidCount, int orderCount)
+    public static string BuildDeleteBlockedMessage(
+        int bidCount,
+        int orderCount,
+        IStringLocalizer<SharedResource> localizer)
     {
         if (orderCount > 0)
         {
-            return "Không xóa được — phiên đã liên kết order.";
+            return localizer["AdminMsg_Auction_DeleteBlockedOrder"].Value;
         }
 
         if (bidCount > 0)
         {
-            return $"Không xóa được — đã có {bidCount} bid. Hãy Cancel thay vì Delete.";
+            return localizer.GetString("AdminMsg_Auction_DeleteBlockedBids", bidCount).Value;
         }
 
-        return "Không thể xóa phiên đấu giá này.";
+        return localizer["AdminMsg_Auction_CannotDelete"].Value;
     }
 
     public static string BuildBulkSkipReason(int auctionId, int bidCount, int orderCount)
@@ -91,16 +99,21 @@ internal static class AdminAuctionLifecycleHelper
         return $"#{auctionId}";
     }
 
-    public static string BuildBulkDeleteSummary(int deletedCount, int requestedCount, IReadOnlyList<string> skipped)
+    public static string BuildBulkDeleteSummary(
+        int deletedCount,
+        int requestedCount,
+        IReadOnlyList<string> skipped,
+        IStringLocalizer<SharedResource> localizer)
     {
         if (skipped.Count == 0)
         {
-            return $"Đã xóa {deletedCount}/{requestedCount} phiên đấu giá.";
+            return localizer.GetString("AdminMsg_Auction_BulkDeleted", deletedCount, requestedCount).Value;
         }
 
-        return $"Đã xóa {deletedCount}/{requestedCount}; bỏ qua: {string.Join(", ", skipped)}.";
+        return localizer.GetString(
+            "AdminMsg_Auction_BulkDeletedWithSkip",
+            deletedCount,
+            requestedCount,
+            string.Join(", ", skipped)).Value;
     }
-
-    public static bool CanCancelStatus(string? status) =>
-        !string.IsNullOrWhiteSpace(status) && CancellableStatuses.Contains(status);
 }

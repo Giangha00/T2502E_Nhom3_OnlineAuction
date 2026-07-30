@@ -4,6 +4,12 @@ public class ProductTemplateFilterViewModel
 {
     public string? Search { get; set; }
 
+    public string? DateRange { get; set; }
+
+    public DateTime? FromDate { get; set; }
+
+    public DateTime? ToDate { get; set; }
+
     public string? SortOrder { get; set; }
 
     public int Page { get; set; } = 1;
