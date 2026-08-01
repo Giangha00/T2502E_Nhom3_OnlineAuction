@@ -134,6 +134,20 @@ footer .footer-link--active:visited {
   color: #1d4ed8;
 }
 
+/* Interactive cursors for language and catalog filters */
+#languageButton,
+#languageDropdown button,
+#auctionFilterForm label,
+#auctionFilterForm input[type="checkbox"],
+#auctionFilterForm button,
+#auctionSort {
+  cursor: pointer;
+}
+
+#auctionFilterForm input[type="number"] {
+  cursor: text;
+}
+
 /* Unified page header — text only (no image banners) */
 .page-header {
   background: #ffffff;

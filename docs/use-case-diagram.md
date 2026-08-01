@@ -15,9 +15,16 @@ This document summarizes the main use cases found from the ASP.NET MVC controlle
 
 Render this block with PlantUML.
 
+Diagram convention used here:
+
+- Actor-to-use-case associations are solid straight lines.
+- `<<include>>` links are drawn as solid directed links for the course/project rule used in this document.
+- `<<extend>>` is only used for optional or conditional behavior, and the arrow points from the extension use case to the base use case.
+
 ```plantuml
 @startuml
 left to right direction
+skinparam linetype ortho
 skinparam packageStyle rectangle
 
 actor Visitor
@@ -114,74 +121,74 @@ rectangle "Online Auction Platform" {
   }
 }
 
-Visitor --> UC_Home
-Visitor --> UC_AuctionList
-Visitor --> UC_AuctionDetail
-Visitor --> UC_BidState
-Visitor --> UC_BuyNowList
-Visitor --> UC_BuyNowDetail
-Visitor --> UC_DownloadDoc
-Visitor --> UC_ViewSeller
-Visitor --> UC_Static
-Visitor --> UC_Language
-Visitor --> UC_SignUp
-Visitor --> UC_Login
-Visitor --> UC_ResetPassword
+Visitor -- UC_Home
+Visitor -- UC_AuctionList
+Visitor -- UC_AuctionDetail
+Visitor -- UC_BidState
+Visitor -- UC_BuyNowList
+Visitor -- UC_BuyNowDetail
+Visitor -- UC_DownloadDoc
+Visitor -- UC_ViewSeller
+Visitor -- UC_Static
+Visitor -- UC_Language
+Visitor -- UC_SignUp
+Visitor -- UC_Login
+Visitor -- UC_ResetPassword
 
-User --> UC_Logout
-User --> UC_Account
-User --> UC_AccountBids
-User --> UC_AccountWatchlist
-User --> UC_AccountOrders
-User --> UC_AccountSelling
-User --> UC_RegisterAuction
-User --> UC_Deposit
-User --> UC_CancelRegistration
-User --> UC_PlaceBid
-User --> UC_Watchlist
-User --> UC_AddCart
-User --> UC_CompleteOrder
-User --> UC_BuyNowOrder
-User --> UC_PaymentConfirmation
-User --> UC_Refund
-User --> UC_ViewNotifications
-User --> UC_RegisterDevice
-User --> UC_MarkNotifications
+User -- UC_Logout
+User -- UC_Account
+User -- UC_AccountBids
+User -- UC_AccountWatchlist
+User -- UC_AccountOrders
+User -- UC_AccountSelling
+User -- UC_RegisterAuction
+User -- UC_Deposit
+User -- UC_CancelRegistration
+User -- UC_PlaceBid
+User -- UC_Watchlist
+User -- UC_AddCart
+User -- UC_CompleteOrder
+User -- UC_BuyNowOrder
+User -- UC_PaymentConfirmation
+User -- UC_Refund
+User -- UC_ViewNotifications
+User -- UC_RegisterDevice
+User -- UC_MarkNotifications
 
-Seller --> UC_CreateAuction
-Seller --> UC_CreateBuyNow
-Seller --> UC_EditOwnListing
-Seller --> UC_DeleteOwnListing
-Seller --> UC_TrackSubmissions
+Seller -- UC_CreateAuction
+Seller -- UC_CreateBuyNow
+Seller -- UC_EditOwnListing
+Seller -- UC_DeleteOwnListing
+Seller -- UC_TrackSubmissions
 
-Admin --> UC_AdminAuth
-Admin --> UC_AdminDashboard
-Admin --> UC_AdminUsers
-Admin --> UC_AdminCategories
-Admin --> UC_AdminProducts
-Admin --> UC_AdminAuctions
-Admin --> UC_VerifyAuctions
-Admin --> UC_AdminBuyNow
-Admin --> UC_AdminComplaints
-Admin --> UC_AdminPermissions
-Admin --> UC_FraudAlerts
-Admin --> UC_RefundDeposit
+Admin -- UC_AdminAuth
+Admin -- UC_AdminDashboard
+Admin -- UC_AdminUsers
+Admin -- UC_AdminCategories
+Admin -- UC_AdminProducts
+Admin -- UC_AdminAuctions
+Admin -- UC_VerifyAuctions
+Admin -- UC_AdminBuyNow
+Admin -- UC_AdminComplaints
+Admin -- UC_AdminPermissions
+Admin -- UC_FraudAlerts
+Admin -- UC_RefundDeposit
 
-UC_SignUp ..> UC_ConfirmEmail : <<include>>
-UC_RegisterAuction ..> UC_Deposit : <<include when deposit required>>
-UC_Deposit ..> UC_PayPalCheckout : <<include>>
-UC_CompleteOrder ..> UC_PayPalCheckout : <<include>>
-UC_BuyNowOrder ..> UC_PayPalCheckout : <<include>>
-UC_PlaceBid ..> UC_BidChallenge : <<extend when suspicious>>
-UC_PlaceBid ..> UC_DetectFraud : <<include>>
-UC_AdminAuctions ..> UC_AdminAuctionPhase : <<include>>
-UC_AdminAuctions ..> UC_FraudAlerts : <<extend>>
-UC_VerifyAuctions ..> UC_SendNotification : <<include>>
-UC_AdminComplaints ..> UC_SendNotification : <<include>>
-UC_FinalizeAuctions ..> UC_NonPayment : <<extend>>
-UC_SendNotification --> NotifyProvider
-UC_PayPalCheckout --> PayPal
-PayPal --> UC_PaymentConfirmation
+UC_SignUp --> UC_ConfirmEmail : <<include>>
+UC_RegisterAuction --> UC_Deposit : <<include>>
+UC_Deposit --> UC_PayPalCheckout : <<include>>
+UC_CompleteOrder --> UC_PayPalCheckout : <<include>>
+UC_BuyNowOrder --> UC_PayPalCheckout : <<include>>
+UC_DetectFraud --> UC_PlaceBid : <<extend>>
+UC_BidChallenge --> UC_PlaceBid : <<extend>>
+UC_AdminAuctions --> UC_AdminAuctionPhase : <<include>>
+UC_FraudAlerts --> UC_AdminAuctions : <<extend>>
+UC_VerifyAuctions --> UC_SendNotification : <<include>>
+UC_AdminComplaints --> UC_SendNotification : <<include>>
+UC_NonPayment --> UC_FinalizeAuctions : <<extend>>
+UC_SendNotification -- NotifyProvider
+UC_PayPalCheckout -- PayPal
+PayPal -- UC_PaymentConfirmation
 
 @enduml
 ```
