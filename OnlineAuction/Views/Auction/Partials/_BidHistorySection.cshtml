@@ -60,7 +60,7 @@
       </tbody>
     </table>
   </div>
-  @if (Model.BidCount > OnlineAuction.Services.ProductDetailMapper.BidHistoryPreviewLimit)
+  @if (Model.BidCount > Model.BidHistory.Count)
   {
     <div id="bidHistoryFooter" class="border-t border-slate-100 px-5 py-3 text-center">
       <a asp-controller="Auction"

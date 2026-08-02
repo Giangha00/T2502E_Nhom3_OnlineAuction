@@ -11,23 +11,23 @@ public sealed class BidFraudDetectionSettings
     /// <summary>
     /// Hard limit: bids per minute per user per auction. Exceeding returns HTTP 429 (no bid insert).
     /// </summary>
-    public int MaxBidsPerMinutePerUser { get; set; } = 10;
+    public int MaxBidsPerMinutePerUser { get; set; } = 30;
 
     /// <summary>
     /// Hard limit: total bids per minute on an auction (all users).
     /// </summary>
-    public int MaxBidsPerMinutePerAuction { get; set; } = 30;
+    public int MaxBidsPerMinutePerAuction { get; set; } = 120;
 
     /// <summary>
     /// Hard limit: bids per minute per IP per auction.
     /// </summary>
-    public int MaxBidsPerMinutePerIp { get; set; } = 20;
+    public int MaxBidsPerMinutePerIp { get; set; } = 60;
 
-    public int SameIpAccountThreshold { get; set; } = 2;
+    public int SameIpAccountThreshold { get; set; } = 4;
 
-    public int RapidBidWindowSeconds { get; set; } = 60;
+    public int RapidBidWindowSeconds { get; set; } = 20;
 
-    public int RapidBidCountThreshold { get; set; } = 5;
+    public int RapidBidCountThreshold { get; set; } = 12;
 
     public int CollusionRoundTripThreshold { get; set; } = 3;
 
@@ -46,7 +46,7 @@ public sealed class BidFraudDetectionSettings
     /// <summary>
     /// Action when a high-severity fraud rule fires: Alert, Reject, or ShadowBan.
     /// </summary>
-    public string HighSeverityAction { get; set; } = HighSeverityBidActions.ShadowBan;
+    public string HighSeverityAction { get; set; } = HighSeverityBidActions.Alert;
 
     /// <summary>
     /// Temporary shadow-ban duration after a high-severity hit (when action is ShadowBan).
@@ -64,7 +64,7 @@ public sealed class BidFraudDetectionSettings
     /// Soft threshold: after this many bids/minute (user+auction), a challenge token is required.
     /// Must be less than or equal to <see cref="MaxBidsPerMinutePerUser"/> to be useful.
     /// </summary>
-    public int ChallengeAfterBidsPerMinute { get; set; } = 8;
+    public int ChallengeAfterBidsPerMinute { get; set; } = 25;
 
     /// <summary>
     /// When true, a fraud alert marks the user as requiring a challenge on the next bid.
