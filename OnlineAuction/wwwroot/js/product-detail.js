@@ -283,7 +283,7 @@
     }
 
     var rawAmount = parseBidInput(bidInput ? bidInput.value : '');
-    var amount = Number.isNaN(rawAmount) ? getMinBid() : snapBidAmount(rawAmount);
+    var amount = Number.isNaN(rawAmount) ? getMinBid() : rawAmount;
     var minBid = getMinBid();
     bidDecreaseBtn.disabled = !canPlaceBid || Number.isNaN(amount) || amount <= minBid;
     bidIncreaseBtn.disabled = !canPlaceBid;
@@ -739,7 +739,6 @@
         return;
       }
 
-      setBidInputValue(snapBidAmount(rawAmount));
       clearBidFeedback();
     });
 
@@ -749,12 +748,6 @@
         if (placeBidBtn) {
           placeBidBtn.click();
           return;
-        }
-
-        var rawAmount = parseBidInput(bidInput.value);
-        var minBid = getMinBid();
-        if (!Number.isNaN(rawAmount) && rawAmount >= minBid) {
-          setBidInputValue(snapBidAmount(rawAmount));
         }
 
         bidInput.blur();
@@ -777,7 +770,7 @@
       var minBid = getMinBid();
       var current = Number.isNaN(rawAmount) || rawAmount < minBid
         ? minBid
-        : snapBidAmount(rawAmount);
+        : rawAmount;
       var next = Math.max(minBid, current - bidStep);
       setBidInputValue(next);
       clearBidFeedback();
@@ -794,7 +787,7 @@
       var minBid = getMinBid();
       var current = Number.isNaN(rawAmount) || rawAmount < minBid
         ? minBid
-        : snapBidAmount(rawAmount);
+        : rawAmount;
       setBidInputValue(current + bidStep);
       clearBidFeedback();
     });
@@ -830,7 +823,7 @@
         return;
       }
 
-      var amount = snapBidAmount(rawAmount);
+      var amount = rawAmount;
       if (Number.isNaN(amount) || amount < minBid) {
         showBidFeedback(formatBidTooLowMessage(minBid));
         return;
@@ -915,7 +908,7 @@
   startCountdown();
 
   if (bidInput && canPlaceBid) {
-    var initialAmount = snapBidAmount(parseBidInput(bidInput.value));
+    var initialAmount = parseBidInput(bidInput.value);
     setBidInputValue(Number.isNaN(initialAmount) ? getMinBid() : initialAmount);
   }
 })();

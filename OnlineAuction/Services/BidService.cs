@@ -310,29 +310,7 @@ public class BidService : IBidService
             return $"Your bid must be at least ${minBid:N0}.";
         }
 
-        if (!IsValidBidIncrement(auction.CurrentPrice, auction.BidStep, amount))
-        {
-            return $"Your bid must increase by at least ${auction.BidStep:N0} per step.";
-        }
-
         return null;
-    }
-
-    private static bool IsValidBidIncrement(decimal currentPrice, decimal bidStep, decimal amount)
-    {
-        if (bidStep <= 0)
-        {
-            return false;
-        }
-
-        var increment = amount - currentPrice;
-        if (increment < bidStep)
-        {
-            return false;
-        }
-
-        var steps = increment / bidStep;
-        return steps == decimal.Truncate(steps);
     }
 
     public async Task<AuctionBidStateViewModel?> GetBidStateAsync(
