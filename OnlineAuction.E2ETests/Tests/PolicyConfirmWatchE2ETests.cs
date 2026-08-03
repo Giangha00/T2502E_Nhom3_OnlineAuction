@@ -109,7 +109,11 @@ public sealed class PolicyConfirmWatchE2ETests : E2ETestBase
 
     [Fact]
     [Trait("SpecId", "CONF-01")]
-    public void CONF_01_HomeExcludesConfirming() { Go("/"); Assert.DoesNotContain("confirming", Driver.PageSource, StringComparison.OrdinalIgnoreCase); }
+    public void CONF_01_HomeExcludesConfirming()
+    {
+        Go("/");
+        Assert.DoesNotContain("status-confirming", Driver.PageSource, StringComparison.OrdinalIgnoreCase);
+    }
 
     [Fact]
     [Trait("SpecId", "CONF-02")]

@@ -269,7 +269,7 @@ public sealed class SetupAuthAdminE2ETests : E2ETestBase
         var canPlace = E2EWait.DomAttr(panel, "data-can-place-bid") == "true";
         if (canPlace && Driver.FindElements(E2ESelectors.PlaceBid).Count > 0)
         {
-            Driver.FindElement(E2ESelectors.PlaceBid).Click();
+            E2EWait.SafeClick(Driver, Driver.FindElement(E2ESelectors.PlaceBid));
             E2EWait.Until(Driver, d => d.FindElements(E2ESelectors.BidPanel).Count > 0, TimeSpan.FromSeconds(3));
         }
 

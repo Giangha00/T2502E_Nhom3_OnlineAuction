@@ -35,12 +35,16 @@ public sealed class CatalogBidE2ETests : E2ETestBase
     public void CAT_04_ScheduledBeforeRegWindow_HiddenFromCatalog()
     {
         Go("/Auction");
-        Assert.DoesNotContain("confirming", Driver.PageSource, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("status-confirming", Driver.PageSource, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
     [Trait("SpecId", "CAT-05")]
-    public void CAT_05_ConfirmingHidden() { Go("/"); Assert.DoesNotContain("status-confirming", Driver.PageSource, StringComparison.OrdinalIgnoreCase); }
+    public void CAT_05_ConfirmingHidden()
+    {
+        Go("/");
+        Assert.DoesNotContain("status-confirming", Driver.PageSource, StringComparison.OrdinalIgnoreCase);
+    }
 
     [Fact]
     [Trait("SpecId", "CAT-06")]

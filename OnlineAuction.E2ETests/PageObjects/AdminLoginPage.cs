@@ -18,13 +18,14 @@ public sealed class AdminLoginPage
         var passwordEl = E2EWait.Visible(_driver, E2ESelectors.AdminPassword);
         passwordEl.Clear();
         passwordEl.SendKeys(password);
-        E2EWait.Visible(_driver, E2ESelectors.AdminLoginSubmit).Click();
+        E2EWait.SafeClick(_driver, E2EWait.Visible(_driver, E2ESelectors.AdminLoginSubmit));
         E2EWait.Until(
             _driver,
-            d => d.Url.Contains("/Admin", StringComparison.OrdinalIgnoreCase)
-                 && !d.Url.Contains("Login", StringComparison.OrdinalIgnoreCase)
-                 || HasValidationErrors(),
-            TimeSpan.FromSeconds(12));
+            d => (d.Url.Contains("/Admin", StringComparison.OrdinalIgnoreCase)
+                  && !d.Url.Contains("Login", StringComparison.OrdinalIgnoreCase))
+                 || HasValidationErrors()
+                 || E2EAuthHelper.HasAdminCookie(d),
+            TimeSpan.FromSeconds(20));
     }
 
     public bool HasValidationErrors() =>

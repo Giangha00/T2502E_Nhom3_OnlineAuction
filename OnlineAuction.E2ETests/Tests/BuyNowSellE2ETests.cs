@@ -88,7 +88,7 @@ public sealed class BuyNowSellE2ETests : E2ETestBase
         E2EAuthHelper.LoginUser(Driver, Config);
         Go("/Sell/Create");
         var submit = Driver.FindElements(By.CssSelector("button[type='submit'], input[type='submit']"));
-        if (submit.Count > 0) submit[0].Click();
+        if (submit.Count > 0) E2EWait.SafeClick(Driver, submit[0]);
         Assert.True(Driver.PageSource.Length > 0);
     }
 

@@ -65,4 +65,19 @@ public static class E2EWait
 #pragma warning restore CS0618
         }
     }
+
+    /// <summary>
+    /// Click via JS to avoid Chrome "Timed out receiving message from renderer" on navigations.
+    /// </summary>
+    public static void SafeClick(IWebDriver driver, IWebElement element)
+    {
+        try
+        {
+            ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", element);
+        }
+        catch (WebDriverException)
+        {
+            element.Click();
+        }
+    }
 }

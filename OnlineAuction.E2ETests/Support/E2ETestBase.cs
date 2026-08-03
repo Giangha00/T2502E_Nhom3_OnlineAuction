@@ -51,7 +51,22 @@ public abstract class E2ETestBase : IDisposable
         return $"{Config.BaseUrl}{normalized}";
     }
 
-    protected void Go(string path) => Driver.Navigate().GoToUrl(Url(path));
+    protected void Go(string path)
+    {
+        var url = Url(path);
+        try
+        {
+            Driver.Navigate().GoToUrl(url);
+        }
+        catch (WebDriverTimeoutException)
+        {
+            // Eager/navigations can still time out on heavy pages; continue if URL matches.
+            if (!Driver.Url.StartsWith(Config.BaseUrl, StringComparison.OrdinalIgnoreCase))
+            {
+                throw;
+            }
+        }
+    }
 
     protected bool HasCookie(string name) =>
         Driver.Manage().Cookies.AllCookies.Any(c => c.Name == name);

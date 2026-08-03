@@ -25,7 +25,7 @@ public sealed class AuthModalPage
     {
         var openBy = tab == "signup" ? E2ESelectors.AuthOpenSignup : E2ESelectors.AuthOpenLogin;
         var btn = E2EWait.Visible(_driver, openBy);
-        btn.Click();
+        E2EWait.SafeClick(_driver, btn);
         E2EWait.Visible(_driver, E2ESelectors.AuthModal);
 
         // Ensure the correct inner tab is active after overlay opens.
@@ -35,7 +35,7 @@ public sealed class AuthModalPage
             var inner = _driver.FindElement(innerTab);
             if (inner.Displayed)
             {
-                inner.Click();
+                E2EWait.SafeClick(_driver, inner);
             }
         }
     }
@@ -49,11 +49,11 @@ public sealed class AuthModalPage
         var passwordEl = E2EWait.Visible(_driver, E2ESelectors.ModalPassword);
         passwordEl.Clear();
         passwordEl.SendKeys(password);
-        E2EWait.Visible(_driver, E2ESelectors.AuthLoginSubmit).Click();
+        E2EWait.SafeClick(_driver, E2EWait.Visible(_driver, E2ESelectors.AuthLoginSubmit));
         E2EWait.Until(
             _driver,
             d => IsLoggedInHeader() || IsErrorVisible() || E2EAuthHelper.HasUserCookie(d),
-            TimeSpan.FromSeconds(12));
+            TimeSpan.FromSeconds(20));
     }
 
     public void SignUp(string fullName, string email, string phone, string password, string confirmPassword)
@@ -64,11 +64,11 @@ public sealed class AuthModalPage
         E2EWait.Visible(_driver, E2ESelectors.ModalPhone).SendKeys(phone);
         E2EWait.Visible(_driver, E2ESelectors.ModalSignupPassword).SendKeys(password);
         E2EWait.Visible(_driver, E2ESelectors.ModalConfirmPassword).SendKeys(confirmPassword);
-        E2EWait.Visible(_driver, E2ESelectors.AuthSignupSubmit).Click();
+        E2EWait.SafeClick(_driver, E2EWait.Visible(_driver, E2ESelectors.AuthSignupSubmit));
         E2EWait.Until(
             _driver,
             d => IsLoggedInHeader() || IsErrorVisible() || E2EAuthHelper.HasUserCookie(d),
-            TimeSpan.FromSeconds(12));
+            TimeSpan.FromSeconds(20));
     }
 
     public bool IsErrorVisible()
