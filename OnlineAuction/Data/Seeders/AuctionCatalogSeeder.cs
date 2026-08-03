@@ -1319,37 +1319,35 @@ public static class AuctionCatalogSeeder
             return;
         }
 
+        var bidderIds = bidders.Select(bidder => bidder.Id).ToList();
+
         var auction = await dbContext.Auctions
             .Include(item => item.Product)
             .Include(item => item.Bids)
             .Include(item => item.Registrations)
-            .FirstOrDefaultAsync(item =>
+            .Where(item =>
                 item.DeletedAt == null &&
                 item.Product.DeletedAt == null &&
                 item.ListingType == ListingTypes.Auction &&
                 item.AuctionEventName == SpreadsheetAuctionCatalog.TestAuctionEventName &&
-                item.Product.Name == SpreadsheetAuctionCatalog.FullFlowDemoProductName);
+                item.Product.Name == SpreadsheetAuctionCatalog.FullFlowDemoProductName)
+            .OrderByDescending(item => item.Registrations.Count(r =>
+                r.DeletedAt == null &&
+                r.Status == AuctionRegistrationStatuses.Approved &&
+                bidderIds.Contains(r.UserId)))
+            .ThenByDescending(item => item.Bids.Count(b => b.DeletedAt == null))
+            .ThenByDescending(item => item.Id)
+            .FirstOrDefaultAsync();
 
         if (auction is null)
         {
             return;
         }
 
-        if (auction.Status is not (AuctionStatuses.Live or AuctionStatuses.EndingSoon))
-        {
-            auction.Status = AuctionStatuses.Live;
-        }
-
-        if (auction.StartDate >= now)
-        {
-            auction.StartDate = now.AddMinutes(-30);
-        }
-
-        if (auction.EndDate <= now)
-        {
-            auction.EndDate = now.AddHours(2);
-        }
-
+        // Live bidding demo: 3 best sellers already registered + bidding, ~10 minutes left.
+        auction.Status = AuctionStatuses.Live;
+        auction.StartDate = now.AddMinutes(-30);
+        auction.EndDate = now.AddMinutes(10);
         auction.RegistrationStartDate = auction.StartDate.AddDays(-1);
         auction.RegistrationEndDate = auction.StartDate.AddMinutes(-5);
         auction.RequiresRegistration = true;
