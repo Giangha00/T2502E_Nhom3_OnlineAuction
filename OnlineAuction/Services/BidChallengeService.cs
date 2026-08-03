@@ -32,8 +32,13 @@ public sealed class BidChallengeService : IBidChallengeService
             return new BidChallengeRequirement(false, BidChallengeProviders.None);
         }
 
-        var flagged = await _cache.GetStringAsync(Key(userId), cancellationToken);
         var overSoftLimit = bidsInCurrentWindow >= _settings.ChallengeAfterBidsPerMinute;
+        if (!_settings.ChallengeAfterFraudAlert)
+        {
+            return new BidChallengeRequirement(overSoftLimit, _settings.ChallengeProvider);
+        }
+
+        var flagged = await _cache.GetStringAsync(Key(userId), cancellationToken);
         var required = !string.IsNullOrEmpty(flagged) || overSoftLimit;
 
         return new BidChallengeRequirement(required, _settings.ChallengeProvider);
