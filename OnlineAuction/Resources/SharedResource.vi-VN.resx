@@ -948,6 +948,9 @@
   <data name="Js_ProductDetail_PlacingBid" xml:space="preserve"><value>Đang đặt giá…</value></data>
   <data name="Js_ProductDetail_BidFailed" xml:space="preserve"><value>Không thể đặt giá. Vui lòng thử lại.</value></data>
   <data name="Js_ProductDetail_BidTooLow" xml:space="preserve"><value>Giá đặt phải ít nhất {0}. Vui lòng nhập mức cao hơn mức tối thiểu.</value></data>
+  <data name="ConfirmModal_Bid_Title" xml:space="preserve"><value>Xác nhận đặt giá?</value></data>
+  <data name="ConfirmModal_Bid_Message" xml:space="preserve"><value>Bạn có chắc chắn muốn bid {0} không?</value></data>
+  <data name="ConfirmModal_Bid_Confirm" xml:space="preserve"><value>Đặt giá</value></data>
   <data name="Js_ProductDetail_BidSuccess" xml:space="preserve"><value>Đặt giá thành công!</value></data>
   <data name="Js_ProductDetail_AuctionEnded" xml:space="preserve"><value>Phiên đấu giá đã kết thúc</value></data>
   <data name="Js_ProductDetail_Registering" xml:space="preserve"><value>Đang đăng ký…</value></data>
