@@ -171,7 +171,7 @@ public class OrderCreationService : IOrderCreationService
 
         var winningBid = await _dbContext.Bids
             .Where(bid => bid.AuctionId == auctionId && bid.IsWinning)
-            .OrderByDescending(bid => bid.Amount)
+            .OrderByDescending(bid => (double)bid.Amount)
             .ThenByDescending(bid => bid.PlacedAt)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -289,7 +289,7 @@ public class OrderCreationService : IOrderCreationService
                 cancellationToken)
             : await _dbContext.Bids
                 .Where(bid => bid.AuctionId == auctionId && bid.IsWinning)
-                .OrderByDescending(bid => bid.Amount)
+                .OrderByDescending(bid => (double)bid.Amount)
                 .ThenByDescending(bid => bid.PlacedAt)
                 .FirstOrDefaultAsync(cancellationToken);
 

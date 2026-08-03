@@ -78,8 +78,8 @@
         }
     }
     var filterAttrs = Model.EnableFiltering
-        ? $"data-id=\"{item.Id}\" data-name=\"{item.Name.ToLowerInvariant()}\" data-category=\"{item.Category}\" data-price=\"{item.CurrentPrice}\" data-time=\"{item.TimeRemaining}\" data-year=\"{item.Year}\" data-grade=\"{gradeNumber}\" data-authenticator=\"{item.Authenticator}\" data-phase=\"{item.ListingPhase}\" data-ending-soon=\"{isEndingSoon.ToString().ToLowerInvariant()}\""
-        : "";
+        ? $"data-e2e=\"auction-card\" data-id=\"{item.Id}\" data-name=\"{item.Name.ToLowerInvariant()}\" data-category=\"{item.Category}\" data-price=\"{item.CurrentPrice}\" data-time=\"{item.TimeRemaining}\" data-year=\"{item.Year}\" data-grade=\"{gradeNumber}\" data-authenticator=\"{item.Authenticator}\" data-phase=\"{item.ListingPhase}\" data-ending-soon=\"{isEndingSoon.ToString().ToLowerInvariant()}\""
+        : $"data-e2e=\"auction-card\" data-id=\"{item.Id}\"";
     var priceLabelKey = isWon
         ? "Card_WinningBid"
         : isBuyNow
@@ -141,7 +141,7 @@ else if (variant == "compact")
 }
 else if (variant == "home")
 {
-    <article class="rarecard-card rarecard-card--home group h-full">
+    <article class="rarecard-card rarecard-card--home group h-full" data-e2e="auction-card" data-id="@item.Id">
         <div class="rarecard-card__shell overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition duration-300 group-hover:shadow-lg">
             <a asp-controller="@(isBuyNow ? "BuyNow" : "Auction")"
                asp-action="Detail"
@@ -219,7 +219,7 @@ else if (variant == "home")
 }
 else if (variant == "related")
 {
-    <article class="rarecard-card rarecard-card--related group">
+    <article class="rarecard-card rarecard-card--related group" data-e2e="auction-card" data-id="@item.Id">
         <div class="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm transition hover:shadow-md">
             <a asp-controller="@(isWon ? "Order" : isBuyNow ? "BuyNow" : "Auction")"
                asp-action="@(isWon ? "Index" : "Detail")"
@@ -290,6 +290,7 @@ else
                     {
                         <button type="button"
                                 data-watchlist-toggle
+                                data-e2e="watchlist-toggle"
                                 data-auction-id="@item.Id"
                                 data-watched="@(Model.IsWatched ? "true" : "false")"
                                 aria-pressed="@(Model.IsWatched ? "true" : "false")"

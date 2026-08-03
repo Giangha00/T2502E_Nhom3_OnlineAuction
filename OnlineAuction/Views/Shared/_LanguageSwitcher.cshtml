@@ -17,7 +17,7 @@
     var current = languages.FirstOrDefault(l => l.Code == currentCulture) ?? languages[0];
 }
 
-<div class="relative" id="languageSwitcher">
+<div class="relative" id="languageSwitcher" data-e2e="language-switcher">
     <button type="button"
             id="languageButton"
             class="flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-blue-300 hover:text-blue-700"
@@ -38,7 +38,7 @@
         <div class="border-b border-slate-100 px-4 py-2.5">
             <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">@Localizer["Language"]</p>
         </div>
-        <form asp-controller="Language" asp-action="SetLanguage" method="post">
+        <form asp-controller="Language" asp-action="SetLanguage" method="post" data-e2e="language-form">
             <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
 
             @foreach (var lang in languages)

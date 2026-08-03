@@ -162,7 +162,7 @@
                     @if (isLoggedIn)
                     {
                         <div class="relative hidden lg:block" id="userMenuRoot">
-                            <button type="button" id="userMenuBtn"
+                            <button type="button" id="userMenuBtn" data-e2e="user-menu"
                                     class="flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white py-1.5 pl-2 pr-3 text-sm font-medium text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
                                     aria-haspopup="true" aria-expanded="false" aria-controls="userMenuPanel">
                                 <span class="account-sidebar__avatar account-sidebar__avatar--sm">@userInitials</span>
@@ -180,10 +180,10 @@
                     else
                     {
                         <div class="hidden items-center gap-2 lg:flex">
-                            <button type="button" data-auth-tab="login" class="@loginBtnClass">
+                            <button type="button" data-auth-tab="login" data-e2e="auth-open-login" class="@loginBtnClass">
                                 @Localizer["Login"]
                             </button>
-                            <button type="button" data-auth-tab="signup" class="@signUpBtnClass">
+                            <button type="button" data-auth-tab="signup" data-e2e="auth-open-signup" class="@signUpBtnClass">
                                 @Localizer["SignUp"]
                             </button>
                         </div>
@@ -254,7 +254,7 @@
         </header>
     }
 
-    <main>
+    <main data-e2e="site-main">
         @RenderBody()
     </main>
 

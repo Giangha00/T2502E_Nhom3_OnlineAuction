@@ -25,6 +25,7 @@
 }
 
 <div class="product-bid-panel"
+     data-e2e="bid-panel"
      data-is-logged-in="@(isLoggedIn ? "true" : "false")"
      data-auction-id="@Model.Id"
      data-end-date="@endDateIso"
@@ -112,7 +113,7 @@
         @if (!Model.IsRegistered && showRegistrationFlow)
         {
           <p class="mb-3 text-sm text-slate-600">@Localizer["Product_MustRegisterToBid"]</p>
-          <button type="button" id="registerAuctionBtn"
+          <button type="button" id="registerAuctionBtn" data-e2e="register-btn"
                   class="flex w-full items-center justify-center rounded-md bg-slate-900 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800">
             @Localizer["Product_RegisterForAuction"]
           </button>
@@ -151,6 +152,7 @@
                      inputmode="numeric"
                      id="bidAmount"
                      name="bidAmount"
+                     data-e2e="bid-amount"
                      value="@minBid.ToString("0.##")"
                      autocomplete="off"
                      class="w-full border-0 bg-transparent py-3 pl-7 pr-3 text-center text-sm font-semibold tabular-nums text-slate-800 outline-none"
@@ -170,7 +172,7 @@
           <p id="bidFeedback" class="mt-2 hidden text-xs font-medium text-red-600" role="alert"></p>
         </div>
 
-        <button type="button" id="placeBidBtn"
+        <button type="button" id="placeBidBtn" data-e2e="place-bid"
                 class="mt-4 flex w-full items-center justify-center rounded-md bg-slate-900 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
                 @(!Model.RequiresRegistration || Model.CanBid ? null : "disabled")>
           @Localizer["Product_Bid"]

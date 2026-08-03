@@ -11,7 +11,7 @@
     var devOtp = TempData["PasswordResetOtp"] as string;
 }
 
-<div id="authModalOverlay" class="home-auth-overlay home-auth-overlay--hidden" aria-hidden="true" hidden>
+<div id="authModalOverlay" class="home-auth-overlay home-auth-overlay--hidden" aria-hidden="true" hidden data-e2e="auth-modal">
   <div class="home-auth-backdrop" id="authModalBackdrop"></div>
   <div class="home-auth-modal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
     <div class="home-auth-modal__grid">
@@ -54,6 +54,7 @@
         <div id="authModalAlerts"
              class="home-auth-alerts"
              aria-live="polite"
+             data-e2e="auth-error"
              data-auth-error="@authError"
              data-auth-success="@authSuccess"></div>
 
@@ -85,7 +86,7 @@
                 @Localizer["Auth_ForgotPassword"]
               </button>
             </div>
-            <button type="submit" class="home-auth-submit">@Localizer["Auth_Continue"]</button>
+            <button type="submit" class="home-auth-submit" data-e2e="auth-login-submit">@Localizer["Auth_Continue"]</button>
           </form>
         </div>
 
@@ -196,7 +197,7 @@
               <label class="home-auth-field__label" for="modalConfirmPassword">@Localizer["Auth_ConfirmPassword"]</label>
               <input name="confirmPassword" id="modalConfirmPassword" type="password" placeholder="@Localizer["Auth_Placeholder_ConfirmPassword"]" required class="home-auth-input"/>
             </div>
-            <button type="submit" class="home-auth-submit">@Localizer["Auth_CreateAccount"]</button>
+            <button type="submit" class="home-auth-submit" data-e2e="auth-signup-submit">@Localizer["Auth_CreateAccount"]</button>
           </form>
         </div>
         </div>

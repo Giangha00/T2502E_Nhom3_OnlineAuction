@@ -760,9 +760,9 @@ public class AuctionHouseDbContext : IdentityDbContext<ApplicationUser, Identity
             entity.Property(n => n.UserId).HasColumnName("user_id");
             entity.Property(n => n.Title).HasColumnName("title").HasMaxLength(200).IsRequired();
             entity.Property(n => n.Message).HasColumnName("message").HasMaxLength(500).IsRequired();
+            // Avoid nvarchar(max): EnsureCreated on SQLite rejects SQL Server type names.
             entity.Property(n => n.LocalizationArgsJson)
-                .HasColumnName("localization_args_json")
-                .HasColumnType("nvarchar(max)");
+                .HasColumnName("localization_args_json");
             entity.Property(n => n.Type).HasColumnName("type").HasMaxLength(30).IsRequired();
             entity.Property(n => n.RelatedUrl).HasColumnName("related_url").HasMaxLength(260);
             entity.Property(n => n.IsRead).HasColumnName("is_read");

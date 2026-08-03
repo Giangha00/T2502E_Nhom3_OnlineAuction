@@ -4,8 +4,8 @@
     ViewData["Title"] = "Admin Login";
 }
 
-<div class="flex min-h-screen items-center justify-center px-4 py-10">
-    <div class="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
+<div class="flex min-h-screen items-center justify-center px-4 py-10" data-e2e-page="admin-login">
+    <div class="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-theme-lg dark:border-gray-800 dark:bg-gray-900" data-e2e="admin-login">
         <div class="mb-8 text-center">
             <img class="mx-auto h-12 dark:hidden" src="~/admin/images/logo/auth-logo.svg" alt="CardMaket Admin" asp-append-version="true" />
             <img class="mx-auto hidden h-12 dark:block" src="~/admin/images/logo/logo-dark.svg" alt="CardMaket Admin" asp-append-version="true" />
@@ -15,7 +15,7 @@
 
         <div asp-validation-summary="ModelOnly" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
 
-        <form asp-area="Admin" asp-controller="Account" asp-action="Login" method="post" class="space-y-5">
+        <form asp-area="Admin" asp-controller="Account" asp-action="Login" method="post" class="space-y-5" data-e2e="admin-login-form">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="ReturnUrl" />
 
@@ -24,6 +24,7 @@
                 <input asp-for="Email"
                        type="email"
                        autocomplete="username"
+                       data-e2e="admin-email"
                        placeholder="admin@auctionhouse.com"
                        class="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white/90" />
                 <span asp-validation-for="Email" class="mt-1 block text-xs text-red-600"></span>
@@ -34,6 +35,7 @@
                 <input asp-for="Password"
                        type="password"
                        autocomplete="current-password"
+                       data-e2e="admin-password"
                        placeholder="Enter your password"
                        class="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white/90" />
                 <span asp-validation-for="Password" class="mt-1 block text-xs text-red-600"></span>
@@ -45,6 +47,7 @@
             </label>
 
             <button type="submit"
+                    data-e2e="admin-login-submit"
                     class="w-full rounded-lg bg-brand-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-600">
                 Sign In
             </button>

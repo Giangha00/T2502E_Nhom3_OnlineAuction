@@ -14,7 +14,7 @@ public class AddNotificationLocalizationArgs : Migration
         migrationBuilder.AddColumn<string>(
             name: "localization_args_json",
             table: "notifications",
-            type: "nvarchar(max)",
+            type: "TEXT",
             nullable: true);
     }
 

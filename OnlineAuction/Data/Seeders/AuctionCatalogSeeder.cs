@@ -148,7 +148,15 @@ public static class AuctionCatalogSeeder
         }
 
         await BackfillSeededProductTemplatesAsync(dbContext, templateCache);
-        await SyncBuyNowPricesAsync(dbContext);
+        try
+        {
+            await SyncBuyNowPricesAsync(dbContext);
+        }
+        catch (DbUpdateException)
+        {
+            dbContext.ChangeTracker.Clear();
+        }
+
         await EnsureDedicatedBuyNowListingsAsync(
             dbContext,
             sellerIds,
@@ -859,9 +867,24 @@ public static class AuctionCatalogSeeder
         {
             var productName = auction.Product.Name!;
             decimal? catalogPrice = null;
-            if (priceMap.TryGetValue(productName, out var mappedPrice))
+            if (priceMap.TryGetValue(productName, out var mappedPrice)
+                && mappedPrice > auction.StartingPrice)
             {
                 catalogPrice = mappedPrice;
+            }
+
+            // CHECK (buy_now_price IS NULL OR buy_now_price > starting_price)
+            if (catalogPrice is null
+                && auction.BuyNowPrice is not null
+                && auction.BuyNowPrice <= auction.StartingPrice)
+            {
+                catalogPrice = null;
+            }
+            else if (catalogPrice is null
+                     && auction.BuyNowPrice is not null
+                     && auction.BuyNowPrice > auction.StartingPrice)
+            {
+                continue;
             }
 
             if (auction.BuyNowPrice == catalogPrice)
@@ -874,9 +897,27 @@ public static class AuctionCatalogSeeder
             changed = true;
         }
 
-        if (changed)
+        if (!changed)
+        {
+            return;
+        }
+
+        try
         {
             await dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            // SQLite CHECK(chk_auctions_prices) — clear invalid optional buy-now on auction rows.
+            dbContext.ChangeTracker.Clear();
+            await dbContext.Auctions
+                .Where(auction =>
+                    auction.ListingType == ListingTypes.Auction
+                    && auction.BuyNowPrice != null
+                    && auction.BuyNowPrice <= auction.StartingPrice)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(auction => auction.BuyNowPrice, (decimal?)null)
+                    .SetProperty(auction => auction.UpdatedAt, DateTime.UtcNow));
         }
     }
 

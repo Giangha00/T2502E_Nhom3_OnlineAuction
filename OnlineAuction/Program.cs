@@ -406,7 +406,14 @@ using (var scope = app.Services.CreateScope())
             refreshTestAuctions,
             syncCatalog,
             app.Environment.EnvironmentName);
-        await AuctionCatalogSeeder.SeedAsync(db, userManager, refreshTestAuctions, syncCatalog);
+        try
+        {
+            await AuctionCatalogSeeder.SeedAsync(db, userManager, refreshTestAuctions, syncCatalog);
+        }
+        catch (Exception ex)
+        {
+            seedLogger.LogError(ex, "AuctionCatalogSeeder failed; continuing startup for local/E2E.");
+        }
     }
     else
     {
