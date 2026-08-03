@@ -101,6 +101,7 @@
   }
 
   var bidChallengeToken = '';
+  var bidSubmissionPending = false;
 
   function postForm(url, payload, extraHeaders) {
     var body = new URLSearchParams();
@@ -795,7 +796,7 @@
 
   if (placeBidBtn && bidPanel) {
     placeBidBtn.addEventListener('click', function () {
-      if (!canPlaceBid) {
+      if (!canPlaceBid || bidSubmissionPending) {
         return;
       }
 
@@ -829,7 +830,25 @@
         return;
       }
 
-      clearBidFeedback();
+      bidSubmissionPending = true;
+      placeBidBtn.disabled = true;
+
+      requestConfirm({
+        title: i18n.confirmBidTitle || 'Confirm bid?',
+        message: i18n.confirmBidMessage || 'Are you sure you want to bid {0}?',
+        messageArgs: [formatCurrency(amount)],
+        confirmText: i18n.confirmBidConfirm || i18n.bid || 'Bid',
+        cancelText: i18n.confirmBidCancel || 'Cancel'
+      }).then(function (confirmed) {
+        if (!confirmed) {
+          bidSubmissionPending = false;
+          if (canPlaceBid && (!requiresRegistration || canBid)) {
+            placeBidBtn.disabled = false;
+          }
+          return;
+        }
+
+        clearBidFeedback();
       setBidInputValue(amount);
       placeBidBtn.disabled = true;
       placeBidBtn.textContent = i18n.placingBid || 'Placing bid…';
@@ -881,11 +900,13 @@
           showBidFeedback((error && error.message) || i18n.bidFailed || 'Unable to place bid. Please try again.');
         })
         .finally(function () {
+          bidSubmissionPending = false;
           if (canPlaceBid && (!requiresRegistration || canBid)) {
             placeBidBtn.disabled = false;
             placeBidBtn.textContent = i18n.bid || 'Bid';
           }
         });
+      });
     });
   }
 

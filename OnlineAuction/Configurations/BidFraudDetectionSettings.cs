@@ -53,12 +53,12 @@ public sealed class BidFraudDetectionSettings
     /// </summary>
     public int ShadowBanDurationMinutes { get; set; } = 30;
 
-    public bool ChallengeEnabled { get; set; } = true;
+    public bool ChallengeEnabled { get; set; } = false;
 
     /// <summary>
     /// Provider name: Stub (admin-configurable accepted tokens) or None.
     /// </summary>
-    public string ChallengeProvider { get; set; } = BidChallengeProviders.Stub;
+    public string ChallengeProvider { get; set; } = BidChallengeProviders.None;
 
     /// <summary>
     /// Soft threshold: after this many bids/minute (user+auction), a challenge token is required.
@@ -69,7 +69,7 @@ public sealed class BidFraudDetectionSettings
     /// <summary>
     /// When true, a fraud alert marks the user as requiring a challenge on the next bid.
     /// </summary>
-    public bool ChallengeAfterFraudAlert { get; set; } = true;
+    public bool ChallengeAfterFraudAlert { get; set; } = false;
 
     /// <summary>
     /// Tokens accepted by the Stub challenge provider (admin-configurable).

@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using OnlineAuction.Configurations;
 using OnlineAuction.Services.Interfaces;
 
 namespace OnlineAuction.Services;
@@ -6,18 +8,26 @@ namespace OnlineAuction.Services;
 public sealed class BidShadowBanService : IBidShadowBanService
 {
     private readonly IDistributedCache _cache;
+    private readonly BidFraudDetectionSettings _settings;
     private readonly ILogger<BidShadowBanService> _logger;
 
     public BidShadowBanService(
         IDistributedCache cache,
+        IOptions<BidFraudDetectionSettings> settings,
         ILogger<BidShadowBanService> logger)
     {
         _cache = cache;
+        _settings = settings.Value;
         _logger = logger;
     }
 
     public async Task<bool> IsShadowBannedAsync(int userId, CancellationToken cancellationToken = default)
     {
+        if (!string.Equals(_settings.HighSeverityAction, HighSeverityBidActions.ShadowBan, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
         var value = await _cache.GetStringAsync(Key(userId), cancellationToken);
         return !string.IsNullOrEmpty(value);
     }

@@ -1570,6 +1570,12 @@ public static class AuctionCatalogSeeder
         var auctionIds = testAuctions.Select(auction => auction.Id).ToList();
         var affectedProductIds = testAuctions.Select(auction => auction.ProductId).Distinct().ToList();
 
+        var bidIds = await dbContext.Bids
+            .AsNoTracking()
+            .Where(bid => auctionIds.Contains(bid.AuctionId))
+            .Select(bid => bid.Id)
+            .ToListAsync();
+
         var orderIds = await dbContext.OrderItems
             .AsNoTracking()
             .Where(item => auctionIds.Contains(item.AuctionId))
@@ -1595,6 +1601,12 @@ public static class AuctionCatalogSeeder
                 .Where(order => orderIds.Contains(order.Id))
                 .ExecuteDeleteAsync();
         }
+
+        await dbContext.BidFraudAlerts
+            .Where(alert =>
+                auctionIds.Contains(alert.AuctionId) ||
+                (alert.BidId != null && bidIds.Contains(alert.BidId.Value)))
+            .ExecuteDeleteAsync();
 
         await dbContext.Bids
             .Where(bid => auctionIds.Contains(bid.AuctionId))
